@@ -84,7 +84,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       72,                     /* GameModeRefresh */
                       GLUT_ACTION_EXIT,       /* ActionOnWindowClose */
                       GLUT_EXEC_STATE_INIT    /* ExecState */
-} ;
+};
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -254,8 +254,8 @@ void fgDeinitialize( void )
     fgState.UseCurrentContext   = GL_FALSE;
     fgState.GLDebugSwitch       = GL_FALSE;
     fgState.XSyncSwitch         = GL_FALSE;
-    fgState.ActionOnWindowClose = GLUT_ACTION_EXIT ;
-    fgState.ExecState           = GLUT_EXEC_STATE_INIT ;
+    fgState.ActionOnWindowClose = GLUT_ACTION_EXIT;
+    fgState.ExecState           = GLUT_EXEC_STATE_INIT;
 
     fgState.IgnoreKeyRepeat = GL_TRUE;
 
@@ -333,112 +333,111 @@ ReadInteger(char *string, char **NextString)
     int Sign = 1;
     
     if (*string == '+')
-	string++;
+        string++;
     else if (*string == '-')
     {
-	string++;
-	Sign = -1;
+        string++;
+        Sign = -1;
     }
     for (; (*string >= '0') && (*string <= '9'); string++)
     {
-	Result = (Result * 10) + (*string - '0');
+        Result = (Result * 10) + (*string - '0');
     }
     *NextString = string;
     if (Sign >= 0)
-	return (Result);
+        return (Result);
     else
-	return (-Result);
+        return (-Result);
 }
 
 static int XParseGeometry (
-_Xconst char *string,
-int *x,
-int *y,
-unsigned int *width,    /* RETURN */
-unsigned int *height)    /* RETURN */
+    _Xconst char *string,
+    int *x,
+    int *y,
+    unsigned int *width,    /* RETURN */
+    unsigned int *height)    /* RETURN */
 {
-	int mask = NoValue;
-	register char *strind;
-	unsigned int tempWidth = 0, tempHeight = 0;
-	int tempX = 0, tempY = 0;
-	char *nextCharacter;
+    int mask = NoValue;
+    register char *strind;
+    unsigned int tempWidth = 0, tempHeight = 0;
+    int tempX = 0, tempY = 0;
+    char *nextCharacter;
 
-	if ( (string == NULL) || (*string == '\0')) return(mask);
-	if (*string == '=')
-		string++;  /* ignore possible '=' at beg of geometry spec */
+    if ( (string == NULL) || (*string == '\0')) return(mask);
+    if (*string == '=')
+        string++;  /* ignore possible '=' at beg of geometry spec */
 
-	strind = (char *)string;
-	if (*strind != '+' && *strind != '-' && *strind != 'x') {
-		tempWidth = ReadInteger(strind, &nextCharacter);
-		if (strind == nextCharacter) 
-		    return (0);
-		strind = nextCharacter;
-		mask |= WidthValue;
-	}
+    strind = (char *)string;
+    if (*strind != '+' && *strind != '-' && *strind != 'x') {
+        tempWidth = ReadInteger(strind, &nextCharacter);
+        if (strind == nextCharacter) 
+            return (0);
+        strind = nextCharacter;
+        mask |= WidthValue;
+    }
 
-	if (*strind == 'x' || *strind == 'X') {	
-		strind++;
-		tempHeight = ReadInteger(strind, &nextCharacter);
-		if (strind == nextCharacter)
-		    return (0);
-		strind = nextCharacter;
-		mask |= HeightValue;
-	}
+    if (*strind == 'x' || *strind == 'X') {
+        strind++;
+        tempHeight = ReadInteger(strind, &nextCharacter);
+        if (strind == nextCharacter)
+            return (0);
+        strind = nextCharacter;
+        mask |= HeightValue;
+    }
 
-	if ((*strind == '+') || (*strind == '-')) {
-		if (*strind == '-') {
-  			strind++;
-			tempX = -ReadInteger(strind, &nextCharacter);
-			if (strind == nextCharacter)
-			    return (0);
-			strind = nextCharacter;
-			mask |= XNegative;
+    if ((*strind == '+') || (*strind == '-')) {
+        if (*strind == '-') {
+            strind++;
+            tempX = -ReadInteger(strind, &nextCharacter);
+            if (strind == nextCharacter)
+                return (0);
+            strind = nextCharacter;
+            mask |= XNegative;
+        }
+        else
+        {
+            strind++;
+            tempX = ReadInteger(strind, &nextCharacter);
+            if (strind == nextCharacter)
+                return(0);
+            strind = nextCharacter;
+        }
+        mask |= XValue;
+        if ((*strind == '+') || (*strind == '-')) {
+            if (*strind == '-') {
+                strind++;
+                tempY = -ReadInteger(strind, &nextCharacter);
+                if (strind == nextCharacter)
+                    return(0);
+                strind = nextCharacter;
+                mask |= YNegative;
+            }
+            else
+            {
+                strind++;
+                tempY = ReadInteger(strind, &nextCharacter);
+                if (strind == nextCharacter)
+                    return(0);
+                strind = nextCharacter;
+            }
+            mask |= YValue;
+        }
+    }
 
-		}
-		else
-		{	strind++;
-			tempX = ReadInteger(strind, &nextCharacter);
-			if (strind == nextCharacter)
-			    return(0);
-			strind = nextCharacter;
-		}
-		mask |= XValue;
-		if ((*strind == '+') || (*strind == '-')) {
-			if (*strind == '-') {
-				strind++;
-				tempY = -ReadInteger(strind, &nextCharacter);
-				if (strind == nextCharacter)
-			    	    return(0);
-				strind = nextCharacter;
-				mask |= YNegative;
+    /* If strind isn't at the end of the string the it's an invalid
+       geometry specification. */
 
-			}
-			else
-			{
-				strind++;
-				tempY = ReadInteger(strind, &nextCharacter);
-				if (strind == nextCharacter)
-			    	    return(0);
-				strind = nextCharacter;
-			}
-			mask |= YValue;
-		}
-	}
-	
-	/* If strind isn't at the end of the string the it's an invalid
-		geometry specification. */
+    if (*strind != '\0') return (0);
 
-	if (*strind != '\0') return (0);
-
-	if (mask & XValue)
-	    *x = tempX;
- 	if (mask & YValue)
-	    *y = tempY;
-	if (mask & WidthValue)
-            *width = tempWidth;
-	if (mask & HeightValue)
-            *height = tempHeight;
-	return (mask);
+    if (mask & XValue)
+        *x = tempX;
+    if (mask & YValue)
+        *y = tempY;
+    if (mask & WidthValue)
+        *width = tempWidth;
+    if (mask & HeightValue)
+        *height = tempHeight;
+    return (mask);
 }
 #endif
 
@@ -549,7 +548,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /*
      * Compact {argv}.
      */
-    j = 2 ;
+    j = 2;
     for( i = 1; i < *pargc; i++, j++ )
     {
         if( argv[ i ] == NULL )
@@ -557,7 +556,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             /* Guaranteed to end because there are "*pargc" arguments left */
             while ( argv[ j ] == NULL )
                 j++;
-            argv[ i ] = argv[ j ] ;
+            argv[ i ] = argv[ j ];
         }
     }
 
@@ -641,461 +640,203 @@ void FGAPIENTRY glutInitDisplayMode( unsigned int displayMode )
 
 /* -- INIT DISPLAY STRING PARSING ------------------------------------------ */
 
-#if 0 /* FIXME: CJP */
-/*
- * There is a discrete number of comparison operators we can encounter:
- *
- *     comparison ::= "=" | "!=" | "<" | ">" | "<=" | ">=" | "~"
- */
-#define  FG_NONE           0x0000
-#define  FG_EQUAL          0x0001
-#define  FG_NOT_EQUAL      0x0002
-#define  FG_LESS           0x0003
-#define  FG_MORE           0x0004
-#define  FG_LESS_OR_EQUAL  0x0005
-#define  FG_MORE_OR_EQUAL  0x0006
-#define  FG_CLOSEST        0x0007
-
-/*
- * The caller can feed us with a number of capability tokens:
- *
- * capability ::= "alpha" | "acca" | "acc" | "blue" | "buffer" | "conformant" | "depth" | "double" |
- *                "green" | "index" | "num" | "red" | "rgba" | "rgb" | "luminance" | "stencil" |
- *                "single" | "stereo" | "samples" | "slow" | "win32pdf" | "xvisual" | "xstaticgray" |
- *                "xgrayscale" | "xstaticcolor" | "xpseudocolor" | "xtruecolor" | "xdirectcolor"
- */
-static gchar* g_Tokens[] =
-{
-    "none", "alpha", "acca", "acc", "blue", "buffer", "conformant", "depth", "double", "green",
-    "index", "num", "red", "rgba", "rgb", "luminance", "stencil", "single", "stereo", "samples",
-    "slow", "win32pdf", "xvisual", "xstaticgray", "xgrayscale", "xstaticcolor", "xpseudocolor",
-    "xtruecolor", "xdirectcolor", NULL
-};
-
-/*
- * The structure to hold the parsed display string tokens
- */
-typedef struct tagSFG_Capability SFG_Capability;
-struct tagSFG_Capability
-{
-    gint capability;        /* the capability token enumerator */
-    gint comparison;        /* the comparison operator used    */
-    gint value;             /* the value we're comparing to    */
-};
-
-/*
- * The scanner configuration for the init display string
- */
-static GScannerConfig fgInitDisplayStringScannerConfig =
-{
-    ( " \t\r\n" )               /* cset_skip_characters     */,
-    (
-        G_CSET_a_2_z
-        "_"
-        G_CSET_A_2_Z
-    )                                        /* cset_identifier_first    */,
-    (
-        G_CSET_a_2_z
-        "_0123456789"
-        G_CSET_A_2_Z
-        G_CSET_LATINS
-        G_CSET_LATINC
-        "<>!=~"
-    )                                        /* cset_identifier_nth      */,
-    ( "#\n" )                            /* cpair_comment_single     */,
-    FALSE                                    /* case_sensitive           */,
-    TRUE                                    /* skip_comment_multi       */,
-    TRUE                                    /* skip_comment_single      */,
-    TRUE                                    /* scan_comment_multi       */,
-    TRUE                                    /* scan_identifier          */,
-    FALSE                                    /* scan_identifier_1char    */,
-    FALSE                                    /* scan_identifier_NULL     */,
-    TRUE                                    /* scan_symbols             */,
-    FALSE                                    /* scan_binary              */,
-    TRUE                                    /* scan_octal               */,
-    TRUE                                    /* scan_float               */,
-    TRUE                                    /* scan_hex                 */,
-    FALSE                                    /* scan_hex_dollar          */,
-    TRUE                                    /* scan_string_sq           */,
-    TRUE                                    /* scan_string_dq           */,
-    TRUE                                    /* numbers_2_int            */,
-    FALSE                                    /* int_2_float              */,
-    FALSE                                    /* identifier_2_string      */,
-    TRUE                                    /* char_2_token             */,
-    FALSE                                    /* symbol_2_token           */,
-    FALSE                                    /* scope_0_fallback         */,
-};
-
-/*
- * Sets the default display mode for all new windows using a string
- */
-void FGAPIENTRY glutInitDisplayString( char* displayMode )
-{
-    /*
-     * display_string ::= (switch)
-     * switch         ::= capability [comparison value]
-     * comparison     ::= "=" | "!=" | "<" | ">" | "<=" | ">=" | "~"
-     * capability     ::= "alpha" | "acca" | "acc" | "blue" | "buffer" | "conformant" |
-     *                    "depth" | "double" | "green" | "index" | "num" | "red" | "rgba" |
-     *                    "rgb" | "luminance" | "stencil" | "single" | "stereo" |
-     *                    "samples" | "slow" | "win32pdf" | "xvisual" | "xstaticgray" |
-     *                    "xgrayscale" | "xstaticcolor" | "xpseudocolor" |
-     *                    "xtruecolor" | "xdirectcolor"
-     * value          ::= 0..9 [value]
-     *
-     * The display string grammar. This should be EBNF, but I couldn't find the definitions so, to
-     * clarify: (expr) means 0 or more times the expression, [expr] means 0 or 1 times expr.
-     *
-     * Create a new GLib lexical analyzer to process the display mode string
-     */
-    GScanner* scanner = g_scanner_new( &fgInitDisplayStringScannerConfig );
-    GList* caps = NULL;
-    gint i;
-
-    /*
-     * Fail if the display mode string is empty or the scanner failed to initialize
-     */
-    freeglut_return_if_fail( (scanner != NULL) && (strlen( displayMode ) > 0) );
-
-    /*
-     * Set the scanner's input name (for debugging)
-     */
-    scanner->input_name = "glutInitDisplayString";
-
-    /*
-     * Start the lexical analysis of the extensions string
-     */
-    g_scanner_input_text( scanner, displayMode, strlen( displayMode ) );
-
-    /*
-     * While there are any more tokens to be checked...
-     */
-    while( !g_scanner_eof( scanner ) )
-    {
-        /*
-         * Actually we're expecting only string tokens
-         */
-        GTokenType tokenType = g_scanner_get_next_token( scanner );
-
-        /*
-         * We are looking for identifiers
-         */
-        if( tokenType == G_TOKEN_IDENTIFIER )
-        {
-            gchar* capability  = NULL;  /* the capability identifier string (always present) */
-            gint   capID       =    0;  /* the capability identifier value (from g_Tokens)   */
-            gint   comparison  =    0;  /* the comparison operator value, see definitions    */
-            gchar* valueString = NULL;  /* if the previous one is present, this is needed    */
-            gint   value       =    0;  /* the integer value converted using a strtol call   */
-            SFG_Capability* capStruct;  /* the capability description structure              */
-
-            /*
-             * OK. The general rule of thumb that we always should be getting a capability identifier
-             * string (see the grammar description). If it is followed by a comparison identifier, then
-             * there must follow an integer value we're comparing the capability to...
-             *
-             * Have the current token analyzed with that in mind...
-             */
-            for( i=0; i<(gint) strlen( scanner->value.v_identifier ); i++ )
-            {
-                gchar c = scanner->value.v_identifier[ i ];
-
-                if( (c == '=') || (c == '!') || (c == '<') || (c == '>') || (c == '~') )
-                    break;
-            }
-
-            /*
-             * Here we go with the length of the capability identifier string.
-             * In the worst of cases, it is as long as the token identifier.
-             */
-            capability = g_strndup( scanner->value.v_identifier, i );
-
-            /*
-             * OK. Is there a chance for comparison and value identifiers to follow?
-             * Note: checking against i+1 as this handles two cases: single character
-             * comparison operator and first of value's digits, which must always be
-             * there, or the two-character comparison operators.
-             */
-            if( (i + 1) < (gint) strlen( scanner->value.v_identifier ) )
-            {
-                /*
-                 * Yeah, indeed, it is the i-th character to start the identifier, then.
-                 */
-                gchar c1 = scanner->value.v_identifier[ i + 0 ];
-                gchar c2 = scanner->value.v_identifier[ i + 1 ];
-
-                if( (c1 == '=')                ) { i += 1; comparison = FG_EQUAL;         } else
-                if( (c1 == '!') && (c2 == '=') ) { i += 2; comparison = FG_NOT_EQUAL;     } else
-                if( (c1 == '<') && (c2 == '=') ) { i += 2; comparison = FG_LESS_OR_EQUAL; } else
-                if( (c1 == '>') && (c2 == '=') ) { i += 2; comparison = FG_MORE_OR_EQUAL; } else
-                if( (c1 == '<')                ) { i += 1; comparison = FG_LESS;          } else
-                if( (c1 == '>')                ) { i += 1; comparison = FG_MORE;          } else
-                if( (c1 == '~')                ) { i += 1; comparison = FG_CLOSEST;       } else
-                g_warning( "invalid comparison operator in token `%s'", scanner->value.v_identifier );
-            }
-
-            /*
-             * Grab the value string that must follow the comparison operator...
-             */
-            if( comparison != FG_NONE && i < (gint) strlen( scanner->value.v_identifier ) )
-            {
-                valueString = strdup( scanner->value.v_identifier + i );
-                if (!valueString)
-                    fgError ("Could not allocate an internal string.");
-            }                
-
-            /*
-             * If there was a value string, convert it to integer...
-             */
-            if( comparison != FG_NONE && strlen( valueString ) > 0 )
-                value = strtol( valueString, NULL, 0 );
-
-            /*
-             * Now we need to match the capability string and its ID
-             */
-            for( i=0; g_Tokens[ i ]!=NULL; i++ )
-            {
-                if( strcmp( capability, g_Tokens[ i ] ) == 0 )
-                {
-                    /*
-                     * Looks like we've found the one we were looking for
-                     */
-                    capID = i;
-                    break;
-                }
-            }
-
-            /*
-             * Create a new capability description structure
-             */
-            capStruct = g_new0( SFG_Capability, 1 );
-
-            /*
-             * Fill in the cap's values, as we have parsed it:
-             */
-            capStruct->capability =      capID;
-            capStruct->comparison = comparison;
-            capStruct->value      =      value;
-
-            /*
-             * Add the new capabaility to the caps list
-             */
-            caps = g_list_append( caps, capStruct );
-
-            /*
-             * Clean up the local mess and keep rolling on
-             */
-            g_free( valueString );
-            g_free( capability );
-        }
-    }
-
-    /*
-     * Now that we have converted the string into somewhat more machine-friendly
-     * form, proceed with matching the frame buffer configuration...
-     *
-     * The caps list could be passed to a function that would try finding the closest 
-     * matching pixel format, visual, frame buffer configuration or whatever. It would 
-     * be good to convert the glutInitDisplayMode() to use the same method.
-     */
-#if 0
-    g_message( "found %i capability preferences", g_list_length( caps ) );
-
-    g_message( "token `%s': cap: %i, com: %i, val: %i",
-        scanner->value.v_identifier,
-        capStruct->capability,
-        capStruct->comparison,
-        capStruct->value
-    );
-#endif
-
-    /*
-     * Free the capabilities we have parsed
-     */
-    for( i=0; i<(gint) g_list_length( caps ); i++ )
-        g_free( g_list_nth( caps, i )->data );
-
-    /*
-     * Destroy the capabilities list itself
-     */
-    g_list_free( caps );
-
-    /*
-     * Free the lexical scanner now...
-     */
-    g_scanner_destroy( scanner );
-}
-#endif
-
 #define NUM_TOKENS             28
 static char* Tokens[] =
 {
-    "alpha", "acca", "acc", "blue", "buffer", "conformant", "depth", "double", "green",
-    "index", "num", "red", "rgba", "rgb", "luminance", "stencil", "single", "stereo", "samples",
-    "slow", "win32pdf", "xvisual", "xstaticgray", "xgrayscale", "xstaticcolor", "xpseudocolor",
+    "alpha", "acca", "acc", "blue", "buffer", "conformant", "depth", "double",
+    "green", "index", "num", "red", "rgba", "rgb", "luminance", "stencil",
+    "single", "stereo", "samples", "slow", "win32pdf", "xvisual",
+    "xstaticgray", "xgrayscale", "xstaticcolor", "xpseudocolor",
     "xtruecolor", "xdirectcolor"
 };
 
 static int TokenLengths[] =
 {
-         5,      4,     3,      4,        6,           10,       5,        6,       5,
-         5,     3,     3,      4,     3,           9,         7,        6,        6,         7,
-        4,          8,         7,            11,           10,             12,             12,
-             10,             12
+    5,       4,      3,     4,      6,        10,           5,       6,
+    5,       5,       3,     3,     4,      3,     9,           7,
+    6,        6,        7,         4,      8,          7,
+    11,            10,           12,             12,
+    10,           12
 };
 
 void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 {
-  int glut_state_flag = 0 ;
-  /*
-   * Unpack a lot of options from a character string.  The options are delimited by blanks or tabs.
-   */
-  char *token ;
-  int len = strlen ( displayMode ) ;
-  char *buffer = (char *)malloc ( (len+1) * sizeof(char) ) ;
-  memcpy ( buffer, displayMode, len ) ;
-  buffer[len] = '\0' ;
-
-  token = strtok ( buffer, " \t" ) ;
-  while ( token )
-  {
+    int glut_state_flag = 0 ;
     /*
-     * Process this token
+     * Unpack a lot of options from a character string.  The options are
+     * delimited by blanks or tabs.
      */
-    int i ;
-    for ( i = 0; i < NUM_TOKENS; i++ )
+    char *token ;
+    int len = strlen ( displayMode ) ;
+    char *buffer = (char *)malloc ( (len+1) * sizeof(char) ) ;
+    memcpy ( buffer, displayMode, len ) ;
+    buffer[len] = '\0' ;
+
+    token = strtok ( buffer, " \t" ) ;
+    while ( token )
     {
-      if ( strncmp ( token, Tokens[i], TokenLengths[i] ) == 0 ) break ;
-    }
+        /*
+         * Process this token
+         */
+        int i ;
+        for ( i = 0; i < NUM_TOKENS; i++ )
+        {
+            if ( strncmp ( token, Tokens[i], TokenLengths[i] ) == 0 ) break ;
+        }
 
-    switch ( i )
-    {
-    case 0 :  /* "alpha":  Alpha color buffer precision in bits */
-      glut_state_flag |= GLUT_ALPHA ;  /* Somebody fix this for me! */
-      break ;
+        switch ( i )
+        {
+        case 0 :  /* "alpha":  Alpha color buffer precision in bits */
+            glut_state_flag |= GLUT_ALPHA ;  /* Somebody fix this for me! */
+            break ;
 
-    case 1 :  /* "acca":  Red, green, blue, and alpha accumulation buffer precision in bits */
-      break ;
+        case 1 :  /* "acca":  Red, green, blue, and alpha accumulation buffer
+                     precision in bits */
+            break ;
 
-    case 2 :  /* "acc":  Red, green, and blue accumulation buffer precision in bits with zero bits alpha */
-      glut_state_flag |= GLUT_ACCUM ;  /* Somebody fix this for me! */
-      break ;
+        case 2 :  /* "acc":  Red, green, and blue accumulation buffer precision
+                     in bits with zero bits alpha */
+            glut_state_flag |= GLUT_ACCUM ;  /* Somebody fix this for me! */
+            break ;
 
-    case 3 :  /* "blue":  Blue color buffer precision in bits */
-      break ;
+        case 3 :  /* "blue":  Blue color buffer precision in bits */
+            break ;
 
-    case 4 :  /* "buffer":  Number of bits in the color index color buffer */
-      break ;
+        case 4 :  /* "buffer":  Number of bits in the color index color buffer
+                   */
+            break ;
 
-    case 5 :  /* "conformant":  Boolean indicating if the frame buffer configuration is conformant or not */
-      break ;
+        case 5 :  /* "conformant":  Boolean indicating if the frame buffer
+                     configuration is conformant or not */
+            break ;
 
-    case 6 :  /* "depth":  Number of bits of precsion in the depth buffer */
-      glut_state_flag |= GLUT_DEPTH ;  /* Somebody fix this for me! */
-      break ;
+        case 6 : /* "depth":  Number of bits of precsion in the depth buffer */
+            glut_state_flag |= GLUT_DEPTH ;  /* Somebody fix this for me! */
+            break ;
 
-    case 7 :  /* "double":  Boolean indicating if the color buffer is double buffered */
-      glut_state_flag |= GLUT_DOUBLE ;
-      break ;
+        case 7 :  /* "double":  Boolean indicating if the color buffer is
+                     double buffered */
+            glut_state_flag |= GLUT_DOUBLE ;
+            break ;
 
-    case 8 :  /* "green":  Green color buffer precision in bits */
-      break ;
+        case 8 :  /* "green":  Green color buffer precision in bits */
+            break ;
 
-    case 9 :  /* "index":  Boolean if the color model is color index or not */
-      glut_state_flag |= GLUT_INDEX ;
-      break ;
+        case 9 :  /* "index":  Boolean if the color model is color index or not
+                   */
+            glut_state_flag |= GLUT_INDEX ;
+            break ;
 
-    case 10 :  /* "num":  A special capability  name indicating where the value represents the Nth frame buffer configuration matching the description string */
-      break ;
+        case 10 :  /* "num":  A special capability  name indicating where the
+                      value represents the Nth frame buffer configuration
+                      matching the description string */
+            break ;
 
-    case 11 :  /* "red":  Red color buffer precision in bits */
-      break ;
+        case 11 :  /* "red":  Red color buffer precision in bits */
+            break ;
 
-    case 12 :  /* "rgba":  Number of bits of red, green, blue, and alpha in the RGBA color buffer */
-      glut_state_flag |= GLUT_RGBA ;  /* Somebody fix this for me! */
-      break ;
+        case 12 :  /* "rgba":  Number of bits of red, green, blue, and alpha in
+                      the RGBA color buffer */
+            glut_state_flag |= GLUT_RGBA ;  /* Somebody fix this for me! */
+            break ;
 
-    case 13 :  /* "rgb":  Number of bits of red, green, and blue in the RGBA color buffer with zero bits alpha */
-      glut_state_flag |= GLUT_RGB ;  /* Somebody fix this for me! */
-      break ;
+        case 13 :  /* "rgb":  Number of bits of red, green, and blue in the
+                      RGBA color buffer with zero bits alpha */
+            glut_state_flag |= GLUT_RGB ;  /* Somebody fix this for me! */
+            break ;
 
-    case 14 :  /* "luminance":  Number of bits of red in the RGBA and zero bits of green, blue (alpha not specified) of color buffer precision */
-      glut_state_flag |= GLUT_LUMINANCE ;  /* Somebody fix this for me! */
-      break ;
+        case 14 :  /* "luminance":  Number of bits of red in the RGBA and zero
+                      bits of green, blue (alpha not specified) of color buffer
+                      precision */
+            glut_state_flag |= GLUT_LUMINANCE ; /* Somebody fix this for me! */
+            break ;
 
-    case 15 :  /* "stencil":  Number of bits in the stencil buffer */
-      glut_state_flag |= GLUT_STENCIL ;  /* Somebody fix this for me! */
-      break ;
+        case 15 :  /* "stencil":  Number of bits in the stencil buffer */
+            glut_state_flag |= GLUT_STENCIL;  /* Somebody fix this for me! */
+            break ;
 
-    case 16 :  /* "single":  Boolean indicate the color buffer is single buffered */
-      glut_state_flag |= GLUT_SINGLE ;
-      break ;
+        case 16 :  /* "single":  Boolean indicate the color buffer is single
+                      buffered */
+            glut_state_flag |= GLUT_SINGLE ;
+            break ;
 
-    case 17 :  /* "stereo":  Boolean indicating the color buffer supports OpenGL-style stereo */
-      glut_state_flag |= GLUT_STEREO ;
-      break ;
+        case 17 :  /* "stereo":  Boolean indicating the color buffer supports
+                      OpenGL-style stereo */
+            glut_state_flag |= GLUT_STEREO ;
+            break ;
 
-    case 18 :  /* "samples":  Indicates the number of multisamples to use based on GLX's SGIS_multisample extension (for antialiasing) */
-      glut_state_flag |= GLUT_MULTISAMPLE ;  /* Somebody fix this for me! */
-      break ;
+        case 18 :  /* "samples":  Indicates the number of multisamples to use
+                      based on GLX's SGIS_multisample extension (for
+                      antialiasing) */
+            glut_state_flag |= GLUT_MULTISAMPLE ; /*Somebody fix this for me!*/
+            break ;
 
-    case 19 :  /* "slow":  Boolean indicating if the frame buffer configuration is slow or not */
-      break ;
+        case 19 :  /* "slow":  Boolean indicating if the frame buffer
+                      configuration is slow or not */
+            break ;
 
-    case 20 :  /* "win32pdf":  matches the Win32 Pixel Format Descriptor by number */
+        case 20 :  /* "win32pdf":  matches the Win32 Pixel Format Descriptor by
+                      number */
 #if TARGET_HOST_WIN32
 #endif
-      break ;
+            break ;
 
-    case 21 :  /* "xvisual":  matches the X visual ID by number */
+        case 21 :  /* "xvisual":  matches the X visual ID by number */
 #if TARGET_HOST_UNIX_X11
 #endif
-      break ;
+            break ;
 
-    case 22 :  /* "xstaticgray":  boolean indicating if the frame buffer configuration's X visual is of type StaticGray */
+        case 22 :  /* "xstaticgray":  boolean indicating if the frame buffer
+                      configuration's X visual is of type StaticGray */
 #if TARGET_HOST_UNIX_X11
 #endif
-      break ;
+            break ;
 
-    case 23 :  /* "xgrayscale":  boolean indicating if the frame buffer configuration's X visual is of type GrayScale */
+        case 23 :  /* "xgrayscale":  boolean indicating if the frame buffer
+                      configuration's X visual is of type GrayScale */
 #if TARGET_HOST_UNIX_X11
 #endif
-      break ;
+            break ;
 
-    case 24 :  /* "xstaticcolor":  boolean indicating if the frame buffer configuration's X visual is of type StaticColor */
+        case 24 :  /* "xstaticcolor":  boolean indicating if the frame buffer
+                      configuration's X visual is of type StaticColor */
 #if TARGET_HOST_UNIX_X11
 #endif
-      break ;
+            break ;
 
-    case 25 :  /* "xpseudocolor":  boolean indicating if the frame buffer configuration's X visual is of type PseudoColor */
+        case 25 :  /* "xpseudocolor":  boolean indicating if the frame buffer
+                      configuration's X visual is of type PseudoColor */
 #if TARGET_HOST_UNIX_X11
 #endif
-      break ;
+            break ;
 
-    case 26 :  /* "xtruecolor":  boolean indicating if the frame buffer configuration's X visual is of type TrueColor */
+        case 26 :  /* "xtruecolor":  boolean indicating if the frame buffer
+                      configuration's X visual is of type TrueColor */
 #if TARGET_HOST_UNIX_X11
 #endif
-      break ;
+            break ;
 
-    case 27 :  /* "xdirectcolor":  boolean indicating if the frame buffer configuration's X visual is of type DirectColor */
+        case 27 :  /* "xdirectcolor":  boolean indicating if the frame buffer
+                      configuration's X visual is of type DirectColor */
 #if TARGET_HOST_UNIX_X11
 #endif
-      break ;
+            break ;
 
-    case 28 :  /* Unrecognized */
-      printf ( "WARNING - Display string token not recognized:  %s\n", token ) ;
-      break ;
+        case 28 :  /* Unrecognized */
+            printf ( "WARNING - Display string token not recognized:  %s\n",
+                     token ) ;
+            break ;
+        }
+
+        token = strtok ( NULL, " \t" ) ;
     }
 
-    token = strtok ( NULL, " \t" ) ;
-  }
+    free ( buffer ) ;
 
-  free ( buffer ) ;
-
-  /*
-   * We will make use of this value when creating a new OpenGL context...
-   */
-  fgState.DisplayMode = glut_state_flag;
+    /*
+     * We will make use of this value when creating a new OpenGL context...
+     */
+    fgState.DisplayMode = glut_state_flag;
 }
 
 /*** END OF FILE ***/
