@@ -137,7 +137,7 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
     /*
      * Make sure the character we want to output is valid
      */
-    freeglut_return_if_fail( character >= 0 && character < font->Quantity );
+    freeglut_return_if_fail( character >= 0 && character < font->256 );
 
     /*
      * Then find the character we want to draw
@@ -196,7 +196,7 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
     /*
      * Make sure the character we want to output is valid
      */
-    freeglut_return_val_if_fail( character > 0 && character < font->Quantity, 0 );
+    freeglut_return_val_if_fail( character > 0 && character < font->256, 0 );
 
     /*
          * Scan the font looking for the specified character
@@ -224,6 +224,8 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
     freeglut_return_if_fail( character >= 0 && character < font->Quantity );
 
     schar = font->Characters[character];
+
+    freeglut_return_if_fail( schar );
 
     strip = schar->Strips;
 
@@ -254,7 +256,11 @@ int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
      */
     freeglut_return_if_fail( character >= 0 && character < font->Quantity );
 
-    return (font->Characters[character]->Right);
+    schar = font->Characters[character];
+
+    freeglut_return_if_fail( schar );
+
+    return (schar->Right);
 }
 
 /*
