@@ -257,3 +257,9 @@ October 24, 2002:
 
 (96) src/freeglut_window.c:551  Removed extra carriage return for Windows users (John F. Fay)
 
+
+*******************************************************************************************
+* Changes on 05 August 2003
+*******************************************************************************************
+
+(97) src/freeglut_main.c:816 and :1571, set the current window (John F. Fay)

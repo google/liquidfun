@@ -814,6 +814,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         if( fgStructure.Window->Callbacks.Mouse == NULL )
           break;
+        /*
+         * Set the current window
+         */
+        fgSetWindow ( window );
+
 
         /*
          * Remember the current modifiers state
@@ -1569,6 +1574,11 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
             ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+
+        /*
+         * Set the current window
+         */
+        fgSetWindow ( window );
 
         /*
          * Finally execute the mouse callback
