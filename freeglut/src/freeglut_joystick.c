@@ -42,8 +42,6 @@
 #include "config.h"
 #endif
 
-#define G_LOG_DOMAIN "freeglut-joystick"
-
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
 

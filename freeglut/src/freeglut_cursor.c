@@ -29,8 +29,6 @@
 #include "config.h"
 #endif
 
-#define  G_LOG_DOMAIN  "freeglut-cursor"
-
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
 

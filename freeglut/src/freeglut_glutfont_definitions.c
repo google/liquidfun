@@ -3,9 +3,10 @@
  *
  * Bitmap and stroke fonts displaying.
  *
- * Copyright (c) 2003 Stephen J. Baker (whether he wants it or not). All Rights Reserved.
- * Written by John F. Fay <fayjf@sourceforge.net>, who releases the copyright over to the
- * "freeglut" project lead.
+ * Copyright (c) 2003 Stephen J. Baker (whether he wants it or not).
+ * All Rights Reserved.
+ * Written by John F. Fay <fayjf@sourceforge.net>, who releases the
+ * copyright over to the "freeglut" project lead.
  * Creation date: Mon July 21 2003
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -27,24 +28,24 @@
  */
 
 /*
- * This file is necessary for the *nix version of "freeglut" because the original GLUT
- * defined its font variables in rather an unusual way.  Publicly, in "glut.h", they were
- * defined as "void *".  Privately, in one of the source code files, they were defined as
- * pointers to a structure.  Most compilers and linkers are satisfied with the "void *"
- * and don't go any farther, but some of them balked.  In particular, when compiling with
- * "freeglut" and then trying to run using the GLUT ".so" library, some of them would give
- * an error.  So we are having to create this file to define the variables as pointers
- * to an unusual structure to match GLUT.
+ * This file is necessary for the *nix version of "freeglut" because the
+ * original GLUT defined its font variables in rather an unusual way.
+ * Publicly, in "glut.h", they were defined as "void *".  Privately,
+ * in one of the source code files, they were defined as pointers to a
+ * structure.  Most compilers and linkers are satisfied with the "void *"
+ * and don't go any farther, but some of them balked.  In particular,
+ * when compiling with "freeglut" and then trying to run using the GLUT
+ * ".so" library, some of them would give an error.  So we are having to
+ * create this file to define the variables as pointers to an unusual
+ * structure to match GLUT.
  */
 
 #include "freeglut_internal.h"
 
 #if TARGET_HOST_UNIX_X11
 
-#define  G_LOG_DOMAIN  "freeglut-glutfont-definitions"
-
 struct freeglutStrokeFont
-{ 
+{
   const char *name ; 
   int num_chars ; 
   void *ch ; 

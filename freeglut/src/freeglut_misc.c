@@ -29,8 +29,6 @@
 #include "config.h"
 #endif
 
-#define  G_LOG_DOMAIN  "freeglut-misc"
-
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
 
@@ -91,13 +89,7 @@ void FGAPIENTRY glutReportErrors( void )
 {
     GLenum error;
     while( ( error = glGetError() ) != GL_NO_ERROR )
-#       undef  G_LOG_DOMAIN
-#       define G_LOG_DOMAIN ((gchar *) 0)
-
         fgWarning( "GL error: %s", gluErrorString( error ) );
-
-#       undef   G_LOG_DOMAIN
-#       define  G_LOG_DOMAIN  "freeglut_misc.c"
 }
 
 /*

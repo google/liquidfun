@@ -29,8 +29,6 @@
 #include "config.h"
 #endif
 
-#define  G_LOG_DOMAIN  "freeglut-gamemode"
-
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
 
