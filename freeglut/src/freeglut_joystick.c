@@ -48,7 +48,7 @@
 /*
  * PWO: I don't like it at all. It's a mess. Could it be cleared?
  */
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
 #   include <windows.h>
 #   if defined( __CYGWIN32__ ) || defined( __CYGWIN__ )
 #       define NEAR /* */
@@ -103,7 +103,7 @@
 #   endif
 #endif
 
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
 #   define _JS_MAX_AXES 6
 #else
 #   ifdef __FreeBSD__
@@ -123,7 +123,7 @@ struct tagSFG_Joystick
     int         id;
 #endif
 
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
     JOYINFOEX   js;
     UINT        js_id;
 #else
@@ -160,7 +160,7 @@ static SFG_Joystick* fgJoystick = NULL;
  */
 static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 {
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
     MMRESULT status;
 #else
     int status;
@@ -180,7 +180,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
         return;
     }
 
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
     status = joyGetPosEx( joy->js_id, &joy->js );
 
     if( status != JOYERR_NOERROR )
@@ -350,7 +350,7 @@ static void fghJoystickRead( SFG_Joystick* joy, int* buttons, float* axes )
  */
 static void fghJoystickOpen( SFG_Joystick* joy )
 {
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
     JOYCAPS jsCaps;
     int     i;
 
@@ -538,7 +538,7 @@ void fgJoystickInit( int ident )
 
     fgJoystick = ( SFG_Joystick * )calloc( sizeof( SFG_Joystick ), 1 );
 
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
     switch( ident )
     {
     case 0:
@@ -578,7 +578,7 @@ void fgJoystickClose( void )
     if( !fgJoystick )
         fgError( "illegal attempt to deinitialize joystick device" );
 
-#ifndef TARGET_HOST_WIN32
+#if !TARGET_HOST_WIN32
     if( ! fgJoystick->error )
         close( fgJoystick->fd );
 #endif
