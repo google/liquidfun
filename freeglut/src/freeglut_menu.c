@@ -183,10 +183,8 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
          * was a submenu then deactivate it.
          */
         if( menu->ActiveEntry && ( menuEntry != menu->ActiveEntry ) )
-        {
             if( menu->ActiveEntry->SubMenu )
                 fgDeactivateSubMenu( menu->ActiveEntry );
-        }
 
         menu->ActiveEntry = menuEntry;
         menu->IsActive = TRUE;
@@ -341,7 +339,7 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
 
     glColor4fv( menu_pen_fore );
 
-    for( menuEntry = (SFG_MenuEntry *)menu->Entries.First, i=0;
+    for( menuEntry = (SFG_MenuEntry *)menu->Entries.First, i = 0;
          menuEntry;
          menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next, ++i )
     {
@@ -357,8 +355,8 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
         /* Try to center the text - JCJ 31 July 2003*/
         glRasterPos2i(
             2 * border,
-            (i + 1)*FREEGLUT_MENU_HEIGHT -
-            (int)( FREEGLUT_MENU_HEIGHT*0.3 - border )
+            ( i + 1 )*FREEGLUT_MENU_HEIGHT -
+            ( int )( FREEGLUT_MENU_HEIGHT*0.3 - border )
         );
 
         /*
@@ -375,7 +373,7 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
             int x_base = menu->Width - 2 - width;
             int y_base = i*FREEGLUT_MENU_HEIGHT + border;
             glBegin( GL_TRIANGLES );
-                glVertex2i( x_base, y_base + 2 * border);
+                glVertex2i( x_base, y_base + 2*border);
                 glVertex2i( menu->Width - 2, y_base +
                             ( FREEGLUT_MENU_HEIGHT + border) / 2 );
                 glVertex2i( x_base, y_base + FREEGLUT_MENU_HEIGHT - border );
@@ -392,9 +390,9 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
     /*
      * Now we are ready to check if any of our children needs to be redrawn:
      */
-    for( menuEntry = (SFG_MenuEntry *)menu->Entries.First;
+    for( menuEntry = ( SFG_MenuEntry * )menu->Entries.First;
          menuEntry;
-         menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
+         menuEntry = ( SFG_MenuEntry * )menuEntry->Node.Next )
     {
         /*
          * Is that an active sub menu by any case?
@@ -415,17 +413,17 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
  * Private static function to set the parent window of a submenu and all
  * of its submenus
  */
-static void fghSetSubmenuParentWindow ( SFG_Window *window, SFG_Menu *menu )
+static void fghSetSubmenuParentWindow( SFG_Window *window, SFG_Menu *menu )
 {
     SFG_MenuEntry *menuEntry;
 
     menu->ParentWindow = window;
 
-    for( menuEntry = (SFG_MenuEntry *)menu->Entries.First;
+    for( menuEntry = ( SFG_MenuEntry * )menu->Entries.First;
          menuEntry;
-         menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
-        if ( menuEntry->SubMenu )
-            fghSetSubmenuParentWindow ( window, menuEntry->SubMenu ) ;
+         menuEntry = ( SFG_MenuEntry * )menuEntry->Node.Next )
+        if( menuEntry->SubMenu )
+            fghSetSubmenuParentWindow( window, menuEntry->SubMenu );
 }
 
 
@@ -437,26 +435,16 @@ void fgDisplayMenu( void )
     SFG_Window* window = fgStructure.Window;
     SFG_Menu* menu = NULL;
 
-    /*
-     * Make sure there is a current window available
-     */
     freeglut_assert_window;
 
     /*
      * Check if there is an active menu attached to this window...
      */
     menu = window->ActiveMenu;
-
-    /*
-     * Did we find an active menu?
-     */
     freeglut_return_if_fail( menu );
 
-    fgSetWindow ( menu->Window );
+    fgSetWindow( menu->Window );
 
-    /*
-     * Prepare the OpenGL state to do the rendering first:
-     */
     glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_TEXTURE_BIT | GL_LIGHTING_BIT |
                   GL_POLYGON_BIT );
 
@@ -465,38 +453,22 @@ void fgDisplayMenu( void )
     glDisable( GL_LIGHTING   );
     glDisable( GL_CULL_FACE  );
 
-    /*
-     * We'll use an orthogonal projection matrix to draw the menu:
-     */
     glMatrixMode( GL_PROJECTION );
-    glPushMatrix();
-    glLoadIdentity();
+    glPushMatrix( );
+    glLoadIdentity( );
     glOrtho(
          0, glutGet( GLUT_WINDOW_WIDTH  ),
          glutGet( GLUT_WINDOW_HEIGHT ), 0,
         -1, 1
     );
 
-    /*
-     * Model-view matix gets reset to identity:
-     */
     glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-    glLoadIdentity();
+    glPushMatrix( );
+    glLoadIdentity( );
 
-    /*
-     * First of all, have the exact menu status check:
-     */
     fghCheckMenuStatus( window, menu );
-
-    /*
-     * The status has been updated and we're ready to have the menu drawn now:
-     */
     fghDisplayMenuBox( menu );
 
-    /*
-     * Restore the old OpenGL settings now
-     */
     glPopAttrib( );
 
     glMatrixMode( GL_PROJECTION );
@@ -506,9 +478,6 @@ void fgDisplayMenu( void )
 
     glutSwapBuffers( );
 
-    /*
-     * Restore the current window
-     */
     fgSetWindow ( window );
 }
 
@@ -532,7 +501,6 @@ void fgActivateMenu( SFG_Window* window, int button )
     /*
      * Set up the initial menu position now:
      */
-
     menu->X = window->State.MouseX + glutGet( GLUT_WINDOW_X );
     menu->Y = window->State.MouseY + glutGet( GLUT_WINDOW_Y );
 
@@ -584,34 +552,13 @@ void fgExecuteMenuCallback( SFG_Menu* menu )
          menuEntry;
          menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next)
     {
-        /*
-         * Is this menu entry active?
-         */
         if( menuEntry->IsActive == TRUE )
         {
-            /*
-             * If there is not a sub menu, execute the menu callback and
-             * return...
-             */
-            if( !( menuEntry->SubMenu ) )
-            {
-                /*
-                 * ...certainly given that there is one...
-                 */
+            if( menuEntry->SubMenu )
+                fgExecuteMenuCallback( menuEntry->SubMenu );
+            else
                 if( menu->Callback )
                     menu->Callback( menuEntry->ID );
-
-                return;
-            }
-
-            /*
-             * Otherwise recurse into the submenu.
-             */
-            fgExecuteMenuCallback( menuEntry->SubMenu );
-
-            /*
-             * There is little sense in dwelling the search on
-             */
             return;
         }
     }
@@ -653,9 +600,9 @@ void fgDeactivateMenu( SFG_Window *window )
     /*
      * Hide all submenu windows, and the root menu's window.
      */
-    for ( menuEntry = (SFG_MenuEntry *)menu->Entries.First;
+    for ( menuEntry = ( SFG_MenuEntry * )menu->Entries.First;
           menuEntry;
-          menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
+          menuEntry = ( SFG_MenuEntry * )menuEntry->Node.Next )
     {
         /*
          * Is that an active submenu by any case?
@@ -664,7 +611,7 @@ void fgDeactivateMenu( SFG_Window *window )
             fgDeactivateSubMenu( menuEntry );
     }
 
-    fgSetWindow ( current_window ) ;
+    fgSetWindow( current_window );
 }
 
 /*
@@ -720,9 +667,9 @@ void fghCalculateMenuBoxSize( void )
     /*
      * The menu's box size depends on the menu entries:
      */
-    for( menuEntry = (SFG_MenuEntry *)fgStructure.Menu->Entries.First;
+    for( menuEntry = ( SFG_MenuEntry * )fgStructure.Menu->Entries.First;
          menuEntry;
-         menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next)
+         menuEntry = ( SFG_MenuEntry * )menuEntry->Node.Next )
     {
         /*
          * Update the menu entry's width value
@@ -759,7 +706,7 @@ void fghCalculateMenuBoxSize( void )
 /*
  * Creates a new menu object, adding it to the freeglut structure
  */
-int FGAPIENTRY glutCreateMenu( void (* callback)( int ) )
+int FGAPIENTRY glutCreateMenu( void(* callback)( int ) )
 {
     /*
      * The menu object creation code resides in freeglut_structure.c
@@ -834,17 +781,17 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
 /*
  * Add a sub menu to the bottom of the current menu
  */
-void FGAPIENTRY glutAddSubMenu( const char* label, int subMenuID )
+void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
 {
-    SFG_MenuEntry* menuEntry =
-        (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
-    SFG_Menu*      subMenu = fgMenuByID( subMenuID );
+    SFG_MenuEntry *menuEntry =
+        ( SFG_MenuEntry * )calloc( sizeof( SFG_MenuEntry ), 1 );
+    SFG_Menu *subMenu = fgMenuByID( subMenuID );
 
     freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Menu );
     freeglut_return_if_fail( subMenu );
 
-    menuEntry->Text = strdup( label );
+    menuEntry->Text    = strdup( label );
     menuEntry->SubMenu = subMenu;
     menuEntry->ID      = -1;
 
@@ -880,7 +827,7 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
     if( menuEntry->Text )
         free( menuEntry->Text );
 
-    menuEntry->Text = strdup( label );
+    menuEntry->Text    = strdup( label );
     menuEntry->ID      = value;
     menuEntry->SubMenu = NULL;
     fghCalculateMenuBoxSize( );
@@ -889,7 +836,8 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
 /*
  * Changes the specified menu item in the current menu into a sub-menu trigger.
  */
-void FGAPIENTRY glutChangeToSubMenu( int item, const char* label, int subMenuID )
+void FGAPIENTRY glutChangeToSubMenu( int item, const char* label,
+                                     int subMenuID )
 {
     SFG_Menu*      subMenu = fgMenuByID( subMenuID );
     SFG_MenuEntry* menuEntry = NULL;
@@ -911,7 +859,7 @@ void FGAPIENTRY glutChangeToSubMenu( int item, const char* label, int subMenuID 
     if( menuEntry->Text )
         free( menuEntry->Text );
 
-    menuEntry->Text = strdup( label );
+    menuEntry->Text    = strdup( label );
     menuEntry->SubMenu = subMenu;
     menuEntry->ID      = -1;
     fghCalculateMenuBoxSize( );
@@ -960,7 +908,7 @@ void FGAPIENTRY glutAttachMenu( int button )
     /*
      * Make the parent window of the menu (and all submenus) the current window
      */
-    fghSetSubmenuParentWindow ( fgStructure.Window, fgStructure.Menu ) ;
+    fghSetSubmenuParentWindow( fgStructure.Window, fgStructure.Menu );
 }
 
 /*
