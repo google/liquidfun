@@ -40,8 +40,10 @@
 /*
  * All of the callbacks setting methods can be generalized to this:
  */
-#define SET_CALLBACK(a) if( fgStructure.Window == NULL ) return;\
-                            fgStructure.Window->Callbacks.a = callback;
+#define SET_CALLBACK(a)              \
+    if( fgStructure.Window == NULL ) \
+        return;                      \
+    fgStructure.Window->Callbacks.a = callback;
 
 /*
  * Sets the Display callback for the current window
@@ -92,7 +94,8 @@ void FGAPIENTRY glutIdleFunc( void (* callback)( void ) )
 /*
  * Sets the Timer callback for the current window
  */
-void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), int timerID )
+void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ),
+                               int timerID )
 {
     SFG_Timer* timer;
 
@@ -227,7 +230,7 @@ void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
 void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
 {
    if( fgStructure.Menu == NULL )
-     return;
+       return;
    fgStructure.Menu->Destroy = callback;
 }
 
