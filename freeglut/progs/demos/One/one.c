@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../include/GL/freeglut.h"
+#include <GL/freeglut.h>
 
 int g_LeaveGameMode = 0;
 int g_InGameMode = 1;
