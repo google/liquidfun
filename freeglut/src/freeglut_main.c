@@ -801,7 +801,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
              *
              * XXX Use a symbolic constant, *not* "4"!
              */
-            if( ( button < 4 ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
+            if( ( button < 3 ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
             {
                 INVOKE_WCB( *window, Mouse, ( button,
                                               pressed ? GLUT_DOWN : GLUT_UP,
@@ -819,9 +819,14 @@ void FGAPIENTRY glutMainLoopEvent( void )
                  * XXX since the order and numbering isn't certain
                  * XXX See XFree86 configuration docs (even back in the
                  * XXX 3.x days, and especially with 4.x).
+		 *
+		 * XXX Note that {button} has already been decremeted
+		 * XXX in mapping from X button numbering to GLUT.
                  */
-                int wheel_number = (button - 4) / 2;
-                int direction = (button & 1)*2 - 1;
+                int wheel_number = (button - 3) / 2;
+		int direction = -1;
+		if( button % 2 )
+		    direction = 1;
                 
                 if( pressed )
                     INVOKE_WCB( *window, MouseWheel, ( wheel_number,
