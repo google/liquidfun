@@ -46,11 +46,6 @@
 #define GLUT_USE_CURRENT_CONTEXT                 1
 
 /*
- * GLUT API Extension macro definitions -- display mode
- */
-#define GLUT_OFFSCREEN                      0x0400
-
-/*
  * GLUT API Extension macro definitions -- the glutGet parameters
  */
 #define  GLUT_ACTION_ON_WINDOW_CLOSE        0x01F9

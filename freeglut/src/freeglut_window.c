@@ -308,70 +308,49 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      */
     assert( window->Window.VisualInfo != NULL );
 
-    window->State.IsOffscreen = GL_FALSE;
-    if( fgState.DisplayMode & GLUT_OFFSCREEN )
+
+    /*
+     * XXX HINT: the masks should be updated when adding/removing callbacks.
+     * XXX       This might speed up message processing. Is that true?
+     * XXX
+     * XXX A: Not appreciably, but it WILL make it easier to debug.
+     * XXX    Try tracing old GLUT and try tracing freeglut.  Old GLUT
+     * XXX    turns off events that it doesn't need and is a whole lot
+     * XXX    more pleasant to trace.  (Think mouse-motion!  Tons of
+     * XXX    ``bonus'' GUI events stream in.)
+     */
+    winAttr.event_mask        =
+        StructureNotifyMask | SubstructureNotifyMask | ExposureMask |
+        ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyRelease |
+        VisibilityChangeMask | EnterWindowMask | LeaveWindowMask |
+        PointerMotionMask | ButtonMotionMask;
+    winAttr.background_pixmap = None;
+    winAttr.background_pixel  = 0;
+    winAttr.border_pixel      = 0;
+
+    winAttr.colormap = XCreateColormap(
+        fgDisplay.Display, fgDisplay.RootWindow,
+        window->Window.VisualInfo->visual, AllocNone
+    );
+
+    mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
+
+    if( window->IsMenu )
     {
-        window->State.IsOffscreen = GL_TRUE;
-        window->Window.Pixmap = XCreatePixmap(
-            fgDisplay.Display, fgDisplay.RootWindow,
-            w, h,
-            window->Window.VisualInfo->depth
-        );
-        if( False != window->Window.Pixmap )
-        {
-            window->Window.Handle = glXCreateGLXPixmap(
-                fgDisplay.Display,
-                window->Window.VisualInfo,
-                window->Window.Pixmap
-            );
-            if( False == window->Window.Handle )
-                XFreePixmap( fgDisplay.Display, window->Window.Pixmap );
-        }
+        winAttr.override_redirect = True;
+        mask |= CWOverrideRedirect;
     }
-    else
-    {
-        /*
-         * XXX HINT: the masks should be updated when adding/removing callbacks.
-         * XXX       This might speed up message processing. Is that true?
-         * XXX
-         * XXX A: Not appreciably, but it WILL make it easier to debug.
-         * XXX    Try tracing old GLUT and try tracing freeglut.  Old GLUT
-         * XXX    turns off events that it doesn't need and is a whole lot
-         * XXX    more pleasant to trace.  (Think mouse-motion!  Tons of
-         * XXX    ``bonus'' GUI events stream in.)
-         */
-        winAttr.event_mask        =
-            StructureNotifyMask | SubstructureNotifyMask | ExposureMask |
-            ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyRelease |
-            VisibilityChangeMask | EnterWindowMask | LeaveWindowMask |
-            PointerMotionMask | ButtonMotionMask;
-        winAttr.background_pixmap = None;
-        winAttr.background_pixel  = 0;
-        winAttr.border_pixel      = 0;
 
-        winAttr.colormap = XCreateColormap(
-            fgDisplay.Display, fgDisplay.RootWindow,
-            window->Window.VisualInfo->visual, AllocNone
-        );
+    window->Window.Handle = XCreateWindow(
+        fgDisplay.Display,
+        window->Parent == NULL ? fgDisplay.RootWindow :
+        window->Parent->Window.Handle,
+        x, y, w, h, 0,
+        window->Window.VisualInfo->depth, InputOutput,
+        window->Window.VisualInfo->visual, mask,
+        &winAttr
+    );
 
-        mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
-
-        if ( window->IsMenu )
-        {
-            winAttr.override_redirect = True;
-            mask |= CWOverrideRedirect;
-        }
-
-        window->Window.Handle = XCreateWindow(
-            fgDisplay.Display,
-            window->Parent == NULL ? fgDisplay.RootWindow :
-                                     window->Parent->Window.Handle,
-            x, y, w, h, 0,
-            window->Window.VisualInfo->depth, InputOutput,
-            window->Window.VisualInfo->visual, mask,
-            &winAttr
-        );
-    }
     /*
      * The GLX context creation, possibly trying the direct context rendering
      *  or else use the current context if the user has so specified
@@ -453,30 +432,27 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     wmHints.flags = StateHint;
     wmHints.initial_state = fgState.ForceIconic ? IconicState : NormalState;
-    if( GL_FALSE == window->State.IsOffscreen )
-    {
-        /*
-         * Prepare the window and iconified window names...
-         */
-        XStringListToTextProperty( (char **) &title, 1, &textProperty );
+    /*
+     * Prepare the window and iconified window names...
+     */
+    XStringListToTextProperty( (char **) &title, 1, &textProperty );
 
-        XSetWMProperties(
-            fgDisplay.Display,
-            window->Window.Handle,
-            &textProperty,
-            &textProperty,
-            0,
-            0,
-            &sizeHints,
-            &wmHints,
-            NULL
-        );
+    XSetWMProperties(
+        fgDisplay.Display,
+        window->Window.Handle,
+        &textProperty,
+        &textProperty,
+        0,
+        0,
+        &sizeHints,
+        &wmHints,
+        NULL
+    );
 
-        XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
-                         &fgDisplay.DeleteWindow, 1 );
+    XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
+                     &fgDisplay.DeleteWindow, 1 );
 
-        XMapWindow( fgDisplay.Display, window->Window.Handle );
-    }
+    XMapWindow( fgDisplay.Display, window->Window.Handle );
 
 #elif TARGET_HOST_WIN32
 
@@ -588,13 +564,9 @@ void fgCloseWindow( SFG_Window* window )
 #if TARGET_HOST_UNIX_X11
 
     glXDestroyContext( fgDisplay.Display, window->Window.Context );
-    if( GL_FALSE == window->State.IsOffscreen )
-        XDestroyWindow( fgDisplay.Display, window->Window.Handle );
-    else
-    {
-        glXDestroyGLXPixmap( fgDisplay.Display, window->Window.Handle );
-        XFreePixmap( fgDisplay.Display, window->Window.Pixmap );
-    }
+    glXDestroyGLXPixmap( fgDisplay.Display, window->Window.Handle );
+    XFreePixmap( fgDisplay.Display, window->Window.Pixmap );
+
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
@@ -650,17 +622,15 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
 {
     int ret = 0;
 
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
-    {
-        SFG_Window* window = NULL;
-        SFG_Window* parent = NULL;
+    SFG_Window* window = NULL;
+    SFG_Window* parent = NULL;
 
-        freeglut_assert_ready;
-        parent = fgWindowByID( parentID );
-        freeglut_return_val_if_fail( parent != NULL, 0 );
-        window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
-        ret = window->ID;
-    }
+    freeglut_assert_ready;
+    parent = fgWindowByID( parentID );
+    freeglut_return_val_if_fail( parent != NULL, 0 );
+    window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
+    ret = window->ID;
+
     return ret;
 }
 
@@ -719,19 +689,17 @@ void FGAPIENTRY glutShowWindow( void )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
-    {
 #if TARGET_HOST_UNIX_X11
 
-        XMapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
-        XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XMapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
-        ShowWindow( fgStructure.Window->Window.Handle, SW_SHOW );
+    ShowWindow( fgStructure.Window->Window.Handle, SW_SHOW );
 
 #endif
-    }
+
     fgStructure.Window->State.Redisplay = GL_TRUE;
 }
 
@@ -743,25 +711,23 @@ void FGAPIENTRY glutHideWindow( void )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
-    {
 #if TARGET_HOST_UNIX_X11
 
-        if( fgStructure.Window->Parent == NULL )
-            XWithdrawWindow( fgDisplay.Display,
-                             fgStructure.Window->Window.Handle,
-                             fgDisplay.Screen );
-        else
-            XUnmapWindow( fgDisplay.Display,
-                          fgStructure.Window->Window.Handle );
-        XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    if( fgStructure.Window->Parent == NULL )
+        XWithdrawWindow( fgDisplay.Display,
+                         fgStructure.Window->Window.Handle,
+                         fgDisplay.Screen );
+    else
+        XUnmapWindow( fgDisplay.Display,
+                      fgStructure.Window->Window.Handle );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
-        ShowWindow( fgStructure.Window->Window.Handle, SW_HIDE );
+    ShowWindow( fgStructure.Window->Window.Handle, SW_HIDE );
 
 #endif
-    }
+
     fgStructure.Window->State.Redisplay = GL_FALSE;
 }
 
@@ -774,20 +740,18 @@ void FGAPIENTRY glutIconifyWindow( void )
     freeglut_assert_window;
 
     fgStructure.Window->State.Visible   = GL_FALSE;
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
-    {
 #if TARGET_HOST_UNIX_X11
 
-        XIconifyWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
-                        fgDisplay.Screen );
-        XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XIconifyWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
+                    fgDisplay.Screen );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
-        ShowWindow( fgStructure.Window->Window.Handle, SW_MINIMIZE );
+    ShowWindow( fgStructure.Window->Window.Handle, SW_MINIMIZE );
 
 #endif
-    }
+
     fgStructure.Window->State.Redisplay = GL_FALSE;
 }
 
@@ -798,8 +762,7 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 {
     freeglut_assert_ready;
     freeglut_assert_window;
-    if( ! fgStructure.Window->Parent &&
-        ( GL_FALSE == fgStructure.Window->State.IsOffscreen ) )
+    if( ! fgStructure.Window->Parent )
     {
 #if TARGET_HOST_UNIX_X11
 
@@ -834,8 +797,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    if( ! fgStructure.Window->Parent &&
-        GL_FALSE == fgStructure.Window->State.IsOffscreen )
+    if( ! fgStructure.Window->Parent )
     {
 #if TARGET_HOST_UNIX_X11
 
@@ -870,13 +832,9 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    /* XXX Could delete/create/set-window-id for offscreen. */
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
-    {
-        fgStructure.Window->State.NeedToResize = GL_TRUE;
-        fgStructure.Window->State.Width  = width ;
-        fgStructure.Window->State.Height = height;
-    }
+    fgStructure.Window->State.NeedToResize = GL_TRUE;
+    fgStructure.Window->State.Width  = width ;
+    fgStructure.Window->State.Height = height;
 }
 
 /*
@@ -887,16 +845,15 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
-    {
 #if TARGET_HOST_UNIX_X11
 
-        XMoveWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
-                     x, y );
-        XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XMoveWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
+                 x, y );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
-
+    
+    {
         RECT winRect;
 
         GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
@@ -908,9 +865,9 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
             winRect.bottom - winRect.top,
             TRUE
         );
+    }
 
 #endif
-    }
 }
 
 /*
@@ -921,23 +878,20 @@ void FGAPIENTRY glutPushWindow( void )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
-    {
 #if TARGET_HOST_UNIX_X11
 
-        XLowerWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
+    XLowerWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
 
 #elif TARGET_HOST_WIN32
 
-        SetWindowPos(
-            fgStructure.Window->Window.Handle,
-            HWND_BOTTOM,
-            0, 0, 0, 0,
-            SWP_NOSIZE | SWP_NOMOVE
-        );
+    SetWindowPos(
+        fgStructure.Window->Window.Handle,
+        HWND_BOTTOM,
+        0, 0, 0, 0,
+        SWP_NOSIZE | SWP_NOMOVE
+    );
 
 #endif
-    }
 }
 
 /*
@@ -948,23 +902,20 @@ void FGAPIENTRY glutPopWindow( void )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
-    {
 #if TARGET_HOST_UNIX_X11
 
-        XRaiseWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
+    XRaiseWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
 
 #elif TARGET_HOST_WIN32
 
-        SetWindowPos(
-            fgStructure.Window->Window.Handle,
-            HWND_TOP,
-            0, 0, 0, 0,
-            SWP_NOSIZE | SWP_NOMOVE
-        );
+    SetWindowPos(
+        fgStructure.Window->Window.Handle,
+        HWND_TOP,
+        0, 0, 0, 0,
+        SWP_NOSIZE | SWP_NOMOVE
+    );
 
 #endif
-    }
 }
 
 /*
@@ -975,7 +926,6 @@ void FGAPIENTRY glutFullScreen( void )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
     {
 #if TARGET_HOST_UNIX_X11
         int x, y;

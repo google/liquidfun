@@ -376,7 +376,6 @@ struct tagSFG_WindowState
 
     GLboolean       IsGameMode;         /* Is this the game mode window?     */
     GLboolean       NeedToResize;       /* Do we need to resize the window?  */
-    GLboolean       IsOffscreen;        /* Tags a `window' as on/offscreen.  */
 };
 
 

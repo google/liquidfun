@@ -67,7 +67,6 @@ AC_OUTPUT(\
 	progs/demos/Fractals_random/Makefile \
 	progs/demos/Lorenz/Makefile \
 	progs/demos/One/Makefile \
-	progs/demos/offscreen/Makefile \
 	progs/demos/shapes/Makefile \
 	src/Makefile \
 	include/Makefile \
