@@ -298,7 +298,6 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
       SFG_Window *activeWindow = fgStructure.Window ;
       INVOKE_WCB( *window, Destroy, ( ) );
       fgSetWindow ( activeWindow ) ;
-      fgClearCallBacks( window );
     }
 
     if ( window->Parent != NULL )
