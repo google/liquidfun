@@ -164,10 +164,10 @@ num_ch: NUM_CH INTEGER { set_num_ch($2);};
 
 fontprops : /* empty */ | properties;
 
-properties : PROPERTIES INTEGER { init_properties ($2); } property_list
-        { check_num_props (); }
+properties : PROPERTIES INTEGER { init_properties ($2); } property_list 
+        { check_num_props (); };
 
-property_list : /* empty */ | single_property property_list
+property_list : /* empty */ | single_property property_list ;
 
 single_property : STRING STRING { add_property($1, $2); };
 
@@ -195,7 +195,7 @@ right : RIGHT REAL{ $$ = $2; };
 strokes :	/* empty */ | path strokes;
 
 path : closeflag n_pts { init_path($1, $2); } points
-	{ check_npts(); }
+	{ check_npts(); };
 
 points : 	/* empty */ | coord points;
 
