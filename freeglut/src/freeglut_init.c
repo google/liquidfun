@@ -95,72 +95,39 @@ SFG_State fgState = { { -1, -1, FALSE },  /* Position */
 void fgInitialize( const char* displayName )
 {
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Have the display created
-     */
     fgDisplay.Display = XOpenDisplay( displayName );
 
     if( fgDisplay.Display == NULL )
-    {
-        /*
-         * Failed to open a display. That's no good.
-         */
         fgError( "failed to open display '%s'", XDisplayName( displayName ) );
-    }
 
-    /*
-     * Check for the OpenGL GLX extension availability:
-     */
     if( !glXQueryExtension( fgDisplay.Display, NULL, NULL ) )
-    {
-        /*
-         * GLX extensions have not been found...
-         */
-        fgError( "OpenGL GLX extension not supported by display '%s'", XDisplayName( displayName ) );
-    }
+        fgError( "OpenGL GLX extension not supported by display '%s'",
+	    XDisplayName( displayName ) );
 
-    /*
-     * Grab the default screen for the display we have just opened
-     */
     fgDisplay.Screen = DefaultScreen( fgDisplay.Display );
-
-    /*
-     * The same applying to the root window
-     */
     fgDisplay.RootWindow = RootWindow(
         fgDisplay.Display,
         fgDisplay.Screen
     );
 
-    /*
-     * Grab the logical screen's geometry
-     */
     fgDisplay.ScreenWidth  = DisplayWidth(
         fgDisplay.Display,
         fgDisplay.Screen
     );
-
     fgDisplay.ScreenHeight = DisplayHeight(
         fgDisplay.Display,
         fgDisplay.Screen
     );
 
-    /*
-     * Grab the physical screen's geometry
-     */
     fgDisplay.ScreenWidthMM = DisplayWidthMM(
         fgDisplay.Display,
         fgDisplay.Screen
     );
-
     fgDisplay.ScreenHeightMM = DisplayHeightMM(
-        fgDisplay.Display,
-        fgDisplay.Screen
+	fgDisplay.Display,
+	fgDisplay.Screen
     );
 
-    /*
-     * The display's connection number
-     */
     fgDisplay.Connection = ConnectionNumber( fgDisplay.Display );
 
     /*
@@ -182,19 +149,9 @@ void fgInitialize( const char* displayName )
      */
     fgDisplay.Instance = GetModuleHandle( NULL );
 
-    /*
-     * Check if the freeglut window class has been registered before...
-     */
     atom = GetClassInfo( fgDisplay.Instance, "FREEGLUT", &wc );
-
-    /*
-     * ...nope, it has not, and we have to do it right now:
-     */
     if( atom == 0 )
     {
-        /*
-         * Make sure the unitialized fields are reset to zero
-         */
         ZeroMemory( &wc, sizeof(WNDCLASS) );
 
         /*
@@ -228,29 +185,17 @@ void fgInitialize( const char* displayName )
     fgDisplay.ScreenHeight = GetSystemMetrics( SM_CYSCREEN );
 
     {
-        /*
-         * Checking the display's size in millimeters isn't too hard, too:
-         */
         HWND desktop = GetDesktopWindow();
         HDC  context = GetDC( desktop );
 
-        /*
-         * Grab the appropriate values now (HORZSIZE and VERTSIZE respectably):
-         */
         fgDisplay.ScreenWidthMM  = GetDeviceCaps( context, HORZSIZE );
         fgDisplay.ScreenHeightMM = GetDeviceCaps( context, VERTSIZE );
 
-        /*
-         * Whoops, forgot to release the device context :)
-         */
         ReleaseDC( desktop, context );
     }
 
 #endif
 
-    /*
-     * Have the joystick device initialized now
-     */
     fgJoystickInit( 0 );
 }
 
@@ -261,12 +206,10 @@ void fgDeinitialize( void )
 {
     SFG_Timer *timer;
 
-    /*
-     * Check if initialization has been performed before
-     */
     if( !fgState.Time.Set )
     {
-        fgWarning( "fgDeinitialize(): fgState.Timer is null => no valid initialization has been performed" );
+        fgWarning( "fgDeinitialize(): fgState.Timer is null => "
+	    "no valid initialization has been performed" );
         return;
     }
 
@@ -279,28 +222,15 @@ void fgDeinitialize( void )
       fgStructure.MenuContext = NULL ;
     }
 
-    /*
-     * Perform the freeglut structure deinitialization
-     */
     fgDestroyStructure();
 
-    /*
-     * Delete all the timers and their storage list
-     */
     while ( (timer = (SFG_Timer *)fgState.Timers.First) != NULL )
     {
       fgListRemove ( &fgState.Timers, &timer->Node ) ;
       free ( timer ) ;
     }
 
-    /*
-     * Deinitialize the joystick device
-     */
     fgJoystickClose();
-
-    /*
-     * Reset the state structure
-     */
 
     fgState.Position.X = -1 ;
     fgState.Position.Y = -1 ;
@@ -310,9 +240,6 @@ void fgDeinitialize( void )
     fgState.Size.Y = 300 ;
     fgState.Size.Use = TRUE ;
 
-    /*
-     * The default display mode to be used
-     */
     fgState.DisplayMode = GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH;
 
     fgState.ForceDirectContext  = FALSE;
@@ -324,14 +251,8 @@ void fgDeinitialize( void )
     fgState.ActionOnWindowClose = GLUT_ACTION_EXIT ;
     fgState.ExecState           = GLUT_EXEC_STATE_INIT ;
 
-    /*
-     * Assume we want to ignore the automatic key repeat
-     */
     fgState.IgnoreKeyRepeat = TRUE;
 
-    /*
-     * Set the default game mode settings
-     */
     fgState.GameModeSize.X  = 640;
     fgState.GameModeSize.Y  = 480;
     fgState.GameModeDepth   =  16;
@@ -344,13 +265,9 @@ void fgDeinitialize( void )
     fgState.MenuStateCallback = (FGCBmenuState)NULL ;
     fgState.MenuStatusCallback = (FGCBmenuStatus)NULL ;
 
-    /*
-     * FPS display
-     */
     fgState.SwapCount   = 0;
     fgState.SwapTime    = 0;
     fgState.FPSInterval = 0;
-
 
 #if TARGET_HOST_UNIX_X11
 
@@ -383,25 +300,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 	fgState.ProgramName = strdup (*argv);
     else
 	fgState.ProgramName = strdup ("");
-    /*
-     * Do not allow multiple initialization of the library
-     */
-    if( fgState.Time.Set )
-    {
-        /*
-         * We can't have multiple initialization performed
-         */
-        fgError( "illegal glutInit() reinitialization attemp" );
-    }
+    if (!fgState.ProgramName)
+	fgError ("Could not allocate space for the program's name.");
 
-    /*
-     * Have the internal freeglut structure initialized now
-     */
+    if( fgState.Time.Set )
+	fgError( "illegal glutInit() reinitialization attemp" );
+
     fgCreateStructure();
 
-    /*
-     * Remember the function's call time
-     */
 #if TARGET_HOST_UNIX_X11
     gettimeofday(&fgState.Time.Value, NULL);
 #elif TARGET_HOST_WIN32
@@ -420,180 +326,135 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
       }
     }
 
-    /*
-     * Grab the environment variable indicating the X display to use.
-     * This is harmless under Win32, so let's let it stay here...
-     */
 #if TARGET_HOST_WIN32
     if ( !getenv ( "DISPLAY" ) )
-      displayName = strdup ( "" ) ;
+	displayName = strdup ( "" ) ;
     else
 #endif
-    displayName = strdup( getenv( "DISPLAY" ) );
+	displayName = strdup( getenv( "DISPLAY" ) );
+    if (!displayName)
+	fgError ("Could not allocate space for display name.");
 
-    /*
-     * Have the program arguments parsed.
-     */
     for( i=1; i<argc; i++ )
     {
-        /*
-         * The X display name settings
-         */
         if( strcmp( argv[ i ], "-display" ) == 0 )
         {
-            /*
-             * Check for possible lack of the next argument
-             */
             if( ++i >= argc )
                 fgError( "-display parameter must be followed by display name" );
 
-            /*
-             * Release the previous display name (the one from app's environment)
-             */
-            free( displayName );
-
-            /*
-             * Make a working copy of the name for us to use
-             */
+            if( displayName )
+		free( displayName );
             displayName = strdup( argv[ i ] );
+	    if (!displayName)
+		fgError( "Could not allocate space for display name (%s)",
+		    argv [i]);
 
-            /*
-             * Have both arguments removed
-             */
             argv[ i - 1 ] = NULL;
-            argv[   i   ] = NULL;
-            (* pargc) -= 2;
+            argv[ i     ] = NULL;
+            (*pargc) -= 2;
         }
-
-        /*
-         * The geometry settings
-         */
         else if( strcmp( argv[ i ], "-geometry" ) == 0 )
         {
-          int result, x, y;
-          unsigned int w, h;
+	    int result, x, y;
+	    unsigned int w, h;
 
-          /*
-           * Again, check if there is at least one more argument
-           */
-          if ( ++i >= argc )
-            fgError( "-geometry parameter must be followed by window geometry settings" );
+	    if ( ++i >= argc )
+            fgError( "-geometry parameter must be followed by window "
+		"geometry settings" );
+	    result = sscanf ( argv[i], "%dx%d+%d+%d", &x, &y, &w, &h );
 
-          /*
-           * Otherwise scan the geometry settings...
-           */
-          result = sscanf ( argv[i], "%dx%d+%d+%d", &x, &y, &w, &h );
+	    if ( result > 3 )
+		fgState.Size.Y = h;
+	    if ( result > 2 )
+		fgState.Size.X = w;
 
-          /*
-           * Check what we have been supplied with...
-           */
-          if ( result > 3 )
-            fgState.Size.Y = h ;
+	    if( result > 1 )
+            {
+		if( y < 0 )
+		    fgState.Position.Y =
+			fgDisplay.ScreenHeight + y - fgState.Size.Y;
+		else
+		    fgState.Position.Y = y;
+	    }
 
-          if ( result > 2 )
-            fgState.Size.X = w ;
+	    if( result > 0 )
+            {
+		if( x < 0 )
+		    fgState.Position.X =
+			fgDisplay.ScreenWidth + x - fgState.Size.X;
+		else
+		    fgState.Position.X = x;
+	    }
 
-          if( result > 1 )
-          {
-            if( y < 0 )
-              fgState.Position.Y = fgDisplay.ScreenHeight + y - fgState.Size.Y;
-            else
-              fgState.Position.Y = y;
-          }
-
-          if( result > 0 )
-          {
-            if( x < 0 )
-              fgState.Position.X = fgDisplay.ScreenWidth + x - fgState.Size.X;
-            else
-              fgState.Position.X = x;
-          }
-
-          /*
-           * Have both arguments removed
-           */
-          argv[ i - 1 ] = NULL;
-          argv[   i   ] = NULL;
-          (* pargc) -= 2;
+	    argv[ i - 1 ] = NULL;
+	    argv[ i     ] = NULL;
+	    (*pargc) -= 2;
         }
-
-        /*
-         * The direct/indirect OpenGL contexts settings
-         */
         else if( strcmp( argv[ i ], "-direct" ) == 0)
         {
-            /*
-             * We try to force direct rendering...
-             */
             if( fgState.TryDirectContext == FALSE )
-                fgError( "parameters ambiguity, -direct and -indirect cannot be both specified" );
+                fgError( "parameters ambiguity, -direct and -indirect "
+		    "cannot be both specified" );
 
             fgState.ForceDirectContext = TRUE;
             argv[ i ] = NULL;
-            (* pargc)--;
+            (*pargc)--;
         }
         else if( strcmp( argv[ i ], "-indirect" ) == 0 )
         {
-            /*
-             * We try to force indirect rendering...
-             */
             if( fgState.ForceDirectContext == TRUE )
-                fgError( "parameters ambiguity, -direct and -indirect cannot be both specified" );
+                fgError( "parameters ambiguity, -direct and -indirect "
+		    "cannot be both specified" );
 
             fgState.TryDirectContext = FALSE;
             argv[ i ] = NULL;
-            (* pargc)--;
+            (*pargc)--;
         }
-
-        /*
-         * The '-iconic' parameter makes all new top-level
-         * windows created in iconified state...
-         */
         else if( strcmp( argv[ i ], "-iconic" ) == 0 )
         {
             fgState.ForceIconic = TRUE;
             argv[ i ] = NULL;
-            (* pargc)--;
+            (*pargc)--;
         }
-
-        /*
-         * The '-gldebug' option activates some OpenGL state debugging features
-         */
         else if( strcmp( argv[ i ], "-gldebug" ) == 0 )
         {
             fgState.GLDebugSwitch = TRUE;
             argv[ i ] = NULL;
-            (* pargc)--;
+            (*pargc)--;
         }
-
-        /*
-         * The '-sync' option activates X protocol synchronization (for debugging purposes)
-         */
         else if( strcmp( argv[ i ], "-sync" ) == 0 )
         {
             fgState.XSyncSwitch = TRUE;
             argv[ i ] = NULL;
-            (* pargc)--;
+            (*pargc)--;
         }
     }
 
     /*
-     * Have the arguments list compacted now
+     * Compact {argv}.
      */
     j = 2 ;
     for( i = 1; i < *pargc; i++, j++ )
     {
-      if( argv[ i ] == NULL )
-      {
-        while ( argv[j] == NULL ) j++ ;  /* Guaranteed to end because there are "*pargc" arguments left */
-        argv[i] = argv[j] ;
-      }
+	if( argv[ i ] == NULL )
+        {
+	    /* Guaranteed to end because there are "*pargc" arguments left */
+	    while ( argv[j] == NULL )
+		j++;
+	    argv[i] = argv[j] ;
+	}
     }
 
     /*
      * Have the display created now. As I am too lazy to implement
      * the program arguments parsing, we will have the DISPLAY
      * environment variable used for opening the X display:
+     *
+     * XXX The above comment is rather unclear.  We have just
+     * XXX completed parsing of the program arguments for GLUT
+     * XXX parameters.  We obviously canNOT parse the application-
+     * XXX specific parameters.  Can someone re-write the above
+     * XXX more clearly?
      */
     fgInitialize( displayName );
 
@@ -606,10 +467,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     if( fgState.Size.X < 0 || fgState.Size.Y < 0 )
         fgState.Size.Use = FALSE;
 
-    /*
-     * Do not forget about releasing the display name string
-     */
-    free( displayName );
+    if( displayName )
+	free( displayName );
 }
 
 /*
@@ -617,23 +476,15 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
  */
 void FGAPIENTRY glutInitWindowPosition( int x, int y )
 {
-    /*
-     * The settings can be disables when both coordinates are negative
-     */
     if( (x >= 0) && (y >= 0) )
     {
-        /*
-         * We want to specify the initial position of each of the windows
-         */
+
         fgState.Position.X   =    x;
         fgState.Position.Y   =    y;
         fgState.Position.Use = TRUE;
     }
     else
     {
-        /*
-         * The initial position of each of the windows is specified by the wm
-         */
         fgState.Position.X   =    -1;
         fgState.Position.Y   =    -1;
         fgState.Position.Use = FALSE;
@@ -645,23 +496,14 @@ void FGAPIENTRY glutInitWindowPosition( int x, int y )
  */
 void FGAPIENTRY glutInitWindowSize( int width, int height )
 {
-    /*
-     * The settings can be disables when both values are negative
-     */
     if( (width > 0) && (height > 0) )
     {
-        /*
-         * We want to specify the initial size of each of the windows
-         */
         fgState.Size.X   =  width;
         fgState.Size.Y   = height;
         fgState.Size.Use =   TRUE;
     }
     else
     {
-        /*
-         * The initial size of each of the windows is specified by the wm (officially this is an error condition)
-         */
         fgState.Size.X   =    -1;
         fgState.Size.Y   =    -1;
         fgState.Size.Use = FALSE;
@@ -879,7 +721,11 @@ void FGAPIENTRY glutInitDisplayString( char* displayMode )
              * Grab the value string that must follow the comparison operator...
              */
             if( comparison != FG_NONE && i < (gint) strlen( scanner->value.v_identifier ) )
+            {
                 valueString = strdup( scanner->value.v_identifier + i );
+		if (!valueString)
+		    fgError ("Could not allocate an internal string.");
+	    }		
 
             /*
              * If there was a value string, convert it to integer...
