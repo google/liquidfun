@@ -35,7 +35,7 @@ libglut_la_SOURCES = freeglut_callbacks.c \
 # Additional linker flags
 #	 
 libglut_la_LIBADD = $(LIBM) $(X_LIBS) -lGL -lGLU -lXext -lX11 -lXxf86vm
-libglut_la_LDFLAGS = -version-info 3:8:0
+libglut_la_LDFLAGS = -version-info 11:8:0
 
 #
 # End of file
