@@ -428,11 +428,23 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 
     /*
      * The GLX context creation, possibly trying the direct context rendering
+     *  or else use the current context if the user has so specified
      */
-    window->Window.Context = glXCreateContext(
-        fgDisplay.Display, window->Window.VisualInfo,
-        NULL, fgState.ForceDirectContext | fgState.TryDirectContext
-    );
+    if ( fgState.UseCurrentContext == TRUE )
+    {
+      window->Window.Context = glXGetCurrentContext();
+
+      if ( ! window->Window.Context )
+        window->Window.Context = glXCreateContext(
+            fgDisplay.Display, window->Window.VisualInfo,
+            NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+        );
+    }
+    else
+      window->Window.Context = glXCreateContext(
+          fgDisplay.Display, window->Window.VisualInfo,
+          NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+      );
 
     /*
      * Make sure the context is direct when the user wants it forced
@@ -536,7 +548,8 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 #       endif
     }
 
-#elif TARGET_HOST_WIN32
+#elif TAR
+GET_HOST_WIN32
 
 	WNDCLASS wc;
 	int flags;
@@ -563,13 +576,16 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 	    	h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 + GetSystemMetrics( SM_CYCAPTION );
       }
 
+
       /*
 	     * Check if the user wants us to use the default position/size
 	     */
 	    if( fgState.Position.Use == FALSE ) { x = CW_USEDEFAULT; y = CW_USEDEFAULT; }
-	    if( fgState.Size    .Use == FALSE ) { w = CW_USEDEFAULT; h = CW_USEDEFAULT; }
+	  
+  if( fgState.Size    .Use == FALSE ) { w = CW_USEDEFAULT; h = CW_USEDEFAULT; }
 
-	    /*
+	
+    /*
 	     * There's a small difference between creating the top, child and game mode windows
 	     */
 	    flags = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
@@ -579,6 +595,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 	    else
 		    flags |= WS_CHILD;
     }
+
     else
     {
         /*
@@ -591,6 +608,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
          */
         flags = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
     }
+
 
     /*
      * Create the window now, passing the freeglut window structure as the parameter
@@ -634,11 +652,13 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
       glReadBuffer ( GL_FRONT ) ;
     }
 
+
     /*
      * Set the newly created window as the current one
      */
     fgSetWindow( window );
 }
+
 
 /*
  * Closes a window, destroying the frame and OpenGL context
@@ -678,6 +698,7 @@ void fgCloseWindow( SFG_Window* window )
 }
 
 
+
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -691,6 +712,7 @@ int FGAPIENTRY glutCreateWindow( const char* title )
     return( fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
                             fgState.Size.X, fgState.Size.Y, FALSE )->ID );
 }
+
 
 /*
  * This function creates a sub window.
@@ -723,6 +745,7 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     return( window->ID );
 }
 
+
 /*
  * Destroys a window and all of its subwindows
  */
@@ -748,6 +771,7 @@ void FGAPIENTRY glutDestroyWindow( int windowID )
    */
   fgState.ExecState = ExecState ;
 }
+
 
 /*
  * This function selects the current window
@@ -785,8 +809,10 @@ void FGAPIENTRY glutSetWindow( int ID )
         return;
     }
 
+
     fgSetWindow ( window ) ;
 }
+
 
 /*
  * This function returns the ID number of the current window, 0 if none exists
@@ -806,11 +832,13 @@ int FGAPIENTRY glutGetWindow( void )
         return( 0 );
     }
 
+
     /*
      * Otherwise, return the ID of the current window
      */
     return( fgStructure.Window->ID );
 }
+
 
 /*
  * This function makes the current window visible
@@ -835,6 +863,7 @@ void FGAPIENTRY glutShowWindow( void )
 #endif
 }
 
+
 /*
  * This function hides the current window
  */
@@ -854,6 +883,7 @@ void FGAPIENTRY glutHideWindow( void )
          */
         XWithdrawWindow( fgDisplay.Display, fgStructure.Window->Window.Handle, fgDisplay.Screen );
     }
+
     else
     {
         /*
@@ -861,6 +891,7 @@ void FGAPIENTRY glutHideWindow( void )
          */
         XUnmapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
     }
+
 
     /*
      * Flush the X state now
@@ -875,6 +906,7 @@ void FGAPIENTRY glutHideWindow( void )
 
 #endif
 }
+
 
 /*
  * Iconify the current window (top-level windows only)
@@ -898,6 +930,7 @@ void FGAPIENTRY glutIconifyWindow( void )
 
 #endif
 }
+
 
 /*
  * Set the current window's title
@@ -939,6 +972,7 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 		XFlush( fgDisplay.Display );
 	}
 
+
 #elif TARGET_HOST_WIN32
 	/*
 	 * This seems to be a bit easier under Win32
@@ -947,6 +981,7 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 
 #endif
 }
+
 
 /*
  * Set the current window's iconified title
@@ -988,6 +1023,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 		XFlush( fgDisplay.Display );
 	}
 
+
 #elif TARGET_HOST_WIN32
 	/*
 	 * This seems to be a bit easier under Win32
@@ -996,6 +1032,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 
 #endif
 }
+
 
 /*
  * Change the current window's size
@@ -1031,12 +1068,14 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
   		width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
 	  	height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 + GetSystemMetrics( SM_CYCAPTION );
     }
+
     else  /* This is a subwindow, get the parent window's position and subtract it off */
     {
       GetWindowRect ( fgStructure.Window->Parent->Window.Handle, &winRect ) ;
       x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME ) ;
       y -= winRect.top + GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION ) ;
     }
+
 
 		/*
 		 * Resize the window, forcing a redraw to happen
@@ -1050,8 +1089,10 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
 			TRUE
 		);
 	}
+
 #endif
 }
+
 
 /*
  * Change the current window's position
@@ -1089,8 +1130,10 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
 		);
 	}
 
+
 #endif
 }
+
 
 /*
  * Lowers the current window (by Z order change)
@@ -1119,6 +1162,7 @@ void FGAPIENTRY glutPushWindow( void )
 #endif
 }
 
+
 /*
  * Raises the current window (by Z order change)
  */
@@ -1146,6 +1190,7 @@ void FGAPIENTRY glutPopWindow( void )
 #endif
 }
 
+
 /*
  * Resize the current window so that it fits the whole screen
  */
@@ -1164,6 +1209,7 @@ void FGAPIENTRY glutFullScreen( void )
     );
 }
 
+
 /*
  * A.Donev: Set and retrieve the window's user data
  */
@@ -1172,18 +1218,11 @@ void* FGAPIENTRY glutGetWindowData( void )
    return(fgStructure.Window->UserData);
 }
 
+
 void FGAPIENTRY glutSetWindowData(void* data)
 {
   fgStructure.Window->UserData=data;
 }
 
+
 /*** END OF FILE ***/
-
-
-
-
-
-
-
-
-
