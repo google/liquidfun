@@ -133,9 +133,6 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
 
 /*
  * Sets the Visibility callback for the current window.
- *
- * I had to peer to GLUT sources to clean up the mess.
- * Can anyone please explain me what is going on here?!?
  */
 static void fghVisibility( int status )
 {
@@ -181,9 +178,6 @@ void FGAPIENTRY glutSpecialUpFunc( void (* callback)( int, int, int ) )
 void FGAPIENTRY glutJoystickFunc( void (* callback)( unsigned int, int, int, int ), int pollInterval )
 {
     SET_CALLBACK( Joystick );
-
-    freeglut_return_if_fail( fgStructure.Window != NULL );
-
     /*
      * Do not forget setting the joystick poll rate
      */
@@ -247,7 +241,8 @@ void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
 /* A. Donev: Destruction callback for menus */
 void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
 {
-   if( fgStructure.Menu == NULL ) return;
+   if( fgStructure.Menu == NULL )
+       return;
    fgStructure.Menu->Destroy = callback;
 }
 
