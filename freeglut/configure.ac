@@ -33,6 +33,7 @@ CFLAGS="$save_CFLAGS"
 
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
+AC_FUNC_VPRINTF
 AC_CHECK_LIBM
 AC_SUBST([LIBM])
 

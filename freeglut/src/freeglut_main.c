@@ -30,6 +30,14 @@
 #if HAVE_ERRNO_H
 #    include <errno.h>
 #endif
+#include <stdarg.h>
+#if HAVE_VPRINTF
+#    define VFPRINTF(s,f,a) vfprintf((s),(f),(a))
+#elif HAVE_DOPRNT
+#    define VFPRINTF(s,f,a) _doprnt((f),(a),(s))
+#else
+#    define VFPRINTF(s,f,a)
+#endif
 
 #if TARGET_HOST_WINCE
 
@@ -348,8 +356,8 @@ void fgError( const char *fmt, ... )
 
     fprintf( stderr, "freeglut ");
     if( fgState.ProgramName )
-        fprintf (stderr, "(%s): ", fgState.ProgramName);
-    vfprintf( stderr, fmt, ap );
+        fprintf( stderr, "(%s): ", fgState.ProgramName );
+    VFPRINTF( stderr, fmt, ap );
     fprintf( stderr, "\n" );
 
     va_end( ap );
@@ -369,7 +377,7 @@ void fgWarning( const char *fmt, ... )
     fprintf( stderr, "freeglut ");
     if( fgState.ProgramName )
         fprintf( stderr, "(%s): ", fgState.ProgramName );
-    vfprintf( stderr, fmt, ap );
+    VFPRINTF( stderr, fmt, ap );
     fprintf( stderr, "\n" );
 
     va_end( ap );

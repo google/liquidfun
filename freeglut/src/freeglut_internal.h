@@ -73,7 +73,6 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #if HAVE_SYS_TYPES_H
 #    include <sys/types.h>
 #endif
