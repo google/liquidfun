@@ -719,3 +719,6 @@ caught. This makes sense and is more compatible with GLUT.
 
 (190) Added eMbedded Visual Tools project/workspace files to
 distribution.
+
+(191) Renamed "configure.in" to the officially preferred
+"configure.ac".
