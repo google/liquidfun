@@ -70,7 +70,6 @@
  * Calls a window's redraw method. This is used when
  * a redraw is forced by the incoming window messages.
  */
-
 static void fghRedrawWindowByHandle
 #if TARGET_HOST_UNIX_X11
     ( Window handle )
@@ -78,37 +77,13 @@ static void fghRedrawWindowByHandle
     ( HWND handle )
 #endif
 {
-    /*
-     * Find the window we have to redraw...
-     */
     SFG_Window* window = fgWindowByHandle( handle );
+
     freeglut_return_if_fail( window != NULL );
-
-    /*
-     * Check if there is a display callback hooked to it
-     */
     freeglut_return_if_fail( window->Callbacks.Display != NULL );
-
-    /*
-     * Return if the window is not visible
-     */
     freeglut_return_if_fail( window->State.Visible == TRUE );
-
-    /*
-     * Set the window as the current one.
-     */
     fgSetWindow( window );
-
-    /*
-     * Do not exagerate with the redisplaying
-     */
     window->State.Redisplay = FALSE;
-
-    /*
-     * Have the callback executed now. The buffers should
-     * be swapped by the glutSwapBuffers() execution inside
-     * the callback itself.
-     */
 
     window->Callbacks.Display();
 }
@@ -125,50 +100,27 @@ static void fghReshapeWindowByHandle
     ( HWND handle, int width, int height )
 #endif
 {
-  SFG_Window *current_window = fgStructure.Window ;
+    SFG_Window *current_window = fgStructure.Window ;
 
-    /*
-     * Find the window that received the reshape event
-     */
     SFG_Window* window = fgWindowByHandle( handle );
     freeglut_return_if_fail( window != NULL );
-
-    /*
-     * Remember about setting the current window...
-     */
     fgSetWindow( window );
-
-    /*
-     * Check if there is a reshape callback hooked
-     */
     if( window->Callbacks.Reshape != NULL )
-    {
-        /*
-         * OKi, have it called immediately
-         */
         window->Callbacks.Reshape( width, height );
-    }
     else
-    {
-        /*
-         * Otherwise just resize the viewport
-         */
         glViewport( 0, 0, width, height );
-    }
 
     /*
-     * Force a window redraw.  In Windows at least this is only a partial solution:  if the
-     * window is increasing in size in either dimension, the already-drawn part does not get
-     * drawn again and things look funny.  But without this we get this bad behaviour whenever
-     * we resize the window.
+     * Force a window redraw.  In Windows at least this is only a partial
+     * solution:  if the window is increasing in size in either dimension,
+     * the already-drawn part does not get drawn again and things look funny.
+     * But without this we get this bad behaviour whenever we resize the
+     * window.
      */
     window->State.Redisplay = TRUE ;
 
-    /*
-     * If this is a menu, restore the active window
-     */
     if ( window->IsMenu )
-      fgSetWindow ( current_window ) ;
+	fgSetWindow ( current_window ) ;
 }
 
 /*
@@ -177,38 +129,20 @@ static void fghReshapeWindowByHandle
 static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
 {
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Check if there is an idle callback hooked
-     */
     if( (window->Callbacks.Display != NULL) &&
         (window->State.Redisplay == TRUE) &&
         (window->State.Visible == TRUE) )
     {
         SFG_Window *current_window = fgStructure.Window ;
 
-        /*
-         * OKi, this is the case: have the window set as the current one
-         */
         fgSetWindow( window );
-
-        /*
-         * Do not exagerate with the redisplaying
-         */
         window->State.Redisplay = FALSE;
-
-        /*
-         * And execute the display callback immediately after
-         */
         window->Callbacks.Display();
-
         fgSetWindow ( current_window ) ;
     }
 
 #elif TARGET_HOST_WIN32
 
-    /*
-     * Do we need to explicitly resize the window?
-     */
     if( window->State.NeedToResize )
     {
         SFG_Window *current_window = fgStructure.Window ;
@@ -221,26 +155,15 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
             glutGet( GLUT_WINDOW_HEIGHT )
         );
 
-        /*
-         * Never ever do that again:
-         */
         window->State.NeedToResize = FALSE;
-
         fgSetWindow ( current_window ) ;
     }
 
-    /*
-     * This is done in a bit different way under Windows
-     */
     if( (window->Callbacks.Display != NULL) &&
         (window->State.Redisplay == TRUE) &&
         (window->State.Visible == TRUE) )
     {
-      /*
-       * Do not exagerate with the redisplaying
-       */
       window->State.Redisplay = FALSE;
-
       RedrawWindow( 
         window->Window.Handle, NULL, NULL, 
         RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
@@ -249,9 +172,6 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
 
 #endif
 
-    /*
-     * Process this window's children (if any)
-     */
     fgEnumSubWindows( window, fghcbDisplayWindow, enumerator );
 }
 
@@ -262,15 +182,8 @@ static void fghDisplayAll( void )
 {
     SFG_Enumerator enumerator;
 
-    /*
-     * Uses a method very similiar for fgWindowByHandle...
-     */
     enumerator.found = FALSE;
     enumerator.data  =  NULL;
-
-    /*
-     * Start the enumeration now:
-     */
     fgEnumWindows( fghcbDisplayWindow, &enumerator );
 }
 
@@ -281,25 +194,11 @@ static void fghcbCheckJoystickPolls( SFG_Window *window, SFG_Enumerator *enumera
 {
     long int checkTime = fgElapsedTime();
 
-    /*
-     * Check if actually need to do the poll for the currently enumerated window:
-     */
     if( window->State.JoystickLastPoll + window->State.JoystickPollRate <= checkTime )
     {
-        /*
-         * Yeah, that's it. Poll the joystick...
-         */
         fgJoystickPollWindow( window );
-
-        /*
-         * ...and reset the polling counters:
-         */
         window->State.JoystickLastPoll = checkTime;
     }
-
-    /*
-     * Process this window's children (if any)
-     */
     fgEnumSubWindows( window, fghcbCheckJoystickPolls, enumerator );
 }
 
@@ -310,15 +209,8 @@ static void fghCheckJoystickPolls( void )
 {
     SFG_Enumerator enumerator;
 
-    /*
-     * Uses a method very similiar for fgWindowByHandle...
-     */
     enumerator.found = FALSE;
     enumerator.data  =  NULL;
-
-    /*
-     * Start the enumeration now:
-     */
     fgEnumWindows( fghcbCheckJoystickPolls, &enumerator );
 }
 
@@ -336,19 +228,14 @@ static void fghCheckTimers( void )
     /*
      * For every timer that is waiting for triggering
      */
-    for( timer = (SFG_Timer *)fgState.Timers.First; timer; timer = (SFG_Timer *)next )
+    for( timer = (SFG_Timer *)fgState.Timers.First;
+	 timer;
+	 timer = (SFG_Timer *)next )
     {
-	      next = (SFG_Timer *)timer->Node.Next;
-
-        /*
-         * Check for the timeout:
-         */
+	next = (SFG_Timer *)timer->Node.Next;
         if( timer->TriggerTime <= checkTime )
         {
-            /*
-             * Add the timer to the timed out timers list
-             */
-	          fgListRemove( &fgState.Timers, &timer->Node );
+	    fgListRemove( &fgState.Timers, &timer->Node );
             fgListAppend( &timedOut, &timer->Node );
         }
     }
@@ -359,10 +246,10 @@ static void fghCheckTimers( void )
      */
     while ( (timer = (SFG_Timer *)timedOut.First) )
     {
-        if( timer->Callback != NULL )
-            timer->Callback( timer->ID );
+	if( timer->Callback != NULL )
+	    timer->Callback( timer->ID );
 	fgListRemove( &timedOut, &timer->Node );
-        free( timer );
+	free( timer );
     }
 }
 
@@ -373,17 +260,17 @@ static void fghCheckTimers( void )
 long fgElapsedTime( void )
 {
 #if TARGET_HOST_UNIX_X11
-	struct timeval now;
-	long elapsed;
+    struct timeval now;
+    long elapsed;
 
-	gettimeofday( &now, NULL );
+    gettimeofday( &now, NULL );
+    
+    elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
+    elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
 
-	elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
-	elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
-
-	return( elapsed );
+    return( elapsed );
 #elif TARGET_HOST_WIN32
-  return (timeGetTime() - fgState.Time.Value);
+    return (timeGetTime() - fgState.Time.Value);
 #endif
 }
 
@@ -545,27 +432,18 @@ void FGAPIENTRY glutMainLoopEvent( void )
   /*
    * This code was repeated constantly, so here it goes into a definition:
    */
-# define GETWINDOW(a) window = fgWindowByHandle( event.a.window );if( window == NULL ) break;
-# define GETMOUSE(a) window->State.MouseX = event.a.x; window->State.MouseY = event.a.y;
+# define GETWINDOW(a)                          \
+  window = fgWindowByHandle( event.a.window ); \
+  if( window == NULL )                         \
+    break;
+# define GETMOUSE(a)                           \
+  window->State.MouseX = event.a.x;            \
+  window->State.MouseY = event.a.y;
 
-  /*
-   * Make sure the display has been created etc.
-   */
   freeglut_assert_ready;
-
-  /*
-   * Do we have any event messages pending?
-   */
   while( XPending( fgDisplay.Display ) )
   {
-    /*
-     * Grab the next event to be processed...
-     */
     XNextEvent( fgDisplay.Display, &event );
-
-    /*
-     * Check the event's type
-     */
     switch( event.type )
     {
     case DestroyNotify:
