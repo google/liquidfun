@@ -117,12 +117,12 @@ void SampleDisplay( void )
      * And then drawn...
      */
     glColor3f( 1, 1, 0 );
-    //glutWireCube( 20.0 );
+    /* glutWireCube( 20.0 ); */
     glutWireTeapot( 20.0 );
-    //glutWireSpher( 15.0, 15, 15 );
-    //glColor3f( 0, 1, 0 );
-    //glutWireCube( 30.0 );
-    //glutSolidCone( 10, 20, 10, 2 );
+    /* glutWireSpher( 15.0, 15, 15 ); */
+    /* glColor3f( 0, 1, 0 ); */
+    /* glutWireCube( 30.0 ); */
+    /* glutSolidCone( 10, 20, 10, 2 ); */
 
     /*
      * Don't forget about the model-view matrix

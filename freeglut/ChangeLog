@@ -722,3 +722,5 @@ distribution.
 
 (191) Renamed "configure.in" to the officially preferred
 "configure.ac".
+
+(192) Make "gcc -Wall -pedantic -Werror" happy.

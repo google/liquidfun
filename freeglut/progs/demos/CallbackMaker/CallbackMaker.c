@@ -47,67 +47,67 @@ Display(void)
   if ( reshape_called )
   {
     sprintf ( line, "Reshape %d:  %d %d\n", reshape_seq, reshape_width, reshape_height );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( key_called )
   {
     sprintf ( line, "Key %d:  %d(%c) %d %d\n", key_seq, key_key, key_key, key_x, key_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( special_called )
   {
     sprintf ( line, "Special %d:  %d(%c) %d %d\n", special_seq, special_key, special_key, special_x, special_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( visibility_called )
   {
     sprintf ( line, "Visibility %d:  %d\n", visibility_seq, visibility_vis );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( keyup_called )
   {
     sprintf ( line, "Key Up %d:  %d(%c) %d %d\n", keyup_seq, keyup_key, keyup_key, keyup_x, keyup_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( specialup_called )
   {
     sprintf ( line, "Special Up %d:  %d(%c) %d %d\n", specialup_seq, specialup_key, specialup_key, specialup_x, specialup_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( joystick_called )
   {
     sprintf ( line, "Joystick %d:  %d %d %d %d\n", joystick_seq, joystick_a, joystick_b, joystick_c, joystick_d );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( mouse_called )
   {
     sprintf ( line, "Mouse %d:  %d %d %d %d\n", mouse_seq, mouse_button, mouse_updown, mouse_x, mouse_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( mousewheel_called )
   {
     sprintf ( line, "Mouse Wheel %d:  %d %d %d %d\n", mousewheel_seq, mousewheel_number, mousewheel_direction, mousewheel_x, mousewheel_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( motion_called )
   {
     sprintf ( line, "Motion %d:  %d %d\n", motion_seq, motion_x, motion_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   if ( passivemotion_called )
   {
     sprintf ( line, "Passive Motion %d:  %d %d\n", passivemotion_seq, passivemotion_x, passivemotion_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, line );
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
   }
 
   glMatrixMode ( GL_PROJECTION );
@@ -336,7 +336,7 @@ main(int argc, char *argv[])
   glutVisibilityFunc( Visibility );
   glutKeyboardUpFunc( KeyUp );
   glutSpecialUpFunc( SpecialUp );
-//  glutJoystickFunc( Joystick, 100 );
+  /*  glutJoystickFunc( Joystick, 100 ); */
   glutMouseFunc ( Mouse ) ;
   glutMouseWheelFunc ( MouseWheel ) ;
   glutMotionFunc ( Motion ) ;

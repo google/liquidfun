@@ -89,7 +89,7 @@
 #           pragma comment (lib, "gdi32.lib")    /* link Windows GDI lib        */
 #           pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
 #           pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
-#       endif //_WIN32_WCE
+#       endif /* _WIN32_WCE */
 #   endif
 
 #else

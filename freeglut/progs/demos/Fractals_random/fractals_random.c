@@ -26,7 +26,8 @@
 #include <string.h>
 #include <math.h>
 #ifdef WIN32
-#include <crtdbg.h>  // DUMP MEMORY LEAKS
+/* DUMP MEMORY LEAKS */
+#include <crtdbg.h>
 #endif
 
 typedef struct
@@ -368,7 +369,8 @@ main(int argc, char *argv[])
   free ( affine ) ;
 
 #ifdef WIN32
-  _CrtDumpMemoryLeaks () ;  // DUMP MEMORY LEAK INFORMATION
+  /* DUMP MEMORY LEAK INFORMATION */
+  _CrtDumpMemoryLeaks () ;
 #endif
 
   return 0;             /* ANSI C requires main to return int. */

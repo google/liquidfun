@@ -144,7 +144,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
              * need to pick a color for foreground/background---but what
              * one we pick doesn't matter for GLUT_CURSOR_NONE.
              */
-            static unsigned char no_cursor_bits[ 32 ];
+            static char no_cursor_bits[ 32 ];
             XColor black;
             no_cursor = XCreatePixmapFromBitmapData( fgDisplay.Display,
                                                      fgDisplay.RootWindow,
