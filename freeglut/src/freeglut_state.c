@@ -562,16 +562,13 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
  */
 int FGAPIENTRY glutGetModifiers( void )
 {
-    if( fgStructure.Window == NULL )
-        return( 0 );
-
-    if( fgStructure.Window->State.Modifiers == 0xffffffff )
+    if( fgState.Modifiers == 0xffffffff )
     {
         fgWarning( "glutGetModifiers() called outside an input callback" );
         return( 0 );
     }
 
-    return( fgStructure.Window->State.Modifiers );
+    return( fgState.Modifiers );
 }
 
 /*

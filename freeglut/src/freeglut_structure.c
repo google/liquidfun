@@ -105,7 +105,6 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
      * Set the default mouse cursor and reset the modifiers value
      */
     window->State.Cursor    = GLUT_CURSOR_INHERIT;
-    window->State.Modifiers = 0xffffffff;
 
     window->IsMenu = isMenu;
 

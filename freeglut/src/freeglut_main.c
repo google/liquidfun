@@ -796,7 +796,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             /*
              * XXX Why don't we use {window}?  Other code here does...
              */
-            fgStructure.Window->State.Modifiers = fgGetXModifiers( &event );
+            fgState.Modifiers = fgGetXModifiers( &event );
 
             /*
              * Finally execute the mouse or mouse wheel callback
@@ -839,7 +839,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             /*
              * Trash the modifiers state
              */
-            fgStructure.Window->State.Modifiers = 0xffffffff;
+            fgState.Modifiers = 0xffffffff;
         }
         break;
 
@@ -891,11 +891,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     if( keyboard_cb )
                     {
                         fgSetWindow( window );
-                        window->State.Modifiers = fgGetXModifiers( &event );
+                        fgState.Modifiers = fgGetXModifiers( &event );
                         keyboard_cb( asciiCode[ 0 ],
                                      event.xkey.x, event.xkey.y
                         );
-                        window->State.Modifiers = 0xffffffff;
+                        fgState.Modifiers = 0xffffffff;
                     }
                 }
                 else
@@ -945,9 +945,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     if( special_cb && ( special != -1 ) )
                     {
                         fgSetWindow( window );
-                        window->State.Modifiers = fgGetXModifiers( &event );
+                        fgState.Modifiers = fgGetXModifiers( &event );
                         special_cb( special, event.xkey.x, event.xkey.y );
-                        window->State.Modifiers = 0xffffffff;
+                        fgState.Modifiers = 0xffffffff;
                     }
                 }
             }
@@ -1286,7 +1286,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
-        window->State.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fgGetWin32Modifiers( );
 
         if( ( wParam & MK_LBUTTON ) ||
             ( wParam & MK_MBUTTON ) ||
@@ -1297,7 +1297,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             INVOKE_WCB( *window, Passive, ( window->State.MouseX,
                                             window->State.MouseY ) );
 
-        window->State.Modifiers = 0xffffffff;
+        fgState.Modifiers = 0xffffffff;
     }
     break;
 
@@ -1423,7 +1423,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
 
         fgSetWindow( window );
-        fgStructure.Window->State.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fgGetWin32Modifiers( );
 
         INVOKE_WCB(
             *window, Mouse,
@@ -1434,7 +1434,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             )
         );
 
-        fgStructure.Window->State.Modifiers = 0xffffffff;
+        fgState.Modifiers = 0xffffffff;
     }
     break;
 
@@ -1468,7 +1468,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
 
         fgSetWindow( window );
-        fgStructure.Window->State.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fgGetWin32Modifiers( );
 
         while( ticks-- )
             if( FETCH_WCB( *window, MouseWheel ) )
@@ -1498,7 +1498,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 );
             }
 
-        fgStructure.Window->State.Modifiers = 0xffffffff;
+        fgState.Modifiers = 0xffffffff;
     }
     break;
 
@@ -1515,7 +1515,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Remember the current modifiers state. This is done here in order 
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
-        window->State.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fgGetWin32Modifiers( );
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
@@ -1567,7 +1567,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                           window->State.MouseX, window->State.MouseY )
             );
 
-        window->State.Modifiers = 0xffffffff;
+        fgState.Modifiers = 0xffffffff;
     }
     break;
 
@@ -1581,7 +1581,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Remember the current modifiers state. This is done here in order 
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
-        window->State.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fgGetWin32Modifiers( );
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
@@ -1650,7 +1650,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                           window->State.MouseX, window->State.MouseY )
             );
 
-        window->State.Modifiers = 0xffffffff;
+        fgState.Modifiers = 0xffffffff;
     }
     break;
 
@@ -1668,12 +1668,12 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          */
         if( FETCH_WCB( *window, Keyboard ) )
         {
-            window->State.Modifiers = fgGetWin32Modifiers( );
+            fgState.Modifiers = fgGetWin32Modifiers( );
             INVOKE_WCB( *window, Keyboard,
                         ( (char)wParam,
                           window->State.MouseX, window->State.MouseY )
             );
-            window->State.Modifiers = 0xffffffff;
+            fgState.Modifiers = 0xffffffff;
         }
     }
     break;

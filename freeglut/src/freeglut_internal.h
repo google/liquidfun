@@ -230,6 +230,7 @@ struct tagSFG_State
     GLboolean        XSyncSwitch;          /* X11 sync protocol switch       */
 
     GLboolean        IgnoreKeyRepeat;      /* Whether to ignore key repeat.  */
+    int              Modifiers;           /* Current ALT/SHIFT/CTRL state    */
 
     GLuint           FPSInterval;          /* Interval between FPS printfs   */
     GLuint           SwapCount;            /* Count of glutSwapBuffer calls  */
@@ -342,7 +343,6 @@ struct tagSFG_WindowState
     GLboolean       Visible;            /* Is the window visible now         */
 
     int             Cursor;             /* The currently selected cursor     */
-    int             Modifiers;          /* The current ALT/SHIFT/CTRL state  */
 
     long            JoystickPollRate;   /* The joystick polling rate         */
     long            JoystickLastPoll;   /* When the last poll has happened   */

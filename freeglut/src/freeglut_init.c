@@ -66,6 +66,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GL_FALSE,              /* GLDebugSwitch */
                       GL_FALSE,              /* XSyncSwitch */
                       GL_TRUE,               /* IgnoreKeyRepeat */
+                      0xffffffff,            /* Modifiers */
                       0,                     /* FPSInterval */
                       0,                     /* SwapCount */
                       0,                     /* SwapTime */
@@ -84,6 +85,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       72,                     /* GameModeRefresh */
                       GLUT_ACTION_EXIT,       /* ActionOnWindowClose */
                       GLUT_EXEC_STATE_INIT    /* ExecState */
+                      NULL,                   /* ProgramName */
 };
 
 
@@ -258,6 +260,7 @@ void fgDeinitialize( void )
     fgState.ExecState           = GLUT_EXEC_STATE_INIT;
 
     fgState.IgnoreKeyRepeat = GL_TRUE;
+    fgState.Modifiers       = 0xffffffff;
 
     fgState.GameModeSize.X  = 640;
     fgState.GameModeSize.Y  = 480;
@@ -453,15 +456,16 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     char* geometry = NULL;
     int i, j, argc = *pargc;
 
-    if (pargc && *pargc && argv && *argv && **argv)
-        fgState.ProgramName = strdup (*argv);
-    else
-        fgState.ProgramName = strdup ("");
-    if( !fgState.ProgramName )
-        fgError ("Could not allocate space for the program's name.");
-
     if( fgState.Initalized )
         fgError( "illegal glutInit() reinitialization attemp" );
+
+    if (pargc && *pargc && argv && *argv && **argv)
+    {
+        fgState.ProgramName = strdup (*argv);
+
+        if( !fgState.ProgramName )
+            fgError ("Could not allocate space for the program's name.");
+    }
 
     fgCreateStructure( );
 
