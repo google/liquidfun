@@ -159,7 +159,7 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
   glPopClientAttrib();
 }
 
-void FGAPIENTRY glutBitmapString( void* fontID, const char *string )
+void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
 {
   int c;
   int numchar = strlen ( string ) ;
@@ -245,7 +245,7 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
 /*
  * Return the width of a string drawn using a bitmap font
  */
-int FGAPIENTRY glutBitmapLength( void* fontID, const char* string )
+int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
 {
   int c, length = 0, this_line_length = 0;
 
@@ -330,7 +330,7 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
   glTranslatef(schar->Right, 0.0, 0.0);
 }
 
-void FGAPIENTRY glutStrokeString( void* fontID, const char *string )
+void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 {
   int c, i, j;
   int numchar = strlen ( string ) ;
@@ -348,7 +348,7 @@ void FGAPIENTRY glutStrokeString( void* fontID, const char *string )
    */
   for( c = 0; c < numchar; c++ )
   {
-    if ( ( string[ c ] >= 0 ) && ( string[ c ] < font->Quantity ) )
+    if ( string[ c ] < font->Quantity )
     {
       if ( string[c] == '\n' )
       {
@@ -405,7 +405,7 @@ int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
 /*
  * Return the width of a string drawn using a stroke font
  */
-int FGAPIENTRY glutStrokeLength( void* fontID, const char* string )
+int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
 {
   int c;
   float length = 0.0;
@@ -422,7 +422,7 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const char* string )
   int numchar = strlen ( string ) ;
   for( c = 0; c < numchar; c++ )
   {
-    if ( ( string[ c ] >= 0 ) && ( string[ c ] < font->Quantity ) )
+    if ( string[ c ] < font->Quantity )
     {
       if ( string[ c ] == '\n' )  /* Carriage return, reset the length of this line */
       {
