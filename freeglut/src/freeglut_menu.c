@@ -215,6 +215,14 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
         menuEntry->SubMenu->X = menu->X + menu->Width ;
         menuEntry->SubMenu->Y = menu->Y + menuEntry->Ordinal * FREEGLUT_MENU_HEIGHT ;
 
+        if ( menuEntry->SubMenu->X + menuEntry->SubMenu->Width > glutGet (
+GLUT_SCREEN_WIDTH ) )
+        menuEntry->SubMenu->X = menu->X - menuEntry->SubMenu->Width ;
+
+        if ( menuEntry->SubMenu->Y + menuEntry->SubMenu->Height > glutGet (
+GLUT_SCREEN_HEIGHT ) )
+        menuEntry->SubMenu->Y -=menuEntry->SubMenu->Height ;
+
         fgSetWindow ( menuEntry->SubMenu->Window ) ;
         glutPositionWindow ( menuEntry->SubMenu->X, menuEntry->SubMenu->Y ) ;
         glutReshapeWindow ( menuEntry->SubMenu->Width, menuEntry->SubMenu->Height ) ;
@@ -513,6 +521,12 @@ void fgActivateMenu( SFG_Window* window, int button )
   menu->X = window->State.MouseX + glutGet ( GLUT_WINDOW_X ) ;
   menu->Y = window->State.MouseY + glutGet ( GLUT_WINDOW_Y ) ;
 
+  if ( menu->X + menu->Width > glutGet ( GLUT_SCREEN_WIDTH ) )
+    menu->X -=menu->Width ;
+
+  if ( menu->Y + menu->Height > glutGet ( GLUT_SCREEN_HEIGHT ) )
+    menu->Y -=menu->Height ;
+
   fgSetWindow ( menu->Window ) ;
   glutPositionWindow ( menu->X, menu->Y ) ;
   glutReshapeWindow ( menu->Width, menu->Height ) ;
@@ -520,10 +534,6 @@ void fgActivateMenu( SFG_Window* window, int button )
   glutShowWindow () ;
   menu->Window->ActiveMenu = menu ;
 
-/*  if( x > ( glutGet( GLUT_WINDOW_WIDTH ) - menu->Width ) )
-    menu->X = glutGet( GLUT_WINDOW_WIDTH ) - menu->Width;
-  if( y > ( glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height) )
-    menu->Y = glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height; */
 }
 
 /*
