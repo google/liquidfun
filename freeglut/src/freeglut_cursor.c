@@ -42,7 +42,9 @@
  * TODO BEFORE THE STABLE RELEASE:
  *
  *  fgDisplayCursor()   -- this waits for better times
- *  glutSetCursor()     -- both X and Win32 mappings are incomplete
+ *                         XXX Just delete fgDisplayCursor?
+ *  glutSetCursor()     -- Win32 mappings are incomplete
+ *                         X mappings are nearly right.
  *
  * It would be good to use custom mouse cursor shapes, and introduce
  * an option to display them using glBitmap() and/or texture mapping,
@@ -56,9 +58,6 @@
  */
 void fgDisplayCursor( void )
 {
-    /*
-     * Do nothing for the moment
-     */
 }
 
 
@@ -69,25 +68,25 @@ void fgDisplayCursor( void )
  */
 void FGAPIENTRY glutSetCursor( int cursorID )
 {
-    /*
-     * Make sure freeglut is ready and there is a current window set
-     */
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
     /*
      * Open issues:
-     * (a) GLUT_CURSOR_NONE doesn't do what it should.
+     * (a) GLUT_CURSOR_NONE doesn't do what it should.  We can probably
+     *     build an empty pixmap for it, though, quite painlessly.
      * (b) Are we allocating resources, or causing X to do so?
      *     If yes, we should arrange to deallocate!
      * (c) No error checking.  Is that a problem?
+     * (d) FULL_CROSSHAIR demotes to plain CROSSHAIR.  Old GLUT allows
+     *     for this, but if there is a system that easily supports a full-
+     *     window (or full-screen) crosshair, we might consider it.
+     * (e) Out-of-range cursor-types are ignored.  Should we abort?
+     *     Print a warning message?
      */
     {
 	Cursor cursor;
-
-	/*
-	 * For now we'll limit ourselves to the X cursor fonts...
-	 */
 #define MAP_CURSOR(a,b) case a: cursor = XCreateFontCursor( fgDisplay.Display, b ); break;
 	if( GLUT_CURSOR_FULL_CROSSHAIR == cursorID )
 	    cursorID = GLUT_CURSOR_CROSSHAIR;
@@ -120,9 +119,6 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 	    return;
 	}
 	
-	/*
-	 * Define a window's cursor now
-	 */
 	if( GLUT_CURSOR_INHERIT == cursorID )
 	    XUndefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle );
 	else
@@ -130,6 +126,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
     }
 
 #elif TARGET_HOST_WIN32
+
 	/*
 	 * This is a temporary solution only...
 	 */
@@ -160,12 +157,8 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 		default:
 		MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
 	}
-
 #endif
 
-    /*
-     * Remember the currently selected cursor
-     */
     fgStructure.Window->State.Cursor = cursorID;
 }
 
@@ -174,12 +167,11 @@ void FGAPIENTRY glutSetCursor( int cursorID )
  */
 void FGAPIENTRY glutWarpPointer( int x, int y )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Move the mouse pointer to given window coordinates
-     */
+
     XWarpPointer(
         fgDisplay.Display,
         None,
@@ -187,25 +179,21 @@ void FGAPIENTRY glutWarpPointer( int x, int y )
         0, 0, 0, 0,
         x, y
     );
-
     XFlush( fgDisplay.Display );
 
 #elif TARGET_HOST_WIN32
+
     {
         POINT coords = { x, y };
-
         /*
-         * First of all, we need to find the new screen-relative coordinates of the mouse cursor
-         */
+         * ClientToScreen() translates {coords} for us.
+	 */
         ClientToScreen( fgStructure.Window->Window.Handle, &coords );
-
-        /*
-         * Now set the new mouse cursor position...
-         */
         SetCursorPos( coords.x, coords.y );
     }
 
 #endif
+
 }
 
 /*** END OF FILE ***/
