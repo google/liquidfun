@@ -379,6 +379,10 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     char* displayName = NULL;
     int i, j, argc = *pargc;
 
+    if (pargc && *pargc && argv && *argv && **argv)
+	fgState.ProgramName = strdup (*argv);
+    else
+	fgState.ProgramName = strdup ("");
     /*
      * Do not allow multiple initialization of the library
      */

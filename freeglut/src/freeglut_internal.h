@@ -244,9 +244,9 @@ struct tagSFG_State
     int              GameModeDepth;        /* The pixel depth for game mode     */
     int              GameModeRefresh;      /* The refresh rate for game mode    */
 
-    int              ActionOnWindowClose ; /* Action when user clicks "x" on window header bar */
-
-    fgExecutionState ExecState ;           /* Current state of the GLUT execution */
+    int              ActionOnWindowClose;  /* Action when user clicks "x" on window header bar */
+    fgExecutionState ExecState;           /* Current state of the GLUT execution */
+    char		*ProgramName;
 };
 
 /*
