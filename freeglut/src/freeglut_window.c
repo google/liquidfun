@@ -645,14 +645,20 @@ int FGAPIENTRY glutCreateWindow( const char* title )
  */
 int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
 {
-    SFG_Window* window = NULL;
-    SFG_Window* parent = NULL;
+    int ret = 0;
+    
+    if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
+    {
+        SFG_Window* window = NULL;
+        SFG_Window* parent = NULL;
 
-    freeglut_assert_ready;
-    parent = fgWindowByID( parentID );
-    freeglut_return_val_if_fail( parent != NULL, 0 );
-    window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
-    return window->ID;
+        freeglut_assert_ready;
+        parent = fgWindowByID( parentID );
+        freeglut_return_val_if_fail( parent != NULL, 0 );
+        window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
+        ret = window->ID;
+    }
+    return ret;
 }
 
 /*
