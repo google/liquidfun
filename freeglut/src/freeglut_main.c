@@ -568,12 +568,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
      */
     switch( event.type )
     {
-    case CreateNotify:
-      /*
-       * The window creation confirmation
-       */
-      break;
-
     case DestroyNotify:
       /*
        * This is sent to confirm the XDestroyWindow call.
@@ -619,6 +613,19 @@ void FGAPIENTRY glutMainLoopEvent( void )
           fghRedrawWindowByHandle( event.xexpose.window );
       break;
 
+      /*
+       * CreateNotify causes a configure-event so that sub-windows are
+       * handled compatibly with GLUT.
+       *
+       * NOTE that it is possible that you will more than one Reshape
+       * event for your top-level window, but something like this appears
+       * to be required for compatbility.
+       *
+       * GLUT presumably does this because it generally tries to treat
+       * sub-windows the same as windows.
+       *
+       */
+    case CreateNotify:
     case ConfigureNotify:
       /*
        * The window gets resized
