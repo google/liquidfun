@@ -36,7 +36,16 @@
  * Under windows, we've got some issues to solve
  */
 #if defined(WIN32)
-#if 0
+#    include <windows.h>
+#    include <windowsx.h>
+#    include <mmsystem.h>
+#    define WINDOWS
+#    pragma comment (lib, "winmm.lib")       /* link with Windows MultiMedia lib */
+#    pragma comment (lib, "opengl32.lib")    /* link with Microsoft OpenGL lib */
+#    pragma comment (lib, "glu32.lib")       /* link with OpenGL Utility lib */
+//#if defined(_USRDLL)
+//#	if defined(FREEGLUTLIB_EXPORTS)
+#if defined(FREEGLUT_DLL)
 #	if defined(FREEGLUT_LIBRARY_BUILD)
 #		define FGAPI __declspec(dllexport)
 #	else
@@ -44,18 +53,10 @@
 #	endif
 #	define FGAPIENTRY __stdcall
 #else
-#    include <windows.h>
-#    include <windowsx.h>
-#    include <mmsystem.h>
-#    define WINDOWS
 #    define FGAPI
 #    define FGAPIENTRY
+#    pragma comment (lib, "freeglut.lib")    /* link with Win32 freeglut lib */
 #endif
-
-#pragma comment (lib, "winmm.lib")       /* link with Windows MultiMedia lib */
-#pragma comment (lib, "opengl32.lib")    /* link with Microsoft OpenGL lib */
-#pragma comment (lib, "glu32.lib")       /* link with OpenGL Utility lib */
-#pragma comment (lib, "freeglut.lib")    /* link with Win32 freeglut lib */
 
 #else
 #	define FGAPI
