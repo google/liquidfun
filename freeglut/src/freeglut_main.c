@@ -28,7 +28,6 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-#include <limits.h>
 #if TARGET_HOST_UNIX_X11
 #include <errno.h>
 #include <sys/stat.h>
@@ -49,8 +48,15 @@ struct GXKeyList gxKeyList;
 
 #endif
 
-#ifndef MAX
-#define MAX(a,b) (((a)>(b)) ? (a) : (b))
+/*
+ * Try to get the maximum value allowed for ints, falling back to the minimum
+ * guaranteed by ISO C99 if there is no suitable header.
+ */
+#if HAVE_LIMITS_H
+#    include <limits.h>
+#endif
+#ifndef INT_MAX
+#    define INT_MAX 32767
 #endif
 
 #ifndef MIN
@@ -445,8 +451,10 @@ static void fghSleepForEvents( void )
         return;
 
     msec = fghNextTimer( );
-    if( fghHaveJoystick( ) )     /* XXX Use GLUT timers for joysticks... */
-        msec = MIN( msec, 10 );  /* XXX Dumb; forces granularity to .01sec */
+    /* XXX Use GLUT timers for joysticks... */
+    /* XXX Dumb; forces granularity to .01sec */
+    if( fghHaveJoystick( ) && ( msec < 10 ) )     
+        msec = 10;
 
 #if TARGET_HOST_UNIX_X11
     /*

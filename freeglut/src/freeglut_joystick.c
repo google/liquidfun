@@ -31,12 +31,11 @@
  *  Many thanks for Steve Baker for permission to pull from that library.
  */
 
-#if defined( __FreeBSD__ ) || defined( __NetBSD__ )
-#    include <sys/param.h>
-#endif
-
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
+#if HAVE_SYS_PARAM_H
+#    include <sys/param.h>
+#endif
 
 /*
  * Initial defines from "js.h" starting around line 33 with the existing "freeglut_joystick.c"
