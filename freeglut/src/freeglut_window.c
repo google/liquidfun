@@ -561,31 +561,19 @@ void fgCloseWindow( SFG_Window* window )
     freeglut_assert_ready;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * As easy as kill bunnies with axes. Destroy the context first:
-     */
+
     glXDestroyContext( fgDisplay.Display, window->Window.Context );
-
-    /*
-     * Then have the window killed:
-     */
     XDestroyWindow( fgDisplay.Display, window->Window.Handle );
-
-    /*
-     * Finally, flush the rests down the stream
-     */
     XFlush( fgDisplay.Display );
 
 #elif TARGET_HOST_WIN32
-	/*
-	 * Send the WM_CLOSE message to the window now
-	 */
-	SendMessage( 
-		window->Window.Handle,
-		WM_CLOSE,
-		0,
-		0
-	);
+
+    SendMessage( 
+        window->Window.Handle,
+        WM_CLOSE,
+        0,
+        0
+    );
 
 #endif
 }
