@@ -250,11 +250,11 @@ int main( int argc, char** argv )
 {
     int menuID, subMenuA, subMenuB;
 
-    glutInit( &argc, argv );
-
     glutInitDisplayString( "stencil~2 rgb double depth>=16 samples" );
     glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowPosition( 100, 100 );
+
+    glutInit( &argc, argv );
 
     subMenuA = glutCreateMenu( SampleMenu );
     glutAddMenuEntry( "Sub menu A1 (01)", 1 );
