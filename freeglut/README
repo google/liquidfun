@@ -9,13 +9,10 @@
     tium style license (see COPYING for details), to offer you a chance to use 
     and/or modify the source.
     
-    It makes use of OpenGL, GLU, GLib and pthreads-win32 libraries. GLib is 
-    LGPL'ed and I hope I do not violate it's license by using it. In case this 
-    is true, please notify me so that I remove GLib usage from the project.
-    
-    The library does not make use of any GLUT code and is not 100% compatible.
-    Code recompilation and/or slight modifications might be required for your
-    applications to work with freeglut.
+    It makes use of OpenGL, GLU, and pthreads-win32 libraries. The library does
+    not make use of any GLUT code and is not 100% compatible. Code recompilation
+    and/or slight modifications might be required for your applications to work
+    with freeglut.
     
 
     PORTS
