@@ -425,12 +425,6 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                  title );
     }
 
-    glXMakeCurrent(
-        fgDisplay.Display,
-        window->Window.Handle,
-        window->Window.Context
-    );
-
     /*
      * XXX Assume the new window is visible by default
      * XXX Is this a  safe assumption?
@@ -484,6 +478,12 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
                      &fgDisplay.DeleteWindow, 1 );
+
+    glXMakeCurrent(
+        fgDisplay.Display,
+        window->Window.Handle,
+        window->Window.Context
+    );
 
     XMapWindow( fgDisplay.Display, window->Window.Handle );
 
