@@ -1507,12 +1507,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             /* Save the current window and menu and set the current window to the window whose menu this is */
             SFG_Window *save_window = fgStructure.Window ;
             SFG_Menu *save_menu = fgStructure.Menu ;
+            SFG_Window *parent_window = window->ActiveMenu->ParentWindow ;
             fgSetWindow ( window ) ;
             fgStructure.Menu = window->ActiveMenu ;
 
             /* Execute the menu callback */
             fgExecuteMenuCallback ( window->ActiveMenu ) ;
-            fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
+            fgDeactivateMenu ( parent_window ) ;
 
             /* Restore the current window and menu */
             fgSetWindow ( save_window ) ;
