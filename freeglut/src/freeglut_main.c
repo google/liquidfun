@@ -1203,6 +1203,8 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 
     case WM_PAINT:
+        /* Turn on the visibility in case it was turned off somehow */
+        window->State.Visible = GL_TRUE;
         BeginPaint( hWnd, &ps );
         fghRedrawWindowByHandle( hWnd );
         EndPaint( hWnd, &ps );
@@ -1406,7 +1408,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     {
         int wheel_number = LOWORD( wParam );
         /* THIS IS SPECULATIVE -- John Fay, 10/2/03 */
-        short ticks = HIWORD( wParam ) / 120;
+        short ticks = ( short )HIWORD( wParam ) / 120;
         /* Should be WHEEL_DELTA instead of 120 */
         int direction = 1;
 
@@ -1684,6 +1686,72 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         /* Pass it on to "DefWindowProc" to repaint a standard border */
         break;
+
+    case WM_SYSCOMMAND :  /* 0x0112 */
+      {
+        /*
+         * We have received a system command message.  Try to act on it.
+         * The commands are passed in through the "lParam" parameter:
+         * Clicking on a corner to resize the window gives a "F004" message
+         * but this is not defined in my header file.
+         */
+          switch ( lParam )
+          {
+          case SC_SIZE       :
+              break ;
+
+          case SC_MOVE       :
+              break ;
+
+          case SC_MINIMIZE   :
+              /* User has clicked on the "-" to minimize the window */
+              /* Turn off the visibility */
+              window->State.Visible = GL_FALSE ;
+
+              break ;
+
+          case SC_MAXIMIZE   :
+              break ;
+
+          case SC_NEXTWINDOW :
+              break ;
+
+          case SC_PREVWINDOW :
+              break ;
+
+          case SC_CLOSE      :
+              /* Followed very closely by a WM_CLOSE message */
+              break ;
+
+          case SC_VSCROLL    :
+              break ;
+
+          case SC_HSCROLL    :
+              break ;
+
+          case SC_MOUSEMENU  :
+              break ;
+
+          case SC_KEYMENU    :
+              break ;
+
+          case SC_ARRANGE    :
+              break ;
+
+          case SC_RESTORE    :
+              break ;
+
+          case SC_TASKLIST   :
+              break ;
+
+          case SC_SCREENSAVE :
+              break ;
+
+          case SC_HOTKEY     :
+              break ;
+          }
+      }
+      break ;
 
     default:
         /*
