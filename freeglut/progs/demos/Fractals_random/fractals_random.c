@@ -67,7 +67,7 @@ static void draw_level ( int num, double m00, double m01, double m10, double m11
     double new_x = affine[random].a00 * current_x + affine[random].a01 * current_y + affine[random].b0 ;
     double new_y = affine[random].a10 * current_x + affine[random].a11 * current_y + affine[random].b1 ;
 
-    glVertex2f ( new_x, new_y ) ;
+    glVertex2d ( new_x, new_y ) ;
     current_x = new_x ;
     current_y = new_y ;
   }
@@ -200,6 +200,59 @@ Special(int key, int x, int y)
 }
 
 
+static int mouse_x = 0, mouse_y = 0 ;
+static int button_down = GLUT_DOWN ;
+
+static void 
+Mouse ( int button, int updown, int x, int y )
+{
+  button_down = updown ;
+
+  if ( updown == GLUT_DOWN )
+  {
+    mouse_x = x ;
+    mouse_y = y ;
+  }
+}
+
+static void 
+MouseMotion ( int x, int y )
+{
+  int window_width  = glutGet ( GLUT_WINDOW_WIDTH  ) ;
+  int window_height = glutGet ( GLUT_WINDOW_HEIGHT ) ;
+  int window_size = ( window_width < window_height ) ? window_width : window_height ;
+
+  double delta_x = 5.0 * (double)(x - mouse_x) / (double)(window_size) ;
+  double delta_y = 5.0 * (double)(y - mouse_y) / (double)(window_size) ;
+
+  xwin += delta_x * scale_factor ;
+  ywin -= delta_y * scale_factor ;
+  glMatrixMode ( GL_MODELVIEW ) ;
+  glTranslated ( delta_x * scale_factor, -delta_y * scale_factor, 0.0 ) ;
+
+  needClear = GL_TRUE;
+  glutPostRedisplay();
+
+  mouse_x = x ;
+  mouse_y = y ;
+}
+
+static void 
+MouseWheel ( int wheel_number, int direction, int x, int y )
+{
+  double scale = ( direction > 0 ) ? 1.25 : 0.8 ;
+
+  glMatrixMode ( GL_MODELVIEW ) ;
+  glTranslated ( -xwin, -ywin, 0.0 ) ;
+  glScaled ( scale, scale, scale ) ;
+  glTranslated ( xwin, ywin, 0.0 ) ;
+  scale_factor /= scale ;
+
+  needClear = GL_TRUE;
+  glutPostRedisplay();
+}
+
+
 void readConfigFile ( char *fnme )
 {
   FILE *fptr = fopen ( fnme, "rt" ) ;
@@ -303,6 +356,9 @@ main(int argc, char *argv[])
   glutKeyboardFunc(Key);
   glutSpecialFunc(Special);
   glutDisplayFunc(Display);
+  glutMouseFunc(Mouse);
+  glutMotionFunc(MouseMotion);
+  glutMouseWheelFunc(MouseWheel);
 
   glutMainLoop();
 
