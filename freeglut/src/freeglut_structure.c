@@ -168,7 +168,7 @@ SFG_Menu* fgCreateMenu( FGCBmenu menuCallback )
     fgState.BuildingAMenu = FALSE ;
 
     glutHideWindow () ;  /* Hide the window for now */
-    fgStructure.Window = current_window ;
+    fgSetWindow ( current_window ) ;
 
     /*
      * Initialize the object properties:
@@ -296,9 +296,9 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     if ( window->Callbacks.Destroy != NULL )
     {
       SFG_Window *activeWindow = fgStructure.Window ;
-      fgStructure.Window = window ;
+      fgSetWindow ( window ) ;
       window->Callbacks.Destroy () ;
-      fgStructure.Window = activeWindow ;
+      fgSetWindow ( activeWindow ) ;
     }
 
     /*

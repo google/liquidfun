@@ -594,7 +594,7 @@ void fgDeactivateMenu( SFG_Window *window )
         fgDeactivateSubMenu ( menuEntry ) ;
     }
 
-    fgStructure.Window = current_window ;
+    fgSetWindow ( current_window ) ;
 }
 
 /*
@@ -629,7 +629,7 @@ void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry )
         fgDeactivateSubMenu ( subMenuIter ) ;
     }
 
-    fgStructure.Window = current_window ;
+    fgSetWindow ( current_window ) ;
 }
 
 /*
