@@ -423,10 +423,12 @@ static int fgHavePendingRedisplays (void)
 static long fgNextTimer( void )
 {
     long ret = INT_MAX;
-    SFG_Timer *timer;
+    SFG_Timer *timer = fgState.Timers.First;
 
-    if( (timer = fgState.Timers.First) )
+    if( timer )
         ret = timer->TriggerTime - fgElapsedTime();
+    if( ret < 0 )
+        ret = 0;
 
     return ret;
 }
@@ -452,7 +454,7 @@ static void fgSleepForEvents( void )
     msec = fgNextTimer( );
     if( fgHaveJoystick( ) )
         msec = MIN( msec, 10 );
-    
+
     wait.tv_sec = msec / 1000;
     wait.tv_usec = (msec % 1000) * 1000;
     err = select( socket+1, &fdset, NULL, NULL, &wait );
