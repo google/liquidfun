@@ -113,7 +113,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
      * dependant, and resides in freeglut_window.c. Uses fgState.
      */
     fgOpenWindow( window, title, x, y, w, h, gameMode,
-                  (parent != NULL) ? TRUE : FALSE );
+                  parent ? GL_TRUE : GL_FALSE );
 
     return window;
 }
@@ -146,9 +146,9 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
      * global variable BuildingAMenu to true so we can ensure
      * it is created without decorations.
      */
-    fgState.BuildingAMenu = TRUE;
+    fgState.BuildingAMenu = GL_TRUE;
 
-    fgCreateWindow( NULL, NULL, x, y, w, h, FALSE );
+    fgCreateWindow( NULL, NULL, x, y, w, h, GL_FALSE );
     menu->Window = fgStructure.Window;
     glutDisplayFunc( fgDisplayMenu );
 
@@ -156,7 +156,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
      * While BuildingAMenu is true, all windows built have no decorations.
      * That's not a good default behavior, so let's set it false again.
      */
-    fgState.BuildingAMenu = FALSE;
+    fgState.BuildingAMenu = GL_FALSE;
 
     glutHideWindow( );  /* Hide the window for now */
     fgSetWindow( current_window );
@@ -318,7 +318,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     }
 
     fgClearCallBacks( window );
-    if( needToClose == TRUE )
+    if( needToClose )
         fgCloseWindow( window );
     free( window );
     if( fgStructure.Window == window )
@@ -425,7 +425,7 @@ void fgDestroyMenu( SFG_Menu* menu )
 
     if( fgStructure.Window == menu->Window )
         fgSetWindow( menu->ParentWindow );
-    fgDestroyWindow( menu->Window, TRUE );
+    fgDestroyWindow( menu->Window, GL_TRUE );
     fgListRemove( &fgStructure.Menus, &menu->Node );
     if( fgStructure.Menu == menu )
         fgStructure.Menu = NULL;
@@ -470,7 +470,7 @@ void fgDestroyStructure( void )
         fgDestroyMenu( menu );
 
     while( window = ( SFG_Window * )fgStructure.Windows.First )
-        fgDestroyWindow( window, TRUE );
+        fgDestroyWindow( window, GL_TRUE );
 }
 
 /*
@@ -491,7 +491,7 @@ void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
          window = ( SFG_Window * )window->Node.Next )
     {
         enumCallback( window, enumerator );
-        if( enumerator->found == TRUE )
+        if( enumerator->found )
             return;
     }
 }
@@ -513,7 +513,7 @@ void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback,
          child = ( SFG_Window * )child->Node.Next )
     {
         enumCallback( child, enumerator );
-        if( enumerator->found == TRUE )
+        if( enumerator->found )
             return;
     }
 }
@@ -524,7 +524,8 @@ void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback,
 static void fghcbWindowByHandle( SFG_Window *window,
                                  SFG_Enumerator *enumerator )
 {
-    freeglut_return_if_fail( enumerator->found == FALSE );
+    if ( enumerator->found )
+        return;
 
 #if TARGET_HOST_UNIX_X11
     #define WBHANDLE (Window)
@@ -537,7 +538,7 @@ static void fghcbWindowByHandle( SFG_Window *window,
      */
     if( window->Window.Handle == WBHANDLE (enumerator->data) )
     {
-        enumerator->found = TRUE;
+        enumerator->found = GL_TRUE;
         enumerator->data = window;
 
         return;
@@ -568,11 +569,11 @@ SFG_Window* fgWindowByHandle
     /*
      * This is easy and makes use of the windows enumeration defined above
      */
-    enumerator.found = FALSE;
+    enumerator.found = GL_FALSE;
     enumerator.data = (void *)hWindow;
     fgEnumWindows( fghcbWindowByHandle, &enumerator );
 
-    if( enumerator.found == TRUE )
+    if( enumerator.found )
         return( SFG_Window *) enumerator.data;
     return NULL;
 }
@@ -585,14 +586,15 @@ static void fghcbWindowByID( SFG_Window *window, SFG_Enumerator *enumerator )
     /*
      * Make sure we do not overwrite our precious results...
      */
-    freeglut_return_if_fail( enumerator->found == FALSE );
+    if ( enumerator->found )
+        return;
 
     /*
      * Check the window's handle. Hope this works. Looks ugly. That's for sure.
      */
     if( window->ID == (int) (enumerator->data) ) /* XXX int/ptr conversion! */
     {
-        enumerator->found = TRUE;
+        enumerator->found = GL_TRUE;
         enumerator->data = window;
 
         return;
@@ -616,10 +618,10 @@ SFG_Window* fgWindowByID( int windowID )
     /*
      * Uses a method very similiar for fgWindowByHandle...
      */
-    enumerator.found = FALSE;
+    enumerator.found = GL_FALSE;
     enumerator.data = (void *) windowID; /* XXX int/pointer conversion! */
     fgEnumWindows( fghcbWindowByID, &enumerator );
-    if( enumerator.found == TRUE )
+    if( enumerator.found )
         return( SFG_Window *) enumerator.data;
     return NULL;
 }

@@ -124,7 +124,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
          menuEntry;
          menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
     {
-        if( menuEntry->SubMenu && ( menuEntry->IsActive == TRUE ) )
+        if( menuEntry->SubMenu && menuEntry->IsActive )
         {
             /*
              * OK, have the sub-menu checked, too. If it returns TRUE, it
@@ -138,9 +138,9 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
              * Reactivate the submenu as the checkMenuStatus may have turned
              * it off if the mouse is in its parent menu entry.
              */
-            menuEntry->SubMenu->IsActive = TRUE;
-            if ( return_status == TRUE )
-                return TRUE;
+            menuEntry->SubMenu->IsActive = GL_TRUE;
+            if ( return_status )
+                return GL_TRUE;
         }
     }
 
@@ -153,9 +153,9 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
     for( menuEntry = (SFG_MenuEntry *)menu->Entries.First;
          menuEntry;
          menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
-        menuEntry->IsActive = FALSE;
+        menuEntry->IsActive = GL_FALSE;
 
-    menu->IsActive = FALSE;
+    menu->IsActive = GL_FALSE;
 
     /*
      * Check if the mouse cursor is contained within the current menu box
@@ -174,7 +174,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
         menuEntry = fghFindMenuEntry( menu, menuID + 1 );
         assert( menuEntry );
 
-        menuEntry->IsActive = TRUE;
+        menuEntry->IsActive = GL_TRUE;
         menuEntry->Ordinal = menuID;
 
         /*
@@ -187,7 +187,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
                 fgDeactivateSubMenu( menu->ActiveEntry );
 
         menu->ActiveEntry = menuEntry;
-        menu->IsActive = TRUE;
+        menu->IsActive = GL_TRUE;
 
         /*
          * OKi, we have marked that entry as active, but it would be also
@@ -203,7 +203,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
                 /*
                  * Set up the initial menu position now...
                  */
-                menuEntry->SubMenu->IsActive = TRUE;
+                menuEntry->SubMenu->IsActive = GL_TRUE;
 
                 /*
                  * Set up the initial submenu position now:
@@ -239,19 +239,19 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
             /*
              * Activate it because its parent entry is active
              */
-            menuEntry->SubMenu->IsActive = TRUE;
+            menuEntry->SubMenu->IsActive = GL_TRUE;
         }
 
         /*
          * Report back that we have caught the menu cursor
          */
-        return TRUE;
+        return GL_TRUE;
     }
 
     /*
      * Looks like the menu cursor is somewhere else...
      */
-    return FALSE;
+    return GL_FALSE;
 }
 
 /*
@@ -307,7 +307,7 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
         /*
          * Has the menu been marked as active, maybe?
          */
-        if( menuEntry->IsActive == TRUE )
+        if( menuEntry->IsActive )
         {
             /*
              * That's truly right, and we need to have it highlighted.
@@ -397,7 +397,7 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
         /*
          * Is that an active sub menu by any case?
          */
-        if( menuEntry->SubMenu && ( menuEntry->IsActive == TRUE ) )
+        if( menuEntry->SubMenu && menuEntry->IsActive )
         {
             /*
              * Yeah, indeed. Have it redrawn now:
@@ -495,7 +495,7 @@ void fgActivateMenu( SFG_Window* window, int button )
      * Mark the menu as active, so that it gets displayed:
      */
     window->ActiveMenu = menu;
-    menu->IsActive = TRUE;
+    menu->IsActive = GL_TRUE;
     fgState.ActiveMenus++;
 
     /*
@@ -552,7 +552,7 @@ void fgExecuteMenuCallback( SFG_Menu* menu )
          menuEntry;
          menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next)
     {
-        if( menuEntry->IsActive == TRUE )
+        if( menuEntry->IsActive )
         {
             if( menuEntry->SubMenu )
                 fgExecuteMenuCallback( menuEntry->SubMenu );
@@ -593,7 +593,7 @@ void fgDeactivateMenu( SFG_Window *window )
      */
     menu->Window->ActiveMenu = NULL;
     menu->ParentWindow->ActiveMenu = NULL;
-    menu->IsActive = FALSE;
+    menu->IsActive = GL_FALSE;
 
     fgState.ActiveMenus--;
 
@@ -631,7 +631,7 @@ void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry )
      * Forget about having that menu active anymore, now:
      */
     menuEntry->SubMenu->Window->ActiveMenu = NULL;
-    menuEntry->SubMenu->IsActive = FALSE;
+    menuEntry->SubMenu->IsActive = GL_FALSE;
 
     /*
      * Hide all submenu windows, and the root menu's window.

@@ -42,7 +42,7 @@ void FGAPIENTRY glutPostRedisplay( void )
 {
     freeglut_assert_ready;
     freeglut_assert_window;
-    fgStructure.Window->State.Redisplay = TRUE;
+    fgStructure.Window->State.Redisplay = GL_TRUE;
 }
 
 /*
@@ -93,7 +93,7 @@ void FGAPIENTRY glutPostWindowRedisplay( int windowID )
     freeglut_assert_ready;
     window = fgWindowByID( windowID );
     freeglut_return_if_fail( window );
-    window->State.Redisplay = TRUE;
+    window->State.Redisplay = GL_TRUE;
 }
 
 /*** END OF FILE ***/

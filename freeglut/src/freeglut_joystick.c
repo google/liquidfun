@@ -185,7 +185,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 
     if( status != JOYERR_NOERROR )
     {
-        joy->error = TRUE;
+        joy->error = GL_TRUE;
         return;
     }
 
@@ -230,7 +230,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
             }
 
             fgWarning( "%s", joy->fname );
-            joy->error = TRUE;
+            joy->error = GL_TRUE;
             return;
         }
 
@@ -261,7 +261,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
     if( status != JS_RETURN )
     {
         fgWarning( "%s", joy->fname );
-        joy->error = TRUE;
+        joy->error = GL_TRUE;
         return;
     }
 
@@ -394,7 +394,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
      * I guess we have no axes at all
      */
     default:
-        joy->error = TRUE;
+        joy->error = GL_TRUE;
         break;
     }
 
@@ -508,7 +508,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
              joy->center[ 1 ] == 512.0f );
    
     if( counter >= 100 )
-        joy->error = TRUE;
+        joy->error = GL_TRUE;
 #       endif
 
     for( i = 0; i < _JS_MAX_AXES; i++ )
@@ -551,7 +551,7 @@ void fgJoystickInit( int ident )
         break;
     default:
         fgJoystick->num_axes = 0;
-        fgJoystick->error = TRUE;
+        fgJoystick->error = GL_TRUE;
         break;
     }
 #else
@@ -579,7 +579,7 @@ void fgJoystickClose( void )
         fgError( "illegal attempt to deinitialize joystick device" );
 
 #ifndef WIN32
-    if( fgJoystick->error != TRUE )
+    if( ! fgJoystick->error )
         close( fgJoystick->fd );
 #endif
 

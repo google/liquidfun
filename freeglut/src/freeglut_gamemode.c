@@ -262,7 +262,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
                                      fgState.GameModeRefresh ) )
             {
                 if( haveToTest )
-                    return TRUE;
+                    return GL_TRUE;
                 /*
                  * OKi, this is the display mode we have been looking for...
                  */
@@ -271,7 +271,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
                     fgDisplay.Screen,
                     displayModes[ i ]
                 );
-                return TRUE;
+                return GL_TRUE;
             }
         }
     }
@@ -279,7 +279,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     /*
      * Something must have went wrong
      */
-    return FALSE;
+    return GL_FALSE;
 
 #   else
 #       warning fghChangeDisplayMode: missing XFree86 video mode extensions, game mode will not change screen resolution when activated
@@ -288,7 +288,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 #elif TARGET_HOST_WIN32
 
     unsigned int    displayModes = 0, mode = 0xffffffff;
-    GLboolean success = FALSE;
+    GLboolean success = GL_FALSE;
     /* HDC      desktopDC; */
     DEVMODE  devMode;
 
@@ -296,7 +296,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
      * Enumerate the available display modes
      * Try to get a complete match
      */
-    while( EnumDisplaySettings( NULL, displayModes, &devMode ) == TRUE )
+    while( EnumDisplaySettings( NULL, displayModes, &devMode ) )
     {
         /*
          * Does the enumerated display mode match the user's preferences?
@@ -319,7 +319,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         /*
          * Enumerate the available display modes
          */
-        while( EnumDisplaySettings( NULL, displayModes, &devMode ) == TRUE )
+        while( EnumDisplaySettings( NULL, displayModes, &devMode ) )
         {
             /* then try without Display Frequency */
             if( fghCheckDisplayMode( devMode.dmPelsWidth,
@@ -413,11 +413,11 @@ void FGAPIENTRY glutGameModeString( const char* string )
 int FGAPIENTRY glutEnterGameMode( void )
 {
     if( fgStructure.GameMode )
-        fgAddToWindowDestroyList( fgStructure.GameMode, TRUE );
+        fgAddToWindowDestroyList( fgStructure.GameMode, GL_TRUE );
     else
         fghRememberState( );
 
-    if( fghChangeDisplayMode( FALSE ) == FALSE )
+    if( ! fghChangeDisplayMode( GL_FALSE ) )
     {
         fgWarning( "failed to change screen settings" );
         return FALSE;
@@ -425,7 +425,7 @@ int FGAPIENTRY glutEnterGameMode( void )
 
     fgStructure.GameMode = fgCreateWindow( 
         NULL, "FREEGLUT", 0, 0,
-        fgState.GameModeSize.X, fgState.GameModeSize.Y, TRUE 
+        fgState.GameModeSize.X, fgState.GameModeSize.Y, GL_TRUE 
     );
 
 #if TARGET_HOST_UNIX_X11
@@ -534,7 +534,7 @@ void FGAPIENTRY glutLeaveGameMode( void )
 {
     freeglut_return_if_fail( fgStructure.GameMode );
 
-    fgAddToWindowDestroyList( fgStructure.GameMode, TRUE );
+    fgAddToWindowDestroyList( fgStructure.GameMode, GL_TRUE );
 
 #if TARGET_HOST_UNIX_X11
 
@@ -557,7 +557,7 @@ int FGAPIENTRY glutGameModeGet( GLenum eWhat )
         return !!fgStructure.GameMode;
 
     case GLUT_GAME_MODE_POSSIBLE:
-        return fghChangeDisplayMode( TRUE );
+        return fghChangeDisplayMode( GL_TRUE );
 
     case GLUT_GAME_MODE_WIDTH:
         return fgState.GameModeSize.X;

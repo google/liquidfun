@@ -55,36 +55,36 @@ SFG_Display fgDisplay;
 /*
  * The settings for the current freeglut session
  */
-SFG_State fgState = { { -1, -1, FALSE },  /* Position */
-                      { 300, 300, TRUE }, /* Size */
+SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
+                      { 300, 300, GL_TRUE }, /* Size */
                       GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,  /* DisplayMode */
-                      FALSE,              /* Initalized */
-                      FALSE,              /* ForceDirectContext */
-                      TRUE,               /* TryDirectContext */
-                      FALSE,              /* ForceIconic */
-                      FALSE,              /* UseCurrentContext */
-                      FALSE,              /* GLDebugSwitch */
-                      FALSE,              /* XSyncSwitch */
-                      TRUE,               /* IgnoreKeyRepeat */
-                      0,                  /* FPSInterval */
-                      0,                  /* SwapCount */
-                      0,                  /* SwapTime */
+                      GL_FALSE,              /* Initalized */
+                      GL_FALSE,              /* ForceDirectContext */
+                      GL_TRUE,               /* TryDirectContext */
+                      GL_FALSE,              /* ForceIconic */
+                      GL_FALSE,              /* UseCurrentContext */
+                      GL_FALSE,              /* GLDebugSwitch */
+                      GL_FALSE,              /* XSyncSwitch */
+                      GL_TRUE,               /* IgnoreKeyRepeat */
+                      0,                     /* FPSInterval */
+                      0,                     /* SwapCount */
+                      0,                     /* SwapTime */
 #if TARGET_HOST_WIN32
-                      { 0, FALSE },       /* Time */
+                      { 0, GL_FALSE },       /* Time */
 #else
-                      { { 0, 0 }, FALSE },
+                      { { 0, 0 }, GL_FALSE },
 #endif
-                      { NULL, NULL }  ,    /* Timers */
-                      NULL,                /* IdleCallback */
-                      FALSE,               /* BuildingAMenu */
-                      0,                   /* ActiveMenus */
-                      NULL,                /* MenuStateCallback */
-                      NULL,                /* MenuStatusCallback */
-                      { 640, 480, TRUE },  /* GameModeSize */
-                      16,                  /* GameModeDepth */
-                      72,                  /* GameModeRefresh */
-                      GLUT_ACTION_EXIT,    /* ActionOnWindowClose */
-                      GLUT_EXEC_STATE_INIT /* ExecState */
+                      { NULL, NULL },         /* Timers */
+                      NULL,                   /* IdleCallback */
+                      GL_FALSE,               /* BuildingAMenu */
+                      0,                      /* ActiveMenus */
+                      NULL,                   /* MenuStateCallback */
+                      NULL,                   /* MenuStatusCallback */
+                      { 640, 480, GL_TRUE },  /* GameModeSize */
+                      16,                     /* GameModeDepth */
+                      72,                     /* GameModeRefresh */
+                      GLUT_ACTION_EXIT,       /* ActionOnWindowClose */
+                      GLUT_EXEC_STATE_INIT    /* ExecState */
 } ;
 
 
@@ -239,31 +239,31 @@ void fgDeinitialize( void )
 
     fgState.Position.X = -1;
     fgState.Position.Y = -1;
-    fgState.Position.Use = FALSE;
+    fgState.Position.Use = GL_FALSE;
 
     fgState.Size.X = 300;
     fgState.Size.Y = 300;
-    fgState.Size.Use = TRUE;
+    fgState.Size.Use = GL_TRUE;
 
     fgState.DisplayMode = GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH;
 
-    fgState.ForceDirectContext  = FALSE;
-    fgState.TryDirectContext    = TRUE;
-    fgState.ForceIconic         = FALSE;
-    fgState.UseCurrentContext   = FALSE;
-    fgState.GLDebugSwitch       = FALSE;
-    fgState.XSyncSwitch         = FALSE;
+    fgState.ForceDirectContext  = GL_FALSE;
+    fgState.TryDirectContext    = GL_TRUE;
+    fgState.ForceIconic         = GL_FALSE;
+    fgState.UseCurrentContext   = GL_FALSE;
+    fgState.GLDebugSwitch       = GL_FALSE;
+    fgState.XSyncSwitch         = GL_FALSE;
     fgState.ActionOnWindowClose = GLUT_ACTION_EXIT ;
     fgState.ExecState           = GLUT_EXEC_STATE_INIT ;
 
-    fgState.IgnoreKeyRepeat = TRUE;
+    fgState.IgnoreKeyRepeat = GL_TRUE;
 
     fgState.GameModeSize.X  = 640;
     fgState.GameModeSize.Y  = 480;
     fgState.GameModeDepth   =  16;
     fgState.GameModeRefresh =  72;
 
-    fgState.Time.Set = FALSE;
+    fgState.Time.Set = GL_FALSE;
 
     fgState.Timers.First = fgState.Timers.Last = NULL;
     fgState.IdleCallback = NULL;
@@ -401,39 +401,39 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         }
         else if( strcmp( argv[ i ], "-direct" ) == 0)
         {
-            if( fgState.TryDirectContext == FALSE )
+            if( ! fgState.TryDirectContext )
                 fgError( "parameters ambiguity, -direct and -indirect "
                     "cannot be both specified" );
 
-            fgState.ForceDirectContext = TRUE;
+            fgState.ForceDirectContext = GL_TRUE;
             argv[ i ] = NULL;
             ( *pargc )--;
         }
         else if( strcmp( argv[ i ], "-indirect" ) == 0 )
         {
-            if( fgState.ForceDirectContext == TRUE )
+            if( fgState.ForceDirectContext )
                 fgError( "parameters ambiguity, -direct and -indirect "
                     "cannot be both specified" );
 
-            fgState.TryDirectContext = FALSE;
+            fgState.TryDirectContext = GL_FALSE;
             argv[ i ] = NULL;
             (*pargc)--;
         }
         else if( strcmp( argv[ i ], "-iconic" ) == 0 )
         {
-            fgState.ForceIconic = TRUE;
+            fgState.ForceIconic = GL_TRUE;
             argv[ i ] = NULL;
             ( *pargc )--;
         }
         else if( strcmp( argv[ i ], "-gldebug" ) == 0 )
         {
-            fgState.GLDebugSwitch = TRUE;
+            fgState.GLDebugSwitch = GL_TRUE;
             argv[ i ] = NULL;
             ( *pargc )--;
         }
         else if( strcmp( argv[ i ], "-sync" ) == 0 )
         {
-            fgState.XSyncSwitch = TRUE;
+            fgState.XSyncSwitch = GL_TRUE;
             argv[ i ] = NULL;
             ( *pargc )--;
         }
@@ -471,10 +471,10 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * Check for the minus one settings for both position and size...
      */
     if( fgState.Position.X < 0 || fgState.Position.Y < 0 )
-        fgState.Position.Use = FALSE;
+        fgState.Position.Use = GL_FALSE;
 
     if( fgState.Size.X < 0 || fgState.Size.Y < 0 )
-        fgState.Size.Use = FALSE;
+        fgState.Size.Use = GL_FALSE;
 
     if( displayName )
         free( displayName );
@@ -487,15 +487,15 @@ void FGAPIENTRY glutInitWindowPosition( int x, int y )
 {
     if( ( x >= 0 ) && ( y >= 0 ) )
     {
-        fgState.Position.X   =    x;
-        fgState.Position.Y   =    y;
-        fgState.Position.Use = TRUE;
+        fgState.Position.X   =       x;
+        fgState.Position.Y   =       y;
+        fgState.Position.Use = GL_TRUE;
     }
     else
     {
-        fgState.Position.X   =    -1;
-        fgState.Position.Y   =    -1;
-        fgState.Position.Use = FALSE;
+        fgState.Position.X   =       -1;
+        fgState.Position.Y   =       -1;
+        fgState.Position.Use = GL_FALSE;
     }
 }
 
@@ -506,15 +506,15 @@ void FGAPIENTRY glutInitWindowSize( int width, int height )
 {
     if( ( width > 0 ) && ( height > 0 ) )
     {
-        fgState.Size.X   =  width;
-        fgState.Size.Y   = height;
-        fgState.Size.Use =   TRUE;
+        fgState.Size.X   =   width;
+        fgState.Size.Y   =  height;
+        fgState.Size.Use = GL_TRUE;
     }
     else
     {
-        fgState.Size.X   =    -1;
-        fgState.Size.Y   =    -1;
-        fgState.Size.Use = FALSE;
+        fgState.Size.X   =       -1;
+        fgState.Size.Y   =       -1;
+        fgState.Size.Use = GL_FALSE;
     }
 }
 

@@ -99,7 +99,7 @@ void FGAPIENTRY glutReportErrors( void )
  */
 void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
 {
-    fgState.IgnoreKeyRepeat = ignore ? TRUE : FALSE;
+    fgState.IgnoreKeyRepeat = ignore ? GL_TRUE : GL_FALSE;
 }
 
 /*

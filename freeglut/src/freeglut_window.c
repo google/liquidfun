@@ -66,7 +66,7 @@ XVisualInfo* fgChooseVisual( void )
 {
 #define BUFFER_SIZES 6
     int bufferSize[BUFFER_SIZES] = { 16, 12, 8, 4, 2, 1 };
-    GLboolean wantIndexedMode = FALSE;
+    GLboolean wantIndexedMode = GL_FALSE;
     int attributes[ 32 ];
     int where = 0;
 
@@ -83,7 +83,7 @@ XVisualInfo* fgChooseVisual( void )
     if( fgState.DisplayMode & GLUT_INDEX )
     {
         ATTRIB_VAL( GLX_BUFFER_SIZE, 8 );
-        wantIndexedMode = TRUE;
+        wantIndexedMode = GL_TRUE;
     }
     else
     {
@@ -121,7 +121,7 @@ XVisualInfo* fgChooseVisual( void )
      */
     ATTRIB( None );
 
-    if( wantIndexedMode == FALSE )
+    if( ! wantIndexedMode )
         return glXChooseVisual( fgDisplay.Display, fgDisplay.Screen,
                                 attributes );
     else
@@ -204,10 +204,10 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     
     pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
     if( pixelformat == 0 )
-        return FALSE;
+        return GL_FALSE;
 
     if( checkOnly )
-        return TRUE;
+        return GL_TRUE;
     return SetPixelFormat( window->Window.Device, pixelformat, ppfd );
 }
 #endif
@@ -249,7 +249,7 @@ void fgSetWindow ( SFG_Window *window )
  */
 void fgOpenWindow( SFG_Window* window, const char* title,
                    int x, int y, int w, int h,
-                   GLboolean gameMode, int isSubWindow )
+                   GLboolean gameMode, GLboolean isSubWindow )
 {
 #if TARGET_HOST_UNIX_X11
     XSetWindowAttributes winAttr;
@@ -370,7 +370,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             NULL, fgState.ForceDirectContext | fgState.TryDirectContext
         );
     }
-    else if ( fgState.UseCurrentContext == TRUE )
+    else if ( fgState.UseCurrentContext )
     {
       window->Window.Context = glXGetCurrentContext();
 
@@ -401,12 +401,12 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      * XXX Assume the new window is visible by default
      * XXX Is this a  safe assumption?
      */
-    window->State.Visible = TRUE;
+    window->State.Visible = GL_TRUE;
 
     sizeHints.flags = 0;
-    if (fgState.Position.Use == TRUE)
+    if ( fgState.Position.Use )
         sizeHints.flags |= USPosition;
-    if (fgState.Size.Use     == TRUE)
+    if ( fgState.Size.Use )
         sizeHints.flags |= USSize;
 
     /*
@@ -423,8 +423,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     sizeHints.height = h;
 
     wmHints.flags = StateHint;
-    wmHints.initial_state =
-        (fgState.ForceIconic == FALSE) ? NormalState : IconicState;
+    wmHints.initial_state = fgState.ForceIconic ? IconicState : NormalState;
 
     /*
      * Prepare the window and iconified window names...
@@ -460,7 +459,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     atom = GetClassInfo( fgDisplay.Instance, "FREEGLUT", &wc );
     assert( atom != 0 );
     
-    if( gameMode != FALSE )
+    if( gameMode )
     {
         assert( window->Parent == NULL );
 
@@ -472,7 +471,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     }
     else
     {
-        if ( ( !isSubWindow ) && ( ! window->IsMenu ) )
+        if ( ( ! isSubWindow ) && ( ! window->IsMenu ) )
         {
             /*
              * Update the window dimensions, taking account of window
@@ -484,12 +483,12 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                 GetSystemMetrics( SM_CYCAPTION );
         }
 
-        if( fgState.Position.Use == FALSE )
+        if( ! fgState.Position.Use )
         {
             x = CW_USEDEFAULT;
             y = CW_USEDEFAULT;
         }
-        if( fgState.Size.Use == FALSE )
+        if( ! fgState.Size.Use )
         {
             w = CW_USEDEFAULT;
             h = CW_USEDEFAULT;
@@ -574,7 +573,7 @@ void fgCloseWindow( SFG_Window* window )
 int FGAPIENTRY glutCreateWindow( const char* title )
 {
     return fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
-                           fgState.Size.X, fgState.Size.Y, FALSE )->ID;
+                           fgState.Size.X, fgState.Size.Y, GL_FALSE )->ID;
 }
 
 /*
@@ -588,7 +587,7 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     freeglut_assert_ready;
     parent = fgWindowByID( parentID );
     freeglut_return_val_if_fail( parent != NULL, 0 );
-    window = fgCreateWindow( parent, "", x, y, w, h, FALSE );
+    window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE );
     return window->ID;
 }
 
@@ -601,7 +600,7 @@ void FGAPIENTRY glutDestroyWindow( int windowID )
     freeglut_return_if_fail( window != NULL );
     {
         fgExecutionState ExecState = fgState.ExecState;
-        fgAddToWindowDestroyList( window, TRUE );
+        fgAddToWindowDestroyList( window, GL_TRUE );
         fgState.ExecState = ExecState;
     }
 }
@@ -658,7 +657,7 @@ void FGAPIENTRY glutShowWindow( void )
 
 #endif
 
-    fgStructure.Window->State.Redisplay = TRUE;
+    fgStructure.Window->State.Redisplay = GL_TRUE;
 }
 
 /*
@@ -684,7 +683,7 @@ void FGAPIENTRY glutHideWindow( void )
 
 #endif
 
-    fgStructure.Window->State.Redisplay = FALSE;
+    fgStructure.Window->State.Redisplay = GL_FALSE;
 }
 
 /*
@@ -707,7 +706,7 @@ void FGAPIENTRY glutIconifyWindow( void )
 
 #endif
 
-    fgStructure.Window->State.Redisplay = FALSE;
+    fgStructure.Window->State.Redisplay = GL_FALSE;
 }
 
 /*

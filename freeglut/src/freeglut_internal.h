@@ -709,7 +709,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 void        fgSetWindow ( SFG_Window *window );
 void        fgOpenWindow( SFG_Window* window, const char* title,
                           int x, int y, int w, int h, GLboolean gameMode,
-                          int isSubWindow );
+                          GLboolean isSubWindow );
 void        fgCloseWindow( SFG_Window* window );
 void        fgAddToWindowDestroyList ( SFG_Window* window,
                                        GLboolean needToClose );

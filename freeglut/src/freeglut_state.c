@@ -105,7 +105,7 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
 
   case GLUT_RENDERING_CONTEXT:
       fgState.UseCurrentContext =
-          ( value == GLUT_USE_CURRENT_CONTEXT ) ? TRUE : FALSE;
+          ( value == GLUT_USE_CURRENT_CONTEXT ) ? GL_TRUE : GL_FALSE;
       break;
 
   case GLUT_WINDOW_CURSOR:
@@ -400,7 +400,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         return ( GetSystemMetrics( SM_CYCAPTION ) ) ;
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
-        return( fgSetupPixelFormat( fgStructure.Window, TRUE, PFD_MAIN_PLANE ) );
+        return( fgSetupPixelFormat( fgStructure.Window, GL_TRUE,
+                                    PFD_MAIN_PLANE ) );
 
     case GLUT_WINDOW_FORMAT_ID:
         if( fgStructure.Window != NULL )
@@ -620,7 +621,8 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
 #elif TARGET_HOST_WIN32
 
     case GLUT_OVERLAY_POSSIBLE:
-/*        return( fgSetupPixelFormat( fgStructure.Window, TRUE, PFD_OVERLAY_PLANE ) ); */
+/*      return( fgSetupPixelFormat( fgStructure.Window, GL_TRUE,
+                                    PFD_OVERLAY_PLANE ) ); */
       return FALSE ;
 
     case GLUT_LAYER_IN_USE:

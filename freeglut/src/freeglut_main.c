@@ -101,9 +101,9 @@ static void fghRedrawWindowByHandle
      * XXX the {window} pointer is defined.
      */
     freeglut_return_if_fail( FETCH_WCB( *window, Display ) );
-    freeglut_return_if_fail( window->State.Visible == TRUE );
+    freeglut_return_if_fail( window->State.Visible );
 
-    window->State.Redisplay = FALSE;
+    window->State.Redisplay = GL_FALSE;
     INVOKE_WCB( *window, Display, ( ) );
 }
 
@@ -139,7 +139,7 @@ static void fghReshapeWindowByHandle
      * But without this we get this bad behaviour whenever we resize the
      * window.
      */
-    window->State.Redisplay = TRUE;
+    window->State.Redisplay = GL_TRUE;
 
     if( window->IsMenu )
         fgSetWindow( current_window );
@@ -161,12 +161,12 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
      * XXX loop if you didn't have a display callback defined...
      */
     if( ( FETCH_WCB( *window, Display ) ) &&
-        ( window->State.Redisplay == TRUE ) &&
-        ( window->State.Visible == TRUE ) )
+        window->State.Redisplay &&
+        window->State.Visible )
     {
         SFG_Window *current_window = fgStructure.Window;
 
-        window->State.Redisplay = FALSE;
+        window->State.Redisplay = GL_FALSE;
         INVOKE_WCB( *window, Display, ( ) );
         fgSetWindow( current_window );
     }
@@ -185,7 +185,7 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
             glutGet( GLUT_WINDOW_HEIGHT )
         );
 
-        window->State.NeedToResize = FALSE;
+        window->State.NeedToResize = GL_FALSE;
         fgSetWindow ( current_window );
     }
 
@@ -193,10 +193,10 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
      * XXX See above comment about the Redisplay flag...
      */
     if( ( FETCH_WCB( *window, Display ) ) &&
-        ( window->State.Redisplay == TRUE ) &&
-        ( window->State.Visible == TRUE ) )
+        window->State.Redisplay &&
+        window->State.Visible )
     {
-        window->State.Redisplay = FALSE;
+        window->State.Redisplay = GL_FALSE;
 
         RedrawWindow(
             window->Window.Handle, NULL, NULL, 
@@ -216,8 +216,8 @@ static void fghDisplayAll( void )
 {
     SFG_Enumerator enumerator;
 
-    enumerator.found = FALSE;
-    enumerator.data  =  NULL;
+    enumerator.found = GL_FALSE;
+    enumerator.data  =     NULL;
 
     fgEnumWindows( fghcbDisplayWindow, &enumerator );
 }
@@ -247,8 +247,8 @@ static void fghCheckJoystickPolls( void )
 {
     SFG_Enumerator enumerator;
 
-    enumerator.found = FALSE;
-    enumerator.data  =  NULL;
+    enumerator.found = GL_FALSE;
+    enumerator.data  =     NULL;
 
     fgEnumWindows( fghcbCheckJoystickPolls, &enumerator );
 }
@@ -319,7 +319,7 @@ long fgElapsedTime( void )
 #elif TARGET_HOST_WIN32
         fgState.Time.Value = timeGetTime( );
 #endif
-        fgState.Time.Set = TRUE;
+        fgState.Time.Set = GL_TRUE;
     }
 }
 
@@ -385,7 +385,7 @@ static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e )
 {
     if( FETCH_WCB( *w, Joystick ) )
     {
-        e->found = TRUE;
+        e->found = GL_TRUE;
         e->data = w;
     }
     fgEnumSubWindows( w, fgCheckJoystickCallback, e );
@@ -393,7 +393,7 @@ static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e )
 static int fgHaveJoystick( void )
 {
     SFG_Enumerator enumerator;
-    enumerator.found = FALSE;
+    enumerator.found = GL_FALSE;
     enumerator.data = NULL;
     fgEnumWindows( fgCheckJoystickCallback, &enumerator );
     return !!enumerator.data;
@@ -402,7 +402,7 @@ static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e )
 {
     if( w->State.Redisplay )
     {
-        e->found = TRUE;
+        e->found = GL_TRUE;
         e->data = w;
     }
     fgEnumSubWindows( w, fgHavePendingRedisplaysCallback, e );
@@ -410,7 +410,7 @@ static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e )
 static int fgHavePendingRedisplays( void )
 {
     SFG_Enumerator enumerator;
-    enumerator.found = FALSE;
+    enumerator.found = GL_FALSE;
     enumerator.data = NULL;
     fgEnumWindows( fgHavePendingRedisplaysCallback, &enumerator );
     return !!enumerator.data;
@@ -532,7 +532,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 GETWINDOW( xclient ); 
 
                 fgCloseWindow ( window );
-                fgAddToWindowDestroyList ( window, FALSE );
+                fgAddToWindowDestroyList ( window, GL_FALSE );
             }
             break;
 
@@ -563,7 +563,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * This is sent to confirm the XDestroyWindow call.
              * XXX WHY is this commented out?  Should we re-enable it?
              */
-            /* fgAddToWindowDestroyList ( window, FALSE ); */
+            /* fgAddToWindowDestroyList ( window, GL_FALSE ); */
             break;
 
         case Expose:
@@ -611,18 +611,18 @@ void FGAPIENTRY glutMainLoopEvent( void )
             {
             case VisibilityUnobscured:
                 INVOKE_WCB( *window, WindowStatus, ( GLUT_FULLY_RETAINED ) );
-                window->State.Visible = TRUE;
+                window->State.Visible = GL_TRUE;
                 break;
                 
             case VisibilityPartiallyObscured:
                 INVOKE_WCB( *window, WindowStatus,
                             ( GLUT_PARTIALLY_RETAINED ) );
-                window->State.Visible = TRUE;
+                window->State.Visible = GL_TRUE;
                 break;
                 
             case VisibilityFullyObscured:
                 INVOKE_WCB( *window, WindowStatus, ( GLUT_FULLY_COVERED ) );
-                window->State.Visible = FALSE;
+                window->State.Visible = GL_FALSE;
                 break;
 
             default:
@@ -656,7 +656,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     window->ActiveMenu->Window->State.MouseY =
                         event.xmotion.y_root - window->ActiveMenu->Y;
                 }
-                window->ActiveMenu->Window->State.Redisplay = TRUE;
+                window->ActiveMenu->Window->State.Redisplay = GL_TRUE;
                 fgSetWindow( window->ActiveMenu->ParentWindow );
 
                 break;
@@ -680,11 +680,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case ButtonRelease:
         case ButtonPress:
         {
-            GLboolean pressed = TRUE;
+            GLboolean pressed = GL_TRUE;
             int button;
 
             if( event.type == ButtonRelease )
-                pressed = FALSE;
+                pressed = GL_FALSE;
 
             /*
              * A mouse button has been pressed or released. Traditionally,
@@ -737,7 +737,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
               
                 /* In the menu, invoke the callback and deactivate the menu*/
                 if( fgCheckActiveMenu( window->ActiveMenu->Window,
-                                       window->ActiveMenu ) == TRUE )
+                                       window->ActiveMenu ) )
                 {
                     /*
                      * Save the current window and menu and set the current
@@ -767,7 +767,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                      */
                     fgDeactivateMenu( window->ActiveMenu->ParentWindow );
               
-                window->State.Redisplay = TRUE;
+                window->State.Redisplay = GL_TRUE;
                 break;
             }
 
@@ -779,7 +779,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 ( window->Menu[ button ] ) &&
                 pressed )
             {
-                window->State.Redisplay = TRUE;
+                window->State.Redisplay = GL_TRUE;
                 fgSetWindow( window );
                 fgActivateMenu( window, button );
                 break;
@@ -1104,7 +1104,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         {
             unsigned int current_DisplayMode = fgState.DisplayMode;
             fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;
-            fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
+            fgSetupPixelFormat( window, GL_FALSE, PFD_MAIN_PLANE );
             fgState.DisplayMode = current_DisplayMode;
 
             if( fgStructure.MenuContext )
@@ -1124,9 +1124,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
         else
         {
-            fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
+            fgSetupPixelFormat( window, GL_FALSE, PFD_MAIN_PLANE );
 
-            if( fgState.UseCurrentContext != TRUE )
+            if( ! fgState.UseCurrentContext )
                 window->Window.Context =
                     wglCreateContext( window->Window.Device );
             else
@@ -1138,7 +1138,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             }
         }
 
-        window->State.NeedToResize = TRUE;
+        window->State.NeedToResize = GL_TRUE;
         ReleaseDC( window->Window.Handle, window->Window.Device );
         break;
 
@@ -1221,8 +1221,8 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 
     case WM_SHOWWINDOW:
-        window->State.Visible = TRUE;
-        window->State.Redisplay = TRUE;
+        window->State.Visible = GL_TRUE;
+        window->State.Redisplay = GL_TRUE;
         break;
 
     case WM_PAINT:
@@ -1264,7 +1264,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Put on a linked list of windows to be removed after all the
          * callbacks have returned
          */
-        fgAddToWindowDestroyList( window, FALSE );
+        fgAddToWindowDestroyList( window, GL_FALSE );
         DestroyWindow( hWnd );
         break;
 
@@ -1281,7 +1281,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         
         if ( window->ActiveMenu )
         {
-            window->State.Redisplay = TRUE;
+            window->State.Redisplay = GL_TRUE;
             fgSetWindow ( window->ActiveMenu->ParentWindow );
             break;
         }
@@ -1308,7 +1308,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_MBUTTONUP:
     case WM_RBUTTONUP:
     {
-        GLboolean pressed = TRUE;
+        GLboolean pressed = GL_TRUE;
         int button;
 
         window->State.MouseX = LOWORD( lParam );
@@ -1317,7 +1317,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /*
          * XXX Either these multi-statement lines should be broken
          * XXX in the form:
-         * XXX     pressed = TRUE;
+         * XXX     pressed = GL_TRUE;
          * XXX     button = GLUT_LEFT_BUTTON;
          * XXX     break;
          * XXX ...or we should use a macro (much as I dislike freeglut's
@@ -1326,19 +1326,19 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         switch( uMsg )
         {
         case WM_LBUTTONDOWN:
-            pressed = TRUE;  button = GLUT_LEFT_BUTTON;   break;
+            pressed = GL_TRUE;  button = GLUT_LEFT_BUTTON;   break;
         case WM_MBUTTONDOWN:
-            pressed = TRUE;  button = GLUT_MIDDLE_BUTTON; break;
+            pressed = GL_TRUE;  button = GLUT_MIDDLE_BUTTON; break;
         case WM_RBUTTONDOWN:
-            pressed = TRUE;  button = GLUT_RIGHT_BUTTON;  break;
+            pressed = GL_TRUE;  button = GLUT_RIGHT_BUTTON;  break;
         case WM_LBUTTONUP:
-            pressed = FALSE; button = GLUT_LEFT_BUTTON;   break;
+            pressed = GL_FALSE; button = GLUT_LEFT_BUTTON;   break;
         case WM_MBUTTONUP:
-            pressed = FALSE; button = GLUT_MIDDLE_BUTTON; break;
+            pressed = GL_FALSE; button = GLUT_MIDDLE_BUTTON; break;
         case WM_RBUTTONUP:
-            pressed = FALSE; button = GLUT_RIGHT_BUTTON;  break;
+            pressed = GL_FALSE; button = GLUT_RIGHT_BUTTON;  break;
         default:
-            pressed = FALSE; button = -1;                 break;
+            pressed = GL_FALSE; button = -1;                 break;
         }
 
         if( GetSystemMetrics( SM_SWAPBUTTON ) )
@@ -1374,9 +1374,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( window->ActiveMenu )
         {
             /* Outside the menu, deactivate the menu if it's a downclick */
-            if( fgCheckActiveMenu( window, window->ActiveMenu ) != TRUE )
+            if( ! fgCheckActiveMenu( window, window->ActiveMenu ) )
             {
-                if( pressed == TRUE )
+                if( pressed )
                     fgDeactivateMenu( window->ActiveMenu->ParentWindow );
             }
             else  /* In menu, invoke the callback and deactivate the menu*/
@@ -1405,14 +1405,14 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
              * click and menu activity.
              */
             if( ! window->IsMenu )
-                window->State.Redisplay = TRUE;
+                window->State.Redisplay = GL_TRUE;
 
             break;
         }
 
-        if( ( window->Menu[ button ] ) && ( pressed == TRUE ) )
+        if ( window->Menu[ button ] && pressed )
         {
-            window->State.Redisplay = TRUE;
+            window->State.Redisplay = GL_TRUE;
             fgSetWindow( window );
             fgActivateMenu( window, button );
 
@@ -1428,7 +1428,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         INVOKE_WCB(
             *window, Mouse,
             ( button,
-              pressed == TRUE ? GLUT_DOWN : GLUT_UP,
+              pressed ? GLUT_DOWN : GLUT_UP,
               window->State.MouseX,
               window->State.MouseY
             )
@@ -1713,7 +1713,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_SYNCPAINT:  /* 0x0088 */
         /* Another window has moved, need to update this one */
-        window->State.Redisplay = TRUE;
+        window->State.Redisplay = GL_TRUE;
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         /* Help screen says this message must be passed to "DefWindowProc" */
         break;
