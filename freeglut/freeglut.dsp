@@ -90,87 +90,87 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=".\src\freeglut_callbacks.c"
+SOURCE=.\src\freeglut_callbacks.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_cursor.c"
+SOURCE=.\src\freeglut_cursor.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_display.c"
+SOURCE=.\src\freeglut_display.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_ext.c"
+SOURCE=.\src\freeglut_ext.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_font.c"
+SOURCE=.\src\freeglut_font.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_font_data.c"
+SOURCE=.\src\freeglut_font_data.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_gamemode.c"
+SOURCE=.\src\freeglut_gamemode.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_geometry.c"
+SOURCE=.\src\freeglut_geometry.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_init.c"
+SOURCE=.\src\freeglut_init.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_joystick.c"
+SOURCE=.\src\freeglut_joystick.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_main.c"
+SOURCE=.\src\freeglut_main.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_menu.c"
+SOURCE=.\src\freeglut_menu.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_misc.c"
+SOURCE=.\src\freeglut_misc.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_overlay.c"
+SOURCE=.\src\freeglut_overlay.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_state.c"
+SOURCE=.\src\freeglut_state.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_stroke_mono_roman.c"
+SOURCE=.\src\freeglut_stroke_mono_roman.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_stroke_roman.c"
+SOURCE=.\src\freeglut_stroke_roman.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_structure.c"
+SOURCE=.\src\freeglut_structure.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_teapot.c"
+SOURCE=.\src\freeglut_teapot.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_videoresize.c"
+SOURCE=.\src\freeglut_videoresize.c
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_window.c"
+SOURCE=.\src\freeglut_window.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -186,7 +186,7 @@ SOURCE=.\include\GL\freeglut_ext.h
 # End Source File
 # Begin Source File
 
-SOURCE=".\src\freeglut_internal.h"
+SOURCE=.\src\freeglut_internal.h
 # End Source File
 # Begin Source File
 
