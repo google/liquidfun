@@ -208,6 +208,13 @@ DEP_CPP_FREEGLUT_GL=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\freeglut_gx.cpp
+DEP_CPP_FREEGLUT_GX=\
+	{$(INCLUDE)}"gx.h"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\freeglut_init.c
 DEP_CPP_FREEGLUT_I=\
 	".\src\freeglut_internal.h"\
@@ -351,11 +358,15 @@ NODEP_CPP_FREEGLUT_V=\
 SOURCE=.\src\freeglut_window.c
 DEP_CPP_FREEGLUT_W=\
 	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"aygshell.h"\
 	{$(INCLUDE)}"GL\freeglut.h"\
 	{$(INCLUDE)}"GL\freeglut_ext.h"\
 	{$(INCLUDE)}"GL\freeglut_std.h"\
+	{$(INCLUDE)}"sipapi.h"\
+	{$(INCLUDE)}"winuserm.h"\
 	
 NODEP_CPP_FREEGLUT_W=\
+	"..\..\..\..\..\Program Files\Windows CE Tools\wce420\POCKET PC 2003\Include\ARMV4\vibrate.h"\
 	".\src\config.h"\
 	
 # End Source File

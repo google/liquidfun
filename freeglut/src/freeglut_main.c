@@ -25,6 +25,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -40,6 +41,29 @@
 #include <errno.h>
 #include <sys/stat.h>
 #elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WINCE
+  // including gx.h does only work in c++ (thanks MS...),
+  // so we define this on our own...
+struct GXKeyList {
+    short vkUp;             // key for up
+    POINT ptUp;             // x,y position of key/button.  Not on screen but in screen coordinates.
+    short vkDown;
+    POINT ptDown;
+    short vkLeft;
+    POINT ptLeft;
+    short vkRight;
+    POINT ptRight;
+    short vkA;
+    POINT ptA;
+    short vkB;
+    POINT ptB;
+    short vkC;
+    POINT ptC;
+    short vkStart;
+    POINT ptStart;
+};
+extern void wince_GetDefaultKeys(void* nData, int iOptions);
+extern void wince_OpenInput();
 #endif
 
 #ifndef MAX
@@ -1259,6 +1283,11 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         window->State.Height = fgState.Size.Y;
 
         ReleaseDC( window->Window.Handle, window->Window.Device );
+
+#if TARGET_HOST_WINCE
+		// Take over button handling
+		wince_OpenInput();
+#endif //TARGET_HOST_WINCE
         break;
 
     case WM_SIZE:
@@ -1370,8 +1399,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_MOUSEMOVE:
     {
+#if TARGET_HOST_WINCE
+        window->State.MouseX = 320-HIWORD( lParam );
+        window->State.MouseY = LOWORD( lParam );
+#else
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
+#endif //TARGET_HOST_WINCE
 
         if ( window->ActiveMenu )
         {
@@ -1405,8 +1439,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         GLboolean pressed = GL_TRUE;
         int button;
 
+#if TARGET_HOST_WINCE
+        window->State.MouseX = 320-HIWORD( lParam );
+        window->State.MouseY = LOWORD( lParam );
+#else
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
+#endif //TARGET_HOST_WINCE
 
         switch( uMsg )
         {
@@ -1609,6 +1648,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
     {
+#if TARGET_HOST_WINCE
+        struct GXKeyList gxKeyList;
+#endif //TARGET_HOST_WINCE
         int keypress = -1;
         POINT mouse_pos ;
 
@@ -1664,6 +1706,30 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                         ( 127, window->State.MouseX, window->State.MouseY )
             );
         }
+
+#if TARGET_HOST_WINCE
+		if(!(lParam & 0x40000000)) // Prevent auto-repeat
+		{
+			wince_GetDefaultKeys(&gxKeyList, 0x03);
+
+			if(wParam==(unsigned)gxKeyList.vkRight)
+				keypress = GLUT_KEY_RIGHT;
+			else if(wParam==(unsigned)gxKeyList.vkLeft)
+				keypress = GLUT_KEY_LEFT;
+			else if(wParam==(unsigned)gxKeyList.vkUp)
+				keypress = GLUT_KEY_UP;
+			else if(wParam==(unsigned)gxKeyList.vkDown)
+				keypress = GLUT_KEY_DOWN;
+			else if(wParam==(unsigned)gxKeyList.vkA)
+				keypress = GLUT_KEY_F1;
+			else if(wParam==(unsigned)gxKeyList.vkB)
+				keypress = GLUT_KEY_F2;
+			else if(wParam==(unsigned)gxKeyList.vkC)
+				keypress = GLUT_KEY_F3;
+			else if(wParam==(unsigned)gxKeyList.vkStart)
+				keypress = GLUT_KEY_F4;
+		}
+#endif
 
         if( keypress != -1 )
             INVOKE_WCB( *window, Special,
