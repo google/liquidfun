@@ -68,11 +68,16 @@
 
 #if TARGET_HOST_UNIX_X11
 #    define _JS_MAX_AXES 16
+#    if HAVE_SYS_IOCTL_H
+#        include <sys/ioctl.h>
+#    endif
+#    if HAVE_FCNTL_H
+#        include <fcntl.h>
+#    endif
 #    if defined(__FreeBSD__) || defined(__NetBSD__)
 /* XXX The below hack is done until freeglut's autoconf is updated. */
 #        define HAVE_USB_JS    1
 
-#        include <sys/ioctl.h>
 #        if defined(__FreeBSD__) && __FreeBSD_version >= 500000
 #            include <sys/joystick.h>
 #        else
@@ -89,11 +94,9 @@
 #        define JS_RETURN (sizeof(struct JS_DATA_TYPE))
 #    endif
 
-#    include <fcntl.h>
 #    include <errno.h>
 
 #    if defined(__linux__)
-#        include <sys/ioctl.h>
 #        include <linux/joystick.h>
 
 /* check the joystick driver version */

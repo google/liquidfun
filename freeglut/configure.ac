@@ -23,7 +23,7 @@ AC_SUBST([LIBXXF86VM])
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([sys/time.h GL/gl.h GL/glu.h GL/glx.h])
+AC_CHECK_HEADERS([GL/gl.h GL/glu.h GL/glx.h fcntl.h sys/ioctl.h sys/time.h])
 AC_HEADER_TIME
 
 save_CFLAGS="$CFLAGS"
@@ -32,6 +32,7 @@ AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [], [], [#include <X11/Xlib.h>])
 CFLAGS="$save_CFLAGS"
 
 # Checks for library functions.
+AC_PROG_GCC_TRADITIONAL
 AC_CHECK_LIBM
 AC_SUBST([LIBM])
 
