@@ -163,7 +163,6 @@ main(int argc, char *argv[])
     glCullFace(GL_BACK);
 
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
 
     glEnable(GL_LIGHT0);
     glEnable(GL_NORMALIZE);
