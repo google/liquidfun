@@ -508,14 +508,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
         switch( event.type )
         {
-        case DestroyNotify:
-            /*
-             * This is sent to confirm the XDestroyWindow call.
-             * XXX WHY is this commented out?  Should we re-enable it?
-             */
-            /* fgAddToWindowDestroyList ( window, FALSE ); */
-            break;
-
         case ClientMessage:
             /*
              * Destroy the window when the WM_DELETE_WINDOW message arrives
@@ -527,26 +519,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 fgCloseWindow ( window ) ;
                 fgAddToWindowDestroyList ( window, FALSE );
             }
-            break;
-
-        case MapNotify:
-        case UnmapNotify:
-            /*
-             * If we never do anything with this, can we just not ask to
-             * get these messages?
-             */
-            break;
-
-        case Expose:
-            /*
-             * We are too dumb to process partial exposes...
-             * XXX Well, we could do it.  However, it seems to only
-             * XXX be potentially useful for single-buffered (since
-             * XXX double-buffered does not respect viewport when we
-             * XXX do a buffer-swap).
-             */
-            if( event.xexpose.count == 0 )
-                fghRedrawWindowByHandle( event.xexpose.window );
             break;
 
             /*
@@ -569,6 +541,34 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 event.xconfigure.width,
                 event.xconfigure.height
             );
+            break;
+
+        case DestroyNotify:
+            /*
+             * This is sent to confirm the XDestroyWindow call.
+             * XXX WHY is this commented out?  Should we re-enable it?
+             */
+            /* fgAddToWindowDestroyList ( window, FALSE ); */
+            break;
+
+        case Expose:
+            /*
+             * We are too dumb to process partial exposes...
+             * XXX Well, we could do it.  However, it seems to only
+             * XXX be potentially useful for single-buffered (since
+             * XXX double-buffered does not respect viewport when we
+             * XXX do a buffer-swap).
+             */
+            if( event.xexpose.count == 0 )
+                fghRedrawWindowByHandle( event.xexpose.window );
+            break;
+
+        case MapNotify:
+        case UnmapNotify:
+            /*
+             * If we never do anything with this, can we just not ask to
+             * get these messages?
+             */
             break;
 
         case MappingNotify:
