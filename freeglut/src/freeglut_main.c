@@ -572,8 +572,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     fgDeinitialize( );
                     exit( 0 );
                 }
+                else if( fgState.ActionOnWindowClose == GLUT_ACTION_GLUTMAINLOOP_RETURNS )
+                    fgState.ExecState = GLUT_EXEC_STATE_STOP;
 
-                fgState.ExecState = GLUT_EXEC_STATE_STOP;
                 return;
             }
             break;
@@ -1086,7 +1087,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 fgDeinitialize( );
                 exit( 0 );
             }
-            fgState.ExecState = GLUT_EXEC_STATE_STOP;
+            else if( fgState.ActionOnWindowClose == GLUT_ACTION_GLUTMAINLOOP_RETURNS )
+                fgState.ExecState = GLUT_EXEC_STATE_STOP;
+
             return;
         }
 
@@ -1894,11 +1897,15 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         {
           /*
            * We have received a system command message.  Try to act on it.
-           * The commands are passed in through the "lParam" parameter:
-           * Clicking on a corner to resize the window gives a "F004" message
-           * but this is not defined in my header file.
+           * The commands are passed in through the "wParam" parameter:
+           * The least significant digit seems to be which edge of the window
+           * is being used for a resize event:
+           *     4  3  5
+           *     1     2
+           *     7  6  8
+           * Congratulations and thanks to Richard Rauch for figuring this out..
            */
-            switch ( lParam )
+            switch ( wParam & 0xfff0 )
             {
             case SC_SIZE       :
                 break ;
@@ -1952,6 +1959,12 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
             case SC_HOTKEY     :
                 break ;
+
+            default:
+#if _DEBUG
+                fgWarning( "Unknown wParam type 0x%x\n", wParam );
+#endif
+                break;
             }
         }
 #endif /* !TARGET_HOST_WINCE */
