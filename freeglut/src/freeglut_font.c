@@ -133,7 +133,7 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
 void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
 {
     int c;
-    int numchar = strlen( string );
+    int numchar = strlen( (char *) string );
     SFG_Font* font = fghFontByID( fontID );
     float raster_position[ 4 ];
 
@@ -189,7 +189,7 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
 {
     int c, length = 0, this_line_length = 0;
     SFG_Font* font = fghFontByID( fontID );
-    int numchar = strlen( string );
+    int numchar = strlen( (char *) string );
 
     for( c = 0; c < numchar; c++ )
     {
@@ -247,7 +247,7 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
 void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 {
     int c, i, j;
-    int numchar = strlen( string );
+    int numchar = strlen( (char *) string );
     float length = 0.0;
     SFG_StrokeFont* font = fghStrokeByID( fontID );
 
@@ -315,7 +315,7 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
     float length = 0.0;
     float this_line_length = 0.0;
     SFG_StrokeFont* font = fghStrokeByID( fontID );
-    int numchar = strlen( string );
+    int numchar = strlen( (char *) string );
 
     for( c = 0; c < numchar; c++ )
         if( string[ c ] < font->Quantity )
