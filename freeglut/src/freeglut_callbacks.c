@@ -52,12 +52,7 @@ void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
 	fgError ("Fatal error in program.  NULL display callback not "
 	    "permitted in GLUT 3.0+ or freeglut 2.0.1+\n");
     SET_CALLBACK( Display );
-
-    /*
-     * Force a redisplay with the new callback
-     */
     fgStructure.Window->State.Redisplay = TRUE;
-
 }
 
 /*
@@ -90,10 +85,6 @@ void FGAPIENTRY glutSpecialFunc( void (* callback)( int, int, int ) )
 void FGAPIENTRY glutIdleFunc( void (* callback)( void ) )
 {
     freeglut_assert_ready;
-
-    /*
-     * The global idle callback pointer is stored in fgState structure
-     */
     fgState.IdleCallback = callback;
 }
 
@@ -106,28 +97,14 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
 
     freeglut_assert_ready;
 
-    /*
-     * Create a new freeglut timer hook structure
-     */
     timer = (SFG_Timer *)calloc( sizeof(SFG_Timer), 1 );
     if (!timer)
 	fgError ("Fatal error: "
 	    "Memory allocation failure in glutTimerFunc()\n");
 
-    /*
-     * Remember the callback address and timer hook's ID
-     */
     timer->Callback  = callback;
     timer->ID        = timerID;
-
-    /*
-     * When will the time out happen (in terms of window's timer)
-     */
     timer->TriggerTime = fgElapsedTime() + timeOut;
-
-    /*
-     * Have the new hook attached to the current window
-     */
     fgListAppend( &fgState.Timers, &timer->Node );
 }
 
@@ -178,14 +155,8 @@ void FGAPIENTRY glutSpecialUpFunc( void (* callback)( int, int, int ) )
 void FGAPIENTRY glutJoystickFunc( void (* callback)( unsigned int, int, int, int ), int pollInterval )
 {
     SET_CALLBACK( Joystick );
-    /*
-     * Do not forget setting the joystick poll rate
-     */
     fgStructure.Window->State.JoystickPollRate = pollInterval;
 
-    /*
-     * Make sure the joystick polling routine gets called as early as possible:
-     */
     fgStructure.Window->State.JoystickLastPoll =
         fgElapsedTime() - fgStructure.Window->State.JoystickPollRate;
 
@@ -202,7 +173,8 @@ void FGAPIENTRY glutMouseFunc( void (* callback)( int, int, int, int ) )
 }
 
 /*
- * Sets the mouse motion callback for the current window (one or more buttons are pressed)
+ * Sets the mouse motion callback for the current window (one or more buttons
+ * are pressed)
  */
 void FGAPIENTRY glutMotionFunc( void (* callback)( int, int ) )
 {
@@ -210,7 +182,8 @@ void FGAPIENTRY glutMotionFunc( void (* callback)( int, int ) )
 }
 
 /*
- * Sets the passive mouse motion callback for the current window (no mouse buttons are pressed)
+ * Sets the passive mouse motion callback for the current window (no mouse
+ * buttons are pressed)
  */
 void FGAPIENTRY glutPassiveMotionFunc( void (* callback)( int, int ) )
 {
@@ -252,7 +225,6 @@ void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
 void FGAPIENTRY glutMenuStateFunc( void (* callback)( int ) )
 {
     freeglut_assert_ready;
-
     fgState.MenuStateCallback = callback;
 }
 
@@ -262,7 +234,6 @@ void FGAPIENTRY glutMenuStateFunc( void (* callback)( int ) )
 void FGAPIENTRY glutMenuStatusFunc( void (* callback)( int, int, int ) )
 {
     freeglut_assert_ready;
-
     fgState.MenuStatusCallback = callback;
 }
 
