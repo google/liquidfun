@@ -366,6 +366,11 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * Grab the environment variable indicating the X display to use.
      * This is harmless under Win32, so let's let it stay here...
      */
+#if TARGET_HOST_WIN32
+    if ( !getenv( "DISPLAY" ) )
+      displayName = strdup( "" );
+    else
+#endif
     displayName = strdup( getenv( "DISPLAY" ) );
 
     /*
