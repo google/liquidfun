@@ -1,3 +1,92 @@
 
-	The up-to-date TODO list can be found under following URL: 
+	The not-so-up-to-date TODO list can be found under following URL: 
 	      http://freeglut.sourceforge.net/progress.html
+
+Issues in Freeglut (so we don't forget):
+
+(3) In the Atlantis demo, if you stop the animation and move the mouse around with a menu open, the whales jiggle but don't circulate.  My guess is that you need a way to redisplay the menu without forcing a redisplay from the application.
+
+(4) In the Atlantis demo, if you bring up the menu in GLUT the animation stops; in freeglut the animation continues.  This may be another manifestation of (3).
+
+(5) In the Atlantis demo modified to draw a solid torus instead of a mother whale, the torus is not shaded according to the lighting.  This is true with both GLUT and freeglut.  With freeglut, when you bring up a menu the shading turns on; with GLUT it does not.
+
+(6) There are several thousand compiler warnings.
+
+(8) With the "bluepony" demo, if you reshape the window using the mouse, the scene does not redraw until you move it with a keypress (arrow key or space bar to start the animation).  Check out the "CS_VREDRAW or CS_HREDRAW" sections in MSVC help for a pointer about this.
+
+(13) If you compare the "bounce" demo with freeglut and GLUT, you see that the slider widths are still slightly off.
+
+(19) The "skyfly" demo resized my video and set it to 256 colors but didn't set it back when it was done.  This is a problem with "skyfly" and not freeglut.
+
+(22) We seem to have troubles with programs that use display lists.  Check out the "walker" demo and load a new curve set.  If you have the debugger going while it is loading, you get the new curves; otherwise you don't.  This has to do with the debugger hiding the freeglut window while the display list is being changed.
+
+(24) The "fgCleanUpGlutsMess" function seems to duplicate the "fgDestroyStructure" or "fgDeinitialize" function and should probably be removed.
+
+(26) The "G_LOG_DOMAIN" defined constants are never used.  Should we start using them in warning and error messages or should we delete them?
+
+(27) The "freeglut_internal.h" file on lines 45ff defines or undefines "G_DISABLE_ASSERT" and "G_DISABLE_CHECKS" but these are never used.  Shall we start using them or should we delete them?
+
+(28) P-GUIDE apparently calls the get and set window size functions repeatedly.  Each time it does, the window shrinks by 2 pixels in each direction.
+
+(29) (for Don Heyse) We need to implement the "glutLayerGet ( GLUT_NORMAL_DAMAGED )" call.
+
+
+These are all for the Windows version.  Somebody needs to check the Unix version to see if the same issues exist there.
+
+
+<June 20, 2003>
+A call for issues brought in the following:
+
+*Fixed*(30) From Aleksandar Donev:  Just a reminder to make sure an autogen.sh script or something alike is there to make the makefiles for the ignorant like me.  From an earlier post of Bernd:  I propose to create a script called autogen.sh in the CVS and make it hold these lines:
+
+set -x
+autoheader
+aclocal
+libtoolize --copy --force
+automake --add-missing
+autoconf
+
+(31) Also from Aleksandar Donev: can some add support for building a debbing version of freeglut to the makefiles? I have no clue how to use automake...
+
+*Fixed*(32) From Eero Pajarre:  A patch to make "freeglut" use the refresh rate in the gamemode string under Windows.
+
+*Fixed*(33) Also from Eero Pajarre:  A patch to prevent "freeglut" from adjusting for the window border thickness in game mode.
+
+(34) Change the name of the source directory from "freeglut-1.3" to "src".
+
+<From the Web Page, dated January 16, 2000; I don't know how many of these have
+already been fixed.>
+
+(35) There is a big guess about the mouse buttons count under X11 (always 3) -- I must remember to correct the menu activation code if this shows to be invalid.
+
+(36) None of the bizarre input devices found in GLUT API is supported (and probably won't).
+
+(37) The joystick code should work fine but I haven't tested it out yet. It might not compile under FreeBSD, as I had to convert it from C++ to C and had no possibility to compile it under FreeBSD.
+
+(38) The menu is displayed using OpenGL, so it requires the window's contents to be refreshed at an interactive rate, which sometimes does not happen. That's why I'll consider adding optional window-system menu navigation later. For now -- extensive testing is what I believe should be done with the menu system.  (Several of the GLUT demos use the menu system.  John Fay has checked it out pretty well.)
+
+*Fixed*(39) It would be good to add two more API functions -- glutBitmapString() and glutStrokeString(), which should limit the quantity of state changes when drawing longer strings.
+
+(40) Need to have own cursor shapes, so that freeglut can pass them to the windowing system, draw them using glBitmap() and/or texture mapping. The cursor shapes are very probable to be found in XFree86 sources.
+
+(41) Indexed color mode might work, however I have not tested it yet.  glutGetColor/glutSetColor is not implemented. Again, looks like a single Xlib call, but there might be some problems with the colormap access. Need to switch into indexed color mode some day and check it out (does Mesa 3.1 work with indexed color mode?)
+
+(42) Overlays are not supported, but one of the GLUT conformance tests fails due to glutLayerGet( GLUT_NORMAL_DAMAGED ) returning FALSE when the window has actually been damaged.
+
+(43) Layers would be good for drawing the menus and mouse cursor, as they wouldn't force the application redraw to update their state.
+
+(44) Does the init display string work?
+
+(45) Is the game mode string parsed correctly?
+
+(46) Does the geometry need normal vectors?
+
+(47) The visibility/window status function is a conceptual mess. I had to peer into the GLUT source code to see what actually happens inside. It helped me a bit, but still one of the visibility tests fails. This is probably the reason for which a window covered by enlightenment status bar is marked as hidden and does not get redrawn.
+
+(48) GLX 1.3 spec states that glXChooseVisual() et consortes are deprecated. Should move to glXFBConfig.
+
+(49) Need to investigate what happens when initial window position is set to (-1,-1). GLUT specification says, that the window positioning should be left to the window system. And I do not know how to force it do so...
+
+(50) I was told it is wrong to have the redisplay forced in the main loop. Is that right?
+
+(51) Some of the tests freeze because they do not generate the glutPostRedisplay() call every frame. Again, this is somehow handled by GLUT, but I can't see how. And why.  Looks like I've fixed it (or rather hacked it?) by forcing a redisplay every frame, but this is no good and kills interactiveness of my console :D
