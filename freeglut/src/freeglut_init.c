@@ -597,16 +597,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /*
      * Compact {argv}.
      */
-    j = 2;
+    j = 1;
     for( i = 1; i < *pargc; i++, j++ )
     {
-        if( argv[ i ] == NULL )
-        {
-            /* Guaranteed to end because there are "*pargc" arguments left */
-            while ( argv[ j ] == NULL )
-                j++;
+        /* Guaranteed to end because there are "*pargc" arguments left */
+        while ( argv[ j ] == NULL )
+            j++;
+        if (i != j)
             argv[ i ] = argv[ j ];
-        }
     }
 
 #endif /* TARGET_HOST_WINCE */
