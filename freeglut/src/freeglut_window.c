@@ -1038,7 +1038,7 @@ void FGAPIENTRY glutFullScreen( void )
                       rect.bottom - rect.top,
                       SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
                       SWP_NOZORDER
-        );
+                    );
 #endif
     }
 }
