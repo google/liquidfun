@@ -162,7 +162,9 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     if( fgState.DisplayMode & GLUT_DOUBLE )
         flags |= PFD_DOUBLEBUFFER;
 
+#if defined(_MSC_VER)
 #pragma message( "fgSetupPixelFormat(): there is still some work to do here!" )
+#endif
 
     /*
      * Specify which pixel format do we opt for...
