@@ -681,23 +681,27 @@ void FGAPIENTRY glutInitDisplayMode( unsigned int displayMode )
 
 /* -- INIT DISPLAY STRING PARSING ------------------------------------------ */
 
-#define NUM_TOKENS             28
+#define NUM_TOKENS             36
 static char* Tokens[] =
 {
     "alpha", "acca", "acc", "blue", "buffer", "conformant", "depth", "double",
     "green", "index", "num", "red", "rgba", "rgb", "luminance", "stencil",
-    "single", "stereo", "samples", "slow", "win32pdf", "xvisual",
+    "single", "stereo", "samples", "slow", "win32pdf", "win32pfd", "xvisual",
     "xstaticgray", "xgrayscale", "xstaticcolor", "xpseudocolor",
-    "xtruecolor", "xdirectcolor"
+    "xtruecolor", "xdirectcolor",
+    "xstaticgrey", "xgreyscale", "xstaticcolour", "xpseudocolour",
+    "xtruecolour", "xdirectcolour", "borderless"
 };
 
 static int TokenLengths[] =
 {
     5,       4,      3,     4,      6,        10,           5,       6,
     5,       5,       3,     3,     4,      3,     9,           7,
-    6,        6,        7,         4,      8,          7,
+    6,        6,        7,         4,      8,          8,          7,
     11,            10,           12,             12,
-    10,           12
+    10,           12,
+    11,            10,           13,             13,
+    11,            13,              10
 };
 
 void FGAPIENTRY glutInitDisplayString( const char* displayMode )
@@ -814,54 +818,66 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
                       configuration is slow or not */
             break ;
 
-        case 20 :  /* "win32pdf":  matches the Win32 Pixel Format Descriptor by
+        case 20 :  /* "win32pdf": (incorrect spelling but was there before */
+        case 21 :  /* "win32pfd":  matches the Win32 Pixel Format Descriptor by
                       number */
 #if TARGET_HOST_WIN32
 #endif
             break ;
 
-        case 21 :  /* "xvisual":  matches the X visual ID by number */
+        case 22 :  /* "xvisual":  matches the X visual ID by number */
 #if TARGET_HOST_UNIX_X11
 #endif
             break ;
 
-        case 22 :  /* "xstaticgray":  boolean indicating if the frame buffer
+        case 23 :  /* "xstaticgray": */
+        case 29 :  /* "xstaticgrey":  boolean indicating if the frame buffer
                       configuration's X visual is of type StaticGray */
 #if TARGET_HOST_UNIX_X11
 #endif
             break ;
 
-        case 23 :  /* "xgrayscale":  boolean indicating if the frame buffer
+        case 24 :  /* "xgrayscale": */
+        case 30 :  /* "xgreyscale":  boolean indicating if the frame buffer
                       configuration's X visual is of type GrayScale */
 #if TARGET_HOST_UNIX_X11
 #endif
             break ;
 
-        case 24 :  /* "xstaticcolor":  boolean indicating if the frame buffer
+        case 25 :  /* "xstaticcolor": */
+        case 31 :  /* "xstaticcolour":  boolean indicating if the frame buffer
                       configuration's X visual is of type StaticColor */
 #if TARGET_HOST_UNIX_X11
 #endif
             break ;
 
-        case 25 :  /* "xpseudocolor":  boolean indicating if the frame buffer
+        case 26 :  /* "xpseudocolor": */
+        case 32 :  /* "xpseudocolour":  boolean indicating if the frame buffer
                       configuration's X visual is of type PseudoColor */
 #if TARGET_HOST_UNIX_X11
 #endif
             break ;
 
-        case 26 :  /* "xtruecolor":  boolean indicating if the frame buffer
+        case 27 :  /* "xtruecolor": */
+        case 33 :  /* "xtruecolour":  boolean indicating if the frame buffer
                       configuration's X visual is of type TrueColor */
 #if TARGET_HOST_UNIX_X11
 #endif
             break ;
 
-        case 27 :  /* "xdirectcolor":  boolean indicating if the frame buffer
+        case 28 :  /* "xdirectcolor": */
+        case 34 :  /* "xdirectcolour":  boolean indicating if the frame buffer
                       configuration's X visual is of type DirectColor */
 #if TARGET_HOST_UNIX_X11
 #endif
             break ;
 
-        case 28 :  /* Unrecognized */
+        case 35 :  /* "borderless":  windows should not have borders */
+#if TARGET_HOST_UNIX_X11
+#endif
+            break ;
+
+        case 36 :  /* Unrecognized */
             fgWarning ( "WARNING - Display string token not recognized:  %s",
                         token );
             break ;
