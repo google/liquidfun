@@ -55,14 +55,33 @@ SFG_Display fgDisplay;
 /*
  * The settings for the current freeglut session
  */
-SFG_State fgState = { { -1, -1, FALSE }, { 300, 300, TRUE }, GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,
-                      FALSE, TRUE, FALSE, FALSE, FALSE, TRUE,
+SFG_State fgState = { { -1, -1, FALSE },  /* Position */
+                      { 300, 300, TRUE }, /* Size */
+                      GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,  /* DisplayMode */
+                      FALSE, /* ForceDirectContext */
+                      TRUE,  /* TryDirectContext */
+                      FALSE, /* ForceIconic */
+                      FALSE, /* GLDebugSwitch */
+                      FALSE, /* XSyncSwitch */
+                      TRUE,  /* IgnoreKeyRepeat */
+                      0,     /* FPSInterval */
+                      0,     /* SwapCount */
+                      0,     /* SwapTime */
 #ifdef TARGET_HOST_WIN32
-                      { 0, FALSE },
+                      { 0, FALSE }, /* Time */
 #else
                       { { 0, 0 }, FALSE },
 #endif
-                      { NULL, NULL }, NULL, NULL, NULL, { 640, 480, TRUE }, 16, 72, GLUT_ACTION_EXIT, GLUT_EXEC_STATE_INIT } ;
+                      { NULL, NULL }, /* Timers */
+                      NULL, /* IdleCallback */
+                      NULL, /* MenuStateCallback */
+                      NULL, /* MenuStatusCallback */
+                      { 640, 480, TRUE }, /* GameModeSize */
+                      16,  /* GameModeDepth */
+                      72,  /* GameModeRefresh */
+                      GLUT_ACTION_EXIT, /* ActionOnWindowClose */
+                      GLUT_EXEC_STATE_INIT /* ExecState */
+};
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -312,6 +331,14 @@ void fgDeinitialize( void )
     fgState.MenuStateCallback = (FGCBmenuState)NULL ;
     fgState.MenuStatusCallback = (FGCBmenuStatus)NULL ;
 
+    /*
+     * FPS display
+     */
+    fgState.SwapCount   = 0;
+    fgState.SwapTime    = 0;
+    fgState.FPSInterval = 0;
+
+
 #if TARGET_HOST_UNIX_X11
 
     /*
@@ -364,6 +391,17 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     fgState.Time.Value = timeGetTime();
 #endif
     fgState.Time.Set = TRUE;
+
+
+    /* check if GLUT_FPS env var is set */
+    {
+        const char *fps = getenv("GLUT_FPS");
+        if (fps) {
+            sscanf(fps, "%d", &fgState.FPSInterval);
+            if (fgState.FPSInterval <= 0)
+                fgState.FPSInterval = 5000;  /* 5000 milliseconds */
+        }
+    }
 
     /*
      * Grab the environment variable indicating the X display to use.
