@@ -27,4 +27,16 @@ dnl Checks for library functions.
 AC_CHECK_LIBM
 AC_SUBST(LIBM)
 
-AC_OUTPUT(Makefile src/Makefile include/Makefile include/GL/Makefile)
+AC_OUTPUT(\
+	Makefile \
+	doc/Makefile \
+	progs/Makefile \
+	progs/demos/Makefile \
+	progs/demos/Fractals/Makefile \
+	progs/demos/Fractals_random/Makefile \
+	progs/demos/Lorenz/Makefile \
+	progs/demos/One/Makefile \
+	src/Makefile \
+	include/Makefile \
+	include/GL/Makefile \
+	)

@@ -1,6 +1,1 @@
-## Process this file with automake to produce Makefile.im
-
-bin_PROGRAMS = one
-one_SOURCES = one.c
-one_LDFLAGS = -export-dynamic -dlpreopen ../src/libfreeglut-2.0.la
-
+EXTRA_DIST = one.c one.dsp

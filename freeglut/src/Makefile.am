@@ -5,6 +5,7 @@
 #
 lib_LTLIBRARIES = libfreeglut.la
 
+noinst_HEADERS = freeglut_internal.h
 #
 # Those source files build the freeglut library
 #
@@ -29,7 +30,6 @@ libfreeglut_la_SOURCES = freeglut_callbacks.c \
 			 freeglut_teapot.c \
 			 freeglut_videoresize.c \
 			 freeglut_window.c
-
 
 #
 # Additional linker flags
