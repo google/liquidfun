@@ -659,7 +659,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
         /*
          * Check if an overlay display mode is possible
          */
-        return( fgSetupPixelFormat( fgStructure.Window, TRUE, PFD_OVERLAY_PLANE ) );
+        return  FALSE;
 
     case GLUT_LAYER_IN_USE:
         /*
