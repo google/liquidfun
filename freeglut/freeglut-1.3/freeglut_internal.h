@@ -220,6 +220,10 @@ struct tagSFG_State
 
     GLboolean        IgnoreKeyRepeat;      /* Whether to ignore key repeat...   */
 
+    GLuint           FPSInterval;          /* Interval between FPS printfs      */
+    GLuint           SwapCount;            /* Count of glutSwapBuffer calls     */
+    GLuint           SwapTime;             /* Time of last SwapBuffers          */
+
     SFG_Time         Time;                 /* The time that glutInit was called */
     SFG_List         Timers;               /* The freeglut timer hooks          */
 

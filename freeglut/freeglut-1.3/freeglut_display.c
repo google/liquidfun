@@ -92,6 +92,22 @@ void FGAPIENTRY glutSwapBuffers( void )
     SwapBuffers( fgStructure.Window->Window.Device );
 
 #endif
+
+    /* GLUT_FPS env var support */
+    if (fgState.FPSInterval) {
+        GLint t = glutGet(GLUT_ELAPSED_TIME);
+        fgState.SwapCount++;
+        if (fgState.SwapTime == 0)
+            fgState.SwapTime = t;
+        else if (t - fgState.SwapTime > fgState.FPSInterval) {
+            float time = 0.001 * (t - fgState.SwapTime);
+            float fps = (float) fgState.SwapCount / time;
+            fprintf(stderr, "FreeGLUT: %d frames in %.2f seconds = %.2f FPS\n",
+                    fgState.SwapCount, time, fps);
+            fgState.SwapTime = t;
+            fgState.SwapCount = 0;
+        }
+    }
 }
 
 /*
