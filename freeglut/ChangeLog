@@ -902,3 +902,6 @@ refresh rate if none could be found. This way the X11 part and the WinDoze
 behave similarly. NOTE: We still don't behave like GLUT, because it has a
 wider notion of "best" match. We have to refactor and extend freeglut quite
 a bit to do that.
+
+(235) Fixed part of bug #926883 (Video mode matching code, memory leaks,
+fullscreen), i.e. issue warnings when XF86VidModeFOO fails.

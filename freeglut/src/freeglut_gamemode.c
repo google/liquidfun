@@ -59,12 +59,12 @@ static void fghRememberState( void )
      * Remember the current ViewPort location of the screen to be able to
      * restore the ViewPort on LeaveGameMode():
      */
-    XF86VidModeGetViewPort(
-        fgDisplay.Display,
-        fgDisplay.Screen,
-        &fgDisplay.DisplayViewPortX,
-        &fgDisplay.DisplayViewPortY
-    );
+    if( !XF86VidModeGetViewPort(
+             fgDisplay.Display,
+             fgDisplay.Screen,
+             &fgDisplay.DisplayViewPortX,
+             &fgDisplay.DisplayViewPortY ) )
+        fgWarning( "XF86VidModeGetViewPort failed" );
 
     /*
      * Remember the current pointer location before going fullscreen
@@ -92,7 +92,7 @@ static void fghRememberState( void )
     );
 
     if( !fgDisplay.DisplayModeValid )
-            fgWarning( "Runtime use of XF86VidModeGetModeLine failed." );
+            fgWarning( "XF86VidModeGetModeLine failed" );
 
 #   else
     /*
@@ -144,12 +144,16 @@ static void fghRestoreState( void )
         XF86VidModeModeInfo** displayModes;
         int i, displayModesCount;
 
-        XF86VidModeGetAllModeLines(
-            fgDisplay.Display,
-            fgDisplay.Screen,
-            &displayModesCount,
-            &displayModes
-        );
+        if( !XF86VidModeGetAllModeLines(
+                 fgDisplay.Display,
+                 fgDisplay.Screen,
+                 &displayModesCount,
+                 &displayModes ) )
+        {
+            fgWarning( "XF86VidModeGetAllModeLines failed" );
+            return;
+        }
+
 
         /*
          * Check every of the modes looking for one that matches our demands.
@@ -161,17 +165,22 @@ static void fghRestoreState( void )
                displayModes[ i ]->vdisplay == fgDisplay.DisplayMode.vdisplay &&
                displayModes[ i ]->dotclock == fgDisplay.DisplayModeClock )
             {
-                XF86VidModeSwitchToMode(
-                    fgDisplay.Display,
-                    fgDisplay.Screen,
-                    displayModes[ i ]
-                );
-                XF86VidModeSetViewPort(
-                     fgDisplay.Display,
-                     fgDisplay.Screen,
-                     fgDisplay.DisplayViewPortX,
-                     fgDisplay.DisplayViewPortY
-                );
+                if( !XF86VidModeSwitchToMode(
+                         fgDisplay.Display,
+                         fgDisplay.Screen,
+                         displayModes[ i ] ) )
+                {
+                    fgWarning( "XF86VidModeSwitchToMode failed" );
+                    break;
+                }
+
+                if( !XF86VidModeSetViewPort(
+                         fgDisplay.Display,
+                         fgDisplay.Screen,
+                         fgDisplay.DisplayViewPortX,
+                         fgDisplay.DisplayViewPortY ) )
+                    fgWarning( "XF86VidModeSetViewPort failed" );
+
 
                 /*
                  * For the case this would be the last X11 call the application
@@ -236,12 +245,16 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         XF86VidModeModeInfo** displayModes;
         int i, ignoreRefreshRate, displayModesCount;
 
-        XF86VidModeGetAllModeLines(
-            fgDisplay.Display,
-            fgDisplay.Screen,
-            &displayModesCount,
-            &displayModes
-        );
+        if( !XF86VidModeGetAllModeLines(
+                 fgDisplay.Display,
+                 fgDisplay.Screen,
+                 &displayModesCount,
+                 &displayModes ) )
+        {
+            fgWarning( "XF86VidModeGetAllModeLines failed" );
+            return success;
+        }
+
 
         /*
          * Check every of the modes looking for one that matches our demands,
@@ -267,7 +280,11 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         }
 
         if( !haveToTest && success ) {
-          XF86VidModeSwitchToMode( fgDisplay.Display, fgDisplay.Screen, displayModes[ i ] );
+            if( !XF86VidModeSwitchToMode(
+                     fgDisplay.Display,
+                     fgDisplay.Screen,
+                     displayModes[ i ] ) )
+                fgWarning( "XF86VidModeSwitchToMode failed" );
         }
 
         XFree( displayModes );
@@ -473,7 +490,8 @@ int FGAPIENTRY glutEnterGameMode( void )
         Window child;
 
         /* Change to viewport to the window topleft edge: */
-        XF86VidModeSetViewPort( fgDisplay.Display, fgDisplay.Screen, 0, 0 );
+        if( !XF86VidModeSetViewPort( fgDisplay.Display, fgDisplay.Screen, 0, 0 ) )
+            fgWarning( "XF86VidModeSetViewPort failed" );
 
         /*
          * Final window repositioning: It could be avoided using an undecorated
