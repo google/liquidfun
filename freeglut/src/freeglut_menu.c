@@ -103,7 +103,7 @@ static float menu_pen_hback [4] = {1.0f,  1.0f,  1.0f,  1.0f};
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
 /*
- * Private static function to find a menu entry by index
+ * Private function to find a menu entry by index
  */
 static SFG_MenuEntry *fghFindMenuEntry( SFG_Menu* menu, int index )
 {
@@ -121,7 +121,7 @@ static SFG_MenuEntry *fghFindMenuEntry( SFG_Menu* menu, int index )
 }
 
 /*
- * Private static function to check for the current menu/sub menu activity state
+ * Private function to check for the current menu/sub menu activity state
  */
 static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
 {
@@ -134,9 +134,6 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
   for( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry;
        menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
   {
-    /*
-     * Is that an active sub menu by any case?
-     */
     if( menuEntry->SubMenu != NULL && menuEntry->IsActive == TRUE )
     {
       /*
@@ -147,8 +144,8 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
       GLboolean return_status = fghCheckMenuStatus( window, menuEntry->SubMenu ) ;
 
       /*
-       * Reactivate the submenu as the checkMenuStatus may have turned it off if the mouse
-       * is in its parent menu entry.
+       * Reactivate the submenu as the checkMenuStatus may have turned it off
+       * if the mouse is in its parent menu entry.
        */
       menuEntry->SubMenu->IsActive = TRUE ;
       if ( return_status == TRUE )
@@ -162,9 +159,6 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
   x = window->State.MouseX;
   y = window->State.MouseY;
 
-  /*
-   * Mark all menu entries inactive...
-   */
   for( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry;
        menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
   {
@@ -177,13 +171,12 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
   /*
    * Check if the mouse cursor is contained within the current menu box
    */
-  if ( ( x >= FREEGLUT_MENU_BORDER ) && ( x < menu->Width  - FREEGLUT_MENU_BORDER ) &&
-       ( y >= FREEGLUT_MENU_BORDER ) && ( y < menu->Height - FREEGLUT_MENU_BORDER ) &&
-       ( window == menu->Window ) )
+  if( ( x >= FREEGLUT_MENU_BORDER ) &&
+      ( x < menu->Width  - FREEGLUT_MENU_BORDER ) &&
+      ( y >= FREEGLUT_MENU_BORDER ) &&
+      ( y < menu->Height - FREEGLUT_MENU_BORDER ) &&
+      ( window == menu->Window ) )
   {
-    /*
-     * Calculation of the highlighted menu item is easy enough now:
-     */
     int menuID = ( y - FREEGLUT_MENU_BORDER ) / FREEGLUT_MENU_HEIGHT ;
 
     /*
@@ -192,15 +185,13 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
     menuEntry = fghFindMenuEntry( menu, menuID + 1 );
     assert( menuEntry != NULL );
 
-    /*
-     * Mark the menu as active...
-     */
     menuEntry->IsActive = TRUE;
     menuEntry->Ordinal = menuID;
 
     /*
-     * If this is not the same as the last active menu entry, deactivate the previous entry.
-     * Specifically, if the previous active entry was a submenu then deactivate it.
+     * If this is not the same as the last active menu entry, deactivate the
+     * previous entry. Specifically, if the previous active entry was a
+     * submenu then deactivate it.
      */
     if ( menu->ActiveEntry && ( menuEntry != menu->ActiveEntry ) )
     {
@@ -209,11 +200,6 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
     }
 
     menu->ActiveEntry = menuEntry ;
-
-    /*
-     * Don't forget about marking the current menu as active, too:
-     */
-
     menu->IsActive = TRUE;
 
     /*
@@ -231,9 +217,6 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
          * Set up the initial menu position now...
          */
 
-        /*
-         * Mark the menu as active, so that it gets displayed:
-         */
         menuEntry->SubMenu->IsActive = TRUE ;
 
         /*
@@ -258,13 +241,10 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
         fgSetWindow ( current_window ) ;
       }
 
-      /*
-       * ...then check the submenu's state:
-       */
       fghCheckMenuStatus( window, menuEntry->SubMenu );
 
       /*
-       * Even if the submenu turned up inactive, activate it because its parent entry is active
+       * Activate it because its parent entry is active
        */
       menuEntry->SubMenu->IsActive = TRUE ;
     }
