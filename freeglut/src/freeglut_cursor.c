@@ -75,37 +75,59 @@ void FGAPIENTRY glutSetCursor( int cursorID )
     freeglut_assert_ready; freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-	{
-		Cursor cursor;
+    /*
+     * Open issues:
+     * (a) GLUT_CURSOR_NONE doesn't do what it should.
+     * (b) Are we allocating resources, or causing X to do so?
+     *     If yes, we should arrange to deallocate!
+     * (c) No error checking.  Is that a problem?
+     */
+    {
+	Cursor cursor;
 
-	    /*
-		 * For now we'll limit ourselves to the X cursor fonts...
-		 */
-#		define MAP_CURSOR(a,b) case a: cursor = XCreateFontCursor( fgDisplay.Display, b ); break;
-
-		switch( cursorID )
-		{
-			MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, XC_left_ptr        );
-			MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  XC_right_ptr       );
-			MAP_CURSOR( GLUT_CURSOR_INFO,        XC_question_arrow  );
-			MAP_CURSOR( GLUT_CURSOR_DESTROY,     XC_target          );
-			MAP_CURSOR( GLUT_CURSOR_HELP,        XC_question_arrow  );
-			MAP_CURSOR( GLUT_CURSOR_CYCLE,       XC_circle          );
-			MAP_CURSOR( GLUT_CURSOR_SPRAY,       XC_spraycan        );
-			MAP_CURSOR( GLUT_CURSOR_WAIT,        XC_watch           );
-			MAP_CURSOR( GLUT_CURSOR_TEXT,        XC_draft_large     );
-			MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   XC_crosshair       );
-			MAP_CURSOR( GLUT_CURSOR_NONE,        XC_trek            );
-
-			default:
-			MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     XC_arrow           );
-		}
-
-	    /*
-	     * Define a window's cursor now
-	     */
-	    XDefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle, cursor );
+	/*
+	 * For now we'll limit ourselves to the X cursor fonts...
+	 */
+#define MAP_CURSOR(a,b) case a: cursor = XCreateFontCursor( fgDisplay.Display, b ); break;
+	if( GLUT_CURSOR_FULL_CROSSHAIR == cursorID )
+	    cursorID = GLUT_CURSOR_CROSSHAIR;
+	switch( cursorID )
+        {
+	    MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, XC_right_ptr);
+	    MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  XC_left_ptr);
+	    MAP_CURSOR( GLUT_CURSOR_INFO,        XC_hand1);
+	    MAP_CURSOR( GLUT_CURSOR_DESTROY,     XC_pirate);
+	    MAP_CURSOR( GLUT_CURSOR_HELP,        XC_question_arrow);
+	    MAP_CURSOR( GLUT_CURSOR_CYCLE,       XC_exchange);
+	    MAP_CURSOR( GLUT_CURSOR_SPRAY,       XC_spraycan);
+	    MAP_CURSOR( GLUT_CURSOR_WAIT,        XC_watch);
+	    MAP_CURSOR( GLUT_CURSOR_TEXT,        XC_xterm);
+	    MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   XC_crosshair);
+	    MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     XC_sb_v_double_arrow);
+	    MAP_CURSOR( GLUT_CURSOR_LEFT_RIGHT,  XC_sb_h_double_arrow);
+	    MAP_CURSOR( GLUT_CURSOR_TOP_SIDE,    XC_top_side);
+	    MAP_CURSOR( GLUT_CURSOR_BOTTOM_SIDE, XC_bottom_side);
+	    MAP_CURSOR( GLUT_CURSOR_LEFT_SIDE,   XC_left_side);
+	    MAP_CURSOR( GLUT_CURSOR_RIGHT_SIDE,  XC_right_side);
+	    MAP_CURSOR( GLUT_CURSOR_TOP_LEFT_CORNER,     XC_top_left_corner);
+	    MAP_CURSOR( GLUT_CURSOR_TOP_RIGHT_CORNER,    XC_top_right_corner);
+	    MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, XC_bottom_right_corner);
+	    MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER, XC_bottom_left_corner);
+	    MAP_CURSOR( GLUT_CURSOR_NONE,        XC_bogosity);
+	case GLUT_CURSOR_INHERIT:
+	    break;
+	default:
+	    return;
 	}
+	
+	/*
+	 * Define a window's cursor now
+	 */
+	if( GLUT_CURSOR_INHERIT == cursorID )
+	    XUndefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle );
+	else
+	    XDefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle, cursor );
+    }
 
 #elif TARGET_HOST_WIN32
 	/*
