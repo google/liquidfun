@@ -1321,7 +1321,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 #if 0
     case WM_SETFOCUS:
-        printf("WM_SETFOCUS: %p\n", window );
+        /* printf("WM_SETFOCUS: %p\n", window ); */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 
@@ -1329,8 +1329,8 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if (LOWORD(wParam) != WA_INACTIVE)
         {
             /* glutSetCursor( fgStructure.Window->State.Cursor ); */
-            printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window,
-                   window->State.Cursor );
+            /* printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window,
+                   window->State.Cursor ); */
             glutSetCursor( window->State.Cursor );
         }
 

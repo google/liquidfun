@@ -191,7 +191,7 @@ struct tagSFG_XYUse
 typedef struct tagSFG_Time SFG_Time;
 struct tagSFG_Time
 {
-#ifdef WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     DWORD Value;
 #else
     struct timeval  Value;

@@ -549,6 +549,8 @@ void FGAPIENTRY glutLeaveGameMode( void )
 
     fgAddToWindowDestroyList( fgStructure.GameMode );
 
+    fgStructure.GameMode = NULL ;
+
 #if TARGET_HOST_UNIX_X11
 
     XUngrabPointer( fgDisplay.Display, CurrentTime );
