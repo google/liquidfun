@@ -381,7 +381,7 @@ do                                                             \
 {                                                              \
     if( FETCH_WCB( window, cbname ) != func )                  \
         (((window).CallBacks[CB_ ## cbname]) = (void *) func); \
-} while( 0 )                                                   \
+} while( 0 )
 
 /*
  * FETCH_WCB() is used as:

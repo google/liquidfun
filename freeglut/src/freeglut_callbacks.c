@@ -33,10 +33,13 @@
 /*
  * All of the callbacks setting methods can be generalized to this:
  */
-#define SET_CALLBACK(a)              \
-    if( fgStructure.Window == NULL ) \
-        return;                      \
-    SET_WCB( ( *( fgStructure.Window ) ), a, callback );
+#define SET_CALLBACK(a)                                  \
+do                                                       \
+{                                                        \
+    if( fgStructure.Window == NULL )                     \
+        return;                                          \
+    SET_WCB( ( *( fgStructure.Window ) ), a, callback ); \
+} while( 0 )
 
 /*
  * Sets the Display callback for the current window
