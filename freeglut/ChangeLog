@@ -112,6 +112,32 @@ October 24, 2002:
 
 (43) Fixed the bitmapped Helvetica 12 and Helvetica 18 fonts so they now match the GLUT fonts.
 
+*******************************************************************************************
+* Sent the files to Don Heyse on November 27 for inclusion in CVS.
+*******************************************************************************************
+
+(44) Fixed the other bitmapped fonts so they now match the GLUT fonts.  There are some differences in the placement of the bit patterns within the characters, but the greatest difference is only a pixel or two.
+
+(45) Added DLL capability.  Changed the names of the outputs so that the static library is "freeglut_static.lib" and the names of the DLL file and its interface file are "freeglut.dll" and "freeglut.lib".
+
+(46) Moved the "freeglut_internal.h" file from the public include directory to the private source code directory.
+
+(47) Split the "freeglut.h" file into a "glut.h" file that is compatible with GLUT and a "freeglut_ext.h" file that contains the new extensions.
+
+*******************************************************************************************
+* Changes starting in May 2003
+*******************************************************************************************
+
+(48) Changed "freeglut_main.c" to allow the Windows version to pass the mouse position to the keystroke callbacks
+
+(49) Changed "freeglut_main.c" in the Unix section to move the call to find the event's window to before the "switch" statement.
+
+(50) Changed "freeglut_main.c" in the Unix section to modify the window closure sequence of events slightly.
+
+(51) Changed "freeglut_state.c" so the "glutGet" calls with window position and size don't move the windows down and to the right one pixel.
+
+
+
 
 
 
