@@ -131,6 +131,7 @@ void fghRememberState( void )
  */
 void fghRestoreState( void )
 {
+#if TARGET_HOST_UNIX_X11
     /*
      * Restore the remembered pointer position:
      */
@@ -138,8 +139,6 @@ void fghRestoreState( void )
 	fgDisplay.Display, None, fgDisplay.RootWindow, 0, 0, 0, 0,
 	fgDisplay.DisplayPointerX, fgDisplay.DisplayPointerY
     );
-
-#if TARGET_HOST_UNIX_X11
 
     /*
      * This highly depends on the XFree86 extensions, not approved as X Consortium standards
