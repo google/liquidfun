@@ -360,6 +360,14 @@ struct tagSFG_WindowState
 
 
 /*
+ * A generic function pointer.  We should really use the GLUTproc type
+ * defined in freeglut_ext.h, but if we include that header in this file
+ * a bunch of other stuff (font-related) blows up!
+ */
+typedef void (*SFG_Proc)();
+
+
+/*
  * SET_WCB() is used as:
  *
  *     SET_WCB( window, Visibility, func );
@@ -380,7 +388,7 @@ struct tagSFG_WindowState
 do                                                             \
 {                                                              \
     if( FETCH_WCB( window, cbname ) != func )                  \
-        (((window).CallBacks[CB_ ## cbname]) = (void *) func); \
+        (((window).CallBacks[CB_ ## cbname]) = (SFG_Proc) func); \
 } while( 0 )
 
 /*
@@ -532,7 +540,7 @@ struct tagSFG_Window
 
     SFG_Context         Window;                 /* Window and OpenGL context */
     SFG_WindowState     State;                  /* The window state          */
-    void         *CallBacks[ TOTAL_CALLBACKS ]; /* Array of window callbacks */
+    SFG_Proc            CallBacks[ TOTAL_CALLBACKS ]; /* Array of window callbacks */
     void               *UserData ;              /* For use by user           */
 
     SFG_Menu*       Menu[ FREEGLUT_MAX_MENUS ]; /* Menus appended to window  */

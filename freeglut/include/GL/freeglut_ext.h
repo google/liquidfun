@@ -112,7 +112,8 @@ FGAPI void    FGAPIENTRY glutSolidCylinder( GLdouble radius, GLdouble height, GL
 /*
  * Extension functions, see freeglut_ext.c
  */
-FGAPI void * FGAPIENTRY glutGetProcAddress( const char *procName );
+typedef void (*GLUTproc)();
+FGAPI GLUTproc FGAPIENTRY glutGetProcAddress( const char *procName );
 
 
 #ifdef __cplusplus
