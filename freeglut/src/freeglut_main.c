@@ -1034,36 +1034,25 @@ void FGAPIENTRY glutMainLoop( void )
   SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
 #endif
 
-  /*
-   * Make sure the display has been created etc.
-   */
   freeglut_assert_ready;
 
 #if TARGET_HOST_WIN32
   /*
-   * Processing before the main loop:  If there is a window which is open and which
-   * has a visibility callback, call it.  I know this is an ugly hack, but I'm not sure
-   * what else to do about it.  Ideally we should leave something uninitialized in the
-   * create window code and initialize it in the main loop, and have that initialization
-   * create a "WM_ACTIVATE" message.  Then we would put the visibility callback code in
-   * the "case WM_ACTIVATE" block below.         - John Fay -- 10/24/02
+   * Processing before the main loop:  If there is a window which is open and
+   * which has a visibility callback, call it.  I know this is an ugly hack,
+   * but I'm not sure what else to do about it.  Ideally we should leave
+   * something uninitialized in the create window code and initialize it in
+   * the main loop, and have that initialization create a "WM_ACTIVATE"
+   * message.  Then we would put the visibility callback code in the
+   * "case WM_ACTIVATE" block below.         - John Fay -- 10/24/02
    */
   while ( window != NULL )
   {
     if ( window->Callbacks.Visibility != NULL )
     {
       SFG_Window *current_window = fgStructure.Window ;
-
-      /*
-       * Set the current window
-       */
       fgSetWindow( window );
-
       window->Callbacks.Visibility ( window->State.Visible ) ;
-
-      /*
-       * Restore the current window
-       */
       fgSetWindow( current_window );
     }
 
@@ -1071,21 +1060,11 @@ void FGAPIENTRY glutMainLoop( void )
   }
 #endif
 
-  /*
-   * Set freeglut to be running
-   */
   fgState.ExecState = GLUT_EXEC_STATE_RUNNING ;
 
-  /*
-   * Enter the main loop itself.  Inside the loop, process events and check for loop exit.
-   */
   while ( fgState.ExecState == GLUT_EXEC_STATE_RUNNING )
   {
     glutMainLoopEvent () ;
-
-    /*
-     * If there are no more windows open, stop execution
-     */
     if ( fgStructure.Windows.First == NULL )
       fgState.ExecState = GLUT_EXEC_STATE_STOP ;
     else
@@ -1105,9 +1084,6 @@ void FGAPIENTRY glutMainLoop( void )
      */
     fgDeinitialize();
 
-    /*
-     * Check whether we return to the calling program or simply exit
-     */
     if ( execState == GLUT_ACTION_EXIT )
       exit ( 0 ) ;
   }
