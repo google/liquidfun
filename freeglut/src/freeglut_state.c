@@ -215,6 +215,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
      */
     case GLUT_WINDOW_X:
     case GLUT_WINDOW_Y:
+    case GLUT_WINDOW_BORDER_WIDTH:
+    case GLUT_WINDOW_HEADER_HEIGHT:
     {
         int x, y;
         Window w;
@@ -233,12 +235,24 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         case GLUT_WINDOW_X: return x;
         case GLUT_WINDOW_Y: return y;
         }
+
+	if ( w == 0 )
+            return( 0 );  /* Just in case */
+
+        XTranslateCoordinates(
+            fgDisplay.Display,
+            fgStructure.Window->Window.Handle,
+            w, 0, 0, &x, &y, &w);
+
+        switch ( eWhat )
+        {
+        case GLUT_WINDOW_BORDER_WIDTH:  return x;
+        case GLUT_WINDOW_HEADER_HEIGHT: return y;
+        }
     }
 
     case GLUT_WINDOW_WIDTH:
     case GLUT_WINDOW_HEIGHT:
-    case GLUT_WINDOW_BORDER_WIDTH :
-    case GLUT_WINDOW_HEADER_HEIGHT :
     {
         XWindowAttributes winAttributes;
 
@@ -264,8 +278,6 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         {
         case GLUT_WINDOW_WIDTH:            return winAttributes.width ;
         case GLUT_WINDOW_HEIGHT:           return winAttributes.height ;
-        case GLUT_WINDOW_BORDER_WIDTH :    return winAttributes.border_width ;
-        case GLUT_WINDOW_HEADER_HEIGHT :   return winAttributes.border_width * 3 ;  /* a kludge for now */
         }
     }
 
