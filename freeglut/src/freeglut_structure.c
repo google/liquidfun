@@ -52,6 +52,13 @@ SFG_Structure fgStructure = { { NULL, NULL },  /* The list of windows       */
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
+void fgInitCallBacks( SFG_Window *window )
+{
+    int i;
+    for( i = 0; i < TOTAL_CALLBACKS; ++i )
+        window->CallBacks[ i ] = NULL;
+}
+
 /*
  * This private function creates, opens and adds to the hierarchy
  * a freeglut window complete with OpenGL context and stuff...
@@ -66,6 +73,8 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
      */
     SFG_Window *window = (SFG_Window *)calloc( sizeof(SFG_Window), 1 );
     int fakeArgc = 0;
+
+    fgInitCallBacks( window );
 
     /*
      * If the freeglut internals haven't been initialized yet,
