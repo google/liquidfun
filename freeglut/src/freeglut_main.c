@@ -31,7 +31,6 @@
 #include <limits.h>
 #if TARGET_HOST_UNIX_X11
 #include <sys/types.h>
-#include <sys/time.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/stat.h>
