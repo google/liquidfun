@@ -437,14 +437,14 @@ io_object_t ioDevices[K_NUM_DEVICES];
 static void fghJoystickFindDevices ( SFG_Joystick* joy, mach_port_t );
 static CFDictionaryRef fghJoystickGetCFProperties ( SFG_Joystick* joy, io_object_t );
 
-void fghJoystickEnumerateElements ( SFG_Joystick* joy, CFTypeRef element );
+static void fghJoystickEnumerateElements ( SFG_Joystick* joy, CFTypeRef element );
 /* callback for CFArrayApply */
 static void fghJoystickElementEnumerator ( SFG_Joystick* joy, void *element, void* vjs );
-void fghJoystickParseElement ( SFG_Joystick* joy, CFDictionaryRef element );
+static void fghJoystickParseElement ( SFG_Joystick* joy, CFDictionaryRef element );
 
-void fghJoystickAddAxisElement ( SFG_Joystick* joy, CFDictionaryRef axis );
-void fghJoystickAddButtonElement ( SFG_Joystick* joy, CFDictionaryRef button );
-void fghJoystickAddHatElement ( SFG_Joystick* joy, CFDictionaryRef hat );
+static void fghJoystickAddAxisElement ( SFG_Joystick* joy, CFDictionaryRef axis );
+static void fghJoystickAddButtonElement ( SFG_Joystick* joy, CFDictionaryRef button );
+static void fghJoystickAddHatElement ( SFG_Joystick* joy, CFDictionaryRef hat );
 #endif
 
 

@@ -48,7 +48,7 @@
  * Remembers the current visual settings, so that
  * we can change them and restore later...
  */
-void fghRememberState( void )
+static void fghRememberState( void )
 {
 #if TARGET_HOST_UNIX_X11
 
@@ -127,7 +127,7 @@ void fghRememberState( void )
 /*
  * Restores the previously remembered visual settings
  */
-void fghRestoreState( void )
+static void fghRestoreState( void )
 {
 #if TARGET_HOST_UNIX_X11
 
@@ -207,7 +207,7 @@ void fghRestoreState( void )
 /*
  * Checks the display mode settings against user's preferences
  */
-GLboolean fghCheckDisplayMode( int width, int height, int depth, int refresh )
+static GLboolean fghCheckDisplayMode( int width, int height, int depth, int refresh )
 {
     /* The desired values should be stored in fgState structure... */
     return ( width == fgState.GameModeSize.X ) &&
@@ -219,7 +219,7 @@ GLboolean fghCheckDisplayMode( int width, int height, int depth, int refresh )
 /*
  * Changes the current display mode to match user's settings
  */
-GLboolean fghChangeDisplayMode( GLboolean haveToTest )
+static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 {
 #if TARGET_HOST_UNIX_X11
 

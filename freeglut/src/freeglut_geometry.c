@@ -121,7 +121,7 @@ void FGAPIENTRY glutSolidCube( GLdouble dSize )
  *    The sign of n can be flipped to get the reverse loop
  */
 
-static void circleTable(double **sint,double **cost,const int n)
+static void fghCircleTable(double **sint,double **cost,const int n)
 {
     int i;
 
@@ -144,7 +144,7 @@ static void circleTable(double **sint,double **cost,const int n)
     {
         free(*sint);
         free(*cost);
-        fgError("Failed to allocate memory in circleTable");
+        fgError("Failed to allocate memory in fghCircleTable");
     }
 
     /* Compute cos and sin around the circle */
@@ -177,8 +177,8 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 
     double *sint1,*cost1;
     double *sint2,*cost2;
-    circleTable(&sint1,&cost1,-slices);
-    circleTable(&sint2,&cost2,stacks*2);
+    fghCircleTable(&sint1,&cost1,-slices);
+    fghCircleTable(&sint2,&cost2,stacks*2);
 
     /* The top stack is covered with a triangle fan */
 
@@ -262,8 +262,8 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
 
     double *sint1,*cost1;
     double *sint2,*cost2;
-    circleTable(&sint1,&cost1,-slices  );
-    circleTable(&sint2,&cost2, stacks*2);
+    fghCircleTable(&sint1,&cost1,-slices  );
+    fghCircleTable(&sint2,&cost2, stacks*2);
 
     /* Draw a line loop for each stack */
 
@@ -336,7 +336,7 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
     /* Pre-computed circle */
 
     double *sint,*cost;
-    circleTable(&sint,&cost,-slices);
+    fghCircleTable(&sint,&cost,-slices);
 
     /* Cover the circular base with a triangle fan... */
 
@@ -420,7 +420,7 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
     /* Pre-computed circle */
 
     double *sint,*cost;
-    circleTable(&sint,&cost,-slices);
+    fghCircleTable(&sint,&cost,-slices);
 
     /* Draw the stacks... */
 
@@ -477,7 +477,7 @@ void FGAPIENTRY glutSolidCylinder(GLdouble radius, GLdouble height, GLint slices
     /* Pre-computed circle */
 
     double *sint,*cost;
-    circleTable(&sint,&cost,-slices);
+    fghCircleTable(&sint,&cost,-slices);
 
     /* Cover the base and top */
 
@@ -538,7 +538,7 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
     /* Pre-computed circle */
 
     double *sint,*cost;
-    circleTable(&sint,&cost,-slices);
+    fghCircleTable(&sint,&cost,-slices);
 
     /* Draw the stacks... */
 

@@ -36,7 +36,7 @@
 #include <aygshell.h>
 #pragma comment( lib, "Aygshell.lib" )
 
-wchar_t* wstr_from_str(const char* str)
+static wchar_t* fghWstrFromStr(const char* str)
 {
     int i,len=strlen(str);
     wchar_t* wstr = (wchar_t*)malloc(2*len+2);
@@ -558,7 +558,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
 #if TARGET_HOST_WINCE
     {
-        wchar_t* wstr = wstr_from_str(title);
+        wchar_t* wstr = fghWstrFromStr(title);
 
         window->Window.Handle = CreateWindow(
             _T("FREEGLUT"),
@@ -849,7 +849,7 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 
 #elif TARGET_HOST_WINCE
         {
-            wchar_t* wstr = wstr_from_str(title);
+            wchar_t* wstr = fghWstrFromStr(title);
 
             SetWindowText( fgStructure.Window->Window.Handle, wstr );
 
@@ -892,7 +892,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 
 #elif TARGET_HOST_WINCE
         {
-            wchar_t* wstr = wstr_from_str(title);
+            wchar_t* wstr = fghWstrFromStr(title);
 
             SetWindowText( fgStructure.Window->Window.Handle, wstr );
 

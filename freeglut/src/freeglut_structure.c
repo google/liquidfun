@@ -53,7 +53,7 @@ SFG_Structure fgStructure = { { NULL, NULL },  /* The list of windows       */
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
-void fgClearCallBacks( SFG_Window *window )
+static void fghClearCallBacks( SFG_Window *window )
 {
     if( window )
     {
@@ -77,7 +77,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
     SFG_Window *window = (SFG_Window *)calloc( sizeof(SFG_Window), 1 );
     int fakeArgc = 0;
 
-    fgClearCallBacks( window );
+    fghClearCallBacks( window );
 
     /*
      * If the freeglut internals haven't been initialized yet,
@@ -187,7 +187,7 @@ void fgAddToWindowDestroyList( SFG_Window* window )
      */
     {
         FGCBDestroy destroy = FETCH_WCB( *window, Destroy );
-        fgClearCallBacks( window );
+        fghClearCallBacks( window );
         SET_WCB( *window, Destroy, destroy );
     }
 }
@@ -239,7 +239,7 @@ void fgDestroyWindow( SFG_Window* window )
         if( window->Menu[ menu_index ] )
             window->Menu[ menu_index ]->ParentWindow = NULL;
 
-    fgClearCallBacks( window );
+    fghClearCallBacks( window );
     fgCloseWindow( window );
     free( window );
     if( fgStructure.Window == window )

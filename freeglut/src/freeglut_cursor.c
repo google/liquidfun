@@ -49,7 +49,7 @@
 
 #if TARGET_HOST_UNIX_X11
 
-int fgGetCursorError( Cursor cursor )
+static int fghGetCursorError( Cursor cursor )
 {
     int ret = 0;
     char buf[ 256 ];
@@ -90,7 +90,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
     /*
      * Open issues:
      * (a) Partial error checking.  Is that a problem?
-     *     Is fgGetCursorError() correct?  Should we abort on errors?
+     *     Is fghGetCursorError() correct?  Should we abort on errors?
      *     Should there be a freeglut-wide X error handler?  Should
      *     we use the X error-handler mechanism?
      * (b) FULL_CROSSHAIR demotes to plain CROSSHAIR.  Old GLUT allows
@@ -171,7 +171,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
             return;
         }
 
-        error = fgGetCursorError( cursor );
+        error = fghGetCursorError( cursor );
 
         if( GLUT_CURSOR_INHERIT == cursorID )
             XUndefineCursor( fgDisplay.Display,

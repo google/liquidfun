@@ -84,7 +84,7 @@
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
 
-static void teapot( GLint grid, GLdouble scale, GLenum type )
+static void fghTeapot( GLint grid, GLdouble scale, GLenum type )
 {
 #if TARGET_HOST_WINCE
 		int i, numV=sizeof(strip_vertices)/4, numI=sizeof(strip_normals)/4;
@@ -183,7 +183,7 @@ static void teapot( GLint grid, GLdouble scale, GLenum type )
 void FGAPIENTRY glutWireTeapot( GLdouble size )
 {
     /* We will use the general teapot rendering code */
-    teapot( 10, size, GL_LINE );
+    fghTeapot( 10, size, GL_LINE );
 }
 
 /*
@@ -192,7 +192,7 @@ void FGAPIENTRY glutWireTeapot( GLdouble size )
 void FGAPIENTRY glutSolidTeapot( GLdouble size )
 {
     /* We will use the general teapot rendering code */
-    teapot( 7, size, GL_FILL );
+    fghTeapot( 7, size, GL_FILL );
 }
 
 /*** END OF FILE ***/

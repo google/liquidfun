@@ -655,11 +655,9 @@ extern SFG_State fgState;
 #define  freeglut_assert_menu   assert( fgStructure.Menu != NULL );
 
 /*
- * The initialize and deinitialize functions get called on glutInit()
- * and glutMainLoop() end respectively. They should create/clean up
+ * The deinitialize function gets called on glutMainLoop() end. It should clean up
  * everything inside of the freeglut
  */
-void fgInitialize( const char* displayName );
 void fgDeinitialize( void );
 
 /*

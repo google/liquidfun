@@ -95,7 +95,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
 /*
  * A call to this function should initialize all the display stuff...
  */
-void fgInitialize( const char* displayName )
+static void fghInitialize( const char* displayName )
 {
 #if TARGET_HOST_UNIX_X11
     fgDisplay.Display = XOpenDisplay( displayName );
@@ -616,7 +616,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * in the program arguments, we will use the DISPLAY environment
      * variable for opening the X display (see code above):
      */
-    fgInitialize( displayName );
+    fghInitialize( displayName );
 
     /*
      * Geometry parsing deffered until here because we may need the screen

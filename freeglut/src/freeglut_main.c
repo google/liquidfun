@@ -413,44 +413,44 @@ void fgWarning( const char *fmt, ... )
  * and all other "joystick timer" code can be yanked.
  *
  */
-static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
+static void fghCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
 {
     if( FETCH_WCB( *w, Joystick ) )
     {
         e->found = GL_TRUE;
         e->data = w;
     }
-    fgEnumSubWindows( w, fgCheckJoystickCallback, e );
+    fgEnumSubWindows( w, fghCheckJoystickCallback, e );
 }
-static int fgHaveJoystick( void )
+static int fghHaveJoystick( void )
 {
     SFG_Enumerator enumerator;
     enumerator.found = GL_FALSE;
     enumerator.data = NULL;
-    fgEnumWindows( fgCheckJoystickCallback, &enumerator );
+    fgEnumWindows( fghCheckJoystickCallback, &enumerator );
     return !!enumerator.data;
 }
-static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
+static void fghHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
 {
     if( w->State.Redisplay )
     {
         e->found = GL_TRUE;
         e->data = w;
     }
-    fgEnumSubWindows( w, fgHavePendingRedisplaysCallback, e );
+    fgEnumSubWindows( w, fghHavePendingRedisplaysCallback, e );
 }
-static int fgHavePendingRedisplays (void)
+static int fghHavePendingRedisplays (void)
 {
     SFG_Enumerator enumerator;
     enumerator.found = GL_FALSE;
     enumerator.data = NULL;
-    fgEnumWindows( fgHavePendingRedisplaysCallback, &enumerator );
+    fgEnumWindows( fghHavePendingRedisplaysCallback, &enumerator );
     return !!enumerator.data;
 }
 /*
  * Returns the number of GLUT ticks (milliseconds) till the next timer event.
  */
-static long fgNextTimer( void )
+static long fghNextTimer( void )
 {
     long ret = INT_MAX;
     SFG_Timer *timer = fgState.Timers.First;
@@ -466,16 +466,16 @@ static long fgNextTimer( void )
  * Does the magic required to relinquish the CPU until something interesting
  * happens.
  */
-static void fgSleepForEvents( void )
+static void fghSleepForEvents( void )
 {
     long msec;
 
-    if( fgState.IdleCallback || fgHavePendingRedisplays( ) )
+    if( fgState.IdleCallback || fghHavePendingRedisplays( ) )
         return;
 
-    msec = fgNextTimer( );
-    if( fgHaveJoystick( ) )     /* XXX Use GLUT timers for joysticks... */
-        msec = MIN( msec, 10 ); /* XXX Dumb; forces granularity to .01sec */
+    msec = fghNextTimer( );
+    if( fghHaveJoystick( ) )     /* XXX Use GLUT timers for joysticks... */
+        msec = MIN( msec, 10 );  /* XXX Dumb; forces granularity to .01sec */
 
 #if TARGET_HOST_UNIX_X11
     /*
@@ -513,7 +513,7 @@ static void fgSleepForEvents( void )
 /*
  * Returns GLUT modifier mask for an XEvent.
  */
-int fgGetXModifiers( XEvent *event )
+static int fghGetXModifiers( XEvent *event )
 {
     int ret = 0;
 
@@ -871,7 +871,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 ! FETCH_WCB( *window, MouseWheel ) )
                 break;
 
-            fgState.Modifiers = fgGetXModifiers( &event );
+            fgState.Modifiers = fghGetXModifiers( &event );
 
             /*
              * Finally execute the mouse or mouse wheel callback
@@ -995,7 +995,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     if( keyboard_cb )
                     {
                         fgSetWindow( window );
-                        fgState.Modifiers = fgGetXModifiers( &event );
+                        fgState.Modifiers = fghGetXModifiers( &event );
                         keyboard_cb( asciiCode[ 0 ],
                                      event.xkey.x, event.xkey.y
                         );
@@ -1049,7 +1049,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     if( special_cb && (special != -1) )
                     {
                         fgSetWindow( window );
-                        fgState.Modifiers = fgGetXModifiers( &event );
+                        fgState.Modifiers = fghGetXModifiers( &event );
                         special_cb( special, event.xkey.x, event.xkey.y );
                         fgState.Modifiers = 0xffffffff;
                     }
@@ -1160,7 +1160,7 @@ void FGAPIENTRY glutMainLoop( void )
             if( fgState.IdleCallback )
                 fgState.IdleCallback( );
 
-            fgSleepForEvents( );
+            fghSleepForEvents( );
         }
     }
 
@@ -1189,7 +1189,7 @@ void FGAPIENTRY glutLeaveMainLoop( void )
 /*
  * Determine a GLUT modifer mask based on MS-WINDOWS system info.
  */
-int fgGetWin32Modifiers (void)
+static int fghGetWin32Modifiers (void)
 {
     return
         ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
@@ -1415,7 +1415,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
-        fgState.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fghGetWin32Modifiers( );
 
         if( ( wParam & MK_LBUTTON ) ||
             ( wParam & MK_MBUTTON ) ||
@@ -1567,7 +1567,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
 
         fgSetWindow( window );
-        fgState.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fghGetWin32Modifiers( );
 
         INVOKE_WCB(
             *window, Mouse,
@@ -1612,7 +1612,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
 
         fgSetWindow( window );
-        fgState.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fghGetWin32Modifiers( );
 
         while( ticks-- )
             if( FETCH_WCB( *window, MouseWheel ) )
@@ -1659,7 +1659,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Remember the current modifiers state. This is done here in order
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
-        fgState.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fghGetWin32Modifiers( );
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
@@ -1747,7 +1747,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Remember the current modifiers state. This is done here in order
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
-        fgState.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fghGetWin32Modifiers( );
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
@@ -1828,7 +1828,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
       if( (fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE) && (HIWORD(lParam) & KF_REPEAT) )
             break;
 
-        fgState.Modifiers = fgGetWin32Modifiers( );
+        fgState.Modifiers = fghGetWin32Modifiers( );
         INVOKE_WCB( *window, Keyboard,
                     ( (char)wParam,
                       window->State.MouseX, window->State.MouseY )
