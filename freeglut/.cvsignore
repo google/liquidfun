@@ -9,6 +9,7 @@ config.log
 config.status
 config.sub
 configure
+freeglut-*.tar.gz
 libtool
 ltmain.sh
 stamp-h1
