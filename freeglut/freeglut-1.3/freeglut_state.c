@@ -381,10 +381,10 @@ int FGAPIENTRY glutGet( GLenum eWhat )
          */
         if ( fgStructure.Window->Parent == NULL )
         {
-          winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME ) - 1;
-          winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME ) - 1;
-          winRect.top    += GetSystemMetrics( SM_CYSIZEFRAME ) - 1 + GetSystemMetrics( SM_CYCAPTION );
-          winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME ) + 1;
+          winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME );
+          winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME );
+          winRect.top    += GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION );
+          winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME );
         }
 
         /*
