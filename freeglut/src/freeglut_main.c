@@ -83,18 +83,6 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
     XResizeWindow( fgDisplay.Display, window->Window.Handle,
                    width, height );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
-    /*
-     * XXX REALLY shouldn't be done.  GLUT docs state that this
-     * XXX isn't even processed immediately, but rather waits
-     * XXX for return to the mainloop.  "This allows multiple
-     * XXX glutReshapeWindow, glutPositionWindow, and glutFullScreen
-     * XXX requests to the same window to be coalesced."  (This is
-     * XXX having some deleterious effect on a sample program of mine.)
-     * XXX Not only does GLUT not flush at this point, GLUT doesn't even
-     * XXX *do* the reshape at this point!  We should probably rip this
-     * XXX out and do what GLUT promises.  It would be more efficient, and
-     * XXX might be more compatible.
-     */
 
 #elif TARGET_HOST_WIN32
 
@@ -168,25 +156,10 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
 static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
 {
     SFG_Window* window = fgWindowByHandle( handle );
-    freeglut_return_if_fail( window != NULL );
+    freeglut_return_if_fail( window );
 
-    /*
-     * XXX Other than clearing the Redisplay flag or not,
-     * XXX we may as well rely on the INVOK_WCB() doing this
-     * XXX pointer-check.
-     * XXX
-     * XXX If we do not invoke the display because the pointer
-     * XXX is not defined (should never happen, really), then
-     * XXX we may enter an infinite busy-loop trying to update
-     * XXX the window.  Similarly, if we skip because the window
-     * XXX is not visible.  However, if the window becomes visible
-     * XXX at a later time, the window should get its callback
-     * XXX invoked.  I would recommend removing the first check,
-     * XXX and making the second check only affect whether the
-     * XXX callback is invoked---but always clear the flag, if
-     * XXX the {window} pointer is defined.
-     */
-    freeglut_return_if_fail( FETCH_WCB( *window, Display ) );
+    window->State.Redisplay = GL_FALSE;
+
     freeglut_return_if_fail( window->State.Visible );
 
     if( window->State.NeedToResize )
@@ -205,7 +178,6 @@ static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
         fgSetWindow ( current_window );
     }
 
-    window->State.Redisplay = GL_FALSE;
     INVOKE_WCB( *window, Display, ( ) );
 }
 
@@ -215,17 +187,7 @@ static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
 static void fghcbDisplayWindow( SFG_Window *window,
                                 SFG_Enumerator *enumerator )
 {
-    /*
-     * XXX Do we need/want to check the callback pointer here?
-     * XXX INVOKE_WCB() will check for us.  Arguably, the
-     * XXX Redisplay status flag should be cleared regardless
-     * XXX of any concern but that {window} is a valid pointer
-     * XXX (which this function is assuming anyway).
-     * XXX Especially since old GLUT wouldn't even enter its main
-     * XXX loop if you didn't have a display callback defined...
-     */
-    if( ( FETCH_WCB( *window, Display ) ) &&
-        window->State.Redisplay &&
+    if( window->State.Redisplay &&
         window->State.Visible )
     {
         if( window->State.NeedToResize )
@@ -851,9 +813,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 ! FETCH_WCB( *window, MouseWheel ) )
                 break;
 
-            /*
-             * XXX Why don't we use {window}?  Other code here does...
-             */
             fgState.Modifiers = fgGetXModifiers( &event );
 
             /*
@@ -1719,21 +1678,12 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( fgState.IgnoreKeyRepeat && (lParam & KF_REPEAT) )
             break;
 
-        /*
-         * XXX INVOKE_WCB() takes care of the callback-pointer check.
-         * XXX We could just uncoditionally find/trash the Modifiers
-         * XXX and get rid of the "if( ... ) {" and "}".  Unconditinal
-         * XXX code is simpler code.  (^&
-         */
-        if( FETCH_WCB( *window, Keyboard ) )
-        {
-            fgState.Modifiers = fgGetWin32Modifiers( );
-            INVOKE_WCB( *window, Keyboard,
-                        ( (char)wParam,
-                          window->State.MouseX, window->State.MouseY )
-            );
-            fgState.Modifiers = 0xffffffff;
-        }
+        fgState.Modifiers = fgGetWin32Modifiers( );
+        INVOKE_WCB( *window, Keyboard,
+                    ( (char)wParam,
+                      window->State.MouseX, window->State.MouseY )
+        );
+        fgState.Modifiers = 0xffffffff;
     }
     break;
 

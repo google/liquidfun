@@ -282,12 +282,6 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     while( subWindow = ( SFG_Window * )window->Children.First )
         fgDestroyWindow( subWindow, needToClose );
 
-    /*
-     * XXX Since INVOKE_WCB() tests the function pointer, why not make
-     * XXX this unconditional?  Overhead is close to nil, and it would
-     * XXX clarify the code by omitting a conditional test.
-     */
-    if( FETCH_WCB( *window, Destroy ) )
     {
         SFG_Window *activeWindow = fgStructure.Window ;
         INVOKE_WCB( *window, Destroy, ( ) );
