@@ -269,6 +269,11 @@ struct tagSFG_Display
     int             DisplayModeValid;   /* Flag that indicates runtime status*/
     XF86VidModeModeLine DisplayMode;    /* Current screen's display settings */
     int             DisplayModeClock;   /* The display mode's refresh rate   */
+    int             DisplayViewPortX;   /* saved X location of the viewport  */
+    int             DisplayViewPortY;   /* saved Y location of the viewport  */
+    int             DisplayPointerX;    /* saved X location of the pointer   */
+    int             DisplayPointerY;    /* saved Y location of the pointer   */
+
 #endif
 
 #elif TARGET_HOST_WIN32

@@ -268,3 +268,28 @@ October 24, 2002:
 
 (99) src/freeglut_window.c:67  Removed #included "mwmborder.c"
 
+*******************************************************************************************
+* Changes on 10 August 2003
+*******************************************************************************************
+
+(100) GameMode fixes: src/freeglut_gamemode.c src/freeglut_internal.h src/freeglut_window.c
+
+  src/freeglut_gamemode.c:
+     fghRememberState():     remember original XFree86 ViewPort
+     fghRememberState():     remember original pointer position
+     fghRestoreState():      restore  original pointer position
+     fghRestoreState():      restore  original XFree86 ViewPort
+     fghChangeDisplayMode(): fix glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)
+     fghChangeDisplayMode(): remove superflous attempt to change ViewPort
+     glutEnterGameMode():    move special XMoveWindow() from generic code here
+     glutEnterGameMode():    call XSync() to avoid races with XPointer calls
+     glutEnterGameMode():    call to XWrapPointer() to ensure that the pointer is grabbed
+     glutEnterGameMode():    wait until window is viewable to avoid exit on XSetInputFocus
+     glutEnterGameMode():    move decorations away to fix fullscreen w/ max resolution
+
+  src/freeglut_internal.h:
+     struct tagSFG_Display:  add fields for saving viewport and pointer position
+
+  src/freeglut_window.c:
+     fgOpenWindow():         remove obsolete special case for GameModeEnter()
+
