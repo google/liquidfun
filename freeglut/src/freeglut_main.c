@@ -1214,11 +1214,16 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_SIZE:
         /*
-         * We got resized... But check if the window has been already added...
+         * If the window is visible, then it is the user manually resizing it.
+         * If it is not, then it is the system sending us a dummy resize with
+         * zero dimensions on a "glutIconifyWindow" call.
          */
-        window->State.NeedToResize = GL_TRUE;
-        window->State.Width  = LOWORD(lParam);
-        window->State.Height = HIWORD(lParam);
+        if( window->State.Visible )
+        {
+            window->State.NeedToResize = GL_TRUE;
+            window->State.Width  = LOWORD(lParam);
+            window->State.Height = HIWORD(lParam);
+        }
         break;
 #if 0
     case WM_SETFOCUS: 

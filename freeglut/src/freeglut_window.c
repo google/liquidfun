@@ -719,6 +719,8 @@ void FGAPIENTRY glutIconifyWindow( void )
     freeglut_assert_ready;
     freeglut_assert_window;
 
+    fgStructure.Window->State.Visible   = GL_FALSE;
+
 #if TARGET_HOST_UNIX_X11
 
     XIconifyWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
