@@ -253,7 +253,7 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 }
 
 /*
- * Draws a solid sphere
+ * Draws a wire sphere
  */
 void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
 {
@@ -531,7 +531,7 @@ void FGAPIENTRY glutSolidCylinder(GLdouble radius, GLdouble height, GLint slices
 
 /*
  * Draws a wire cylinder
-   */
+ */
 void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks)
 {
     int i,j;
@@ -586,7 +586,7 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
 }
 
 /*
- *
+ * Draws a wire torus
  */
 void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLint nSides, GLint nRings )
 {
@@ -664,7 +664,7 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
 }
 
 /*
- *
+ * Draws a solid torus
  */
 void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLint nSides, GLint nRings )
 {
