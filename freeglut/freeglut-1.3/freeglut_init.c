@@ -163,7 +163,7 @@ void fgInitialize( const char* displayName )
      */
     if( atom == 0 )
     {
-        gboolean retval;
+        GLboolean retval;
 
         /*
          * Make sure the unitialized fields are reset to zero
@@ -349,7 +349,11 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /*
      * Remember the function's call time
      */
+#ifndef WIN32
     gettimeofday(&fgState.Time.Value, NULL);
+#else
+    fgState.Time.Value = timeGetTime();
+#endif
     fgState.Time.Set = TRUE;
 
     /*

@@ -80,6 +80,10 @@ void fghRememberState( void )
     /*
      * Grab the current desktop settings...
      */
+
+/* hack to get around my stupid cross-gcc headers */
+#define ENUM_CURRENT_SETTINGS -1
+
     EnumDisplaySettings( NULL, ENUM_CURRENT_SETTINGS, &fgDisplay.DisplayMode );
 
     /*
@@ -233,8 +237,8 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 
 #elif TARGET_HOST_WIN32
 
-    guint    displayModes = 0, mode = 0xffffffff;
-    gboolean success = FALSE;
+    unsigned int    displayModes = 0, mode = 0xffffffff;
+    GLboolean success = FALSE;
     HDC      desktopDC;
     DEVMODE  devMode;
 

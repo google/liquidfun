@@ -214,10 +214,10 @@ XVisualInfo* fgChooseVisual( void )
  * Setup the pixel format for a Win32 window
  */
 #if TARGET_HOST_WIN32
-gboolean fgSetupPixelFormat( SFG_Window* window, gboolean checkOnly )
+GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly )
 {
 	PIXELFORMATDESCRIPTOR* ppfd, pfd;
-	gint flags, pixelformat;
+	int flags, pixelformat;
 
 	/*
 	 * Check if the window seems valid
@@ -469,7 +469,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 #elif TARGET_HOST_WIN32
 
 	WNDCLASS wc;
-	gint flags;
+	int flags;
 	ATOM atom;
 	HWND hWnd;
 
@@ -479,7 +479,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 	 * Grab the window class we have registered on glutInit():
 	 */
 	atom = GetClassInfo( fgDisplay.Instance, "FREEGLUT", &wc );
-	g_assert( atom != 0 );
+	assert( atom != 0 );
 
     if( gameMode == FALSE )
     {
@@ -512,7 +512,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
         /*
          * In game mode, the story is a little bit different...
          */
-        g_assert( window->Parent == NULL );
+        assert( window->Parent == NULL );
 
         /*
          * Set the window creation flags appropriately to make the window entirely visible:
@@ -537,7 +537,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 	/*
      * Make sure window was created
      */
-	g_assert( window->Window.Handle != NULL );
+	assert( window->Window.Handle != NULL );
 
     /*
      * Show and update the main window. Hide the mouse cursor.

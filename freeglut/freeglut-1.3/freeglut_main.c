@@ -313,6 +313,7 @@ static void fghCheckTimers( void )
  */
 long fgElapsedTime( void )
 {
+#ifndef WIN32
 	struct timeval now;
 	long elapsed;
 
@@ -322,6 +323,9 @@ long fgElapsedTime( void )
 	elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
 
 	return( elapsed );
+#else
+        return (timeGetTime() - fgState.Time.Value);
+#endif
 }
 
 /*
@@ -826,7 +830,7 @@ void FGAPIENTRY glutMainLoop( void )
 
 #elif TARGET_HOST_WIN32
 
-    gboolean bLoop = TRUE;
+    GLboolean bLoop = TRUE;
     MSG stMsg;
 
     /*
@@ -1068,8 +1072,8 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_MBUTTONUP:
     case WM_RBUTTONUP:
     {
-        gboolean pressed = TRUE;
-        gint button;
+        GLboolean pressed = TRUE;
+        int button;
 
         /*
          * A mouse button has been pressed *or* released. Again, break off
@@ -1181,7 +1185,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
     {
-        gint keypress = -1;
+        int keypress = -1;
 
         /*
          * First of all, make sure that there is a window to be notified of this
