@@ -254,3 +254,6 @@ October 24, 2002:
 *******************************************************************************************
 
 (95) src/freeglut_initial.c:91  Added check for SOLARIS OS (Dave Reed)
+
+(96) src/freeglut_window.c:551  Removed extra carriage return for Windows users (John F. Fay)
+

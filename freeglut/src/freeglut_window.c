@@ -548,8 +548,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 #       endif
     }
 
-#elif TAR
-GET_HOST_WIN32
+#elif TARGET_HOST_WIN32
 
 	WNDCLASS wc;
 	int flags;
