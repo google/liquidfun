@@ -273,6 +273,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         window->Window.VisualInfo = fgChooseVisual( );
     else
     {
+        /* XXX Why are menus double- and depth-buffered? */
         unsigned int current_DisplayMode = fgState.DisplayMode ;
         fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH ;
         window->Window.VisualInfo = fgChooseVisual( );
@@ -336,11 +337,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
          * XXX A: Not appreciably, but it WILL make it easier to debug.
          * XXX    Try tracing old GLUT and try tracing freeglut.  Old GLUT
          * XXX    turns off events that it doesn't need and is a whole lot
-         * XXX    more pleasant to trace.  (Hint: Think mouse-motion!)
-         * XXX
-         * XXX    It may make a difference in networked environments or on
-         * XXX    some very slow systems, but I think that that is secondary
-         * XXX    to making debugging easier.
+         * XXX    more pleasant to trace.  (Think mouse-motion!  Tons of
+         * XXX    ``bonus'' GUI events stream in.)
          */
         winAttr.event_mask        =
             StructureNotifyMask | SubstructureNotifyMask | ExposureMask |
@@ -395,7 +393,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             );
         }
 
-/*      window->Window.Context = fgStructure.MenuContext->Context ; */
+        /* window->Window.Context = fgStructure.MenuContext->Context; */
         window->Window.Context = glXCreateContext(
             fgDisplay.Display, window->Window.VisualInfo,
             NULL, fgState.ForceDirectContext | fgState.TryDirectContext
@@ -1035,7 +1033,7 @@ void FGAPIENTRY glutFullScreen( void )
                       rect.bottom - rect.top,
                       SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
                       SWP_NOZORDER
-                    );
+        );
 #endif
     }
 }
