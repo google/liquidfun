@@ -54,8 +54,10 @@
  * Somehow all Win32 include headers depend on this one:
  */
 #if TARGET_HOST_WIN32
-    #include <windows.h>
-    #include <windowsx.h>
+#include <windows.h>
+#include <windowsx.h>
+
+#define strdup   _strdup
 #endif
 
 /*
@@ -576,7 +578,7 @@ XVisualInfo* fgChooseVisual( void );
  */
 #if TARGET_HOST_WIN32
 LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly );
+GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly, unsigned char layer_type );
 #endif
 
 /*
@@ -584,6 +586,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly );
  * Defined in freeglut_structure.c, freeglut_window.c.
  */
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title, int x, int y, int w, int h, GLboolean gameMode );
+void        fgSetWindow ( SFG_Window *window ) ;
 void        fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, int h, GLboolean gameMode, int isSubWindow );
 void        fgCloseWindow( SFG_Window* window );
 void        fgAddToWindowDestroyList ( SFG_Window* window, GLboolean needToClose ) ;
