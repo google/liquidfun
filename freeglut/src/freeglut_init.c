@@ -1076,42 +1076,42 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
       break ;
 
     case 20 :  /* "win32pdf":  matches the Win32 Pixel Format Descriptor by number */
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
 #endif
       break ;
 
     case 21 :  /* "xvisual":  matches the X visual ID by number */
-#ifdef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_UNIX_X11
 #endif
       break ;
 
     case 22 :  /* "xstaticgray":  boolean indicating if the frame buffer configuration's X visual is of type StaticGray */
-#ifdef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_UNIX_X11
 #endif
       break ;
 
     case 23 :  /* "xgrayscale":  boolean indicating if the frame buffer configuration's X visual is of type GrayScale */
-#ifdef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_UNIX_X11
 #endif
       break ;
 
     case 24 :  /* "xstaticcolor":  boolean indicating if the frame buffer configuration's X visual is of type StaticColor */
-#ifdef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_UNIX_X11
 #endif
       break ;
 
     case 25 :  /* "xpseudocolor":  boolean indicating if the frame buffer configuration's X visual is of type PseudoColor */
-#ifdef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_UNIX_X11
 #endif
       break ;
 
     case 26 :  /* "xtruecolor":  boolean indicating if the frame buffer configuration's X visual is of type TrueColor */
-#ifdef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_UNIX_X11
 #endif
       break ;
 
     case 27 :  /* "xdirectcolor":  boolean indicating if the frame buffer configuration's X visual is of type DirectColor */
-#ifdef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_UNIX_X11
 #endif
       break ;
 
