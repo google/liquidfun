@@ -481,7 +481,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 #elif TARGET_HOST_WIN32
 
     WNDCLASS wc;
-    int flags;
+    DWORD flags;
+    DWORD exFlags = 0;
     ATOM atom;
 
     freeglut_assert_ready;
@@ -534,14 +535,18 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         flags = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
 
         if ( window->IsMenu )
-            flags |= WS_POPUP ;
+        {
+            flags |= WS_POPUP;
+            exFlags |= WS_EX_TOOLWINDOW;
+        }
         else if( window->Parent == NULL )
             flags |= WS_OVERLAPPEDWINDOW;
         else
             flags |= WS_CHILD;
     }
 
-    window->Window.Handle = CreateWindow( 
+    window->Window.Handle = CreateWindowEx(
+        exFlags,
         "FREEGLUT",
         title,
         flags,
