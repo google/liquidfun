@@ -58,31 +58,31 @@ SFG_Display fgDisplay;
 SFG_State fgState = { { -1, -1, FALSE },  /* Position */
                       { 300, 300, TRUE }, /* Size */
                       GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,  /* DisplayMode */
-                      FALSE, /* ForceDirectContext */
-                      TRUE,  /* TryDirectContext */
-                      FALSE, /* ForceIconic */
-                      FALSE, /* UseCurrentContext */
-                      FALSE, /* GLDebugSwitch */
-                      FALSE, /* XSyncSwitch */
-                      TRUE,  /* IgnoreKeyRepeat */
-                      0,     /* FPSInterval */
-                      0,     /* SwapCount */
-                      0,     /* SwapTime */
+                      FALSE,              /* ForceDirectContext */
+                      TRUE,               /* TryDirectContext */
+                      FALSE,              /* ForceIconic */
+                      FALSE,              /* UseCurrentContext */
+                      FALSE,              /* GLDebugSwitch */
+                      FALSE,              /* XSyncSwitch */
+                      TRUE,               /* IgnoreKeyRepeat */
+                      0,                  /* FPSInterval */
+                      0,                  /* SwapCount */
+                      0,                  /* SwapTime */
 #if TARGET_HOST_WIN32
-                      { 0, FALSE }, /* Time */
+                      { 0, FALSE },       /* Time */
 #else
                       { { 0, 0 }, FALSE },
 #endif
-                      { NULL, NULL }, /* Timers */
-                      NULL, /* IdleCallback */
-                      FALSE, /* BuildingAMenu */
-                      0,    /* ActiveMenus */
-                      NULL, /* MenuStateCallback */
-                      NULL, /* MenuStatusCallback */
-                      { 640, 480, TRUE }, /* GameModeSize */
-                      16,  /* GameModeDepth */
-                      72,  /* GameModeRefresh */
-                      GLUT_ACTION_EXIT, /* ActionOnWindowClose */
+                      { NULL, NULL }  ,    /* Timers */
+                      NULL,                /* IdleCallback */
+                      FALSE,               /* BuildingAMenu */
+                      0,                   /* ActiveMenus */
+                      NULL,                /* MenuStateCallback */
+                      NULL,                /* MenuStatusCallback */
+                      { 640, 480, TRUE },  /* GameModeSize */
+                      16,                  /* GameModeDepth */
+                      72,                  /* GameModeRefresh */
+                      GLUT_ACTION_EXIT,    /* ActionOnWindowClose */
                       GLUT_EXEC_STATE_INIT /* ExecState */
 } ;
 
@@ -175,7 +175,7 @@ void fgInitialize( const char* displayName )
          * Register the window class
          */
         atom = RegisterClass( &wc );
-        assert( atom != 0 );
+        assert( atom );
     }
 
     /*
@@ -185,7 +185,7 @@ void fgInitialize( const char* displayName )
     fgDisplay.ScreenHeight = GetSystemMetrics( SM_CYSCREEN );
 
     {
-        HWND desktop = GetDesktopWindow();
+        HWND desktop = GetDesktopWindow( );
         HDC  context = GetDC( desktop );
 
         fgDisplay.ScreenWidthMM  = GetDeviceCaps( context, HORZSIZE );
@@ -222,9 +222,9 @@ void fgDeinitialize( void )
         fgStructure.MenuContext = NULL;
     }
 
-    fgDestroyStructure();
+    fgDestroyStructure( );
 
-    while( timer = (SFG_Timer *)fgState.Timers.First )
+    while( timer = ( SFG_Timer * )fgState.Timers.First )
     {
         fgListRemove ( &fgState.Timers, &timer->Node );
         free( timer );
@@ -262,8 +262,8 @@ void fgDeinitialize( void )
 
     fgState.Timers.First = fgState.Timers.Last = NULL;
     fgState.IdleCallback = NULL;
-    fgState.MenuStateCallback = (FGCBMenuState)NULL;
-    fgState.MenuStatusCallback = (FGCBMenuStatus)NULL;
+    fgState.MenuStateCallback = ( FGCBMenuState )NULL;
+    fgState.MenuStatusCallback = ( FGCBMenuStatus )NULL;
 
     fgState.SwapCount   = 0;
     fgState.SwapTime    = 0;
@@ -309,24 +309,24 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         fgState.ProgramName = strdup (*argv);
     else
         fgState.ProgramName = strdup ("");
-    if (!fgState.ProgramName)
+    if( !fgState.ProgramName )
         fgError ("Could not allocate space for the program's name.");
 
     if( fgState.Time.Set )
         fgError( "illegal glutInit() reinitialization attemp" );
 
-    fgCreateStructure();
+    fgCreateStructure( );
 
 #if TARGET_HOST_UNIX_X11
-    gettimeofday(&fgState.Time.Value, NULL);
+    gettimeofday( &fgState.Time.Value, NULL );
 #elif TARGET_HOST_WIN32
-    fgState.Time.Value = timeGetTime();
+    fgState.Time.Value = timeGetTime( );
 #endif
     fgState.Time.Set = TRUE;
 
     /* check if GLUT_FPS env var is set */
     {
-        const char *fps = getenv ( "GLUT_FPS" );
+        const char *fps = getenv( "GLUT_FPS" );
         if( fps )
         {
             sscanf( fps, "%d", &fgState.FPSInterval );
@@ -342,9 +342,9 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 #endif
         displayName = strdup( getenv( "DISPLAY" ) );
     if( !displayName )
-        fgError ("Could not allocate space for display name.");
+        fgError( "Could not allocate space for display name." );
 
-    for( i=1; i<argc; i++ )
+    for( i = 1; i < argc; i++ )
     {
         if( strcmp( argv[ i ], "-display" ) == 0 )
         {
@@ -354,27 +354,27 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             if( displayName )
                 free( displayName );
             displayName = strdup( argv[ i ] );
-            if (!displayName)
+            if( !displayName )
                 fgError( "Could not allocate space for display name (%s)",
-                    argv [i]);
+                    argv [ i ] );
 
             argv[ i - 1 ] = NULL;
             argv[ i     ] = NULL;
-            (*pargc) -= 2;
+            ( *pargc ) -= 2;
         }
         else if( strcmp( argv[ i ], "-geometry" ) == 0 )
         {
             int result, x, y;
             unsigned int w, h;
 
-            if ( ++i >= argc )
-            fgError( "-geometry parameter must be followed by window "
-                "geometry settings" );
-            result = sscanf ( argv[i], "%dx%d+%d+%d", &x, &y, &w, &h );
+            if( ++i >= argc )
+                fgError( "-geometry parameter must be followed by window "
+                         "geometry settings" );
+            result = sscanf( argv[ i ], "%dx%d+%d+%d", &x, &y, &w, &h );
 
-            if ( result > 3 )
+            if( result > 3 )
                 fgState.Size.Y = h;
-            if ( result > 2 )
+            if( result > 2 )
                 fgState.Size.X = w;
 
             if( result > 1 )
@@ -397,7 +397,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 
             argv[ i - 1 ] = NULL;
             argv[ i     ] = NULL;
-            (*pargc) -= 2;
+            ( *pargc ) -= 2;
         }
         else if( strcmp( argv[ i ], "-direct" ) == 0)
         {
@@ -407,7 +407,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 
             fgState.ForceDirectContext = TRUE;
             argv[ i ] = NULL;
-            (*pargc)--;
+            ( *pargc )--;
         }
         else if( strcmp( argv[ i ], "-indirect" ) == 0 )
         {
@@ -423,19 +423,19 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         {
             fgState.ForceIconic = TRUE;
             argv[ i ] = NULL;
-            (*pargc)--;
+            ( *pargc )--;
         }
         else if( strcmp( argv[ i ], "-gldebug" ) == 0 )
         {
             fgState.GLDebugSwitch = TRUE;
             argv[ i ] = NULL;
-            (*pargc)--;
+            ( *pargc )--;
         }
         else if( strcmp( argv[ i ], "-sync" ) == 0 )
         {
             fgState.XSyncSwitch = TRUE;
             argv[ i ] = NULL;
-            (*pargc)--;
+            ( *pargc )--;
         }
     }
 
@@ -448,9 +448,9 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         if( argv[ i ] == NULL )
         {
             /* Guaranteed to end because there are "*pargc" arguments left */
-            while ( argv[j] == NULL )
+            while ( argv[ j ] == NULL )
                 j++;
-            argv[i] = argv[j] ;
+            argv[ i ] = argv[ j ] ;
         }
     }
 
@@ -485,7 +485,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
  */
 void FGAPIENTRY glutInitWindowPosition( int x, int y )
 {
-    if( (x >= 0) && (y >= 0) )
+    if( ( x >= 0 ) && ( y >= 0 ) )
     {
         fgState.Position.X   =    x;
         fgState.Position.Y   =    y;
@@ -504,7 +504,7 @@ void FGAPIENTRY glutInitWindowPosition( int x, int y )
  */
 void FGAPIENTRY glutInitWindowSize( int width, int height )
 {
-    if( (width > 0) && (height > 0) )
+    if( ( width > 0 ) && ( height > 0 ) )
     {
         fgState.Size.X   =  width;
         fgState.Size.Y   = height;
