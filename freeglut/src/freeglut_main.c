@@ -968,10 +968,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     char keys[32];
                     XQueryKeymap( fgDisplay.Display, keys ); /* Look at X11 keystate to detect repeat mode */
 
-                    if ( keys[event.xkey.keycode>>3] & (1<<(event.xkey.keycode%8)) )
-                        window->State.KeyRepeating = GL_TRUE;
-                    else
-                        window->State.KeyRepeating = GL_FALSE;
+                    if ( event.xkey.keycode<256 )            /* XQueryKeymap is limited to 256 keycodes    */
+                    {
+                        if ( keys[event.xkey.keycode>>3] & (1<<(event.xkey.keycode%8)) )
+                            window->State.KeyRepeating = GL_TRUE;
+                        else
+                            window->State.KeyRepeating = GL_FALSE;
+                    }
                 }
             }
             else
