@@ -253,7 +253,10 @@ void FGAPIENTRY glutWarpPointer( int x, int y )
 #elif TARGET_HOST_WIN32
 
     {
-        POINT coords = { x, y };
+        POINT coords;
+        coords.x = x;
+        coords.y = y;
+
         /*
          * ClientToScreen() translates {coords} for us.
          */
