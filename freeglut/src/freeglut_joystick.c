@@ -738,7 +738,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 
             if ( buttons != NULL ) *buttons = joy->tmp_buttons;
             if ( axes    != NULL )
-                memcpy ( axes, joy->tmp_axes, sizeof(float) * num_axes );
+                memcpy ( axes, joy->tmp_axes, sizeof(float) * joy->num_axes );
 
             return;
         }
