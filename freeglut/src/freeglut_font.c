@@ -155,7 +155,7 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
      * point back to the start of the line and down one line.
      */
     while( c = *string++ )
-        if( string[c] == '\n' )
+        if( c == '\n' )
         {
             glBitmap ( 0, 0, 0, 0, -x, (float) -font->Height, NULL );
             x = 0.0f;

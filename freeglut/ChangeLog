@@ -706,3 +706,5 @@ from freeglut.
 unimplemented).
 
 (187) Fixed bug #1045054 (KeyReleaseMask typo).
+
+(188) Fixed bug #1040435 (glutBitmapString() bug).
