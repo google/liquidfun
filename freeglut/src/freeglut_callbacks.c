@@ -49,8 +49,8 @@
 void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
 {
     if( !callback )
-      fgError ("Fatal error in program.  NULL display callback not "
-          "permitted in GLUT 3.0+ or freeglut 2.0.1+\n");
+        fgError ("Fatal error in program.  NULL display callback not "
+                 "permitted in GLUT 3.0+ or freeglut 2.0.1+\n");
     SET_CALLBACK( Display );
     fgStructure.Window->State.Redisplay = TRUE;
 }
@@ -66,7 +66,8 @@ void FGAPIENTRY glutReshapeFunc( void (* callback)( int, int ) )
 /*
  * Sets the Keyboard callback for the current window
  */
-void FGAPIENTRY glutKeyboardFunc( void (* callback)( unsigned char, int, int ) )
+void FGAPIENTRY glutKeyboardFunc( void (* callback)
+                                  ( unsigned char, int, int ) )
 {
     SET_CALLBACK( Keyboard );
 }
@@ -114,8 +115,8 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
 static void fghVisibility( int status )
 {
     freeglut_assert_ready;
-    freeglut_return_if_fail( fgStructure.Window != NULL );
-    freeglut_return_if_fail( fgStructure.Window->Callbacks.Visibility != NULL );
+    freeglut_return_if_fail( fgStructure.Window );
+    freeglut_return_if_fail( fgStructure.Window->Callbacks.Visibility );
 
     if( status == GLUT_HIDDEN  || status == GLUT_FULLY_COVERED )
         fgStructure.Window->Callbacks.Visibility( GLUT_NOT_VISIBLE );
@@ -136,7 +137,8 @@ void FGAPIENTRY glutVisibilityFunc( void (* callback)( int ) )
 /*
  * Sets the keyboard key release callback for the current window
  */
-void FGAPIENTRY glutKeyboardUpFunc( void (* callback)( unsigned char, int, int ) )
+void FGAPIENTRY glutKeyboardUpFunc( void (* callback)
+                                    ( unsigned char, int, int ) )
 {
     SET_CALLBACK( KeyboardUp );
 }
@@ -152,7 +154,9 @@ void FGAPIENTRY glutSpecialUpFunc( void (* callback)( int, int, int ) )
 /*
  * Sets the joystick callback and polling rate for the current window
  */
-void FGAPIENTRY glutJoystickFunc( void (* callback)( unsigned int, int, int, int ), int pollInterval )
+void FGAPIENTRY glutJoystickFunc( void (* callback)
+                                  ( unsigned int, int, int, int ),
+                                  int pollInterval )
 {
     SET_CALLBACK( Joystick );
     fgStructure.Window->State.JoystickPollRate = pollInterval;
