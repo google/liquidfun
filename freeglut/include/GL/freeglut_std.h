@@ -106,6 +106,7 @@
 #define  FREEGLUT             1
 #define  GLUT_API_VERSION     4
 #define  FREEGLUT_VERSION_2_0 1
+#define  GLUT_XLIB_IMPLEMENTATION 13
 
 /*
  * Always include OpenGL and GLU headers
@@ -557,7 +558,7 @@ FGAPI void    FGAPIENTRY glutCopyColormap( int window );
  * Misc keyboard and joystick functions, see freeglut_misc.c
  */
 FGAPI void    FGAPIENTRY glutIgnoreKeyRepeat( int ignore );
-FGAPI void    FGAPIENTRY glutSetKeyRepeat( int repeatMode );  /* DEPRECATED 11/4/02 - Do not use */
+FGAPI void    FGAPIENTRY glutSetKeyRepeat( int repeatMode );
 FGAPI void    FGAPIENTRY glutForceJoystickFunc( void );
 
 /*

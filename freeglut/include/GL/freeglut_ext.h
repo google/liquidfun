@@ -46,6 +46,14 @@
 #define GLUT_USE_CURRENT_CONTEXT                 1
 
 /*
+ * Direct/Indirect rendering context options (has meaning only in Unix/X11)
+ */
+#define GLUT_FORCE_INDIRECT_CONTEXT              0
+#define GLUT_ALLOW_DIRECT_CONTEXT                1
+#define GLUT_TRY_DIRECT_CONTEXT                  2
+#define GLUT_FORCE_DIRECT_CONTEXT                3
+
+/*
  * GLUT API Extension macro definitions -- the glutGet parameters
  */
 #define  GLUT_ACTION_ON_WINDOW_CLOSE        0x01F9
@@ -56,6 +64,7 @@
 #define  GLUT_VERSION                       0x01FC
 
 #define  GLUT_RENDERING_CONTEXT             0x01FD
+#define  GLUT_DIRECT_RENDERING              0x01FE
 
 /*
  * Process loop function, see freeglut_main.c
