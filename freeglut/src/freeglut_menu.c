@@ -47,9 +47,30 @@
 /*
  * We'll be using freeglut fonts to draw the menu
  */
-#define  FREEGLUT_MENU_FONT    GLUT_BITMAP_8_BY_13
-#define  FREEGLUT_MENU_HEIGHT  15
-#define  FREEGLUT_MENU_BORDER   8
+#define FREEGLUT_MENU_FONT    GLUT_BITMAP_8_BY_13
+/*#define FREEGLUT_MENU_FONT    GLUT_BITMAP_HELVETICA_18*/
+#define FREEGLUT_MENU_HEIGHT  (glutBitmapHeight(FREEGLUT_MENU_FONT) + FREEGLUT_MENU_BORDER)
+#define  FREEGLUT_MENU_BORDER   2
+
+
+/*
+ * These variables should be moved into the freeglut global state, but for now,
+ * we'll put them here.  They are for rendering the freeglut menu items.
+ * The choices are fore- and background, with and without h for Highlighting.
+ * Old GLUT appeared to be system-dependant for its colors (sigh) so we are
+ * too.  These variables should be stuffed into global state and initialized
+ * via the glutInit*() system.
+ */
+static float menu_pen_fore  [4] = {0.0f,  0.0f,  0.0f,  1.0f};
+static float menu_pen_back  [4] = {0.85f, 0.85f, 0.85f, 1.0f};
+
+#if TARGET_HOST_WIN32
+static float menu_pen_hfore [4] = {1.0f,  1.0f,  1.0f,  1.0f};
+static float menu_pen_hback [4] = {0.15f, 0.15f, 0.45f, 1.0f};
+#else
+static float menu_pen_hfore [4] = {0.0f,  0.0f,  0.0f,  1.0f};
+static float menu_pen_hback [4] = {1.0f,  1.0f,  1.0f,  1.0f};
+#endif
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -129,12 +150,14 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
   /*
    * Check if the mouse cursor is contained within the current menu box
    */
-  if ( ( x >= 0 ) && ( x < menu->Width ) && ( y >= 0 ) && ( y < menu->Height ) && ( window == menu->Window ) )
+  if ( ( x >= FREEGLUT_MENU_BORDER ) && ( x < menu->Width  - FREEGLUT_MENU_BORDER ) &&
+       ( y >= FREEGLUT_MENU_BORDER ) && ( y < menu->Height - FREEGLUT_MENU_BORDER ) &&
+       ( window == menu->Window ) )
   {
     /*
      * Calculation of the highlighted menu item is easy enough now:
      */
-    int menuID = y / FREEGLUT_MENU_HEIGHT;
+    int menuID = ( y - FREEGLUT_MENU_BORDER ) / FREEGLUT_MENU_HEIGHT ;
 
     /*
      * The mouse cursor is somewhere over our box, check it out.
@@ -231,25 +254,38 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
 {
   SFG_MenuEntry *menuEntry;
   int i;
+  int border = FREEGLUT_MENU_BORDER ;
 
   /*
    * Have the menu box drawn first. The +- values are
    * here just to make it more nice-looking...
    */
-  glColor4f( 0.1289f, 0.2257f, 0.28516f, 1.0f ); /* a non-black dark version of the below. */
-  glBegin( GL_QUADS );
-    glVertex2i( 0          , 0            );
-    glVertex2i( menu->Width, 0            );
-    glVertex2i( menu->Width, menu->Height );
-    glVertex2i( 0          , menu->Height );
+  glColor4f( 1.0f, 1.0f, 1.0f, 1.0f ); /* a non-black dark version of the below. */
+  glBegin( GL_QUAD_STRIP );
+    glVertex2i( menu->Width       , 0                  );
+    glVertex2i( menu->Width-border,              border);
+    glVertex2i( 0                 , 0                  );
+    glVertex2i(             border,              border);
+    glVertex2i( 0                 , menu->Height       );
+    glVertex2i(             border, menu->Height-border);
   glEnd();
 
-  glColor4f( 0.3f, 0.4f, 0.5f, 1.0f );
+  glColor4f( 0.5f, 0.5f, 0.5f, 1.0f ); /* a non-black dark version of the below. */
+  glBegin( GL_QUAD_STRIP );
+    glVertex2i( 0                 , menu->Height       );
+    glVertex2i(             border, menu->Height-border);
+    glVertex2i( menu->Width       , menu->Height       );
+    glVertex2i( menu->Width-border, menu->Height-border);
+    glVertex2i( menu->Width       , 0                  );
+    glVertex2i( menu->Width-border,              border);
+  glEnd();
+
+  glColor4fv ( menu_pen_back ) ;
   glBegin( GL_QUADS );
-    glVertex2i(             1, 1             );
-    glVertex2i( menu->Width-1, 1             );
-    glVertex2i( menu->Width-1, menu->Height-1);
-    glVertex2i(             1, menu->Height-1);
+    glVertex2i(             border,              border);
+    glVertex2i( menu->Width-border,              border);
+    glVertex2i( menu->Width-border, menu->Height-border);
+    glVertex2i(             border, menu->Height-border);
   glEnd();
 
   /*
@@ -273,12 +309,12 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
       /*
        * So have the highlight drawn...
        */
-      glColor4f( 0.2f, 0.3f, 0.4f, 1.0f );
+      glColor4fv ( menu_pen_hback ) ;
       glBegin( GL_QUADS );
-        glVertex2i( 2            , (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
-        glVertex2i( menu->Width-2, (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
-        glVertex2i( menu->Width-2, (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
-        glVertex2i( 2            , (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
+        glVertex2i(             FREEGLUT_MENU_BORDER, (menuID + 0)*FREEGLUT_MENU_HEIGHT + FREEGLUT_MENU_BORDER );
+        glVertex2i( menu->Width-FREEGLUT_MENU_BORDER, (menuID + 0)*FREEGLUT_MENU_HEIGHT + FREEGLUT_MENU_BORDER );
+        glVertex2i( menu->Width-FREEGLUT_MENU_BORDER, (menuID + 1)*FREEGLUT_MENU_HEIGHT + FREEGLUT_MENU_BORDER );
+        glVertex2i(             FREEGLUT_MENU_BORDER, (menuID + 1)*FREEGLUT_MENU_HEIGHT + FREEGLUT_MENU_BORDER );
       glEnd();
     }
   }
@@ -286,17 +322,24 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
   /*
    * Print the menu entries now...
    */
-  glColor4f( 1, 1, 1, 1 );
+
+  glColor4fv ( menu_pen_fore );
 
   for( menuEntry = (SFG_MenuEntry *)menu->Entries.First, i=0; menuEntry;
        menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next, ++i )
   {
     /*
+     * If the menu entry is active, set the color to white
+     */
+    if ( menuEntry->IsActive )
+      glColor4fv ( menu_pen_hfore ) ;
+
+    /*
      * Move the raster into position...
      */
     glRasterPos2i(
-        FREEGLUT_MENU_BORDER,
-        (i + 1)*FREEGLUT_MENU_HEIGHT-(int)(FREEGLUT_MENU_HEIGHT*0.3) /* Try to center the text - JCJ 31 July 2003*/
+        2 * FREEGLUT_MENU_BORDER,
+        (i + 1)*FREEGLUT_MENU_HEIGHT-(int)(FREEGLUT_MENU_HEIGHT*0.3 - FREEGLUT_MENU_BORDER ) /* Try to center the text - JCJ 31 July 2003*/
     );
 
     /*
@@ -309,26 +352,21 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
      */
     if ( menuEntry->SubMenu != NULL )
     {
-      GLubyte arrow_char [] = { 0, 0, 32, 48, 56, 60, 62, 63, 62, 60, 56, 48, 32, 0, 0 } ;
-      int width = glutBitmapWidth ( FREEGLUT_MENU_FONT, ' ' ) ;
-
-      glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
-
-      /*
-       * Set up the pixel unpacking ways
-       */
-      glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
-      glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
-      glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
-      glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
-      glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
-      glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
-
-      glRasterPos2i ( menu->Width - 2 - width,
-                      (i + 1)*FREEGLUT_MENU_HEIGHT - 1) ;
-      glBitmap ( width, FREEGLUT_MENU_HEIGHT, 0, 0, 0.0, 0.0, arrow_char ) ;
-      glPopClientAttrib();
+      int width = glutBitmapWidth ( FREEGLUT_MENU_FONT, '_' ) ;
+      int x_base = menu->Width - 2 - width;
+      int y_base = i*FREEGLUT_MENU_HEIGHT + FREEGLUT_MENU_BORDER;
+      glBegin( GL_TRIANGLES );
+      glVertex2i( x_base, y_base + 2*FREEGLUT_MENU_BORDER);
+      glVertex2i( menu->Width - 2, y_base + (FREEGLUT_MENU_HEIGHT + FREEGLUT_MENU_BORDER) / 2 );
+      glVertex2i( x_base, y_base + FREEGLUT_MENU_HEIGHT - FREEGLUT_MENU_BORDER);
+      glEnd( );
     }
+
+    /*
+     * If the menu entry is active, reset the color
+     */
+    if ( menuEntry->IsActive )
+      glColor4fv ( menu_pen_fore ) ;
   }
 
   /*
@@ -661,7 +699,7 @@ void fghCalculateMenuBoxSize( void )
      */
 
     if (menuEntry->SubMenu != NULL)
-       menuEntry->Width += glutBitmapLength( FREEGLUT_MENU_FONT, " " );
+       menuEntry->Width += glutBitmapLength( FREEGLUT_MENU_FONT, "_" );
 
     /*
      * Check if it's the biggest we've found
@@ -675,8 +713,8 @@ void fghCalculateMenuBoxSize( void )
   /*
    * Store the menu's box size now:
    */
-  fgStructure.Menu->Height = height; 
-  fgStructure.Menu->Width  = width + 2 * FREEGLUT_MENU_BORDER ;
+  fgStructure.Menu->Height = height + 2 * FREEGLUT_MENU_BORDER ; 
+  fgStructure.Menu->Width  = width  + 4 * FREEGLUT_MENU_BORDER ;
 }
 
 
