@@ -1007,12 +1007,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
     fghCheckJoystickPolls();
 
     /*
-     * No messages in the queue, which means we are idling...
-     */
-    if( fgState.IdleCallback != NULL )
-        fgState.IdleCallback();
-
-    /*
      * Remember about displaying all the windows that have
      * been marked for a redisplay (possibly in the idle call):
      */
@@ -1051,12 +1045,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
      * Poll the joystick and notify all windows that want to be notified...
      */
     fghCheckJoystickPolls();
-
-    /*
-     * No messages in the queue, which means we are idling...
-     */
-    if( fgState.IdleCallback != NULL )
-      fgState.IdleCallback();
 
     /*
      * Remember about displaying all the windows that have
@@ -1136,7 +1124,11 @@ void FGAPIENTRY glutMainLoop( void )
     if ( fgStructure.Windows.First == NULL )
       fgState.ExecState = GLUT_EXEC_STATE_STOP ;
     else
+    {
+      if ( fgState.IdleCallback )
+        fgState.IdleCallback ();
       fgSleepForEvents();
+    }
   }
 
   {
