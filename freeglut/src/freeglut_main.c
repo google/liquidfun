@@ -478,7 +478,7 @@ static void fghSleepForEvents( void )
         wait.tv_usec = (msec % 1000) * 1000;
         err = select( socket+1, &fdset, NULL, NULL, &wait );
 
-        if( -1 == err )
+        if( ( -1 == err ) && ( errno != EINTR ) )
             fgWarning ( "freeglut select() error: %d", errno );
     }
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE

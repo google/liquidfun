@@ -708,3 +708,7 @@ unimplemented).
 (187) Fixed bug #1045054 (KeyReleaseMask typo).
 
 (188) Fixed bug #1040435 (glutBitmapString() bug).
+
+(189) Fixed first bug of #1064195 (two things when using signals):
+Don't issue a warning about select when a non-blocked signal was
+caught. This makes sense and is more compatible with GLUT.
