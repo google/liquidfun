@@ -106,6 +106,34 @@ static SFG_MenuEntry *fghFindMenuEntry( SFG_Menu* menu, int index )
 }
 
 /*
+ * Deactivates a menu pointed by the function argument.
+ */
+static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
+{
+    SFG_Window *current_window = fgStructure.Window;
+    SFG_MenuEntry *subMenuIter;
+    /* Hide the present menu's window */
+    fgSetWindow( menuEntry->SubMenu->Window );
+    glutHideWindow( );
+
+    /* Forget about having that menu active anymore, now: */
+    menuEntry->SubMenu->Window->ActiveMenu = NULL;
+    menuEntry->SubMenu->IsActive = GL_FALSE;
+
+    /* Hide all submenu windows, and the root menu's window. */
+    for ( subMenuIter = (SFG_MenuEntry *)menuEntry->SubMenu->Entries.First;
+          subMenuIter;
+          subMenuIter = (SFG_MenuEntry *)subMenuIter->Node.Next )
+    {
+        /* Is that an active submenu by any case? */
+        if( subMenuIter->SubMenu )
+            fghDeactivateSubMenu( subMenuIter );
+    }
+
+    fgSetWindow( current_window );
+}
+
+/*
  * Private function to check for the current menu/sub menu activity state
  */
 static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
@@ -173,7 +201,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
          */
         if( menu->ActiveEntry && ( menuEntry != menu->ActiveEntry ) )
             if( menu->ActiveEntry->SubMenu )
-                fgDeactivateSubMenu( menu->ActiveEntry );
+                fghDeactivateSubMenu( menu->ActiveEntry );
 
         menu->ActiveEntry = menuEntry;
         menu->IsActive = GL_TRUE;
@@ -369,7 +397,7 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
  * Private static function to set the parent window of a submenu and all
  * of its submenus
  */
-static void fghSetSubmenuParentWindow( SFG_Window *window, SFG_Menu *menu )
+static void fghSetMenuParentWindow( SFG_Window *window, SFG_Menu *menu )
 {
     SFG_MenuEntry *menuEntry;
 
@@ -379,7 +407,7 @@ static void fghSetSubmenuParentWindow( SFG_Window *window, SFG_Menu *menu )
          menuEntry;
          menuEntry = ( SFG_MenuEntry * )menuEntry->Node.Next )
         if( menuEntry->SubMenu )
-            fghSetSubmenuParentWindow( window, menuEntry->SubMenu );
+            fghSetMenuParentWindow( window, menuEntry->SubMenu );
 }
 
 /*
@@ -463,14 +491,19 @@ void fgDisplayMenu( void )
 /*
  * Activates a menu pointed by the function argument
  */
-void fgActivateMenu( SFG_Window* window, int button )
+static void fghActivateMenu( SFG_Window* window, int button )
 {
     /* We'll be referencing this menu a lot, so remember its address: */
     SFG_Menu* menu = window->Menu[ button ];
 
+    /* If the menu is already active in another window, deactivate it there */
+    if ( menu->ParentWindow )
+      menu->ParentWindow->ActiveMenu = NULL ;
+
     /* Mark the menu as active, so that it gets displayed: */
     window->ActiveMenu = menu;
     menu->IsActive = GL_TRUE;
+    fghSetMenuParentWindow ( window, menu );
     fgState.ActiveMenus++;
 
     /* Set up the initial menu position now: */
@@ -576,7 +609,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
         /* XXX Posting a requisite Redisplay seems bogus. */
         window->State.Redisplay = GL_TRUE;
         fgSetWindow( window );
-        fgActivateMenu( window, button );
+        fghActivateMenu( window, button );
         return GL_TRUE;
     }
 
@@ -604,6 +637,7 @@ void fgDeactivateMenu( SFG_Window *window )
     /* Forget about having that menu active anymore, now: */
     menu->Window->ActiveMenu = NULL;
     menu->ParentWindow->ActiveMenu = NULL;
+    fghSetMenuParentWindow ( NULL, menu );
     menu->IsActive = GL_FALSE;
 
     fgState.ActiveMenus--;
@@ -615,35 +649,7 @@ void fgDeactivateMenu( SFG_Window *window )
     {
         /* Is that an active submenu by any case? */
         if( menuEntry->SubMenu )
-            fgDeactivateSubMenu( menuEntry );
-    }
-
-    fgSetWindow( current_window );
-}
-
-/*
- * Deactivates a menu pointed by the function argument.
- */
-void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry )
-{
-    SFG_Window *current_window = fgStructure.Window;
-    SFG_MenuEntry *subMenuIter;
-    /* Hide the present menu's window */
-    fgSetWindow( menuEntry->SubMenu->Window );
-    glutHideWindow( );
-
-    /* Forget about having that menu active anymore, now: */
-    menuEntry->SubMenu->Window->ActiveMenu = NULL;
-    menuEntry->SubMenu->IsActive = GL_FALSE;
-
-    /* Hide all submenu windows, and the root menu's window. */
-    for ( subMenuIter = (SFG_MenuEntry *)menuEntry->SubMenu->Entries.First;
-          subMenuIter;
-          subMenuIter = (SFG_MenuEntry *)subMenuIter->Node.Next )
-    {
-        /* Is that an active submenu by any case? */
-        if( subMenuIter->SubMenu )
-            fgDeactivateSubMenu( subMenuIter );
+            fghDeactivateSubMenu( menuEntry );
     }
 
     fgSetWindow( current_window );
@@ -788,9 +794,6 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
     menuEntry->SubMenu = subMenu;
     menuEntry->ID      = -1;
 
-    /* Make the submenu's parent window be the menu's parent window */
-    fghSetSubmenuParentWindow( fgStructure.Menu->ParentWindow, subMenu );
-
     fgListAppend( &fgStructure.Menu->Entries, &menuEntry->Node );
     fghCalculateMenuBoxSize( );
 }
@@ -888,9 +891,6 @@ void FGAPIENTRY glutAttachMenu( int button )
     freeglut_return_if_fail( button < FREEGLUT_MAX_MENUS );
 
     fgStructure.Window->Menu[ button ] = fgStructure.Menu;
-
-    /* Make the parent window of the menu (and all submenus) the current window */
-    fghSetSubmenuParentWindow( fgStructure.Window, fgStructure.Menu );
 }
 
 /*

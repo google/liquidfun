@@ -99,7 +99,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
      * dependant, and resides in freeglut_window.c. Uses fgState.
      */
     fgOpenWindow( window, title, x, y, w, h, gameMode,
-                  parent ? GL_TRUE : GL_FALSE );
+                  (GLboolean)(parent ? GL_TRUE : GL_FALSE) );
 
     return window;
 }
@@ -115,7 +115,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     /* Have the menu object created */
     SFG_Menu* menu = (SFG_Menu *)calloc( sizeof(SFG_Menu), 1 );
 
-    menu->ParentWindow = fgStructure.Window;
+    menu->ParentWindow = NULL;
 
     /* Create a window for the menu to reside in. */
 
@@ -192,8 +192,6 @@ void fgCloseWindows( )
  */
 void fgDestroyWindow( SFG_Window* window )
 {
-    int menu_index;
-
     FREEGLUT_INTERNAL_ERROR_EXIT ( window, "Window destroy function called with null window",
                                    "fgDestroyWindow" );
 
@@ -214,10 +212,6 @@ void fgDestroyWindow( SFG_Window* window )
     if( window->ActiveMenu )
       fgDeactivateMenu( window );
 
-    for( menu_index = 0; menu_index < 3; menu_index ++ )
-        if( window->Menu[ menu_index ] )
-            window->Menu[ menu_index ]->ParentWindow = NULL;
-
     fghClearCallBacks( window );
     fgCloseWindow( window );
     free( window );
@@ -233,6 +227,10 @@ static void fghRemoveMenuFromWindow( SFG_Window* window, SFG_Menu* menu )
 {
     SFG_Window *subWindow;
     int i;
+
+    /* Check whether this is the active menu in the window */
+    if ( menu == window->ActiveMenu )
+        window->ActiveMenu = NULL ;
 
     /*
      * Check if the menu is attached to the current window,
@@ -318,7 +316,7 @@ void fgDestroyMenu( SFG_Menu* menu )
     }
 
     if( fgStructure.Window == menu->Window )
-        fgSetWindow( menu->ParentWindow );
+        fgSetWindow( NULL );
     fgDestroyWindow( menu->Window );
     fgListRemove( &fgStructure.Menus, &menu->Node );
     if( fgStructure.Menu == menu )

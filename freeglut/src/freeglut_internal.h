@@ -514,7 +514,7 @@ struct tagSFG_Menu
 
     SFG_MenuEntry      *ActiveEntry;  /* Currently active entry in the menu  */
     SFG_Window         *Window;       /* Window for menu                     */
-    SFG_Window         *ParentWindow; /* Window in which the menu is defined */
+    SFG_Window         *ParentWindow; /* Window in which the menu is invoked */
 };
 
 /* This is a menu entry */
@@ -759,6 +759,9 @@ int  glutJoystickGetNumAxes( int ident );
 int  glutJoystickGetNumButtons( int ident );
 int  glutJoystickNotWorking( int ident );
 
+/* Setting the cursor for a given window */
+void fgSetCursor ( SFG_Window *window, int cursorID );
+
 /*
  * Helper function to enumerate through all registered windows
  * and one to enumerate all of a window's subwindows...
@@ -799,11 +802,9 @@ SFG_Menu* fgMenuByID( int menuID );
  * The menu activation and deactivation the code. This is the meat
  * of the menu user interface handling code...
  */
-void fgActivateMenu( SFG_Window* window, int button );
 GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
                               int mouse_x, int mouse_y );
 void fgDeactivateMenu( SFG_Window *window );
-void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry );
 
 /*
  * This function gets called just before the buffers swap, so that
@@ -811,12 +812,6 @@ void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry );
  * is defined in freeglut_menu.c file.
  */
 void fgDisplayMenu( void );
-
-/*
- * Display the mouse cursor using OpenGL calls. The function
- * is defined in freeglut_cursor.c file.
- */
-void fgDisplayCursor( void );
 
 /* Elapsed time as per glutGet(GLUT_ELAPSED_TIME). */
 long fgElapsedTime( void );

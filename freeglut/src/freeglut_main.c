@@ -1223,27 +1223,19 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_ACTIVATE:
         if (LOWORD(wParam) != WA_INACTIVE)
         {
-/*            printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window,
+/*            printf("WM_ACTIVATE: fgSetCursor( %p, %d)\n", window,
                    window->State.Cursor ); */
-            glutSetCursor( window->State.Cursor );
+            fgSetCursor( window, window->State.Cursor );
         }
 
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 #endif
 
-        /*
-         * XXX Why not re-use some common code with the glutSetCursor()
-         * XXX function (or perhaps invoke glutSetCursor())?
-         * XXX That is, why are we duplicating code, here, from
-         * XXX glutSetCursor()?  The WIN32 code should be able to just
-         * XXX call glutSetCursor() instead of defining two macros
-         * XXX and implementing a nested case in-line.
-         */
     case WM_SETCURSOR:
 /*      printf ( "Cursor event %x %x %x %x\n", window, window->State.Cursor, lParam, wParam ) ; */
         if( LOWORD( lParam ) == HTCLIENT )
-            glutSetCursor ( window->State.Cursor ) ;
+            fgSetCursor ( window, window->State.Cursor ) ;
         else
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
@@ -1386,15 +1378,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( fgCheckActiveMenu( window, button, pressed,
                                window->State.MouseX, window->State.MouseY ) )
             break;
-
-        if( window->Menu[ button ] && pressed )
-        {
-            window->State.Redisplay = GL_TRUE;
-            fgSetWindow( window );
-            fgActivateMenu( window, button );
-
-            break;
-        }
 
         /* Set capture so that the window captures all the mouse messages */
         /*

@@ -593,7 +593,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 #endif /* TARGET_HOST_WINCE */
 
     UpdateWindow( window->Window.Handle );
-    ShowCursor( TRUE );  /* XXX Old comments say "hide cusror"! */
+    ShowCursor( TRUE );  /* XXX Old comments say "hide cursor"! */
 
 #endif
 
