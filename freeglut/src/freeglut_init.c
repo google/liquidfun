@@ -68,7 +68,7 @@ SFG_State fgState = { { -1, -1, FALSE },  /* Position */
                       0,     /* FPSInterval */
                       0,     /* SwapCount */
                       0,     /* SwapTime */
-#ifdef TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32
                       { 0, FALSE }, /* Time */
 #else
                       { { 0, 0 }, FALSE },
