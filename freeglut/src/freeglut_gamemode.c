@@ -62,12 +62,16 @@ void fghRememberState( void )
     /*
      * Query the current display settings:
      */
-    XF86VidModeGetModeLine(
+    fgDisplay.DisplayModeValid = 
+      XF86VidModeGetModeLine(
         fgDisplay.Display,
         fgDisplay.Screen,
         &fgDisplay.DisplayModeClock,
         &fgDisplay.DisplayMode
     );
+
+    if (!fgDisplay.DisplayModeValid)
+    	fgWarning( "Runtime use of XF86VidModeGetModeLine failed.\n" );
 
 #   else
 #       warning fghRememberState: missing XFree86 video mode extensions, game mode will not change screen resolution when activated
@@ -106,47 +110,50 @@ void fghRestoreState( void )
      */
 #   ifdef X_XF86VidModeGetAllModeLines
 
-    XF86VidModeModeInfo** displayModes;
-    int i, displayModesCount;
-
-    /*
-     * Query for all the display available...
-     */
-    XF86VidModeGetAllModeLines(
-        fgDisplay.Display,
-        fgDisplay.Screen,
-        &displayModesCount,
-        &displayModes
-    );
-
-    /*
-     * Check every of the modes looking for one that matches our demands
-     */
-    for( i=0; i<displayModesCount; i++ )
+    if (fgDisplay.DisplayModeValid)
     {
-        if( displayModes[ i ]->hdisplay == fgDisplay.DisplayMode.hdisplay &&
-            displayModes[ i ]->vdisplay == fgDisplay.DisplayMode.vdisplay &&
-            displayModes[ i ]->dotclock == fgDisplay.DisplayModeClock )
+        XF86VidModeModeInfo** displayModes;
+        int i, displayModesCount;
+
+        /*
+         * Query for all the display available...
+         */
+        XF86VidModeGetAllModeLines(
+            fgDisplay.Display,
+            fgDisplay.Screen,
+            &displayModesCount,
+            &displayModes
+        );
+
+        /*
+         * Check every of the modes looking for one that matches our demands
+         */
+        for( i=0; i<displayModesCount; i++ )
         {
-            /*
-             * OKi, this is the display mode we have been looking for...
-             */
-            XF86VidModeSwitchToMode(
-                fgDisplay.Display,
-                fgDisplay.Screen,
-                displayModes[ i ]
-            );
+            if( displayModes[ i ]->hdisplay == fgDisplay.DisplayMode.hdisplay &&
+                displayModes[ i ]->vdisplay == fgDisplay.DisplayMode.vdisplay &&
+                displayModes[ i ]->dotclock == fgDisplay.DisplayModeClock )
+            {
+                /*
+                 * OKi, this is the display mode we have been looking for...
+                 */
+                XF86VidModeSwitchToMode(
+                    fgDisplay.Display,
+                    fgDisplay.Screen,
+                    displayModes[ i ]
+                );
 
-	    /*
-	     * In case this will be the last X11 call we do before exit,
-	     * we've to flush the X11 output queue to be sure the command
-	     * is really brought onto it's way to the X server.
-	     * The application should not do this because it
-	     * would not be platform independent then.
-	     */
-	    XFlush(fgDisplay.Display);
+	  	    /*
+	  	     * In case this will be the last X11 call we do before exit,
+	  	     * we've to flush the X11 output queue to be sure the command
+	  	     * is really brought onto it's way to the X server.
+	  	     * The application should not do this because it
+	  	     * would not be platform independent then.
+	  	     */
+	  	    XFlush(fgDisplay.Display);
 
-            return;
+                return;
+            }
         }
     }
 
@@ -188,52 +195,55 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
      */
 #   ifdef X_XF86VidModeGetAllModeLines
 
-    XF86VidModeModeInfo** displayModes;
-    int i, displayModesCount;
-
-    /*
-     * Query for all the display available...
-     */
-    XF86VidModeGetAllModeLines(
-        fgDisplay.Display,
-        fgDisplay.Screen,
-        &displayModesCount,
-        &displayModes
-    );
-
-    /*
-     * Check every of the modes looking for one that matches our demands
-     */
-    for( i=0; i<displayModesCount; i++ )
+    if (fgDisplay.DisplayModeValid)
     {
-        if( fghCheckDisplayMode( displayModes[ i ]->hdisplay, displayModes[ i ]->vdisplay,
-                                 fgState.GameModeDepth, fgState.GameModeRefresh ) )
+        XF86VidModeModeInfo** displayModes;
+        int i, displayModesCount;
+
+        /*
+         * Query for all the display available...
+         */
+        XF86VidModeGetAllModeLines(
+            fgDisplay.Display,
+            fgDisplay.Screen,
+            &displayModesCount,
+            &displayModes
+        );
+
+        /*
+         * Check every of the modes looking for one that matches our demands
+         */
+        for( i=0; i<displayModesCount; i++ )
         {
-	    if( haveToTest )
-		return( TRUE );
-            /*
-             * OKi, this is the display mode we have been looking for...
-             */
-            XF86VidModeSwitchToMode(
-                fgDisplay.Display,
-                fgDisplay.Screen,
-                displayModes[ i ]
-            );
+            if( fghCheckDisplayMode( displayModes[ i ]->hdisplay, displayModes[ i ]->vdisplay,
+                                     fgState.GameModeDepth, fgState.GameModeRefresh ) )
+            {
+	  	    if( haveToTest )
+				return( TRUE );
+                /*
+                 * OKi, this is the display mode we have been looking for...
+                 */
+                XF86VidModeSwitchToMode(
+                    fgDisplay.Display,
+                    fgDisplay.Screen,
+                    displayModes[ i ]
+                );
 
-            /*
-             * Set the viewport's origin to (0,0) (the game mode window's top-left corner)
-             */
-            XF86VidModeSetViewPort(
-                fgDisplay.Display,
-                fgDisplay.Screen,
-                0,
-                0
-            );
+                /*
+                 * Set the viewport's origin to (0,0) (the game mode window's top-left corner)
+                 */
+                XF86VidModeSetViewPort(
+                    fgDisplay.Display,
+                    fgDisplay.Screen,
+                    0,
+                    0
+                );
 
-            /*
-             * Return successfull...
-             */
-            return( TRUE );
+                /*
+                 * Return successfull...
+                 */
+                return( TRUE );
+            }
         }
     }
 
