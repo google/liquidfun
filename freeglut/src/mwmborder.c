@@ -12,7 +12,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
-#define HAVE_MOTIF
+#undef HAVE_MOTIF
 #ifdef HAVE_MOTIF
 
 #include <Xm/MwmUtil.h>
