@@ -336,7 +336,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      */
     winAttr.event_mask        =
         StructureNotifyMask | SubstructureNotifyMask | ExposureMask |
-        ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyRelease |
+        ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask |
         VisibilityChangeMask | EnterWindowMask | LeaveWindowMask |
         PointerMotionMask | ButtonMotionMask;
     winAttr.background_pixmap = None;

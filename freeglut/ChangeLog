@@ -702,3 +702,5 @@ from freeglut.
 
 (186) Fixed bug #1087642 (glutDeviceGet(GLUT_DEVICE_KEY_REPEAT)
 unimplemented).
+
+(187) Fixed bug #1045054 (KeyReleaseMask typo).
