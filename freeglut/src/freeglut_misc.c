@@ -50,9 +50,9 @@
  */
 int FGAPIENTRY glutExtensionSupported( const char* extension )
 {
-  const char *extensions;
+  const char *extensions, *start;
   const char *ptr;
-  int len = strlen ( extension ) ;
+  const int len = strlen( extension ) ;
 
   /*
    * Make sure there is a current window, and thus -- a current context available
@@ -61,41 +61,30 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
   freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
 
   /*
+   * Check if the extension itself looks valid (contains no spaces)
+   */
+  if (strchr(extension, ' '))
+    return 0;
+
+  /*
    * Note it is safe to query the extensions
    */
-  extensions = glGetString(GL_EXTENSIONS);
+  start = extensions = (const char *) glGetString(GL_EXTENSIONS);
 
+  /* XXX consider printing a warning to stderr that there's no current
+   * rendering context.
+   */
   freeglut_return_val_if_fail( extensions != NULL, 0 );
 
-  /*
-   * Check if the extension itself looks valid
-   */
-  if ( strchr ( extension, ' ' ) != NULL )
-    return( 0 );
-
-  /*
-   * Look for our extension
-   */
-  for (ptr = extensions; *ptr;)
-  {
-    /*
-     * Is it the current extension?
-     */
-    if ( strncmp ( extension, extensions, len ) == 0 )
-      return 1 ;
-
-    /*
-     * No, go find the next extension.  They are separated from each other by one or more blank spaces.
-     */
-    ptr = strchr ( ptr, ' ' ) ;
-
-    /*
-     * If we ran off the end of the "extensions" character string, we didn't find it.  Return failure.
-     */
-    if ( !ptr ) return 0 ;
-
-    while ( *ptr == ' ' )
-      ptr++ ;
+  while (1) {
+     const char *p = strstr(extensions, extension);
+     if (!p)
+        return 0;  /* not found */
+     /* check that the match isn't a super string */
+     if ((p == start || p[-1] == ' ') && (p[len] == ' ' || p[len] == 0))
+        return 1;
+     /* skip the false match and continue */
+     extensions = p + len;
   }
 
   return 0 ;
