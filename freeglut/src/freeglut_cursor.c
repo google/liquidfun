@@ -75,44 +75,44 @@ void FGAPIENTRY glutSetCursor( int cursorID )
    *     Print a warning message?
    */
     {
-	Cursor cursor;
+        Cursor cursor;
 #define MAP_CURSOR(a,b) case a: cursor = XCreateFontCursor( fgDisplay.Display, b ); break;
-	if( GLUT_CURSOR_FULL_CROSSHAIR == cursorID )
-	    cursorID = GLUT_CURSOR_CROSSHAIR;
-	
-	switch( cursorID )
+        if( GLUT_CURSOR_FULL_CROSSHAIR == cursorID )
+            cursorID = GLUT_CURSOR_CROSSHAIR;
+        
+        switch( cursorID )
         {
-	    MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, XC_right_ptr);
-	    MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  XC_left_ptr);
-	    MAP_CURSOR( GLUT_CURSOR_INFO,        XC_hand1);
-	    MAP_CURSOR( GLUT_CURSOR_DESTROY,     XC_pirate);
-	    MAP_CURSOR( GLUT_CURSOR_HELP,        XC_question_arrow);
-	    MAP_CURSOR( GLUT_CURSOR_CYCLE,       XC_exchange);
-	    MAP_CURSOR( GLUT_CURSOR_SPRAY,       XC_spraycan);
-	    MAP_CURSOR( GLUT_CURSOR_WAIT,        XC_watch);
-	    MAP_CURSOR( GLUT_CURSOR_TEXT,        XC_xterm);
-	    MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   XC_crosshair);
-	    MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     XC_sb_v_double_arrow);
-	    MAP_CURSOR( GLUT_CURSOR_LEFT_RIGHT,  XC_sb_h_double_arrow);
-	    MAP_CURSOR( GLUT_CURSOR_TOP_SIDE,    XC_top_side);
-	    MAP_CURSOR( GLUT_CURSOR_BOTTOM_SIDE, XC_bottom_side);
-	    MAP_CURSOR( GLUT_CURSOR_LEFT_SIDE,   XC_left_side);
-	    MAP_CURSOR( GLUT_CURSOR_RIGHT_SIDE,  XC_right_side);
-	    MAP_CURSOR( GLUT_CURSOR_TOP_LEFT_CORNER,     XC_top_left_corner);
-	    MAP_CURSOR( GLUT_CURSOR_TOP_RIGHT_CORNER,    XC_top_right_corner);
-	    MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, XC_bottom_right_corner);
-	    MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER, XC_bottom_left_corner);
-	    MAP_CURSOR( GLUT_CURSOR_NONE,        XC_bogosity);
-	case GLUT_CURSOR_INHERIT:
-	    break;
-	default:
-	    return;
-	}
+            MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, XC_right_ptr);
+            MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  XC_left_ptr);
+            MAP_CURSOR( GLUT_CURSOR_INFO,        XC_hand1);
+            MAP_CURSOR( GLUT_CURSOR_DESTROY,     XC_pirate);
+            MAP_CURSOR( GLUT_CURSOR_HELP,        XC_question_arrow);
+            MAP_CURSOR( GLUT_CURSOR_CYCLE,       XC_exchange);
+            MAP_CURSOR( GLUT_CURSOR_SPRAY,       XC_spraycan);
+            MAP_CURSOR( GLUT_CURSOR_WAIT,        XC_watch);
+            MAP_CURSOR( GLUT_CURSOR_TEXT,        XC_xterm);
+            MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   XC_crosshair);
+            MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     XC_sb_v_double_arrow);
+            MAP_CURSOR( GLUT_CURSOR_LEFT_RIGHT,  XC_sb_h_double_arrow);
+            MAP_CURSOR( GLUT_CURSOR_TOP_SIDE,    XC_top_side);
+            MAP_CURSOR( GLUT_CURSOR_BOTTOM_SIDE, XC_bottom_side);
+            MAP_CURSOR( GLUT_CURSOR_LEFT_SIDE,   XC_left_side);
+            MAP_CURSOR( GLUT_CURSOR_RIGHT_SIDE,  XC_right_side);
+            MAP_CURSOR( GLUT_CURSOR_TOP_LEFT_CORNER,     XC_top_left_corner);
+            MAP_CURSOR( GLUT_CURSOR_TOP_RIGHT_CORNER,    XC_top_right_corner);
+            MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, XC_bottom_right_corner);
+            MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER, XC_bottom_left_corner);
+            MAP_CURSOR( GLUT_CURSOR_NONE,        XC_bogosity);
+        case GLUT_CURSOR_INHERIT:
+            break;
+        default:
+            return;
+        }
 
-	if( GLUT_CURSOR_INHERIT == cursorID )
-	    XUndefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle );
-	else
-	    XDefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle, cursor );
+        if( GLUT_CURSOR_INHERIT == cursorID )
+            XUndefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle );
+        else
+            XDefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle, cursor );
     }
 
 #elif TARGET_HOST_WIN32
@@ -121,32 +121,32 @@ void FGAPIENTRY glutSetCursor( int cursorID )
    * This is a temporary solution only...
    */
   /* Set the cursor AND change it for this window class. */
-#	define MAP_CURSOR(a,b) case a: SetCursor( LoadCursor( NULL, b ) ); \
+#        define MAP_CURSOR(a,b) case a: SetCursor( LoadCursor( NULL, b ) ); \
         SetClassLong(fgStructure.Window->Window.Handle,GCL_HCURSOR,(LONG)LoadCursor(NULL,b)); \
         break;
-	/* Nuke the cursor AND change it for this window class. */
-#	define ZAP_CURSOR(a,b) case a: SetCursor( NULL ); \
+        /* Nuke the cursor AND change it for this window class. */
+#        define ZAP_CURSOR(a,b) case a: SetCursor( NULL ); \
         SetClassLong(fgStructure.Window->Window.Handle,GCL_HCURSOR,(LONG)NULL); \
         break;
 
-	switch( cursorID )
-	{
-	    MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
-	    MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
-	    MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
-	    MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
-	    MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP	   );
-	    MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
-	    MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
-	    MAP_CURSOR( GLUT_CURSOR_WAIT,		 IDC_WAIT      );
-	    MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
-	    MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
-	    /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   ); */
-	    ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL	   );
-	    
-	default:
-	    MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
-	}
+        switch( cursorID )
+        {
+            MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
+            MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
+            MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
+            MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
+            MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP           );
+            MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
+            MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
+            MAP_CURSOR( GLUT_CURSOR_WAIT,                 IDC_WAIT      );
+            MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
+            MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
+            /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO                   ); */
+            ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL           );
+            
+        default:
+            MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
+        }
 #endif
 
   fgStructure.Window->State.Cursor = cursorID;

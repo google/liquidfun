@@ -65,10 +65,10 @@ void fghRememberState( void )
      * restore the ViewPort on LeaveGameMode():
      */
     XF86VidModeGetViewPort(
-	fgDisplay.Display,
-	fgDisplay.Screen,
-	&fgDisplay.DisplayViewPortX,
-	&fgDisplay.DisplayViewPortY
+        fgDisplay.Display,
+        fgDisplay.Screen,
+        &fgDisplay.DisplayViewPortX,
+        &fgDisplay.DisplayViewPortY
     );
 
     /*
@@ -76,15 +76,15 @@ void fghRememberState( void )
      * for restoring it later:
      */
     {
-	Window junk_window;
-	unsigned int mask;
+        Window junk_window;
+        unsigned int mask;
 
-	XQueryPointer(
-	    fgDisplay.Display, fgDisplay.RootWindow,
-	    &junk_window, &junk_window,
-	    &fgDisplay.DisplayPointerX, &fgDisplay.DisplayPointerY,
-	    &fgDisplay.DisplayPointerX, &fgDisplay.DisplayPointerY, &mask
-	);
+        XQueryPointer(
+            fgDisplay.Display, fgDisplay.RootWindow,
+            &junk_window, &junk_window,
+            &fgDisplay.DisplayPointerX, &fgDisplay.DisplayPointerY,
+            &fgDisplay.DisplayPointerX, &fgDisplay.DisplayPointerY, &mask
+        );
     }
 
     /*
@@ -99,7 +99,7 @@ void fghRememberState( void )
     );
 
     if (!fgDisplay.DisplayModeValid)
-    	fgWarning( "Runtime use of XF86VidModeGetModeLine failed.\n" );
+            fgWarning( "Runtime use of XF86VidModeGetModeLine failed.\n" );
 
 #   else
 #       warning fghRememberState: missing XFree86 video mode extensions, game mode will not change screen resolution when activated
@@ -138,8 +138,8 @@ void fghRestoreState( void )
      * Restore the remembered pointer position:
      */
     XWarpPointer(
-	fgDisplay.Display, None, fgDisplay.RootWindow, 0, 0, 0, 0,
-	fgDisplay.DisplayPointerX, fgDisplay.DisplayPointerY
+        fgDisplay.Display, None, fgDisplay.RootWindow, 0, 0, 0, 0,
+        fgDisplay.DisplayPointerX, fgDisplay.DisplayPointerY
     );
 
     /*
@@ -179,22 +179,22 @@ void fghRestoreState( void )
                     displayModes[ i ]
                 );
 
-		/*
-		 * Now we can restore the remembered ViewPort:
-		 */
-		XF86VidModeSetViewPort(
-		     fgDisplay.Display,
-		     fgDisplay.Screen,
-		     fgDisplay.DisplayViewPortX,
-		     fgDisplay.DisplayViewPortY
-		);
+                /*
+                 * Now we can restore the remembered ViewPort:
+                 */
+                XF86VidModeSetViewPort(
+                     fgDisplay.Display,
+                     fgDisplay.Screen,
+                     fgDisplay.DisplayViewPortX,
+                     fgDisplay.DisplayViewPortY
+                );
 
-	  	/*
-	  	 * For the case this would be the last X11 call the application
-	  	 * calls exit() we've to flush the X11 output queue to have the
-	  	 * commands sent to the X server before the application exists.
-	  	 */
-	  	XFlush(fgDisplay.Display);
+                  /*
+                   * For the case this would be the last X11 call the application
+                   * calls exit() we've to flush the X11 output queue to have the
+                   * commands sent to the X server before the application exists.
+                   */
+                  XFlush(fgDisplay.Display);
 
                 return;
             }
@@ -266,8 +266,8 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
             if( fghCheckDisplayMode( displayModes[ i ]->hdisplay, displayModes[ i ]->vdisplay,
                                      fgState.GameModeDepth, fgState.GameModeRefresh ) )
             {
-	  	    if( haveToTest )
-				return( TRUE );
+                      if( haveToTest )
+                                return( TRUE );
                 /*
                  * OKi, this is the display mode we have been looking for...
                  */
@@ -346,7 +346,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
           mode = displayModes;
           break;
         }
-	
+        
         /*
          * Switch to the next display mode, if any
          */
@@ -458,7 +458,7 @@ int FGAPIENTRY glutEnterGameMode( void )
      */
     if( fghChangeDisplayMode( FALSE ) == FALSE )
     {
-	      fgWarning( "failed to change screen settings" );
+              fgWarning( "failed to change screen settings" );
         return( FALSE );
     }
 
@@ -482,11 +482,11 @@ int FGAPIENTRY glutEnterGameMode( void )
 
     /* Move the Pointer to the middle of the fullscreen window */
     XWarpPointer(
-	fgDisplay.Display,
-	None, 
-	fgDisplay.RootWindow,
-	0, 0, 0, 0,
-	fgState.GameModeSize.X/2, fgState.GameModeSize.Y/2
+        fgDisplay.Display,
+        None, 
+        fgDisplay.RootWindow,
+        0, 0, 0, 0,
+        fgState.GameModeSize.X/2, fgState.GameModeSize.Y/2
     );
 
     /*
@@ -499,12 +499,12 @@ int FGAPIENTRY glutEnterGameMode( void )
      * the application which we have to aviod, so wait until it's viewable:
      */
     while (GrabSuccess != XGrabPointer(
-	    fgDisplay.Display, fgStructure.GameMode->Window.Handle,
-	    TRUE, ButtonPressMask|ButtonReleaseMask|ButtonMotionMask
-		|PointerMotionMask,
-	    GrabModeAsync, GrabModeAsync,
-	    fgStructure.GameMode->Window.Handle, None, CurrentTime)) {
-	usleep (100);
+            fgDisplay.Display, fgStructure.GameMode->Window.Handle,
+            TRUE, ButtonPressMask|ButtonReleaseMask|ButtonMotionMask
+                |PointerMotionMask,
+            GrabModeAsync, GrabModeAsync,
+            fgStructure.GameMode->Window.Handle, None, CurrentTime)) {
+        usleep (100);
     }
 
     /*
@@ -521,31 +521,31 @@ int FGAPIENTRY glutEnterGameMode( void )
 #   ifdef X_XF86VidModeSetViewPort
 
     if (fgDisplay.DisplayModeValid) {
-	int x, y;
-	Window child;
+        int x, y;
+        Window child;
 
-	/*
-	 * Change to viewport to the window topleft edge:
-	 */
-	XF86VidModeSetViewPort(fgDisplay.Display, fgDisplay.Screen, 0, 0);
+        /*
+         * Change to viewport to the window topleft edge:
+         */
+        XF86VidModeSetViewPort(fgDisplay.Display, fgDisplay.Screen, 0, 0);
 
-	/*
-	 * Final window repositioning: It could be avoided using an undecorated
-	 * window using override_redirect, but this * would possily require more
-	 * changes and investigation.
-	 */
+        /*
+         * Final window repositioning: It could be avoided using an undecorated
+         * window using override_redirect, but this * would possily require more
+         * changes and investigation.
+         */
 
         /* Get the current postion of the drawable area on screen */
-	XTranslateCoordinates(
-	    fgDisplay.Display,
-	    fgStructure.Window->Window.Handle,
-	    fgDisplay.RootWindow,
-	    0, 0, &x, &y,
-	    &child
-	);
+        XTranslateCoordinates(
+            fgDisplay.Display,
+            fgStructure.Window->Window.Handle,
+            fgDisplay.RootWindow,
+            0, 0, &x, &y,
+            &child
+        );
 
-	/* Move the decorataions out of the topleft corner of the display */
-	XMoveWindow(fgDisplay.Display, fgStructure.Window->Window.Handle, -x, -y);
+        /* Move the decorataions out of the topleft corner of the display */
+        XMoveWindow(fgDisplay.Display, fgStructure.Window->Window.Handle, -x, -y);
     }
 
 #endif

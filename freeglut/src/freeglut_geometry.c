@@ -230,9 +230,9 @@ void FGAPIENTRY glutSolidSphere( GLdouble dRadius, GLint slices, GLint stacks )
         glVertex3d(
             radius * *(row + 3 * i + 0),
             radius * *(row + 3 * i + 1),
-	          radius * *(row + 3 * i + 2)
-	    );
-	
+                  radius * *(row + 3 * i + 2)
+            );
+        
         phi += dphi;
     }
 
@@ -263,8 +263,8 @@ void FGAPIENTRY glutSolidSphere( GLdouble dRadius, GLint slices, GLint stacks )
             glVertex3d(
                 radius * *(row + 3 * i + 0),
                 radius * *(row + 3 * i + 1),
-		        radius * *(row + 3 * i + 2)
-		    );
+                        radius * *(row + 3 * i + 2)
+                    );
 
             glNormal3dv( next + i * 3 );
             glVertex3d(
@@ -300,8 +300,8 @@ void FGAPIENTRY glutSolidSphere( GLdouble dRadius, GLint slices, GLint stacks )
         glVertex3d(
             radius * *(row + 3 * i + 0),
             radius * *(row + 3 * i + 1),
-	          radius * *(row + 3 * i + 2)
-	   );
+                  radius * *(row + 3 * i + 2)
+           );
     }
 
     glEnd();
