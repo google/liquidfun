@@ -61,7 +61,7 @@ static int fghGetConfig( int attribute )
 
   if( fgStructure.Window )
       glXGetConfig( fgDisplay.Display, fgStructure.Window->Window.VisualInfo,
-	  attribute, &returnValue );
+                    attribute, &returnValue );
 
   return returnValue;
 }
@@ -107,12 +107,12 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
 
   case GLUT_RENDERING_CONTEXT:
       fgState.UseCurrentContext =
-	  ( value == GLUT_USE_CURRENT_CONTEXT ) ? TRUE : FALSE;
+          ( value == GLUT_USE_CURRENT_CONTEXT ) ? TRUE : FALSE;
       break;
 
   case GLUT_WINDOW_CURSOR:
       if( fgStructure.Window != NULL )
-	  fgStructure.Window->State.Cursor = value;
+          fgStructure.Window->State.Cursor = value;
       break;
 
   default:
@@ -368,21 +368,27 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_WINDOW_HEIGHT:
     {
         /*
-         *  There is considerable confusion about the "right thing to do" concerning window
-         * size and position.  GLUT itself is not consistent between Windows and Linux; since
-         * platform independence is a virtue for "freeglut", we decided to break with GLUT's
-         * behaviour.
-         *  Under Linux, it is apparently not possible to get the window border sizes in order
-         * to subtract them off the window's initial position until some time after the window
-         * has been created.  Therefore we decided on the following behaviour, both under
-         * Windows and under Linux:
-         *  - When you create a window with position (x,y) and size (w,h), the upper left hand
-         *    corner of the outside of the window is at (x,y) and the size of the drawable area
-         *    is (w,h).
-         *  - When you query the size and position of the window--as is happening here for
-         *    Windows--"freeglut" will return the size of the drawable area--the (w,h) that you
-         *    specified when you created the window--and the coordinates of the upper left hand
-         *    corner of the drawable area--which is NOT the (x,y) you specified.
+         *  There is considerable confusion about the "right thing to
+         *  do" concerning window  size and position.  GLUT itself is
+         *  not consistent between Windows and UNIX/X11; since
+         *  platform independence is a virtue for "freeglut", we
+         *  decided to break with GLUT's behaviour.
+         *
+         *  Under UNIX/X11, it is apparently not possible to get the
+         *  window border sizes in order to subtract them off the
+         *  window's initial position until some time after the window
+         *  has been created.  Therefore we decided on the following
+         *  behaviour, both under Windows and under UNIX/X11:
+         *  - When you create a window with position (x,y) and size
+         *    (w,h), the upper left hand corner of the outside of the
+         *    window is at (x,y) and the size of the drawable area  is
+         *    (w,h).
+         *  - When you query the size and position of the window--as
+         *    is happening here for Windows--"freeglut" will return
+         *    the size of the drawable area--the (w,h) that you
+         *    specified when you created the window--and the coordinates
+         *    of the upper left hand corner of the drawable
+         *    area--which is NOT the (x,y) you specified.
          */
 
         RECT winRect;
