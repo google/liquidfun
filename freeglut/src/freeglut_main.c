@@ -1688,70 +1688,73 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 
     case WM_SYSCOMMAND :  /* 0x0112 */
-      {
-        /*
-         * We have received a system command message.  Try to act on it.
-         * The commands are passed in through the "lParam" parameter:
-         * Clicking on a corner to resize the window gives a "F004" message
-         * but this is not defined in my header file.
-         */
-          switch ( lParam )
-          {
-          case SC_SIZE       :
-              break ;
+        {
+          /*
+           * We have received a system command message.  Try to act on it.
+           * The commands are passed in through the "lParam" parameter:
+           * Clicking on a corner to resize the window gives a "F004" message
+           * but this is not defined in my header file.
+           */
+            switch ( lParam )
+            {
+            case SC_SIZE       :
+                break ;
 
-          case SC_MOVE       :
-              break ;
+            case SC_MOVE       :
+                break ;
 
-          case SC_MINIMIZE   :
-              /* User has clicked on the "-" to minimize the window */
-              /* Turn off the visibility */
-              window->State.Visible = GL_FALSE ;
+            case SC_MINIMIZE   :
+                /* User has clicked on the "-" to minimize the window */
+                /* Turn off the visibility */
+                window->State.Visible = GL_FALSE ;
 
-              break ;
+                break ;
 
-          case SC_MAXIMIZE   :
-              break ;
+            case SC_MAXIMIZE   :
+                break ;
 
-          case SC_NEXTWINDOW :
-              break ;
+            case SC_NEXTWINDOW :
+                break ;
 
-          case SC_PREVWINDOW :
-              break ;
+            case SC_PREVWINDOW :
+                break ;
 
-          case SC_CLOSE      :
-              /* Followed very closely by a WM_CLOSE message */
-              break ;
+            case SC_CLOSE      :
+                /* Followed very closely by a WM_CLOSE message */
+                break ;
 
-          case SC_VSCROLL    :
-              break ;
+            case SC_VSCROLL    :
+                break ;
 
-          case SC_HSCROLL    :
-              break ;
+            case SC_HSCROLL    :
+                break ;
 
-          case SC_MOUSEMENU  :
-              break ;
+            case SC_MOUSEMENU  :
+                break ;
 
-          case SC_KEYMENU    :
-              break ;
+            case SC_KEYMENU    :
+                break ;
 
-          case SC_ARRANGE    :
-              break ;
+            case SC_ARRANGE    :
+                break ;
 
-          case SC_RESTORE    :
-              break ;
+            case SC_RESTORE    :
+                break ;
 
-          case SC_TASKLIST   :
-              break ;
+            case SC_TASKLIST   :
+                break ;
 
-          case SC_SCREENSAVE :
-              break ;
+            case SC_SCREENSAVE :
+                break ;
 
-          case SC_HOTKEY     :
-              break ;
-          }
-      }
-      break ;
+            case SC_HOTKEY     :
+                break ;
+            }
+        }
+
+        /* We need to pass the message on to the operating system as well */
+        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        break;
 
     default:
         /*
