@@ -131,6 +131,7 @@ static void fghVisibility( int status )
 {
     int glut_status = GLUT_VISIBLE;
 
+    FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Visibility Callback" );
     freeglut_return_if_fail( fgStructure.Window );
 
     if( ( GLUT_HIDDEN == status )  || ( GLUT_FULLY_COVERED == status ) )
