@@ -157,6 +157,7 @@ static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
 {
     SFG_Window* window = fgWindowByHandle( handle );
     freeglut_return_if_fail( window );
+    freeglut_return_if_fail( FETCH_WCB ( *window, Display ) );
 
     window->State.Redisplay = GL_FALSE;
 
