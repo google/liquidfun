@@ -147,3 +147,13 @@ October 24, 2002:
 (54) Fixes for the window positioning problem.
 
 (55)  Fixed a couple of compiler warnings and other bugs. Changed "freeglut_main.c" to remove a compiler warning. Changed "freeglut_structure.c" to set the current window before calling the window closure callback.
+
+
+*******************************************************************************************
+* Changes on 17 June 2003
+*******************************************************************************************
+
+(56)  Added glutGetProcAddress()
+
+(57)  Added GLUT_FPS env var.
+
