@@ -205,6 +205,7 @@ void fgInitialize( const char* displayName )
 #endif
 
     fgJoystickInit( 0 );
+    fgJoystickInit( 1 );
 
     fgState.Initialised = GL_TRUE;
 }
