@@ -155,7 +155,7 @@ static struct name_address_pair glut_functions[] = {
    { "glutEnterGameMode", (void *) glutEnterGameMode },
    { "glutLeaveGameMode", (void *) glutLeaveGameMode },
    { "glutGameModeGet", (void *) glutGameModeGet },
-   /* FreeGLUT extensions */
+   /* freeglut extensions */
    { "glutMainLoopEvent", (void *) glutMainLoopEvent },
    { "glutLeaveMainLoop", (void *) glutLeaveMainLoop },
    { "glutCloseFunc", (void *) glutCloseFunc },

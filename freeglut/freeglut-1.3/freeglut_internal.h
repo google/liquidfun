@@ -411,7 +411,7 @@ struct tagSFG_MenuEntry
 };
 
 /*
- * A window, making part of FreeGLUT windows hierarchy. Should be kept portable.
+ * A window, making part of freeglut windows hierarchy. Should be kept portable.
  */
 typedef struct tagSFG_Window SFG_Window;
 struct tagSFG_Window

@@ -447,7 +447,7 @@ static void fgCleanUpGlutsMess( void )
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
- * Executes a single iteration in the FreeGLUT processing loop.
+ * Executes a single iteration in the freeglut processing loop.
  */
 void FGAPIENTRY glutMainLoopEvent( void )
 {
@@ -1051,7 +1051,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
 }
 
 /*
- * Enters the FreeGLUT processing loop. Stays until the "ExecState" changes to "GLUT_EXEC_STATE_STOP".
+ * Enters the freeglut processing loop. Stays until the "ExecState" changes to "GLUT_EXEC_STATE_STOP".
  */
 void FGAPIENTRY glutMainLoop( void )
 {
@@ -1126,7 +1126,7 @@ void FGAPIENTRY glutMainLoop( void )
 }
 
 /*
- * Leaves the FreeGLUT processing loop.
+ * Leaves the freeglut processing loop.
  */
 void FGAPIENTRY glutLeaveMainLoop( void )
 {

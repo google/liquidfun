@@ -1120,7 +1120,7 @@ These queries do not depend on the current window.
 <li>GLUT_INIT_STATE - ?
 <li>GLUT_VERSION - Return value will be X*10000+Y*100+Z where X is the
     major version, Y is the minor version and Z is the patch level.
-    This query is only supported in FreeGLUT (version 1.3 or later).
+    This query is only supported in freeglut (version 1.3 or later).
 </ul>
 
 
@@ -1134,7 +1134,7 @@ These queries do not depend on the current window.
                                       
                                   <h2> 13.7&nbsp; glutGetProcAddress</h2>
                                   <p><tt>glutGetProcAddress</tt> returns
-a pointer to a named GL or FreeGLUT function. </p>
+a pointer to a named GL or freeglut function. </p>
                                   <p><b>Usage</b></p>
                                   <p><tt>void *glutGetProcAddress ( const
 char *procName ) ;</tt></p>
@@ -1148,7 +1148,7 @@ functions directly, that application will only link/run with an OpenGL library
 that supports the extension. By using a function pointer returned from glutGetProcAddress(),
 the application will avoid this hard dependency and be more portable and interoperate
 better with various implementations of OpenGL. </p>
-                                  <p> Both OpenGL functions and FreeGLUT
+                                  <p> Both OpenGL functions and freeglut
 functions can be queried with this function. </p>
                                   <p><b>NOTE</b>: this function is not supported
 in GLUT. </p>
@@ -1872,8 +1872,8 @@ GLUT State</h1>
                                       
 
 <p>
-FreeGLUT users should normally just include GL/glut.h in their programs.
-Programs which need FreeGLUT-specific functions should also include
+freeglut users should normally just include GL/glut.h in their programs.
+Programs which need freeglut-specific functions should also include
 GL/freeglut_ext.h as follows:
 </p>
 
@@ -1885,12 +1885,12 @@ GL/freeglut_ext.h as follows:
 </pre>
 
 <p>
-Compile-time FreeGLUT version testing can be done as follows:
+Compile-time freeglut version testing can be done as follows:
 </p>
 
 <pre>
 #ifdef FREEGLUT_VERSION_1_4
-  code specific to FreeGLUT 1.4 or later here
+  code specific to freeglut 1.4 or later here
 #endif
 </pre>
 
@@ -1900,7 +1900,7 @@ be defined.  This scheme mimics OpenGL conventions.
 </p>
 
 <p>
-The FreeGLUT version can be queried at runtime by calling
+The freeglut version can be queried at runtime by calling
 glutGet(GLUT_VERSION).
 The result will be X*10000+Y*100+Z where X is the major version, Y is the
 minor version and Z is the patch level.
@@ -1911,7 +1911,7 @@ This may be used as follows:
 
 <pre>
 if (glutGet(GLUT_VERSION) < 10300) {
-    printf("Sorry, you need FreeGLUT version 1.3.0 or later to run this program.\n");
+    printf("Sorry, you need freeglut version 1.3.0 or later to run this program.\n");
     exit(1);
 }
 </pre>
