@@ -50,6 +50,13 @@ fi
 AC_SUBST(LIBRARY)
 AC_SUBST(HEADER)
 
+AC_ARG_ENABLE(warnings,
+[  --enable-warnings       Enable gcc compiler warnings],
+if test "x$GCC" == xyes
+then
+ CFLAGS="$CFLAGS -Wall -Wno-parentheses -Werror"
+fi)
+
 AC_OUTPUT(\
 	Makefile \
 	doc/Makefile \
