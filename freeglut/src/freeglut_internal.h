@@ -810,6 +810,7 @@ void fgListInit(SFG_List *list);
 void fgListAppend(SFG_List *list, SFG_Node *node);
 void fgListRemove(SFG_List *list, SFG_Node *node);
 int fgListLength(SFG_List *list);
+void fgListInsert(SFG_List *list, SFG_Node *next, SFG_Node *node);
 
 /*
  * Error Messages functions
