@@ -613,12 +613,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * XXX double-buffered does not respect viewport when we
              * XXX do a buffer-swap).
              *
-             * XXX GETWINDOW( xexpose );
-             * XXX fgSetWindow( window );
-             * XXX glutPostRedisplay( );
              */
             if( event.xexpose.count == 0 )
-                fghRedrawWindowByHandle( event.xexpose.window );
+            {
+                GETWINDOW( xexpose );
+                fgSetWindow( window );
+                glutPostRedisplay( );
+            }
             break;
 
         case MapNotify:
