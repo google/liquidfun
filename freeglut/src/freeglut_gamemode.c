@@ -428,6 +428,8 @@ int FGAPIENTRY glutEnterGameMode( void )
         fgState.GameModeSize.X, fgState.GameModeSize.Y, GL_TRUE, GL_FALSE
     );
 
+    fgStructure.GameMode->State.IsGameMode = GL_TRUE;
+
 #if TARGET_HOST_UNIX_X11
 
     /* Move the window up to the topleft corner */
@@ -533,6 +535,8 @@ int FGAPIENTRY glutEnterGameMode( void )
 void FGAPIENTRY glutLeaveGameMode( void )
 {
     freeglut_return_if_fail( fgStructure.GameMode );
+
+    fgStructure.GameMode->State.IsGameMode = GL_FALSE;
 
     fgAddToWindowDestroyList( fgStructure.GameMode );
 

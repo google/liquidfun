@@ -87,42 +87,49 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
 #elif TARGET_HOST_WIN32
 
     {
-        RECT winRect;
-        int x, y;
+        RECT rect;
 
-        GetWindowRect( window->Window.Handle, &winRect );
-        x = winRect.left;
-        y = winRect.top;
+        /*
+         * For windowed mode, get the current position of the
+         * window and resize taking the size of the frame
+         * decorations into account.
+         */
+
+        GetWindowRect( window->Window.Handle, &rect );
+        rect.right  = rect.left + width;
+        rect.bottom = rect.top  + height;
 
         if ( window->Parent == NULL )
         {
-            /*
-             * Adjust the size of the window to allow for the size of the
-             * frame, if we are not a menu
-             */
-            if ( ! window->IsMenu )
+            if ( ! window->IsMenu && !window->State.IsGameMode )
             {
-                width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-                height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
-                    GetSystemMetrics( SM_CYCAPTION );
+                rect.right  += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
+                rect.bottom += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
+                               GetSystemMetrics( SM_CYCAPTION );
             }
         }
         else
         {
-            GetWindowRect( window->Parent->Window.Handle,
-                           &winRect );
-            x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME );
-            y -= winRect.top + GetSystemMetrics( SM_CYSIZEFRAME ) +
-                GetSystemMetrics( SM_CYCAPTION );
+            GetWindowRect( window->Parent->Window.Handle, &rect );
+            AdjustWindowRect ( &rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS |
+                                      WS_CLIPCHILDREN, FALSE );
         }
 
-        MoveWindow(
-            window->Window.Handle,
-            x,
-            y,
-            width,
-            height,
-            TRUE
+        /*
+         * SWP_NOACTIVATE	Do not activate the window
+         * SWP_NOOWNERZORDER	Do not change position in z-order
+         * SWP_NOSENDCHANGING	Supress WM_WINDOWPOSCHANGING message
+         * SWP_NOZORDER		Retains the current Z order (ignore 2nd param)
+         */
+
+        SetWindowPos( window->Window.Handle,
+                      HWND_TOP,
+                      rect.left,
+                      rect.top,
+                      rect.right  - rect.left,
+                      rect.bottom - rect.top,
+                      SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
+                      SWP_NOZORDER
         );
     }
 
