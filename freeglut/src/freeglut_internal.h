@@ -389,13 +389,14 @@ struct tagSFG_WindowState
  *
  */
 #define INVOKE_WCB(window,cbname,arg_list)    \
+do                                            \
 {                                             \
     if( FETCH_WCB( window, cbname ) )         \
     {                                         \
         fgSetWindow( &window );               \
         FETCH_WCB( window, cbname ) arg_list; \
     }                                         \
-}
+} while( 0 )
 
 /*
  * The window callbacks the user can supply us with. Should be kept portable.
