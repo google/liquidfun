@@ -793,68 +793,9 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-#if TARGET_HOST_UNIX_X11
-
-    XResizeWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
-                   width, height );
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
-    /*
-     * XXX REALLY shouldn't be done.  GLUT docs state that this
-     * XXX isn't even processed immediately, but rather waits
-     * XXX for return to the mainloop.  "This allows multiple
-     * XXX glutReshapeWindow, glutPositionWindow, and glutFullScreen
-     * XXX requests to the same window to be coalesced."  (This is
-     * XXX having some deleterious effect on a sample program of mine.)
-     * XXX Not only does GLUT not flush at this point, GLUT doesn't even
-     * XXX *do* the reshape at this point!  We should probably rip this
-     * XXX out and do what GLUT promises.  It would be more efficient, and
-     * XXX might be more compatible.
-     */
-
-#elif TARGET_HOST_WIN32
-
-    {
-        RECT winRect;
-        int x, y;
-
-        GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
-        x = winRect.left;
-        y = winRect.top;
-
-        if ( fgStructure.Window->Parent == NULL )
-        {
-            /*
-             * Adjust the size of the window to allow for the size of the
-             * frame, if we are not a menu
-             */
-            if ( ! fgStructure.Window->IsMenu )
-            {
-                width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-                height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
-                    GetSystemMetrics( SM_CYCAPTION );
-            }
-        }
-        else
-        {
-            GetWindowRect( fgStructure.Window->Parent->Window.Handle,
-                           &winRect );
-            x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME );
-            y -= winRect.top + GetSystemMetrics( SM_CYSIZEFRAME ) +
-                GetSystemMetrics( SM_CYCAPTION );
-        }
-
-        MoveWindow(
-            fgStructure.Window->Window.Handle,
-            x,
-            y,
-            width,
-            height,
-            TRUE
-        );
-    }
-
-#endif
-
+    fgStructure.Window->State.NeedToResize = GL_TRUE;
+    fgStructure.Window->State.Width  = width ;
+    fgStructure.Window->State.Height = height;
 }
 
 /*

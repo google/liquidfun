@@ -204,10 +204,10 @@ struct tagSFG_Time
  */
 typedef enum
 {
-    GLUT_EXEC_STATE_INIT,
-    GLUT_EXEC_STATE_RUNNING,
-    GLUT_EXEC_STATE_STOP
-} fgExecutionState;
+  GLUT_EXEC_STATE_INIT,
+  GLUT_EXEC_STATE_RUNNING,
+  GLUT_EXEC_STATE_STOP
+} fgExecutionState ;
 
 /*
  * This structure holds different freeglut settings
@@ -219,7 +219,7 @@ struct tagSFG_State
     SFG_XYUse        Size;                 /* The default windows' size      */
     unsigned int     DisplayMode;          /* Display mode for new windows   */
 
-    GLboolean        Initialised;          /* Freeglut has been initialised  */
+    GLboolean        Initialised;          /* freeglut has been initialised  */
 
     GLboolean        ForceDirectContext;   /* Force direct rendering?        */
     GLboolean        TryDirectContext;     /* What about giving a try to?    */
@@ -231,7 +231,7 @@ struct tagSFG_State
     GLboolean        XSyncSwitch;          /* X11 sync protocol switch       */
 
     GLboolean        IgnoreKeyRepeat;      /* Whether to ignore key repeat.  */
-    int              Modifiers;           /* Current ALT/SHIFT/CTRL state    */
+    int              Modifiers;            /* Current ALT/SHIFT/CTRL state   */
 
     GLuint           FPSInterval;          /* Interval between FPS printfs   */
     GLuint           SwapCount;            /* Count of glutSwapBuffer calls  */
@@ -352,9 +352,7 @@ struct tagSFG_WindowState
 
     GLboolean       IsGameMode;         /* Is this the game mode window?     */
 
-#if TARGET_HOST_WIN32
-    GLboolean       NeedToResize;       /* Do we need to explicitly resize?  */
-#endif
+    GLboolean       NeedToResize;       /* Do we need to resize the window?  */
 };
 
 
@@ -531,12 +529,12 @@ struct tagSFG_Window
 /*
  * A linked list structure of windows
  */
-typedef struct tagSFG_WindowList SFG_WindowList;
+typedef struct tagSFG_WindowList SFG_WindowList ;
 struct tagSFG_WindowList
 {
-    SFG_Window *window;
-    GLboolean needToClose;
-    SFG_WindowList *next;
+    SFG_Window *window ;
+    GLboolean needToClose ;
+    SFG_WindowList *next ;
 };
 
 /*
@@ -656,7 +654,7 @@ extern SFG_State fgState;
         return;
 #define  freeglut_return_val_if_fail( expr, val ) \
     if( !(expr) )                                 \
-        return val;
+        return val ;
 
 /*
  * A call to those macros assures us that there is a current
@@ -706,15 +704,15 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
  */
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
                             int x, int y, int w, int h,
-			    GLboolean gameMode, GLboolean isMenu );
-void        fgSetWindow ( SFG_Window *window );
+                            GLboolean gameMode, GLboolean isMenu );
+void        fgSetWindow ( SFG_Window *window ) ;
 void        fgOpenWindow( SFG_Window* window, const char* title,
                           int x, int y, int w, int h, GLboolean gameMode,
                           GLboolean isSubWindow );
 void        fgCloseWindow( SFG_Window* window );
 void        fgAddToWindowDestroyList ( SFG_Window* window,
-                                       GLboolean needToClose );
-void        fgCloseWindows( );
+                                       GLboolean needToClose ) ;
+void        fgCloseWindows ();
 void        fgDestroyWindow( SFG_Window* window, GLboolean needToClose );
 void        fgClearCallBacks( SFG_Window *window );
 

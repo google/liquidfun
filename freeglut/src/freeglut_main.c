@@ -65,14 +65,115 @@
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
 /*
- * Calls a window's redraw method. This is used when
- * a redraw is forced by the incoming window messages.
+ * Handle a window configuration change. When no reshape
+ * callback is hooked, the viewport size is updated to
+ * match the new window size.
  *
  * XXX We can/should make a "unified" window handle type so that
  * XXX the function headers don't need this silly #ifdef junk.
  * XXX Make the type, say, {fgWindow}.  On UNIX_X11, this is
  * XXX {Window}.  On WIN32, it is {HWND}.  Then do the #ifdef
  * XXX junk *once* in "freeglut_internal.h".
+ */
+static void fghReshapeWindowByHandle
+#if TARGET_HOST_UNIX_X11
+    ( Window handle, int width, int height )
+#elif TARGET_HOST_WIN32
+    ( HWND handle, int width, int height )
+#endif
+{
+    SFG_Window *current_window = fgStructure.Window;
+
+    SFG_Window* window = fgWindowByHandle( handle );
+    freeglut_return_if_fail( window != NULL );
+
+
+#if TARGET_HOST_UNIX_X11
+
+    XResizeWindow( fgDisplay.Display, window->Window.Handle,
+                   width, height );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    /*
+     * XXX REALLY shouldn't be done.  GLUT docs state that this
+     * XXX isn't even processed immediately, but rather waits
+     * XXX for return to the mainloop.  "This allows multiple
+     * XXX glutReshapeWindow, glutPositionWindow, and glutFullScreen
+     * XXX requests to the same window to be coalesced."  (This is
+     * XXX having some deleterious effect on a sample program of mine.)
+     * XXX Not only does GLUT not flush at this point, GLUT doesn't even
+     * XXX *do* the reshape at this point!  We should probably rip this
+     * XXX out and do what GLUT promises.  It would be more efficient, and
+     * XXX might be more compatible.
+     */
+
+#elif TARGET_HOST_WIN32
+
+    {
+        RECT winRect;
+        int x, y;
+
+        GetWindowRect( window->Window.Handle, &winRect );
+        x = winRect.left;
+        y = winRect.top;
+
+        if ( window->Parent == NULL )
+        {
+            /*
+             * Adjust the size of the window to allow for the size of the
+             * frame, if we are not a menu
+             */
+            if ( ! window->IsMenu )
+            {
+                width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
+                height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
+                    GetSystemMetrics( SM_CYCAPTION );
+            }
+        }
+        else
+        {
+            GetWindowRect( window->Parent->Window.Handle,
+                           &winRect );
+            x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME );
+            y -= winRect.top + GetSystemMetrics( SM_CYSIZEFRAME ) +
+                GetSystemMetrics( SM_CYCAPTION );
+        }
+
+        MoveWindow(
+            window->Window.Handle,
+            x,
+            y,
+            width,
+            height,
+            TRUE
+        );
+    }
+
+#endif
+
+    if( !( FETCH_WCB( *window, Reshape ) ) )
+    {
+        fgSetWindow( window );
+        glViewport( 0, 0, width, height );
+    }
+    else
+        INVOKE_WCB( *window, Reshape, ( width, height ) );
+
+    /*
+     * Force a window redraw.  In Windows at least this is only a partial
+     * solution:  if the window is increasing in size in either dimension,
+     * the already-drawn part does not get drawn again and things look funny.
+     * But without this we get this bad behaviour whenever we resize the
+     * window.
+     */
+    window->State.Redisplay = GL_TRUE;
+
+    if( window->IsMenu )
+        fgSetWindow( current_window );
+}
+
+/*
+ * Calls a window's redraw method. This is used when
+ * a redraw is forced by the incoming window messages.
  */
 static void fghRedrawWindowByHandle
 #if TARGET_HOST_UNIX_X11
@@ -103,54 +204,32 @@ static void fghRedrawWindowByHandle
     freeglut_return_if_fail( FETCH_WCB( *window, Display ) );
     freeglut_return_if_fail( window->State.Visible );
 
+    if( window->State.NeedToResize )
+    {
+        SFG_Window *current_window = fgStructure.Window;
+
+        fgSetWindow( window );
+
+        fghReshapeWindowByHandle( 
+            window->Window.Handle,
+            window->State.Width,
+            window->State.Height
+        );
+
+        window->State.NeedToResize = GL_FALSE;
+        fgSetWindow ( current_window );
+    }
+
     window->State.Redisplay = GL_FALSE;
     INVOKE_WCB( *window, Display, ( ) );
 }
 
 /*
- * Handle a window configuration change. When no reshape
- * callback is hooked, the viewport size is updated to
- * match the new window size.
- */
-static void fghReshapeWindowByHandle
-#if TARGET_HOST_UNIX_X11
-    ( Window handle, int width, int height )
-#elif TARGET_HOST_WIN32
-    ( HWND handle, int width, int height )
-#endif
-{
-    SFG_Window *current_window = fgStructure.Window;
-
-    SFG_Window* window = fgWindowByHandle( handle );
-    freeglut_return_if_fail( window != NULL );
-
-    if( !( FETCH_WCB( *window, Reshape ) ) )
-    {
-        fgSetWindow( window );
-        glViewport( 0, 0, width, height );
-    }
-    else
-        INVOKE_WCB( *window, Reshape, ( width, height ) );
-
-    /*
-     * Force a window redraw.  In Windows at least this is only a partial
-     * solution:  if the window is increasing in size in either dimension,
-     * the already-drawn part does not get drawn again and things look funny.
-     * But without this we get this bad behaviour whenever we resize the
-     * window.
-     */
-    window->State.Redisplay = GL_TRUE;
-
-    if( window->IsMenu )
-        fgSetWindow( current_window );
-}
-
-/*
  * A static helper function to execute display callback for a window
  */
-static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
+static void fghcbDisplayWindow( SFG_Window *window,
+                                SFG_Enumerator *enumerator )
 {
-#if TARGET_HOST_UNIX_X11
     /*
      * XXX Do we need/want to check the callback pointer here?
      * XXX INVOKE_WCB() will check for us.  Arguably, the
@@ -164,47 +243,38 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
         window->State.Redisplay &&
         window->State.Visible )
     {
-        SFG_Window *current_window = fgStructure.Window;
+        if( window->State.NeedToResize )
+        {
+            SFG_Window *current_window = fgStructure.Window;
+
+            fgSetWindow( window );
+
+            fghReshapeWindowByHandle( 
+                window->Window.Handle,
+                window->State.Width,
+                window->State.Height
+            );
+
+            window->State.NeedToResize = GL_FALSE;
+            fgSetWindow ( current_window );
+        }
 
         window->State.Redisplay = GL_FALSE;
-        INVOKE_WCB( *window, Display, ( ) );
-        fgSetWindow( current_window );
-    }
 
+#if TARGET_HOST_UNIX_X11
+        {
+            SFG_Window *current_window = fgStructure.Window;
+
+            INVOKE_WCB( *window, Display, ( ) );
+            fgSetWindow( current_window );
+        }
 #elif TARGET_HOST_WIN32
-
-    if( window->State.NeedToResize )
-    {
-        SFG_Window *current_window = fgStructure.Window;
-
-        fgSetWindow( window );
-
-        fghReshapeWindowByHandle( 
-            window->Window.Handle,
-            glutGet( GLUT_WINDOW_WIDTH ),
-            glutGet( GLUT_WINDOW_HEIGHT )
-        );
-
-        window->State.NeedToResize = GL_FALSE;
-        fgSetWindow ( current_window );
-    }
-
-    /*
-     * XXX See above comment about the Redisplay flag...
-     */
-    if( ( FETCH_WCB( *window, Display ) ) &&
-        window->State.Redisplay &&
-        window->State.Visible )
-    {
-        window->State.Redisplay = GL_FALSE;
-
         RedrawWindow(
             window->Window.Handle, NULL, NULL, 
             RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
         );
-    }
-
 #endif
+    }
 
     fgEnumSubWindows( window, fghcbDisplayWindow, enumerator );
 }
@@ -217,7 +287,7 @@ static void fghDisplayAll( void )
     SFG_Enumerator enumerator;
 
     enumerator.found = GL_FALSE;
-    enumerator.data  =     NULL;
+    enumerator.data  =  NULL;
 
     fgEnumWindows( fghcbDisplayWindow, &enumerator );
 }
@@ -248,7 +318,7 @@ static void fghCheckJoystickPolls( void )
     SFG_Enumerator enumerator;
 
     enumerator.found = GL_FALSE;
-    enumerator.data  =     NULL;
+    enumerator.data  =  NULL;
 
     fgEnumWindows( fghcbCheckJoystickPolls, &enumerator );
 }
@@ -296,20 +366,20 @@ static void fghCheckTimers( void )
  */
 long fgElapsedTime( void )
 {
-    if (fgState.Time.Set)
+    if ( fgState.Time.Set )
     {
 #if TARGET_HOST_UNIX_X11
         struct timeval now;
         long elapsed;
-    
+        
         gettimeofday( &now, NULL );
-    
-	elapsed  = ( now.tv_usec - fgState.Time.Value.tv_usec ) / 1000;
-	elapsed += ( now.tv_sec  - fgState.Time.Value.tv_sec  ) * 1000;
-    
+        
+        elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
+        elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
+        
         return elapsed;
 #elif TARGET_HOST_WIN32
-	return timeGetTime( ) - fgState.Time.Value;
+        return timeGetTime() - fgState.Time.Value;
 #endif
     }
     else
@@ -317,11 +387,11 @@ long fgElapsedTime( void )
 #if TARGET_HOST_UNIX_X11
         gettimeofday( &fgState.Time.Value, NULL );
 #elif TARGET_HOST_WIN32
-        fgState.Time.Value = timeGetTime( );
+        fgState.Time.Value = timeGetTime () ;
 #endif
-        fgState.Time.Set = GL_TRUE;
+        fgState.Time.Set = GL_TRUE ;
 
-        return 0;
+        return 0 ;
     }
 }
 
@@ -334,16 +404,16 @@ void fgError( const char *fmt, ... )
 
     va_start( ap, fmt );
 
-    fprintf( stderr, "freeglut " );
+    fprintf( stderr, "freeglut ");
     if( fgState.ProgramName )
-        fprintf( stderr, "(%s): ", fgState.ProgramName );
+        fprintf (stderr, "(%s): ", fgState.ProgramName);
     vfprintf( stderr, fmt, ap );
     fprintf( stderr, "\n" );
 
     va_end( ap );
 
     if ( fgState.Initialised )
-        fgDeinitialize( );
+        fgDeinitialize () ;
 
     exit( 1 );
 }
@@ -354,7 +424,7 @@ void fgWarning( const char *fmt, ... )
 
     va_start( ap, fmt );
 
-    fprintf( stderr, "freeglut " );
+    fprintf( stderr, "freeglut ");
     if( fgState.ProgramName )
         fprintf( stderr, "(%s): ", fgState.ProgramName );
     vfprintf( stderr, fmt, ap );
@@ -383,7 +453,7 @@ void fgWarning( const char *fmt, ... )
  * an opaque wall.
  *
  */
-static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e )
+static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
 {
     if( FETCH_WCB( *w, Joystick ) )
     {
@@ -400,7 +470,7 @@ static int fgHaveJoystick( void )
     fgEnumWindows( fgCheckJoystickCallback, &enumerator );
     return !!enumerator.data;
 }
-static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e )
+static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
 {
     if( w->State.Redisplay )
     {
@@ -409,7 +479,7 @@ static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e )
     }
     fgEnumSubWindows( w, fgHavePendingRedisplaysCallback, e );
 }        
-static int fgHavePendingRedisplays( void )
+static int fgHavePendingRedisplays (void)
 {
     SFG_Enumerator enumerator;
     enumerator.found = GL_FALSE;
@@ -431,13 +501,13 @@ static int fgHaveTimers( void )
  */
 static long fgNextTimer( void )
 {
-    long now = fgElapsedTime( );
+    long now = fgElapsedTime();
     long ret = INT_MAX;
     SFG_Timer *timer;
 
-    for( timer = ( SFG_Timer * )fgState.Timers.First;
+    for( timer = (SFG_Timer *)fgState.Timers.First;
          timer;
-         timer = ( SFG_Timer * )timer->Node.Next )
+         timer = (SFG_Timer *)timer->Node.Next )
         ret = MIN( ret, MAX( 0, timer->TriggerTime - now ) );
 
     return ret;
@@ -465,12 +535,12 @@ static void fgSleepForEvents( void )
     if( fgHaveJoystick( ) )
         msec = MIN( msec, 10 );
     
-    wait.tv_sec  =   msec / 1000;
-    wait.tv_usec = ( msec % 1000 ) * 1000;
+    wait.tv_sec = msec / 1000;
+    wait.tv_usec = (msec % 1000) * 1000;
     err = select( socket+1, &fdset, NULL, NULL, &wait );
 
     if( -1 == err )
-        fgWarning( "freeglut select() error: %d\n", errno );
+        fgWarning ( "freeglut select() error: %d\n", errno );
     
 #elif TARGET_HOST_WIN32
 #endif
@@ -535,7 +605,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             {
                 GETWINDOW( xclient ); 
 
-                fgCloseWindow ( window );
+                fgCloseWindow ( window ) ;
                 fgAddToWindowDestroyList ( window, GL_FALSE );
             }
             break;
@@ -555,11 +625,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
              */
         case CreateNotify:
         case ConfigureNotify:
-            fghReshapeWindowByHandle(
-                event.xconfigure.window,
-                event.xconfigure.width,
-                event.xconfigure.height
-            );
+            GETWINDOW( xconfigure );
+            window->State.NeedToResize = GL_TRUE ;
+            window->State.Width  = event.xconfigure.width ;
+            window->State.Height = event.xconfigure.height;
             break;
 
         case DestroyNotify:
@@ -660,8 +729,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     window->ActiveMenu->Window->State.MouseY =
                         event.xmotion.y_root - window->ActiveMenu->Y;
                 }
-                window->ActiveMenu->Window->State.Redisplay = GL_TRUE;
-                fgSetWindow( window->ActiveMenu->ParentWindow );
+                window->ActiveMenu->Window->State.Redisplay = GL_TRUE ;
+                fgSetWindow( window->ActiveMenu->ParentWindow ) ;
 
                 break;
             }
@@ -672,7 +741,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
              */
 #define BUTTON_MASK \
   ( Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask )
-            if( event.xmotion.state & BUTTON_MASK )
+            if ( event.xmotion.state & BUTTON_MASK )
                 INVOKE_WCB( *window, Motion, ( event.xmotion.x,
                                                event.xmotion.y ) );
             else
@@ -688,7 +757,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             int button;
 
             if( event.type == ButtonRelease )
-                pressed = GL_FALSE;
+                pressed = GL_FALSE ;
 
             /*
              * A mouse button has been pressed or released. Traditionally,
@@ -827,7 +896,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                  * XXX Note that {button} has already been decremeted
                  * XXX in mapping from X button numbering to GLUT.
                  */
-                int wheel_number = ( button - 3 ) / 2;
+                int wheel_number = (button - 3) / 2;
                 int direction = -1;
                 if( button % 2 )
                     direction = 1;
@@ -946,7 +1015,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                      * Execute the callback (if one has been specified),
                      * given that the special code seems to be valid...
                      */
-                    if( special_cb && ( special != -1 ) )
+                    if( special_cb && (special != -1) )
                     {
                         fgSetWindow( window );
                         fgState.Modifiers = fgGetXModifiers( &event );
@@ -962,7 +1031,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             break; /* XXX Should disable this event */
 
         default:
-            fgWarning( "Unknown X event type: %d", event.type );
+            fgWarning ("Unknown X event type: %d", event.type);
             break;
         }
     }
@@ -974,7 +1043,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
     while( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
     {
         if( GetMessage( &stMsg, NULL, 0, 0 ) == 0 )
-            fgState.ExecState = GLUT_EXEC_STATE_STOP;
+            fgState.ExecState = GLUT_EXEC_STATE_STOP ;
 
         TranslateMessage( &stMsg );
         DispatchMessage( &stMsg );
@@ -995,7 +1064,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
 void FGAPIENTRY glutMainLoop( void )
 {
 #if TARGET_HOST_WIN32
-    SFG_Window *window = (SFG_Window *)fgStructure.Windows.First;
+    SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
 #endif
 
     freeglut_assert_ready;
@@ -1012,19 +1081,19 @@ void FGAPIENTRY glutMainLoop( void )
      */
     while( window )
     {
-        if( FETCH_WCB( *window, Visibility ) )
+        if ( FETCH_WCB( *window, Visibility ) )
         {
-            SFG_Window *current_window = fgStructure.Window;
+            SFG_Window *current_window = fgStructure.Window ;
 
             INVOKE_WCB( *window, Visibility, ( window->State.Visible ) );
             fgSetWindow( current_window );
         }
         
-        window = (SFG_Window *)window->Node.Next;
+        window = (SFG_Window *)window->Node.Next ;
     }
 #endif
 
-    fgState.ExecState = GLUT_EXEC_STATE_RUNNING;
+    fgState.ExecState = GLUT_EXEC_STATE_RUNNING ;
     while( fgState.ExecState == GLUT_EXEC_STATE_RUNNING )
     {
         glutMainLoopEvent( );
@@ -1036,7 +1105,7 @@ void FGAPIENTRY glutMainLoop( void )
             if( fgState.IdleCallback )
                 fgState.IdleCallback( );
 
-            fgSleepForEvents( );
+            fgSleepForEvents();
         }
     }
 
@@ -1050,7 +1119,7 @@ void FGAPIENTRY glutMainLoop( void )
         fgDeinitialize( );
 
         if( execState == GLUT_ACTION_EXIT )
-            exit( 0 );
+            exit( 0 ) ;
     }
 }
 
@@ -1059,7 +1128,7 @@ void FGAPIENTRY glutMainLoop( void )
  */
 void FGAPIENTRY glutLeaveMainLoop( void )
 {
-    fgState.ExecState = GLUT_EXEC_STATE_STOP;
+    fgState.ExecState = GLUT_EXEC_STATE_STOP ;
 }
 
 
@@ -1089,7 +1158,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     LONG lRet = 1;
 
     if ( ( window == NULL ) && ( uMsg != WM_CREATE ) )
-      return DefWindowProc( hWnd, uMsg, wParam, lParam );
+      return DefWindowProc( hWnd, uMsg, wParam, lParam ) ;
 
     /* printf ( "Window %3d message <%04x> %12d %12d\n", window?window->ID:0,
              uMsg, wParam, lParam ); */
@@ -1114,7 +1183,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             if( fgStructure.MenuContext )
                 wglMakeCurrent( window->Window.Device,
                                 fgStructure.MenuContext->Context
-                );
+                ) ;
             else
             {
                 fgStructure.MenuContext =
@@ -1123,7 +1192,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                     wglCreateContext( window->Window.Device );
             }
 
-            /* window->Window.Context = wglGetCurrentContext( );   */
+            /* window->Window.Context = wglGetCurrentContext () ;   */
             window->Window.Context = wglCreateContext( window->Window.Device );
         }
         else
@@ -1143,6 +1212,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
 
         window->State.NeedToResize = GL_TRUE;
+        window->State.Width  = fgState.Size.X;
+        window->State.Height = fgState.Size.Y;
+
         ReleaseDC( window->Window.Handle, window->Window.Device );
         break;
 
@@ -1150,16 +1222,18 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /*
          * We got resized... But check if the window has been already added...
          */
-        fghReshapeWindowByHandle( hWnd, LOWORD(lParam), HIWORD(lParam) );
+        window->State.NeedToResize = GL_TRUE;
+        window->State.Width  = LOWORD(lParam);
+        window->State.Height = HIWORD(lParam);
         break;
 #if 0
     case WM_SETFOCUS: 
-        printf( "WM_SETFOCUS: %p\n", window );
+        printf("WM_SETFOCUS: %p\n", window );
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 
     case WM_ACTIVATE: 
-        if( LOWORD( wParam ) != WA_INACTIVE )
+        if (LOWORD(wParam) != WA_INACTIVE)
         {
             /* glutSetCursor( fgStructure.Window->State.Cursor ); */
             printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window,
@@ -1171,34 +1245,26 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 #endif
 
-    case WM_SETCURSOR: 
         /*
-         * Windows seems to need reminding to erase the cursor for NONE.
-         */
-
-        /*
-         * XXX Is this #if 0 section anything that we need to worry
-         * XXX about?  Can we delete it?  If it will ever be used,
-         * XXX why not re-use some common code with the glutSetCursor()
+         * XXX Why not re-use some common code with the glutSetCursor()
          * XXX function (or perhaps invoke glutSetCursor())?
+         * XXX That is, why are we duplicating code, here, from
+         * XXX glutSetCursor()?  The WIN32 code should be able to just
+         * XXX call glutSetCurdsor() instead of defining two macros
+         * XXX and implementing a nested case in-line.
          */
-#if 0
-        if( ( LOWORD( lParam ) == HTCLIENT ) &&
-            ( fgStructure.Window->State.Cursor == GLUT_CURSOR_NONE ) )
-          SetCursor( NULL );
-#else
-
+    case WM_SETCURSOR: 
         /* Set the cursor AND change it for this window class. */
-#define MAP_CURSOR(a,b)                     \
-    case a:                                 \
-        SetCursor( LoadCursor( NULL, b ) ); \
-        break;
+#define MAP_CURSOR(a,b)                 \
+    case a:                             \
+    SetCursor( LoadCursor( NULL, b ) ); \
+    break;
 
         /* Nuke the cursor AND change it for this window class. */
-#define ZAP_CURSOR(a,b)     \
-    case a:                 \
-        SetCursor( NULL );  \
-        break;
+#define ZAP_CURSOR(a,b) \
+    case a:             \
+    SetCursor( NULL );  \
+    break;
 
         if( LOWORD( lParam ) == HTCLIENT )
             switch( window->State.Cursor )
@@ -1219,7 +1285,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             default:
                 MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
             }
-#endif
         else
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
@@ -1243,8 +1308,8 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          */
         if( fgStructure.Window == window )
         {
-            int used = FALSE;
-            SFG_Window *iter;
+            int used = FALSE ;
+            SFG_Window *iter ;
 
             wglMakeCurrent( NULL, NULL );
             /*
@@ -1318,31 +1383,36 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
 
-        /*
-         * XXX Either these multi-statement lines should be broken
-         * XXX in the form:
-         * XXX     pressed = GL_TRUE;
-         * XXX     button = GLUT_LEFT_BUTTON;
-         * XXX     break;
-         * XXX ...or we should use a macro (much as I dislike freeglut's
-         * XXX preponderance of using macros to "compress" code).
-         */
         switch( uMsg )
         {
         case WM_LBUTTONDOWN:
-            pressed = GL_TRUE;  button = GLUT_LEFT_BUTTON;   break;
+            pressed = GL_TRUE;
+            button = GLUT_LEFT_BUTTON;
+            break;
         case WM_MBUTTONDOWN:
-            pressed = GL_TRUE;  button = GLUT_MIDDLE_BUTTON; break;
+            pressed = GL_TRUE;
+            button = GLUT_MIDDLE_BUTTON;
+            break;
         case WM_RBUTTONDOWN:
-            pressed = GL_TRUE;  button = GLUT_RIGHT_BUTTON;  break;
+            pressed = GL_TRUE;
+            button = GLUT_RIGHT_BUTTON;
+            break;
         case WM_LBUTTONUP:
-            pressed = GL_FALSE; button = GLUT_LEFT_BUTTON;   break;
+            pressed = GL_FALSE;
+            button = GLUT_LEFT_BUTTON;
+            break;
         case WM_MBUTTONUP:
-            pressed = GL_FALSE; button = GLUT_MIDDLE_BUTTON; break;
+            pressed = GL_FALSE;
+            button = GLUT_MIDDLE_BUTTON;
+            break;
         case WM_RBUTTONUP:
-            pressed = GL_FALSE; button = GLUT_RIGHT_BUTTON;  break;
+            pressed = GL_FALSE;
+            button = GLUT_RIGHT_BUTTON;
+            break;
         default:
-            pressed = GL_FALSE; button = -1;                 break;
+            pressed = GL_FALSE;
+            button = -1;
+            break;
         }
 
         if( GetSystemMetrics( SM_SWAPBUTTON ) )
@@ -1504,13 +1574,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         fgState.Modifiers = 0xffffffff;
     }
-    break;
+    break ;
 
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
     {
         int keypress = -1;
-        POINT mouse_pos;
+        POINT mouse_pos ;
 
         if( fgState.IgnoreKeyRepeat && (lParam & KF_REPEAT) )
             break;
@@ -1738,57 +1808,58 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
            */
             switch ( lParam )
             {
-            case SC_SIZE:
-                break;
+            case SC_SIZE       :
+                break ;
 
-            case SC_MOVE:
-                break;
+            case SC_MOVE       :
+                break ;
 
-            case SC_MINIMIZE:
+            case SC_MINIMIZE   :
                 /* User has clicked on the "-" to minimize the window */
                 /* Turn off the visibility */
-                window->State.Visible = GL_FALSE;
-                break;
+                window->State.Visible = GL_FALSE ;
 
-            case SC_MAXIMIZE:
-                break;
+                break ;
 
-            case SC_NEXTWINDOW:
-                break;
+            case SC_MAXIMIZE   :
+                break ;
 
-            case SC_PREVWINDOW:
-                break;
+            case SC_NEXTWINDOW :
+                break ;
 
-            case SC_CLOSE:
+            case SC_PREVWINDOW :
+                break ;
+
+            case SC_CLOSE      :
                 /* Followed very closely by a WM_CLOSE message */
-                break;
+                break ;
 
-            case SC_VSCROLL:
-                break;
+            case SC_VSCROLL    :
+                break ;
 
-            case SC_HSCROLL:
-                break;
+            case SC_HSCROLL    :
+                break ;
 
-            case SC_MOUSEMENU:
-                break;
+            case SC_MOUSEMENU  :
+                break ;
 
-            case SC_KEYMENU:
-                break;
+            case SC_KEYMENU    :
+                break ;
 
-            case SC_ARRANGE:
-                break;
+            case SC_ARRANGE    :
+                break ;
 
-            case SC_RESTORE:
-                break;
+            case SC_RESTORE    :
+                break ;
 
-            case SC_TASKLIST:
-                break;
+            case SC_TASKLIST   :
+                break ;
 
-            case SC_SCREENSAVE:
-                break;
+            case SC_SCREENSAVE :
+                break ;
 
-            case SC_HOTKEY:
-                break;
+            case SC_HOTKEY     :
+                break ;
             }
         }
 
