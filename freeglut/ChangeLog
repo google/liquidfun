@@ -176,9 +176,10 @@ October 24, 2002:
 
 (80) Fixed autogen.sh and removed aclocal.m4
 
+(81) Added 'freeglut.kdevelop' (Gideon [Kdevelop 3.0]) project file
 
 *******************************************************************************************
 * Changes on 24 June 2003
 *******************************************************************************************
 
-(90) Added 'freeglut_ext.c' to the project files 'freeglut.dsp' and 'freeglut_static.dsp' (New list #10)
+(82) Added 'freeglut_ext.c' to the project files 'freeglut.dsp' and 'freeglut_static.dsp' (New list #10)
