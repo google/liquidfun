@@ -82,9 +82,9 @@ void fghRememberState( void )
      */
 
 /* hack to get around my stupid cross-gcc headers */
-#define ENUM_CURRENT_SETTINGS -1
+#define FREEGLUT_ENUM_CURRENT_SETTINGS -1
 
-    EnumDisplaySettings( NULL, ENUM_CURRENT_SETTINGS, &fgDisplay.DisplayMode );
+    EnumDisplaySettings( NULL, FREEGLUT_ENUM_CURRENT_SETTINGS, &fgDisplay.DisplayMode );
 
     /*
      * Make sure we will be restoring all settings needed
@@ -254,7 +254,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
                                  devMode.dmBitsPerPel, fgState.GameModeRefresh ) )
         {
             /*
-             * OKi, we've found a matching display mode, remember it's number and break
+             * OKi, we've found a matching display mode, remember its number and break
              */
             mode = displayModes;
             break;
@@ -355,7 +355,7 @@ int FGAPIENTRY glutEnterGameMode( void )
         /*
          * ...if so, delete it before proceeding...
          */
-        fgDestroyWindow( fgStructure.GameMode, TRUE );
+        fgAddToWindowDestroyList( fgStructure.GameMode, TRUE );
     }
     else
     {
@@ -370,7 +370,7 @@ int FGAPIENTRY glutEnterGameMode( void )
      */
     if( fghChangeDisplayMode( FALSE ) == FALSE )
     {
-	fgWarning( "failed to change screen settings" );
+	      fgWarning( "failed to change screen settings" );
         return( FALSE );
     }
 
@@ -434,9 +434,9 @@ void FGAPIENTRY glutLeaveGameMode( void )
     freeglut_return_if_fail( fgStructure.GameMode != NULL );
 
     /*
-     * First of all, have the game mode window created
+     * First of all, have the game mode window destroyed
      */
-    fgDestroyWindow( fgStructure.GameMode, TRUE );
+    fgAddToWindowDestroyList( fgStructure.GameMode, TRUE );
 
 #if TARGET_HOST_UNIX_X11
 

@@ -55,7 +55,14 @@ SFG_Display fgDisplay;
 /*
  * The settings for the current freeglut session
  */
-SFG_State fgState;
+SFG_State fgState = { { -1, -1, FALSE }, { 300, 300, TRUE }, GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,
+                      FALSE, TRUE, FALSE, FALSE, FALSE, TRUE,
+#ifdef TARGET_HOST_WIN32
+                      { 0, FALSE },
+#else
+                      { { 0, 0 }, FALSE },
+#endif
+                      { NULL, NULL }, NULL, NULL, NULL, { 640, 480, TRUE }, 16, 72, GLUT_ACTION_EXIT, GLUT_EXEC_STATE_INIT } ;
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -163,15 +170,13 @@ void fgInitialize( const char* displayName )
      */
     if( atom == 0 )
     {
-        GLboolean retval;
-
         /*
          * Make sure the unitialized fields are reset to zero
          */
         ZeroMemory( &wc, sizeof(WNDCLASS) );
 
         /*
-         * Each of the windows should have it's own device context...
+         * Each of the windows should have its own device context...
          */
         wc.style          = CS_OWNDC;
         wc.lpfnWndProc    = fgWindowProc;
@@ -187,8 +192,8 @@ void fgInitialize( const char* displayName )
         /*
          * Register the window class
          */
-        retval = RegisterClass( &wc );
-        assert( retval != FALSE );
+        atom = RegisterClass( &wc );
+        assert( atom != 0 );
     }
 
     /*
@@ -250,14 +255,59 @@ void fgDeinitialize( void )
      */
     while ( (timer = fgState.Timers.First) != NULL )
     {
-	fgListRemove(&fgState.Timers, &timer->Node);
-	free(timer);
+      fgListRemove ( &fgState.Timers, &timer->Node ) ;
+      free ( timer ) ;
     }
 
     /*
      * Deinitialize the joystick device
      */
     fgJoystickClose();
+
+    /*
+     * Reset the state structure
+     */
+
+    fgState.Position.X = -1 ;
+    fgState.Position.Y = -1 ;
+    fgState.Position.Use = FALSE ;
+
+    fgState.Size.X = 300 ;
+    fgState.Size.Y = 300 ;
+    fgState.Size.Use = TRUE ;
+
+    /*
+     * The default display mode to be used
+     */
+    fgState.DisplayMode = GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH;
+
+    fgState.ForceDirectContext  = FALSE;
+    fgState.TryDirectContext    = TRUE;
+    fgState.ForceIconic         = FALSE;
+    fgState.GLDebugSwitch       = FALSE;
+    fgState.XSyncSwitch         = FALSE;
+    fgState.ActionOnWindowClose = GLUT_ACTION_EXIT ;
+    fgState.ExecState           = GLUT_EXEC_STATE_INIT ;
+
+    /*
+     * Assume we want to ignore the automatic key repeat
+     */
+    fgState.IgnoreKeyRepeat = TRUE;
+
+    /*
+     * Set the default game mode settings
+     */
+    fgState.GameModeSize.X  = 640;
+    fgState.GameModeSize.Y  = 480;
+    fgState.GameModeDepth   =  16;
+    fgState.GameModeRefresh =  72;
+
+    fgState.Time.Set = FALSE ;
+
+    fgState.Timers.First = fgState.Timers.Last = NULL ;
+    fgState.IdleCallback = NULL ;
+    fgState.MenuStateCallback = (FGCBmenuState)NULL ;
+    fgState.MenuStatusCallback = (FGCBmenuStatus)NULL ;
 
 #if TARGET_HOST_UNIX_X11
 
@@ -283,7 +333,6 @@ void fgDeinitialize( void )
  */
 void FGAPIENTRY glutInit( int* pargc, char** argv )
 {
-    char* geometrySettings = NULL;
     char* displayName = NULL;
     int i, j, argc = *pargc;
 
@@ -304,54 +353,11 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     fgCreateStructure();
 
     /*
-     * Fill in the default values that have not been passed in yet.
-     */
-    if( fgState.Position.Use == FALSE )
-    {
-        fgState.Position.X = -1;
-        fgState.Position.Y = -1;
-    }
-
-    if( fgState.Size.Use == FALSE )
-    {
-        fgState.Size.X   =  300;
-        fgState.Size.Y   =  300;
-        fgState.Size.Use = TRUE;
-    }
-
-    /*
-     * Some more settings to come
-     */
-    fgState.ForceDirectContext = FALSE;
-    fgState.TryDirectContext   = TRUE;
-    fgState.ForceIconic        = FALSE;
-    fgState.GLDebugSwitch      = FALSE;
-    fgState.XSyncSwitch        = FALSE;
-
-    /*
-     * Assume we want to ignore the automatic key repeat
-     */
-    fgState.IgnoreKeyRepeat = TRUE;
-
-    /*
-     * The default display mode to be used
-     */
-    fgState.DisplayMode = GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH;
-
-    /*
-     * Set the default game mode settings
-     */
-    fgState.GameModeSize.X  = 640;
-    fgState.GameModeSize.Y  = 480;
-    fgState.GameModeDepth   =  16;
-    fgState.GameModeRefresh =  72;
-
-    /*
      * Remember the function's call time
      */
-#ifndef WIN32
+#if TARGET_HOST_UNIX_X11
     gettimeofday(&fgState.Time.Value, NULL);
-#else
+#elif TARGET_HOST_WIN32
     fgState.Time.Value = timeGetTime();
 #endif
     fgState.Time.Set = TRUE;
@@ -401,23 +407,51 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
          */
         else if( strcmp( argv[ i ], "-geometry" ) == 0 )
         {
-            /*
-             * Again, check if there is at least one more argument
-             */
-            if( ++i >= argc )
-                fgError( "-geometry parameter must be followed by window geometry settings" );
+          int result, x, y;
+          unsigned int w, h;
 
-            /*
-             * Otherwise make a duplicate of the geometry settings...
-             */
-            geometrySettings = strdup( argv[ i ] );
+          /*
+           * Again, check if there is at least one more argument
+           */
+          if ( ++i >= argc )
+            fgError( "-geometry parameter must be followed by window geometry settings" );
 
-            /*
-             * Have both arguments removed
-             */
-            argv[ i - 1 ] = NULL;
-            argv[   i   ] = NULL;
-            (* pargc) -= 2;
+          /*
+           * Otherwise scan the geometry settings...
+           */
+          result = sscanf ( argv[i], "%dx%d+%d+%d", &x, &y, &w, &h );
+
+          /*
+           * Check what we have been supplied with...
+           */
+          if ( result > 3 )
+            fgState.Size.Y = h ;
+
+          if ( result > 2 )
+            fgState.Size.X = w ;
+
+          if( result > 1 )
+          {
+            if( y < 0 )
+              fgState.Position.Y = fgDisplay.ScreenHeight + y - fgState.Size.Y;
+            else
+              fgState.Position.Y = y;
+          }
+
+          if( result > 0 )
+          {
+            if( x < 0 )
+              fgState.Position.X = fgDisplay.ScreenWidth + x - fgState.Size.X;
+            else
+              fgState.Position.X = x;
+          }
+
+          /*
+           * Have both arguments removed
+           */
+          argv[ i - 1 ] = NULL;
+          argv[   i   ] = NULL;
+          (* pargc) -= 2;
         }
 
         /*
@@ -483,19 +517,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /*
      * Have the arguments list compacted now
      */
-    for( i=1; i<argc; i++ )
+    j = 2 ;
+    for( i = 1; i < *pargc; i++, j++ )
     {
-        if( argv[ i ] == NULL )
-        {
-            for( j=i; j<argc; j++ )
-            {
-                if( argv[ j ] != NULL )
-                {
-                    argv[ i ] = argv[ j ];
-                    argv[ j ] = NULL;
-                }
-            }
-        }
+      if( argv[ i ] == NULL )
+      {
+        while ( argv[j] == NULL ) j++ ;  /* Guaranteed to end because there are "*pargc" arguments left */
+        argv[i] = argv[j] ;
+      }
     }
 
     /*
@@ -504,55 +533,6 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * environment variable used for opening the X display:
      */
     fgInitialize( displayName );
-
-#if TARGET_HOST_UNIX_X11
-    /*
-     * We can process the default window geometry settings safely now
-     *
-     * WARNING: have this rewritten to be portable. That won't be hard.
-     */
-    if( geometrySettings != NULL )
-    {
-        int result, x, y;
-	unsigned int w, h;
-
-        /*
-         * Have the settings parsed now. This is easy.
-         * We will use the XParseGeometry function.
-         */
-        result = XParseGeometry( geometrySettings, &x, &y, &w, &h );
-
-        /*
-         * Check what we have been supplied with...
-         */
-        if( (result & WidthValue) && (w >= 0) )
-            fgState.Size.X = w;
-
-        if( (result & HeightValue) && (h >= 0) )
-            fgState.Size.Y = h;
-
-        if( result & XValue )
-        {
-            if( result & XNegative )
-                fgState.Position.X = fgDisplay.ScreenWidth + x - fgState.Size.X;
-            else
-                fgState.Position.X = x;
-        }
-
-        if( result & YValue )
-        {
-            if( result & YNegative )
-                fgState.Position.Y = fgDisplay.ScreenHeight + y - fgState.Size.Y;
-            else
-                fgState.Position.Y = y;
-        }
-
-        /*
-         * Free the geometry settings string
-         */
-        free( geometrySettings );
-    }
-#endif
 
     /*
      * Check for the minus one settings for both position and size...
@@ -605,7 +585,7 @@ void FGAPIENTRY glutInitWindowSize( int width, int height )
     /*
      * The settings can be disables when both values are negative
      */
-    if( (width >= 0) && (height >= 0) )
+    if( (width > 0) && (height > 0) )
     {
         /*
          * We want to specify the initial size of each of the windows
@@ -617,7 +597,7 @@ void FGAPIENTRY glutInitWindowSize( int width, int height )
     else
     {
         /*
-         * The initial size of each of the windows is specified by the wm
+         * The initial size of each of the windows is specified by the wm (officially this is an error condition)
          */
         fgState.Size.X   =    -1;
         fgState.Size.Y   =    -1;
@@ -845,7 +825,7 @@ void FGAPIENTRY glutInitDisplayString( char* displayMode )
                 value = strtol( valueString, NULL, 0 );
 
             /*
-             * Now we need to match the capability string and it's ID
+             * Now we need to match the capability string and its ID
              */
             for( i=0; g_Tokens[ i ]!=NULL; i++ )
             {
@@ -921,8 +901,175 @@ void FGAPIENTRY glutInitDisplayString( char* displayMode )
 }
 #endif
 
+#define NUM_TOKENS             28
+static char* Tokens[] =
+{
+    "alpha", "acca", "acc", "blue", "buffer", "conformant", "depth", "double", "green",
+    "index", "num", "red", "rgba", "rgb", "luminance", "stencil", "single", "stereo", "samples",
+    "slow", "win32pdf", "xvisual", "xstaticgray", "xgrayscale", "xstaticcolor", "xpseudocolor",
+    "xtruecolor", "xdirectcolor"
+};
+
+static int TokenLengths[] =
+{
+         5,      4,     3,      4,        6,           10,       5,        6,       5,
+         5,     3,     3,      4,     3,           9,         7,        6,        6,         7,
+        4,          8,         7,            11,           10,             12,             12,
+             10,             12
+};
+
 void FGAPIENTRY glutInitDisplayString( char* displayMode )
 {
+  int glut_state_flag = 0 ;
+  /*
+   * Unpack a lot of options from a character string.  The options are delimited by blanks or tabs.
+   */
+  char *token ;
+  int len = strlen ( displayMode ) ;
+  char *buffer = malloc ( (len+1) * sizeof(char) ) ;
+  memcpy ( buffer, displayMode, len ) ;
+  buffer[len] = '\0' ;
+
+  token = strtok ( buffer, " \t" ) ;
+  while ( token )
+  {
+    /*
+     * Process this token
+     */
+    int i ;
+    for ( i = 0; i < NUM_TOKENS; i++ )
+    {
+      if ( strncmp ( token, Tokens[i], TokenLengths[i] ) == 0 ) break ;
+    }
+
+    switch ( i )
+    {
+    case 0 :  /* "alpha":  Alpha color buffer precision in bits */
+      glut_state_flag |= GLUT_ALPHA ;  /* Somebody fix this for me! */
+      break ;
+
+    case 1 :  /* "acca":  Red, green, blue, and alpha accumulation buffer precision in bits */
+      break ;
+
+    case 2 :  /* "acc":  Red, green, and blue accumulation buffer precision in bits with zero bits alpha */
+      glut_state_flag |= GLUT_ACCUM ;  /* Somebody fix this for me! */
+      break ;
+
+    case 3 :  /* "blue":  Blue color buffer precision in bits */
+      break ;
+
+    case 4 :  /* "buffer":  Number of bits in the color index color buffer */
+      break ;
+
+    case 5 :  /* "conformant":  Boolean indicating if the frame buffer configuration is conformant or not */
+      break ;
+
+    case 6 :  /* "depth":  Number of bits of precsion in the depth buffer */
+      glut_state_flag |= GLUT_DEPTH ;  /* Somebody fix this for me! */
+      break ;
+
+    case 7 :  /* "double":  Boolean indicating if the color buffer is double buffered */
+      glut_state_flag |= GLUT_DOUBLE ;
+      break ;
+
+    case 8 :  /* "green":  Green color buffer precision in bits */
+      break ;
+
+    case 9 :  /* "index":  Boolean if the color model is color index or not */
+      glut_state_flag |= GLUT_INDEX ;
+      break ;
+
+    case 10 :  /* "num":  A special capability  name indicating where the value represents the Nth frame buffer configuration matching the description string */
+      break ;
+
+    case 11 :  /* "red":  Red color buffer precision in bits */
+      break ;
+
+    case 12 :  /* "rgba":  Number of bits of red, green, blue, and alpha in the RGBA color buffer */
+      glut_state_flag |= GLUT_RGBA ;  /* Somebody fix this for me! */
+      break ;
+
+    case 13 :  /* "rgb":  Number of bits of red, green, and blue in the RGBA color buffer with zero bits alpha */
+      glut_state_flag |= GLUT_RGB ;  /* Somebody fix this for me! */
+      break ;
+
+    case 14 :  /* "luminance":  Number of bits of red in the RGBA and zero bits of green, blue (alpha not specified) of color buffer precision */
+      glut_state_flag |= GLUT_LUMINANCE ;  /* Somebody fix this for me! */
+      break ;
+
+    case 15 :  /* "stencil":  Number of bits in the stencil buffer */
+      glut_state_flag |= GLUT_STENCIL ;  /* Somebody fix this for me! */
+      break ;
+
+    case 16 :  /* "single":  Boolean indicate the color buffer is single buffered */
+      glut_state_flag |= GLUT_SINGLE ;
+      break ;
+
+    case 17 :  /* "stereo":  Boolean indicating the color buffer supports OpenGL-style stereo */
+      glut_state_flag |= GLUT_STEREO ;
+      break ;
+
+    case 18 :  /* "samples":  Indicates the number of multisamples to use based on GLX's SGIS_multisample extension (for antialiasing) */
+      glut_state_flag |= GLUT_MULTISAMPLE ;  /* Somebody fix this for me! */
+      break ;
+
+    case 19 :  /* "slow":  Boolean indicating if the frame buffer configuration is slow or not */
+      break ;
+
+    case 20 :  /* "win32pdf":  matches the Win32 Pixel Format Descriptor by number */
+#ifdef TARGET_HOST_WIN32
+#endif
+      break ;
+
+    case 21 :  /* "xvisual":  matches the X visual ID by number */
+#ifdef TARGET_HOST_UNIX_X11
+#endif
+      break ;
+
+    case 22 :  /* "xstaticgray":  boolean indicating if the frame buffer configuration's X visual is of type StaticGray */
+#ifdef TARGET_HOST_UNIX_X11
+#endif
+      break ;
+
+    case 23 :  /* "xgrayscale":  boolean indicating if the frame buffer configuration's X visual is of type GrayScale */
+#ifdef TARGET_HOST_UNIX_X11
+#endif
+      break ;
+
+    case 24 :  /* "xstaticcolor":  boolean indicating if the frame buffer configuration's X visual is of type StaticColor */
+#ifdef TARGET_HOST_UNIX_X11
+#endif
+      break ;
+
+    case 25 :  /* "xpseudocolor":  boolean indicating if the frame buffer configuration's X visual is of type PseudoColor */
+#ifdef TARGET_HOST_UNIX_X11
+#endif
+      break ;
+
+    case 26 :  /* "xtruecolor":  boolean indicating if the frame buffer configuration's X visual is of type TrueColor */
+#ifdef TARGET_HOST_UNIX_X11
+#endif
+      break ;
+
+    case 27 :  /* "xdirectcolor":  boolean indicating if the frame buffer configuration's X visual is of type DirectColor */
+#ifdef TARGET_HOST_UNIX_X11
+#endif
+      break ;
+
+    case 28 :  /* Unrecognized */
+      printf ( "WARNING - Display string token not recognized:  %s\n", token ) ;
+      break ;
+    }
+
+    token = strtok ( NULL, " \t" ) ;
+  }
+
+  free ( buffer ) ;
+
+  /*
+   * We will make use of this value when creating a new OpenGL context...
+   */
+  fgState.DisplayMode = glut_state_flag;
 }
 
 /*** END OF FILE ***/

@@ -258,8 +258,13 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly )
     pfd.cAccumGreenBits		= 0;
     pfd.cAccumBlueBits		= 0;
     pfd.cAccumAlphaBits		= 0;
+#if 0
     pfd.cDepthBits			= 32;
     pfd.cStencilBits		= 0;
+#else
+    pfd.cDepthBits			= 24;
+    pfd.cStencilBits		= 8;
+#endif
     pfd.cAuxBuffers			= 0;
     pfd.iLayerType			= PFD_MAIN_PLANE;
     pfd.bReserved			= 0;
@@ -300,7 +305,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly )
  * Opens a window. Requires a SFG_Window object created and attached
  * to the freeglut structure. OpenGL context is created here.
  */
-void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, int h, GLboolean gameMode )
+void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, int h, GLboolean gameMode, int isSubWindow )
 {
 #if TARGET_HOST_UNIX_X11
     XSetWindowAttributes winAttr;
@@ -471,7 +476,6 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 	WNDCLASS wc;
 	int flags;
 	ATOM atom;
-	HWND hWnd;
 
     freeglut_assert_ready;
 
@@ -483,15 +487,20 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 
     if( gameMode == FALSE )
     {
+      if ( !isSubWindow )
+      {
         /*
          * Update the window position and dimensions, taking account of window decorations
          */
-		x -= (GetSystemMetrics( SM_CXSIZEFRAME ) - 1); 
-		y -= (GetSystemMetrics( SM_CYSIZEFRAME ) - 1);
-		w += (GetSystemMetrics( SM_CXSIZEFRAME ) - 1)*2;
-		h += (GetSystemMetrics( SM_CYSIZEFRAME ) - 1)*2 + GetSystemMetrics( SM_CYCAPTION );
 
-        /*
+		    x -= (GetSystemMetrics( SM_CXSIZEFRAME ) ); 
+	    	y -= (GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION ) );
+        if ( y < 0 ) y = 0 ;
+	    	w += (GetSystemMetrics( SM_CXSIZEFRAME ) )*2;
+	    	h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 + GetSystemMetrics( SM_CYCAPTION );
+      }
+
+      /*
 	     * Check if the user wants us to use the default position/size
 	     */
 	    if( fgState.Position.Use == FALSE ) { x = CW_USEDEFAULT; y = CW_USEDEFAULT; }
@@ -600,7 +609,7 @@ void fgCloseWindow( SFG_Window* window )
 int FGAPIENTRY glutCreateWindow( const char* title )
 {
     /*
-     * Create a new window and return it's unique ID number
+     * Create a new window and return its unique ID number
      */
     return( fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
                             fgState.Size.X, fgState.Size.Y, FALSE )->ID );
@@ -638,7 +647,7 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
 }
 
 /*
- * Destroys a window and all of it's subwindows
+ * Destroys a window and all of its subwindows
  */
 void FGAPIENTRY glutDestroyWindow( int windowID )
 {
@@ -652,7 +661,7 @@ void FGAPIENTRY glutDestroyWindow( int windowID )
      * There is a function that performs all needed steps
      * defined in freeglut_structure.c. Let's use it:
      */
-    fgDestroyWindow( window, TRUE );
+    fgAddToWindowDestroyList( window, TRUE );
 }
 
 /*
@@ -955,19 +964,37 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
 #elif TARGET_HOST_WIN32
 	{
 		RECT winRect;
+    int x, y ;
 
 		/*
 		 * First off, grab the current window's position
 		 */
 		GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
+    x = winRect.left ;
+    y = winRect.top ;
+
+    if ( fgStructure.Window->Parent == NULL )  /* If this is not a subwindow ... */
+    {
+      /*
+       * Adjust the size of the window to allow for the size of the frame
+       */
+  		width += (GetSystemMetrics( SM_CXSIZEFRAME ) - 1)*2;
+	  	height += (GetSystemMetrics( SM_CYSIZEFRAME ) - 1)*2 + GetSystemMetrics( SM_CYCAPTION );
+    }
+    else  /* This is a subwindow, get the parent window's position and subtract it off */
+    {
+      GetWindowRect ( fgStructure.Window->Parent->Window.Handle, &winRect ) ;
+      x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME ) ;
+      y -= winRect.top + GetSystemMetrics( SM_CXSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION ) ;
+    }
 
 		/*
 		 * Resize the window, forcing a redraw to happen
 		 */
 		MoveWindow(
 			fgStructure.Window->Window.Handle,
-			winRect.left,
-			winRect.top,
+			x,
+			y,
 			width,
 			height,
 			TRUE
@@ -999,7 +1026,17 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
 		 */
 		GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
 
-		/*
+    if ( fgStructure.Window->Parent == NULL )  /* If this is not a subwindow ... */
+    {
+      /*
+       * Adjust the position of the window to allow for the size of the frame
+       */
+  		x -= (GetSystemMetrics( SM_CXSIZEFRAME ) - 1); 
+	  	y -= (GetSystemMetrics( SM_CYSIZEFRAME ) - 1 + GetSystemMetrics( SM_CYCAPTION ));
+      if ( y < 0 ) y = 0 ;
+    }
+
+    /*
 		 * Reposition the window, forcing a redraw to happen
 		 */
 		MoveWindow(

@@ -182,8 +182,8 @@ void FGAPIENTRY glutJoystickFunc( void (* callback)( unsigned int, int, int, int
     fgStructure.Window->State.JoystickLastPoll =
         fgElapsedTime() - fgStructure.Window->State.JoystickPollRate;
 
-    if( fgStructure.Window->State.JoystickLastPoll < 0.0 )
-        fgStructure.Window->State.JoystickLastPoll = 0.0;
+    if( fgStructure.Window->State.JoystickLastPoll < 0 )
+        fgStructure.Window->State.JoystickLastPoll = 0;
 }
 
 /*
@@ -216,6 +216,19 @@ void FGAPIENTRY glutPassiveMotionFunc( void (* callback)( int, int ) )
 void FGAPIENTRY glutEntryFunc( void (* callback)( int ) )
 {
     SET_CALLBACK( Entry );
+}
+
+/*
+ * Window destruction callbacks
+ */
+void FGAPIENTRY glutCloseFunc( void (* callback)( void ) )
+{
+    SET_CALLBACK( Destroy );
+}
+
+void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
+{
+    glutCloseFunc( callback );
 }
 
 /*

@@ -106,7 +106,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title, int x, int y,
      * Open the window now. The fgOpenWindow() function is system
      * dependant, and resides in freeglut_window.c. Uses fgState.
      */
-    fgOpenWindow( window, title, x, y, w, h, gameMode );
+    fgOpenWindow( window, title, x, y, w, h, gameMode, (parent != NULL) ? TRUE : FALSE );
 
     /*
      * Return a pointer to the newly created window
@@ -160,7 +160,67 @@ SFG_Menu* fgCreateMenu( FGCBmenu menuCallback )
 }
 
 /*
- * This function destroys a window and all of it's subwindows. Actually,
+ * Linked list of windows to destroy ... this is so we don't destroy a window from the middle of
+ * its callback.  Some C compilers take an extremely dim view of this.
+ */
+
+static SFG_WindowList* WindowsToDestroy = (SFG_WindowList*)NULL ;
+
+/*
+ * Function to add a window to the linked list of windows to destroy.  Subwindows are automatically
+ * added because they hang from the window structure.
+ */
+void fgAddToWindowDestroyList ( SFG_Window* window, GLboolean needToClose )
+{
+  SFG_WindowList *new_list_entry = (SFG_WindowList*)malloc ( sizeof(SFG_WindowList) ) ;
+  new_list_entry->window = window ;
+  new_list_entry->needToClose = needToClose ;
+  new_list_entry->next = WindowsToDestroy ;
+  WindowsToDestroy = new_list_entry ;
+
+  /*
+   * Check the execution state.  If this has been called from "glutDestroyWindow",
+   * a statement in that function will reset the "ExecState" after this function returns.
+   */
+  if ( fgState.ActionOnWindowClose != GLUT_ACTION_CONTINUE_EXECUTION )
+  {
+    /*
+     * Set the execution state flag to drop out of the main loop.
+     */
+    if ( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
+      fgState.ExecState = GLUT_EXEC_STATE_STOP ;
+  }
+}
+
+/*
+ * Function to close down all the windows in the "WindowsToDestroy" list
+ */
+void fgCloseWindows ()
+{
+  fgExecutionState ExecState = fgState.ExecState ;
+
+  SFG_WindowList *window_ptr = WindowsToDestroy ;
+  WindowsToDestroy = (SFG_WindowList*)NULL ;  // In case the destroy callbacks cause more windows to be closed
+
+  while ( window_ptr )
+  {
+    SFG_WindowList *next = window_ptr->next ;
+    fgDestroyWindow ( window_ptr->window, window_ptr->needToClose ) ;
+    free ( window_ptr ) ;
+    window_ptr = next ;
+
+    if ( !window_ptr ) window_ptr = WindowsToDestroy ;
+  }
+
+  /*
+   * Since the "fgDestroyWindow" function could easily have set the "ExecState" to stop,
+   * let's set it back to what it was.
+   */
+  fgState.ExecState = ExecState ;
+}
+
+/*
+ * This function destroys a window and all of its subwindows. Actually,
  * another function, defined in freeglut_window.c is called, but this is
  * a whole different story...
  */
@@ -174,19 +234,25 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     /*
      * Does this window have any subwindows?
      */
-    if( (subWindow = window->Children.First) != NULL )
+    while ( (subWindow = window->Children.First) != NULL )
     {
         /*
          * Destroy the first window in the list (possibly destroying
-         * it's subwindows too). This is not very effective, but works
+         * its subwindows too). This is not very effective, but works
          */
-        fgDestroyWindow( subWindow, TRUE );
+        fgDestroyWindow( subWindow, needToClose );
     }
 
     /*
-     * Now we should remove the reference to this window from it's parent
+     * If the programmer defined a destroy callback, call it
      */
-    if( window->Parent != NULL )
+    if ( window->Callbacks.Destroy != NULL )
+      window->Callbacks.Destroy () ;
+
+    /*
+     * Now we should remove the reference to this window from its parent
+     */
+    if ( window->Parent != NULL )
         fgListRemove( &window->Parent->Children, &window->Node );
     else
         fgListRemove( &fgStructure.Windows, &window->Node );
@@ -212,7 +278,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
 }
 
 /*
- * This is a helper static function that removes a menu (given it's pointer)
+ * This is a helper static function that removes a menu (given its pointer)
  * from any windows that can be accessed from a given parent...
  */
 static void fghRemoveMenuFromWindow( SFG_Window* window, SFG_Menu* menu )
@@ -246,15 +312,15 @@ static void fghRemoveMenuFromWindow( SFG_Window* window, SFG_Menu* menu )
  */
 static void fghRemoveMenuFromMenu( SFG_Menu* from, SFG_Menu* menu )
 {
-    SFG_MenuEntry *entry;
+  SFG_MenuEntry *entry;
 
-    for( entry = from->Entries.First; entry; entry = entry->Node.Next )
+  for( entry = from->Entries.First; entry; entry = entry->Node.Next )
+  {
+    if (entry->SubMenu == menu)
     {
-        if (entry->SubMenu == menu)
-        {
-                entry->SubMenu = NULL;
-        }
+      entry->SubMenu = NULL;
     }
+  }
 }
 
 /*
@@ -263,64 +329,63 @@ static void fghRemoveMenuFromMenu( SFG_Menu* from, SFG_Menu* menu )
  */
 void fgDestroyMenu( SFG_Menu* menu )
 {
-    SFG_Window *window;
-    SFG_Menu *from;
-    SFG_MenuEntry *entry;
+  SFG_Window *window;
+  SFG_Menu *from;
+  SFG_MenuEntry *entry;
 
-    assert( menu != NULL );
-    freeglut_assert_ready;
+  assert( menu != NULL );
+  freeglut_assert_ready;
 
-    /*
-     * First of all, have all references to this menu removed from all windows:
-     */
-    for( window = fgStructure.Windows.First; window;
-	 window = window->Node.Next )
-    {
-        fghRemoveMenuFromWindow( window, menu );
-    }
+  /*
+   * First of all, have all references to this menu removed from all windows:
+   */
+  for( window = fgStructure.Windows.First; window; window = window->Node.Next )
+  {
+    fghRemoveMenuFromWindow( window, menu );
+  }
 
-    /*
-     * Now proceed with removing menu entries that lead to this menu
-     */
-    for( from = fgStructure.Menus.First; from; from = from->Node.Next )
-    {
-        fghRemoveMenuFromMenu( from, menu );
-    }
+  /*
+   * Now proceed with removing menu entries that lead to this menu
+   */
+  for( from = fgStructure.Menus.First; from; from = from->Node.Next )
+  {
+    fghRemoveMenuFromMenu( from, menu );
+  }
 
-    /*
-     * Now we are pretty sure the menu is not used anywhere
-     * and that we can remove all of it's entries
-     */
-    while( (entry = menu->Entries.First) != NULL )
-    {
-	fgListRemove(&menu->Entries, &entry->Node);
-
-        /*
-         * There might be a string allocated, have it freed:
-         */
-        free( entry->Text );
-
-        /*
-         * Deallocate the entry itself:
-         */
-        free( entry );
-    }
+  /*
+   * Now we are pretty sure the menu is not used anywhere
+   * and that we can remove all of its entries
+   */
+  while( (entry = menu->Entries.First) != NULL )
+  {
+    fgListRemove(&menu->Entries, &entry->Node);
 
     /*
-     * Remove the menu from the menus list
+     * There might be a string allocated, have it freed:
      */
-    fgListRemove( &fgStructure.Menus, &menu->Node );
+    free( entry->Text );
 
     /*
-     * If that menu was the current one...
+     * Deallocate the entry itself:
      */
-    if( fgStructure.Menu == menu )
-        fgStructure.Menu = NULL;
+    free( entry );
+  }
 
-    /*
-     * Have the menu structure freed
-     */
-    free( menu );
+  /*
+   * Remove the menu from the menus list
+   */
+  fgListRemove( &fgStructure.Menus, &menu->Node );
+
+  /*
+   * If that menu was the current one...
+   */
+  if( fgStructure.Menu == menu )
+    fgStructure.Menu = NULL;
+
+  /*
+   * Have the menu structure freed
+   */
+  free( menu );
 }
 
 /*
@@ -331,14 +396,14 @@ void fgDestroyMenu( SFG_Menu* menu )
  */
 void fgCreateStructure( void )
 {
-    /*
-     * We will be needing two lists: the first containing windows,
-     * and the second containing the user-defined menus.
-     * Also, no current window/menu is set, as none has been created yet.
-     */
+  /*
+   * We will be needing two lists: the first containing windows,
+   * and the second containing the user-defined menus.
+   * Also, no current window/menu is set, as none has been created yet.
+   */
 
-   fgListInit(&fgStructure.Windows);
-   fgListInit(&fgStructure.Menus);
+  fgListInit(&fgStructure.Windows);
+  fgListInit(&fgStructure.Menus);
 }
 
 /*
@@ -347,22 +412,22 @@ void fgCreateStructure( void )
  */
 void fgDestroyStructure( void )
 {
-    SFG_Window *window;
-    SFG_Menu *menu;
+  SFG_Window *window;
+  SFG_Menu *menu;
 
-    /*
-     * Just make sure we are not called in vain...
-     */
-    freeglut_assert_ready;
+  /*
+   * Just make sure we are not called in vain...
+   */
+  freeglut_assert_ready;
 
-    /*
-     * Make sure all windows and menus have been deallocated
-     */
-    while( (window = fgStructure.Windows.First) != NULL )
-        fgDestroyWindow( window, TRUE );
+  /*
+   * Make sure all windows and menus have been deallocated
+   */
+  while( (window = fgStructure.Windows.First) != NULL )
+    fgDestroyWindow( window, TRUE );
 
-    while( (menu = fgStructure.Menus.First) != NULL )
-        fgDestroyMenu( menu );
+  while( (menu = fgStructure.Menus.First) != NULL )
+    fgDestroyMenu( menu );
 }
 
 /*
@@ -370,28 +435,28 @@ void fgDestroyStructure( void )
  */
 void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
 {
-    SFG_Window *window;
+  SFG_Window *window;
 
-    assert( (enumCallback != NULL) && (enumerator != NULL) );
-    freeglut_assert_ready;
+  assert( (enumCallback != NULL) && (enumerator != NULL) );
+  freeglut_assert_ready;
+
+  /*
+   * Check every of the top-level windows
+   */
+  for( window = fgStructure.Windows.First; window;
+       window = window->Node.Next )
+  {
+    /*
+     * Execute the callback...
+     */
+    enumCallback( window, enumerator );
 
     /*
-     * Check every of the top-level windows
+     * If it has been marked as 'found', stop searching
      */
-    for( window = fgStructure.Windows.First; window;
-         window = window->Node.Next )
-    {
-        /*
-         * Execute the callback...
-         */
-        enumCallback( window, enumerator );
-
-        /*
-         * If it has been marked as 'found', stop searching
-         */
-        if( enumerator->found == TRUE )
-            return;
-    }
+    if( enumerator->found == TRUE )
+      return;
+  }
 }
 
 /*
@@ -399,31 +464,31 @@ void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
  */
 void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
 {
-    SFG_Window *child;
+  SFG_Window *child;
 
-    assert( (enumCallback != NULL) && (enumerator != NULL) );
-    freeglut_assert_ready;
+  assert( (enumCallback != NULL) && (enumerator != NULL) );
+  freeglut_assert_ready;
+
+  /*
+   * Check every of the window's children:
+   */
+  for( child = window->Children.First; child; child = child->Node.Next )
+  {
+    /*
+     * Execute the callback...
+     */
+    enumCallback( child, enumerator );
 
     /*
-     * Check every of the window's children:
+     * If it has been marked as 'found', stop searching
      */
-    for( child = window->Children.First; child; child = child->Node.Next )
-    {
-        /*
-         * Execute the callback...
-         */
-        enumCallback( child, enumerator );
-
-        /*
-         * If it has been marked as 'found', stop searching
-         */
-        if( enumerator->found == TRUE )
-            return;
-    }
+    if( enumerator->found == TRUE )
+      return;
+  }
 }
 
 /*
- * A static helper function to look for a window given it's handle
+ * A static helper function to look for a window given its handle
  */
 static void fghcbWindowByHandle( SFG_Window *window, SFG_Enumerator *enumerator )
 {
@@ -495,7 +560,7 @@ SFG_Window* fgWindowByHandle
 }
 
 /*
- * A static helper function to look for a window given it's ID
+ * A static helper function to look for a window given its ID
  */
 static void fghcbWindowByID( SFG_Window *window, SFG_Enumerator *enumerator )
 {
@@ -554,7 +619,7 @@ SFG_Window* fgWindowByID( int windowID )
 }
 
 /*
- * Looks up a menu given it's ID. This is easier that fgWindowByXXX
+ * Looks up a menu given its ID. This is easier that fgWindowByXXX
  * as all menus are placed in a single doubly linked list...
  */
 SFG_Menu* fgMenuByID( int menuID )

@@ -50,58 +50,59 @@
  */
 int FGAPIENTRY glutExtensionSupported( const char* extension )
 {
-    const char *extensions;
-    const char *ptr;
-    int i;
+  const char *extensions;
+  const char *ptr;
+  int len = strlen ( extension ) ;
+
+  /*
+   * Make sure there is a current window, and thus -- a current context available
+   */
+  freeglut_assert_ready;
+  freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
+
+  /*
+   * Note it is safe to query the extensions
+   */
+  extensions = glGetString(GL_EXTENSIONS);
+
+  freeglut_return_val_if_fail( extensions != NULL, 0 );
+
+  /*
+   * Check if the extension itself looks valid
+   */
+  if ( strchr ( extension, ' ' ) != NULL )
+    return( 0 );
+
+  /*
+   * Look for our extension
+   */
+  for (ptr = extensions; *ptr;)
+  {
+    /*
+     * Is it the current extension?
+     */
+    if ( strncmp ( extension, extensions, len ) == 0 )
+      return 1 ;
 
     /*
-     * Make sure there is a current window, and thus -- a current context available
+     * No, go find the next extension.  They are separated from each other by one or more blank spaces.
      */
-    freeglut_assert_ready;
-    freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
+    ptr = strchr ( ptr + len, ' ' ) ;
 
     /*
-     * Not it is safe to query the extenstions
+     * If we ran off the end of the "extensions" character string, we didn't find it.  Return failure.
      */
-    extensions = glGetString(GL_EXTENSIONS);
+    if ( !ptr ) return 0 ;
 
-    freeglut_return_val_if_fail( extensions != NULL, 0 );
+    while ( *ptr == ' ' )
+      ptr++ ;
+  }
 
-    /*
-     * Check if the extension itself looks valid
-     */
-    for( i=0; i<strlen( extension ); i++ )
-        if( extension[ i ] == ' ' )
-            return( 0 );
-
-    /*
-     * Look for our extension
-     */
-    for (ptr = extensions; *ptr;)
-    {
-        const char *str = extension;
-        char c;
-
-        while ( (c = *(str++)) )
-        {
-            if (*ptr != c)
-                goto next;
-            ptr++;
-        }
-        if ( !(c = *ptr) || c == ' ' )
-            return 1;
-    next:
-        while ( (c = *ptr) && c != ' ' )
-            ptr++;
-        while (*ptr == ' ')
-            ptr++;
-    }
-
-    return 0;
+  return 0 ;
 }
 
 /*
- * This function reports all the errors that happened till now
+ * This function reports all the OpenGL errors that happened till now
  */
 void FGAPIENTRY glutReportErrors( void )
 {
@@ -133,10 +134,10 @@ void FGAPIENTRY glutReportErrors( void )
 /*
  * Turns the ignore key auto repeat feature on and off
  */
-void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
+void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )  /* DEPRECATED 11/4/02 - Do not use */
 {
     /*
-     * This is simple and not demanging...
+     * This is simple and not damaging...
      */
     fgState.IgnoreKeyRepeat = ignore ? TRUE : FALSE;
 }

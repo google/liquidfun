@@ -81,10 +81,16 @@ static void fghRedrawWindowByHandle
     glutSetWindow( window->ID );
 
     /*
+     * Do not exagerate with the redisplaying
+     */
+    window->State.Redisplay = FALSE;
+
+    /*
      * Have the callback executed now. The buffers should
      * be swapped by the glutSwapBuffers() execution inside
      * the callback itself.
      */
+
     window->Callbacks.Display();
 }
 
@@ -128,6 +134,14 @@ static void fghReshapeWindowByHandle
          */
         glViewport( 0, 0, width, height );
     }
+
+    /*
+     * Force a window redraw.  In Windows at least this is only a partial solution:  if the
+     * window is increasing in size in either dimension, the already-drawn part does not get
+     * drawn again and things look funny.  But without this we get this bad behaviour whenever
+     * we resize the window.
+     */
+    window->State.Redisplay = TRUE ;
 }
 
 /*
@@ -183,10 +197,20 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
     /*
      * This is done in a bit different way under Windows
      */
-    RedrawWindow( 
+    if( (window->Callbacks.Display != NULL) &&
+        (window->State.Redisplay == TRUE) &&
+        (window->State.Visible == TRUE) )
+    {
+      /*
+       * Do not exagerate with the redisplaying
+       */
+      window->State.Redisplay = FALSE;
+
+      RedrawWindow( 
         window->Window.Handle, NULL, NULL, 
         RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE 
-    );
+	);
+    }
 
 #endif
 
@@ -220,7 +244,7 @@ static void fghDisplayAll( void )
  */
 static void fghcbCheckJoystickPolls( SFG_Window *window, SFG_Enumerator *enumerator )
 {
-    double checkTime = fgElapsedTime();
+    long int checkTime = fgElapsedTime();
 
     /*
      * Check if actually need to do the poll for the currently enumerated window:
@@ -307,12 +331,13 @@ static void fghCheckTimers( void )
     }
 }
 
+
 /*
  * Elapsed Time
  */
 long fgElapsedTime( void )
 {
-#ifndef WIN32
+#if TARGET_HOST_UNIX_X11
 	struct timeval now;
 	long elapsed;
 
@@ -322,8 +347,8 @@ long fgElapsedTime( void )
 	elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
 
 	return( elapsed );
-#else
-        return (timeGetTime() - fgState.Time.Value);
+#elif TARGET_HOST_WIN32
+  return (timeGetTime() - fgState.Time.Value);
 #endif
 }
 
@@ -358,585 +383,727 @@ void fgWarning( const char *fmt, ... )
     va_end( ap );
 }
 
+/*
+ * Clean up on exit
+ */
+static void fgCleanUpGlutsMess( void ) 
+{
+  int i;
+
+  i = 0;
+
+  if ( fgStructure.Windows.First != NULL ) 
+  {
+    SFG_Window *win = fgStructure.Windows.First ;
+    glEnd();
+    glFinish();
+    glFlush();
+    while ( win != NULL )
+    {
+      SFG_Window *temp_win = win->Node.Next ;
+      fgDestroyWindow ( win, FALSE ) ;
+      win = temp_win ;
+    }
+  }
+
+#if 0
+  /* these are pointers to external handles */
+
+  __glutWindowListSize    = 0;
+  __glutStaleWindowList   = NULL;
+  __glutWindowList        = NULL;
+  __glutCurrentWindow     = NULL;
+
+  /* make sure we no longer have a GL context */
+
+  if ( wglGetCurrentContext() != NULL ) 
+  {
+    wglDeleteContext( wglGetCurrentContext() );
+  }
+
+  hInstance = GetModuleHandle(NULL);
+  UnregisterClass( classname, hInstance );
+
+  /* clean up allocated timer memory */
+
+  tList = __glutTimerList;
+  i = 0;
+
+  while ( __glutTimerList ) 
+  {
+    i++;
+    tList = __glutTimerList;
+    
+    if ( __glutTimerList )
+      __glutTimerList = __glutTimerList->next;
+
+    if ( tList )
+      free( tList );
+  }
+#endif
+}
+
+
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
- * Enters the FreeGLUT processing loop. Never returns.
+ * Executes a single iteration in the FreeGLUT processing loop.
  */
-void FGAPIENTRY glutMainLoop( void )
+void FGAPIENTRY glutMainLoopEvent( void )
 {
 #if TARGET_HOST_UNIX_X11
-    SFG_Window* window;
-    XEvent event;
-    int modifiers;
+  SFG_Window* window;
+  XEvent event;
+  int modifiers;
+
+  /*
+   * This code was repeated constantly, so here it goes into a definition:
+   */
+# define GETWINDOW(a) window = fgWindowByHandle( event.a.window );if( window == NULL ) break;
+# define GETMOUSE(a) window->State.MouseX = event.a.x; window->State.MouseY = event.a.y;
+
+  /*
+   * Make sure the display has been created etc.
+   */
+  freeglut_assert_ready;
+
+  /*
+   * Do we have any event messages pending?
+   */
+  if( XPending( fgDisplay.Display ) )
+  {
+    /*
+     * Grab the next event to be processed...
+     */
+    XNextEvent( fgDisplay.Display, &event );
 
     /*
-     * This code was repeated constantly, so here it goes into a definition:
+     * Check the event's type
      */
-#   define GETWINDOW(a) window = fgWindowByHandle( event.a.window );if( window == NULL ) break;
-#   define GETMOUSE(a) window->State.MouseX = event.a.x; window->State.MouseY = event.a.y;
-
-    /*
-     * Make sure the display has been created etc.
-     */
-    freeglut_assert_ready;
-
-    /*
-     * Enter the loop. Iterate as long as there are
-     * any windows in the freeglut structure.
-     */
-    while( fgStructure.Windows.First != NULL )
+    switch( event.type )
     {
+    case CreateNotify:
+      /*
+       * The window creation confirmation
+       */
+      break;
+
+    case DestroyNotify:
+      /*
+       * This is sent to confirm the XDestroyWindow call.
+       */
+      /*
+       * Call the window closure callback, remove from the structure, etc.
+       */
+      fgAddToWindowDestroyList ( window, FALSE );
+
+      break;
+
+    case ClientMessage:
+      /*
+       * Destroy the window when the WM_DELETE_WINDOW message arrives
+       */
+      if( (Atom) event.xclient.data.l[ 0 ] == fgDisplay.DeleteWindow )
+      {
+      }
+      break;
+
+    case UnmapNotify:
+      /*
+       * A window of ours has been unmapped...
+       */
+      break;
+
+    case Expose:
+      /*
+       * We are too dumb to process partial exposes...
+       */
+      if( event.xexpose.count == 0 )
+          fghRedrawWindowByHandle( event.xexpose.window );
+      break;
+
+    case ConfigureNotify:
+      /*
+       * The window gets resized
+       */
+      fghReshapeWindowByHandle(
+          event.xconfigure.window,
+          event.xconfigure.width,
+          event.xconfigure.height
+      );
+      break;
+
+    case MappingNotify:
+      /*
+       * Have the client's keyboard knowledge updated (xlib.ps,
+       * page 206, says that's a good thing to do)
+       */
+      XRefreshKeyboardMapping( (XMappingEvent *) &event );
+      break;
+
+    case VisibilityNotify:
+      {
         /*
-         * Do we have any event messages pending?
+         * The window's visiblity might have changed
          */
-        if( XPending( fgDisplay.Display ) )
+        GETWINDOW( xvisibility );
+
+        /*
+         * Break now if no window status callback has been hooked to that window
+         */
+        if( window->Callbacks.WindowStatus == NULL )
+            break;
+
+        /*
+         * We're going to send a callback to a window. Make it current.
+         */
+        glutSetWindow( window->ID );
+
+        /*
+         * Sending this event, the X server can notify us that the window has just
+         * acquired one of the three possible visibility states: VisibilityUnobscured,
+         * VisibilityPartiallyObscured or VisibilityFullyObscured
+         */
+        switch( event.xvisibility.state )
         {
+        case VisibilityUnobscured:
+          /*
+           * We are fully visible...
+           */
+          window->Callbacks.WindowStatus( GLUT_FULLY_RETAINED );
+          window->State.Visible = TRUE;
+          break;
+
+        case VisibilityPartiallyObscured:
+          /*
+           * The window is partially visible
+           */
+          window->Callbacks.WindowStatus( GLUT_PARTIALLY_RETAINED );
+          window->State.Visible = TRUE;
+          break;
+
+        case VisibilityFullyObscured:
+          /*
+           * The window is totally obscured
+           */
+          window->Callbacks.WindowStatus( GLUT_FULLY_COVERED );
+          window->State.Visible = FALSE;
+          break;
+        }
+      }
+      break;
+
+    case EnterNotify:
+      {
+        /*
+         * Mouse is over one of our windows
+         */
+        GETWINDOW( xcrossing ); GETMOUSE( xcrossing );
+
+        /*
+         * Is there an entry callback hooked to the window?
+         */
+        if( window->Callbacks.Entry != NULL )
+        {
+          /*
+           * Yeah. Notify the window about having the mouse cursor over
+           */
+          window->Callbacks.Entry( GLUT_ENTERED );
+        }
+      }
+      break;
+
+    case LeaveNotify:
+      {
+        /*
+         * Mouse is no longer over one of our windows
+         */
+        GETWINDOW( xcrossing ); GETMOUSE( xcrossing );
+
+        /*
+         * Is there an entry callback hooked to the window?
+         */
+        if( window->Callbacks.Entry != NULL )
+        {
+          /*
+           * Yeah. Notify the window about having the mouse cursor over
+           */
+          window->Callbacks.Entry( GLUT_LEFT );
+        }
+      }
+      break;
+
+    case MotionNotify:
+      {
+        /*
+         * The mouse cursor was moved...
+         */
+        GETWINDOW( xmotion ); GETMOUSE( xmotion );
+
+        /*
+         * What kind of a movement was it?
+         */
+        if( (event.xmotion.state & Button1Mask) || (event.xmotion.state & Button2Mask) ||
+            (event.xmotion.state & Button3Mask) || (event.xmotion.state & Button4Mask) ||
+            (event.xmotion.state & Button5Mask) )
+        {
+          /*
+           * A mouse button was pressed during the movement...
+           * Is there a motion callback hooked to the window?
+           */
+          if( window->Callbacks.Motion != NULL )
+          {
             /*
-             * Grab the next event to be processed...
+             * Yup. Have it executed immediately
              */
-            XNextEvent( fgDisplay.Display, &event );
-
-            /*
-             * Check the event's type
-             */
-            switch( event.type )
-            {
-            case CreateNotify:
-                /*
-                 * The window creation confirmation
-                 */
-                break;
-
-            case DestroyNotify:
-                /*
-                 * This is sent to confirm the XDestroyWindow call. Ignore it.
-                 */
-                break;
-
-            case ClientMessage:
-                /*
-                 * Destroy the window when the WM_DELETE_WINDOW message arrives
-                 */
-                if( (Atom) event.xclient.data.l[ 0 ] == fgDisplay.DeleteWindow )
-                {
-                    /*
-                     * I wonder if the window still exists ;-)
-                     */
-                    fgDestroyWindow( fgWindowByHandle( event.xclient.window ), TRUE );
-                }
-                break;
-
-            case UnmapNotify:
-                /*
-                 * A window of ours has been unmapped...
-                 */
-                break;
-
-            case Expose:
-                /*
-                 * We are too dumb to process partial exposes...
-                 */
-                if( event.xexpose.count == 0 )
-                    fghRedrawWindowByHandle( event.xexpose.window );
-                break;
-
-            case ConfigureNotify:
-                /*
-                 * The window gets resized
-                 */
-                fghReshapeWindowByHandle(
-                    event.xconfigure.window,
-                    event.xconfigure.width,
-                    event.xconfigure.height
-                );
-                break;
-
-            case MappingNotify:
-                /*
-                 * Have the client's keyboard knowledge updated (xlib.ps,
-                 * page 206, says that's a good thing to do)
-                 */
-                XRefreshKeyboardMapping( (XMappingEvent *) &event );
-                break;
-
-            case VisibilityNotify:
-                {
-                    /*
-                     * The window's visiblity might have changed
-                     */
-                    GETWINDOW( xvisibility );
-
-                    /*
-                     * Break now if no window status callback has been hooked to that window
-                     */
-                    if( window->Callbacks.WindowStatus == NULL )
-                        break;
-
-                    /*
-                     * We're going to send a callback to a window. Make it current.
-                     */
-                    glutSetWindow( window->ID );
-
-                    /*
-                     * Sending this event, the X server can notify us that the window has just
-                     * acquired one of the three possible visibility states: VisibilityUnobscured,
-                     * VisibilityPartiallyObscured or VisibilityFullyObscured
-                     */
-                    switch( event.xvisibility.state )
-                    {
-                    case VisibilityUnobscured:
-                        /*
-                         * We are fully visible...
-                         */
-                        window->Callbacks.WindowStatus( GLUT_FULLY_RETAINED );
-                        window->State.Visible = TRUE;
-                        break;
-
-                    case VisibilityPartiallyObscured:
-                        /*
-                         * The window is partially visible
-                         */
-                        window->Callbacks.WindowStatus( GLUT_PARTIALLY_RETAINED );
-                        window->State.Visible = TRUE;
-                        break;
-
-                    case VisibilityFullyObscured:
-                        /*
-                         * The window is totally obscured
-                         */
-                        window->Callbacks.WindowStatus( GLUT_FULLY_COVERED );
-                        window->State.Visible = FALSE;
-                        break;
-                    }
-                }
-                break;
-
-            case EnterNotify:
-                {
-                    /*
-                     * Mouse is over one of our windows
-                     */
-                    GETWINDOW( xcrossing ); GETMOUSE( xcrossing );
-
-                    /*
-                     * Is there an entry callback hooked to the window?
-                     */
-                    if( window->Callbacks.Entry != NULL )
-                    {
-                        /*
-                         * Yeah. Notify the window about having the mouse cursor over
-                         */
-                        window->Callbacks.Entry( GLUT_ENTERED );
-                    }
-                }
-                break;
-
-            case LeaveNotify:
-                {
-                    /*
-                     * Mouse is no longer over one of our windows
-                     */
-                    GETWINDOW( xcrossing ); GETMOUSE( xcrossing );
-
-                    /*
-                     * Is there an entry callback hooked to the window?
-                     */
-                    if( window->Callbacks.Entry != NULL )
-                    {
-                        /*
-                         * Yeah. Notify the window about having the mouse cursor over
-                         */
-                        window->Callbacks.Entry( GLUT_LEFT );
-                    }
-                }
-                break;
-
-            case MotionNotify:
-                {
-                    /*
-                     * The mouse cursor was moved...
-                     */
-                    GETWINDOW( xmotion ); GETMOUSE( xmotion );
-
-                    /*
-                     * What kind of a movement was it?
-                     */
-                    if( (event.xmotion.state & Button1Mask) || (event.xmotion.state & Button2Mask) ||
-                        (event.xmotion.state & Button3Mask) || (event.xmotion.state & Button4Mask) ||
-                        (event.xmotion.state & Button5Mask) )
-                    {
-                        /*
-                         * A mouse button was pressed during the movement...
-                         * Is there a motion callback hooked to the window?
-                         */
-                        if( window->Callbacks.Motion != NULL )
-                        {
-                            /*
-                             * Yup. Have it executed immediately
-                             */
-                            window->Callbacks.Motion( event.xmotion.x, event.xmotion.y );
-                        }
-                    }
-                    else
-                    {
-                        /*
-                         * Otherwise it was a passive movement...
-                         */
-                        if( window->Callbacks.Passive != NULL )
-                        {
-                            /*
-                             * That's right, and there is a passive callback, too.
-                             */
-                            window->Callbacks.Passive( event.xmotion.x, event.xmotion.y );
-                        }
-                    }
-                }
-                break;
-
-            case ButtonRelease:
-            case ButtonPress:
-                {
-                    int button;
-
-                    /*
-                     * A mouse button has been pressed or released. Traditionally,
-                     * break if the window was found within the freeglut structures.
-                     */
-                    GETWINDOW( xbutton ); GETMOUSE( xbutton );
-
-                    /*
-                     * GLUT API assumes that you can't have more than three mouse buttons, so:
-                     */
-                    switch( event.xbutton.button )
-                    {
-                    /*
-                     * WARNING: this might be wrong, if we only have two mouse buttons,
-                     *          Button2 might mean the right button, isn't that right?
-                     */
-                    case Button1:   button = GLUT_LEFT_BUTTON;   break;
-                    case Button2:   button = GLUT_MIDDLE_BUTTON; break;
-                    case Button3:   button = GLUT_RIGHT_BUTTON;  break;
-                    default:        button = -1;                 break;
-                    }
-
-                    /*
-                     * Skip the unwanted mouse buttons...
-                     */
-                    if( button == -1 )
-                        break;
-
-                    /*
-                     * Do not execute the callback if a menu is hooked to this key.
-                     * In that case an appropriate private call should be generated
-                     */
-                    if( window->Menu[ button ] != NULL )
-                    {
-                        /*
-                         * Set the current window
-                         */
-                        glutSetWindow( window->ID );
-
-                        if( event.type == ButtonPress )
-                        {
-                            /*
-                             * Activate the appropriate menu structure...
-                             */
-                            fgActivateMenu( button );
-                        }
-                        else
-                        {
-                            /*
-                             * There are two general cases generated when a menu button
-                             * is released -- it can provoke a menu call (when released
-                             * over a menu area) or just deactivate the menu (when released
-                             * somewhere else). Unfortunately, both cases must be checked
-                             * recursively due to the submenu possibilities.
-                             */
-                            fgDeactivateMenu( button );
-                        }
-                        break;
-                    }
-
-                    /*
-                     * Check if there is a mouse callback hooked to the window
-                     */
-                    if( window->Callbacks.Mouse == NULL )
-                        break;
-
-                    /*
-                     * Set the current window
-                     */
-                    glutSetWindow( window->ID );
-
-                    /*
-                     * Remember the current modifiers state
-                     */
-                    modifiers = 0;
-                    if (event.xbutton.state & (ShiftMask|LockMask))
-                        modifiers |= GLUT_ACTIVE_SHIFT;
-                    if (event.xbutton.state & ControlMask)
-                        modifiers |= GLUT_ACTIVE_CTRL;
-                    if (event.xbutton.state & Mod1Mask)
-                        modifiers |= GLUT_ACTIVE_ALT;
-                    window->State.Modifiers = modifiers;
-
-                    /*
-                     * Finally execute the mouse callback
-                     */
-                    window->Callbacks.Mouse(
-                        button,
-                        event.type == ButtonPress ? GLUT_DOWN : GLUT_UP,
-                        event.xbutton.x,
-                        event.xbutton.y
-                    );
-
-                    /*
-                     * Trash the modifiers state
-                     */
-                    window->State.Modifiers = 0xffffffff;
-                }
-                break;
-
-            case KeyRelease:
-            case KeyPress:
-                {
-                    FGCBkeyboard keyboard_cb;
-                    FGCBspecial special_cb;
-
-                    /*
-                     * A key has been pressed, find the window that had the focus:
-                     */
-                    GETWINDOW( xkey ); GETMOUSE( xkey );
-
-                    if( event.type == KeyPress )
-                    {
-                        keyboard_cb = window->Callbacks.Keyboard;
-                        special_cb = window->Callbacks.Special;
-                    }
-                    else
-                    {
-                        keyboard_cb = window->Callbacks.KeyboardUp;
-                        special_cb = window->Callbacks.SpecialUp;
-                    }
-
-                    /*
-                     * Is there a keyboard/special callback hooked for this window?
-                     */
-                    if( (keyboard_cb != NULL) || (special_cb != NULL) )
-                    {
-                        XComposeStatus composeStatus;
-                        char asciiCode[ 32 ];
-                        KeySym keySym;
-                        int len;
-
-                        /*
-                         * Check for the ASCII/KeySym codes associated with the event:
-                         */
-                        len = XLookupString( &event.xkey, asciiCode, sizeof(asciiCode), &keySym, &composeStatus );
-
-                        /*
-                         * Get ready to calling the keyboard/special callbacks
-                         */
-                        glutSetWindow( window->ID );
-
-                        /*
-                         * GLUT API tells us to have two separate callbacks...
-                         */
-                        if( len > 0 )
-                        {
-                            /*
-                             * ...one for the ASCII translateable keypresses...
-                             */
-                            if( keyboard_cb != NULL )
-                            {
-                                /*
-                                 * Remember the current modifiers state
-                                 */
-                                modifiers = 0;
-                                if (event.xkey.state & (ShiftMask|LockMask))
-                                    modifiers |= GLUT_ACTIVE_SHIFT;
-                                if (event.xkey.state & ControlMask)
-                                    modifiers |= GLUT_ACTIVE_CTRL;
-                                if (event.xkey.state & Mod1Mask)
-                                    modifiers |= GLUT_ACTIVE_ALT;
-                                window->State.Modifiers = modifiers;
-
-                                /*
-                                 * Execute the callback
-                                 */
-                                keyboard_cb( asciiCode[ 0 ], event.xkey.x, event.xkey.y );
-
-                                /*
-                                 * Trash the modifiers state
-                                 */
-                                window->State.Modifiers = 0xffffffff;
-                            }
-                        }
-                        else
-                        {
-                            int special = -1;
-
-                            /*
-                             * ...and one for all the others, which need to be translated to GLUT_KEY_Xs...
-                             */
-                            switch( keySym )
-                            {
-                            /*
-                             * First the function keys come:
-                             */
-                            case XK_F1:     special = GLUT_KEY_F1;     break;
-                            case XK_F2:     special = GLUT_KEY_F2;     break;
-                            case XK_F3:     special = GLUT_KEY_F3;     break;
-                            case XK_F4:     special = GLUT_KEY_F4;     break;
-                            case XK_F5:     special = GLUT_KEY_F5;     break;
-                            case XK_F6:     special = GLUT_KEY_F6;     break;
-                            case XK_F7:     special = GLUT_KEY_F7;     break;
-                            case XK_F8:     special = GLUT_KEY_F8;     break;
-                            case XK_F9:     special = GLUT_KEY_F9;     break;
-                            case XK_F10:    special = GLUT_KEY_F10;    break;
-                            case XK_F11:    special = GLUT_KEY_F11;    break;
-                            case XK_F12:    special = GLUT_KEY_F12;    break;
-
-                            /*
-                             * Then the arrows and stuff:
-                             */
-                            case XK_Left:   special = GLUT_KEY_LEFT;   break;
-                            case XK_Right:  special = GLUT_KEY_RIGHT;  break;
-                            case XK_Up:     special = GLUT_KEY_UP;     break;
-                            case XK_Down:   special = GLUT_KEY_DOWN;   break;
-
-                            case XK_KP_Prior:
-                            case XK_Prior:  special = GLUT_KEY_PAGE_UP; break;
-                            case XK_KP_Next:
-                            case XK_Next:   special = GLUT_KEY_PAGE_DOWN; break;
-                            case XK_KP_Home:
-                            case XK_Home:   special = GLUT_KEY_HOME;   break;
-                            case XK_KP_End:
-                            case XK_End:    special = GLUT_KEY_END;    break;
-                            case XK_KP_Insert:
-                            case XK_Insert: special = GLUT_KEY_INSERT; break;
-                            }
-
-                            /*
-                             * Execute the callback (if one has been specified),
-                             * given that the special code seems to be valid...
-                             */
-                            if( (special_cb != NULL) && (special != -1) )
-                            {
-                                /*
-                                 * Remember the current modifiers state
-                                 */
-                                modifiers = 0;
-                                if (event.xkey.state & (ShiftMask|LockMask))
-                                    modifiers |= GLUT_ACTIVE_SHIFT;
-                                if (event.xkey.state & ControlMask)
-                                    modifiers |= GLUT_ACTIVE_CTRL;
-                                if (event.xkey.state & Mod1Mask)
-                                    modifiers |= GLUT_ACTIVE_ALT;
-                                window->State.Modifiers = modifiers;
-
-                                special_cb( special, event.xkey.x, event.xkey.y );
-
-                                /*
-                                 * Trash the modifiers state
-                                 */
-                                window->State.Modifiers = 0xffffffff;
-                            }
-                        }
-                    }
-                }
-                break;
-            }
+            window->Callbacks.Motion( event.xmotion.x, event.xmotion.y );
+          }
         }
         else
         {
+          /*
+           * Otherwise it was a passive movement...
+           */
+          if( window->Callbacks.Passive != NULL )
+          {
             /*
-             * Have all the timers checked.
+             * That's right, and there is a passive callback, too.
              */
-            fghCheckTimers();
-
-            /*
-             * Poll the joystick and notify all windows that want to be notified...
-             */
-            fghCheckJoystickPolls();
-
-            /*
-             * No messages in the queue, which means we are idling...
-             */
-            if( fgState.IdleCallback != NULL )
-                fgState.IdleCallback();
-
-            /*
-             * Remember about displaying all the windows that have
-             * been marked for a redisplay (possibly in the idle call):
-             */
-            fghDisplayAll();
+            window->Callbacks.Passive( event.xmotion.x, event.xmotion.y );
+          }
         }
+      }
+      break;
+
+    case ButtonRelease:
+    case ButtonPress:
+      {
+        GLboolean pressed = TRUE ;
+        int button;
+
+        if ( event.type == ButtonRelease ) pressed = FALSE ;
+
+        /*
+         * A mouse button has been pressed or released. Traditionally,
+         * break if the window was found within the freeglut structures.
+         */
+        GETWINDOW( xbutton ); GETMOUSE( xbutton );
+
+        /*
+         * GLUT API assumes that you can't have more than three mouse buttons, so:
+         */
+        switch( event.xbutton.button )
+        {
+        /*
+         * WARNING: this might be wrong, if we only have two mouse buttons,
+         *          Button2 might mean the right button, isn't that right?
+         */
+        case Button1:   button = GLUT_LEFT_BUTTON;   break;
+        case Button2:   button = GLUT_MIDDLE_BUTTON; break;
+        case Button3:   button = GLUT_RIGHT_BUTTON;  break;
+        default:        button = -1;                 break;
+        }
+
+        /*
+         * Skip the unwanted mouse buttons...
+         */
+        if( button == -1 )
+          break;
+
+        /*
+         * Do not execute the application's mouse callback if a menu is hooked to this button.
+         * In that case an appropriate private call should be generated.
+         * Near as I can tell, this is the menu behaviour:
+         *  - Down-click the menu button, menu not active:  activate the menu with its upper left-hand corner at the mouse location.
+         *  - Down-click any button outside the menu, menu active:  deactivate the menu
+         *  - Down-click any button inside the menu, menu active:  select the menu entry and deactivate the menu
+         *  - Up-click the menu button, menu not active:  nothing happens
+         *  - Up-click the menu button outside the menu, menu active:  nothing happens
+         *  - Up-click the menu button inside the menu, menu active:  select the menu entry and deactivate the menu
+         */
+        if ( window->ActiveMenu != NULL )  /* Window has an active menu, it absorbs any mouse click */
+        {
+          if ( fgCheckActiveMenu ( window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
+          {
+            fgExecuteMenuCallback ( window->ActiveMenu ) ;
+            fgDeactivateMenu ( window ) ;
+          }
+          else  /* Outside the menu, deactivate the menu if it's a downclick */
+          {
+            if ( pressed == TRUE ) fgDeactivateMenu ( window ) ;
+          }
+
+          /*
+           * Let's make the window redraw as a result of the mouse click and menu activity.
+           */
+          window->State.Redisplay = TRUE ;
+
+          break ;
+        }
+
+        /*
+         * No active menu, let's check whether we need to activate one.
+         */
+        if ( ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
+        {
+          /*
+           * Let's make the window redraw as a result of the mouse click.
+           */
+          window->State.Redisplay = TRUE ;
+
+          /*
+           * Activate the appropriate menu structure...
+           */
+          fgActivateMenu( window, button );
+
+          break;
+        }
+
+        /*
+         * Check if there is a mouse callback hooked to the window
+         */
+        if( window->Callbacks.Mouse == NULL )
+          break;
+
+        /*
+         * Set the current window
+         */
+        glutSetWindow( window->ID );
+
+        /*
+         * Remember the current modifiers state
+         */
+        modifiers = 0;
+        if (event.xbutton.state & (ShiftMask|LockMask))
+          modifiers |= GLUT_ACTIVE_SHIFT;
+        if (event.xbutton.state & ControlMask)
+          modifiers |= GLUT_ACTIVE_CTRL;
+        if (event.xbutton.state & Mod1Mask)
+          modifiers |= GLUT_ACTIVE_ALT;
+        window->State.Modifiers = modifiers;
+
+        /*
+         * Finally execute the mouse callback
+         */
+        window->Callbacks.Mouse(
+            button,
+            event.type == ButtonPress ? GLUT_DOWN : GLUT_UP,
+            event.xbutton.x,
+            event.xbutton.y
+        );
+
+        /*
+         * Trash the modifiers state
+         */
+        window->State.Modifiers = 0xffffffff;
+      }
+      break;
+
+    case KeyRelease:
+    case KeyPress:
+      {
+        FGCBkeyboard keyboard_cb;
+        FGCBspecial special_cb;
+
+        /*
+         * A key has been pressed, find the window that had the focus:
+         */
+        GETWINDOW( xkey ); GETMOUSE( xkey );
+
+        if( event.type == KeyPress )
+        {
+          keyboard_cb = window->Callbacks.Keyboard;
+          special_cb = window->Callbacks.Special;
+        }
+        else
+        {
+          keyboard_cb = window->Callbacks.KeyboardUp;
+          special_cb = window->Callbacks.SpecialUp;
+        }
+
+        /*
+         * Is there a keyboard/special callback hooked for this window?
+         */
+        if( (keyboard_cb != NULL) || (special_cb != NULL) )
+        {
+          XComposeStatus composeStatus;
+          char asciiCode[ 32 ];
+          KeySym keySym;
+          int len;
+
+          /*
+           * Check for the ASCII/KeySym codes associated with the event:
+           */
+          len = XLookupString( &event.xkey, asciiCode, sizeof(asciiCode), &keySym, &composeStatus );
+
+          /*
+           * Get ready to calling the keyboard/special callbacks
+           */
+          glutSetWindow( window->ID );
+
+          /*
+           * GLUT API tells us to have two separate callbacks...
+           */
+          if( len > 0 )
+          {
+            /*
+             * ...one for the ASCII translateable keypresses...
+             */
+            if( keyboard_cb != NULL )
+            {
+              /*
+               * Remember the current modifiers state
+               */
+              modifiers = 0;
+              if (event.xkey.state & (ShiftMask|LockMask))
+                  modifiers |= GLUT_ACTIVE_SHIFT;
+              if (event.xkey.state & ControlMask)
+                  modifiers |= GLUT_ACTIVE_CTRL;
+              if (event.xkey.state & Mod1Mask)
+                  modifiers |= GLUT_ACTIVE_ALT;
+              window->State.Modifiers = modifiers;
+
+              /*
+               * Execute the callback
+               */
+              keyboard_cb( asciiCode[ 0 ], event.xkey.x, event.xkey.y );
+
+              /*
+               * Trash the modifiers state
+               */
+              window->State.Modifiers = 0xffffffff;
+            }
+          }
+          else
+          {
+            int special = -1;
+
+            /*
+             * ...and one for all the others, which need to be translated to GLUT_KEY_Xs...
+             */
+            switch( keySym )
+            {
+            /*
+             * First the function keys come:
+             */
+            case XK_F1:     special = GLUT_KEY_F1;     break;
+            case XK_F2:     special = GLUT_KEY_F2;     break;
+            case XK_F3:     special = GLUT_KEY_F3;     break;
+            case XK_F4:     special = GLUT_KEY_F4;     break;
+            case XK_F5:     special = GLUT_KEY_F5;     break;
+            case XK_F6:     special = GLUT_KEY_F6;     break;
+            case XK_F7:     special = GLUT_KEY_F7;     break;
+            case XK_F8:     special = GLUT_KEY_F8;     break;
+            case XK_F9:     special = GLUT_KEY_F9;     break;
+            case XK_F10:    special = GLUT_KEY_F10;    break;
+            case XK_F11:    special = GLUT_KEY_F11;    break;
+            case XK_F12:    special = GLUT_KEY_F12;    break;
+
+            /*
+             * Then the arrows and stuff:
+             */
+            case XK_Left:   special = GLUT_KEY_LEFT;   break;
+            case XK_Right:  special = GLUT_KEY_RIGHT;  break;
+            case XK_Up:     special = GLUT_KEY_UP;     break;
+            case XK_Down:   special = GLUT_KEY_DOWN;   break;
+
+            case XK_KP_Prior:
+            case XK_Prior:  special = GLUT_KEY_PAGE_UP; break;
+            case XK_KP_Next:
+            case XK_Next:   special = GLUT_KEY_PAGE_DOWN; break;
+            case XK_KP_Home:
+            case XK_Home:   special = GLUT_KEY_HOME;   break;
+            case XK_KP_End:
+            case XK_End:    special = GLUT_KEY_END;    break;
+            case XK_KP_Insert:
+            case XK_Insert: special = GLUT_KEY_INSERT; break;
+            }
+
+            /*
+             * Execute the callback (if one has been specified),
+             * given that the special code seems to be valid...
+             */
+            if( (special_cb != NULL) && (special != -1) )
+            {
+              /*
+               * Remember the current modifiers state
+               */
+              modifiers = 0;
+              if (event.xkey.state & (ShiftMask|LockMask))
+                modifiers |= GLUT_ACTIVE_SHIFT;
+              if (event.xkey.state & ControlMask)
+                modifiers |= GLUT_ACTIVE_CTRL;
+              if (event.xkey.state & Mod1Mask)
+                modifiers |= GLUT_ACTIVE_ALT;
+              window->State.Modifiers = modifiers;
+
+              special_cb( special, event.xkey.x, event.xkey.y );
+
+              /*
+               * Trash the modifiers state
+               */
+              window->State.Modifiers = 0xffffffff;
+            }
+          }
+        }
+      }
+      break;
     }
+  }
+  else
+  {
+    /*
+     * Have all the timers checked.
+     */
+    fghCheckTimers();
+
+    /*
+     * Poll the joystick and notify all windows that want to be notified...
+     */
+    fghCheckJoystickPolls();
+
+    /*
+     * No messages in the queue, which means we are idling...
+     */
+    if( fgState.IdleCallback != NULL )
+        fgState.IdleCallback();
+
+    /*
+     * Remember about displaying all the windows that have
+     * been marked for a redisplay (possibly in the idle call):
+     */
+    fghDisplayAll();
+  }
 
 #elif TARGET_HOST_WIN32
 
-    GLboolean bLoop = TRUE;
-    MSG stMsg;
+  MSG stMsg;
+
+  /*
+   * The windows processing is considerably smaller
+   */
+  if( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
+  {
+    /*
+     * Grab the message now, checking for WM_QUIT
+     */
+    if( GetMessage( &stMsg, NULL, 0, 0 ) == 0 )
+      fgState.ExecState = GLUT_EXEC_STATE_STOP ;
 
     /*
-     * The windows main loop is considerably smaller
+     * Translate virtual-key messages and send them to the window...
      */
-    while( bLoop )
-    {
-        if( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
-        {
-            /*
-             * Grab the message now, checking for WM_QUIT
-             */
-            if( GetMessage( &stMsg, NULL, 0, 0 ) == 0 )
-                bLoop = FALSE;
+    TranslateMessage( &stMsg );
+    DispatchMessage( &stMsg );
+  }
+  else
+  {
+    /*
+     * Have all the timers checked.
+     */
+    fghCheckTimers();
 
-            /*
-             * Translate virtual-key messages and send them to the window...
-             */
-            TranslateMessage( &stMsg );
-            DispatchMessage( &stMsg );
-        }
-        else
-        {
-            /*
-             * Have all the timers checked.
-             */
-            fghCheckTimers();
+    /*
+     * Poll the joystick and notify all windows that want to be notified...
+     */
+    fghCheckJoystickPolls();
 
-            /*
-             * Poll the joystick and notify all windows that want to be notified...
-             */
-            fghCheckJoystickPolls();
+    /*
+     * No messages in the queue, which means we are idling...
+     */
+    if( fgState.IdleCallback != NULL )
+      fgState.IdleCallback();
 
-            /*
-             * No messages in the queue, which means we are idling...
-             */
-            if( fgState.IdleCallback != NULL )
-                fgState.IdleCallback();
+    /*
+     * Remember about displaying all the windows that have
+     * been marked for a redisplay (possibly in the idle call):
+     */
+    fghDisplayAll();
+  }
+#endif
+}
 
-            /*
-             * Remember about displaying all the windows that have
-             * been marked for a redisplay (possibly in the idle call):
-             */
-            fghDisplayAll();
-
-            /*
-             * We need to terminate the main loop if no windows are left
-             */
-            bLoop = (fgStructure.Windows.First != NULL);
-        }
-    }
-
+/*
+ * Enters the FreeGLUT processing loop. Stays until the "ExecState" changes to "GLUT_EXEC_STATE_STOP".
+ */
+void FGAPIENTRY glutMainLoop( void )
+{
+#if TARGET_HOST_WIN32
+  SFG_Window *window = fgStructure.Windows.First ;
 #endif
 
+  /*
+   * Make sure the display has been created etc.
+   */
+  freeglut_assert_ready;
+
+#if TARGET_HOST_WIN32
+  /*
+   * Processing before the main loop:  If there is a window which is open and which
+   * has a visibility callback, call it.  I know this is an ugly hack, but I'm not sure
+   * what else to do about it.  Ideally we should leave something uninitialized in the
+   * create window code and initialize it in the main loop, and have that initialization
+   * create a "WM_ACTIVATE" message.  Then we would put the visibility callback code in
+   * the "case WM_ACTIVATE" block below.         - John Fay -- 10/24/02
+   */
+  while ( window != NULL )
+  {
+    if ( window->Callbacks.Visibility != NULL )
+      window->Callbacks.Visibility ( window->State.Visible ) ;
+
+    window = window->Node.Next ;
+  }
+#endif
+
+  /*
+   * Set freeglut to be running
+   */
+  fgState.ExecState = GLUT_EXEC_STATE_RUNNING ;
+
+  /*
+   * Enter the main loop itself.  Inside the loop, process events and check for loop exit.
+   */
+  while ( fgState.ExecState == GLUT_EXEC_STATE_RUNNING )
+  {
+    glutMainLoopEvent () ;
+
     /*
-     * When this loop terminates, destroy the display, state and structure
-     * of a freeglut session, so that another glutInit() call can happen
+     * If an event caused a window to be closed, do the actual closing here
      */
-    fgDeinitialize();
+    fgCloseWindows () ;
+
+    /*
+     * If there are no more windows open, stop execution
+     */
+    if ( fgStructure.Windows.First == NULL )
+      fgState.ExecState = GLUT_EXEC_STATE_STOP ;
+  }
+
+
+  /*
+   * If we got here by the user closing a window or by the application closing down, there may still be windows open.
+   */
+  fgCleanUpGlutsMess () ;
+
+  /*
+   * Check whether we return to the calling program or simply exit
+   */
+  if ( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
+    exit ( 0 ) ;
+
+  /*
+   * When this loop terminates, destroy the display, state and structure
+   * of a freeglut session, so that another glutInit() call can happen
+   */
+  fgDeinitialize();
+}
+
+/*
+ * Leaves the FreeGLUT processing loop.
+ */
+void FGAPIENTRY glutLeaveMainLoop( void )
+{
+  fgState.ExecState = GLUT_EXEC_STATE_STOP ;
 }
 
 /*
@@ -949,8 +1116,10 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     PAINTSTRUCT ps;
     LONG lRet = 1;
 
-#   define  assert_window_registered  if( window == NULL ) return( DefWindowProc( hWnd, uMsg, wParam, lParam ) );
+    if ( ( window == NULL ) && ( uMsg != WM_CREATE ) )
+      return( DefWindowProc( hWnd, uMsg, wParam, lParam ) );
 
+/*    if ( uMsg != 0x000f ) printf ( "message <%x>\n", uMsg ) ; */
     /*
      * Check what type of message are we receiving
      */
@@ -1000,11 +1169,78 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
          */
         fghReshapeWindowByHandle( hWnd, LOWORD(lParam), HIWORD(lParam) );
         break;
+#if 0
+    case WM_SETFOCUS: 
+        printf("WM_SETFOCUS: %p\n", window );
+        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        break;
+
+    case WM_ACTIVATE: 
+        if (LOWORD(wParam) != WA_INACTIVE)
+        {
+          //glutSetCursor( fgStructure.Window->State.Cursor );
+	        printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window, window->State.Cursor );
+
+          glutSetCursor( window->State.Cursor );
+        }
+
+        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        break;
+#endif
+
+    case WM_SETCURSOR: 
+        /*
+         * Windows seems to need reminding to erase the cursor for NONE.
+         */
+#if 0
+        if ((LOWORD(lParam) == HTCLIENT) &&
+	    (fgStructure.Window->State.Cursor == GLUT_CURSOR_NONE))
+	  SetCursor( NULL );
+#else
+	// Set the cursor AND change it for this window class. 
+#	define MAP_CURSOR(a,b) case a: SetCursor( LoadCursor( NULL, b ) ); \
+        break;
+	// Nuke the cursor AND change it for this window class. 
+#	define ZAP_CURSOR(a,b) case a: SetCursor( NULL ); \
+        break;
+
+        if (LOWORD(lParam) == HTCLIENT)
+	  switch( window->State.Cursor )
+	  {
+		MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
+		MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
+		MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
+		MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
+		MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP	   );
+		MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
+		MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
+		MAP_CURSOR( GLUT_CURSOR_WAIT,		 IDC_WAIT      );
+		MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
+		MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
+		//MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   );
+		ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL	   );
+
+		default:
+		MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
+	  }
+#endif
+	else
+	  lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+	break;
+
+    case WM_SHOWWINDOW:
+        /*
+         * We are now Visible!
+         */
+        window->State.Visible = TRUE;
+        window->State.Redisplay = TRUE;
+        break;
 
     case WM_PAINT:
         /*
          * Start the painting job
          */
+
         BeginPaint( hWnd, &ps );
 
         /*
@@ -1029,22 +1265,24 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         }
 
         /*
+         * Put on a linked list of windows to be removed after all the callbacks have returned
+         */
+        fgAddToWindowDestroyList ( window, FALSE ) ;
+
+        /*
          * Proceed with the window destruction
          */
-        DestroyWindow( window->Window.Handle );
+        DestroyWindow( hWnd );
         break;
 
     case WM_DESTROY:
         /*
-         * The window already got destroyed, so forget about it's existence:
+         * The window already got destroyed, so don't bother with it.
          */
-        fgDestroyWindow( window, FALSE );
         return( 0 );
 
     case WM_MOUSEMOVE:
     {
-        assert_window_registered;
-
         /*
          * The mouse cursor has moved. Remember the new mouse cursor's position
          */
@@ -1054,16 +1292,23 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /*
          * Fallback if there's an active menu hooked to this window
          */
-        if( window->MenuActive[ 0 ] || window->MenuActive[ 1 ] || window->MenuActive[ 2 ] )
+        if( window->ActiveMenu != NULL )
+        {
+            /*
+             * Let's make the window redraw as a result of the mouse motion.
+             */
+            window->State.Redisplay = TRUE ;
+
             break;
+        }
 
         /*
          * Remember the current modifiers state.
          */
         window->State.Modifiers = 
-            (GetKeyState( VK_LSHIFT   ) || GetKeyState( VK_RSHIFT   )) ? GLUT_ACTIVE_SHIFT : 0 |
-            (GetKeyState( VK_LCONTROL ) || GetKeyState( VK_RCONTROL )) ? GLUT_ACTIVE_CTRL  : 0 |
-            (GetKeyState( VK_LMENU    ) || GetKeyState( VK_RMENU    )) ? GLUT_ACTIVE_ALT   : 0;
+            ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
+            ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
+            ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
         /*
          * Check if any of the mouse buttons is pressed...
@@ -1123,12 +1368,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         int button;
 
         /*
-         * A mouse button has been pressed *or* released. Again, break off
-         * if the message was not directed towards a freeglut window...
-         */
-        assert_window_registered;
-
-        /*
          * The mouse cursor has moved. Remember the new mouse cursor's position
          */
         window->State.MouseX = LOWORD( lParam );
@@ -1162,34 +1401,51 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             return( DefWindowProc( hWnd, uMsg, lParam, wParam ) );
 
         /*
-         * Do not execute the callback if a menu is hooked to this key.
-         * In that case an appropriate private call should be generated
+         * Do not execute the application's mouse callback if a menu is hooked to this button.
+         * In that case an appropriate private call should be generated.
+         * Near as I can tell, this is the menu behaviour:
+         *  - Down-click the menu button, menu not active:  activate the menu with its upper left-hand corner at the mouse location.
+         *  - Down-click any button outside the menu, menu active:  deactivate the menu
+         *  - Down-click any button inside the menu, menu active:  select the menu entry and deactivate the menu
+         *  - Up-click the menu button, menu not active:  nothing happens
+         *  - Up-click the menu button outside the menu, menu active:  nothing happens
+         *  - Up-click the menu button inside the menu, menu active:  select the menu entry and deactivate the menu
          */
-        if( window->Menu[ button ] != NULL )
+        if ( window->ActiveMenu != NULL )  /* Window has an active menu, it absorbs any mouse click */
+        {
+          if ( fgCheckActiveMenu ( window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
+          {
+            fgExecuteMenuCallback ( window->ActiveMenu ) ;
+            fgDeactivateMenu ( window ) ;
+          }
+          else  /* Outside the menu, deactivate the menu if it's a downclick */
+          {
+            if ( pressed == TRUE ) fgDeactivateMenu ( window ) ;
+          }
+
+          /*
+           * Let's make the window redraw as a result of the mouse click and menu activity.
+           */
+          window->State.Redisplay = TRUE ;
+
+          break ;
+        }
+
+        /*
+         * No active menu, let's check whether we need to activate one.
+         */
+        if ( ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
         {
             /*
-             * Set the current window
+             * Let's make the window redraw as a result of the mouse click.
              */
-            glutSetWindow( window->ID );
+            window->State.Redisplay = TRUE ;
 
-            if( pressed == TRUE )
-            {
-                /*
-                 * Activate the appropriate menu structure...
-                 */
-                fgActivateMenu( button );
-            }
-            else
-            {
-                /*
-                 * There are two general cases generated when a menu button
-                 * is released -- it can provoke a menu call (when released
-                 * over a menu area) or just deactivate the menu (when released
-                 * somewhere else). Unfortunately, both cases must be checked
-                 * recursively due to the submenu possibilities.
-                 */
-                fgDeactivateMenu( button );
-            }
+            /*
+             * Activate the appropriate menu structure...
+             */
+            fgActivateMenu( window, button );
+
             break;
         }
 
@@ -1208,9 +1464,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
          * Remember the current modifiers state.
          */
         window->State.Modifiers = 
-            (GetKeyState( VK_LSHIFT   ) || GetKeyState( VK_RSHIFT   )) ? GLUT_ACTIVE_SHIFT : 0 |
-            (GetKeyState( VK_LCONTROL ) || GetKeyState( VK_RCONTROL )) ? GLUT_ACTIVE_CTRL  : 0 |
-            (GetKeyState( VK_LMENU    ) || GetKeyState( VK_RMENU    )) ? GLUT_ACTIVE_ALT   : 0;
+            ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
+            ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
+            ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
         /*
          * Finally execute the mouse callback
@@ -1235,24 +1491,24 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         int keypress = -1;
 
         /*
-         * First of all, make sure that there is a window to be notified of this
-         */
-        assert_window_registered;
-
-        /*
          * Ignore the automatic key repetition if needed:
          */
         if( fgState.IgnoreKeyRepeat && (lParam & KF_REPEAT) )
             break;
 
         /*
+         * Set the current window
+         */
+        glutSetWindow( window->ID );
+
+        /*
          * Remember the current modifiers state. This is done here in order 
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
         window->State.Modifiers = 
-            (GetKeyState( VK_LSHIFT   ) || GetKeyState( VK_RSHIFT   )) ? GLUT_ACTIVE_SHIFT : 0 |
-            (GetKeyState( VK_LCONTROL ) || GetKeyState( VK_RCONTROL )) ? GLUT_ACTIVE_CTRL  : 0 |
-            (GetKeyState( VK_LMENU    ) || GetKeyState( VK_RMENU    )) ? GLUT_ACTIVE_ALT   : 0;
+            ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
+            ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
+            ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
         /*
          * Convert the Win32 keystroke codes to GLUTtish way
@@ -1305,14 +1561,84 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     }
     break;
 
+    case WM_SYSKEYUP:
+    case WM_KEYUP:
+    {
+        int keypress = -1;
+
+        /*
+         * Set the current window
+         */
+        glutSetWindow( window->ID );
+
+        /*
+         * Remember the current modifiers state. This is done here in order 
+         * to make sure the VK_DELETE keyboard callback is executed properly.
+         */
+        window->State.Modifiers = 
+            ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
+            ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
+            ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+
+        /*
+         * Convert the Win32 keystroke codes to GLUTtish way.  "KEY(a,b)" was defined under "WM_KEYDOWN"
+         */
+
+        switch( wParam )
+        {
+          /*
+           * Most of the special characters can be handled automagically...
+           */
+          KEY( VK_F1,     GLUT_KEY_F1        ); KEY( VK_F2,     GLUT_KEY_F2        );
+          KEY( VK_F3,     GLUT_KEY_F3        ); KEY( VK_F4,     GLUT_KEY_F4        );
+          KEY( VK_F5,     GLUT_KEY_F5        ); KEY( VK_F6,     GLUT_KEY_F6        );
+          KEY( VK_F7,     GLUT_KEY_F7        ); KEY( VK_F8,     GLUT_KEY_F8        );
+          KEY( VK_F9,     GLUT_KEY_F9        ); KEY( VK_F10,    GLUT_KEY_F10       );
+          KEY( VK_F11,    GLUT_KEY_F11       ); KEY( VK_F12,    GLUT_KEY_F12       );
+          KEY( VK_PRIOR,  GLUT_KEY_PAGE_UP   ); KEY( VK_NEXT,   GLUT_KEY_PAGE_DOWN );
+          KEY( VK_HOME,   GLUT_KEY_HOME      ); KEY( VK_END,    GLUT_KEY_END       );
+          KEY( VK_LEFT,   GLUT_KEY_LEFT      ); KEY( VK_UP,     GLUT_KEY_UP        );
+          KEY( VK_RIGHT,  GLUT_KEY_RIGHT     ); KEY( VK_DOWN,   GLUT_KEY_DOWN      );
+          KEY( VK_INSERT, GLUT_KEY_INSERT    );
+
+          /*
+           * ...yet there is a small exception we need to have handled...
+           */
+          case VK_DELETE:
+            /*
+             * The delete key should be treated as an ASCII keypress:
+             */
+            if( window->Callbacks.KeyboardUp != NULL )
+                window->Callbacks.KeyboardUp( 127, window->State.MouseX, window->State.MouseY );
+          default:
+            /*
+             * Call the KeyboardUp callback for a regular character if there is one.
+             */
+            if( window->Callbacks.KeyboardUp != NULL )
+                window->Callbacks.KeyboardUp( wParam, window->State.MouseX, window->State.MouseY );
+        }
+
+        /*
+         * Execute the special callback, if present, given the conversion was a success:
+         */
+        if( (keypress != -1) && (window->Callbacks.SpecialUp != NULL) )
+        {
+            /*
+             * Have the special callback executed:
+             */
+            window->Callbacks.SpecialUp( keypress, window->State.MouseX, window->State.MouseY );
+        }
+
+        /*
+         * Thrash the modifiers register now
+         */
+        window->State.Modifiers = 0xffffffff;
+    }
+    break;
+
     case WM_SYSCHAR:
     case WM_CHAR:
     {
-        /*
-         * First of all, make sure that there is a window to be notified of this
-         */
-        assert_window_registered;
-
         /*
          * Ignore the automatic key repetition if needed:
          */
@@ -1328,9 +1654,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
              * Remember the current modifiers state
              */
             window->State.Modifiers = 
-                (GetKeyState( VK_LSHIFT   ) || GetKeyState( VK_RSHIFT   )) ? GLUT_ACTIVE_SHIFT : 0 |
-                (GetKeyState( VK_LCONTROL ) || GetKeyState( VK_RCONTROL )) ? GLUT_ACTIVE_CTRL  : 0 |
-                (GetKeyState( VK_LMENU    ) || GetKeyState( VK_RMENU    )) ? GLUT_ACTIVE_ALT   : 0;
+                ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
+                ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
+                ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
             /*
              * Have the special callback executed:
@@ -1344,6 +1670,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         }
     }
     break;
+
+    case WM_CAPTURECHANGED :  /* User has finished resizing the window, force a redraw */
+      if ( window->Callbacks.Display )
+        window->Callbacks.Display () ;
+
+//      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ) ;
+      break ;
 
     default:
         /*

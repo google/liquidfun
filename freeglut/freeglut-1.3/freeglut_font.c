@@ -37,8 +37,7 @@
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
- *  glutStrokeCharacter()       -- stroke fonts not implemented, uses a bitmap font instead
- *  glutStrokeWidth()           -- stroke fonts not implemented, uses a bitmap font instead
+ *  Test things out ...
  */
 
 /* -- IMPORT DECLARATIONS -------------------------------------------------- */
@@ -60,15 +59,15 @@ extern SFG_StrokeFont fgStrokeMonoRoman;
  * This is for GLUT binary compatibility, as suggested by Steve Baker
  */
 #if TARGET_HOST_UNIX_X11
-    void* glutStrokeRoman;
-    void* glutStrokeMonoRoman;
-    void* glutBitmap9By15;
-    void* glutBitmap8By13;
-    void* glutBitmapTimesRoman10;
-    void* glutBitmapTimesRoman24;
-    void* glutBitmapHelvetica10;
-    void* glutBitmapHelvetica12;
-    void* glutBitmapHelvetica18;
+  void* glutStrokeRoman;
+  void* glutStrokeMonoRoman;
+  void* glutBitmap9By15;
+  void* glutBitmap8By13;
+  void* glutBitmapTimesRoman10;
+  void* glutBitmapTimesRoman24;
+  void* glutBitmapHelvetica10;
+  void* glutBitmapHelvetica12;
+  void* glutBitmapHelvetica18;
 #endif
 
 
@@ -80,23 +79,23 @@ extern SFG_StrokeFont fgStrokeMonoRoman;
  */
 static SFG_Font* fghFontByID( void* font )
 {
-    /*
-     * Try matching the font ID and the font data structure
-     */
-    if( font == GLUT_BITMAP_8_BY_13        ) return( &fgFontFixed8x13    );
-    if( font == GLUT_BITMAP_9_BY_15        ) return( &fgFontFixed9x15    );
-    if( font == GLUT_BITMAP_HELVETICA_10   ) return( &fgFontHelvetica10  );
-    if( font == GLUT_BITMAP_HELVETICA_12   ) return( &fgFontHelvetica12  );
-    if( font == GLUT_BITMAP_HELVETICA_18   ) return( &fgFontHelvetica18  );
-    if( font == GLUT_BITMAP_TIMES_ROMAN_10 ) return( &fgFontTimesRoman10 );
-    if( font == GLUT_BITMAP_TIMES_ROMAN_24 ) return( &fgFontTimesRoman24 );
+  /*
+   * Try matching the font ID and the font data structure
+   */
+  if( font == GLUT_BITMAP_8_BY_13        ) return( &fgFontFixed8x13    );
+  if( font == GLUT_BITMAP_9_BY_15        ) return( &fgFontFixed9x15    );
+  if( font == GLUT_BITMAP_HELVETICA_10   ) return( &fgFontHelvetica10  );
+  if( font == GLUT_BITMAP_HELVETICA_12   ) return( &fgFontHelvetica12  );
+  if( font == GLUT_BITMAP_HELVETICA_18   ) return( &fgFontHelvetica18  );
+  if( font == GLUT_BITMAP_TIMES_ROMAN_10 ) return( &fgFontTimesRoman10 );
+  if( font == GLUT_BITMAP_TIMES_ROMAN_24 ) return( &fgFontTimesRoman24 );
 
-    /*
-     * This probably is the library user's fault
-     */
-    fgError( "font 0x%08x not found", font );
+  /*
+   * This probably is the library user's fault
+   */
+  fgError( "font 0x%08x not found", font );
 
-    return 0;
+  return 0;
 }
 
 /*
@@ -105,18 +104,18 @@ static SFG_Font* fghFontByID( void* font )
  */
 static SFG_StrokeFont* fghStrokeByID( void* font )
 {
-    /*
-     * Try matching the font ID and the font data structure
-     */
-    if( font == GLUT_STROKE_ROMAN ) return( &fgStrokeRoman );
-    if( font == GLUT_STROKE_MONO_ROMAN ) return( &fgStrokeMonoRoman );
+  /*
+   * Try matching the font ID and the font data structure
+   */
+  if( font == GLUT_STROKE_ROMAN      ) return( &fgStrokeRoman     );
+  if( font == GLUT_STROKE_MONO_ROMAN ) return( &fgStrokeMonoRoman );
 
-    /*
-     * This probably is the library user's fault
-     */
-    fgError( "stroke font 0x%08x not found", font );
+  /*
+   * This probably is the library user's fault
+   */
+  fgError( "stroke font 0x%08x not found", font );
 
-    return 0;
+  return 0;
 }
 
 
@@ -127,60 +126,117 @@ static SFG_StrokeFont* fghStrokeByID( void* font )
  */
 void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
 {
-    const GLubyte* face;
+  const GLubyte* face;
 
-    /*
-     * First of all we'll need a font to use
-     */
-    SFG_Font* font = fghFontByID( fontID );
+  /*
+   * First of all we'll need a font to use
+   */
+  SFG_Font* font = fghFontByID( fontID );
 
-    /*
-     * Make sure the character we want to output is valid
-     */
-    freeglut_return_if_fail( character >= 0 && character < 256 );
+  /*
+   * Make sure the character we want to output is valid
+   */
+  freeglut_return_if_fail( character >= 0 && character < 256 );
 
-    /*
-     * Then find the character we want to draw
-     */
-    face = font->Characters[ character - 1 ];
+  /*
+   * Then find the character we want to draw
+   */
+  face = font->Characters[ character - 1 ];
 
-    /*
-     * Save the old pixel store settings
-     */
-    glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
+  /*
+   * Save the old pixel store settings
+   */
+  glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
 
-    /*
-     * Set up the pixel unpacking ways
-     */
-    glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
-    glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
-    glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
-    glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
-    glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
-    glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
+  /*
+   * Set up the pixel unpacking ways
+   */
+  glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
+  glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
+  glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
+  glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
+  glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
+  glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
 
-    /*
-     * We'll use a glBitmap call to draw the font.
-     */
-    glBitmap(
-        face[ 0 ], font->Height,    /* The bitmap's width and height */
-        0, 0,                       /* The origin -- what the hell?  */
-        face[ 0 ] + 1, 0,           /* The raster advance -- inc. x  */
-        (face + 1)                  /* The packed bitmap data...     */
-    );
+  /*
+   * We'll use a glBitmap call to draw the font.
+   */
+  glBitmap(
+      face[ 0 ], font->Height,      /* The bitmap's width and height */
+      font->xorig, font->yorig,     /* The origin -- what on earth?  */
+      (float)(face[ 0 ] + 1), 0.0,  /* The raster advance -- inc. x  */
+      (face + 1)                    /* The packed bitmap data...     */
+  );
 
-    /*
-     * Restore the old pixel store settings
-     */
-    glPopClientAttrib();
+  /*
+   * Restore the old pixel store settings
+   */
+  glPopClientAttrib();
 }
 
 void FGAPIENTRY glutBitmapString( void* fontID, const char *string )
 {
-    int i;
+  int c;
+  int numchar = strlen ( string ) ;
 
-    for( i=0; i<strlen( string ); i++ )
-        glutBitmapCharacter( fontID, string[ i ] );
+  /*
+   * First of all we'll need a font to use
+   */
+  SFG_Font* font = fghFontByID( fontID );
+
+  float raster_position[4] ;
+  glGetFloatv ( GL_CURRENT_RASTER_POSITION, raster_position ) ;
+
+  /*
+   * Save the old pixel store settings
+   */
+  glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
+
+  /*
+   * Set up the pixel unpacking ways
+   */
+  glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
+  glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
+  glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
+  glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
+  glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
+  glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
+
+  /*
+   * Step through the string, drawing each character.
+   * A carriage return will simply translate the next character's insertion point back to the
+   * start of the line and down one line.
+   */
+  for( c = 0; c < numchar; c++ )
+  {
+    if ( ( string[ c ] >= 0 ) && ( string[ c ] < 256 ) )
+    {
+      if ( string[c] == '\n' )
+      {
+        raster_position[1] -= (float)font->Height ;
+        glRasterPos4fv ( raster_position ) ;
+      }
+      else  /* Not a carriage return, draw the bitmap character */
+      {
+        const GLubyte* face = font->Characters[ string[ c ] - 1 ] ;
+
+        /*
+         * We'll use a glBitmap call to draw the font.
+         */
+        glBitmap(
+            face[ 0 ], font->Height,      /* The bitmap's width and height */
+            font->xorig, font->yorig,     /* The origin -- what on earth?  */
+            (float)(face[ 0 ] + 1), 0.0,  /* The raster advance -- inc. x  */
+            (face + 1)                    /* The packed bitmap data...     */
+        ) ;
+      }
+    }
+  }
+
+  /*
+   * Restore the old pixel store settings
+   */
+  glPopClientAttrib();
 }
 
 /*
@@ -188,80 +244,20 @@ void FGAPIENTRY glutBitmapString( void* fontID, const char *string )
  */
 int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
 {
-    /*
-     * First of all, grab the font we need
-     */
-    SFG_Font* font = fghFontByID( fontID );
+  /*
+   * First of all, grab the font we need
+   */
+  SFG_Font* font = fghFontByID( fontID );
 
-    /*
-     * Make sure the character we want to output is valid
-     */
-    freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
+  /*
+   * Make sure the character we want to output is valid
+   */
+  freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
 
-    /*
-         * Scan the font looking for the specified character
-     */
-    return( *(font->Characters[ character - 1 ]) + 1 );
-}
-
-/*
- * Draw a stroke character
- */
-void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
-{
-    const SFG_StrokeChar *schar;
-    const SFG_StrokeStrip *strip;
-    int i, j;
-
-    /*
-     * First of all we'll need a font to use
-     */
-    SFG_StrokeFont* font = fghStrokeByID( fontID );
-
-    /*
-     * Make sure the character we want to output is valid
-     */
-    freeglut_return_if_fail( character >= 0 && character < font->Quantity );
-
-    schar = font->Characters[character];
-
-    freeglut_return_if_fail( schar );
-
-    strip = schar->Strips;
-
-    for (i = 0; i < schar->Number; i++, strip++)
-    {
-        glBegin(GL_LINE_STRIP);
-        for(j = 0; j < strip->Number; j++)
-        {
-            glVertex2f(strip->Vertices[j].X, strip->Vertices[j].Y);
-        }
-        glEnd();
-    }
-    glTranslatef(schar->Right, 0.0, 0.0);
-}
-
-/*
- * Return the width in pixels of a stroke character
- */
-int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
-{
-    const SFG_StrokeChar *schar;
-    /*
-     * First of all we'll need a font to use
-     */
-    SFG_StrokeFont* font = fghStrokeByID( fontID );
-
-    /*
-     * Make sure the character we want to output is valid
-     */
-    freeglut_return_if_fail( character >= 0 && character < font->Quantity );
-
-    schar = font->Characters[character];
-
-    freeglut_return_if_fail( schar );
-
-    return (schar->Right);
+  /*
+       * Scan the font looking for the specified character
+   */
+  return( *(font->Characters[ character - 1 ]) + 1 );
 }
 
 /*
@@ -269,37 +265,37 @@ int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
  */
 int FGAPIENTRY glutBitmapLength( void* fontID, const char* string )
 {
-    int i, length = 0;
+  int c, length = 0, this_line_length = 0;
 
-    /*
-     * Using glutBitmapWidth() function to calculate the result
-     */
-    for( i=0; i<strlen( string ); i++ )
-        length += glutBitmapWidth( fontID, string[ i ] );
+  /*
+   * First of all, grab the font we need
+   */
+  SFG_Font* font = fghFontByID( fontID );
 
-    /*
-     * Return the result now
-     */
-    return( length );
-}
+  /*
+   * Step through the characters in the string, adding up the width of each one
+   */
+  int numchar = strlen ( string ) ;
+  for( c = 0; c < numchar; c++ )
+  {
+    if ( ( string[ c ] >= 0 ) && ( string[ c ] < 256 ) )
+    {
+      if ( string[ c ] == '\n' )  /* Carriage return, reset the length of this line */
+      {
+        if ( length < this_line_length ) length = this_line_length ;
+        this_line_length = 0 ;
+      }
+      else  /* Not a carriage return, increment the length of this line */
+        this_line_length += *(font->Characters[ string[ c ] - 1 ]) + 1 ;
+    }
+  }
 
-/*
- * Return the width of a string drawn using a stroke font
- */
-int FGAPIENTRY glutStrokeLength( void* fontID, const char* string )
-{
-    int i, length = 0;
+  if ( length < this_line_length ) length = this_line_length ;
 
-    /*
-     * Using glutStrokeWidth() function to calculate the result
-     */
-    for( i=0; i<strlen( string ); i++ )
-        length += glutStrokeWidth( fontID, string[ i ] );
-
-    /*
-     * Return the result now
-     */
-    return( length );
+  /*
+   * Return the result now
+   */
+  return( length );
 }
 
 /*
@@ -307,15 +303,168 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const char* string )
  */
 int FGAPIENTRY glutBitmapHeight( void* fontID )
 {
-    /*
-     * See which font are we queried about
-     */
-    SFG_Font* font = fghFontByID( fontID );
+  /*
+   * See which font are we queried about
+   */
+  SFG_Font* font = fghFontByID( fontID );
 
-    /*
-     * Return the character set's height
-     */
-    return( font->Height );
+  /*
+   * Return the character set's height
+   */
+  return( font->Height );
+}
+
+/*
+ * Draw a stroke character
+ */
+void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
+{
+  const SFG_StrokeChar *schar;
+  const SFG_StrokeStrip *strip;
+  int i, j;
+
+  /*
+   * First of all we'll need a font to use
+   */
+  SFG_StrokeFont* font = fghStrokeByID( fontID );
+
+  /*
+   * Make sure the character we want to output is valid
+   */
+  freeglut_return_if_fail( character >= 0 && character < font->Quantity );
+
+  schar = font->Characters[character];
+
+  freeglut_return_if_fail( schar );
+
+  strip = schar->Strips;
+
+  for (i = 0; i < schar->Number; i++, strip++)
+  {
+    glBegin(GL_LINE_STRIP);
+    for(j = 0; j < strip->Number; j++)
+    {
+      glVertex2f(strip->Vertices[j].X, strip->Vertices[j].Y);
+    }
+    glEnd();
+  }
+  glTranslatef(schar->Right, 0.0, 0.0);
+}
+
+void FGAPIENTRY glutStrokeString( void* fontID, const char *string )
+{
+  int c, i, j;
+  int numchar = strlen ( string ) ;
+  float length = 0.0 ;
+
+  /*
+   * First of all we'll need a font to use
+   */
+  SFG_StrokeFont* font = fghStrokeByID( fontID );
+
+  /*
+   * Step through the string, drawing each character.
+   * A carriage return will simply translate the next character's insertion point back to the
+   * start of the line and down one line.
+   */
+  for( c = 0; c < numchar; c++ )
+  {
+    if ( ( string[ c ] >= 0 ) && ( string[ c ] < font->Quantity ) )
+    {
+      if ( string[c] == '\n' )
+      {
+        glTranslatef ( -length, -(float)(font->Height), 0.0 ) ;
+        length = 0.0 ;
+      }
+      else  /* Not a carriage return, draw the bitmap character */
+      {
+        const SFG_StrokeChar *schar = font->Characters[string[c]];
+        if ( schar != NULL )
+        {
+          const SFG_StrokeStrip *strip = schar->Strips;
+
+          for (i = 0; i < schar->Number; i++, strip++)
+          {
+            glBegin(GL_LINE_STRIP);
+            for(j = 0; j < strip->Number; j++)
+              glVertex2f(strip->Vertices[j].X, strip->Vertices[j].Y);
+
+            glEnd();
+          }
+
+          length += schar->Right ;
+          glTranslatef(schar->Right, 0.0, 0.0);
+        }
+      }
+    }
+  }
+}
+
+/*
+ * Return the width in pixels of a stroke character
+ */
+int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
+{
+  const SFG_StrokeChar *schar;
+  /*
+   * First of all we'll need a font to use
+   */
+  SFG_StrokeFont* font = fghStrokeByID( fontID );
+
+  /*
+   * Make sure the character we want to output is valid
+   */
+  freeglut_return_val_if_fail( character >= 0 && character < font->Quantity, 0 );
+
+  schar = font->Characters[character];
+
+  freeglut_return_val_if_fail( schar, 0 );
+
+  return ((int)(schar->Right + 0.5));
+}
+
+/*
+ * Return the width of a string drawn using a stroke font
+ */
+int FGAPIENTRY glutStrokeLength( void* fontID, const char* string )
+{
+  int c;
+  float length = 0.0;
+  float this_line_length = 0.0 ;
+
+  /*
+   * First of all we'll need a font to use
+   */
+  SFG_StrokeFont* font = fghStrokeByID( fontID );
+
+  /*
+   * Step through the characters in the string, adding up the width of each one
+   */
+  int numchar = strlen ( string ) ;
+  for( c = 0; c < numchar; c++ )
+  {
+    if ( ( string[ c ] >= 0 ) && ( string[ c ] < font->Quantity ) )
+    {
+      if ( string[ c ] == '\n' )  /* Carriage return, reset the length of this line */
+      {
+        if ( length < this_line_length ) length = this_line_length ;
+        this_line_length = 0.0 ;
+      }
+      else  /* Not a carriage return, increment the length of this line */
+      {
+        const SFG_StrokeChar *schar = font->Characters[string[c]];
+        if ( schar != NULL )
+          this_line_length += schar->Right ;
+      }
+    }
+  }
+
+  if ( length < this_line_length ) length = this_line_length ;
+
+  /*
+   * Return the result now
+   */
+  return( (int)(length+0.5) );
 }
 
 /*

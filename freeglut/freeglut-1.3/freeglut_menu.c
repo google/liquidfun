@@ -49,6 +49,7 @@
  */
 #define  FREEGLUT_MENU_FONT    GLUT_BITMAP_8_BY_13
 #define  FREEGLUT_MENU_HEIGHT  15
+#define  FREEGLUT_MENU_BORDER   8
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -74,215 +75,247 @@ static SFG_MenuEntry *fghFindMenuEntry( SFG_Menu* menu, int index )
 /*
  * Private static function to check for the current menu/sub menu activity state
  */
-static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
+static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
 {
-    SFG_Window* window = fgStructure.Window;
-    SFG_MenuEntry* menuEntry;
-    int x, y;
+  SFG_MenuEntry* menuEntry;
+  int x, y;
 
+  /*
+   * First of all check any of the active sub menus...
+   */
+  for( menuEntry = menu->Entries.First; menuEntry;
+       menuEntry = menuEntry->Node.Next )
+  {
     /*
-     * First of all check any of the active sub menus...
+     * Is that an active sub menu by any case?
      */
-    for( menuEntry = menu->Entries.First; menuEntry;
-         menuEntry = menuEntry->Node.Next )
+    if( menuEntry->SubMenu != NULL && menuEntry->IsActive == TRUE )
     {
-        /*
-         * Is that an active sub menu by any case?
-         */
-        if( menuEntry->SubMenu != NULL && menuEntry->IsActive == TRUE )
-        {
-            /*
-             * OKi, have the sub-menu checked, too. If it returns TRUE, it will mean
-             * that it caught the mouse cursor and we do not need to regenerate
-             * the activity list, and so our parents do...
-             */
-            if( fghCheckMenuStatus( menuEntry->SubMenu ) == TRUE )
-                return( TRUE );
-        }
-    }
-
-    /*
-     * That much about our sub menus, let's get to checking the current menu:
-     */
-    x = window->State.MouseX - menu->X;
-    y = window->State.MouseY - menu->Y;
-
-    /*
-     * Mark all menu entries inactive...
-     */
-    for( menuEntry = menu->Entries.First; menuEntry;
-         menuEntry = menuEntry->Node.Next )
-    {
-        menuEntry->IsActive = FALSE;
-    }
-
-    menu->IsActive = FALSE;
-
-    /*
-     * Check if the mouse cursor is contained within the current menu box
-     */
-    if( x >= 0 && x < menu->Width && y >= 0 && y < menu->Height )
-    {
-        /*
-         * Calculation of the highlighted menu item is easy enough now:
-         */
-        int menuID = y / FREEGLUT_MENU_HEIGHT;
-
-        /*
-         * The mouse cursor is somewhere over our box, check it out.
-         */
-        menuEntry = fghFindMenuEntry( menu, menuID + 1 );
-        assert( menuEntry != NULL );
-
-        /*
-         * Mark the menu as active...
-         */
-        menuEntry->IsActive = TRUE;
-        menuEntry->Ordinal = menuID;
-
-        /*
-         * Don't forget about marking the current menu as active, too:
-         */
-        menu->IsActive = TRUE;
-
-        /*
-         * OKi, we have marked that entry as active, but it would be also
-         * nice to have it's contents updated, in case it's a sub menu.
-         * Also, ignore the return value of the check function:
-         */
-        if( menuEntry->SubMenu != NULL )
-        {
-            int x = window->State.MouseX;
-            int y = window->State.MouseY;
-
-            /*
-             * Set up the initial menu position now...
-             */
-
-            if( x > 15 ) menuEntry->SubMenu->X = x - 15; else menuEntry->SubMenu->X = 15;
-            if( y > 15 ) menuEntry->SubMenu->Y = y - 15; else menuEntry->SubMenu->Y = 15;
-
-            if( x > (glutGet( GLUT_WINDOW_WIDTH  ) - menuEntry->SubMenu->Width  - 15) )
-                menuEntry->SubMenu->X = glutGet( GLUT_WINDOW_WIDTH  ) - menuEntry->SubMenu->Width  - 15;
-            if( y > (glutGet( GLUT_WINDOW_HEIGHT ) - menuEntry->SubMenu->Height - 15) )
-                menuEntry->SubMenu->Y = glutGet( GLUT_WINDOW_HEIGHT ) - menuEntry->SubMenu->Height - 15;
-
-            /*
-             * ...then check the submenu's state:
-             */
-            fghCheckMenuStatus( menuEntry->SubMenu );
-        }
-
-        /*
-         * Report back that we have caught the menu cursor
-         */
+      /*
+       * OK, have the sub-menu checked, too. If it returns TRUE, it will mean
+       * that it caught the mouse cursor and we do not need to regenerate
+       * the activity list, and so our parents do...
+       */
+      if( fghCheckMenuStatus( window, menuEntry->SubMenu ) == TRUE )
         return( TRUE );
     }
+  }
+
+  /*
+   * That much about our sub menus, let's get to checking the current menu:
+   */
+  x = window->State.MouseX - menu->X;
+  y = window->State.MouseY - menu->Y;
+
+  /*
+   * Mark all menu entries inactive...
+   */
+  for( menuEntry = menu->Entries.First; menuEntry;
+       menuEntry = menuEntry->Node.Next )
+  {
+    menuEntry->IsActive = FALSE;
+  }
+
+  menu->IsActive = FALSE;
+
+  /*
+   * Check if the mouse cursor is contained within the current menu box
+   */
+  if( x >= 0 && x < menu->Width && y >= 0 && y < menu->Height )
+  {
+    /*
+     * Calculation of the highlighted menu item is easy enough now:
+     */
+    int menuID = y / FREEGLUT_MENU_HEIGHT;
 
     /*
-     * Looks like the menu cursor is somewhere else...
+     * The mouse cursor is somewhere over our box, check it out.
      */
-    return( FALSE );
+    menuEntry = fghFindMenuEntry( menu, menuID + 1 );
+    assert( menuEntry != NULL );
+
+    /*
+     * Mark the menu as active...
+     */
+    menuEntry->IsActive = TRUE;
+    menuEntry->Ordinal = menuID;
+
+    /*
+     * Don't forget about marking the current menu as active, too:
+     */
+    menu->IsActive = TRUE;
+
+    /*
+     * OKi, we have marked that entry as active, but it would be also
+     * nice to have its contents updated, in case it's a sub menu.
+     * Also, ignore the return value of the check function:
+     */
+    if( menuEntry->SubMenu != NULL )
+    {
+      /*
+       * Set up the initial menu position now...
+       */
+
+      menuEntry->SubMenu->X = menu->X + menu->Width ;
+      menuEntry->SubMenu->Y = menu->Y + menuEntry->Ordinal * FREEGLUT_MENU_HEIGHT ;
+
+      /*
+       * Make sure the submenu stays within the window
+       */
+      if ( menuEntry->SubMenu->X + menuEntry->SubMenu->Width > glutGet ( GLUT_WINDOW_WIDTH ) )
+      {
+        menuEntry->SubMenu->X = menu->X - menuEntry->SubMenu->Width ;
+        if ( menuEntry->SubMenu->X < 0 )
+          menuEntry->SubMenu->X = glutGet ( GLUT_WINDOW_WIDTH ) - menuEntry->SubMenu->Width ;
+      }
+
+      /*
+       * ...then check the submenu's state:
+       */
+      fghCheckMenuStatus( window, menuEntry->SubMenu );
+
+      /*
+       * Even if the submenu turned up inactive, activate it because its parent entry is active
+       */
+      menuEntry->SubMenu->IsActive = TRUE ;
+    }
+
+    /*
+     * Report back that we have caught the menu cursor
+     */
+    return( TRUE );
+  }
+
+  /*
+   * Looks like the menu cursor is somewhere else...
+   */
+  return( FALSE );
 }
 
 /*
- * Displays a menu box and all of it's submenus (if they are active)
+ * Displays a menu box and all of its submenus (if they are active)
  */
 static void fghDisplayMenuBox( SFG_Menu* menu )
 {
-    SFG_MenuEntry *menuEntry;
-    int i;
+  SFG_MenuEntry *menuEntry;
+  int i;
 
+  /*
+   * Have the menu box drawn first. The +- values are
+   * here just to make it more nice-looking...
+   */
+  glColor4f( 0.0, 0.0, 0.0, 1.0 );
+  glBegin( GL_QUADS );
+    glVertex2f( menu->X              , menu->Y - 1                );
+    glVertex2f( menu->X + menu->Width, menu->Y - 1                );
+    glVertex2f( menu->X + menu->Width, menu->Y + 4 + menu->Height );
+    glVertex2f( menu->X              , menu->Y + 4 + menu->Height );
+  glEnd();
+
+  glColor4f( 0.3, 0.4, 0.5, 1.0 );
+  glBegin( GL_QUADS );
+    glVertex2f( menu->X - 2              , menu->Y + 1                );
+    glVertex2f( menu->X - 2 + menu->Width, menu->Y + 1                );
+    glVertex2f( menu->X - 2 + menu->Width, menu->Y + 2 + menu->Height );
+    glVertex2f( menu->X - 2              , menu->Y + 2 + menu->Height );
+  glEnd();
+
+  /*
+   * Check if any of the submenus is currently active...
+   */
+  for( menuEntry = menu->Entries.First; menuEntry;
+       menuEntry = menuEntry->Node.Next )
+  {
     /*
-     * Have the menu box drawn first. The +- values are
-     * here just to make it more nice-looking...
+     * Has the menu been marked as active, maybe?
      */
-    glColor4f( 0.0, 0.0, 0.0, 1.0 );
-    glBegin( GL_QUADS );
-        glVertex2f( menu->X - 8              , menu->Y - 1                );
-        glVertex2f( menu->X + 8 + menu->Width, menu->Y - 1                );
-        glVertex2f( menu->X + 8 + menu->Width, menu->Y + 4 + menu->Height );
-        glVertex2f( menu->X - 8              , menu->Y + 4 + menu->Height );
-    glEnd();
-
-    glColor4f( 0.3, 0.4, 0.5, 1.0 );
-    glBegin( GL_QUADS );
-        glVertex2f( menu->X - 6              , menu->Y + 1                );
-        glVertex2f( menu->X + 6 + menu->Width, menu->Y + 1                );
-        glVertex2f( menu->X + 6 + menu->Width, menu->Y + 2 + menu->Height );
-        glVertex2f( menu->X - 6              , menu->Y + 2 + menu->Height );
-    glEnd();
-
-    /*
-     * Check if any of the submenus is currently active...
-     */
-    for( menuEntry = menu->Entries.First; menuEntry;
-         menuEntry = menuEntry->Node.Next )
+    if( menuEntry->IsActive == TRUE )
     {
-        /*
-         * Has the menu been marked as active, maybe?
-         */
-        if( menuEntry->IsActive == TRUE )
-        {
-            /*
-             * That's truly right, and we need to have it highlighted.
-             * There is an assumption that mouse cursor didn't move
-             * since the last check of menu activity state:
-             */
-            int menuID = menuEntry->Ordinal;
+      /*
+       * That's truly right, and we need to have it highlighted.
+       * There is an assumption that mouse cursor didn't move
+       * since the last check of menu activity state:
+       */
+      int menuID = menuEntry->Ordinal;
 
-            /*
-             * So have the highlight drawn...
-             */
-            glColor4f( 0.2, 0.3, 0.4, 1.0 );
-            glBegin( GL_QUADS );
-                glVertex2f( menu->X - 6              , menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
-                glVertex2f( menu->X + 6 + menu->Width, menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
-                glVertex2f( menu->X + 6 + menu->Width, menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
-                glVertex2f( menu->X - 6              , menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
-            glEnd();
-        }
+      /*
+       * So have the highlight drawn...
+       */
+      glColor4f( 0.2, 0.3, 0.4, 1.0 );
+      glBegin( GL_QUADS );
+        glVertex2f( menu->X - 2              , menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
+        glVertex2f( menu->X - 2 + menu->Width, menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
+        glVertex2f( menu->X - 2 + menu->Width, menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
+        glVertex2f( menu->X - 2              , menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
+      glEnd();
     }
+  }
+
+  /*
+   * Print the menu entries now...
+   */
+  glColor4f( 1, 1, 1, 1 );
+
+  for( menuEntry = menu->Entries.First, i=0; menuEntry;
+       menuEntry = menuEntry->Node.Next, ++i )
+  {
+    /*
+     * Move the raster into position...
+     */
+    glRasterPos2i(
+        menu->X + FREEGLUT_MENU_BORDER,
+        menu->Y + (i + 1)*FREEGLUT_MENU_HEIGHT
+    );
 
     /*
-     * Print the menu entries now...
+     * Have the label drawn, character after character:
      */
-    glColor4f( 1, 1, 1, 1 );
-
-    for( menuEntry = menu->Entries.First, i=0; menuEntry;
-         menuEntry = menuEntry->Node.Next, ++i )
-    {
-        /*
-         * Move the raster into position...
-         */
-        glRasterPos2i(
-            menu->X,
-            menu->Y + (i + 1)*FREEGLUT_MENU_HEIGHT
-        );
-
-        /*
-         * Have the label drawn, character after character:
-         */
-        glutBitmapString( FREEGLUT_MENU_FONT, menuEntry->Text);
-    }
+    glutBitmapString( FREEGLUT_MENU_FONT, menuEntry->Text);
 
     /*
-     * Now we are ready to check if any of our children needs to be redrawn:
+     * If it's a submenu, draw a right arrow
      */
-    for( menuEntry = menu->Entries.First; menuEntry;
-         menuEntry = menuEntry->Node.Next )
+    if ( menuEntry->SubMenu != NULL )
     {
-        /*
-         * Is that an active sub menu by any case?
-         */
-        if( menuEntry->SubMenu != NULL && menuEntry->IsActive == TRUE )
-        {
-            /*
-             * Yeah, indeed. Have it redrawn now:
-             */
-            fghDisplayMenuBox( menuEntry->SubMenu );
-        }
+      GLubyte arrow_char [] = { 0, 0, 32, 48, 56, 60, 62, 63, 62, 60, 56, 48, 32, 0, 0 } ;
+      int width = glutBitmapWidth ( FREEGLUT_MENU_FONT, ' ' ) ;
+
+      glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
+
+      /*
+       * Set up the pixel unpacking ways
+       */
+      glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
+      glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
+      glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
+      glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
+      glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
+      glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
+
+      glRasterPos2i ( menu->X + menu->Width - 2 - width,
+                      menu->Y + (i + 1)*FREEGLUT_MENU_HEIGHT ) ;
+      glBitmap ( width, FREEGLUT_MENU_HEIGHT, 0, 0, 0.0, 0.0, arrow_char ) ;
+      glPopClientAttrib();
     }
+  }
+
+  /*
+   * Now we are ready to check if any of our children needs to be redrawn:
+   */
+  for( menuEntry = menu->Entries.First; menuEntry;
+       menuEntry = menuEntry->Node.Next )
+  {
+    /*
+     * Is that an active sub menu by any case?
+     */
+    if( menuEntry->SubMenu != NULL && menuEntry->IsActive == TRUE )
+    {
+      /*
+       * Yeah, indeed. Have it redrawn now:
+       */
+      fghDisplayMenuBox( menuEntry->SubMenu );
+    }
+  }
 }
 
 /*
@@ -292,7 +325,6 @@ void fgDisplayMenu( void )
 {
     SFG_Window* window = fgStructure.Window;
     SFG_Menu* menu = NULL;
-    int i;
 
     /*
      * Make sure there is a current window available
@@ -302,17 +334,12 @@ void fgDisplayMenu( void )
     /*
      * Check if there is an active menu attached to this window...
      */
-    for( i=0; i<FREEGLUT_MAX_MENUS; i++ )
-    {
-        if( window->Menu[ i ] != NULL && window->MenuActive[ i ] == TRUE )
-            menu = window->Menu[ i ];
-    };
+    menu = window->ActiveMenu;
 
     /*
      * Did we find an active window?
      */
     freeglut_return_if_fail( menu != NULL );
-
     /*
      * Prepare the OpenGL state to do the rendering first:
      */
@@ -345,7 +372,7 @@ void fgDisplayMenu( void )
     /*
      * First of all, have the exact menu status check:
      */
-    fghCheckMenuStatus( menu );
+    fghCheckMenuStatus( window, menu );
 
     /*
      * The status has been updated and we're ready to have the menu drawn now:
@@ -357,118 +384,119 @@ void fgDisplayMenu( void )
      */
     glPopAttrib();
 
-    glMatrixMode( GL_MODELVIEW );
-    glPopMatrix();
     glMatrixMode( GL_PROJECTION );
+    glPopMatrix();
+    glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
 }
 
 /*
  * Activates a menu pointed by the function argument
  */
-void fgActivateMenu( int button )
+void fgActivateMenu( SFG_Window* window, int button )
 {
-    SFG_Window* window = fgStructure.Window;
-    SFG_Menu* menu = NULL;
-    int x, y;
+  int x, y;
 
-    freeglut_assert_window;
+  /*
+   * We'll be referencing this menu a lot, so remember its address:
+   */
+  SFG_Menu* menu = window->Menu[ button ];
 
-    /*
-     * Mark the menu as active, so that it gets displayed:
-     */
-    window->MenuActive[ button ] = TRUE;
+  /*
+   * Mark the menu as active, so that it gets displayed:
+   */
+  window->ActiveMenu = menu;
+  menu->IsActive = TRUE ;
 
-    /*
-     * We'll be referencing this menu a lot, so remember it's address:
-     */
-    menu = window->Menu[ button ];
+  /*
+   * Grab the mouse cursor position respective to the current window
+   */
+  x = window->State.MouseX;
+  y = window->State.MouseY;
 
-    /*
-     * Grab the mouse cursor position respective to the current window
-     */
-    x = window->State.MouseX;
-    y = window->State.MouseY;
+  /*
+   * Set up the initial menu position now:
+   */
+  menu->X = x ;
+  menu->Y = y ;
 
-    /*
-     * Set up the initial menu position now:
-     */
-    if( x > 10 ) menu->X = x - 10; else menu->X = 5;
-    if( y > 10 ) menu->Y = y - 10; else menu->Y = 5;
+  glutSetWindow ( window->ID ) ;
 
-    if( x > (glutGet( GLUT_WINDOW_WIDTH  ) - menu->Width ) )
-        menu->X = glutGet( GLUT_WINDOW_WIDTH  ) - menu->Width;
-    if( y > (glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height) )
-        menu->Y = glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height;
+  if( x > ( glutGet( GLUT_WINDOW_WIDTH ) - menu->Width ) )
+    menu->X = glutGet( GLUT_WINDOW_WIDTH ) - menu->Width;
+  if( y > ( glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height) )
+    menu->Y = glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height;
 }
 
 /*
- * Private static function to check for menu entry selection on menu deactivation
+ * Check whether an active menu absorbs a mouse click
  */
-static void fghCheckMenuSelect( SFG_Menu* menu )
+GLboolean fgCheckActiveMenu ( SFG_Window *window, SFG_Menu *menu )
 {
-    SFG_MenuEntry *menuEntry;
+  /*
+   * Near as I can tell, this is the active menu behaviour:
+   *  - Down-click any button outside the menu, menu active:  deactivate the menu
+   *  - Down-click any button inside the menu, menu active:  select the menu entry and deactivate the menu
+   *  - Up-click the menu button outside the menu, menu active:  nothing happens
+   *  - Up-click the menu button inside the menu, menu active:  select the menu entry and deactivate the menu
+   * Since menus can have submenus, we need to check this recursively.
+   */
+  return fghCheckMenuStatus ( window, menu ) ;
+}
 
+/*
+ * Function to check for menu entry selection on menu deactivation
+ */
+void fgExecuteMenuCallback( SFG_Menu* menu )
+{
+  SFG_MenuEntry *menuEntry;
+
+  /*
+   * First of all check any of the active sub menus...
+   */
+  for( menuEntry = menu->Entries.First; menuEntry; menuEntry = menuEntry->Node.Next)
+  {
     /*
-     * First of all check any of the active sub menus...
+     * Is this menu entry active?
      */
-    for( menuEntry = menu->Entries.First; menuEntry;
-         menuEntry = menuEntry->Node.Next)
+    if( menuEntry->IsActive == TRUE )
     {
+      /*
+       * If there is not a sub menu, execute the menu callback and return...
+       */
+      if( menuEntry->SubMenu == NULL )
+      {
         /*
-         * Is this menu entry active?
+         * ...certainly given that there is one...
          */
-        if( menuEntry->IsActive == TRUE )
-        {
-            /*
-             * If this is not a sub menu, execute the menu callback and return...
-             */
-            if( menuEntry->SubMenu == NULL )
-            {
-                /*
-                 * ...certainly given that there is one...
-                 */
-                if( menu->Callback != NULL )
-                    menu->Callback( menuEntry->ID );
+        if( menu->Callback != NULL )
+          menu->Callback( menuEntry->ID );
 
-                return;
-            }
+        return;
+      }
 
-            /*
-             * Otherwise recurse into the submenu.
-             */
-            fghCheckMenuSelect( menuEntry->SubMenu );
+      /*
+       * Otherwise recurse into the submenu.
+       */
+      fgExecuteMenuCallback( menuEntry->SubMenu );
 
-            /*
-             * There is little sense in dwelling the search on
-             */
-            return;
-        }
+      /*
+       * There is little sense in dwelling the search on
+       */
+      return;
     }
+  }
 }
 
 /*
  * Deactivates a menu pointed by the function argument.
  */
-void fgDeactivateMenu( int button )
+void fgDeactivateMenu( SFG_Window *window )
 {
-    SFG_Window* window = fgStructure.Window;
-    SFG_Menu* menu = NULL;
-    int i;
-
-    /*
-     * Make sure there is a current window available...
-     */
-    freeglut_assert_window;
-
     /*
      * Check if there is an active menu attached to this window...
      */
-    for( i=0; i<FREEGLUT_MAX_MENUS; i++ )
-    {
-        if( window->Menu[ i ] != NULL && window->MenuActive[ i ] == TRUE )
-            menu = window->Menu[ i ];
-    };
+    SFG_Menu* menu = window->ActiveMenu;
 
     /*
      * Did we find an active window?
@@ -476,15 +504,10 @@ void fgDeactivateMenu( int button )
     freeglut_return_if_fail( menu != NULL );
 
     /*
-     * Check if there was any menu entry active. This would
-     * mean the user has selected a menu entry...
-     */
-    fghCheckMenuSelect( menu );
-
-    /*
      * Forget about having that menu active anymore, now:
      */
-    fgStructure.Window->MenuActive[ button ] = FALSE;
+    window->ActiveMenu = NULL;
+    menu->IsActive = FALSE ;
 }
 
 /*
@@ -492,39 +515,39 @@ void fgDeactivateMenu( int button )
  */
 void fghCalculateMenuBoxSize( void )
 {
-    SFG_MenuEntry* menuEntry;
-    int width = 0, height = 0;
+  SFG_MenuEntry* menuEntry;
+  int width = 0, height = 0;
+
+  /*
+   * Make sure there is a current menu set
+   */
+  freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
+
+  /*
+   * The menu's box size depends on the menu entries:
+   */
+  for( menuEntry = fgStructure.Menu->Entries.First; menuEntry;
+       menuEntry = menuEntry->Node.Next)
+  {
+    /*
+     * Update the menu entry's width value
+     */
+    menuEntry->Width = glutBitmapLength( FREEGLUT_MENU_FONT, menuEntry->Text );
 
     /*
-     * Make sure there is a current menu set
+     * Check if it's the biggest we've found
      */
-    freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
+    if( menuEntry->Width > width )
+      width = menuEntry->Width;
 
-    /*
-     * The menu's box size depends on the menu entries:
-     */
-    for( menuEntry = fgStructure.Menu->Entries.First; menuEntry;
-         menuEntry = menuEntry->Node.Next)
-    {
-        /*
-         * Update the menu entry's width value
-         */
-        menuEntry->Width = glutBitmapLength( FREEGLUT_MENU_FONT, menuEntry->Text );
+    height += FREEGLUT_MENU_HEIGHT;
+  }
 
-        /*
-         * Check if it's the biggest we've found
-         */
-        if( menuEntry->Width > width )
-            width = menuEntry->Width;
-
-        height += FREEGLUT_MENU_HEIGHT;
-    }
-
-    /*
-     * Store the menu's box size now:
-     */
-    fgStructure.Menu->Height = height; 
-    fgStructure.Menu->Width  = width;
+  /*
+   * Store the menu's box size now:
+   */
+  fgStructure.Menu->Height = height; 
+  fgStructure.Menu->Width  = width + 2 * FREEGLUT_MENU_BORDER ;
 }
 
 
@@ -581,7 +604,7 @@ int FGAPIENTRY glutGetMenu( void )
 }
 
 /*
- * Sets the current menu given it's menu ID
+ * Sets the current menu given its menu ID
  */
 void FGAPIENTRY glutSetMenu( int menuID )
 {
@@ -629,32 +652,32 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
  */
 void FGAPIENTRY glutAddSubMenu( const char* label, int subMenuID )
 {
-    SFG_MenuEntry* menuEntry = calloc( sizeof(SFG_MenuEntry), 1 );
-    SFG_Menu*      subMenu = fgMenuByID( subMenuID );
+  SFG_MenuEntry* menuEntry = calloc( sizeof(SFG_MenuEntry), 1 );
+  SFG_Menu*      subMenu = fgMenuByID( subMenuID );
 
-    /*
-     * Make sure there is a current menu and the sub menu
-     * we want to attach actually exists...
-     */
-    freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
-    freeglut_return_if_fail( subMenu != NULL );
+  /*
+   * Make sure there is a current menu and the sub menu
+   * we want to attach actually exists...
+   */
+  freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
+  freeglut_return_if_fail( subMenu != NULL );
 
-    /*
-     * Fill in the appropriate values
-     */
-    menuEntry->Text    = strdup( label );
-    menuEntry->SubMenu = subMenu;
-    menuEntry->ID      = -1;
+  /*
+   * Fill in the appropriate values
+   */
+  menuEntry->Text    = strdup( label );
+  menuEntry->SubMenu = subMenu;
+  menuEntry->ID      = -1;
 
-    /*
-     * Have the new menu entry attached to the current menu
-     */
-    fgListAppend( &fgStructure.Menu->Entries, &menuEntry->Node );
+  /*
+   * Have the new menu entry attached to the current menu
+   */
+  fgListAppend( &fgStructure.Menu->Entries, &menuEntry->Node );
 
-    /*
-     * Update the menu's dimensions now
-     */
-    fghCalculateMenuBoxSize();
+  /*
+   * Update the menu's dimensions now
+   */
+  fghCalculateMenuBoxSize();
 }
 
 /*

@@ -47,96 +47,83 @@
 
 /* -- LOCAL DEFINITIONS ---------------------------------------------------- */
 
-/*
- * Those are definitions introduced to make the glutGet() more easy,
- * however they might introduce errors if someone ports GLX to Win32 :)
- *
- * Btw. this is not that a bad idea (wrapping WGL around GLX)...
- */
-#if TARGET_HOST_WIN32
-#	define GLX_RGBA                 0x01
-#	define GLX_DOUBLEBUFFER         0x02
-#	define GLX_BUFFER_SIZE          0x03
-#	define GLX_STENCIL_SIZE         0x04
-#	define GLX_DEPTH_SIZE           0x05
-#	define GLX_RED_SIZE             0x06
-#	define GLX_GREEN_SIZE           0x07
-#	define GLX_BLUE_SIZE            0x08
-#	define GLX_ALPHA_SIZE           0x09
-#	define GLX_ACCUM_RED_SIZE       0x0A
-#	define GLX_ACCUM_GREEN_SIZE     0x0B
-#	define GLX_ACCUM_BLUE_SIZE      0x0C
-#	define GLX_ACCUM_ALPHA_SIZE     0x0D
-#	define GLX_STEREO               0x0E
-#endif
-
-
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
+#if TARGET_HOST_UNIX_X11
 /*
  * Queries the GL context about some attributes
  */
 static int fghGetConfig( int attribute )
 {
-    int returnValue;
+  int returnValue ;
 
-    /*
-     * Return nothing if there is no current window set
-     */
-    if( fgStructure.Window == NULL )
-        return( 0 );
+  /*
+   * Return nothing if there is no current window set
+   */
+  if( fgStructure.Window == NULL )
+    return( 0 );
 
-#if TARGET_HOST_UNIX_X11
-    /*
-     * glXGetConfig should work fine
-     */
-    glXGetConfig( fgDisplay.Display, fgStructure.Window->Window.VisualInfo, attribute, &returnValue );
+  /*
+   * glXGetConfig should work fine
+   */
+  glXGetConfig( fgDisplay.Display, fgStructure.Window->Window.VisualInfo, attribute, &returnValue );
 
-#elif TARGET_HOST_WIN32
-    /*
-     * This is going to be a bit harder than the X11 version...
-     */
-#   pragma message( "freeglut_state.c::fghGetConfig() says hello world my name is not implemented!" )
-    switch( attribute )
-    {
-    case GLX_RGBA:
-    case GLX_DOUBLEBUFFER:
-    case GLX_BUFFER_SIZE:
-    case GLX_RED_SIZE:
-    case GLX_GREEN_SIZE:
-    case GLX_BLUE_SIZE:
-    case GLX_DEPTH_SIZE:
-        return( 1 );
 
-    case GLX_STENCIL_SIZE:
-    case GLX_ALPHA_SIZE:
-    case GLX_ACCUM_RED_SIZE:
-    case GLX_ACCUM_GREEN_SIZE:
-    case GLX_ACCUM_BLUE_SIZE:
-    case GLX_ACCUM_ALPHA_SIZE:
-    case GLX_STEREO:
-    default:
-        /*
-         * Well, this looks like not implemented to me :)
-         */
-        return( 0 );
-    }
-
+  /*
+   * Have the query results returned
+   */
+  return ( returnValue ) ;
+}
 #endif
 
-    /*
-     * Have the query results returned
-     */
-    return( returnValue );
-}
-
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
+
+/*
+ * General settings assignment method
+ */
+void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
+{
+  freeglut_assert_ready;
+
+  /*
+   * Check what is the caller querying for. In chronological code add order.
+   */
+  switch( eWhat )
+  {
+  case GLUT_INIT_WINDOW_X:          fgState.Position.X          = (GLint)value ;
+                                    break ;
+  case GLUT_INIT_WINDOW_Y:          fgState.Position.Y          = (GLint)value ;
+                                    break ;
+  case GLUT_INIT_WINDOW_WIDTH:      fgState.Size.X              = (GLint)value ;
+                                    break ;
+  case GLUT_INIT_WINDOW_HEIGHT:     fgState.Size.Y              = (GLint)value ;
+                                    break ;
+  case GLUT_INIT_DISPLAY_MODE:      fgState.DisplayMode         = (unsigned int)value ;
+                                    break ;
+
+  case GLUT_ACTION_ON_WINDOW_CLOSE: fgState.ActionOnWindowClose = value ;
+                                    break ;
+
+  case GLUT_WINDOW_CURSOR:
+      if( fgStructure.Window != NULL ) fgStructure.Window->State.Cursor = value ;
+      break ;
+
+  default:
+      /*
+       * Just have it reported, so that we can see what needs to be implemented
+       */
+      fgWarning( "glutSetOption(): missing enum handle %i\n", eWhat );
+      break;
+  }
+}
 
 /*
  * General settings query method
  */
 int FGAPIENTRY glutGet( GLenum eWhat )
 {
+  int returnValue ;
+  GLboolean boolValue ;
     freeglut_assert_ready;
 
     /*
@@ -172,8 +159,9 @@ int FGAPIENTRY glutGet( GLenum eWhat )
          */
         return( 0 );
 
+#if TARGET_HOST_UNIX_X11
     /*
-     * The rest of GLX queries is general enough to use a macro to check them
+     * The rest of GLX queries under X are general enough to use a macro to check them
      */
 #   define GLX_QUERY(a,b) case a: return( fghGetConfig( b ) );
 
@@ -194,7 +182,6 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
 #   undef GLX_QUERY
 
-#if TARGET_HOST_UNIX_X11
     /*
      * Colormap size is handled in a bit different way than all the rest
      */
@@ -314,6 +301,60 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
 #elif TARGET_HOST_WIN32
 
+    /*
+     * Handle the OpenGL inquiries
+     */
+    case GLUT_WINDOW_RGBA:
+      glGetBooleanv ( GL_RGBA_MODE, &boolValue ) ;         /* True if color buffers store RGBA */
+      returnValue = boolValue ? 1 : 0 ;
+      return ( returnValue ) ;
+    case GLUT_WINDOW_DOUBLEBUFFER:
+      glGetBooleanv ( GL_DOUBLEBUFFER, &boolValue ) ;      /* True if front and back buffers exist */
+      returnValue = boolValue ? 1 : 0 ;
+      return ( returnValue ) ;
+    case GLUT_WINDOW_STEREO:
+      glGetBooleanv ( GL_STEREO, &boolValue ) ;            /* True if left and right buffers exist */
+      returnValue = boolValue ? 1 : 0 ;
+      return ( returnValue ) ;
+
+    case GLUT_WINDOW_RED_SIZE:
+      glGetIntegerv ( GL_RED_BITS, &returnValue ) ;          /* Number of bits per red component in color buffers */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_GREEN_SIZE:
+      glGetIntegerv ( GL_GREEN_BITS, &returnValue ) ;        /* Number of bits per green component in color buffers */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_BLUE_SIZE:
+      glGetIntegerv ( GL_BLUE_BITS, &returnValue ) ;         /* Number of bits per blue component in color buffers */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_ALPHA_SIZE:
+      glGetIntegerv ( GL_ALPHA_BITS, &returnValue ) ;        /* Number of bits per alpha component in color buffers */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_ACCUM_RED_SIZE:
+      glGetIntegerv ( GL_ACCUM_RED_BITS, &returnValue ) ;    /* Number of bits per red component in the accumulation buffer */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_ACCUM_GREEN_SIZE:
+      glGetIntegerv ( GL_ACCUM_GREEN_BITS, &returnValue ) ;  /* Number of bits per green component in the accumulation buffer */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_ACCUM_BLUE_SIZE:
+      glGetIntegerv ( GL_ACCUM_BLUE_BITS, &returnValue ) ;   /* Number of bits per blue component in the accumulation buffer */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_ACCUM_ALPHA_SIZE:
+      glGetIntegerv ( GL_ACCUM_ALPHA_BITS, &returnValue ) ;  /* Number of bits per alpha component in the accumulation buffer */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_DEPTH_SIZE:
+      glGetIntegerv ( GL_DEPTH_BITS, &returnValue ) ;        /* Number of depth-buffer bitplanes */
+      return ( returnValue ) ;
+
+    case GLUT_WINDOW_BUFFER_SIZE:
+      returnValue = 1 ;                                      /* ????? */
+      return ( returnValue ) ;
+    case GLUT_WINDOW_STENCIL_SIZE:
+      returnValue = 0 ;                                      /* ????? */
+      return ( returnValue ) ;
+
+    /*
+     * Window position and size
+     */
     case GLUT_WINDOW_X:
     case GLUT_WINDOW_Y:
     case GLUT_WINDOW_WIDTH:
@@ -410,6 +451,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
             return( 0 );
 
         return( fgListLength( &fgStructure.Menu->Entries ) );
+
+    case GLUT_ACTION_ON_WINDOW_CLOSE: return ( fgState.ActionOnWindowClose ) ;
 
     default:
         /*
