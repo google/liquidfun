@@ -546,8 +546,8 @@ struct tagSFG_Window
 typedef struct tagSFG_WindowList SFG_WindowList ;
 struct tagSFG_WindowList
 {
+    SFG_Node node;
     SFG_Window *window ;
-    SFG_WindowList *next ;
 };
 
 /*
@@ -558,6 +558,7 @@ struct tagSFG_Structure
 {
     SFG_List        Windows;      /* The global windows list            */
     SFG_List        Menus;        /* The global menus list              */
+    SFG_List        WindowsToDestroy;
 
     SFG_Window*     Window;       /* The currently active win.          */
     SFG_Menu*       Menu;         /* Same, but menu...                  */

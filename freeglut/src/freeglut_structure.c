@@ -42,6 +42,7 @@
 
 SFG_Structure fgStructure = { { NULL, NULL },  /* The list of windows       */
                               { NULL, NULL },  /* The list of menus         */
+                              { NULL, NULL },  /* Windows to Destroy list   */
                               NULL,            /* The current window        */
                               NULL,            /* The current menu          */
                               NULL,            /* The menu OpenGL context   */
@@ -172,14 +173,6 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
 }
 
 /*
- * Linked list of windows to destroy ... this is so we don't destroy a
- * window from the middle of its callback.  Some C compilers take an
- * extremely dim view of this.
- */
-
-static SFG_WindowList* WindowsToDestroy = ( SFG_WindowList* )NULL;
-
-/*
  * Function to add a window to the linked list of windows to destroy.
  * Subwindows are automatically added because they hang from the window
  * structure.
@@ -189,8 +182,7 @@ void fgAddToWindowDestroyList( SFG_Window* window )
     SFG_WindowList *new_list_entry =
         ( SFG_WindowList* )malloc( sizeof(SFG_WindowList ) );
     new_list_entry->window = window;
-    new_list_entry->next = WindowsToDestroy;
-    WindowsToDestroy = new_list_entry;
+    fgListAppend( &fgStructure.WindowsToDestroy, &new_list_entry->node );
 
     /*
      * Check if the window is the current one...
@@ -218,22 +210,13 @@ void fgAddToWindowDestroyList( SFG_Window* window )
  */
 void fgCloseWindows( )
 {
-    SFG_WindowList *window_ptr = WindowsToDestroy;
-    WindowsToDestroy = ( SFG_WindowList* )NULL;
-    /* In case the destroy callbacks cause more windows to be closed */
+    SFG_WindowList *window_ptr;
 
-    while( window_ptr )
+    while( window_ptr = fgStructure.WindowsToDestroy.First )
     {
-        SFG_WindowList *next = window_ptr->next;
         fgDestroyWindow( window_ptr->window );
+        fgListRemove( &fgStructure.WindowsToDestroy, &window_ptr->node );
         free( window_ptr );
-        window_ptr = next;
-
-        if( !window_ptr )
-        {
-            window_ptr = WindowsToDestroy;
-            WindowsToDestroy = ( SFG_WindowList* )NULL;
-        }
     }
 }
 
@@ -404,6 +387,7 @@ void fgCreateStructure( void )
 
     fgListInit(&fgStructure.Windows);
     fgListInit(&fgStructure.Menus);
+    fgListInit(&fgStructure.WindowsToDestroy);
 }
 
 /*
@@ -417,6 +401,11 @@ void fgDestroyStructure( void )
     SFG_Menu *menu;
 
     freeglut_assert_ready;
+
+    /*
+     * Clean up the WindowsToDestroy list.
+     */
+    fgCloseWindows();
 
     /*
      * Make sure all windows and menus have been deallocated
