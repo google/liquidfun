@@ -42,41 +42,18 @@
 #include <sys/stat.h>
 #elif TARGET_HOST_WIN32
 #elif TARGET_HOST_WINCE
-  // including gx.h does only work in c++ (thanks MS...),
-  // so we define this on our own...
-struct GXKeyList {
-    short vkUp;             // key for up
-    POINT ptUp;             // x,y position of key/button.  Not on screen but in screen coordinates.
-    short vkDown;
-    POINT ptDown;
-    short vkLeft;
-    POINT ptLeft;
-    short vkRight;
-    POINT ptRight;
-    short vkA;
-    POINT ptA;
-    short vkB;
-    POINT ptB;
-    short vkC;
-    POINT ptC;
-    short vkStart;
-    POINT ptStart;
-};
-/*__declspec(dllimport) struct GXKeyList GXGetDefaultKeys(int iOptions);
-__declspec(dllimport) int GXOpenInput();
-#include "my_gx.h"*/
 
-extern void wince_GetDefaultKeys(void* nData, int iOptions);
-extern void wince_OpenInput();
+typedef struct GXDisplayProperties GXDisplayProperties;
+typedef struct GXKeyList GXKeyList;
+#include <gx.h>
 
-/*void wince_GetDefaultKeys(void* nData, int iOptions)
-{
-    *(struct GXKeyList*)nData = GXGetDefaultKeys(iOptions);
-}
-void wince_OpenInput()
-{
-    GXOpenInput();
-}*/
+typedef struct GXKeyList (*GXGETDEFAULTKEYS)(int);
+typedef int (*GXOPENINPUT)();
+
+GXGETDEFAULTKEYS GXGetDefaultKeys_ = NULL;
+GXOPENINPUT GXOpenInput_ = NULL;
+
+struct GXKeyList gxKeyList;
 
 #endif
 
@@ -1302,8 +1279,21 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         ReleaseDC( window->Window.Handle, window->Window.Device );
 
 #if TARGET_HOST_WINCE
-        // Take over button handling
-        wince_OpenInput();
+        /* Take over button handling */
+        {
+            HINSTANCE dxDllLib=LoadLibrary(_T("gx.dll"));
+            if (dxDllLib)
+            {
+                GXGetDefaultKeys_=(GXGETDEFAULTKEYS)GetProcAddress(dxDllLib, _T("?GXGetDefaultKeys@@YA?AUGXKeyList@@H@Z"));
+                GXOpenInput_=(GXOPENINPUT)GetProcAddress(dxDllLib, _T("?GXOpenInput@@YAHXZ"));
+            }
+
+            if(GXOpenInput_)
+                (*GXOpenInput_)();
+            if(GXGetDefaultKeys_)
+                gxKeyList = (*GXGetDefaultKeys_)(GX_LANDSCAPEKEYS);
+        }
+
 #endif /* TARGET_HOST_WINCE */
         break;
 
@@ -1665,9 +1655,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
     {
-#if TARGET_HOST_WINCE
-        struct GXKeyList gxKeyList;
-#endif /* TARGET_HOST_WINCE */
         int keypress = -1;
         POINT mouse_pos ;
 
@@ -1725,10 +1712,8 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
 
 #if TARGET_HOST_WINCE
-        if(!(lParam & 0x40000000)) // Prevent auto-repeat
+        if(!(lParam & 0x40000000)) /* Prevent auto-repeat */
         {
-            wince_GetDefaultKeys(&gxKeyList, 0x03);
-
             if(wParam==(unsigned)gxKeyList.vkRight)
                 keypress = GLUT_KEY_RIGHT;
             else if(wParam==(unsigned)gxKeyList.vkLeft)

@@ -176,7 +176,7 @@ void fgInitialize( const char* displayName )
         wc.style          = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
         if (!wc.hIcon)
           wc.hIcon        = LoadIcon( NULL, IDI_WINLOGO );
-#else //TARGET_HOST_WINCE
+#else /* TARGET_HOST_WINCE */
         wc.style          = CS_HREDRAW | CS_VREDRAW;
 #endif
 
