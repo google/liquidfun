@@ -1668,12 +1668,24 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
              */
             if( window->Callbacks.KeyboardUp != NULL )
                 window->Callbacks.KeyboardUp( 127, window->State.MouseX, window->State.MouseY );
+
+            break ;
           default:
-            /*
-             * Call the KeyboardUp callback for a regular character if there is one.
-             */
-            if( window->Callbacks.KeyboardUp != NULL )
-                window->Callbacks.KeyboardUp( wParam, window->State.MouseX, window->State.MouseY );
+            {
+              /*
+               * Call the KeyboardUp callback for a regular character if there is one.
+               */
+              BYTE state[ 256 ];
+              WORD code[ 2 ];
+
+              GetKeyboardState(state);
+
+              if ( ToAscii( wParam, 0, state, code, 0 ) == 1 )
+                wParam=code[ 0 ];
+
+              if( window->Callbacks.KeyboardUp != NULL )
+                window->Callbacks.KeyboardUp( (char)wParam, window->State.MouseX, window->State.MouseY );
+            }
         }
 
         /*
@@ -1719,7 +1731,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             /*
              * Have the special callback executed:
              */
-            window->Callbacks.Keyboard( wParam, window->State.MouseX, window->State.MouseY );
+            window->Callbacks.Keyboard( (char)wParam, window->State.MouseX, window->State.MouseY );
 
             /*
              * Thrash the modifiers register now
