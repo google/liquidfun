@@ -50,6 +50,9 @@ float scale_factor = 1.0 ;
 /* The current point */
 float current_x = 0.0, current_y = 0.0 ;
 
+/* Signals when a glClear is needed */
+static GLboolean needClear = GL_TRUE;
+
 static void draw_level ( int num, double m00, double m01, double m10, double m11, double n0, double n1 )
 {
   /* Draw a fractal transformed by "M", "N" as passed in */
@@ -70,6 +73,11 @@ static void draw_level ( int num, double m00, double m01, double m10, double m11
 static void 
 Display(void)
 {
+  if (needClear) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    needClear = GL_FALSE;
+  }
+
   /* the curve */
   glPushMatrix();
   glScalef(2.5, 2.5, 2.5);
@@ -99,6 +107,7 @@ Reshape(int width, int height)
   xwin = -1.0 ;
   ywin =  0.0 ;
   glTranslatef(xwin, ywin, -5.0);
+  needClear = GL_TRUE;
 }
 
 static void 
@@ -119,7 +128,7 @@ Key(unsigned char key, int x, int y)
     break ;
   }
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  needClear = GL_TRUE;
 
   glutPostRedisplay();
 }
@@ -169,7 +178,7 @@ Special(int key, int x, int y)
     break ;
   }
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  needClear = GL_TRUE;
 
   glutPostRedisplay();
 }
@@ -255,8 +264,6 @@ main(int argc, char *argv[])
   fractal_window = glutCreateWindow( window_title );
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glutReshapeFunc(Reshape);
   glutKeyboardFunc(Key);
