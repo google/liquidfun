@@ -139,7 +139,8 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
  */
 static void fghVisibility( int status )
 {
-    freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Window != NULL );
+    freeglut_assert_ready;
+    freeglut_return_if_fail( fgStructure.Window != NULL );
     freeglut_return_if_fail( fgStructure.Window->Callbacks.Visibility != NULL );
 
     if( status == GLUT_HIDDEN  || status == GLUT_FULLY_COVERED )
