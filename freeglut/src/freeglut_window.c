@@ -237,8 +237,8 @@ void fgSetWindow ( SFG_Window *window )
         window->Window.Device = GetDC( window->Window.Handle );
         wglMakeCurrent( 
             window->Window.Device, 
-            window->Window.Context 
-  	);
+            window->Window.Context
+        );
     }
 #endif
     fgStructure.Window = window;
@@ -781,7 +781,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 
 #elif TARGET_HOST_WIN32
 
-	SetWindowText( fgStructure.Window->Window.Handle, title );
+    SetWindowText( fgStructure.Window->Window.Handle, title );
 
 #endif
 
@@ -819,8 +819,8 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
              */
             if ( ! fgStructure.Window->IsMenu )
             {
-    		width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-	    	height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
+                width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
+                height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
                     GetSystemMetrics( SM_CYCAPTION );
             }
         }
