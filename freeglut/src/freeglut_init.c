@@ -230,13 +230,13 @@ void fgDeinitialize( void )
 
     fgDestroyStructure( );
 
-    while( (timer = fgState.Timers.First) )
+    while( timer = fgState.Timers.First )
     {
         fgListRemove( &fgState.Timers, &timer->Node );
         free( timer );
     }
 
-    while( (timer = fgState.FreeTimers.First) )
+    while( timer = fgState.FreeTimers.First )
     {
         fgListRemove( &fgState.FreeTimers, &timer->Node );
         free( timer );
@@ -268,7 +268,7 @@ void fgDeinitialize( void )
     fgState.ActionOnWindowClose = GLUT_ACTION_EXIT;
     fgState.ExecState           = GLUT_EXEC_STATE_INIT;
 
-    fgState.KeyRepeat       = GL_FALSE;
+    fgState.KeyRepeat       = GL_TRUE;
     fgState.Modifiers       = 0xffffffff;
 
     fgState.GameModeSize.X  = 640;
@@ -603,7 +603,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         /* Guaranteed to end because there are "*pargc" arguments left */
         while ( argv[ j ] == NULL )
             j++;
-        if (i != j)
+        if ( i != j )
             argv[ i ] = argv[ j ];
     }
 

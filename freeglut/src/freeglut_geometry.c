@@ -131,7 +131,7 @@ static void fghCircleTable(double **sint,double **cost,const int n)
 
     /* Determine the angle between samples */
 
-    const double angle = 2*M_PI/(double)n;
+    const double angle = 2*M_PI/(double)( ( n == 0 ) ? 1 : n );
 
     /* Allocate memory for n samples, plus duplicate of first entry at the end */
 
@@ -149,7 +149,10 @@ static void fghCircleTable(double **sint,double **cost,const int n)
 
     /* Compute cos and sin around the circle */
 
-    for (i=0; i<size; i++)
+    (*sint)[0] = 0.0;
+    (*cost)[0] = 1.0;
+
+    for (i=1; i<size; i++)
     {
         (*sint)[i] = sin(angle*i);
         (*cost)[i] = cos(angle*i);
@@ -183,9 +186,9 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
     /* The top stack is covered with a triangle fan */
 
     z0 = 1.0;
-    z1 = cost2[1];
+    z1 = cost2[(stacks>0)?1:0];
     r0 = 0.0;
-    r1 = sint2[1];
+    r1 = sint2[(stacks>0)?1:0];
 
     glBegin(GL_TRIANGLE_FAN);
 
@@ -325,8 +328,8 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
     double z0,z1;
     double r0,r1;
 
-    const double zStep = height/stacks;
-    const double rStep = base/stacks;
+    const double zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
+    const double rStep = base / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Scaling factors for vertex normals */
 
@@ -409,8 +412,8 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
     double z = 0.0;
     double r = base;
 
-    const double zStep = height/stacks;
-    const double rStep = base/stacks;
+    const double zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
+    const double rStep = base / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Scaling factors for vertex normals */
 
@@ -471,8 +474,8 @@ void FGAPIENTRY glutSolidCylinder(GLdouble radius, GLdouble height, GLint slices
 
     /* Step in z and radius as stacks are drawn. */
 
-          double z0,z1;
-    const double zStep = height/stacks;
+    double z0,z1;
+    const double zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Pre-computed circle */
 
@@ -533,7 +536,7 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
     /* Step in z and radius as stacks are drawn. */
 
           double z = 0.0;
-    const double zStep = height/stacks;
+    const double zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Pre-computed circle */
 
@@ -588,6 +591,8 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
   double *vertex, *normal;
   int    i, j;
   double spsi, cpsi, sphi, cphi ;
+  if ( nSides < 1 ) nSides = 1;
+  if ( nRings < 1 ) nRings = 1;
 
   /* Allocate the vertices array */
   vertex = (double *)calloc( sizeof(double), 3 * nSides * nRings );
@@ -664,6 +669,8 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
   double *vertex, *normal;
   int    i, j;
   double spsi, cpsi, sphi, cphi ;
+  if ( nSides < 1 ) nSides = 1;
+  if ( nRings < 1 ) nRings = 1;
 
   /* Increment the number of sides and rings to allow for one more point than surface */
   nSides ++ ;
@@ -836,13 +843,13 @@ void FGAPIENTRY glutWireOctahedron( void )
 #define RADIUS    1.0f
   glBegin( GL_LINE_LOOP );
     glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
-    glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
-    glNormal3d( 0.577350269189,-0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
+    glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS, 0.0 );
+    glNormal3d( 0.577350269189,-0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, 0.0 );
     glNormal3d( 0.577350269189,-0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
-    glNormal3d(-0.577350269189, 0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
+    glNormal3d(-0.577350269189, 0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, 0.0 );
     glNormal3d(-0.577350269189, 0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
     glNormal3d(-0.577350269189,-0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
-    glNormal3d(-0.577350269189,-0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
+    glNormal3d(-0.577350269189,-0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS, 0.0 );
   glEnd();
 #undef RADIUS
 }
@@ -855,42 +862,49 @@ void FGAPIENTRY glutSolidOctahedron( void )
 #define RADIUS    1.0f
   glBegin( GL_TRIANGLES );
     glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
-    glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
-    glNormal3d( 0.577350269189,-0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
+    glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS, 0.0 );
+    glNormal3d( 0.577350269189,-0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, 0.0 );
     glNormal3d( 0.577350269189,-0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
-    glNormal3d(-0.577350269189, 0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
+    glNormal3d(-0.577350269189, 0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, 0.0 );
     glNormal3d(-0.577350269189, 0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
     glNormal3d(-0.577350269189,-0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
-    glNormal3d(-0.577350269189,-0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
+    glNormal3d(-0.577350269189,-0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS, 0.0 );
   glEnd();
 #undef RADIUS
 }
+
+/* Magic Numbers:  r0 = ( 1, 0, 0 )
+ *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
+ *                 r2 = ( -1/3, -sqrt(2) / 3, sqrt(6) / 3 )
+ *                 r3 = ( -1/3, -sqrt(2) / 3, -sqrt(6) / 3 )
+ * |r0| = |r1| = |r2| = |r3| = 1
+ * Distance between any two points is 2 sqrt(6) / 3
+ *
+ * Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
+ */
+
+#define NUM_TETR_FACES     4
+
+static GLdouble tet_r[4][3] = { {             1.0,             0.0,             0.0 },
+                                { -0.333333333333,  0.942809041582,             0.0 },
+                                { -0.333333333333, -0.471404520791,  0.816496580928 },
+                                { -0.333333333333, -0.471404520791, -0.816496580928 } } ;
+
+static GLint tet_i[4][3] =  /* Vertex indices */
+{
+  { 1, 3, 2 }, { 0, 2, 3 }, { 0, 3, 1 }, { 0, 1, 2 }
+} ;
 
 /*
  *
  */
 void FGAPIENTRY glutWireTetrahedron( void )
 {
-  /* Magic Numbers:  r0 = ( 1, 0, 0 )
-   *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
-   *                 r2 = ( -1/3, -sqrt(2) / 3, sqrt(6) / 3 )
-   *                 r3 = ( -1/3, -sqrt(2) / 3, -sqrt(6) / 3 )
-   * |r0| = |r1| = |r2| = |r3| = 1
-   * Distance between any two points is 2 sqrt(6) / 3
-   *
-   * Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
-   */
-
-  double r0[3] = {             1.0,             0.0,             0.0 } ;
-  double r1[3] = { -0.333333333333,  0.942809041582,             0.0 } ;
-  double r2[3] = { -0.333333333333, -0.471404520791,  0.816496580928 } ;
-  double r3[3] = { -0.333333333333, -0.471404520791, -0.816496580928 } ;
-
   glBegin( GL_LINE_LOOP ) ;
-    glNormal3d (           -1.0,             0.0,             0.0 ) ; glVertex3dv ( r1 ) ; glVertex3dv ( r3 ) ; glVertex3dv ( r2 ) ;
-    glNormal3d ( 0.333333333333, -0.942809041582,             0.0 ) ; glVertex3dv ( r0 ) ; glVertex3dv ( r2 ) ; glVertex3dv ( r3 ) ;
-    glNormal3d ( 0.333333333333,  0.471404520791, -0.816496580928 ) ; glVertex3dv ( r0 ) ; glVertex3dv ( r3 ) ; glVertex3dv ( r1 ) ;
-    glNormal3d ( 0.333333333333,  0.471404520791,  0.816496580928 ) ; glVertex3dv ( r0 ) ; glVertex3dv ( r1 ) ; glVertex3dv ( r2 ) ;
+    glNormal3d ( -tet_r[0][0], -tet_r[0][1], -tet_r[0][2] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[2] ) ;
+    glNormal3d ( -tet_r[1][0], -tet_r[1][1], -tet_r[1][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[2] ) ; glVertex3dv ( tet_r[3] ) ;
+    glNormal3d ( -tet_r[2][0], -tet_r[2][1], -tet_r[2][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[1] ) ;
+    glNormal3d ( -tet_r[3][0], -tet_r[3][1], -tet_r[3][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[2] ) ;
   glEnd() ;
 }
 
@@ -899,26 +913,11 @@ void FGAPIENTRY glutWireTetrahedron( void )
  */
 void FGAPIENTRY glutSolidTetrahedron( void )
 {
-  /* Magic Numbers:  r0 = ( 1, 0, 0 )
-   *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
-   *                 r2 = ( -1/3, -sqrt(2) / 3, sqrt(6) / 3 )
-   *                 r3 = ( -1/3, -sqrt(2) / 3, -sqrt(6) / 3 )
-   * |r0| = |r1| = |r2| = |r3| = 1
-   * Distance between any two points is 2 sqrt(6) / 3
-   *
-   * Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
-   */
-
-  double r0[3] = {             1.0,             0.0,             0.0 } ;
-  double r1[3] = { -0.333333333333,  0.942809041582,             0.0 } ;
-  double r2[3] = { -0.333333333333, -0.471404520791,  0.816496580928 } ;
-  double r3[3] = { -0.333333333333, -0.471404520791, -0.816496580928 } ;
-
   glBegin( GL_TRIANGLES ) ;
-    glNormal3d (           -1.0,             0.0,             0.0 ) ; glVertex3dv ( r1 ) ; glVertex3dv ( r3 ) ; glVertex3dv ( r2 ) ;
-    glNormal3d ( 0.333333333333, -0.942809041582,             0.0 ) ; glVertex3dv ( r0 ) ; glVertex3dv ( r2 ) ; glVertex3dv ( r3 ) ;
-    glNormal3d ( 0.333333333333,  0.471404520791, -0.816496580928 ) ; glVertex3dv ( r0 ) ; glVertex3dv ( r3 ) ; glVertex3dv ( r1 ) ;
-    glNormal3d ( 0.333333333333,  0.471404520791,  0.816496580928 ) ; glVertex3dv ( r0 ) ; glVertex3dv ( r1 ) ; glVertex3dv ( r2 ) ;
+    glNormal3d ( -tet_r[0][0], -tet_r[0][1], -tet_r[0][2] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[2] ) ;
+    glNormal3d ( -tet_r[1][0], -tet_r[1][1], -tet_r[1][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[2] ) ; glVertex3dv ( tet_r[3] ) ;
+    glNormal3d ( -tet_r[2][0], -tet_r[2][1], -tet_r[2][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[1] ) ;
+    glNormal3d ( -tet_r[3][0], -tet_r[3][1], -tet_r[3][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[2] ) ;
   glEnd() ;
 }
 
@@ -1027,29 +1026,6 @@ void FGAPIENTRY glutSolidRhombicDodecahedron( void )
   glEnd () ;
 }
 
-#define NUM_FACES     4
-
-static GLdouble tetrahedron_v[4][3] =  /* Vertices */
-{
-  { -0.5, -0.288675134595, -0.144337567297 },
-  {  0.5, -0.288675134595, -0.144337567297 },
-  {  0.0,  0.577350269189, -0.144337567297 },
-  {  0.0,  0.0,             0.672159013631 }
-} ;
-
-static GLint tetrahedron_i[4][3] =  /* Vertex indices */
-{
-  { 0, 1, 2 }, { 0, 2, 3 }, { 0, 3, 1 }, { 1, 3, 2 }
-} ;
-
-static GLdouble tetrahedron_n[4][3] =  /* Normals */
-{
-  {  0.0,             0.0,            -1.0 },
-  { -0.816496580928,  0.471404520791,  0.333333333333 },
-  {  0.0,            -0.942809041582,  0.333333333333 },
-  {  0.816496580928,  0.471404520791,  0.333333333333 }
-} ;
-
 void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
 {
   int i, j ;
@@ -1057,15 +1033,15 @@ void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], G
   if ( num_levels == 0 )
   {
 
-    for ( i = 0 ; i < NUM_FACES ; i++ )
+    for ( i = 0 ; i < NUM_TETR_FACES ; i++ )
     {
       glBegin ( GL_LINE_LOOP ) ;
-      glNormal3dv ( tetrahedron_n[i] ) ;
+      glNormal3d ( -tet_r[i][0], -tet_r[i][1], -tet_r[i][2] ) ;
       for ( j = 0; j < 3; j++ )
       {
-        double x = offset[0] + scale * tetrahedron_v[tetrahedron_i[i][j]][0] ;
-        double y = offset[1] + scale * tetrahedron_v[tetrahedron_i[i][j]][1] ;
-        double z = offset[2] + scale * tetrahedron_v[tetrahedron_i[i][j]][2] ;
+        double x = offset[0] + scale * tet_r[tet_i[i][j]][0] ;
+        double y = offset[1] + scale * tet_r[tet_i[i][j]][1] ;
+        double z = offset[2] + scale * tet_r[tet_i[i][j]][2] ;
         glVertex3d ( x, y, z ) ;
       }
 
@@ -1077,18 +1053,13 @@ void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], G
     GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
     num_levels -- ;
     scale /= 2.0 ;
-    local_offset[0] = offset[0] + scale * tetrahedron_v[0][0] ;
-    local_offset[1] = offset[1] + scale * tetrahedron_v[0][1] ;
-    local_offset[2] = offset[2] + scale * tetrahedron_v[0][2] ;
-    glutWireSierpinskiSponge ( num_levels, local_offset, scale ) ;
-    local_offset[0] += scale ;
-    glutWireSierpinskiSponge ( num_levels, local_offset, scale ) ;
-    local_offset[0] -= 0.5            * scale ;
-    local_offset[1] += 0.866025403784 * scale ;
-    glutWireSierpinskiSponge ( num_levels, local_offset, scale ) ;
-    local_offset[1] -= 0.577350269189 * scale ;
-    local_offset[2] += 0.816496580928 * scale ;
-    glutWireSierpinskiSponge ( num_levels, local_offset, scale ) ;
+    for ( i = 0 ; i < NUM_TETR_FACES ; i++ )
+    {
+      local_offset[0] = offset[0] + scale * tet_r[i][0] ;
+      local_offset[1] = offset[1] + scale * tet_r[i][1] ;
+      local_offset[2] = offset[2] + scale * tet_r[i][2] ;
+      glutWireSierpinskiSponge ( num_levels, local_offset, scale ) ;
+    }
   }
 }
 
@@ -1100,14 +1071,14 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
   {
     glBegin ( GL_TRIANGLES ) ;
 
-    for ( i = 0 ; i < NUM_FACES ; i++ )
+    for ( i = 0 ; i < NUM_TETR_FACES ; i++ )
     {
-      glNormal3dv ( tetrahedron_n[i] ) ;
+      glNormal3d ( -tet_r[i][0], -tet_r[i][1], -tet_r[i][2] ) ;
       for ( j = 0; j < 3; j++ )
       {
-        double x = offset[0] + scale * tetrahedron_v[tetrahedron_i[i][j]][0] ;
-        double y = offset[1] + scale * tetrahedron_v[tetrahedron_i[i][j]][1] ;
-        double z = offset[2] + scale * tetrahedron_v[tetrahedron_i[i][j]][2] ;
+        double x = offset[0] + scale * tet_r[tet_i[i][j]][0] ;
+        double y = offset[1] + scale * tet_r[tet_i[i][j]][1] ;
+        double z = offset[2] + scale * tet_r[tet_i[i][j]][2] ;
         glVertex3d ( x, y, z ) ;
       }
     }
@@ -1119,21 +1090,14 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
     GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
     num_levels -- ;
     scale /= 2.0 ;
-    local_offset[0] = offset[0] + scale * tetrahedron_v[0][0] ;
-    local_offset[1] = offset[1] + scale * tetrahedron_v[0][1] ;
-    local_offset[2] = offset[2] + scale * tetrahedron_v[0][2] ;
-    glutSolidSierpinskiSponge ( num_levels, local_offset, scale ) ;
-    local_offset[0] += scale ;
-    glutSolidSierpinskiSponge ( num_levels, local_offset, scale ) ;
-    local_offset[0] -= 0.5            * scale ;
-    local_offset[1] += 0.866025403784 * scale ;
-    glutSolidSierpinskiSponge ( num_levels, local_offset, scale ) ;
-    local_offset[1] -= 0.577350269189 * scale ;
-    local_offset[2] += 0.816496580928 * scale ;
-    glutSolidSierpinskiSponge ( num_levels, local_offset, scale ) ;
+    for ( i = 0 ; i < NUM_TETR_FACES ; i++ )
+    {
+      local_offset[0] = offset[0] + scale * tet_r[i][0] ;
+      local_offset[1] = offset[1] + scale * tet_r[i][1] ;
+      local_offset[2] = offset[2] + scale * tet_r[i][2] ;
+      glutSolidSierpinskiSponge ( num_levels, local_offset, scale ) ;
+    }
   }
 }
-
-#undef NUM_FACES
 
 /*** END OF FILE ***/
