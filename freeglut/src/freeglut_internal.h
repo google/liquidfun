@@ -198,13 +198,15 @@ struct tagSFG_Time
 };
 
 /*
- * An enumeration containing the state of the GLUT execution:  initializing, running, or stopping
+ * An enumeration containing the state of the GLUT execution:
+ * initializing, running, or stopping
  */
-typedef enum {
-  GLUT_EXEC_STATE_INIT,
-  GLUT_EXEC_STATE_RUNNING,
-  GLUT_EXEC_STATE_STOP
-} fgExecutionState ;
+typedef enum
+{
+    GLUT_EXEC_STATE_INIT,
+    GLUT_EXEC_STATE_RUNNING,
+    GLUT_EXEC_STATE_STOP
+} fgExecutionState;
 
 /*
  * This structure holds different freeglut settings
@@ -363,8 +365,7 @@ struct tagSFG_WindowState
  *          {Visibility} is the window-specific callback to fetch.
  *
  * The result is correctly type-cast to the callback function pointer
- * type.  (This is accomlished by abutting the callback name to a
- * common prefix, using ANSI C token-pasting.)
+ * type.
  */
 #define FETCH_WCB(window,cbname) \
     ((FGCB ## cbname)((window).CallBacks[CB_ ## cbname]))
@@ -528,12 +529,12 @@ struct tagSFG_Window
 /*
  * A linked list structure of windows
  */
-typedef struct tagSFG_WindowList SFG_WindowList ;
+typedef struct tagSFG_WindowList SFG_WindowList;
 struct tagSFG_WindowList
 {
-    SFG_Window *window ;
-    GLboolean needToClose ;
-    SFG_WindowList *next ;
+    SFG_Window *window;
+    GLboolean needToClose;
+    SFG_WindowList *next;
 };
 
 /*
@@ -653,7 +654,7 @@ extern SFG_State fgState;
         return;
 #define  freeglut_return_val_if_fail( expr, val ) \
     if( !(expr) )                                 \
-        return( val );
+        return val;
 
 /*
  * A call to those macros assures us that there is a current
@@ -703,14 +704,14 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
  */
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
                             int x, int y, int w, int h, GLboolean gameMode );
-void        fgSetWindow ( SFG_Window *window ) ;
+void        fgSetWindow ( SFG_Window *window );
 void        fgOpenWindow( SFG_Window* window, const char* title,
                           int x, int y, int w, int h, GLboolean gameMode,
                           int isSubWindow );
 void        fgCloseWindow( SFG_Window* window );
 void        fgAddToWindowDestroyList ( SFG_Window* window,
-                                       GLboolean needToClose ) ;
-void        fgCloseWindows ();
+                                       GLboolean needToClose );
+void        fgCloseWindows( );
 void        fgDestroyWindow( SFG_Window* window, GLboolean needToClose );
 void        fgClearCallBacks( SFG_Window *window );
 
