@@ -1459,9 +1459,15 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       {
         int wheel_number = LOWORD ( lParam ) ;
         /* THIS IS SPECULATIVE -- John Fay, 10/2/03 */
-        int direction = HIWORD ( lParam ) / 120 ;
+        int ticks = HIWORD ( lParam ) / 120 ;
         /* Should be WHEEL_DELTA instead of 120 */
-        int ticks = abs( direction );
+        int direction = 1;
+
+        if( ticks < 0 )
+        {
+            direction = -1;
+            ticks = -ticks;
+        }
 
         /*
          * The mouse cursor has moved. Remember the new mouse cursor's position
