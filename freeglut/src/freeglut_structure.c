@@ -109,7 +109,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 /*
  * This private function creates a menu and adds it to the menus list
  */
-SFG_Menu* fgCreateMenu( FGCBmenu menuCallback )
+SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
 {
     int x = 100, y = 100, w = 100, h = 100 ;
     SFG_Window *current_window = fgStructure.Window ;
@@ -266,11 +266,12 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     while ( (subWindow = (SFG_Window *)window->Children.First) != NULL )
         fgDestroyWindow( subWindow, needToClose );
 
-    if ( window->Callbacks.Destroy != NULL )
+    if ( FETCH_WCB( *window, Destroy ) )
     {
       SFG_Window *activeWindow = fgStructure.Window ;
-      fgSetWindow ( window ) ;
-      window->Callbacks.Destroy () ;
+      /* fgSetWindow ( window ) ; */
+      /* window->Callbacks.Destroy () ; */
+      INVOKE_WCB( *window, Destroy, ( ) );
       fgSetWindow ( activeWindow ) ;
     }
 

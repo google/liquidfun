@@ -83,12 +83,13 @@ static void fghRedrawWindowByHandle
 {
     SFG_Window* window = fgWindowByHandle( handle );
     freeglut_return_if_fail( window != NULL );
-    freeglut_return_if_fail( window->Callbacks.Display != NULL );
+    freeglut_return_if_fail( FETCH_WCB( *window, Display ) );
     freeglut_return_if_fail( window->State.Visible == TRUE );
 
-    fgSetWindow( window );
+    /* fgSetWindow( window ); */
     window->State.Redisplay = FALSE;
-    window->Callbacks.Display( );
+    /* window->Callbacks.Display( ); */
+    INVOKE_WCB( *window, Display, ( ) );
 }
 
 /*
@@ -108,11 +109,20 @@ static void fghReshapeWindowByHandle
     SFG_Window* window = fgWindowByHandle( handle );
     freeglut_return_if_fail( window != NULL );
 
-    fgSetWindow( window );
-    if( window->Callbacks.Reshape != NULL )
-        window->Callbacks.Reshape( width, height );
-    else
+    /*
+     * fgSetWindow( window );
+     * if( window->Callbacks.Reshape != NULL )
+     *     window->Callbacks.Reshape( width, height );
+     * else
+     *     glViewport( 0, 0, width, height );
+     */
+    if( !( FETCH_WCB( *window, Reshape ) ) )
+    {
+        fgSetWindow( window );
         glViewport( 0, 0, width, height );
+    }
+    else
+        INVOKE_WCB( *window, Reshape, ( width, height ) );
 
     /*
      * Force a window redraw.  In Windows at least this is only a partial
@@ -133,15 +143,16 @@ static void fghReshapeWindowByHandle
 static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
 {
 #if TARGET_HOST_UNIX_X11
-    if( (window->Callbacks.Display != NULL) &&
-        (window->State.Redisplay == TRUE) &&
-        (window->State.Visible == TRUE) )
+    if( ( FETCH_WCB( *window, Display ) ) &&
+        ( window->State.Redisplay == TRUE ) &&
+        ( window->State.Visible == TRUE ) )
     {
         SFG_Window *current_window = fgStructure.Window ;
 
-        fgSetWindow( window );
+        /* fgSetWindow( window ); */
         window->State.Redisplay = FALSE;
-        window->Callbacks.Display( );
+        /* window->Callbacks.Display( ); */
+        INVOKE_WCB( *window, Display, ( ) );
         fgSetWindow( current_window );
     }
 
@@ -163,13 +174,13 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
         fgSetWindow ( current_window );
     }
 
-    if( (window->Callbacks.Display != NULL) &&
-        (window->State.Redisplay == TRUE) &&
-        (window->State.Visible == TRUE) )
+    if( ( FETCH_WCB( *window, Display ) ) &&
+        ( window->State.Redisplay == TRUE ) &&
+        ( window->State.Visible == TRUE ) )
     {
         window->State.Redisplay = FALSE;
 
-        RedrawWindow( 
+        RedrawWindow(
             window->Window.Handle, NULL, NULL, 
             RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
         );
@@ -339,7 +350,7 @@ void fgWarning( const char *fmt, ... )
  */
 static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
 {
-    if( w->Callbacks.Joystick )
+    if( FETCH_WCB( *w, Joystick ) )
     {
         e->found = TRUE;
         e->data = w;
@@ -553,7 +564,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case VisibilityNotify:
         {
             GETWINDOW( xvisibility ); 
-            if( window->Callbacks.WindowStatus == NULL )
+            if( ! FETCH_WCB( *window, WindowStatus ) )
                 break;
             fgSetWindow( window );
 
@@ -566,17 +577,18 @@ void FGAPIENTRY glutMainLoopEvent( void )
             switch( event.xvisibility.state )
             {
             case VisibilityUnobscured:
-                window->Callbacks.WindowStatus( GLUT_FULLY_RETAINED );
+                INVOKE_WCB( *window, WindowStatus, ( GLUT_FULLY_RETAINED ) );
                 window->State.Visible = TRUE;
                 break;
                 
             case VisibilityPartiallyObscured:
-                window->Callbacks.WindowStatus( GLUT_PARTIALLY_RETAINED );
+                INVOKE_WCB( *window, WindowStatus,
+                            ( GLUT_PARTIALLY_RETAINED ) );
                 window->State.Visible = TRUE;
                 break;
                 
             case VisibilityFullyObscured:
-                window->Callbacks.WindowStatus( GLUT_FULLY_COVERED );
+                INVOKE_WCB( *window, WindowStatus, ( GLUT_FULLY_COVERED ) );
                 window->State.Visible = FALSE;
                 break;
 
@@ -592,23 +604,29 @@ void FGAPIENTRY glutMainLoopEvent( void )
         {
             GETWINDOW( xcrossing );
             GETMOUSE( xcrossing );
-            if( window->Callbacks.Entry )
-            {
-                fgSetWindow( window ) ;
-                window->Callbacks.Entry( GLUT_ENTERED );
-            }
+            /*
+             * if( window->Callbacks.Entry )
+             * {
+             *     fgSetWindow( window ) ;
+             *     window->Callbacks.Entry( GLUT_ENTERED );
+             * }
+             */
+            INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
         }
         break;
-
+        /* XXX Combine EnterNotify and LeaveNotify */
         case LeaveNotify:
         {
             GETWINDOW( xcrossing );
             GETMOUSE( xcrossing );
-            if( window->Callbacks.Entry )
-            {
-                fgSetWindow( window ) ;
-                window->Callbacks.Entry( GLUT_LEFT );
-            }
+            /*
+             * if( window->Callbacks.Entry )
+             * {
+             *     fgSetWindow( window ) ;
+             *     window->Callbacks.Entry( GLUT_LEFT );
+             * }
+             */
+            INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
         }
         break;
 
@@ -646,21 +664,29 @@ void FGAPIENTRY glutMainLoopEvent( void )
                  * A mouse button was pressed during the movement...
                  * Is there a motion callback hooked to the window?
                  */
-                if( window->Callbacks.Motion )
-                {
-                    fgSetWindow ( window ) ;
-                    window->Callbacks.Motion( event.xmotion.x,
-                                              event.xmotion.y );
-                }
+                /*
+                 * if( window->Callbacks.Motion )
+                 * {
+                 *     fgSetWindow ( window ) ;
+                 *     window->Callbacks.Motion( event.xmotion.x,
+                 *                               event.xmotion.y );
+                 * }
+                 */
+                INVOKE_WCB( *window, Motion, ( event.xmotion.x,
+                                             event.xmotion.y ) );
             }
             else
             {
-                if( window->Callbacks.Passive )
-                {
-                    fgSetWindow( window );
-                    window->Callbacks.Passive( event.xmotion.x,
-                                               event.xmotion.y );
-                }
+                /*
+                 * if( window->Callbacks.Passive )
+                 * {
+                 *     fgSetWindow( window );
+                 *     window->Callbacks.Passive( event.xmotion.x,
+                 *                                event.xmotion.y );
+                 * }
+                 */
+                INVOKE_WCB( *window, Passive, ( event.xmotion.x,
+                                              event.xmotion.y ) );
             }
         }
         break;
@@ -773,11 +799,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * Check if there is a mouse or mouse wheel callback hooked to the
              * window
              */
-            if( ( window->Callbacks.Mouse == NULL ) &&
-                ( window->Callbacks.MouseWheel == NULL ) )
+            if( ! FETCH_WCB( *window, Mouse ) &&
+                ! FETCH_WCB( *window, MouseWheel ) )
                 break;
 
-            fgSetWindow( window );
+            /* fgSetWindow( window ); */
 
             /*
              * XXX Why don't we use {window}?  Other code here does...
@@ -789,15 +815,22 @@ void FGAPIENTRY glutMainLoopEvent( void )
              *
              * XXX Use a symbolic constant, *not* "4"!
              */
-            if( ( button < 4 ) || ( !( window->Callbacks.MouseWheel ) ) )
+            if( ( button < 4 ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
             {
-                if( window->Callbacks.Mouse )
-                    fgStructure.Window->Callbacks.Mouse(
-                        button,
-                        pressed ? GLUT_DOWN : GLUT_UP,
-                        event.xbutton.x,
-                        event.xbutton.y
-                    );
+                /*
+                 * if( window->Callbacks.Mouse )
+                 *    fgStructure.Window->Callbacks.Mouse(
+                 *        button,
+                 *        pressed ? GLUT_DOWN : GLUT_UP,
+                 *        event.xbutton.x,
+                 *        event.xbutton.y
+                 *    );
+                 */
+                INVOKE_WCB( *window, Mouse, ( button,
+                                              pressed ? GLUT_DOWN : GLUT_UP,
+                                              event.xbutton.x,
+                                              event.xbutton.y )
+                );
             }
             else
             {
@@ -813,12 +846,20 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 int wheel_number = (button - 4) / 2;
                 int direction = (button & 1)*2 - 1;
                 
+                /*
+                 * if( pressed )
+                 *    fgStructure.Window->Callbacks.MouseWheel(
+                 *        wheel_number,
+                 *        direction,
+                 *        event.xbutton.x,
+                 *        event.xbutton.y
+                 *    );
+                 */
                 if( pressed )
-                    fgStructure.Window->Callbacks.MouseWheel(
-                        wheel_number,
-                        direction,
-                        event.xbutton.x,
-                        event.xbutton.y
+                    INVOKE_WCB( *window, MouseWheel, ( wheel_number,
+                                                       direction,
+                                                       event.xbutton.x,
+                                                       event.xbutton.y )
                     );
             }
 
@@ -832,21 +873,21 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case KeyRelease:
         case KeyPress:
         {
-            FGCBkeyboard keyboard_cb;
-            FGCBspecial special_cb;
+            FGCBKeyboard keyboard_cb;
+            FGCBSpecial special_cb;
 
             GETWINDOW( xkey );
             GETMOUSE( xkey );
 
             if( event.type == KeyPress )
             {
-                keyboard_cb = window->Callbacks.Keyboard;
-                special_cb = window->Callbacks.Special;
+                keyboard_cb = FETCH_WCB( *window, Keyboard );
+                special_cb  = FETCH_WCB( *window, Special  );
             }
             else
             {
-                keyboard_cb = window->Callbacks.KeyboardUp;
-                special_cb = window->Callbacks.SpecialUp;
+                keyboard_cb = FETCH_WCB( *window, KeyboardUp );
+                special_cb  = FETCH_WCB( *window, SpecialUp  );
             }
 
             /*
@@ -989,12 +1030,15 @@ void FGAPIENTRY glutMainLoop( void )
      */
     while( window )
     {
-        if ( window->Callbacks.Visibility )
+        if ( FETCH_WCB( *window, Visibility ) )
         {
             SFG_Window *current_window = fgStructure.Window ;
 
-            fgSetWindow( window );
-            window->Callbacks.Visibility ( window->State.Visible ) ;
+            /*
+             * fgSetWindow( window );
+             * window->Callbacks.Visibility ( window->State.Visible ) ;
+             */
+            INVOKE_WCB( *window, Visibility, ( window->State.Visible ) );
             fgSetWindow( current_window );
         }
         
@@ -1264,21 +1308,29 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             ( wParam & MK_MBUTTON ) ||
             ( wParam & MK_RBUTTON ) )
         {
-            if( window->Callbacks.Motion )
-            {
-                fgSetWindow( window );
-                window->Callbacks.Motion( window->State.MouseX,
-                                          window->State.MouseY );
-            }
+            /*
+             * if( window->Callbacks.Motion )
+             * {
+             *      fgSetWindow( window );
+             *      window->Callbacks.Motion( window->State.MouseX,
+             *                                window->State.MouseY );
+             * }
+             */
+            INVOKE_WCB( *window, Motion, ( window->State.MouseX,
+                                           window->State.MouseY ) );
         }
         else
         {
-            if( window->Callbacks.Passive )
-            {
-                fgSetWindow( window );
-                window->Callbacks.Passive( window->State.MouseX,
-                                           window->State.MouseY );
-            }
+            /*
+             * if( window->Callbacks.Passive )
+             * {
+             *      fgSetWindow( window );
+             *      window->Callbacks.Passive( window->State.MouseX,
+             *                                 window->State.MouseY );
+             * }
+             */
+            INVOKE_WCB( *window, Passive, ( window->State.MouseX,
+                                            window->State.MouseY ) );
         }
 
         window->State.Modifiers = 0xffffffff;
@@ -1391,18 +1443,28 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
-        if( window->Callbacks.Mouse == NULL )
+        if( ! FETCH_WCB( *window, Mouse ) )
             break;
 
         fgSetWindow( window );
         fgStructure.Window->State.Modifiers = fgGetWin32Modifiers( );
 
-        window->Callbacks.Mouse(
-            button,
-            pressed == TRUE ? GLUT_DOWN : GLUT_UP,
-            window->State.MouseX,
-            window->State.MouseY
+        INVOKE_WCB(
+            *window, Mouse,
+            ( button,
+              pressed == TRUE ? GLUT_DOWN : GLUT_UP,
+              window->State.MouseX,
+              window->State.MouseY
+            )
         );
+        /*
+         * window->Callbacks.Mouse(
+         *     button,
+         *     pressed == TRUE ? GLUT_DOWN : GLUT_UP,
+         *     window->State.MouseX,
+         *     window->State.MouseY
+         * );
+         */
 
         fgStructure.Window->State.Modifiers = 0xffffffff;
     }
@@ -1431,21 +1493,33 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /*        window->State.MouseY = HIWORD( lParam ); */
         /* change "lParam" to other parameter */
 
-        if( ( window->Callbacks.MouseWheel == NULL ) &&
-            ( window->Callbacks.Mouse == NULL ) )
+        if( ! FETCH_WCB( *window, MouseWheel ) &&
+            ! FETCH_WCB( *window, Mouse ) )
             break;
 
         fgSetWindow( window );
         fgStructure.Window->State.Modifiers = fgGetWin32Modifiers( );
 
         while( ticks-- )
-            if( window->Callbacks.MouseWheel )
-                window->Callbacks.MouseWheel(
-                    wheel_number,
-                    direction,
-                    window->State.MouseX,
-                    window->State.MouseY
+            if( FETCH_WCB( *window, MouseWheel ) )
+            {
+                INVOKE_WCB( *window, MouseWheel,
+                            ( wheel_number,
+                              direction,
+                              window->State.MouseX,
+                              window->State.MouseY
+                            )
                 );
+            }
+            /*
+             * if( window->Callbacks.MouseWheel )
+             *     window->Callbacks.MouseWheel(
+             *         wheel_number,
+             *         direction,
+             *         window->State.MouseX,
+             *         window->State.MouseY
+             *     );
+             */
             else  /* No mouse wheel, call the mouse button callback twice */
             {
                 /*
@@ -1455,14 +1529,25 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 int button = wheel_number*2 + 4;
                 if( direction > 0 )
                     ++button;
-                window->Callbacks.Mouse( button, GLUT_DOWN,
-                                         window->State.MouseX,
-                                         window->State.MouseY
+                INVOKE_WCB( *window, Mouse,
+                            ( button, GLUT_DOWN,
+                              window->State.MouseX, window->State.MouseY )
                 );
-                window->Callbacks.Mouse( button, GLUT_UP,
-                                         window->State.MouseX,
-                                         window->State.MouseY
+                INVOKE_WCB( *window, Mouse,
+                            ( button, GLUT_UP,
+                              window->State.MouseX, window->State.MouseX )
                 );
+                
+                /*
+                 * window->Callbacks.Mouse( button, GLUT_DOWN,
+                 *                          window->State.MouseX,
+                 *                          window->State.MouseY
+                 * );
+                 * window->Callbacks.Mouse( button, GLUT_UP,
+                 *                          window->State.MouseX,
+                 *                          window->State.MouseY
+                 * );
+                 */
             }
 
         fgStructure.Window->State.Modifiers = 0xffffffff;
@@ -1523,20 +1608,30 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             /*
              * The delete key should be treated as an ASCII keypress:
              */
-            if( window->Callbacks.Keyboard )
-            {
-                fgSetWindow( window );
-                window->Callbacks.Keyboard( 127, window->State.MouseX,
-                                            window->State.MouseY );
-            }
+            /*
+             * if( window->Callbacks.Keyboard )
+             * {
+             *     fgSetWindow( window );
+             *     window->Callbacks.Keyboard( 127, window->State.MouseX,
+             *                                 window->State.MouseY );
+             * }
+             */
+            INVOKE_WCB( *window, Keyboard,
+                        ( 127, window->State.MouseX, window->State.MouseY )
+            );
         }
 
-        if( ( keypress != -1 ) && window->Callbacks.Special )
-        {
-            fgSetWindow( window );
-            window->Callbacks.Special( keypress, window->State.MouseX,
-                                       window->State.MouseY );
-        }
+        /* if( ( keypress != -1 ) && window->Callbacks.Special )
+         * {
+         *     fgSetWindow( window );
+         *     window->Callbacks.Special( keypress, window->State.MouseX,
+         *                                window->State.MouseY );
+         * }
+         */
+        if( keypress != -1 )
+            INVOKE_WCB( *window, Special,
+                        ( keypress, window->State.MouseX, window->State.MouseY )
+            );
 
         window->State.Modifiers = 0xffffffff;
     }
@@ -1593,13 +1688,16 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
               /*
                * The delete key should be treated as an ASCII keypress:
                */
-              if( window->Callbacks.KeyboardUp )
-              {
-                  fgSetWindow( window );
-                  window->Callbacks.KeyboardUp( 127, window->State.MouseX,
-                                                window->State.MouseY );
-              }
-              
+              /* if( window->Callbacks.KeyboardUp )
+               * {
+               *     fgSetWindow( window );
+               *     window->Callbacks.KeyboardUp( 127, window->State.MouseX,
+               *                                   window->State.MouseY );
+               * }
+               */
+              INVOKE_WCB( *window, KeyboardUp,
+                          ( 127, window->State.MouseX, window->State.MouseY )
+              );
               break;
 
         default:
@@ -1612,22 +1710,35 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             if( ToAscii( wParam, 0, state, code, 0 ) == 1 )
                 wParam=code[ 0 ];
 
-            if( window->Callbacks.KeyboardUp )
-            {
-                fgSetWindow( window );
-                window->Callbacks.KeyboardUp( (char)wParam,
-                                              window->State.MouseX,
-                                              window->State.MouseY );
-            }
+            /*
+             * if( window->Callbacks.KeyboardUp )
+             * {
+             *     fgSetWindow( window );
+             *     window->Callbacks.KeyboardUp( (char)wParam,
+             *                                   window->State.MouseX,
+             *                                   window->State.MouseY );
+             * }
+             */
+            INVOKE_WCB( *window, KeyboardUp,
+                        ( (char)wParam,
+                          window->State.MouseX, window->State.MouseY )
+            );
         }
         }
 
-        if( (keypress != -1) && window->Callbacks.SpecialUp )
-        {
-            fgSetWindow( window );
-            window->Callbacks.SpecialUp( keypress, window->State.MouseX,
-                                         window->State.MouseY );
-        }
+        /*
+         * if( (keypress != -1) && window->Callbacks.SpecialUp )
+         * {
+         *     fgSetWindow( window );
+         *     window->Callbacks.SpecialUp( keypress, window->State.MouseX,
+         *                                  window->State.MouseY );
+         * }
+         */
+        if( keypress != -1 )
+            INVOKE_WCB( *window, SpecialUp,
+                        ( keypress,
+                          window->State.MouseX, window->State.MouseY )
+            );
 
         window->State.Modifiers = 0xffffffff;
     }
@@ -1639,12 +1750,16 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( fgState.IgnoreKeyRepeat && (lParam & KF_REPEAT) )
             break;
 
-        if( window->Callbacks.Keyboard )
+        if( FETCH_WCB( *window, Keyboard ) )
         {
-            fgSetWindow( window );
+            /* fgSetWindow( window ); */
             window->State.Modifiers = fgGetWin32Modifiers( );
-            window->Callbacks.Keyboard( (char)wParam, window->State.MouseX,
-                                        window->State.MouseY );
+            /* window->Callbacks.Keyboard( (char)wParam, window->State.MouseX,
+               window->State.MouseY ); */
+            INVOKE_WCB( *window, Keyboard,
+                        ( (char)wParam,
+                          window->State.MouseX, window->State.MouseY )
+            );
             window->State.Modifiers = 0xffffffff;
         }
     }
@@ -1652,11 +1767,14 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_CAPTURECHANGED:
         /* User has finished resizing the window, force a redraw */
-        if( window->Callbacks.Display )
-        {
-            fgSetWindow( window );
-            window->Callbacks.Display( );
-        }
+        /*
+         * if( window->Callbacks.Display )
+         * {
+         *     fgSetWindow( window );
+         *     window->Callbacks.Display( );
+         * }
+         */
+        INVOKE_WCB( *window, Display, ( ) );
 
         /*lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ) ; */
         break;

@@ -597,17 +597,26 @@ void fgJoystickPollWindow( SFG_Window* window )
     int buttons;
 
     freeglut_return_if_fail( fgJoystick != NULL && window != NULL );
-    freeglut_return_if_fail( window->Callbacks.Joystick != NULL );
+    freeglut_return_if_fail( FETCH_WCB( *window, Joystick ) );
 
     fghJoystickRead( fgJoystick, &buttons, axes );
 
-    fgSetWindow (window);
-    window->Callbacks.Joystick(
-        buttons,
-        (int) (axes[ 0 ] * 1000.0f),
-        (int) (axes[ 1 ] * 1000.0f),
-        (int) (axes[ 2 ] * 1000.0f)
+    INVOKE_WCB( *window, Joystick,
+                ( buttons,
+                  (int) (axes[ 0 ] * 1000.0f ),
+                  (int) (axes[ 1 ] * 1000.0f ),
+                  (int) (axes[ 2 ] * 1000.0f ) )
     );
+    
+    /*
+     * fgSetWindow (window);
+     * window->Callbacks.Joystick(
+     *   buttons,
+     *   (int) (axes[ 0 ] * 1000.0f),
+     *   (int) (axes[ 1 ] * 1000.0f),
+     *   (int) (axes[ 2 ] * 1000.0f)
+     * );
+     */
 }
 
 /*

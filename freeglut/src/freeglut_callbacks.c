@@ -41,7 +41,8 @@
 #define SET_CALLBACK(a)              \
     if( fgStructure.Window == NULL ) \
         return;                      \
-    fgStructure.Window->Callbacks.a = callback;
+    FETCH_WCB( ( *( fgStructure.Window ) ), a ) = callback;
+    /* fgStructure.Window->Callbacks.a = callback; */
 
 /*
  * Sets the Display callback for the current window
@@ -115,14 +116,25 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ),
  */
 static void fghVisibility( int status )
 {
+    FGCBVisibility vis;
+    int glut_status;
+    
     freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Window );
-    freeglut_return_if_fail( fgStructure.Window->Callbacks.Visibility );
+    vis = FETCH_WCB( ( *( fgStructure.Window ) ), Visibility );
+    freeglut_return_if_fail( vis );
+    /* Callbacks.Visibility ); */
 
     if( status == GLUT_HIDDEN  || status == GLUT_FULLY_COVERED )
+        glut_status = GLUT_NOT_VISIBLE;
+    else
+        glut_status = GLUT_VISIBLE;
+    vis( glut_status );
+    /*
         fgStructure.Window->Callbacks.Visibility( GLUT_NOT_VISIBLE );
     else
         fgStructure.Window->Callbacks.Visibility( GLUT_VISIBLE );
+    */
 }
 
 void FGAPIENTRY glutVisibilityFunc( void (* callback)( int ) )

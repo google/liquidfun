@@ -145,7 +145,7 @@ void FGAPIENTRY glutForceJoystickFunc( void )
 {
     freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Window != NULL );
-    freeglut_return_if_fail( fgStructure.Window->Callbacks.Joystick != NULL );
+    freeglut_return_if_fail( FETCH_WCB( *( fgStructure.Window ), Joystick ) );
     fgJoystickPollWindow( fgStructure.Window );
 }
 

@@ -262,8 +262,8 @@ void fgDeinitialize( void )
 
     fgState.Timers.First = fgState.Timers.Last = NULL;
     fgState.IdleCallback = NULL;
-    fgState.MenuStateCallback = (FGCBmenuState)NULL;
-    fgState.MenuStatusCallback = (FGCBmenuStatus)NULL;
+    fgState.MenuStateCallback = (FGCBMenuState)NULL;
+    fgState.MenuStatusCallback = (FGCBMenuStatus)NULL;
 
     fgState.SwapCount   = 0;
     fgState.SwapTime    = 0;
