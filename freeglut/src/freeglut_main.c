@@ -90,7 +90,7 @@ static void fghRedrawWindowByHandle
 
     fgSetWindow( window );
     window->State.Redisplay = FALSE;
-    window->Callbacks.Display();
+    window->Callbacks.Display( );
 }
 
 /*
@@ -105,7 +105,7 @@ static void fghReshapeWindowByHandle
     ( HWND handle, int width, int height )
 #endif
 {
-    SFG_Window *current_window = fgStructure.Window ;
+    SFG_Window *current_window = fgStructure.Window;
 
     SFG_Window* window = fgWindowByHandle( handle );
     freeglut_return_if_fail( window != NULL );
@@ -123,10 +123,10 @@ static void fghReshapeWindowByHandle
      * But without this we get this bad behaviour whenever we resize the
      * window.
      */
-    window->State.Redisplay = TRUE ;
+    window->State.Redisplay = TRUE;
 
     if( window->IsMenu )
-        fgSetWindow( current_window ) ;
+        fgSetWindow( current_window );
 }
 
 /*
@@ -143,15 +143,15 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
 
         fgSetWindow( window );
         window->State.Redisplay = FALSE;
-        window->Callbacks.Display();
-        fgSetWindow( current_window ) ;
+        window->Callbacks.Display( );
+        fgSetWindow( current_window );
     }
 
 #elif TARGET_HOST_WIN32
 
     if( window->State.NeedToResize )
     {
-        SFG_Window *current_window = fgStructure.Window ;
+        SFG_Window *current_window = fgStructure.Window;
 
         fgSetWindow( window );
 
@@ -162,7 +162,7 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
         );
 
         window->State.NeedToResize = FALSE;
-        fgSetWindow ( current_window ) ;
+        fgSetWindow ( current_window );
     }
 
     if( (window->Callbacks.Display != NULL) &&
@@ -201,7 +201,7 @@ static void fghDisplayAll( void )
 static void fghcbCheckJoystickPolls( SFG_Window *window,
                                      SFG_Enumerator *enumerator )
 {
-    long int checkTime = fgElapsedTime();
+    long int checkTime = fgElapsedTime( );
 
     if( window->State.JoystickLastPoll + window->State.JoystickPollRate <=
         checkTime )
@@ -231,7 +231,7 @@ static void fghCheckJoystickPolls( void )
  */
 static void fghCheckTimers( void )
 {
-    long checkTime = fgElapsedTime();
+    long checkTime = fgElapsedTime( );
     SFG_Timer *timer, *next;
     SFG_List timedOut;
 
@@ -278,9 +278,9 @@ long fgElapsedTime( void )
     elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
     elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
     
-    return( elapsed );
+    return elapsed;
 #elif TARGET_HOST_WIN32
-    return (timeGetTime() - fgState.Time.Value);
+    return timeGetTime() - fgState.Time.Value;
 #endif
 }
 
@@ -409,15 +409,14 @@ static void fgSleepForEvents( void )
     struct timeval wait;
     long msec;    
     
-    if( fgState.IdleCallback ||
-        fgHavePendingRedisplays() )
+    if( fgState.IdleCallback || fgHavePendingRedisplays( ) )
         return;
     socket = ConnectionNumber( fgDisplay.Display );
     FD_ZERO( &fdset );
     FD_SET( socket, &fdset );
     
-    msec = fgNextTimer();
-    if( fgHaveJoystick() )
+    msec = fgNextTimer( );
+    if( fgHaveJoystick( ) )
         msec = MIN( msec, 10 );
     
     wait.tv_sec = msec / 1000;
@@ -435,7 +434,7 @@ static void fgSleepForEvents( void )
 /*
  * Returns GLUT modifier mask for an XEvent.
  */
-int fgGetXModifiers(XEvent *event)
+int fgGetXModifiers( XEvent *event )
 {
     int ret = 0;
 
@@ -1086,24 +1085,24 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         window->Window.Device = GetDC( hWnd );
         if( fgState.BuildingAMenu )
         {
-          unsigned int current_DisplayMode = fgState.DisplayMode;
-          fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;
-          fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
-          fgState.DisplayMode = current_DisplayMode;
+            unsigned int current_DisplayMode = fgState.DisplayMode;
+            fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;
+            fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
+            fgState.DisplayMode = current_DisplayMode;
 
-          if( fgStructure.MenuContext )
-              wglMakeCurrent( window->Window.Device,
-                              fgStructure.MenuContext->Context ) ;
-          else
-          {
-              fgStructure.MenuContext =
-                  (SFG_MenuContext *)malloc( sizeof(SFG_MenuContext) );
-              fgStructure.MenuContext->Context =
-                  wglCreateContext( window->Window.Device );
-          }
+            if( fgStructure.MenuContext )
+                wglMakeCurrent( window->Window.Device,
+                                fgStructure.MenuContext->Context ) ;
+            else
+            {
+                fgStructure.MenuContext =
+                    (SFG_MenuContext *)malloc( sizeof(SFG_MenuContext) );
+                fgStructure.MenuContext->Context =
+                    wglCreateContext( window->Window.Device );
+            }
 
-          /* window->Window.Context = wglGetCurrentContext () ;   */
-          window->Window.Context = wglCreateContext( window->Window.Device );
+            /* window->Window.Context = wglGetCurrentContext () ;   */
+            window->Window.Context = wglCreateContext( window->Window.Device );
         }
         else
         {
@@ -1143,7 +1142,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             /* glutSetCursor( fgStructure.Window->State.Cursor ); */
             printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window,
                    window->State.Cursor );
-
             glutSetCursor( window->State.Cursor );
         }
 
@@ -1239,7 +1237,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Put on a linked list of windows to be removed after all the
          * callbacks have returned
          */
-        fgAddToWindowDestroyList( window, FALSE ) ;
+        fgAddToWindowDestroyList( window, FALSE );
         DestroyWindow( hWnd );
         break;
 
@@ -1247,7 +1245,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /*
          * The window already got destroyed, so don't bother with it.
          */
-        return( 0 );
+        return 0;
 
     case WM_MOUSEMOVE:
     {
@@ -1256,13 +1254,8 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         
         if ( window->ActiveMenu )
         {
-            window->State.Redisplay = TRUE ;
-
-            /*
-             * Since the window is a menu, make the parent window current
-             */
-            fgSetWindow ( window->ActiveMenu->ParentWindow ) ;
-
+            window->State.Redisplay = TRUE;
+            fgSetWindow ( window->ActiveMenu->ParentWindow );
             break;
         }
 
@@ -1461,13 +1454,16 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                  * XXX buttons.  Sorry.
                  */
                 int button = wheel_number*2 + 4;
-                button += (1 + direction)/2;
+                if( direction > 0 )
+                    ++button;
                 window->Callbacks.Mouse( button, GLUT_DOWN,
                                          window->State.MouseX,
-                                         window->State.MouseY ) ;
+                                         window->State.MouseY
+                );
                 window->Callbacks.Mouse( button, GLUT_UP,
                                          window->State.MouseX,
-                                         window->State.MouseY ) ;
+                                         window->State.MouseY
+                );
             }
 
         fgStructure.Window->State.Modifiers = 0xffffffff;
@@ -1551,7 +1547,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_KEYUP:
     {
         int keypress = -1;
-        POINT mouse_pos ;
+        POINT mouse_pos;
 
         /*
          * Remember the current modifiers state. This is done here in order 
@@ -1660,7 +1656,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( window->Callbacks.Display )
         {
             fgSetWindow( window );
-
             window->Callbacks.Display( );
         }
 
@@ -1714,7 +1709,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
     }
 
-    return lRet ;
+    return lRet;
 }
 #endif
 
