@@ -431,6 +431,7 @@ static void fgSleepForEvents( void )
 #endif
 }
 
+#if TARGET_HOST_UNIX_X11
 /*
  * Returns GLUT modifier mask for an XEvent.
  */
@@ -447,6 +448,7 @@ int fgGetXModifiers(XEvent *event)
     
     return ret;
 }
+#endif
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
