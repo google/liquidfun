@@ -89,7 +89,6 @@
 #        define JS_RETURN (sizeof(struct JS_DATA_TYPE))
 #    endif
 
-#    include <unistd.h>
 #    include <fcntl.h>
 #    include <errno.h>
 

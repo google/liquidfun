@@ -30,8 +30,6 @@
 
 #include <limits.h>
 #if TARGET_HOST_UNIX_X11
-#include <sys/types.h>
-#include <unistd.h>
 #include <errno.h>
 #include <sys/stat.h>
 #elif TARGET_HOST_WIN32
