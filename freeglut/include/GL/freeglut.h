@@ -1,5 +1,5 @@
-#ifndef  FREEGLUT_H
-#define  FREEGLUT_H
+#ifndef  __FREEGLUT_H__
+#define  __FREEGLUT_H__
 
 /*
  * freeglut.h
@@ -19,5 +19,4 @@
 
 /*** END OF FILE ***/
 
-#endif /* FREEGLUT_H */
-
+#endif /* __FREEGLUT_H__ */

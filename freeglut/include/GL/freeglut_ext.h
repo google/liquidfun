@@ -1,5 +1,5 @@
-#ifndef  FREEGLUT_EXT_H
-#define  FREEGLUT_EXT_H
+#ifndef  __FREEGLUT_EXT_H__
+#define  __FREEGLUT_EXT_H__
 
 /*
  * freeglut_ext.h
@@ -109,5 +109,4 @@ FGAPI void * FGAPIENTRY glutGetProcAddress( const char *procName );
 
 /*** END OF FILE ***/
 
-#endif /* FREEGLUT_EXT_H */
-
+#endif /* __FREEGLUT_EXT_H__ */

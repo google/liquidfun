@@ -1,5 +1,5 @@
-#ifndef  GLUT_H
-#define  GLUT_H
+#ifndef  __GLUT_H__
+#define  __GLUT_H__
 
 /*
  * freeglut.h
@@ -540,5 +540,4 @@ FGAPI void    FGAPIENTRY glutReportErrors( void );
 
 /*** END OF FILE ***/
 
-#endif /* GLUT_H */
-
+#endif /* __GLUT_H__ */
