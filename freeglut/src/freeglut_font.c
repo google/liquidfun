@@ -112,7 +112,7 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
     /*
      * Find the character we want to draw (???)
      */
-    face = font->Characters[ character - 1 ];
+    face = font->Characters[ character ];
 
     glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
     glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
@@ -137,6 +137,19 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
     SFG_Font* font = fghFontByID( fontID );
     float raster_position[ 4 ];
 
+    glPushAttrib( GL_TRANSFORM_BIT );
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix( );
+    glLoadIdentity( );
+    glMatrixMode( GL_PROJECTION );
+    glPushMatrix( );
+    glLoadIdentity( );
+    glOrtho(
+        0, glutGet( GLUT_WINDOW_WIDTH ),
+        0, glutGet( GLUT_WINDOW_HEIGHT ),
+        -10, 10
+    );
+
     glGetFloatv ( GL_CURRENT_RASTER_POSITION, raster_position );
     glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
     glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
@@ -159,7 +172,7 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
         }
         else  /* Not an EOL, draw the bitmap character */
         {
-            const GLubyte* face = font->Characters[ string[ c ] - 1 ];
+            const GLubyte* face = font->Characters[ string[ c ] ];
 
             glBitmap(
                 face[ 0 ], font->Height,     /* Bitmap's width and height    */
@@ -168,7 +181,12 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
                 ( face + 1 )                 /* The packed bitmap data...    */
             );
         }
+
     glPopClientAttrib( );
+    glPopMatrix( );
+    glMatrixMode( GL_MODELVIEW );
+    glPopMatrix( );
+    glPopAttrib( );
 }
 
 /*
@@ -179,7 +197,7 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
     SFG_Font* font = fghFontByID( fontID );
 
     freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
-    return *( font->Characters[ character - 1 ] );
+    return *( font->Characters[ character ] );
 }
 
 /*
@@ -194,7 +212,7 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
     for( c = 0; c < numchar; c++ )
     {
         if( string[ c ] != '\n' )/* Not an EOL, increment length of line */
-            this_line_length += *( font->Characters[ string[ c ] - 1 ]);
+            this_line_length += *( font->Characters[ string[ c ] ]);
         else  /* EOL; reset the length of this line */
         {
             if( length < this_line_length )
