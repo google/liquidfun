@@ -118,6 +118,9 @@
 typedef struct tagSFG_Joystick SFG_Joystick;
 struct tagSFG_Joystick
 {
+/*
+ * XXX All BSDs might share this?
+ */
 #ifdef __FreeBSD__
     int         id;
 #endif
@@ -291,15 +294,15 @@ static float fghJoystickFudgeAxis( SFG_Joystick* joy, float value, int axis )
                                                     joy->min[ axis ]);
 
         if( xx < -joy->saturate[ axis ] )
-            return( -1.0f );
+            return -1.0f;
 
         if( xx > -joy->dead_band [ axis ] )
-            return(  0.0f );
+            return 0.0f;
 
         xx = (xx + joy->dead_band[ axis ]) / (joy->saturate[ axis ] -
                                               joy->dead_band[ axis ]);
 
-        return( ( xx < -1.0f ) ? -1.0f : xx );
+        return ( xx < -1.0f ) ? -1.0f : xx;
     }
     else
     {
@@ -315,7 +318,7 @@ static float fghJoystickFudgeAxis( SFG_Joystick* joy, float value, int axis )
         xx = (xx - joy->dead_band[ axis ]) / (joy->saturate[ axis ] -
                                               joy->dead_band[ axis ]);
 
-        return( ( xx > 1.0f ) ? 1.0f : xx );
+        return ( xx > 1.0f ) ? 1.0f : xx;
     }
 }
 
@@ -440,7 +443,9 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 
     if( joy->error )
         return;
-
+/*
+ * XXX All BSDs should share this?
+ */
 #   ifdef __FreeBSD__
     fghJoystickRawRead(joy, buttons, axes );
     joy->error = axes[ 0 ] < -1000000000.0f;
@@ -477,6 +482,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
      * Set the correct number of axes for the linux driver
      */
 #       ifdef JS_NEW
+
     ioctl( joy->fd, JSIOCGAXES   , &joy->num_axes    );
     ioctl( joy->fd, JSIOCGBUTTONS, &joy->num_buttons );
     fcntl( joy->fd, F_SETFL, O_NONBLOCK );
@@ -498,7 +504,10 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     { 
         fghJoystickRawRead( joy, NULL, joy->center );
         counter++;
-    } while( !joy->error && counter < 100 && joy->center[ 0 ] == 512.0f && joy->center[ 1 ] == 512.0f );
+    } while( !joy->error &&
+             counter < 100 &&
+             joy->center[ 0 ] == 512.0f &&
+             joy->center[ 1 ] == 512.0f );
    
     if( counter >= 100 )
         joy->error = TRUE;
@@ -534,12 +543,24 @@ void fgJoystickInit( int ident )
 #ifdef WIN32
     switch( ident )
     {
-    case 0:  fgJoystick->js_id    = JOYSTICKID1; fghJoystickOpen( fgJoystick ); break;
-    case 1:  fgJoystick->js_id    = JOYSTICKID2; fghJoystickOpen( fgJoystick ); break;
-    default: fgJoystick->num_axes = 0; fgJoystick->error = TRUE;                break;
+    case 0:
+        fgJoystick->js_id = JOYSTICKID1;
+        fghJoystickOpen( fgJoystick );
+        break;
+    case 1:
+        fgJoystick->js_id = JOYSTICKID2;
+        fghJoystickOpen( fgJoystick );
+        break;
+    default:
+        fgJoystick->num_axes = 0;
+        fgJoystick->error = TRUE;
+        break;
     }
 #else
 
+/*
+ * XXX All BSDs should share this code?
+ */
 #   ifdef __FreeBSD__
     fgJoystick->id = ident;
     sprintf( fgJoystick->fname, "/dev/joy%d", ident );
@@ -596,22 +617,34 @@ void fgJoystickPollWindow( SFG_Window* window )
  *      We might consider adding such functions to freeglut-2.0.
  */
 #if 0
-  int  getNumAxes () { return num_axes ; }
-  int  notWorking () { return error ;    }
+int  getNumAxes ()
+    { return num_axes; }
+int  notWorking ()
+    { return error; }
 
-  float getDeadBand ( int axis )             { return dead_band [ axis ] ; }
-  void  setDeadBand ( int axis, float db )   { dead_band [ axis ] = db   ; }
+float getDeadBand ( int axis )
+    { return dead_band [ axis ]; }
+void  setDeadBand ( int axis, float db )
+    { dead_band [ axis ] = db; }
 
-  float getSaturation ( int axis )           { return saturate [ axis ]  ; }
-  void  setSaturation ( int axis, float st ) { saturate [ axis ] = st    ; }
+float getSaturation ( int axis )
+    { return saturate [ axis ]; }
+void  setSaturation ( int axis, float st )
+    { saturate [ axis ] = st; }
 
-  void setMinRange ( float *axes ) { memcpy ( min   , axes, num_axes * sizeof(float) ) ; }
-  void setMaxRange ( float *axes ) { memcpy ( max   , axes, num_axes * sizeof(float) ) ; }
-  void setCenter   ( float *axes ) { memcpy ( center, axes, num_axes * sizeof(float) ) ; }
+void setMinRange ( float *axes )
+    { memcpy ( min   , axes, num_axes * sizeof(float) ); }
+void setMaxRange ( float *axes )
+    { memcpy ( max   , axes, num_axes * sizeof(float) ); }
+void setCenter   ( float *axes )
+    { memcpy ( center, axes, num_axes * sizeof(float) ); }
 
-  void getMinRange ( float *axes ) { memcpy ( axes, min   , num_axes * sizeof(float) ) ; }
-  void getMaxRange ( float *axes ) { memcpy ( axes, max   , num_axes * sizeof(float) ) ; }
-  void getCenter   ( float *axes ) { memcpy ( axes, center, num_axes * sizeof(float) ) ; }
+void getMinRange ( float *axes )
+    { memcpy ( axes, min   , num_axes * sizeof(float) ); }
+void getMaxRange ( float *axes )
+    { memcpy ( axes, max   , num_axes * sizeof(float) ); }
+void getCenter   ( float *axes )
+    { memcpy ( axes, center, num_axes * sizeof(float) ); }
 #endif
 
 /*** END OF FILE ***/
