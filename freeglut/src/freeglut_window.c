@@ -960,7 +960,8 @@ void FGAPIENTRY glutFullScreen( void )
             fgDisplay.ScreenWidth,
             fgDisplay.ScreenHeight
         );
-        XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+
+        XFlush( fgDisplay.Display ); /* This is needed */
 
         XTranslateCoordinates(
             fgDisplay.Display,

@@ -296,19 +296,31 @@ static void fghCheckTimers( void )
  */
 long fgElapsedTime( void )
 {
+    if (fgState.Time.Set)
+    {
 #if TARGET_HOST_UNIX_X11
-    struct timeval now;
-    long elapsed;
+        struct timeval now;
+        long elapsed;
     
-    gettimeofday( &now, NULL );
+        gettimeofday( &now, NULL );
     
-    elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
-    elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
+        elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
+        elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
     
-    return elapsed;
+        return elapsed;
 #elif TARGET_HOST_WIN32
-    return timeGetTime() - fgState.Time.Value;
+        return timeGetTime() - fgState.Time.Value;
 #endif
+    }
+    else
+    {
+#if TARGET_HOST_UNIX_X11
+        gettimeofday( &fgState.Time.Value, NULL );
+#elif TARGET_HOST_WIN32
+        fgState.Time.Value = timeGetTime( );
+#endif
+        fgState.Time.Set = TRUE;
+    }
 }
 
 /*

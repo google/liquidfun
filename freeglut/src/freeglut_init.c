@@ -58,6 +58,7 @@ SFG_Display fgDisplay;
 SFG_State fgState = { { -1, -1, FALSE },  /* Position */
                       { 300, 300, TRUE }, /* Size */
                       GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,  /* DisplayMode */
+                      FALSE,              /* Initalized */
                       FALSE,              /* ForceDirectContext */
                       TRUE,               /* TryDirectContext */
                       FALSE,              /* ForceIconic */
@@ -197,6 +198,8 @@ void fgInitialize( const char* displayName )
 #endif
 
     fgJoystickInit( 0 );
+
+    fgState.Initalized = GL_TRUE;
 }
 
 /*
@@ -206,12 +209,14 @@ void fgDeinitialize( void )
 {
     SFG_Timer *timer;
 
-    if( !fgState.Time.Set )
+    if( !fgState.Initalized )
     {
-        fgWarning( "fgDeinitialize(): fgState.Timer is null => "
-            "no valid initialization has been performed" );
+        fgWarning( "fgDeinitialize(): "
+                   "no valid initialization has been performed" );
         return;
     }
+
+    fgState.Initalized = GL_FALSE;
 
     /*
      * If there was a menu created, destroy the rendering context
@@ -312,17 +317,12 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     if( !fgState.ProgramName )
         fgError ("Could not allocate space for the program's name.");
 
-    if( fgState.Time.Set )
+    if( fgState.Initalized )
         fgError( "illegal glutInit() reinitialization attemp" );
 
     fgCreateStructure( );
 
-#if TARGET_HOST_UNIX_X11
-    gettimeofday( &fgState.Time.Value, NULL );
-#elif TARGET_HOST_WIN32
-    fgState.Time.Value = timeGetTime( );
-#endif
-    fgState.Time.Set = TRUE;
+    fgElapsedTime( );
 
     /* check if GLUT_FPS env var is set */
     {

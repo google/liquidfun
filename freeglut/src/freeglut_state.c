@@ -127,8 +127,14 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     int returnValue ;
     GLboolean boolValue ;
 
-    if ( eWhat == GLUT_INIT_STATE )
-        return ( fgState.Time.Set ) ;
+    switch (eWhat)
+    {
+    case GLUT_INIT_STATE:
+        return ( fgState.Initalized ) ;
+
+    case GLUT_ELAPSED_TIME:
+        return( fgElapsedTime() );
+    }
 
     freeglut_assert_ready;
 
@@ -137,9 +143,6 @@ int FGAPIENTRY glutGet( GLenum eWhat )
      */
     switch( eWhat )
     {
-    case GLUT_ELAPSED_TIME:
-        return( fgElapsedTime() );
-
     /*
      * Following values are stored in fgState and fgDisplay global structures
      */
