@@ -164,15 +164,15 @@
     /*
      * I don't really know if it's a good idea... But here it goes:
      */
-    extern void* glutStrokeRoman;
-    extern void* glutStrokeMonoRoman;
-    extern void* glutBitmap9By15;
-    extern void* glutBitmap8By13;
-    extern void* glutBitmapTimesRoman10;
-    extern void* glutBitmapTimesRoman24;
-    extern void* glutBitmapHelvetica10;
-    extern void* glutBitmapHelvetica12;
-    extern void* glutBitmapHelvetica18;
+    extern struct _GLUTstrokeFont glutStrokeRoman;
+    extern struct _GLUTstrokeFont glutStrokeMonoRoman;
+    extern struct _GLUTbitmapFont glutBitmap9By15;
+    extern struct _GLUTbitmapFont glutBitmap8By13;
+    extern struct _GLUTbitmapFont glutBitmapTimesRoman10;
+    extern struct _GLUTbitmapFont glutBitmapTimesRoman24;
+    extern struct _GLUTbitmapFont glutBitmapHelvetica10;
+    extern struct _GLUTbitmapFont glutBitmapHelvetica12;
+    extern struct _GLUTbitmapFont glutBitmapHelvetica18;
 
     /*
      * Those pointers will be used by following definitions:

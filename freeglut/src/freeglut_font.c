@@ -59,15 +59,30 @@ extern SFG_StrokeFont fgStrokeMonoRoman;
  * This is for GLUT binary compatibility, as suggested by Steve Baker
  */
 #if TARGET_HOST_UNIX_X11
-  void* glutStrokeRoman;
-  void* glutStrokeMonoRoman;
-  void* glutBitmap9By15;
-  void* glutBitmap8By13;
-  void* glutBitmapTimesRoman10;
-  void* glutBitmapTimesRoman24;
-  void* glutBitmapHelvetica10;
-  void* glutBitmapHelvetica12;
-  void* glutBitmapHelvetica18;
+  struct _GLUTstrokeFont {
+    const char *name;
+    int num_chars;
+    void *ch;
+    float top;
+    float bottom;
+  };
+
+  struct _GLUTbitmapFont {
+    const char *name;
+    const int num_chars;
+    const int first;
+    const void *ch;
+  };
+
+  struct _GLUTstrokeFont glutStrokeRoman;
+  struct _GLUTstrokeFont glutStrokeMonoRoman;
+  struct _GLUTbitmapFont glutBitmap9By15;
+  struct _GLUTbitmapFont glutBitmap8By13;
+  struct _GLUTbitmapFont glutBitmapTimesRoman10;
+  struct _GLUTbitmapFont glutBitmapTimesRoman24;
+  struct _GLUTbitmapFont glutBitmapHelvetica10;
+  struct _GLUTbitmapFont glutBitmapHelvetica12;
+  struct _GLUTbitmapFont glutBitmapHelvetica18;
 #endif
 
 
