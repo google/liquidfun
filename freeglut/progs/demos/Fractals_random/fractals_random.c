@@ -236,6 +236,10 @@ void readConfigFile ( char *fnme )
   }
 }
 
+void Idle(void) {
+    return;
+}
+
 int 
 main(int argc, char *argv[])
 {
@@ -262,6 +266,7 @@ main(int argc, char *argv[])
   glutKeyboardFunc(Key);
   glutSpecialFunc(Special);
   glutDisplayFunc(Display);
+  glutIdleFunc(Idle);
 
   glutMainLoop();
 
