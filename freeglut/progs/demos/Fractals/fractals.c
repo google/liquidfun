@@ -120,6 +120,8 @@ Reshape(int width, int height)
 static void 
 Key(unsigned char key, int x, int y)
 {
+  int need_redisplay = 1;
+  
   switch (key) {
   case 27:  /* Escape key */
     glutLeaveMainLoop () ;
@@ -140,16 +142,21 @@ Key(unsigned char key, int x, int y)
     xwin = -1.0 ;
     ywin = 0.0 ;
     glTranslated ( xwin, ywin, -5.0 ) ;
-
     break ;
-  }
 
-  glutPostRedisplay();
+  default:
+    need_redisplay = 0;
+    break;
+  }
+  if (need_redisplay)
+    glutPostRedisplay();
 }
 
 static void 
 Special(int key, int x, int y)
 {
+  int need_redisplay = 1;
+
   switch (key) {
   case GLUT_KEY_UP :
     glMatrixMode ( GL_MODELVIEW ) ;
@@ -190,9 +197,13 @@ Special(int key, int x, int y)
     glTranslated ( xwin, ywin, 0.0 ) ;
     scale_factor *= 1.25 ;
     break ;
-  }
 
-  glutPostRedisplay();
+  default:
+    need_redisplay = 0;
+    break;
+  }
+  if (need_redisplay)
+    glutPostRedisplay();
 }
 
 
