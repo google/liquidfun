@@ -575,11 +575,8 @@ void fgCloseWindow( SFG_Window* window )
  */
 int FGAPIENTRY glutCreateWindow( const char* title )
 {
-    /*
-     * Create a new window and return its unique ID number
-     */
-    return( fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
-                            fgState.Size.X, fgState.Size.Y, FALSE )->ID );
+    return fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
+                           fgState.Size.X, fgState.Size.Y, FALSE )->ID;
 }
 
 /*
@@ -591,26 +588,10 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     SFG_Window* parent = NULL;
 
     freeglut_assert_ready;
-
-    /*
-     * Find a parent to the newly created window...
-     */
     parent = fgWindowByID( parentID );
-
-    /*
-     * Fail if the parent has not been found
-     */
     freeglut_return_val_if_fail( parent != NULL, 0 );
-
-    /*
-     * Create the new window
-     */
     window = fgCreateWindow( parent, "", x, y, w, h, FALSE );
-
-    /*
-     * Return the new window's ID
-     */
-    return( window->ID );
+    return window->ID;
 }
 
 /*
@@ -618,25 +599,13 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
  */
 void FGAPIENTRY glutDestroyWindow( int windowID )
 {
-  fgExecutionState ExecState = fgState.ExecState ;
-
-  /*
-   * Grab the freeglut window pointer from the structure
-   */
-  SFG_Window* window = fgWindowByID( windowID );
-  freeglut_return_if_fail( window != NULL );
-
-  /*
-   * There is a function that performs all needed steps
-   * defined in freeglut_structure.c. Let's use it:
-   */
-  fgAddToWindowDestroyList( window, TRUE );
-
-  /*
-   * Since the "fgAddToWindowDestroyList" function could easily have set the "ExecState"
-   * to stop, let's set it back to what it was.
-   */
-  fgState.ExecState = ExecState ;
+    SFG_Window* window = fgWindowByID( windowID );
+    freeglut_return_if_fail( window != NULL );
+    {
+        fgExecutionState ExecState = fgState.ExecState;
+        fgAddToWindowDestroyList( window, TRUE );
+        fgState.ExecState = ExecState;
+    }
 }
 
 /*
@@ -646,36 +615,19 @@ void FGAPIENTRY glutSetWindow( int ID )
 {
     SFG_Window* window = NULL;
 
-    /*
-     * Make sure we don't get called too early
-     */
     freeglut_assert_ready;
-
-    /*
-     * Be wise. Be wise. Be wise. Be quick.
-     */
     if( fgStructure.Window != NULL )
         if( fgStructure.Window->ID == ID )
             return;
 
-    /*
-     * Now we are sure there is sense in looking for the window
-     */
     window = fgWindowByID( ID );
-
-    /*
-     * In the case of an utter failure...
-     */
     if( window == NULL )
     {
-        /*
-         * ...issue a warning message and keep rolling on
-         */
         fgWarning( "glutSetWindow(): window ID %i not found!", ID );
         return;
     }
 
-    fgSetWindow ( window ) ;
+    fgSetWindow( window ) ;
 }
 
 /*
@@ -684,22 +636,9 @@ void FGAPIENTRY glutSetWindow( int ID )
 int FGAPIENTRY glutGetWindow( void )
 {
     freeglut_assert_ready;
-
-    /*
-     * Do we have a current window selected?
-     */
     if( fgStructure.Window == NULL )
-    {
-        /*
-         * Nope. Return zero to mark the state.
-         */
-        return( 0 );
-    }
-
-    /*
-     * Otherwise, return the ID of the current window
-     */
-    return( fgStructure.Window->ID );
+        return 0;
+    return fgStructure.Window->ID;
 }
 
 /*
@@ -707,28 +646,21 @@ int FGAPIENTRY glutGetWindow( void )
  */
 void FGAPIENTRY glutShowWindow( void )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Showing the window is done via mapping under X
-     */
+
     XMapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
     XFlush( fgDisplay.Display );
 
 #elif TARGET_HOST_WIN32
-	/*
-	 * Restore the window's originial position and size
-	 */
-	ShowWindow( fgStructure.Window->Window.Handle, SW_SHOW );
+
+    ShowWindow( fgStructure.Window->Window.Handle, SW_SHOW );
 
 #endif
 
-  /*
-   * Since the window is visible, we need to redisplay it ...
-   */
-  fgStructure.Window->State.Redisplay = TRUE;
-
+    fgStructure.Window->State.Redisplay = TRUE;
 }
 
 /*
@@ -736,45 +668,25 @@ void FGAPIENTRY glutShowWindow( void )
  */
 void FGAPIENTRY glutHideWindow( void )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * The way we hide a window depends on if we're dealing
-     * with a top-level or children one...
-     */
-    if( fgStructure.Window->Parent == NULL )
-    {
-        /*
-         * This is a top-level window
-         */
-        XWithdrawWindow( fgDisplay.Display, fgStructure.Window->Window.Handle, fgDisplay.Screen );
-    }
-    else
-    {
-        /*
-         * Nope, it's a child window
-         */
-        XUnmapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
-    }
 
-    /*
-     * Flush the X state now
-     */
+    if( fgStructure.Window->Parent == NULL )
+        XWithdrawWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
+                         fgDisplay.Screen );
+    else
+        XUnmapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
     XFlush( fgDisplay.Display );
 
 #elif TARGET_HOST_WIN32
-	/*
-	 * Hide the window
-	 */
-	ShowWindow( fgStructure.Window->Window.Handle, SW_HIDE );
+
+    ShowWindow( fgStructure.Window->Window.Handle, SW_HIDE );
 
 #endif
 
-  /*
-   * Since the window is hidden, we don't need to redisplay it ...
-   */
-  fgStructure.Window->State.Redisplay = FALSE;
+    fgStructure.Window->State.Redisplay = FALSE;
 }
 
 /*
@@ -782,28 +694,22 @@ void FGAPIENTRY glutHideWindow( void )
  */
 void FGAPIENTRY glutIconifyWindow( void )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Iconify the window and flush the X state
-     */
-    XIconifyWindow( fgDisplay.Display, fgStructure.Window->Window.Handle, fgDisplay.Screen );
+
+    XIconifyWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
+                    fgDisplay.Screen );
     XFlush( fgDisplay.Display );
 
 #elif TARGET_HOST_WIN32
-	/*
-	 * Minimize the current window (this should be the same as X window iconifying)
-	 */
-	ShowWindow( fgStructure.Window->Window.Handle, SW_MINIMIZE );
+
+    ShowWindow( fgStructure.Window->Window.Handle, SW_MINIMIZE );
 
 #endif
 
-  /*
-   * Since the window is just an icon, we don't need to redisplay it ...
-   */
-  fgStructure.Window->State.Redisplay = FALSE;
-
+    fgStructure.Window->State.Redisplay = FALSE;
 }
 
 /*
@@ -811,48 +717,36 @@ void FGAPIENTRY glutIconifyWindow( void )
  */
 void FGAPIENTRY glutSetWindowTitle( const char* title )
 {
-	freeglut_assert_ready; freeglut_assert_window;
-
-    /*
-     * Works only for top-level windows
-     */
+    freeglut_assert_ready;
+    freeglut_assert_window;
     if( fgStructure.Window->Parent != NULL )
         return;
 
 #if TARGET_HOST_UNIX_X11
-	{
-		XTextProperty text;
 
-		/*
-		 * Prepare the text properties
-		 */
-		text.value = (unsigned char *) title;
-		text.encoding = XA_STRING;
-		text.format = 8;
-		text.nitems = strlen( title );
-
-		/*
-		 * Set the title now
-		 */
-		XSetWMName(
-			fgDisplay.Display,
-			fgStructure.Window->Window.Handle,
-			&text
-		);
-
-		/*
-		 * Have the X display state flushed
-		 */
-		XFlush( fgDisplay.Display );
-	}
+    {
+        XTextProperty text;
+        
+        text.value = (unsigned char *) title;
+        text.encoding = XA_STRING;
+        text.format = 8;
+        text.nitems = strlen( title );
+        
+        XSetWMName(
+            fgDisplay.Display,
+            fgStructure.Window->Window.Handle,
+            &text
+        );
+        
+        XFlush( fgDisplay.Display );
+    }
 
 #elif TARGET_HOST_WIN32
-	/*
-	 * This seems to be a bit easier under Win32
-	 */
-	SetWindowText( fgStructure.Window->Window.Handle, title );
+
+    SetWindowText( fgStructure.Window->Window.Handle, title );
 
 #endif
+
 }
 
 /*
@@ -860,48 +754,37 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
  */
 void FGAPIENTRY glutSetIconTitle( const char* title )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
-    /*
-     * Works only for top-level windows
-     */
     if( fgStructure.Window->Parent != NULL )
         return;
 
 #if TARGET_HOST_UNIX_X11
-	{
-		XTextProperty text;
 
-		/*
-		 * Prepare the text properties
-		 */
-		text.value = (unsigned char *) title;
-		text.encoding = XA_STRING;
-		text.format = 8;
-		text.nitems = strlen( title );
+    {
+        XTextProperty text;
+        
+        text.value = (unsigned char *) title;
+        text.encoding = XA_STRING;
+        text.format = 8;
+        text.nitems = strlen( title );
 
-		/*
-		 * Set the title now
-		 */
-		XSetWMIconName(
-			fgDisplay.Display,
-			fgStructure.Window->Window.Handle,
-			&text
-		);
+        XSetWMIconName(
+            fgDisplay.Display,
+            fgStructure.Window->Window.Handle,
+            &text
+        );
 
-		/*
-		 * Have the X display state flushed
-		 */
-		XFlush( fgDisplay.Display );
-	}
+        XFlush( fgDisplay.Display );
+    }
 
 #elif TARGET_HOST_WIN32
-	/*
-	 * This seems to be a bit easier under Win32
-	 */
+
 	SetWindowText( fgStructure.Window->Window.Handle, title );
 
 #endif
+
 }
 
 /*
@@ -909,58 +792,59 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
  */
 void FGAPIENTRY glutReshapeWindow( int width, int height )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Resize the window and flush the X state
-     */
-    XResizeWindow( fgDisplay.Display, fgStructure.Window->Window.Handle, width, height );
+
+    XResizeWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
+                   width, height );
     XFlush( fgDisplay.Display );
 
 #elif TARGET_HOST_WIN32
-	{
-		RECT winRect;
-    int x, y ;
 
-		/*
-		 * First off, grab the current window's position
-		 */
-		GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
-    x = winRect.left ;
-    y = winRect.top ;
-
-    if ( fgStructure.Window->Parent == NULL )  /* If this is not a subwindow ... */
     {
-      /*
-       * Adjust the size of the window to allow for the size of the frame, if we are not a menu
-       */
-      if ( ! fgStructure.Window->IsMenu )
-      {
+        RECT winRect;
+        int x, y;
+
+        GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
+        x = winRect.left;
+        y = winRect.top;
+
+        if ( fgStructure.Window->Parent == NULL )
+        {
+            /*
+             * Adjust the size of the window to allow for the size of the
+             * frame, if we are not a menu
+             */
+            if ( ! fgStructure.Window->IsMenu )
+            {
     		width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-	    	height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 + GetSystemMetrics( SM_CYCAPTION );
-      }
-    }
-    else  /* This is a subwindow, get the parent window's position and subtract it off */
-    {
-      GetWindowRect ( fgStructure.Window->Parent->Window.Handle, &winRect ) ;
-      x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME ) ;
-      y -= winRect.top + GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION ) ;
+	    	height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
+                    GetSystemMetrics( SM_CYCAPTION );
+            }
+        }
+        else
+        {
+            GetWindowRect( fgStructure.Window->Parent->Window.Handle,
+                           &winRect );
+            x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME );
+            y -= winRect.top + GetSystemMetrics( SM_CYSIZEFRAME ) +
+                GetSystemMetrics( SM_CYCAPTION );
+        }
+
+        MoveWindow(
+            fgStructure.Window->Window.Handle,
+            x,
+            y,
+            width,
+            height,
+            TRUE
+        );
     }
 
-		/*
-		 * Resize the window, forcing a redraw to happen
-		 */
-		MoveWindow(
-			fgStructure.Window->Window.Handle,
-			x,
-			y,
-			width,
-			height,
-			TRUE
-		);
-	}
 #endif
+
 }
 
 /*
@@ -968,38 +852,32 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
  */
 void FGAPIENTRY glutPositionWindow( int x, int y )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Reposition the window and flush the X state
-     */
+
     XMoveWindow( fgDisplay.Display, fgStructure.Window->Window.Handle, x, y );
     XFlush( fgDisplay.Display );
 
 #elif TARGET_HOST_WIN32
-	{
-		RECT winRect;
 
-		/*
-		 * First off, grab the current window's position
-		 */
-		GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
-
-    /*
-		 * Reposition the window, forcing a redraw to happen
-		 */
-		MoveWindow(
-			fgStructure.Window->Window.Handle,
-			x,
-			y,
-			winRect.right - winRect.left,
-			winRect.bottom - winRect.top,
-			TRUE
-		);
-	}
+    {
+        RECT winRect;
+        
+        GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
+        MoveWindow(
+            fgStructure.Window->Window.Handle,
+            x,
+            y,
+            winRect.right - winRect.left,
+            winRect.bottom - winRect.top,
+            TRUE
+        );
+    }
 
 #endif
+
 }
 
 /*
@@ -1007,26 +885,24 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
  */
 void FGAPIENTRY glutPushWindow( void )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Lower the current window
-     */
+
     XLowerWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
 
 #elif TARGET_HOST_WIN32
-	/*
-	 * Set the new window's Z position, not affecting the rest of the settings:
-	 */
-	SetWindowPos(
-		fgStructure.Window->Window.Handle,
-		HWND_BOTTOM,
-		0, 0, 0, 0,
-		SWP_NOSIZE | SWP_NOMOVE
-	);
+
+    SetWindowPos(
+        fgStructure.Window->Window.Handle,
+        HWND_BOTTOM,
+        0, 0, 0, 0,
+        SWP_NOSIZE | SWP_NOMOVE
+    );
 
 #endif
+
 }
 
 /*
@@ -1034,26 +910,24 @@ void FGAPIENTRY glutPushWindow( void )
  */
 void FGAPIENTRY glutPopWindow( void )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Raise the current window
-     */
+
     XRaiseWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
 
 #elif TARGET_HOST_WIN32
-	/*
-	 * Set the new window's Z position, not affecting the rest of the settings:
-	 */
-	SetWindowPos(
-		fgStructure.Window->Window.Handle,
-		HWND_TOP,
-		0, 0, 0, 0,
-		SWP_NOSIZE | SWP_NOMOVE
-	);
+
+    SetWindowPos(
+        fgStructure.Window->Window.Handle,
+        HWND_TOP,
+        0, 0, 0, 0,
+        SWP_NOSIZE | SWP_NOMOVE
+    );
 
 #endif
+
 }
 
 /*
@@ -1061,7 +935,8 @@ void FGAPIENTRY glutPopWindow( void )
  */
 void FGAPIENTRY glutFullScreen( void )
 {
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
 #if TARGET_HOST_UNIX_X11
     {
@@ -1110,12 +985,12 @@ void FGAPIENTRY glutFullScreen( void )
  */
 void* FGAPIENTRY glutGetWindowData( void )
 {
-   return(fgStructure.Window->UserData);
+    return fgStructure.Window->UserData;
 }
 
 void FGAPIENTRY glutSetWindowData(void* data)
 {
-  fgStructure.Window->UserData=data;
+    fgStructure.Window->UserData=data;
 }
 
 /*** END OF FILE ***/
