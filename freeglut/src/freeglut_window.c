@@ -302,7 +302,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     }
 
     FREEGLUT_INTERNAL_ERROR_EXIT( window->Window.VisualInfo != NULL,
-                                  "Unable to get window visual info", "fgOpenWindow" );
+                                  "Visual with necessary capabilities not found", "fgOpenWindow" );
 
     /*
      * XXX HINT: the masks should be updated when adding/removing callbacks.
