@@ -116,10 +116,10 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
         }
 
         /*
-         * SWP_NOACTIVATE      Do not activate the window
-         * SWP_NOOWNERZORDER   Do not change position in z-order
-         * SWP_NOSENDCHANGING  Supress WM_WINDOWPOSCHANGING message
-         * SWP_NOZORDER        Retains the current Z order (ignore 2nd param)
+         * SWP_NOACTIVATE	Do not activate the window
+         * SWP_NOOWNERZORDER	Do not change position in z-order
+         * SWP_NOSENDCHANGING	Supress WM_WINDOWPOSCHANGING message
+         * SWP_NOZORDER		Retains the current Z order (ignore 2nd param)
          */
 
         SetWindowPos( window->Window.Handle,
@@ -202,17 +202,17 @@ static void fghcbDisplayWindow( SFG_Window *window,
     if( window->State.NeedToResize )
     {
         SFG_Window *current_window = fgStructure.Window;
-        
+
         fgSetWindow( window );
-        
+
         fghReshapeWindowByHandle( 
             window->Window.Handle,
             window->State.Width,
             window->State.Height
         );
-        
+
         window->State.NeedToResize = GL_FALSE;
-        fgSetWindow( current_window );
+        fgSetWindow ( current_window );
     }
 
     if( window->State.Redisplay &&
@@ -450,11 +450,11 @@ static long fgNextTimer( void )
  */
 static void fgSleepForEvents( void )
 {
-    long msec;
+    long msec;    
 
     if( fgState.IdleCallback || fgHavePendingRedisplays( ) )
         return;
-    
+
     msec = fgNextTimer( );
     if( fgHaveJoystick( ) )     /* XXX Use GLUT timers for joysticks... */
         msec = MIN( msec, 10 ); /* XXX Dumb; forces granularity to .01sec */
@@ -465,10 +465,10 @@ static void fgSleepForEvents( void )
         int err;
         int socket;
         struct timeval wait;
-
         socket = ConnectionNumber( fgDisplay.Display );
         FD_ZERO( &fdset );
         FD_SET( socket, &fdset );
+
         wait.tv_sec = msec / 1000;
         wait.tv_usec = (msec % 1000) * 1000;
         err = select( socket+1, &fdset, NULL, NULL, &wait );
@@ -477,7 +477,7 @@ static void fgSleepForEvents( void )
             fgWarning ( "freeglut select() error: %d\n", errno );
     }
 #elif TARGET_HOST_WIN32
-    MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLEVENTS );
+    MsgWaitForMultipleObjects ( 0, NULL, FALSE, msec, QS_ALLEVENTS );
 #endif
 }
 
@@ -596,6 +596,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case DestroyNotify:
             /*
              * This is sent to confirm the XDestroyWindow call.
+             *
              * XXX WHY is this commented out?  Should we re-enable it?
              */
             /* fgAddToWindowDestroyList ( window ); */
@@ -1051,6 +1052,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
  */
 void FGAPIENTRY glutMainLoop( void )
 {
+    int action;
+
 #if TARGET_HOST_WIN32
     SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
 #endif
@@ -1111,9 +1114,12 @@ void FGAPIENTRY glutMainLoop( void )
     /*
      * When this loop terminates, destroy the display, state and structure
      * of a freeglut session, so that another glutInit() call can happen
+     *
+     * Save the "ActionOnWindowClose" because "fgDeinitialize" resets it.
      */
+    action = fgState.ActionOnWindowClose;
     fgDeinitialize( );
-    if( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
+    if( action == GLUT_ACTION_EXIT )
         exit( 0 );
 }
 
@@ -1224,6 +1230,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             window->State.Width  = LOWORD(lParam);
             window->State.Height = HIWORD(lParam);
         }
+
         break;
 #if 0
     case WM_SETFOCUS: 
