@@ -529,12 +529,12 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 #endif
 
     window->Window.DoubleBuffered =
-        ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0 ;
+        ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0;
 
     if ( ! window->Window.DoubleBuffered )
     {
-        glDrawBuffer ( GL_FRONT ) ;
-        glReadBuffer ( GL_FRONT ) ;
+        glDrawBuffer ( GL_FRONT );
+        glReadBuffer ( GL_FRONT );
     }
     fgSetWindow( window );
 }
@@ -625,7 +625,7 @@ void FGAPIENTRY glutSetWindow( int ID )
         return;
     }
 
-    fgSetWindow( window ) ;
+    fgSetWindow( window );
 }
 
 /*

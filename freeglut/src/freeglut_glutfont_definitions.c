@@ -51,7 +51,7 @@ struct freeglutStrokeFont
   void *ch ; 
   float top ; 
   float bottom ; 
-} ; 
+}; 
 
 struct freeglutBitmapFont
 { 
@@ -59,7 +59,7 @@ struct freeglutBitmapFont
   const int num_chars ; 
   const int first ; 
   const void *ch ; 
-} ; 
+}; 
 
 
 struct freeglutStrokeFont glutStrokeRoman ;

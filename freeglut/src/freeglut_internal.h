@@ -705,13 +705,13 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
                             int x, int y, int w, int h,
                             GLboolean gameMode, GLboolean isMenu );
-void        fgSetWindow ( SFG_Window *window ) ;
+void        fgSetWindow ( SFG_Window *window );
 void        fgOpenWindow( SFG_Window* window, const char* title,
                           int x, int y, int w, int h, GLboolean gameMode,
                           GLboolean isSubWindow );
 void        fgCloseWindow( SFG_Window* window );
 void        fgAddToWindowDestroyList ( SFG_Window* window,
-                                       GLboolean needToClose ) ;
+                                       GLboolean needToClose );
 void        fgCloseWindows ();
 void        fgDestroyWindow( SFG_Window* window, GLboolean needToClose );
 void        fgClearCallBacks( SFG_Window *window );

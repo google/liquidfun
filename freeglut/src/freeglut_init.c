@@ -230,7 +230,7 @@ void fgDeinitialize( void )
 
     fgDestroyStructure( );
 
-    while( (timer = ( SFG_Timer * )fgState.Timers.First) )
+    while( timer = ( SFG_Timer * )fgState.Timers.First )
     {
         fgListRemove ( &fgState.Timers, &timer->Node );
         free( timer );
@@ -376,9 +376,9 @@ ReadInteger(char *string, char **NextString)
     }
     *NextString = string;
     if (Sign >= 0)
-        return (Result);
+        return Result;
     else
-        return (-Result);
+        return -Result;
 }
 
 static int XParseGeometry (
@@ -394,7 +394,8 @@ static int XParseGeometry (
     int tempX = 0, tempY = 0;
     char *nextCharacter;
 
-    if ( (string == NULL) || (*string == '\0')) return(mask);
+    if ( (string == NULL) || (*string == '\0'))
+      return mask;
     if (*string == '=')
         string++;  /* ignore possible '=' at beg of geometry spec */
 
@@ -402,7 +403,7 @@ static int XParseGeometry (
     if (*strind != '+' && *strind != '-' && *strind != 'x') {
         tempWidth = ReadInteger(strind, &nextCharacter);
         if (strind == nextCharacter) 
-            return (0);
+            return 0;
         strind = nextCharacter;
         mask |= WidthValue;
     }
@@ -411,7 +412,7 @@ static int XParseGeometry (
         strind++;
         tempHeight = ReadInteger(strind, &nextCharacter);
         if (strind == nextCharacter)
-            return (0);
+            return 0;
         strind = nextCharacter;
         mask |= HeightValue;
     }
@@ -421,7 +422,7 @@ static int XParseGeometry (
             strind++;
             tempX = -ReadInteger(strind, &nextCharacter);
             if (strind == nextCharacter)
-                return (0);
+                return 0;
             strind = nextCharacter;
             mask |= XNegative;
         }
@@ -430,7 +431,7 @@ static int XParseGeometry (
             strind++;
             tempX = ReadInteger(strind, &nextCharacter);
             if (strind == nextCharacter)
-                return(0);
+                return 0;
             strind = nextCharacter;
         }
         mask |= XValue;
@@ -439,7 +440,7 @@ static int XParseGeometry (
                 strind++;
                 tempY = -ReadInteger(strind, &nextCharacter);
                 if (strind == nextCharacter)
-                    return(0);
+                    return 0;
                 strind = nextCharacter;
                 mask |= YNegative;
             }
@@ -448,7 +449,7 @@ static int XParseGeometry (
                 strind++;
                 tempY = ReadInteger(strind, &nextCharacter);
                 if (strind == nextCharacter)
-                    return(0);
+                    return 0;
                 strind = nextCharacter;
             }
             mask |= YValue;
@@ -458,7 +459,7 @@ static int XParseGeometry (
     /* If strind isn't at the end of the string the it's an invalid
        geometry specification. */
 
-    if (*strind != '\0') return (0);
+    if (*strind != '\0') return 0;
 
     if (mask & XValue)
         *x = tempX;
@@ -468,7 +469,7 @@ static int XParseGeometry (
         *width = tempWidth;
     if (mask & HeightValue)
         *height = tempHeight;
-    return (mask);
+    return mask;
 }
 #endif
 
@@ -699,12 +700,12 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
      * delimited by blanks or tabs.
      */
     char *token ;
-    int len = strlen ( displayMode ) ;
-    char *buffer = (char *)malloc ( (len+1) * sizeof(char) ) ;
-    memcpy ( buffer, displayMode, len ) ;
-    buffer[len] = '\0' ;
+    int len = strlen ( displayMode );
+    char *buffer = (char *)malloc ( (len+1) * sizeof(char) );
+    memcpy ( buffer, displayMode, len );
+    buffer[len] = '\0';
 
-    token = strtok ( buffer, " \t" ) ;
+    token = strtok ( buffer, " \t" );
     while ( token )
     {
         /*
@@ -856,14 +857,14 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 
         case 28 :  /* Unrecognized */
             printf ( "WARNING - Display string token not recognized:  %s\n",
-                     token ) ;
+                     token );
             break ;
         }
 
-        token = strtok ( NULL, " \t" ) ;
+        token = strtok ( NULL, " \t" );
     }
 
-    free ( buffer ) ;
+    free ( buffer );
 
     /*
      * We will make use of this value when creating a new OpenGL context...

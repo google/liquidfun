@@ -289,7 +289,7 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
         glVertex2i( menu->Width - border,                border);
     glEnd( );
 
-    glColor4fv( menu_pen_back ) ;
+    glColor4fv( menu_pen_back );
     glBegin( GL_QUADS );
         glVertex2i(               border,                border);
         glVertex2i( menu->Width - border,                border);

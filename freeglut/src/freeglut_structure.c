@@ -279,7 +279,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     assert( window );
     freeglut_assert_ready;
 
-    while( (subWindow = ( SFG_Window * )window->Children.First) )
+    while( subWindow = ( SFG_Window * )window->Children.First )
         fgDestroyWindow( subWindow, needToClose );
 
     /*
@@ -291,7 +291,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     {
         SFG_Window *activeWindow = fgStructure.Window ;
         INVOKE_WCB( *window, Destroy, ( ) );
-        fgSetWindow ( activeWindow ) ;
+        fgSetWindow ( activeWindow );
     }
 
     if( window->Parent )
@@ -402,7 +402,7 @@ void fgDestroyMenu( SFG_Menu* menu )
      * Now we are pretty sure the menu is not used anywhere
      * and that we can remove all of its entries
      */
-    while( (entry = ( SFG_MenuEntry * )menu->Entries.First) )
+    while( entry = ( SFG_MenuEntry * )menu->Entries.First )
     {
         fgListRemove( &menu->Entries, &entry->Node );
 
@@ -457,10 +457,10 @@ void fgDestroyStructure( void )
     /*
      * Make sure all windows and menus have been deallocated
      */
-    while( (menu = ( SFG_Menu * )fgStructure.Menus.First) )
+    while( menu = ( SFG_Menu * )fgStructure.Menus.First )
         fgDestroyMenu( menu );
 
-    while( (window = ( SFG_Window * )fgStructure.Windows.First) )
+    while( window = ( SFG_Window * )fgStructure.Windows.First )
         fgDestroyWindow( window, GL_TRUE );
 }
 
@@ -651,7 +651,7 @@ void fgListAppend(SFG_List *list, SFG_Node *node)
 {
     SFG_Node *ln;
 
-    if ( (ln = (SFG_Node *)list->Last) )
+    if ( ln = (SFG_Node *)list->Last )
     {
         ln->Next = node;
         node->Prev = ln;
@@ -670,9 +670,9 @@ void fgListRemove(SFG_List *list, SFG_Node *node)
 {
     SFG_Node *ln;
 
-    if( (ln = (SFG_Node *)node->Next) )
+    if( ln = (SFG_Node *)node->Next )
         ln->Prev = node->Prev;
-    if( (ln = (SFG_Node *)node->Prev) )
+    if( ln = (SFG_Node *)node->Prev )
         ln->Next = node->Next;
     if( (ln = (SFG_Node *)list->First) == node )
         list->First = node->Next;

@@ -387,7 +387,7 @@ long fgElapsedTime( void )
 #if TARGET_HOST_UNIX_X11
         gettimeofday( &fgState.Time.Value, NULL );
 #elif TARGET_HOST_WIN32
-        fgState.Time.Value = timeGetTime () ;
+        fgState.Time.Value = timeGetTime ();
 #endif
         fgState.Time.Set = GL_TRUE ;
 
@@ -413,7 +413,7 @@ void fgError( const char *fmt, ... )
     va_end( ap );
 
     if ( fgState.Initialised )
-        fgDeinitialize () ;
+        fgDeinitialize ();
 
     exit( 1 );
 }
@@ -605,7 +605,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             {
                 GETWINDOW( xclient ); 
 
-                fgCloseWindow ( window ) ;
+                fgCloseWindow ( window );
                 fgAddToWindowDestroyList ( window, GL_FALSE );
             }
             break;
@@ -730,7 +730,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                         event.xmotion.y_root - window->ActiveMenu->Y;
                 }
                 window->ActiveMenu->Window->State.Redisplay = GL_TRUE ;
-                fgSetWindow( window->ActiveMenu->ParentWindow ) ;
+                fgSetWindow( window->ActiveMenu->ParentWindow );
 
                 break;
             }
@@ -1119,7 +1119,7 @@ void FGAPIENTRY glutMainLoop( void )
         fgDeinitialize( );
 
         if( execState == GLUT_ACTION_EXIT )
-            exit( 0 ) ;
+            exit( 0 );
     }
 }
 
@@ -1158,7 +1158,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     LONG lRet = 1;
 
     if ( ( window == NULL ) && ( uMsg != WM_CREATE ) )
-      return DefWindowProc( hWnd, uMsg, wParam, lParam ) ;
+      return DefWindowProc( hWnd, uMsg, wParam, lParam );
 
     /* printf ( "Window %3d message <%04x> %12d %12d\n", window?window->ID:0,
              uMsg, wParam, lParam ); */
@@ -1183,7 +1183,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             if( fgStructure.MenuContext )
                 wglMakeCurrent( window->Window.Device,
                                 fgStructure.MenuContext->Context
-                ) ;
+                );
             else
             {
                 fgStructure.MenuContext =
@@ -1192,7 +1192,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                     wglCreateContext( window->Window.Device );
             }
 
-            /* window->Window.Context = wglGetCurrentContext () ;   */
+            /* window->Window.Context = wglGetCurrentContext ();   */
             window->Window.Context = wglCreateContext( window->Window.Device );
         }
         else
@@ -1756,7 +1756,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /* User has finished resizing the window, force a redraw */
         INVOKE_WCB( *window, Display, ( ) );
 
-        /*lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ) ; */
+        /*lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ); */
         break;
 
         /*
