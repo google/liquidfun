@@ -42,14 +42,8 @@
  */
 void FGAPIENTRY glutPostRedisplay( void )
 {
-    /*
-     * Is there a current window set?
-     */
-    freeglut_assert_ready; freeglut_assert_window;
-
-    /*
-     * Just mark the window as one that we need to redisplay...
-     */
+    freeglut_assert_ready;
+    freeglut_assert_window;
     fgStructure.Window->State.Redisplay = TRUE;
 }
 
@@ -58,38 +52,19 @@ void FGAPIENTRY glutPostRedisplay( void )
  */
 void FGAPIENTRY glutSwapBuffers( void )
 {
-    /*
-     * As long as we've got a current window set...
-     */
-    freeglut_assert_ready; freeglut_assert_window;
+    freeglut_assert_ready;
+    freeglut_assert_window;
 
-    /*
-     * Have the mouse cursor drawn for the current window
-     */
     fgDisplayCursor();
-
-    /*
-     * Make sure the current context is flushed
-     */
     glFlush();
 
-    /*
-     * If it's single-buffered, we shouldn't be here.
-     */
-    if ( ! fgStructure.Window->Window.DoubleBuffered ) return ;
+    if ( ! fgStructure.Window->Window.DoubleBuffered )
+	return ;
 
 #if TARGET_HOST_UNIX_X11
-    /*
-     * Issue the glXSwapBuffers call and be done with it
-     */
     glXSwapBuffers( fgDisplay.Display, fgStructure.Window->Window.Handle );
-
 #elif TARGET_HOST_WIN32
-    /*
-     * Swap the window's buffers
-     */
     SwapBuffers( fgStructure.Window->Window.Device );
-
 #endif
 
     /* GLUT_FPS env var support */
@@ -117,20 +92,8 @@ void FGAPIENTRY glutPostWindowRedisplay( int windowID )
     SFG_Window* window;
 
     freeglut_assert_ready;
-
-    /*
-     * Try looking for the window
-     */
     window = fgWindowByID( windowID );
-
-    /*
-     * If failed, return
-     */
     freeglut_return_if_fail( window != NULL );
-
-    /*
-     * Otherwise mark the window for being redisplayed
-     */
     window->State.Redisplay = TRUE;
 }
 
