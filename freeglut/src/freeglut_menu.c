@@ -638,7 +638,7 @@ void fgDeactivateMenu( SFG_Window *window )
       /*
        * Is that an active submenu by any case?
        */
-      if ( ( menuEntry->SubMenu != NULL ) && menuEntry->SubMenu->IsActive )
+      if ( menuEntry->SubMenu != NULL )
         fgDeactivateSubMenu ( menuEntry ) ;
     }
 
@@ -673,7 +673,7 @@ void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry )
       /*
        * Is that an active submenu by any case?
        */
-      if ( ( subMenuIter->SubMenu != NULL ) && subMenuIter->SubMenu->IsActive )
+      if ( subMenuIter->SubMenu != NULL )
         fgDeactivateSubMenu ( subMenuIter ) ;
     }
 
