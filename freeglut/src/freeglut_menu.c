@@ -325,7 +325,7 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
       glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
 
       glRasterPos2i ( menu->Width - 2 - width,
-                      (i + 1)*FREEGLUT_MENU_HEIGHT ) ;
+                      (i + 1)*FREEGLUT_MENU_HEIGHT - 1) ;
       glBitmap ( width, FREEGLUT_MENU_HEIGHT, 0, 0, 0.0, 0.0, arrow_char ) ;
       glPopClientAttrib();
     }
