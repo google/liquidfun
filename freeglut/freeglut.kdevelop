@@ -1,0 +1,40 @@
+<?xml version = '1.0'?>
+<kdevelop>
+  <general>
+    <author>Pawel W. Olszta</author>
+    <email>olszta@sourceforge.net</email>
+    <version>$VERSION$</version>
+    <projectmanagement>KDevAutoProject</projectmanagement>
+    <primarylanguage>C++</primarylanguage>
+    <ignoreparts>
+      <part>KDevFileView</part>
+    </ignoreparts>
+  </general>
+  <kdevautoproject>
+    <general>
+      <activetarget>src/freeglut</activetarget>
+    </general>
+    <run>
+      <mainprogram>src/freeglut</mainprogram>
+    </run>
+    <make>
+      <envvars>
+        <envvar value="1" name="WANT_AUTOCONF_2_5" />
+        <envvar value="1" name="WANT_AUTOMAKE_1_6" />
+      </envvars>
+    </make>
+  </kdevautoproject>
+  <kdevdebugger>
+    <general>
+      <dbgshell>libtool</dbgshell>
+    </general>
+  </kdevdebugger>
+  <kdevfilecreate>
+    <filetypes/>
+    <useglobaltypes>
+      <type ext="ui" />
+      <type ext="cpp" />
+      <type ext="h" />
+    </useglobaltypes>
+  </kdevfilecreate>
+</kdevelop>
