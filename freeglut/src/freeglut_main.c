@@ -752,17 +752,23 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         if( window->ActiveMenu != NULL )
         {
+        		if ( window == window->ActiveMenu->ParentWindow )
+        		{
+        			window->ActiveMenu->Window->State.MouseX = event.xmotion.x_root - window->ActiveMenu->X ;
+        			window->ActiveMenu->Window->State.MouseY = event.xmotion.y_root - window->ActiveMenu->Y ;
+            }
+
             /*
              * Let's make the window redraw as a result of the mouse motion.
              */
-            window->State.Redisplay = TRUE ;
+            window->ActiveMenu->Window->State.Redisplay = TRUE ;
 
             /*
              * Since the window is a menu, make the parent window current
              */
             fgSetWindow ( window->ActiveMenu->ParentWindow ) ;
 
-            break;
+            break;  /* I think this should stay in -- an active menu should absorb the mouse motion */
         }
 
         /*
@@ -847,7 +853,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         if ( window->ActiveMenu != NULL )  /* Window has an active menu, it absorbs any mouse click */
         {
-          if ( fgCheckActiveMenu ( window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
+      		if ( window == window->ActiveMenu->ParentWindow )
+      		{
+      			window->ActiveMenu->Window->State.MouseX = event.xbutton.x_root - window->ActiveMenu->X ;
+      			window->ActiveMenu->Window->State.MouseY = event.xbutton.y_root - window->ActiveMenu->Y ;
+      		}
+
+          if ( fgCheckActiveMenu ( window->ActiveMenu->Window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
           {
             /* Save the current window and menu and set the current window to the window whose menu this is */
             SFG_Window *save_window = fgStructure.Window ;

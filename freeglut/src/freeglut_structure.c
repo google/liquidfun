@@ -273,6 +273,7 @@ void fgCloseWindows ()
 void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
 {
     SFG_Window* subWindow;
+    int menu_index ;
 
     assert( window != NULL );
     freeglut_assert_ready;
@@ -308,6 +309,15 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
         fgListRemove( &window->Parent->Children, &window->Node );
     else
         fgListRemove( &fgStructure.Windows, &window->Node );
+
+    if ( window->ActiveMenu != NULL )
+      fgDeactivateMenu ( window ) ;
+
+    for ( menu_index = 0; menu_index < 3; menu_index ++ )
+    {
+      if ( window->Menu[menu_index] != NULL )
+        window->Menu[menu_index]->ParentWindow = NULL ;
+    }
 
     /*
      * OK, this window seems disconnected from the structure enough
