@@ -342,7 +342,7 @@ struct tagSFG_Context
 #if TARGET_HOST_UNIX_X11
     XVisualInfo*    VisualInfo;      /* The window's visual information     */
     Pixmap          Pixmap;          /* Used for offscreen rendering        */
-    //GLXPixmap       GLXPixMap;       /* Used for offscreen rendering        */
+    /* GLXPixmap      GLXPixMap; */  /* Used for offscreen rendering        */
 #elif TARGET_HOST_WIN32
     HDC             Device;          /* The window's device context         */
 #endif
