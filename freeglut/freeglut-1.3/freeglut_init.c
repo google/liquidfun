@@ -188,7 +188,7 @@ void fgInitialize( const char* displayName )
          * Register the window class
          */
         retval = RegisterClass( &wc );
-        g_assert( retval != FALSE );
+        assert( retval != FALSE );
     }
 
     /*

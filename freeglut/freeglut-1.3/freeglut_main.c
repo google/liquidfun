@@ -914,7 +914,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
          * The window structure is passed as the creation structure paramter...
          */
         window = (SFG_Window *) (((LPCREATESTRUCT) lParam)->lpCreateParams);
-        g_assert( window != NULL );
+        assert( window != NULL );
 
         /*
          * We can safely store the window's handle now:
