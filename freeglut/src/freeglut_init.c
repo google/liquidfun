@@ -216,7 +216,7 @@ void fgDeinitialize( void )
         return;
     }
 
-    fgState.Initalized = GL_FALSE;
+    /* fgState.Initalized = GL_FALSE; */
 
     /*
      * If there was a menu created, destroy the rendering context
@@ -236,6 +236,8 @@ void fgDeinitialize( void )
     }
 
     fgJoystickClose( );
+
+    fgState.Initalized = GL_FALSE;
 
     fgState.Position.X = -1;
     fgState.Position.Y = -1;
