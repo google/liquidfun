@@ -51,15 +51,6 @@
 #endif
 
 #define  FREEGLUT_MAX_MENUS         3
-#define  FREEGLUT_DEBUG             1
-
-#if FREEGLUT_DEBUG
-    #undef   G_DISABLE_ASSERT
-    #undef   G_DISABLE_CHECKS
-#else
-    #define  G_DISABLE_ASSERT
-    #define  G_DISABLE_CHECKS
-#endif
 
 /*
  * Somehow all Win32 include headers depend on this one:
