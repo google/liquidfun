@@ -1,0 +1,117 @@
+Changes to Freeglut:
+
+Before and on October 22, 2002:
+
+(1) Many trivial changes (changing floating-point numbers to integers, for example) to reduce the number of compiler warnings
+
+(2) Removing "strlen" calls from for-loop headers to make things execute ever-so-slightly faster
+
+(3) Slight changes to the "glutSolidSphere" and "glutWireSphere" functions to reduce the number of calls to the sine and cosine functions and otherwise make it slightly more efficient
+
+(4) Added wire and solid torus, wire and solid dodecahedron, wire and solid octahedron, wire and solid tetrahedron, and wire and solid icosahedron
+
+(5) Fixed a bug by which the GLUT menu now draws even when nothing else is happening in the window
+
+(6) Fixed a bug by which freeglut now tracks which window text is being entered into
+
+(7) Added code to adjust for the thickness of the window borders and header bar when resizing and repositioning a window
+
+October 23, 2002:
+
+(8) Added a window destroy callback for freeglut to call the application when a window is closed.  Made freeglut call "exit" if there is no window destroy callback.
+
+October 24, 2002:
+
+(8b)  Also started working on the code to implement the other behaviors when the user clicks on the "x" on the window header bar.
+
+(9) Added the "glutSetOption" function, the "GLUT_ACTION_ON_WINDOW_CLOSE" enumeration, and its allowed values
+
+(10) Added code to check whether a window is a subwindow in the reposition and reshape functions.  If it is a subwindow, do not adjust the position and size for the window border.
+
+(11) Added code to fix the drawing of subwindows inside of windows.  The Windows implementation uses "GetWindowRect" which uses coordinates relative to the screen corner, not the parent window corner.
+
+(12) Modified the code to open a window so that the freeglut window now matches the GLUT window.
+
+(13) Added an ugly hack to the main loop function to call each window's visibility callback before jumping into the main loop.  This fixes the behaviour of several of the demo programs.
+
+
+
+*******************************************************************************************
+* Sent a copy of the files to Steve Baker 10/24/02.
+*******************************************************************************************
+
+(14) Reworked the "freeglut_font.c" file pretty thoroughly to speed things up a bit, to add the "glutStrokeString" function, and to make the "glutStrokeLength" function return an accurate value for long strings.  Also allowed the string functions to handle character strings containing carriage returns.
+
+(15) Moved the "fgState" structure initialization in "freeglut_init.c" out of "fgInitialize" to set them at compile time.  Also added it to "fgDeinitialize" to reset the state.
+
+(16) Recoded a bit in "glutInit" to speed things up slightly
+
+(17) Added "#pragma warning ( once: 4305 )" directives to the stroke font files so that I don't get 4000 compiler warnings about assigning double precision constants to single precision variables
+
+(18) Added a state enumeration (initializing, running, stopping) and flag to the "fgState" structure.  Modified the window closure and main loop code to use the enumeration instead of local variables.
+
+(19) Fixed the "glutPositionWindow" so that if you get and retrieve the window position twenty times in a row the window won't slide down the screen.
+
+(20) Recoded the "glut*Cone" functions so that they have normals on the curved surface and so that the "base" argument is really the radius of the base of the cone.
+
+(21) Added code to render a rhombic dodecahedron in the geometry library.
+
+(22) Started work on a "glutInitDisplayString" function.  I have provided a framework; I will need some serious help in interpreting the results.
+
+(23) Modified the "fgDisplayMenu" so that the matrix mode is GL_MODELVIEW instead of GL_PROJECTION when execution returns to its calling function.  I have no idea why, but this fixes some display problems in some of the demos.  Part (or all) of the display was blanking out when the user brought up a menu.
+
+(24) Added four "pragma comment" lines to "freeglut.h" so that freeglut will automatically (under Windows) include "winmm.lib", "opengl32.lib", "glu32.lib", and "freeglut.lib".  This way the application doesn't have to do this by hand.
+
+(25) Fixed the window positioning code so that if the border is going to extend above the top of the screen, it gets set to the top of the screen.
+
+(26) Added right-arrows to menu entries which have submenus.  Also modified the submenu position so that it comes down to the right or to the left of the parent menu.
+
+(27) Recoded a good bit of the menu processing to make the menus behave more like GLUT menus.
+
+*******************************************************************************************
+* Sent a copy of the files to Steve Baker 10/31/02.  Also posted these on the reflector.
+*******************************************************************************************
+
+(28) Added parentheses to the Windows version of setting the "State.Modifiers" to allow for precedence of operators.  Also modified the code so that it follows the "getKeyState" return value specification.
+
+(29) Made the window event handler check for the existence of a window for all messages except the "create" message
+
+(30) Changed the order of events in the window closure function so that the window would still be in the windows structure when the closure message to Windows was sent.
+
+(31) Made some more changes to the window closure code so that it works from both clicking on the "x" and from a "glutDestroyWindow" call
+
+*******************************************************************************************
+* Sent a copy of the files to Steve Baker 10/31/02 as an update.  Also posted these on the reflector.
+*******************************************************************************************
+
+(32) Added "glutLeaveMainLoop" function.
+
+(33) Added "glutMainLoopEvent" function.  This processes a single iteration through the "glutMainLoop" and is (theoretically) usable for re-entrant GLUT code.
+
+(34) Implemented the "WM_KEYUP" and "WM_SPECIALKEYUP" callbacks in the Windows version.
+
+(35) Added normals to the "glutWireCube" function
+
+(36) Recoded "glutGetExtension" to remove a <Steve, cover your eyes> "goto" statement </Steve, cover your eyes> from the code.
+
+(37) Marked the "glutSetKeyRepeat" function as deprecated.
+
+(38) Implemented most of the Windows version of the "fghGetConfig" function.
+
+*******************************************************************************************
+* Took up the project again November 19.
+*******************************************************************************************
+
+(39) Added two missing characters to each of the bitmapped fonts.
+
+(40) Added "glutSierpinskiSponge" to the geometry file.  I can take it out if people object.
+
+(41) Added a linked list of windows to close so that if you destroy a window from within its callback the program won't terminate on error.
+
+(42) Added a call to "free" in the joystick code so we wouldn't have a memory leak.  Also fixed another memory leak.
+
+(43) Fixed the bitmapped Helvetica 12 and Helvetica 18 fonts so they now match the GLUT fonts.
+
+
+
+
