@@ -811,19 +811,15 @@ void FGAPIENTRY glutMainLoopEvent( void )
         }
 
         /*
-         * Check if there is a mouse or mouse wheel callback hooked to the window
+         * Check if there is a mouse or mouse wheel callback hooked to the
+         * window
          */
-        if ( ( window->Callbacks.Mouse == NULL ) && ( window->Callbacks.MouseWheel == NULL ) )
+        if ( ( window->Callbacks.Mouse == NULL ) &&
+             ( window->Callbacks.MouseWheel == NULL ) )
           break;
 
-        /*
-         * Set the current window
-         */
         fgSetWindow ( window );
 
-        /*
-         * Remember the current modifiers state
-         */
         modifiers = 0;
         if (event.xbutton.state & (ShiftMask|LockMask))
           modifiers |= GLUT_ACTIVE_SHIFT;
@@ -835,6 +831,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
         /*
          * Finally execute the mouse or mouse wheel callback
+         *
+         * XXX Use a symbolic constant, *not* "4"!
          */
         if ( button < 4 )
         {
@@ -847,17 +845,27 @@ void FGAPIENTRY glutMainLoopEvent( void )
         }
         else
         {
-          if ( window->Callbacks.MouseWheel != NULL )
+          if ( window->Callbacks.MouseWheel )
           {
-            int wheel_number = button / 2 - 2 ;  /* Map 4 and 5 to wheel zero */
-            int direction = 9 - button * 2 ;     /* Map 4 to +1 and 5 to -1 */
+              /*
+               * Map 4 and 5 to wheel zero; EVEN to +1, ODD to -1
+               *  "  6 and 7 "    "   one; ...
+               *
+               * XXX This *should* be behind some variables/macros,
+               * XXX since the order and numbering isn't certain
+               * XXX See XFree86 configuration docs (even back in the
+               * XXX 3.x days, and especially with 4.x).
+               */
+            int wheel_number = (button - 4) / 2;
+            int direction = (button & 1)*2 - 1;
 
-            fgStructure.Window->Callbacks.MouseWheel(
-                wheel_number,
-                direction,
-                event.xbutton.x,
-                event.xbutton.y
-            );
+            if( ButtonPress )
+                fgStructure.Window->Callbacks.MouseWheel(
+                    wheel_number,
+                    direction,
+                    event.xbutton.x,
+                    event.xbutton.y
+                );
           }
           else
           {
@@ -1446,25 +1454,34 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     }
     break;
 
-    case 0x020a :  /* Should be WM_MOUSEWHEEL but my compiler doesn't recognize it */
+    case 0x020a:
+        /* Should be WM_MOUSEWHEEL but my compiler doesn't recognize it */
       {
-        int wheel_number = LOWORD ( lParam ) ;  /* THIS IS SPECULATIVE -- John Fay, 10/2/03 */
-        int direction = HIWORD ( lParam ) / 120 ;  /* Should be WHEEL_DELTA instead of 120 */
+        int wheel_number = LOWORD ( lParam ) ;
+        /* THIS IS SPECULATIVE -- John Fay, 10/2/03 */
+        int direction = HIWORD ( lParam ) / 120 ;
+        /* Should be WHEEL_DELTA instead of 120 */
 
         /*
          * The mouse cursor has moved. Remember the new mouse cursor's position
          */
-//        window->State.MouseX = LOWORD( lParam );  // Need to adjust by window position,
-//        window->State.MouseY = HIWORD( lParam );  // change "lParam" to other parameter
+        /*        window->State.MouseX = LOWORD( lParam ); */
+        /* Need to adjust by window position, */
+        /*        window->State.MouseY = HIWORD( lParam ); */
+        /* change "lParam" to other parameter */
 
-        if ( ( window->Callbacks.MouseWheel == NULL ) && ( window->Callbacks.Mouse == NULL ) )
+        if ( ( window->Callbacks.MouseWheel == NULL ) &&
+             ( window->Callbacks.Mouse == NULL ) )
             break;
 
         fgSetWindow ( window );
         fgStructure.Window->State.Modifiers = 
-            ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
-            ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
-            ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+            ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) ||
+                ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
+            ( ( (GetKeyState( VK_LCONTROL ) < 0 ) ||
+                ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
+            ( ( (GetKeyState( VK_LMENU    ) < 0 ) ||
+                ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
         if ( window->Callbacks.MouseWheel )
           window->Callbacks.MouseWheel(
@@ -1473,10 +1490,20 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
               window->State.MouseX,
               window->State.MouseY
           ) ;
-        else  // No mouse wheel, call the mouse button callback twice
+        else  /* No mouse wheel, call the mouse button callback twice */
         {
-          window->Callbacks.Mouse ( ( direction > 0 ) ? 4 : 5, GLUT_DOWN, window->State.MouseX, window->State.MouseY ) ;
-          window->Callbacks.Mouse ( ( direction > 0 ) ? 4 : 5, GLUT_UP,   window->State.MouseX, window->State.MouseY ) ;
+          int button = wheel_number * 2 + 4;
+          /*
+           * XXX The above assumes that you have no more than 3 mouse
+           * XXX buttons.  Sorry.
+           */
+          button += (1 + direction)/2;
+          window->Callbacks.Mouse ( button, GLUT_DOWN,
+                                    window->State.MouseX,
+                                    window->State.MouseY ) ;
+          window->Callbacks.Mouse ( button, GLUT_UP,
+                                    window->State.MouseX,
+                                    window->State.MouseY ) ;
         }
 
         fgStructure.Window->State.Modifiers = 0xffffffff;
