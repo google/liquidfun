@@ -573,13 +573,19 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 int width = event.xconfigure.width;
                 int height = event.xconfigure.height;
 
-                GETWINDOW( xconfigure );
-                if( FETCH_WCB( *window, Reshape ) )
-                    INVOKE_WCB( *window, Reshape, ( width, height ) );
-                else
+                if( ( width != window->State.Width ) ||
+                    ( height != window->State.Height ) )
                 {
-                    fgSetWindow( window );
-                    glViewport( 0, 0, width, height );
+                    window->State.Width = width;
+                    window->State.Height = height;
+                    if( FETCH_WCB( *window, Reshape ) )
+                        INVOKE_WCB( *window, Reshape, ( width, height ) );
+                    else
+                    {
+                        fgSetWindow( window );
+                        glViewport( 0, 0, width, height );
+                    }
+                    glutPostRedisplay( );
                 }
             }
             break;
