@@ -436,16 +436,16 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     XMapWindow( fgDisplay.Display, window->Window.Handle );
 
     /*
-     * This somehow fixes the glutGet() GLUT_WINDOW_X and GLUT_WINDOW_Y problem...
-     */
-    //XMoveWindow( fgDisplay.Display, window->Window.Handle, x, y );
-
-    /*
      * In game mode, move the viewport a bit to hide the decorations.
      * This code depends on the XFree86 video mode extensions.
      */
     if( gameMode == TRUE )
     {
+        /*
+	 * This somehow fixes the glutGet() GLUT_WINDOW_X and GLUT_WINDOW_Y problem...
+	 */
+        XMoveWindow( fgDisplay.Display, window->Window.Handle, x, y );
+
 #       ifdef X_XF86VidModeSetViewPort
 
         /*
