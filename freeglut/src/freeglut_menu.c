@@ -992,20 +992,10 @@ void FGAPIENTRY glutRemoveMenuItem( int item )
 void FGAPIENTRY glutAttachMenu( int button )
 {
     freeglut_assert_ready;
-
-    /*
-     * There must be a current window and a current menu set:
-     */
-    freeglut_return_if_fail( fgStructure.Window != NULL || fgStructure.Menu != NULL );
-
-    /*
-     * Make sure the button value is valid (0, 1 or 2, see freeglut.h)
-     */
-    freeglut_return_if_fail( button == GLUT_LEFT_BUTTON || button == GLUT_MIDDLE_BUTTON || button == GLUT_RIGHT_BUTTON );
-
-    /*
-     * It is safe now to attach the menu
-     */
+    freeglut_return_if_fail( fgStructure.Window );
+    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( button >= 0 );
+    freeglut_return_if_fail( button < FREEGLUT_MAX_MENUS );
     fgStructure.Window->Menu[ button ] = fgStructure.Menu;
 
     /*
@@ -1020,20 +1010,10 @@ void FGAPIENTRY glutAttachMenu( int button )
 void FGAPIENTRY glutDetachMenu( int button )
 {
     freeglut_assert_ready;
-
-    /*
-     * There must be a current window set:
-     */
     freeglut_return_if_fail( fgStructure.Window != NULL );
-
-    /*
-     * Make sure the button value is valid (0, 1 or 2, see freeglut.h)
-     */
-    freeglut_return_if_fail( button != 0 && button != 1 && button != 2 );
-
-    /*
-     * It is safe now to detach the menu
-     */
+    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( button >= 0 );
+    freeglut_return_if_fail( button < FREEGLUT_MAX_MENUS );
     fgStructure.Window->Menu[ button ] = NULL;
 }
 
