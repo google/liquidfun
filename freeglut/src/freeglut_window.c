@@ -581,7 +581,7 @@ void fgCloseWindow( SFG_Window* window )
             wglDeleteContext( window->Window.Context );
     }
 
-    DestroyWindow( hWnd );
+    DestroyWindow( window->Window.Handle );
 #endif
 }
 
