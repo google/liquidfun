@@ -650,3 +650,15 @@ files where they do not belong.
 *******************************************************************************************
 * Freeglut 2.2.0 RC 1 Released on  December 10, 2003!
 *******************************************************************************************
+
+(179) CallbackMaker.dsp, demos.dsw, shapes.dsp all updated and are
+packaged with distributions
+
+(180) Fix for the window sizes on Win32 (Nigel Stewart)
+
+(181) Disable/enable lighting in the "one.c" demo (John Fay)
+
+*******************************************************************************************
+* Freeglut 2.2.0 RC 2 Released on  December 11, 2003!
+*******************************************************************************************
+
