@@ -15,7 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "freeglutdll"=.\freeglutdll.dsp - Package Owner=<4>
+Project: "freeglut_static"=.\freeglut_static.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
