@@ -199,6 +199,10 @@ SOURCE=.\include\GL\freeglut_std.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\freeglut_teapot_data.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\GL\glut.h
 # End Source File
 # End Group
