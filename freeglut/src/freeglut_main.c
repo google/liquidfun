@@ -379,20 +379,12 @@ void fgWarning( const char *fmt, ... )
  * Indicates whether Joystick events are being used by ANY window.
  *
  * The current mechanism is to walk all of the windows and ask if
- * there is a joystick callback.  Certainly in some cases, maybe
- * in all cases, the joystick is attached to the system and accessed
- * from ONE point by GLUT/freeglut, so this is not the right way,
- * in general, to do this.  However, the Joystick code is segregated
- * in its own little world, so we can't access the information that
- * we need in order to do that nicely.
+ * there is a joystick callback.  We have a short-circuit early
+ * return if we find any joystick handler registered.
  *
- * Some alternatives:
- *  * Store Joystick data into freeglut global state.
- *  * Provide NON-static functions or data from Joystick *.c file.
- *
- * Basically, the RIGHT way to do this requires knowing something
- * about the Joystick.  Right now, the Joystick code is behind
- * an opaque wall.
+ * The real way to do this is to make use of the glutTimer() API
+ * to more cleanly re-implement the joystick API.  Then, this code
+ * and all other "joystick timer" code can be yanked.
  *
  */
 static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
