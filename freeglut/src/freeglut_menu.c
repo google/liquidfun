@@ -768,21 +768,8 @@ void FGAPIENTRY glutDestroyMenu( int menuID )
 int FGAPIENTRY glutGetMenu( void )
 {
     freeglut_assert_ready;
-
-    /*
-     * Is there a current menu set?
-     */
     if( fgStructure.Menu != NULL )
-    {
-        /*
-         * Yes, there is indeed...
-         */
         return( fgStructure.Menu->ID );
-    }
-
-    /*
-     * No, there is no current menu at all
-     */
     return( 0 );
 }
 
@@ -793,11 +780,8 @@ void FGAPIENTRY glutSetMenu( int menuID )
 {
     SFG_Menu* menu = fgMenuByID( menuID );
 
-    freeglut_assert_ready; freeglut_return_if_fail( menu != NULL );
-
-    /*
-     * The current menu pointer is stored in fgStructure.Menu
-     */
+    freeglut_assert_ready;
+    freeglut_return_if_fail( menu != NULL );
     fgStructure.Menu = menu;
 }
 
@@ -808,14 +792,8 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
 {
     SFG_MenuEntry* menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
 
-    /*
-     * Make sure there is a current menu set
-     */
-    freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
-
-    /*
-     * Fill in the appropriate values...
-     */
+    freeglut_assert_ready;
+    freeglut_return_if_fail( fgStructure.Menu != NULL );
     menuEntry->Text = strdup( label );
     menuEntry->ID   = value;
 
@@ -823,10 +801,6 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
      * Have the new menu entry attached to the current menu
      */
     fgListAppend( &fgStructure.Menu->Entries, &menuEntry->Node );
-
-    /*
-     * Update the menu's dimensions now
-     */
     fghCalculateMenuBoxSize();
 }
 
@@ -838,16 +812,10 @@ void FGAPIENTRY glutAddSubMenu( const char* label, int subMenuID )
   SFG_MenuEntry* menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
   SFG_Menu*      subMenu = fgMenuByID( subMenuID );
 
-  /*
-   * Make sure there is a current menu and the sub menu
-   * we want to attach actually exists...
-   */
-  freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
+  freeglut_assert_ready;
+  freeglut_return_if_fail( fgStructure.Menu != NULL );
   freeglut_return_if_fail( subMenu != NULL );
 
-  /*
-   * Fill in the appropriate values
-   */
   menuEntry->Text = strdup( label );
   menuEntry->SubMenu = subMenu;
   menuEntry->ID      = -1;
@@ -856,15 +824,7 @@ void FGAPIENTRY glutAddSubMenu( const char* label, int subMenuID )
    * Make the submenu's parent window be the menu's parent window
    */
   fghSetSubmenuParentWindow ( fgStructure.Menu->ParentWindow, subMenu ) ;
-
-  /*
-   * Have the new menu entry attached to the current menu
-   */
   fgListAppend( &fgStructure.Menu->Entries, &menuEntry->Node );
-
-  /*
-   * Update the menu's dimensions now
-   */
   fghCalculateMenuBoxSize();
 }
 
@@ -875,19 +835,9 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
 {
     SFG_MenuEntry* menuEntry = NULL;
 
-    /*
-     * Make sure there is a current menu set...
-     */
-    freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
-
-    /*
-     * Get n-th menu entry in the current menu, starting from one:
-     */
+    freeglut_assert_ready;
+    freeglut_return_if_fail( fgStructure.Menu != NULL );
     menuEntry = fghFindMenuEntry( fgStructure.Menu, item );
-
-    /*
-     * Make sure the menu entry exists
-     */
     freeglut_return_if_fail( menuEntry != NULL );
 
     /*
@@ -900,9 +850,6 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
     menuEntry->ID      = value;
     menuEntry->SubMenu = NULL;
 
-    /*
-     * Update the menu's dimensions now
-     */
     fghCalculateMenuBoxSize();
 }
 
@@ -914,20 +861,10 @@ void FGAPIENTRY glutChangeToSubMenu( int item, const char* label, int subMenuID 
     SFG_Menu*      subMenu = fgMenuByID( subMenuID );
     SFG_MenuEntry* menuEntry = NULL;
 
-    /*
-     * Make sure there is a current menu set and the sub menu exists...
-     */
-    freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
+    freeglut_assert_ready;
+    freeglut_return_if_fail( fgStructure.Menu != NULL );
     freeglut_return_if_fail( subMenu != NULL );
-
-    /*
-     * Get n-th menu entry in the current menu, starting from one:
-     */
     menuEntry = fghFindMenuEntry( fgStructure.Menu, item );
-
-    /*
-     * Make sure the menu entry exists
-     */
     freeglut_return_if_fail( menuEntry != NULL );
 
     /*
@@ -940,9 +877,6 @@ void FGAPIENTRY glutChangeToSubMenu( int item, const char* label, int subMenuID 
     menuEntry->SubMenu = subMenu;
     menuEntry->ID      = -1;
 
-    /*
-     * Update the menu's dimensions now
-     */
     fghCalculateMenuBoxSize();
 }
 
@@ -953,36 +887,13 @@ void FGAPIENTRY glutRemoveMenuItem( int item )
 {
     SFG_MenuEntry* menuEntry;
 
-    /*
-     * Make sure there is a current menu set
-     */
-    freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Menu != NULL );
-
-    /*
-     * Get n-th menu entry in the current menu, starting from one:
-     */
+    freeglut_assert_ready;
+    freeglut_return_if_fail( fgStructure.Menu );
     menuEntry = fghFindMenuEntry( fgStructure.Menu, item );
-
-    /*
-     * Make sure the menu entry exists
-     */
     freeglut_return_if_fail( menuEntry != NULL );
-
-    /*
-     * Removing a menu entry is quite simple...
-     */
     fgListRemove( &fgStructure.Menu->Entries, &menuEntry->Node );
-
-    /*
-     * Free the entry label string, too
-     */
     free( menuEntry->Text );
-
     free( menuEntry );
-
-    /*
-     * Update the menu's dimensions now
-     */
     fghCalculateMenuBoxSize();
 }
 
@@ -1010,7 +921,7 @@ void FGAPIENTRY glutAttachMenu( int button )
 void FGAPIENTRY glutDetachMenu( int button )
 {
     freeglut_assert_ready;
-    freeglut_return_if_fail( fgStructure.Window != NULL );
+    freeglut_return_if_fail( fgStructure.Window );
     freeglut_return_if_fail( fgStructure.Menu );
     freeglut_return_if_fail( button >= 0 );
     freeglut_return_if_fail( button < FREEGLUT_MAX_MENUS );
