@@ -1415,7 +1415,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     {
         int wheel_number = LOWORD( wParam );
         /* THIS IS SPECULATIVE -- John Fay, 10/2/03 */
-        short ticks = HIWORD( lParam ) / 120;
+        short ticks = HIWORD( wParam ) / 120;
         /* Should be WHEEL_DELTA instead of 120 */
         int direction = 1;
 
