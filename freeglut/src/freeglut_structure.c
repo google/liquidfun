@@ -321,6 +321,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
      * have everything inside it freed and we do not have to care...
      */
     free( window );
+    if ( fgStructure.Window == window ) fgStructure.Window = NULL ;
 }
 
 /*
@@ -432,6 +433,9 @@ void fgDestroyMenu( SFG_Menu* menu )
   /*
    * Destroy the window associated with the menu
    */
+  if ( fgStructure.Window == menu->Window )
+    fgSetWindow ( menu->ParentWindow ) ;
+
   fgDestroyWindow ( menu->Window, TRUE ) ;
 
   /*
