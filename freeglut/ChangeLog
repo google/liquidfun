@@ -724,3 +724,7 @@ distribution.
 "configure.ac".
 
 (192) Make "gcc -Wall -pedantic -Werror" happy.
+
+(193) Modernized configure.ac a bit and added a rule to Makefile.am to
+update libtool. Note that all gcc compiler warnings are now on by
+default.

@@ -1,74 +1,72 @@
-dnl Process this file with autoconf to produce a configure script.
-AC_INIT(Makefile.am)
+# Process this file with autoconf to produce a configure script.
 
-AM_INIT_AUTOMAKE(freeglut,2.2.0)
-AM_CONFIG_HEADER(config.h)
+AC_INIT([freeglut library], [2.2.0], [freeglut-bugs@lists.sourceforge.net], [freeglut])
+AM_INIT_AUTOMAKE
+AC_PREREQ([2.59])
+AC_CONFIG_SRCDIR([AUTHORS])
+AC_CONFIG_HEADERS([config.h])
 
-dnl Checks for programs.
+# Checks for programs.
 AC_PROG_CC
 AC_C_CONST
 AC_EXEEXT
 AC_LIBTOOL_DLOPEN
-AM_PROG_LIBTOOL
-AC_SUBST(LIBTOOL_DEPS)
+AC_PROG_LIBTOOL
+AC_SUBST([LIBTOOL_DEPS])
 
-dnl Checks for libraries.
+# Checks for libraries.
 AC_PATH_XTRA
+AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode],
+	     [LIBXXF86VM=-lXxf86vm], [LIBXXF86VM=],
+             [$X_LIBS -lXext -lX11])
+AC_SUBST([LIBXXF86VM])
 
-AC_CHECK_LIB(Xxf86vm,XF86VidModeSwitchToMode,
-	LIBXXF86VM=-lXxf86vm,LIBXXF86VM=,$X_LIBS -lXext -lX11)
-AC_SUBST(LIBXXF86VM)
-
-dnl Checks for header files.
-AC_STDC_HEADERS
-AC_HAVE_HEADERS( GL/gl.h GL/glu.h GL/glx.h )
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([GL/gl.h GL/glu.h GL/glx.h])
 
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $X_CFLAGS"
-AC_CHECK_HEADERS(X11/extensions/xf86vmode.h,,,[#include <X11/Xlib.h>])
+AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [], [], [#include <X11/Xlib.h>])
 CFLAGS="$save_CFLAGS"
 
-dnl Checks for typedefs, structures, and compiler characteristics.
-
-dnl Checks for library functions.
-
+# Checks for library functions.
 AC_CHECK_LIBM
-AC_SUBST(LIBM)
+AC_SUBST([LIBM])
 
-dnl Build time configuration
-
-AC_ARG_ENABLE(replace-glut,
-[  --disable-replace-glut  Coexist with existing glut library])
-if test "x$enable_replace_glut" != xno
-then
- LIBRARY=glut
- HEADER=glut.h
+# Build time configuration.
+AC_ARG_ENABLE([replace-glut],
+[AS_HELP_STRING([--enable-replace-glut],
+                [be a replacement for GLUT @<:@default=yes@:>@])])
+if test "x$enable_replace_glut" != xno; then
+  LIBRARY=glut
+  HEADER=glut.h
 else
- LIBRARY=freeglut
- HEADER=
+  LIBRARY=freeglut
+  HEADER=
 fi
-AC_SUBST(LIBRARY)
-AC_SUBST(HEADER)
+AC_SUBST([LIBRARY])
+AC_SUBST([HEADER])
 
-AC_ARG_ENABLE(warnings,
-[  --enable-warnings       Enable gcc compiler warnings],
-if test "x$GCC" == xyes
-then
- CFLAGS="$CFLAGS -Wall -Wno-parentheses -Werror"
-fi)
+AC_ARG_ENABLE([warnings],
+[AS_HELP_STRING([--enable-warnings],
+                [use all gcc compiler warnings @<:@default=yes@:>@])])
+if test "x$enable_warnings" != xno -a "x$GCC" = xyes; then
+  CFLAGS="$CFLAGS -Wall -pedantic -Werror"
+fi
 
-AC_OUTPUT(\
-	Makefile \
-	doc/Makefile \
-	progs/Makefile \
-	progs/demos/Makefile \
-	progs/demos/CallbackMaker/Makefile \
-	progs/demos/Fractals/Makefile \
-	progs/demos/Fractals_random/Makefile \
-	progs/demos/Lorenz/Makefile \
-	progs/demos/One/Makefile \
-	progs/demos/shapes/Makefile \
-	src/Makefile \
-	include/Makefile \
-	include/GL/Makefile \
-	)
+# Generate output.
+AC_CONFIG_FILES([Makefile
+                 doc/Makefile
+                 include/GL/Makefile
+                 include/Makefile
+                 progs/Makefile
+                 progs/demos/CallbackMaker/Makefile
+                 progs/demos/Fractals/Makefile
+                 progs/demos/Fractals_random/Makefile
+                 progs/demos/Lorenz/Makefile
+                 progs/demos/Makefile
+                 progs/demos/One/Makefile
+                 progs/demos/shapes/Makefile
+                 src/Makefile])
+AC_OUTPUT

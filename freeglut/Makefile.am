@@ -1,4 +1,4 @@
-## Process this file with automake to produce makefile.im
+## Process this file with automake to produce Makefile.in
 
 SUBDIRS = src include progs doc
 AUTOMAKE_OPTIONS = gnu
@@ -11,3 +11,5 @@ EXTRA_DIST = \
 	freeglut_static.dsp \
 	freeglut_evc4.vcp freeglut_evc4.vcw
 
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status --recheck
