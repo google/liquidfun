@@ -712,3 +712,10 @@ unimplemented).
 (189) Fixed first bug of #1064195 (two things when using signals):
 Don't issue a warning about select when a non-blocked signal was
 caught. This makes sense and is more compatible with GLUT.
+
+***************************************************************************
+* Changes on January 1, 2005.
+***************************************************************************
+
+(190) Added eMbedded Visual Tools project/workspace files to
+distribution.

@@ -8,5 +8,6 @@ EXTRA_DIST = \
 	freeglut.lsm autogen.sh \
 	freeglut.kdevprj freeglut.kdevelop \
 	freeglut.dsp freeglut.dsw \
-	freeglut_static.dsp
+	freeglut_static.dsp \
+	freeglut_evc4.vcp freeglut_evc4.vcw
 
