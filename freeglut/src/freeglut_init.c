@@ -519,9 +519,13 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         const char *fps = getenv( "GLUT_FPS" );
         if( fps )
         {
-            sscanf( fps, "%d", &fgState.FPSInterval );
-            if( fgState.FPSInterval <= 0 )
-                fgState.FPSInterval = 5000;  /* 5000 milliseconds */
+            int interval;
+            sscanf( fps, "%d", &interval );
+            
+            if( interval <= 0 )
+                fgState.FPSInterval = 5000;  /* 5000 millisecond default */
+            else
+                fgState.FPSInterval = interval;
         }
     }
 
