@@ -43,7 +43,7 @@ wchar_t* wstr_from_str(const char* str)
     for(i=0; i<len; i++)
         wstr[i] = str[i];
     wstr[len] = 0;
-	return wstr;
+    return wstr;
 }
 
 
@@ -172,7 +172,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                               unsigned char layer_type )
 {
 #if TARGET_HOST_WINCE
-	return GL_TRUE;
+    return GL_TRUE;
 #else
     PIXELFORMATDESCRIPTOR* ppfd, pfd;
     int flags, pixelformat;
@@ -554,29 +554,29 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     }
 
 #if TARGET_HOST_WINCE
-	{
-		wchar_t* wstr = wstr_from_str(title);
+    {
+        wchar_t* wstr = wstr_from_str(title);
 
-		window->Window.Handle = CreateWindow( 
-			_T("FREEGLUT"),
-			wstr,
-			WS_VISIBLE | WS_POPUP,
-			0,0, 240,320,
-			NULL,
-			NULL,
-			fgDisplay.Instance,
-			(LPVOID) window
-		);
+        window->Window.Handle = CreateWindow(
+            _T("FREEGLUT"),
+            wstr,
+            WS_VISIBLE | WS_POPUP,
+            0,0, 240,320,
+            NULL,
+            NULL,
+            fgDisplay.Instance,
+            (LPVOID) window
+        );
 
-		free(wstr);
+        free(wstr);
 
-		SHFullScreen(window->Window.Handle, SHFS_HIDESTARTICON);
-		SHFullScreen(window->Window.Handle, SHFS_HIDESIPBUTTON);
-		SHFullScreen(window->Window.Handle, SHFS_HIDETASKBAR);
-		MoveWindow(window->Window.Handle, 0, 0, 240, 320, TRUE);
-		ShowWindow(window->Window.Handle, SW_SHOW);
-		UpdateWindow(window->Window.Handle);
-	}
+        SHFullScreen(window->Window.Handle, SHFS_HIDESTARTICON);
+        SHFullScreen(window->Window.Handle, SHFS_HIDESIPBUTTON);
+        SHFullScreen(window->Window.Handle, SHFS_HIDETASKBAR);
+        MoveWindow(window->Window.Handle, 0, 0, 240, 320, TRUE);
+        ShowWindow(window->Window.Handle, SW_SHOW);
+        UpdateWindow(window->Window.Handle);
+    }
 #else
     window->Window.Handle = CreateWindowEx(
         exFlags,
@@ -628,9 +628,7 @@ void fgCloseWindow( SFG_Window* window )
 #if TARGET_HOST_UNIX_X11
 
     glXDestroyContext( fgDisplay.Display, window->Window.Context );
-    glXDestroyGLXPixmap( fgDisplay.Display, window->Window.Handle );
-    XFreePixmap( fgDisplay.Display, window->Window.Pixmap );
-
+    XDestroyWindow( fgDisplay.Display, window->Window.Handle );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
@@ -850,13 +848,13 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
         SetWindowText( fgStructure.Window->Window.Handle, title );
 
 #elif TARGET_HOST_WINCE
-		{
-			wchar_t* wstr = wstr_from_str(title);
+        {
+            wchar_t* wstr = wstr_from_str(title);
 
-			SetWindowText( fgStructure.Window->Window.Handle, wstr );
+            SetWindowText( fgStructure.Window->Window.Handle, wstr );
 
-			free(wstr);
-		}
+            free(wstr);
+        }
 #endif
     }
 }
@@ -893,13 +891,13 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
         SetWindowText( fgStructure.Window->Window.Handle, title );
 
 #elif TARGET_HOST_WINCE
-		{
-			wchar_t* wstr = wstr_from_str(title);
+        {
+            wchar_t* wstr = wstr_from_str(title);
 
-			SetWindowText( fgStructure.Window->Window.Handle, wstr );
+            SetWindowText( fgStructure.Window->Window.Handle, wstr );
 
-			free(wstr);
-		}
+            free(wstr);
+        }
 #endif
     }
 }
@@ -932,7 +930,7 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
-    
+
     {
         RECT winRect;
 
