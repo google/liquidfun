@@ -212,63 +212,21 @@ int FGAPIENTRY glutGet( GLenum eWhat )
      */
     case GLUT_WINDOW_X:
     case GLUT_WINDOW_Y:
+    case GLUT_WINDOW_WIDTH:
+    case GLUT_WINDOW_HEIGHT:
+    case GLUT_WINDOW_BORDER_WIDTH :
+    case GLUT_WINDOW_HEADER_HEIGHT :
     {
         XWindowAttributes winAttributes;
-        Window another, window;
-        int x, y;
 
         /*
          * Return zero if there is no current window set
          */
         if( fgStructure.Window == NULL )
             return( 0 );
-
-        /*
-         * So, grab the current window's position
-         */
-        window = fgStructure.Window->Window.Handle;
 
         /*
          * Grab the current window's attributes now
-         */
-        XGetWindowAttributes(
-            fgDisplay.Display,
-            window,
-            &winAttributes
-        );
-
-        /*
-         * Correct the results for the parental relation and border size
-         */
-        XTranslateCoordinates(
-            fgDisplay.Display,
-            window,
-            winAttributes.root,
-            -winAttributes.border_width,
-            -winAttributes.border_width,
-            &x, &y,
-            &another
-        );
-
-        /*
-         * See if we have to return the X or Y coordinate
-         */
-        return( eWhat == GLUT_WINDOW_X ? x : y );
-    }
-
-    case GLUT_WINDOW_WIDTH:
-    case GLUT_WINDOW_HEIGHT:
-    {
-        XWindowAttributes winAttributes;
-
-        /*
-         * Return zero if there is no current window set
-         */
-        if( fgStructure.Window == NULL )
-            return( 0 );
-
-        /*
-         * Checking for window's size is much easier:
          */
         XGetWindowAttributes(
             fgDisplay.Display,
@@ -277,9 +235,17 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         );
 
         /*
-         * See if to return the window's width or height
+         * See which window attribute to return
          */
-        return( eWhat == GLUT_WINDOW_WIDTH ? winAttributes.width : winAttributes.height );
+        switch ( eWhat )
+        {
+        case GLUT_WINDOW_X:                return winAttributes.x ;
+        case GLUT_WINDOW_Y:                return winAttributes.y ;
+        case GLUT_WINDOW_WIDTH:            return winAttributes.width ;
+        case GLUT_WINDOW_HEIGHT:           return winAttributes.height ;
+        case GLUT_WINDOW_BORDER_WIDTH :    return winAttributes.border_width ;
+        case GLUT_WINDOW_HEADER_HEIGHT :   return winAttributes.border_width * 3 ;  /* a kludge for now */
+        }
     }
 
     /*
@@ -364,6 +330,24 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_WINDOW_WIDTH:
     case GLUT_WINDOW_HEIGHT:
     {
+        /*
+         *  There is considerable confusion about the "right thing to do" concerning window
+         * size and position.  GLUT itself is not consistent between Windows and Linux; since
+         * platform independence is a virtue for "freeglut", we decided to break with GLUT's
+         * behaviour.
+         *  Under Linux, it is apparently not possible to get the window border sizes in order
+         * to subtract them off the window's initial position until some time after the window
+         * has been created.  Therefore we decided on the following behaviour, both under
+         * Windows and under Linux:
+         *  - When you create a window with position (x,y) and size (w,h), the upper left hand
+         *    corner of the outside of the window is at (x,y) and the size of the drawable area
+         *    is (w,h).
+         *  - When you query the size and position of the window--as is happening here for
+         *    Windows--"freeglut" will return the size of the drawable area--the (w,h) that you
+         *    specified when you created the window--and the coordinates of the upper left hand
+         *    corner of the drawable area--which is NOT the (x,y) you specified.
+         */
+
         RECT winRect;
 
         /*
@@ -373,6 +357,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         /*
          * We need to call GetWindowRect() first...
+         *  (this returns the pixel coordinates of the outside of the window)
          */
         GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
 
@@ -399,6 +384,12 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         }
     }
     break;
+
+    case GLUT_WINDOW_BORDER_WIDTH :
+        return ( GetSystemMetrics( SM_CXSIZEFRAME ) ) ;
+
+    case GLUT_WINDOW_HEADER_HEIGHT :
+        return ( GetSystemMetrics( SM_CYCAPTION ) ) ;
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
         /*

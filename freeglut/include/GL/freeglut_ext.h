@@ -40,9 +40,12 @@
 #define GLUT_ACTION_CONTINUE_EXECUTION           2
 
 /*
- * GLUT API macro definitions -- the glutGet parameters
+ * GLUT API Extension macro definitions -- the glutGet parameters
  */
 #define  GLUT_ACTION_ON_WINDOW_CLOSE        0x01F9
+
+#define  GLUT_WINDOW_BORDER_WIDTH           0x01FA
+#define  GLUT_WINDOW_HEADER_HEIGHT          0x01FB
 
 /*
  * Process loop function, see freeglut_main.c
