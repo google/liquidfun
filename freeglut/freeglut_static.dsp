@@ -97,6 +97,10 @@ SOURCE=".\src\freeglut_display.c"
 # End Source File
 # Begin Source File
 
+SOURCE=".\src\freeglut_ext.c"
+# End Source File
+# Begin Source File
+
 SOURCE=".\src\freeglut_font.c"
 # End Source File
 # Begin Source File
