@@ -608,19 +608,12 @@ SFG_Menu* fgMenuByID( int menuID )
     /*
      * It's enough to check all entries in fgStructure.Menus...
      */
-    for( menu = (SFG_Menu *)fgStructure.Menus.First; menu; menu = (SFG_Menu *)menu->Node.Next )
-    {
-        /*
-         * Does the ID number match?
-         */
+    for( menu = (SFG_Menu *)fgStructure.Menus.First;
+         menu;
+         menu = (SFG_Menu *)menu->Node.Next )
         if( menu->ID == menuID )
-            return( menu );
-    }
-
-    /*
-     * We have not found the requested menu ID
-     */
-    return( NULL );
+            return menu;
+    return NULL;
 }
 
 /*
@@ -673,7 +666,7 @@ int fgListLength(SFG_List *list)
     for( node = (SFG_Node *)list->First; node; node = (SFG_Node *)node->Next )
         ++length;
 
-    return( length );
+    return length;
 }
 
 /*** END OF FILE ***/
