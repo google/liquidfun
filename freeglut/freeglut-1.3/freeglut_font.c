@@ -137,7 +137,7 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
     /*
      * Make sure the character we want to output is valid
      */
-    freeglut_return_if_fail( character >= 0 && character < font->256 );
+    freeglut_return_if_fail( character >= 0 && character < 256 );
 
     /*
      * Then find the character we want to draw
@@ -196,7 +196,7 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
     /*
      * Make sure the character we want to output is valid
      */
-    freeglut_return_val_if_fail( character > 0 && character < font->256, 0 );
+    freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
 
     /*
          * Scan the font looking for the specified character
@@ -246,6 +246,7 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
  */
 int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
 {
+    const SFG_StrokeChar *schar;
     /*
      * First of all we'll need a font to use
      */
