@@ -41,8 +41,8 @@
  *  fgSetupPixelFormat      -- ignores the display mode settings
  *  fgOpenWindow()          -- check the Win32 version, -iconic handling!
  *  fgCloseWindow()         -- check the Win32 version
- *  glutCreateWindow()      -- see what happens when default position and size is {-1,-1}
- *  glutCreateSubWindow()   -- see what happens when default position and size is {-1,-1}
+ *  glutCreateWindow()      -- Check when default position and size is {-1,-1}
+ *  glutCreateSubWindow()   -- Check when default position and size is {-1,-1}
  *  glutDestroyWindow()     -- check the Win32 version
  *  glutSetWindow()         -- check the Win32 version
  *  glutGetWindow()         -- OK
@@ -66,7 +66,8 @@
 
 XVisualInfo* fgChooseVisual( void )
 {
-    int bufferSize[] = { 16, 12, 8, 4, 2, 1 };
+#define BUFFER_SIZES 6
+    int bufferSize[BUFFER_SIZES] = { 16, 12, 8, 4, 2, 1 };
     GLboolean wantIndexedMode = FALSE;
     int attributes[ 32 ];
     int where = 0;
@@ -74,90 +75,47 @@ XVisualInfo* fgChooseVisual( void )
     /*
      * First we have to process the display mode settings...
      */
-#   define ATTRIB(a) attributes[where++]=a;
+/*
+ * Why is there a semi-colon in this #define?  The code
+ * that uses the macro seems to always add more semicolons...
+ */
+#define ATTRIB(a) attributes[where++]=a;
+#define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
 
-    /*
-     * Decide if we want a true or indexed color visual:
-     */
-    if( !(fgState.DisplayMode & GLUT_INDEX) )
+    if( fgState.DisplayMode & GLUT_INDEX )
     {
-        /*
-         * We are sure that there will be R, B and B components requested:
-         */
-        ATTRIB( GLX_RGBA       );
-        ATTRIB( GLX_RED_SIZE   ); ATTRIB( 1 );
-        ATTRIB( GLX_GREEN_SIZE ); ATTRIB( 1 );
-        ATTRIB( GLX_BLUE_SIZE  ); ATTRIB( 1 );
-
-        /*
-         * Check if the A component is required, too:
-         */
-        if( fgState.DisplayMode & GLUT_ALPHA )
-        {
-            ATTRIB( GLX_ALPHA_SIZE ); ATTRIB( 1 );
-        }
+        ATTRIB_VAL( GLX_BUFFER_SIZE, 8 );
+        wantIndexedMode = TRUE;
     }
     else
     {
-        /*
-         * We've got an indexed color request
-         */
-        ATTRIB( GLX_BUFFER_SIZE ); ATTRIB( 8 );
-
-        /*
-         * Set the 'I want indexed mode' switch
-         */
-        wantIndexedMode = TRUE;
+        ATTRIB( GLX_RGBA );
+        ATTRIB_VAL( GLX_RED_SIZE,   1 );
+        ATTRIB_VAL( GLX_GREEN_SIZE, 1 );
+        ATTRIB_VAL( GLX_BLUE_SIZE,  1 );
+        if( fgState.DisplayMode & GLUT_ALPHA )
+            ATTRIB_VAL( GLX_ALPHA_SIZE, 1 );
     }
 
-    /*
-     * We can have double or single buffered contexts created
-     */
     if( fgState.DisplayMode & GLUT_DOUBLE )
-    {
         ATTRIB( GLX_DOUBLEBUFFER );
-    }
 
-    /*
-     * Stereoscopy seems a nice thing to have
-     */
     if( fgState.DisplayMode & GLUT_STEREO )
-    {
         ATTRIB( GLX_STEREO );
-    }
 
-    /*
-     * Depth buffer is almost always required
-     */
     if( fgState.DisplayMode & GLUT_DEPTH )
-    {
-        ATTRIB( GLX_DEPTH_SIZE ); ATTRIB( 1 );
-    }
+        ATTRIB_VAL( GLX_DEPTH_SIZE, 1 );
 
-    /*
-     * Stenciling support
-     */
     if( fgState.DisplayMode & GLUT_STENCIL )
-    {
-        ATTRIB( GLX_STENCIL_SIZE ); ATTRIB( 1 );
-    }
+        ATTRIB_VAL( GLX_STENCIL_SIZE, 1 );
 
-    /*
-     * And finally the accumulation buffers
-     */
     if( fgState.DisplayMode & GLUT_ACCUM )
     {
-        ATTRIB( GLX_ACCUM_RED_SIZE );   ATTRIB( 1 );
-        ATTRIB( GLX_ACCUM_GREEN_SIZE ); ATTRIB( 1 );
-        ATTRIB( GLX_ACCUM_BLUE_SIZE );  ATTRIB( 1 );
-
-        /*
-         * Check if the A component is required, too:
-         */
+        ATTRIB_VAL( GLX_ACCUM_RED_SIZE,   1 );
+        ATTRIB_VAL( GLX_ACCUM_GREEN_SIZE, 1 );
+        ATTRIB_VAL( GLX_ACCUM_BLUE_SIZE,  1 );
         if( fgState.DisplayMode & GLUT_ALPHA )
-        {
-            ATTRIB( GLX_ACCUM_ALPHA_SIZE ); ATTRIB( 1 );
-        }
+            ATTRIB_VAL( GLX_ACCUM_ALPHA_SIZE, 1 );
     }
 
     /*
@@ -165,48 +123,28 @@ XVisualInfo* fgChooseVisual( void )
      */
     ATTRIB( None );
 
-    /*
-     * OKi now, we've got two cases -- RGB(A) and index mode visuals
-     */
     if( wantIndexedMode == FALSE )
-    {
-        /*
-         * The easier one. And more common, too.
-         */
-        return( glXChooseVisual( fgDisplay.Display, fgDisplay.Screen, attributes ) );
-    }
+        return glXChooseVisual( fgDisplay.Display, fgDisplay.Screen,
+                                attributes );
     else
     {
         XVisualInfo* visualInfo;
         int i;
 
         /*
-         * In indexed mode, we need to check how many bits of depth can we achieve
+         * In indexed mode, we need to check how many bits of depth can we
+         * achieve.  We do this by trying each possibility from the list
+         * given in the {bufferSize} array.  If we match, we return to caller.
          */
-        for( i=0; i<6; i++ )
+        for( i=0; i<BUFFER_SIZES; i++ )
         {
-
-            /*
-             * The GLX_BUFFER_SIZE value comes always first, so:
-             */
             attributes[ 1 ] = bufferSize[ i ];
-
-            /*
-             * Check if such visual is possible
-             */
-            visualInfo = glXChooseVisual( fgDisplay.Display, fgDisplay.Screen, attributes );
-
-            /*
-             * The buffer size are sorted in descendant order, so choose the first:
-             */
+            visualInfo = glXChooseVisual( fgDisplay.Display, fgDisplay.Screen,
+                                          attributes );
             if( visualInfo != NULL )
-                return( visualInfo );
+                return visualInfo;
         }
-
-        /*
-         * If we are still here, it means that the visual info was not found
-         */
-        return( NULL );
+        return NULL;
     }
 }
 #endif
