@@ -183,7 +183,10 @@ void fgInitialize( const char* displayName )
         wc.cbClsExtra     = 0;
         wc.cbWndExtra     = 0;
         wc.hInstance      = fgDisplay.Instance;
-        wc.hIcon          = LoadIcon( NULL, IDI_WINLOGO );
+        wc.hIcon          = LoadIcon( fgDisplay.Instance, "GLUT_ICON" );
+        if (!wc.hIcon)
+          wc.hIcon        = LoadIcon( NULL, IDI_WINLOGO );
+
         wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
         wc.hbrBackground  = NULL;
         wc.lpszMenuName   = NULL;
