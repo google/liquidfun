@@ -247,7 +247,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, int* buttons, float* axes )
 
     if( status != JS_RETURN )
     {
-        g_warning( joy->fname );
+        fgWarning( joy->fname );
         joy->error = TRUE;
         return;
     }
@@ -413,7 +413,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     if( joy->error )
       return ;
 
-    sprintf( joyfname, "%s/.joy%drc", g_getenv( "HOME" ), joy->id );
+    sprintf( joyfname, "%s/.joy%drc", getenv( "HOME" ), joy->id );
 
     joyfile = fopen( joyfname, "r" );
     joy->error = (joyfile == NULL);
