@@ -207,3 +207,5 @@ October 24, 2002:
 (85) Removed genfonts/genstrokes code, updated configure.in and Makefile.in
 
 (86) Moved tests/one.c into progs/demos/One/one.c, updated configure.in and Makefile.in
+
+(87) Removed tests directory
