@@ -528,13 +528,21 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
 
 #endif
 
-    case GLUT_JOYSTICK_POLL_RATE:
     case GLUT_HAS_JOYSTICK:
+        return fgJoystickDetect ();
+
     case GLUT_OWNS_JOYSTICK:
+        return fgState.JoysticksInitialised;
+
+    case GLUT_JOYSTICK_POLL_RATE:
+        return fgStructure.Window ? fgStructure.Window->State.JoystickPollRate : 0;
+
+    /* The following two are only for Joystick 0 but this is an improvement */
     case GLUT_JOYSTICK_BUTTONS:
+        return glutJoystickGetNumButtons ( 0 );
+
     case GLUT_JOYSTICK_AXES:
-        /* XXX WARNING: THIS IS A BIG LIE! */
-        return 0;
+        return glutJoystickGetNumAxes ( 0 );
 
     case GLUT_HAS_SPACEBALL:
     case GLUT_HAS_DIAL_AND_BUTTON_BOX:

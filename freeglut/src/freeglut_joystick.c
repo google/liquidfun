@@ -450,7 +450,6 @@ static void fghJoystickAddHatElement ( SFG_Joystick* joy, CFDictionaryRef hat );
  * The static joystick structure pointer
  */
 #define MAX_NUM_JOYSTICKS  2
-static int fgNumberOfJoysticks = 0;
 static SFG_Joystick *fgJoystick [ MAX_NUM_JOYSTICKS ];
 
 
@@ -1528,7 +1527,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 /*
  * This function replaces the constructor method in the JS library.
  */
-void fgJoystickInit( int ident )
+static void fghJoystickInit( int ident )
 {
     if( ident >= MAX_NUM_JOYSTICKS )
       fgError( "Too large a joystick number: %d", ident );
@@ -1639,6 +1638,22 @@ void fgJoystickInit( int ident )
 }
 
 /*
+ * Try initializing all the joysticks (well, both of them)
+ */
+void fgInitialiseJoysticks ( void )
+{
+  /* Initialization courtesy of OpenGLUT -- do we want it? */
+  if( !fgState.JoysticksInitialised )
+  {
+    int ident ;
+    for ( ident = 0; ident < MAX_NUM_JOYSTICKS; ident++ )
+      fghJoystickInit( ident );
+
+    fgState.JoysticksInitialised = GL_TRUE;
+  }
+}
+
+/*
  *
  */
 void fgJoystickClose( void )
@@ -1722,11 +1737,37 @@ void fgJoystickPollWindow( SFG_Window* window )
 }
 
 /*
- * PWO: These jsJoystick class methods have not been implemented.
+ * Implementation for glutDeviceGet(GLUT_HAS_JOYSTICK)
+ */
+int fgJoystickDetect( void )
+{
+  int ident;
+
+  fgInitialiseJoysticks ();
+
+  if ( !fgJoystick )
+    return 0;
+
+  if ( !fgState.JoysticksInitialised )
+    return 0;
+
+  for( ident=0; ident<MAX_NUM_JOYSTICKS; ident++ )
+    if( fgJoystick[ident] && !fgJoystick[ident]->error )
+      return 1;
+
+  return 0;
+}
+
+/*
+ * Joystick information functions
  */
 int  glutJoystickGetNumAxes( int ident )
 {
     return fgJoystick[ ident ]->num_axes;
+}
+int  glutJoystickGetNumButtons( int ident )
+{
+    return fgJoystick[ ident ]->num_buttons;
 }
 int  glutJoystickNotWorking( int ident )
 {

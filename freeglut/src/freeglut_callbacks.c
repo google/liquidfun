@@ -171,12 +171,7 @@ void FGAPIENTRY glutJoystickFunc( void (* callback)
                                   ( unsigned int, int, int, int ),
                                   int pollInterval )
 {
-    if( !fgState.JoysticksInitialised )
-    {
-        fgJoystickInit( 0 );
-        fgJoystickInit( 1 );
-        fgState.JoysticksInitialised = GL_TRUE;
-    }
+    fgInitialiseJoysticks ();
 
     SET_CALLBACK( Joystick );
     fgStructure.Window->State.JoystickPollRate = pollInterval;

@@ -704,9 +704,15 @@ SFG_Menu*   fgCreateMenu( FGCBMenu menuCallback );
 void        fgDestroyMenu( SFG_Menu* menu );
 
 /* Joystick device management functions, defined in freeglut_joystick.c */
-void        fgJoystickInit( int ident );
+int         fgJoystickDetect( void );
+void        fgInitialiseJoysticks( void );
 void        fgJoystickClose( void );
 void        fgJoystickPollWindow( SFG_Window* window );
+
+/* More joystick functions.  Should these go into the API?  */
+int  glutJoystickGetNumAxes( int ident );
+int  glutJoystickGetNumButtons( int ident );
+int  glutJoystickNotWorking( int ident );
 
 /*
  * Helper function to enumerate through all registered windows
