@@ -120,6 +120,7 @@ typedef void (* FGCBvisibility    )( int );
 typedef void (* FGCBkeyboard      )( unsigned char, int, int );
 typedef void (* FGCBspecial       )( int, int, int );
 typedef void (* FGCBmouse         )( int, int, int, int );
+typedef void (* FGCBmousewheel    )( int, int, int, int );
 typedef void (* FGCBmotion        )( int, int );
 typedef void (* FGCBpassive       )( int, int );
 typedef void (* FGCBentry         )( int );
@@ -244,9 +245,10 @@ struct tagSFG_State
     int              GameModeDepth;        /* The pixel depth for game mode     */
     int              GameModeRefresh;      /* The refresh rate for game mode    */
 
-    int              ActionOnWindowClose;  /* Action when user clicks "x" on window header bar */
-    fgExecutionState ExecState;           /* Current state of the GLUT execution */
-    char		*ProgramName;
+    int              ActionOnWindowClose ; /* Action when user clicks "x" on window header bar */
+
+    fgExecutionState ExecState ;           /* Current state of the GLUT execution */
+    char            *ProgramName ;         /* Name of the program invoking the "freeglut" library" */
 };
 
 /*
@@ -368,6 +370,7 @@ struct tagSFG_WindowCallbacks
     FGCBspecial         Special;
     FGCBspecialUp       SpecialUp;
     FGCBmouse           Mouse;
+    FGCBmousewheel      MouseWheel;
     FGCBmotion          Motion;
     FGCBpassive         Passive;
     FGCBentry           Entry;

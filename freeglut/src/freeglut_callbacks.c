@@ -49,8 +49,8 @@
 void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
 {
     if( !callback )
-	fgError ("Fatal error in program.  NULL display callback not "
-	    "permitted in GLUT 3.0+ or freeglut 2.0.1+\n");
+      fgError ("Fatal error in program.  NULL display callback not "
+          "permitted in GLUT 3.0+ or freeglut 2.0.1+\n");
     SET_CALLBACK( Display );
     fgStructure.Window->State.Redisplay = TRUE;
 }
@@ -99,8 +99,8 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
 
     timer = (SFG_Timer *)calloc( sizeof(SFG_Timer), 1 );
     if (!timer)
-	fgError ("Fatal error: "
-	    "Memory allocation failure in glutTimerFunc()\n");
+      fgError ("Fatal error: "
+          "Memory allocation failure in glutTimerFunc()\n");
 
     timer->Callback  = callback;
     timer->ID        = timerID;
@@ -173,6 +173,14 @@ void FGAPIENTRY glutMouseFunc( void (* callback)( int, int, int, int ) )
 }
 
 /*
+ * Sets the mouse wheel callback for the current window
+ */
+void FGAPIENTRY glutMouseWheelFunc( void (* callback)( int, int, int, int ) )
+{
+    SET_CALLBACK( MouseWheel );
+}
+
+/*
  * Sets the mouse motion callback for the current window (one or more buttons
  * are pressed)
  */
@@ -215,7 +223,7 @@ void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
 void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
 {
    if( fgStructure.Menu == NULL )
-       return;
+     return;
    fgStructure.Menu->Destroy = callback;
 }
 

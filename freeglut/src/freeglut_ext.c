@@ -89,6 +89,7 @@ static struct name_address_pair glut_functions[] = {
    { "glutReshapeFunc", (void *) glutReshapeFunc },
    { "glutKeyboardFunc", (void *) glutKeyboardFunc },
    { "glutMouseFunc", (void *) glutMouseFunc },
+   { "glutMouseWheelFunc", (void *) glutMouseWheelFunc },
    { "glutMotionFunc", (void *) glutMotionFunc },
    { "glutPassiveMotionFunc", (void *) glutPassiveMotionFunc },
    { "glutEntryFunc", (void *) glutEntryFunc },

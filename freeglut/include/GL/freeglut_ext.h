@@ -66,6 +66,7 @@ FGAPI void    FGAPIENTRY glutLeaveMainLoop( void );
 /*
  * Window-specific callback functions, see freeglut_callbacks.c
  */
+FGAPI void    FGAPIENTRY glutMouseWheelFunc( void (* callback)( int, int, int, int ) );
 FGAPI void    FGAPIENTRY glutCloseFunc( void (* callback)( void ) );
 FGAPI void    FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) );
 /* A. Donev: Also a destruction callback for menus */

@@ -70,6 +70,7 @@
  * Calls a window's redraw method. This is used when
  * a redraw is forced by the incoming window messages.
  */
+
 static void fghRedrawWindowByHandle
 #if TARGET_HOST_UNIX_X11
     ( Window handle )
@@ -78,13 +79,12 @@ static void fghRedrawWindowByHandle
 #endif
 {
     SFG_Window* window = fgWindowByHandle( handle );
-
     freeglut_return_if_fail( window != NULL );
     freeglut_return_if_fail( window->Callbacks.Display != NULL );
     freeglut_return_if_fail( window->State.Visible == TRUE );
+
     fgSetWindow( window );
     window->State.Redisplay = FALSE;
-
     window->Callbacks.Display();
 }
 
@@ -100,10 +100,11 @@ static void fghReshapeWindowByHandle
     ( HWND handle, int width, int height )
 #endif
 {
-    SFG_Window *current_window = fgStructure.Window ;
+  SFG_Window *current_window = fgStructure.Window ;
 
     SFG_Window* window = fgWindowByHandle( handle );
     freeglut_return_if_fail( window != NULL );
+
     fgSetWindow( window );
     if( window->Callbacks.Reshape != NULL )
         window->Callbacks.Reshape( width, height );
@@ -120,7 +121,7 @@ static void fghReshapeWindowByHandle
     window->State.Redisplay = TRUE ;
 
     if ( window->IsMenu )
-	fgSetWindow ( current_window ) ;
+      fgSetWindow ( current_window ) ;
 }
 
 /*
@@ -164,6 +165,7 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
         (window->State.Visible == TRUE) )
     {
       window->State.Redisplay = FALSE;
+
       RedrawWindow( 
         window->Window.Handle, NULL, NULL, 
         RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
@@ -184,6 +186,7 @@ static void fghDisplayAll( void )
 
     enumerator.found = FALSE;
     enumerator.data  =  NULL;
+
     fgEnumWindows( fghcbDisplayWindow, &enumerator );
 }
 
@@ -199,6 +202,7 @@ static void fghcbCheckJoystickPolls( SFG_Window *window, SFG_Enumerator *enumera
         fgJoystickPollWindow( window );
         window->State.JoystickLastPoll = checkTime;
     }
+
     fgEnumSubWindows( window, fghcbCheckJoystickPolls, enumerator );
 }
 
@@ -211,6 +215,7 @@ static void fghCheckJoystickPolls( void )
 
     enumerator.found = FALSE;
     enumerator.data  =  NULL;
+
     fgEnumWindows( fghcbCheckJoystickPolls, &enumerator );
 }
 
@@ -229,13 +234,14 @@ static void fghCheckTimers( void )
      * For every timer that is waiting for triggering
      */
     for( timer = (SFG_Timer *)fgState.Timers.First;
-	 timer;
-	 timer = (SFG_Timer *)next )
+         timer;
+         timer = (SFG_Timer *)next )
     {
-	next = (SFG_Timer *)timer->Node.Next;
+	      next = (SFG_Timer *)timer->Node.Next;
+
         if( timer->TriggerTime <= checkTime )
         {
-	    fgListRemove( &fgState.Timers, &timer->Node );
+          fgListRemove( &fgState.Timers, &timer->Node );
             fgListAppend( &timedOut, &timer->Node );
         }
     }
@@ -246,10 +252,10 @@ static void fghCheckTimers( void )
      */
     while ( (timer = (SFG_Timer *)timedOut.First) )
     {
-	if( timer->Callback != NULL )
-	    timer->Callback( timer->ID );
-	fgListRemove( &timedOut, &timer->Node );
-	free( timer );
+        if( timer->Callback != NULL )
+            timer->Callback( timer->ID );
+        fgListRemove( &timedOut, &timer->Node );
+        free( timer );
     }
 }
 
@@ -262,12 +268,12 @@ long fgElapsedTime( void )
 #if TARGET_HOST_UNIX_X11
     struct timeval now;
     long elapsed;
-
+    
     gettimeofday( &now, NULL );
     
     elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
     elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
-
+    
     return( elapsed );
 #elif TARGET_HOST_WIN32
     return (timeGetTime() - fgState.Time.Value);
@@ -436,14 +442,17 @@ void FGAPIENTRY glutMainLoopEvent( void )
   window = fgWindowByHandle( event.a.window ); \
   if( window == NULL )                         \
     break;
+
 # define GETMOUSE(a)                           \
   window->State.MouseX = event.a.x;            \
   window->State.MouseY = event.a.y;
 
   freeglut_assert_ready;
+
   while( XPending( fgDisplay.Display ) )
   {
     XNextEvent( fgDisplay.Display, &event );
+
     switch( event.type )
     {
     case DestroyNotify:
@@ -637,10 +646,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         if( window->ActiveMenu != NULL )
         {
-        		if ( window == window->ActiveMenu->ParentWindow )
-        		{
-        			window->ActiveMenu->Window->State.MouseX = event.xmotion.x_root - window->ActiveMenu->X ;
-        			window->ActiveMenu->Window->State.MouseY = event.xmotion.y_root - window->ActiveMenu->Y ;
+	    if ( window == window->ActiveMenu->ParentWindow )
+            {
+		window->ActiveMenu->Window->State.MouseX = event.xmotion.x_root - window->ActiveMenu->X ;
+		window->ActiveMenu->Window->State.MouseY = event.xmotion.y_root - window->ActiveMenu->Y ;
             }
 
             /*
@@ -653,7 +662,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
              */
             fgSetWindow ( window->ActiveMenu->ParentWindow ) ;
 
-            break;  /* I think this should stay in -- an active menu should absorb the mouse motion */
+            break;
         }
 
         /*
@@ -715,15 +724,15 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         GETWINDOW( xbutton ); GETMOUSE( xbutton );
 
-	/*
-	 * An X button (at least in XFree86) is numbered from 1.
-	 * A GLUT button is numbered from 0.
-	 * Old GLUT passed through buttons other than just the first
-	 * three, though it only gave symbolic names and official
-	 * support to the first three.
-	 *
-	 */
-	button = event.xbutton.button - 1;
+        /*
+      	 * An X button (at least in XFree86) is numbered from 1.
+      	 * A GLUT button is numbered from 0.
+      	 * Old GLUT passed through buttons other than just the first
+      	 * three, though it only gave symbolic names and official
+      	 * support to the first three.
+      	 *
+      	 */
+      	button = event.xbutton.button - 1;
 
         /*
          * Do not execute the application's mouse callback if a menu is hooked to this button.
@@ -738,47 +747,46 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         if ( window->ActiveMenu != NULL )  /* Window has an active menu, it absorbs any mouse click */
         {
-      		if ( window == window->ActiveMenu->ParentWindow )
-      		{
-      			window->ActiveMenu->Window->State.MouseX = event.xbutton.x_root - window->ActiveMenu->X ;
-      			window->ActiveMenu->Window->State.MouseY = event.xbutton.y_root - window->ActiveMenu->Y ;
-      		}
+	    if ( window == window->ActiveMenu->ParentWindow )
+            {
+		window->ActiveMenu->Window->State.MouseX = event.xbutton.x_root - window->ActiveMenu->X ;
+		window->ActiveMenu->Window->State.MouseY = event.xbutton.y_root - window->ActiveMenu->Y ;
+	    }
+	    
+	    if ( fgCheckActiveMenu ( window->ActiveMenu->Window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
+            {
+		/* Save the current window and menu and set the current window to the window whose menu this is */
+		SFG_Window *save_window = fgStructure.Window ;
+		SFG_Menu *save_menu = fgStructure.Menu ;
+		SFG_Window *parent_window = window->ActiveMenu->ParentWindow ;
+		fgSetWindow ( parent_window ) ;
+		fgStructure.Menu = window->ActiveMenu ;
 
-          if ( fgCheckActiveMenu ( window->ActiveMenu->Window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
-          {
-            /* Save the current window and menu and set the current window to the window whose menu this is */
-            SFG_Window *save_window = fgStructure.Window ;
-            SFG_Menu *save_menu = fgStructure.Menu ;
-            SFG_Window *parent_window = window->ActiveMenu->ParentWindow ;
-            fgSetWindow ( parent_window ) ;
-            fgStructure.Menu = window->ActiveMenu ;
+		/* Execute the menu callback */
+		fgExecuteMenuCallback ( window->ActiveMenu ) ;
+		fgDeactivateMenu ( parent_window ) ;
 
-            /* Execute the menu callback */
-            fgExecuteMenuCallback ( window->ActiveMenu ) ;
-            fgDeactivateMenu ( parent_window ) ;
+		/* Restore the current window and menu */
+		fgSetWindow ( save_window ) ;
+		fgStructure.Menu = save_menu ;
+	    }
+	    else  /* Outside the menu, deactivate the menu if it's a downclick */
+		if ( pressed == TRUE )
+		    fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
 
-            /* Restore the current window and menu */
-            fgSetWindow ( save_window ) ;
-            fgStructure.Menu = save_menu ;
-          }
-          else  /* Outside the menu, deactivate the menu if it's a downclick */
-          {
-            if ( pressed == TRUE ) fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
-          }
-
-          /*
-           * Let's make the window redraw as a result of the mouse click and menu activity.
-           */
-          window->State.Redisplay = TRUE ;
-
-          break ;
+	    /*
+	     * Let's make the window redraw as a result of the mouse click and menu activity.
+	     */
+	    window->State.Redisplay = TRUE ;
+	    
+	    break ;
         }
 
         /*
          * No active menu, let's check whether we need to activate one.
          */
         if (( 0 <= button ) && ( 2 >= button ) &&
-	    ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
+      	    ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
         {
           /*
            * Let's make the window redraw as a result of the mouse click.
@@ -799,9 +807,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
         }
 
         /*
-         * Check if there is a mouse callback hooked to the window
+         * Check if there is a mouse or mouse wheel callback hooked to the window
          */
-        if( window->Callbacks.Mouse == NULL )
+        if ( ( window->Callbacks.Mouse == NULL ) && ( window->Callbacks.MouseWheel == NULL ) )
           break;
 
         /*
@@ -822,14 +830,41 @@ void FGAPIENTRY glutMainLoopEvent( void )
         fgStructure.Window->State.Modifiers = modifiers;
 
         /*
-         * Finally execute the mouse callback
+         * Finally execute the mouse or mouse wheel callback
          */
-        fgStructure.Window->Callbacks.Mouse(
-            button,
-            event.type == ButtonPress ? GLUT_DOWN : GLUT_UP,
-            event.xbutton.x,
-            event.xbutton.y
-        );
+        if ( button < 4 )
+        {
+          fgStructure.Window->Callbacks.Mouse(
+              button,
+              event.type == ButtonPress ? GLUT_DOWN : GLUT_UP,
+              event.xbutton.x,
+              event.xbutton.y
+          );
+        }
+        else
+        {
+          if ( window->Callbacks.MouseWheel != NULL )
+          {
+            int wheel_number = button / 2 - 2 ;  /* Map 4 and 5 to wheel zero */
+            int direction = 9 - button * 2 ;     /* Map 4 to +1 and 5 to -1 */
+
+            fgStructure.Window->Callbacks.MouseWheel(
+                wheel_number,
+                direction,
+                event.xbutton.x,
+                event.xbutton.y
+            );
+          }
+          else
+          {
+            fgStructure.Window->Callbacks.Mouse(
+                button,
+                event.type == ButtonPress ? GLUT_DOWN : GLUT_UP,
+                event.xbutton.x,
+                event.xbutton.y
+		);
+          }
+        }
 
         /*
          * Trash the modifiers state
@@ -847,7 +882,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * A key has been pressed, find the window that had the focus:
          */
-        GETWINDOW( xkey ); GETMOUSE( xkey );
+        GETWINDOW( xkey );
+	GETMOUSE( xkey );
 
         if( event.type == KeyPress )
         {
@@ -964,9 +1000,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
              */
             if( (special_cb != NULL) && (special != -1) )
             {
-              /*
-               * Set the current window
-               */
               fgSetWindow( window );
 
               /*
@@ -999,30 +1032,21 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
   MSG stMsg;
 
-  /*
-   * The windows processing is considerably smaller
-   */
-  while( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
+  while ( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
   {
-    /*
-     * Grab the message now, checking for WM_QUIT
-     */
     if( GetMessage( &stMsg, NULL, 0, 0 ) == 0 )
       fgState.ExecState = GLUT_EXEC_STATE_STOP ;
 
-    /*
-     * Translate virtual-key messages and send them to the window...
-     */
     TranslateMessage( &stMsg );
     DispatchMessage( &stMsg );
   }
-
 #endif
 
-    fghCheckTimers ();
-    fghCheckJoystickPolls ();
-    fghDisplayAll ();
-    fgCloseWindows () ;
+  fghCheckTimers();
+  fghCheckJoystickPolls();
+  fghDisplayAll();
+
+  fgCloseWindows () ;
 }
 
 /*
@@ -1051,6 +1075,7 @@ void FGAPIENTRY glutMainLoop( void )
     if ( window->Callbacks.Visibility != NULL )
     {
       SFG_Window *current_window = fgStructure.Window ;
+
       fgSetWindow( window );
       window->Callbacks.Visibility ( window->State.Visible ) ;
       fgSetWindow( current_window );
@@ -1061,16 +1086,17 @@ void FGAPIENTRY glutMainLoop( void )
 #endif
 
   fgState.ExecState = GLUT_EXEC_STATE_RUNNING ;
-
   while ( fgState.ExecState == GLUT_EXEC_STATE_RUNNING )
   {
     glutMainLoopEvent () ;
+
     if ( fgStructure.Windows.First == NULL )
       fgState.ExecState = GLUT_EXEC_STATE_STOP ;
     else
     {
       if ( fgState.IdleCallback )
         fgState.IdleCallback ();
+
       fgSleepForEvents();
     }
   }
@@ -1111,9 +1137,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       return( DefWindowProc( hWnd, uMsg, wParam, lParam ) );
 
 /*    printf ( "Window %3d message <%04x> %12d %12d\n", window?window->ID:0, uMsg, wParam, lParam ) ; */
-    /*
-     * Check what type of message are we receiving
-     */
     switch( uMsg )
     {
     case WM_CREATE:
@@ -1123,32 +1146,15 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         window = (SFG_Window *) (((LPCREATESTRUCT) lParam)->lpCreateParams);
         assert( window != NULL );
 
-        /*
-         * We can safely store the window's handle now:
-         */
         window->Window.Handle = hWnd;
-
-        /*
-         * Get the window's device context
-         */
         window->Window.Device = GetDC( hWnd );
-
-        /*
-         * Create or get the OpenGL rendering context now
-         */
         if ( fgState.BuildingAMenu )
         {
-          /*
-           * Setup the pixel format of our window
-           */
           unsigned int current_DisplayMode = fgState.DisplayMode ;
           fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH ;
           fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
           fgState.DisplayMode = current_DisplayMode ;
 
-          /*
-           * If there isn't already an OpenGL rendering context for menu windows, make one
-           */
           if ( !fgStructure.MenuContext )
           {
             fgStructure.MenuContext = (SFG_MenuContext *)malloc ( sizeof(SFG_MenuContext) ) ;
@@ -1162,9 +1168,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         }
         else
         {
-          /*
-           * Setup the pixel format of our window
-           */
           fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
 
           if ( fgState.UseCurrentContext == TRUE )
@@ -1177,14 +1180,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             window->Window.Context = wglCreateContext( window->Window.Device );
         }
 
-        /*
-         * Still, we'll be needing to explicitly resize the window
-         */
         window->State.NeedToResize = TRUE;
-
-        /*
-         * Finally, have the window's device context released
-         */
         ReleaseDC( window->Window.Handle, window->Window.Device );
         break;
 
@@ -1254,28 +1250,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	break;
 
     case WM_SHOWWINDOW:
-        /*
-         * We are now Visible!
-         */
         window->State.Visible = TRUE;
         window->State.Redisplay = TRUE;
         break;
 
     case WM_PAINT:
-        /*
-         * Start the painting job
-         */
-
         BeginPaint( hWnd, &ps );
-
-        /*
-         * Call the engine's main frame drawing method
-         */
         fghRedrawWindowByHandle( hWnd );
-
-        /*
-         * End the painting job, release the device context
-         */
         EndPaint( hWnd, &ps );
         break;
 
@@ -1289,7 +1270,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
           SFG_Window *iter ;
 
             wglMakeCurrent( NULL, NULL );
-            /* Step through the list of windows.  If the rendering context is notbeing used
+            /* Step through the list of windows.  If the rendering context is not being used
              * by another window, then we delete it.
              */
             for ( iter = (SFG_Window *)fgStructure.Windows.First; iter; iter = (SFG_Window *)iter->Node.Next )
@@ -1305,10 +1286,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
          * Put on a linked list of windows to be removed after all the callbacks have returned
          */
         fgAddToWindowDestroyList ( window, FALSE ) ;
-
-        /*
-         * Proceed with the window destruction
-         */
         DestroyWindow( hWnd );
         break;
 
@@ -1320,20 +1297,11 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
     case WM_MOUSEMOVE:
     {
-        /*
-         * The mouse cursor has moved. Remember the new mouse cursor's position
-         */
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
 
-        /*
-         * Fallback if there's an active menu hooked to this window
-         */
         if ( window->ActiveMenu != NULL )
         {
-            /*
-             * Let's make the window redraw as a result of the mouse motion.
-             */
             window->State.Redisplay = TRUE ;
 
             /*
@@ -1344,57 +1312,28 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             break;
         }
 
-        /*
-         * Remember the current modifiers state.
-         */
         window->State.Modifiers = 
             ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
             ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
-        /*
-         * Check if any of the mouse buttons is pressed...
-         */
         if( (wParam & MK_LBUTTON) || (wParam & MK_MBUTTON) || (wParam & MK_RBUTTON) )
         {
-            /*
-             * Yeah, indeed. We need to use the motion callback then:
-             */
             if( window->Callbacks.Motion != NULL )
             {
-                /*
-                 * Make sure the current window is set...
-                 */
                 fgSetWindow( window );
-
-                /*
-                 * Execute the active mouse motion callback now
-                 */
                 window->Callbacks.Motion( window->State.MouseX, window->State.MouseY );
             }
         }
         else
         {
-            /*
-             * All mouse buttons are up, execute the passive mouse motion callback
-             */
             if( window->Callbacks.Passive != NULL )
             {
-                /*
-                 * Make sure the current window is set
-                 */
                 fgSetWindow( window );
-
-                /*
-                 * Execute the passive mouse motion callback
-                 */
                 window->Callbacks.Passive( window->State.MouseX, window->State.MouseY );
             }
         }
 
-        /*
-         * Thrash the current modifiers state now
-         */
         window->State.Modifiers = 0xffffffff;
     }
     break;
@@ -1409,15 +1348,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         GLboolean pressed = TRUE;
         int button;
 
-        /*
-         * The mouse cursor has moved. Remember the new mouse cursor's position
-         */
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
 
-        /*
-         * We're curious about the GLUT API button name...
-         */
         switch( uMsg )
         {
         case WM_LBUTTONDOWN: pressed = TRUE;  button = GLUT_LEFT_BUTTON;   break;
@@ -1429,16 +1362,10 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         default:             pressed = FALSE; button = -1;                 break;
         }
 
-        /*
-         * The left and right mouse buttons might have been swapped...
-         */
         if( GetSystemMetrics( SM_SWAPBUTTON ) )
             if( button == GLUT_LEFT_BUTTON ) button = GLUT_RIGHT_BUTTON;
             else if( button == GLUT_RIGHT_BUTTON ) button = GLUT_LEFT_BUTTON;
 
-        /*
-         * Hey, what's up with you?
-         */
         if( button == -1 )
             return( DefWindowProc( hWnd, uMsg, lParam, wParam ) );
 
@@ -1485,51 +1412,25 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
           break ;
         }
 
-        /*
-         * No active menu, let's check whether we need to activate one.
-         */
         if ( ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
         {
-            /*
-             * Let's make the window redraw as a result of the mouse click.
-             */
             window->State.Redisplay = TRUE ;
-
-            /*
-             * Set the current window
-             */
             fgSetWindow( window );
-
-            /*
-             * Activate the appropriate menu structure...
-             */
             fgActivateMenu( window, button );
 
             break;
         }
 
-        /*
-         * Check if there is a mouse callback hooked to the window
-         */
         if( window->Callbacks.Mouse == NULL )
             break;
 
-        /*
-         * Set the current window
-         */
         fgSetWindow ( window );
 
-        /*
-         * Remember the current modifiers state.
-         */
         fgStructure.Window->State.Modifiers = 
             ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
             ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
-        /*
-         * Finally execute the mouse callback
-         */
         window->Callbacks.Mouse(
             button,
             pressed == TRUE ? GLUT_DOWN : GLUT_UP,
@@ -1537,12 +1438,46 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             window->State.MouseY
         );
 
-        /*
-         * Trash the modifiers state
-         */
         fgStructure.Window->State.Modifiers = 0xffffffff;
     }
     break;
+
+    case 0x020a :  /* Should be WM_MOUSEWHEEL but my compiler doesn't recognize it */
+      {
+        int wheel_number = LOWORD ( lParam ) ;  /* THIS IS SPECULATIVE -- John Fay, 10/2/03 */
+        int direction = HIWORD ( lParam ) / 120 ;  /* Should be WHEEL_DELTA instead of 120 */
+
+        /*
+         * The mouse cursor has moved. Remember the new mouse cursor's position
+         */
+//        window->State.MouseX = LOWORD( lParam );  // Need to adjust by window position,
+//        window->State.MouseY = HIWORD( lParam );  // change "lParam" to other parameter
+
+        if ( ( window->Callbacks.MouseWheel == NULL ) && ( window->Callbacks.Mouse == NULL ) )
+            break;
+
+        fgSetWindow ( window );
+        fgStructure.Window->State.Modifiers = 
+            ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
+            ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
+            ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+
+        if ( window->Callbacks.MouseWheel )
+          window->Callbacks.MouseWheel(
+              wheel_number,
+              direction,
+              window->State.MouseX,
+              window->State.MouseY
+          ) ;
+        else  // No mouse wheel, call the mouse button callback twice
+        {
+          window->Callbacks.Mouse ( ( direction > 0 ) ? 4 : 5, GLUT_DOWN, window->State.MouseX, window->State.MouseY ) ;
+          window->Callbacks.Mouse ( ( direction > 0 ) ? 4 : 5, GLUT_UP,   window->State.MouseX, window->State.MouseY ) ;
+        }
+
+        fgStructure.Window->State.Modifiers = 0xffffffff;
+      }
+      break ;
 
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
@@ -1550,9 +1485,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         int keypress = -1;
         POINT mouse_pos ;
 
-        /*
-         * Ignore the automatic key repetition if needed:
-         */
         if( fgState.IgnoreKeyRepeat && (lParam & KF_REPEAT) )
             break;
 
@@ -1565,9 +1497,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
-        /*
-         * Set the mouse position
-         */
         GetCursorPos ( &mouse_pos ) ;
         ScreenToClient ( window->Window.Handle, &mouse_pos ) ;
 
@@ -1581,9 +1510,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
         switch( wParam )
         {
-            /*
-             * Most of the special characters can be handled automagically...
-             */
             KEY( VK_F1,     GLUT_KEY_F1        ); KEY( VK_F2,     GLUT_KEY_F2        );
             KEY( VK_F3,     GLUT_KEY_F3        ); KEY( VK_F4,     GLUT_KEY_F4        );
             KEY( VK_F5,     GLUT_KEY_F5        ); KEY( VK_F6,     GLUT_KEY_F6        );
@@ -1596,10 +1522,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             KEY( VK_RIGHT,  GLUT_KEY_RIGHT     ); KEY( VK_DOWN,   GLUT_KEY_DOWN      );
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
 
-            /*
-             * ...yet there is a small exception we need to have handled...
-             */
-            case VK_DELETE:
+        case VK_DELETE:
                 /*
                  * The delete key should be treated as an ASCII keypress:
                  */
@@ -1610,25 +1533,12 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 }
         }
 
-        /*
-         * Execute the special callback, if present, given the conversion was a success:
-         */
         if( (keypress != -1) && (window->Callbacks.Special != NULL) )
         {
-            /*
-             * Set the current window
-             */
             fgSetWindow( window );
-
-            /*
-             * Have the special callback executed:
-             */
             window->Callbacks.Special( keypress, window->State.MouseX, window->State.MouseY );
         }
 
-        /*
-         * Thrash the modifiers register now
-         */
         window->State.Modifiers = 0xffffffff;
     }
     break;
@@ -1648,9 +1558,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
-        /*
-         * Set the mouse position
-         */
         GetCursorPos ( &mouse_pos ) ;
         ScreenToClient ( window->Window.Handle, &mouse_pos ) ;
 
@@ -1663,9 +1570,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
         switch( wParam )
         {
-          /*
-           * Most of the special characters can be handled automagically...
-           */
           KEY( VK_F1,     GLUT_KEY_F1        ); KEY( VK_F2,     GLUT_KEY_F2        );
           KEY( VK_F3,     GLUT_KEY_F3        ); KEY( VK_F4,     GLUT_KEY_F4        );
           KEY( VK_F5,     GLUT_KEY_F5        ); KEY( VK_F6,     GLUT_KEY_F6        );
@@ -1678,9 +1582,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
           KEY( VK_RIGHT,  GLUT_KEY_RIGHT     ); KEY( VK_DOWN,   GLUT_KEY_DOWN      );
           KEY( VK_INSERT, GLUT_KEY_INSERT    );
 
-          /*
-           * ...yet there is a small exception we need to have handled...
-           */
           case VK_DELETE:
             /*
              * The delete key should be treated as an ASCII keypress:
@@ -1694,9 +1595,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             break ;
           default:
             {
-              /*
-               * Call the KeyboardUp callback for a regular character if there is one.
-               */
               BYTE state[ 256 ];
               WORD code[ 2 ];
 
@@ -1707,35 +1605,18 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
               if( window->Callbacks.KeyboardUp != NULL )
               {
-                /*
-                 * Set the current window
-                 */
                 fgSetWindow( window );
-
                 window->Callbacks.KeyboardUp( (char)wParam, window->State.MouseX, window->State.MouseY );
               }
             }
         }
 
-        /*
-         * Execute the special callback, if present, given the conversion was a success:
-         */
         if( (keypress != -1) && (window->Callbacks.SpecialUp != NULL) )
         {
-            /*
-             * Set the current window
-             */
             fgSetWindow( window );
-
-            /*
-             * Have the special callback executed:
-             */
             window->Callbacks.SpecialUp( keypress, window->State.MouseX, window->State.MouseY );
         }
 
-        /*
-         * Thrash the modifiers register now
-         */
         window->State.Modifiers = 0xffffffff;
     }
     break;
@@ -1743,38 +1624,18 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_SYSCHAR:
     case WM_CHAR:
     {
-        /*
-         * Ignore the automatic key repetition if needed:
-         */
         if( fgState.IgnoreKeyRepeat && (lParam & KF_REPEAT) )
             break;
 
-        /*
-         * Clear to go with the keyboard callback, if registered:
-         */
         if( window->Callbacks.Keyboard != NULL )
         {
-            /*
-             * Set the current window
-             */
             fgSetWindow( window );
-
-            /*
-             * Remember the current modifiers state
-             */
             window->State.Modifiers = 
                 ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
                 ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
                 ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
-            /*
-             * Have the special callback executed:
-             */
             window->Callbacks.Keyboard( (char)wParam, window->State.MouseX, window->State.MouseY );
-
-            /*
-             * Thrash the modifiers register now
-             */
             window->State.Modifiers = 0xffffffff;
         }
     }
@@ -1783,9 +1644,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_CAPTURECHANGED :  /* User has finished resizing the window, force a redraw */
       if ( window->Callbacks.Display )
       {
-        /*
-         * Set the current window
-         */
         fgSetWindow( window );
 
         window->Callbacks.Display () ;
