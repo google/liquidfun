@@ -86,8 +86,8 @@ FGAPI void    FGAPIENTRY glutSetMenuData(void* data);
  */
 FGAPI int     FGAPIENTRY glutBitmapHeight( void* font );
 FGAPI GLfloat FGAPIENTRY glutStrokeHeight( void* font );
-FGAPI void    FGAPIENTRY glutBitmapString( void* font, const char *string );
-FGAPI void    FGAPIENTRY glutStrokeString( void* font, const char *string );
+FGAPI void    FGAPIENTRY glutBitmapString( void* font, const unsigned char *string );
+FGAPI void    FGAPIENTRY glutStrokeString( void* font, const unsigned char *string );
 
 /*
  * Geometry functions, see freeglut_geometry.c
