@@ -179,7 +179,11 @@ struct tagSFG_XYUse
 typedef struct tagSFG_Time SFG_Time;
 struct tagSFG_Time
 {
+#ifdef WIN32
+    DWORD Value;
+#else
     struct timeval  Value;
+#endif
     GLboolean       Set;
 };
 
@@ -512,7 +516,7 @@ XVisualInfo* fgChooseVisual( void );
  */
 #if TARGET_HOST_WIN32
 LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-gboolean fgSetupPixelFormat( SFG_Window* window, gboolean checkOnly );
+GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly );
 #endif
 
 /*
