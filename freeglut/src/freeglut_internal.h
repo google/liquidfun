@@ -89,10 +89,8 @@
     #include <X11/Xatom.h>
     #include <X11/keysym.h>
 
-    #ifndef __sgi
-      #ifndef SOLARIS
+    #if HAVE_X11_EXTENSIONS_XF86VMODE_H
         #include <X11/extensions/xf86vmode.h>
-      #endif
     #endif
 #endif
 
