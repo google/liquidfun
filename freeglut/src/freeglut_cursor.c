@@ -103,7 +103,8 @@ void FGAPIENTRY glutSetCursor( int cursorID )
             MAP_CURSOR( GLUT_CURSOR_RIGHT_SIDE,  XC_right_side);
             MAP_CURSOR( GLUT_CURSOR_TOP_LEFT_CORNER,     XC_top_left_corner);
             MAP_CURSOR( GLUT_CURSOR_TOP_RIGHT_CORNER,    XC_top_right_corner);
-            MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, XC_bottom_right_corner);
+            MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER,
+                        XC_bottom_right_corner);
             MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER, XC_bottom_left_corner);
             /* MAP_CURSOR( GLUT_CURSOR_NONE,        XC_bogosity); */
         case GLUT_CURSOR_NONE:
