@@ -75,7 +75,6 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 {
     /* Have the window object created */
     SFG_Window *window = (SFG_Window *)calloc( sizeof(SFG_Window), 1 );
-    int fakeArgc = 0;
 
     fghClearCallBacks( window );
 
@@ -120,7 +119,6 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
 
     /* Have the menu object created */
     SFG_Menu* menu = (SFG_Menu *)calloc( sizeof(SFG_Menu), 1 );
-    int fakeArgc = 0;
 
     menu->ParentWindow = fgStructure.Window;
 

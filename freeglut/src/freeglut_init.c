@@ -228,13 +228,13 @@ void fgDeinitialize( void )
 
     fgDestroyStructure( );
 
-    while( timer = fgState.Timers.First )
+    while( ( timer = fgState.Timers.First) )
     {
         fgListRemove( &fgState.Timers, &timer->Node );
         free( timer );
     }
 
-    while( timer = fgState.FreeTimers.First )
+    while( ( timer = fgState.FreeTimers.First) )
     {
         fgListRemove( &fgState.FreeTimers, &timer->Node );
         free( timer );
@@ -620,9 +620,13 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 
     if (geometry )
     {
+        unsigned int parsedWidth, parsedHeight;
         int mask = XParseGeometry( geometry,
                                    &fgState.Position.X, &fgState.Position.Y,
-                                   &fgState.Size.X, &fgState.Size.Y );
+                                   &parsedWidth, &parsedHeight );
+        /* TODO: Check for overflow? */
+        fgState.Size.X = parsedWidth;
+        fgState.Size.Y = parsedHeight;
 
         if( (mask & (WidthValue|HeightValue)) == (WidthValue|HeightValue) )
             fgState.Size.Use = GL_TRUE;

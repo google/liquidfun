@@ -156,7 +156,7 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
      * A newline will simply translate the next character's insertion
      * point back to the start of the line and down one line.
      */
-    while( c = *string++ )
+    while( ( c = *string++) )
         if( string[c] == '\n' )
         {
             glBitmap ( 0, 0, 0, 0, -x, (float) -font->Height, NULL );
@@ -206,7 +206,7 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
     if ( !string || ! *string )
         return 0;
 
-    while( c = *string++ )
+    while( ( c = *string++) )
     {
         if( c != '\n' )/* Not an EOL, increment length of line */
             this_line_length += *( font->Characters[ c ]);
@@ -281,7 +281,7 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
      * A newline will simply translate the next character's insertion
      * point back to the start of the line and down one line.
      */
-    while( c = *string++ )
+    while( ( c = *string++) )
         if( c < font->Quantity )
         {
             if( c == '\n' )
@@ -348,7 +348,7 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
     if ( !string || ! *string )
         return 0;
 
-    while( c = *string++ )
+    while( ( c = *string++) )
         if( c < font->Quantity )
         {
             if( c == '\n' ) /* EOL; reset the length of this line */
