@@ -60,7 +60,6 @@
 #    define _JS_MAX_AXES  8
 #    include <windows.h>
 #    include <mmsystem.h>
-#    include <string.h>
 #    include <regstr.h>
 
 #endif
