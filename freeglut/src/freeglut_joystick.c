@@ -73,8 +73,8 @@
 #if TARGET_HOST_UNIX_X11
 #    define _JS_MAX_AXES 16
 #    if defined(__FreeBSD__) || defined(__NetBSD__)
-/* XXX The next line is an unjustified hack which needs to be changed by someone who
- * XXX is familiar with *nix, BSD, and USB joysticks.
+/*
+ * XXX The below hack is done until freeglut's autoconf is updated.
  */
 #        define HAVE_USB_JS    1
 
@@ -84,6 +84,13 @@
 #        if __FreeBSD_version >= 500000
 #            include <sys/joystick.h>
 #        else
+/*
+ * XXX NetBSD/amd64 systems may find that they have to steal the
+ * XXX /usr/include/machine/joystick.h from a NetBSD/i386 system.
+ * XXX I cannot comment whether that works for the interface, but
+ * XXX it lets you compile...(^&  I do not think that we can do away
+ * XXX with this header.
+ */
 #            include <machine/joystick.h>
 #        endif
 #        define JS_DATA_TYPE joystick
@@ -137,7 +144,7 @@
 #    ifdef HAVE_USB_JS
 #        if defined(__NetBSD__)
 /*
- * XXX Apparently another ugly hack which someone who knows BSD and USBHID needs to solve
+ * XXX The below hack is done until freeglut's autoconf is updated.
  */
 #            define HAVE_USBHID_H 1
 #            ifdef HAVE_USBHID_H
