@@ -385,17 +385,9 @@ struct tagSFG_WindowState
  * but this can cause warnings because the FETCH_WCB() macro type-
  * casts its result, and a type-cast value shouldn't be an lvalue.
  *
- * XXX Note that there is no type-checking to make sure that {func} is
- * XXX a suitable type.  We could add a safety-check of the form:
- * XXX
- * XXX     if( FETCH_WCB( ... ) != func )
- * XXX         ...
- * XXX
- * XXX ...is this desired?
- *
- * XXX The {if( FETCH_WCB( ... ) != func )} test is to do type-checking
- * XXX and for no other reason.  Since it's hidden in the macro, the
- * XXX ugliness is felt to be rather benign.
+ * The {if( FETCH_WCB( ... ) != func )} test is to do type-checking
+ * and for no other reason.  Since it's hidden in the macro, the
+ * ugliness is felt to be rather benign.
  */
 #define SET_WCB(window,cbname,func)                   \
 do                                                    \
