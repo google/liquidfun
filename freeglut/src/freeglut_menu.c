@@ -79,14 +79,13 @@
 
 
 /*
- * These variables should be moved into the freeglut global state, but for now,
- * we'll put them here.  They are for rendering the freeglut menu items.
+ * These variables are for rendering the freeglut menu items.
+ *
  * The choices are fore- and background, with and without h for Highlighting.
  * Old GLUT appeared to be system-dependant for its colors (sigh) so we are
  * too.  These variables should be stuffed into global state and initialized
  * via the glutInit*() system.
  */
-
 #if TARGET_HOST_WIN32
 static float menu_pen_fore  [4] = {0.0f,  0.0f,  0.0f,  1.0f};
 static float menu_pen_back  [4] = {0.85f, 0.85f, 0.85f, 1.0f};
