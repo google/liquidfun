@@ -144,7 +144,8 @@ Functions</a>
 <br>13.3&nbsp; glutDeviceGet
 <br>13.4&nbsp; glutGetModifiers
 <br>13.5&nbsp; glutLayerGet
-<br>13.6&nbsp; glutExtensionSupported</blockquote>
+<br>13.6&nbsp; glutExtensionSupported
+<br>13.7&nbsp; glutGetProcAddress</blockquote>
 
 <p><br>14.0&nbsp; <a href="#FontRendering">Font Rendering Functions</a>
 <blockquote>14.1&nbsp; glutBitmapCharacter
@@ -269,7 +270,15 @@ in pixels for bitmapped fonts and in OpenGL units for the stroke fonts.
 3.4.4&nbsp; Geometry Rendering</h3>
 Two functions have been added to render a wireframe and a solid rhombic
 dodecahedron.
+<h3>
+3.4.5&nbsp; Extension Function Queries</h3>
+glutGetProcAddress is a wrapper for the glXGetProcAddressARB and
+wglGetProcAddress functions.
 <h1>
+
+
+
+
 4.0&nbsp;<a NAME="Initialization"></a> Initialization Functions</h1>
 
 <h2>
@@ -810,6 +819,33 @@ have them fixed.
 <h2>
 13.6&nbsp; glutExtensionSupported</h2>
 
+<h2>
+13.7&nbsp; glutGetProcAddress</h2>
+<p>
+<tt>glutGetProcAddress</tt> returns a pointer to a named GL or FreeGLUT function.
+</p>
+<p><b>Usage</b>
+<p><tt>void *glutGetProcAddress ( const char *procName ) ;</tt>
+<p><tt>procName&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </tt>Name of
+an OpenGL or GLUT function.
+</p>
+<p><b>Description</b>
+<p><tt>glutGetProcAddress</tt> is useful for dealing with OpenGL extensions.
+If an application calls OpenGL extension functions directly, that application
+will only link/run with an OpenGL library that supports the extension.
+By using a function pointer returned from glutGetProcAddress(), the
+application will avoid this hard dependency and be more portable and
+interoperate better with various implementations of OpenGL.
+</p>
+<p>
+Both OpenGL functions and FreeGLUT functions can be queried with this function.
+</p>
+<p>
+<b>NOTE</b>: this function is not supported in GLUT.
+</p>
+
+
+
 <h1>
 14.0&nbsp;<a NAME="FontRendering"></a> Font Rendering Functions</h1>
 <i>Freeglut</i> supports two types of font rendering:&nbsp; bitmap fonts,
@@ -1306,6 +1342,19 @@ is the famous OpenGL teapot [add reference].
 
 <h1>
 20.0&nbsp;<a NAME="UsageNotes"></a> Usage Notes</h1>
+
+<p>
+The following environment variables are recognized by FreeGLUT:
+</p>
+<ul>
+<li>GLUT_FPS - specifies a time interval (in milliseconds) for
+reporting framerate messages to stderr.  For example, if FREEGLUT_FPS
+is set to 5000, every 5 seconds a message will be printed to stderr
+showing the current frame rate.  The frame rate is measured by
+counting the number of times glutSwapBuffers() is called over the time
+interval.
+</ul>
+
 
 <h1>
 21.0&nbsp;<a NAME="ImplementationNotes"></a> Implementation Notes</h1>
