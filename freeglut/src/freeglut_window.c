@@ -524,32 +524,21 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     if( !( window->Window.Handle ) )
         fgError( "Failed to create a window (%s)!", title );
 
-    /*
-     * Show and update the main window. Hide(???) the mouse cursor.
-     */
     ShowWindow( window->Window.Handle,
                 fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOW );
     UpdateWindow( window->Window.Handle );
-    ShowCursor( TRUE );
+    ShowCursor( TRUE );  /* XXX Old comments say "hide cusror"! */
 
 #endif
 
     window->Window.DoubleBuffered =
         ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0 ;
 
-    /*
-     * If it's not double-buffered, make sure the rendering is done to the
-     * front buffer.
-     */
     if ( ! window->Window.DoubleBuffered )
     {
         glDrawBuffer ( GL_FRONT ) ;
         glReadBuffer ( GL_FRONT ) ;
     }
-
-    /*
-     * Set the newly created window as the current one
-     */
     fgSetWindow( window );
 }
 
