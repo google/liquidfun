@@ -656,15 +656,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 (event.xmotion.state & Button3Mask) ||
                 (event.xmotion.state & Button4Mask) ||
                 (event.xmotion.state & Button5Mask) )
-            {
                 INVOKE_WCB( *window, Motion, ( event.xmotion.x,
                                                event.xmotion.y ) );
-            }
             else
-            {
                 INVOKE_WCB( *window, Passive, ( event.xmotion.x,
                                                 event.xmotion.y ) );
-            }
         }
         break;
 
@@ -795,13 +791,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * XXX Use a symbolic constant, *not* "4"!
              */
             if( ( button < 3 ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
-            {
                 INVOKE_WCB( *window, Mouse, ( button,
                                               pressed ? GLUT_DOWN : GLUT_UP,
                                               event.xbutton.x,
                                               event.xbutton.y )
                 );
-            }
             else
             {
                 /*
@@ -1272,15 +1266,11 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( ( wParam & MK_LBUTTON ) ||
             ( wParam & MK_MBUTTON ) ||
             ( wParam & MK_RBUTTON ) )
-        {
             INVOKE_WCB( *window, Motion, ( window->State.MouseX,
                                            window->State.MouseY ) );
-        }
         else
-        {
             INVOKE_WCB( *window, Passive, ( window->State.MouseX,
                                             window->State.MouseY ) );
-        }
 
         window->State.Modifiers = 0xffffffff;
     }
@@ -1443,7 +1433,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         while( ticks-- )
             if( FETCH_WCB( *window, MouseWheel ) )
-            {
                 INVOKE_WCB( *window, MouseWheel,
                             ( wheel_number,
                               direction,
@@ -1451,7 +1440,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                               window->State.MouseY
                             )
                 );
-            }
             else  /* No mouse wheel, call the mouse button callback twice */
             {
                 /*
