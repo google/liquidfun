@@ -452,6 +452,16 @@ static void fgSleepForEvents( void )
         msec = MIN( msec, 10 ); /* XXX Dumb; forces granularity to .01sec */
 
 #if TARGET_HOST_UNIX_X11
+    /*
+     * Possibly due to aggressive use of XFlush() and friends,
+     * it is possible to have our socket drained but still have
+     * unprocessed events.  (Or, this may just be normal with
+     * X, anyway?)  We do non-trivial processing of X events
+     * after tham in event-reading loop, in any case, so we
+     * need to allow that we may have an empty socket but non-
+     * empty event queue.
+     */
+    if( ! XPending( fgDisplay.Display ) )
     {
         fd_set fdset;
         int err;
