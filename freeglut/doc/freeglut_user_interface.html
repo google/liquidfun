@@ -19,7 +19,7 @@
 <h1> OpenGL Utility Toolkit</h1>
  </center>
 <center>  
-<h1> (freeglut)</h1>
+<h1> (<i>freeglut</i> 2.0.0)</h1>
  </center>
 <center>  
 <h1> Application Programming Interface</h1>
@@ -31,11 +31,11 @@
  </center>
     
 <center>  
-<h2> The freeglut Programming Consortium</h2>
+<h2> The <i>freeglut</i> Programming Consortium</h2>
  </center>
     
 <center>  
-<h2> November, 2002</h2>
+<h2> July, 2003</h2>
  </center>
     
 <p><br>
@@ -323,7 +323,7 @@ There was no way for an application to loop in GLUT for a while, possibly
 as a subloop while a specific window was open, and then return to the calling
 function.&nbsp; A new function, "<tt>glutMainLoopEvent</tt>", has been added
 to allow this functionality.&nbsp; Another function, "<tt>glutLeaveMainLoop</tt>
-", has also been added to allow the application to tell freeglut to clean
+", has also been added to allow the application to tell <i>freeglut</i> to clean
 up and close down.                                    
                                   <h3> 3.4.2&nbsp; Action on Window Closure</h3>
   Another difficulty with GLUT, especially with multiple-window programs,
@@ -1120,7 +1120,7 @@ These queries do not depend on the current window.
 <li>GLUT_INIT_STATE - ?
 <li>GLUT_VERSION - Return value will be X*10000+Y*100+Z where X is the
     major version, Y is the minor version and Z is the patch level.
-    This query is only supported in freeglut (version 1.3 or later).
+    This query is only supported in <i>freeglut</i> (version 2.0.0 or later).
 </ul>
 
 
@@ -1148,7 +1148,7 @@ functions directly, that application will only link/run with an OpenGL library
 that supports the extension. By using a function pointer returned from glutGetProcAddress(),
 the application will avoid this hard dependency and be more portable and interoperate
 better with various implementations of OpenGL. </p>
-                                  <p> Both OpenGL functions and freeglut
+                                  <p> Both OpenGL functions and <i>freeglut</i>
 functions can be queried with this function. </p>
                                   <p><b>Changes From GLUT</b> </p>
                                    
@@ -1890,7 +1890,7 @@ Programs which use the <i>freeglut</i>-specific extensions to GLUT should includ
 </pre>
 
 <p>
-Compile-time freeglut version testing can be done as follows:
+Compile-time <i>freeglut</i> version testing can be done as follows:
 </p>
 
 <pre>
@@ -1905,7 +1905,7 @@ be defined.  This scheme mimics OpenGL conventions.
 </p>
 
 <p>
-The freeglut version can be queried at runtime by calling
+The <i>freeglut</i> version can be queried at runtime by calling
 glutGet(GLUT_VERSION).
 The result will be X*10000+Y*100+Z where X is the major version, Y is the
 minor version and Z is the patch level.
