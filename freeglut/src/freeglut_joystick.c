@@ -79,9 +79,7 @@
 #        define HAVE_USB_JS    1
 
 #        include <sys/ioctl.h>
-#        include <machine/joystick.h>         /* For analog joysticks */
-
-#        if __FreeBSD_version >= 500000
+#        if defined(__FreeBSD__) && __FreeBSD_version >= 500000
 #            include <sys/joystick.h>
 #        else
 /*
@@ -91,7 +89,7 @@
  * XXX it lets you compile...(^&  I do not think that we can do away
  * XXX with this header.
  */
-#            include <machine/joystick.h>
+#            include <machine/joystick.h>         /* For analog joysticks */
 #        endif
 #        define JS_DATA_TYPE joystick
 #        define JS_RETURN (sizeof(struct JS_DATA_TYPE))
@@ -153,7 +151,15 @@
 #                include <usb.h>
 #            endif
 #        elif defined(__FreeBSD__)
-#            include <libusbhid.h>
+#            if __FreeBSD_version < 500000
+#                include <libusbhid.h>
+#            else
+/*
+ * XXX The below hack is done until freeglut's autoconf is updated.
+ */
+#                define HAVE_USBHID_H 1
+#                include <usbhid.h>
+#            endif
 #        endif
 #        include <dev/usb/usb.h>
 #        include <dev/usb/usbhid.h>
@@ -404,7 +410,7 @@ struct tagSFG_Joystick
 #   endif
 
 #   ifdef JS_NEW
-       struct js_event     js         ;
+       struct js_event     js;
        int          tmp_buttons;
        float        tmp_axes [ _JS_MAX_AXES ];
 #   else
@@ -853,7 +859,7 @@ static int fghJoystickFindDevices ( SFG_Joystick *joy, mach_port_t masterPort )
 
     rv = IOServiceGetMatchingServices(masterPort, hidMatch, &hidIterator);
     if (rv != kIOReturnSuccess || !hidIterator) {
-      fgWarning ( "%s", "no joystick (HID) devices found");
+      fgWarning( "%s", "no joystick (HID) devices found" );
       return;
     }
 
@@ -1045,7 +1051,9 @@ static void fghJoystickAddHatElement ( SFG_Joystick *joy, CFDictionaryRef button
 /* Inspired by
    http://msdn.microsoft.com/archive/en-us/dnargame/html/msdn_sidewind3d.asp
  */
-#    pragma comment (lib, "advapi32.lib")
+#    if defined(_MSC_VER)
+#        pragma comment (lib, "advapi32.lib")
+#    endif
 
 static int fghJoystickGetOEMProductName ( SFG_Joystick* joy, char *buf, int buf_sz )
 {
@@ -1573,7 +1581,7 @@ void fgJoystickInit( int ident )
       ref = CFDictionaryGetValue (properties, CFSTR("USB Product Name"));
 
     if (!ref || !CFStringGetCString ((CFStringRef) ref, name, 128, CFStringGetSystemEncoding ())) {
-      fgWarning ( "%s", "error getting device name");
+      fgWarning( "%s", "error getting device name" );
       name[0] = '\0';
     }
 #endif
@@ -1708,33 +1716,33 @@ void fgJoystickPollWindow( SFG_Window* window )
  * PWO: These jsJoystick class methods have not been implemented.
  *      We might consider adding such functions to freeglut-2.0.
  */
-int  getNumAxes ( int ident )
+int  glutJoystickGetNumAxes ( int ident )
     { return fgJoystick[ident]->num_axes; }
-int  notWorking ( int ident )
+int  glutJoystickNotWorking ( int ident )
     { return fgJoystick[ident]->error; }
 
-float getDeadBand ( int ident, int axis )
+float glutJoystickGetDeadBand ( int ident, int axis )
     { return fgJoystick[ident]->dead_band [ axis ]; }
-void  setDeadBand ( int ident, int axis, float db )
+void  glutJoystickSetDeadBand ( int ident, int axis, float db )
     { fgJoystick[ident]->dead_band [ axis ] = db; }
 
-float getSaturation ( int ident, int axis )
+float glutJoystickGetSaturation ( int ident, int axis )
     { return fgJoystick[ident]->saturate [ axis ]; }
-void  setSaturation ( int ident, int axis, float st )
+void  glutJoystickSetSaturation ( int ident, int axis, float st )
     { fgJoystick[ident]->saturate [ axis ] = st; }
 
-void setMinRange ( int ident, float *axes )
+void glutJoystickSetMinRange ( int ident, float *axes )
     { memcpy ( fgJoystick[ident]->min   , axes, fgJoystick[ident]->num_axes * sizeof(float) ); }
-void setMaxRange ( int ident, float *axes )
+void glutJoystickSetMaxRange ( int ident, float *axes )
     { memcpy ( fgJoystick[ident]->max   , axes, fgJoystick[ident]->num_axes * sizeof(float) ); }
-void setCenter   ( int ident, float *axes )
+void glutJoystickSetCenter   ( int ident, float *axes )
     { memcpy ( fgJoystick[ident]->center, axes, fgJoystick[ident]->num_axes * sizeof(float) ); }
 
-void getMinRange ( int ident, float *axes )
+void glutJoystickGetMinRange ( int ident, float *axes )
     { memcpy ( axes, fgJoystick[ident]->min   , fgJoystick[ident]->num_axes * sizeof(float) ); }
-void getMaxRange ( int ident, float *axes )
+void glutJoystickGetMaxRange ( int ident, float *axes )
     { memcpy ( axes, fgJoystick[ident]->max   , fgJoystick[ident]->num_axes * sizeof(float) ); }
-void getCenter   ( int ident, float *axes )
+void glutJoystickGetCenter   ( int ident, float *axes )
     { memcpy ( axes, fgJoystick[ident]->center, fgJoystick[ident]->num_axes * sizeof(float) ); }
 
 /*** END OF FILE ***/
