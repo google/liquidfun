@@ -48,14 +48,14 @@
 
 #else
 
-#	if defined(FREEGLUT_EXPORTS)
-#		define FGAPI __declspec(dllexport)
-/* #		define FGAPI */
-#	else
-#		define FGAPI __declspec(dllimport)
+#        if defined(FREEGLUT_EXPORTS)
+#                define FGAPI __declspec(dllexport)
+/* #                define FGAPI */
+#        else
+#                define FGAPI __declspec(dllimport)
 #   pragma comment (lib, "freeglut.lib")    /* link with Win32 freeglut lib */
-#	endif
-#	define FGAPIENTRY __stdcall
+#        endif
+#        define FGAPIENTRY __stdcall
 
 #endif
 
@@ -67,8 +67,8 @@
 
 
 #else
-#	define FGAPI
-#	define FGAPIENTRY
+#        define FGAPI
+#        define FGAPIENTRY
 #endif
 
 /*

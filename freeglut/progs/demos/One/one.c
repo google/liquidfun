@@ -56,14 +56,14 @@ void PrintText( int nX, int nY, char* pszText )
     glLoadIdentity();
     
     /*
-     * Now the main text	
+     * Now the main text        
      */
     glColor3ub( 0, 0, 0 ); 
     glRasterPos2i( nX, nY ); 
 
     for( p=pszText, lines=0; *p; p++ )
     {
-	if( *p == '\n' )
+        if( *p == '\n' )
         {
             lines++;
             glRasterPos2i( nX, nY-(lines*18) );
@@ -71,7 +71,7 @@ void PrintText( int nX, int nY, char* pszText )
         
         glutBitmapCharacter( GLUT_BITMAP_HELVETICA_18,  *p );
     }
-	
+        
     /*
      * Revert to the old matrix modes
      */   
@@ -311,7 +311,7 @@ int main( int argc, char** argv )
     printf( "current window is %ix%i+%i+%i",
             glutGet( GLUT_WINDOW_X ), glutGet( GLUT_WINDOW_Y ),
             glutGet( GLUT_WINDOW_WIDTH ), glutGet( GLUT_WINDOW_HEIGHT )
-    );	
+    );        
 
     /*
      * Enter the main FreeGLUT processing loop

@@ -185,8 +185,8 @@ void *FGAPIENTRY glutGetProcAddress( const char *procName )
     /* Try GLUT functions first */
     int i;
     for( i = 0; glut_functions[ i ].name; i++ )
-	if( strcmp( glut_functions[ i ].name, procName ) == 0)
-	    return glut_functions[ i ].address;
+        if( strcmp( glut_functions[ i ].name, procName ) == 0)
+            return glut_functions[ i ].address;
 
     /* Try core GL functions */
 #if TARGET_HOST_WIN32

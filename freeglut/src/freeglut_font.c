@@ -120,10 +120,10 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
     glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
     glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
     glBitmap(
-	face[ 0 ], font->Height,      /* The bitmap's width and height  */
-	font->xorig, font->yorig,     /* The origin in the font glyph   */
-	( float )( face[ 0 ] ), 0.0,  /* The raster advance -- inc. x,y */
-	( face + 1 )                  /* The packed bitmap data...      */
+        face[ 0 ], font->Height,      /* The bitmap's width and height  */
+        font->xorig, font->yorig,     /* The origin in the font glyph   */
+        ( float )( face[ 0 ] ), 0.0,  /* The raster advance -- inc. x,y */
+        ( face + 1 )                  /* The packed bitmap data...      */
     );
     glPopClientAttrib( );
 }
