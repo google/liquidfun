@@ -60,8 +60,11 @@
 #endif
 
 #pragma comment (lib, "winmm.lib")       /* link with Windows MultiMedia lib */
+#pragma comment (lib, "user32.lib") /* link with Windows user lib */
+#pragma comment (lib, "gdi32.lib") /* link with Windows GDI lib */
 #pragma comment (lib, "opengl32.lib")    /* link with Microsoft OpenGL lib */
 #pragma comment (lib, "glu32.lib")       /* link with OpenGL Utility lib */
+
 
 #else
 #	define FGAPI
