@@ -37,18 +37,43 @@
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
- * It would be cool if the submenu entries were somehow marked, for example with a dings
- * on the right menu border or something like that. Think about the possibility of doing
- * the menu on layers *or* using the native window system instead of OpenGL.
+ * Wouldn't 1.0 have been "the" stable release?  Now we are past 2.0,
+ * so this comment is probably just out of date.  (20031026; rkr)
+ *
+ * Think about the possibility of doing the menu on layers *or* using the
+ * native window system instead of OpenGL.
  */
 
 /* -- DEFINITIONS ---------------------------------------------------------- */
 
 /*
- * We'll be using freeglut fonts to draw the menu
+ * FREEGLUT_MENU_FONT can be any freeglut bitmapped font.
+ * (Stroked fonts would not be out of the question, but we'd need to alter
+ *  code, since GLUT (hence freeglut) does not quite unify stroked and
+ *  bitmapped font handling.)
+ * Old UNIX/X11 GLUT (BSD, UNIX, IRIX, LINUX, HPUX, ...) used a system
+ * font best approximated by an 18-pixel HELVETICA, I think.  MS-WINDOWS
+ * GLUT used something closest to the 8x13 fixed-width font.  (Old
+ * GLUT apparently uses host-system menus rather than building its own.
+ * freeglut is building its own menus from scratch.)
+ *
+ * FREEGLUT_MENU_HEIGHT gives the height of ONE menu box.  This should be
+ * the distances between two adjacent menu entries.  It should scale
+ * automatically with the font choice, so you needn't alter it---unless you
+ * use a stroked font.
+ *
+ * FREEGLUT_MENU_BORDER says how many pixels to allow around the edge of a
+ * menu.  (It also seems to be the same as the number of pixels used as
+ * a border around *items* to separate them from neighbors.  John says
+ * that that wasn't the original intent...if not, perhaps we need another
+ * symbolic constant, FREEGLUT_MENU_ITEM_BORDER, or such.)
  */
+#if TARGET_HOST_WIN32
 #define FREEGLUT_MENU_FONT    GLUT_BITMAP_8_BY_13
-/*#define FREEGLUT_MENU_FONT    GLUT_BITMAP_HELVETICA_18*/
+#elif TARGET_HOST_UNIX_X11
+#define FREEGLUT_MENU_FONT    GLUT_BITMAP_HELVETICA_18
+#endif
+
 #define FREEGLUT_MENU_HEIGHT  (glutBitmapHeight(FREEGLUT_MENU_FONT) + FREEGLUT_MENU_BORDER)
 #define  FREEGLUT_MENU_BORDER   2
 
@@ -61,13 +86,15 @@
  * too.  These variables should be stuffed into global state and initialized
  * via the glutInit*() system.
  */
-static float menu_pen_fore  [4] = {0.0f,  0.0f,  0.0f,  1.0f};
-static float menu_pen_back  [4] = {0.85f, 0.85f, 0.85f, 1.0f};
 
 #if TARGET_HOST_WIN32
+static float menu_pen_fore  [4] = {0.0f,  0.0f,  0.0f,  1.0f};
+static float menu_pen_back  [4] = {0.85f, 0.85f, 0.85f, 1.0f};
 static float menu_pen_hfore [4] = {1.0f,  1.0f,  1.0f,  1.0f};
 static float menu_pen_hback [4] = {0.15f, 0.15f, 0.45f, 1.0f};
 #else
+static float menu_pen_fore  [4] = {0.0f,  0.0f,  0.0f,  1.0f};
+static float menu_pen_back  [4] = {0.70f, 0.70f, 0.70f, 1.0f};
 static float menu_pen_hfore [4] = {0.0f,  0.0f,  0.0f,  1.0f};
 static float menu_pen_hback [4] = {1.0f,  1.0f,  1.0f,  1.0f};
 #endif
