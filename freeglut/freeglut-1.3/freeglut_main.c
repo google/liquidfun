@@ -139,7 +139,7 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
     /*
      * Check if there is an idle callback hooked
      */
-// #   warning there is a redisplay hack here (see the code commented out)
+#   warning there is a redisplay hack here (see the code commented out)
     if( (window->Callbacks.Display != NULL) &&
         /*(window->State.Redisplay == TRUE) &&*/
         (window->State.Visible == TRUE) )

@@ -234,9 +234,9 @@ static void fghRemoveMenuFromWindow( SFG_Window* window, SFG_Menu* menu )
      * Call this function for all of the window's children recursively:
      */
     for( subWindow = window->Children.First; subWindow;
-         subWindow = subWindow->Node.Next);
+         subWindow = subWindow->Node.Next)
     {
-        fghRemoveMenuFromWindow(subWindow, menu );
+        fghRemoveMenuFromWindow( subWindow, menu );
     }
 }
 
