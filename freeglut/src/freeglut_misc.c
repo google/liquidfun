@@ -87,7 +87,7 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
     /*
      * No, go find the next extension.  They are separated from each other by one or more blank spaces.
      */
-    ptr = strchr ( ptr + len, ' ' ) ;
+    ptr = strchr ( ptr, ' ' ) ;
 
     /*
      * If we ran off the end of the "extensions" character string, we didn't find it.  Return failure.
