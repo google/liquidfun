@@ -353,6 +353,8 @@ struct tagSFG_WindowState
 {
     int             Width;              /* Window's width in pixels          */
     int             Height;             /* The same about the height         */
+    int             OldWidth;           /* Window width from before a resize */
+    int             OldHeight;          /*   "    height  "    "    "   "    */
 
     GLboolean       Redisplay;          /* Do we have to redisplay?          */
     GLboolean       Visible;            /* Is the window visible now         */

@@ -559,10 +559,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * (in freeglut only) will not get an initial reshape event,
              * which can break things.
              *
-             * XXX NOTE that it is possible that you will more than one Reshape
-             * XXX event for your top-level window, but something like this
-             * XXX appears to be required for compatbility.
-             *
              * GLUT presumably does this because it generally tries to treat
              * sub-windows the same as windows.
              */
@@ -573,11 +569,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 int width = event.xconfigure.width;
                 int height = event.xconfigure.height;
 
-                if( ( width != window->State.Width ) ||
-                    ( height != window->State.Height ) )
+                if( ( width != window->State.OldWidth ) ||
+                    ( height != window->State.OldHeight ) )
                 {
-                    window->State.Width = width;
-                    window->State.Height = height;
+                    window->State.OldWidth = width;
+                    window->State.OldHeight = height;
                     if( FETCH_WCB( *window, Reshape ) )
                         INVOKE_WCB( *window, Reshape, ( width, height ) );
                     else
