@@ -39,7 +39,7 @@
 #    include "config.h"
 #endif
 
-#include "../include/GL/freeglut.h"
+#include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
 /*
