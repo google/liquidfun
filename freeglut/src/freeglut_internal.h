@@ -240,7 +240,6 @@ struct tagSFG_State
 
     FGCBIdle         IdleCallback;         /* The global idle callback       */
 
-    GLboolean        BuildingAMenu;        /* Are we presently making a menu */
     int              ActiveMenus;          /* Num. of currently active menus */
     FGCBMenuState    MenuStateCallback;    /* Menu callbacks are global      */
     FGCBMenuStatus   MenuStatusCallback;
@@ -705,7 +704,8 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
  * Defined in freeglut_structure.c, freeglut_window.c.
  */
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
-                            int x, int y, int w, int h, GLboolean gameMode );
+                            int x, int y, int w, int h,
+			    GLboolean gameMode, GLboolean isMenu );
 void        fgSetWindow ( SFG_Window *window );
 void        fgOpenWindow( SFG_Window* window, const char* title,
                           int x, int y, int w, int h, GLboolean gameMode,

@@ -69,7 +69,8 @@ void fgClearCallBacks( SFG_Window *window )
  * If parent is set to NULL, the window created will be a topmost one.
  */
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
-                            int x, int y, int w, int h, GLboolean gameMode )
+                            int x, int y, int w, int h,
+                            GLboolean gameMode, GLboolean isMenu )
 {
     /*
      * Have the window object created
@@ -106,7 +107,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
     window->State.Cursor    = GLUT_CURSOR_INHERIT;
     window->State.Modifiers = 0xffffffff;
 
-    window->IsMenu = fgState.BuildingAMenu ;
+    window->IsMenu = isMenu;
 
     /*
      * Open the window now. The fgOpenWindow() function is system
@@ -142,21 +143,12 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     menu->ParentWindow = fgStructure.Window;
 
     /*
-     * Create a window for the menu to reside in.  Set the
-     * global variable BuildingAMenu to true so we can ensure
-     * it is created without decorations.
+     * Create a window for the menu to reside in.
      */
-    fgState.BuildingAMenu = GL_TRUE;
 
-    fgCreateWindow( NULL, NULL, x, y, w, h, GL_FALSE );
+    fgCreateWindow( NULL, NULL, x, y, w, h, GL_FALSE, GL_TRUE );
     menu->Window = fgStructure.Window;
     glutDisplayFunc( fgDisplayMenu );
-
-    /*
-     * While BuildingAMenu is true, all windows built have no decorations.
-     * That's not a good default behavior, so let's set it false again.
-     */
-    fgState.BuildingAMenu = GL_FALSE;
 
     glutHideWindow( );  /* Hide the window for now */
     fgSetWindow( current_window );

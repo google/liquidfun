@@ -265,7 +265,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      * XXX With a little thought, we should be able to greatly
      * XXX simplify this.
      */
-    if ( !fgState.BuildingAMenu )
+    if ( !window->IsMenu )
       window->Window.VisualInfo = fgChooseVisual();
     else if ( fgStructure.MenuContext )
         window->Window.VisualInfo = fgChooseVisual();
@@ -327,7 +327,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
 
-    if ( fgState.BuildingAMenu )
+    if ( window->IsMenu )
     {
         winAttr.override_redirect = True;
         mask |= CWOverrideRedirect;
@@ -347,7 +347,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      * The GLX context creation, possibly trying the direct context rendering
      *  or else use the current context if the user has so specified
      */
-    if ( fgState.BuildingAMenu )
+    if ( window->IsMenu )
     {
         /*
          * If there isn't already an OpenGL rendering context for menu
@@ -573,7 +573,8 @@ void fgCloseWindow( SFG_Window* window )
 int FGAPIENTRY glutCreateWindow( const char* title )
 {
     return fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
-                           fgState.Size.X, fgState.Size.Y, GL_FALSE )->ID;
+                           fgState.Size.X, fgState.Size.Y, GL_FALSE,
+                           GL_FALSE )->ID;
 }
 
 /*
@@ -587,7 +588,7 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     freeglut_assert_ready;
     parent = fgWindowByID( parentID );
     freeglut_return_val_if_fail( parent != NULL, 0 );
-    window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE );
+    window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
     return window->ID;
 }
 

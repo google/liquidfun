@@ -76,7 +76,6 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
 #endif
                       { NULL, NULL },         /* Timers */
                       NULL,                   /* IdleCallback */
-                      GL_FALSE,               /* BuildingAMenu */
                       0,                      /* ActiveMenus */
                       NULL,                   /* MenuStateCallback */
                       NULL,                   /* MenuStatusCallback */

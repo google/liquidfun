@@ -1100,7 +1100,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         window->Window.Handle = hWnd;
         window->Window.Device = GetDC( hWnd );
-        if( fgState.BuildingAMenu )
+        if( window->IsMenu )
         {
             unsigned int current_DisplayMode = fgState.DisplayMode;
             fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;

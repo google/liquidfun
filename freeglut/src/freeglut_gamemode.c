@@ -425,7 +425,7 @@ int FGAPIENTRY glutEnterGameMode( void )
 
     fgStructure.GameMode = fgCreateWindow( 
         NULL, "FREEGLUT", 0, 0,
-        fgState.GameModeSize.X, fgState.GameModeSize.Y, GL_TRUE 
+        fgState.GameModeSize.X, fgState.GameModeSize.Y, GL_TRUE, GL_FALSE
     );
 
 #if TARGET_HOST_UNIX_X11
