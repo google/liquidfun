@@ -2,7 +2,7 @@
 
 AC_INIT([freeglut library], [2.2.0], [freeglut-bugs@lists.sourceforge.net], [freeglut])
 AM_INIT_AUTOMAKE
-AC_PREREQ([2.59])
+AC_PREREQ([2.58])
 AC_CONFIG_SRCDIR([AUTHORS])
 AC_CONFIG_HEADERS([config.h])
 
