@@ -147,7 +147,7 @@ void fgInitialize( const char* displayName )
     ATOM atom;
 
     /*
-     * What we need to do is to initialize the fgDisplay global structure here...
+     * What we need to do is to initialize the fgDisplay global structure here.
      */
     fgDisplay.Instance = GetModuleHandle( NULL );
 
@@ -157,9 +157,14 @@ void fgInitialize( const char* displayName )
         ZeroMemory( &wc, sizeof(WNDCLASS) );
 
         /*
-         * Each of the windows should have its own device context...
+         * Each of the windows should have its own device context, and we
+         * want redraw events during Vertical and Horizontal Resizes by
+         * the user.
+         *
+         * XXX Old code had "| CS_DBCLCKS" commented out.  Plans for the
+         * XXX future?  Dead-end idea?
          */
-        wc.style          = CS_OWNDC /* | CS_DBLCLKS */;
+        wc.style          = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
         wc.lpfnWndProc    = fgWindowProc;
         wc.cbClsExtra     = 0;
         wc.cbWndExtra     = 0;
