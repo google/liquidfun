@@ -413,7 +413,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     if( joy->error )
       return ;
 
-    sprintf( joyfname, "%s/.joy%drc", g_getenv( "HOME" ), id );
+    sprintf( joyfname, "%s/.joy%drc", g_getenv( "HOME" ), joy->id );
 
     joyfile = fopen( joyfname, "r" );
     joy->error = (joyfile == NULL);
@@ -434,8 +434,8 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 
     for( i=0 ; i<_JS_MAX_AXES ; i++ )
     {
-        dead_band[ i ] = 0.0f;
-        saturate [ i ] = 1.0f;
+        joy->dead_band[ i ] = 0.0f;
+        joy->saturate [ i ] = 1.0f;
     }
 #   else
 
