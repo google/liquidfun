@@ -1213,15 +1213,52 @@ void FGAPIENTRY glutFullScreen( void )
 {
     freeglut_assert_ready; freeglut_assert_window;
 
-    /*
-     * Just have the window repositioned and resized
-     */
-    glutPositionWindow( 0, 0 );
+#if TARGET_HOST_UNIX_X11
+    {
+        int x, y;
+        Window w;
 
-    glutReshapeWindow(
+        XTranslateCoordinates(
+            fgDisplay.Display,
+            fgStructure.Window->Window.Handle,
+            fgDisplay.RootWindow,
+            0, 0, &x, &y, &w
+        );
+
+        if (w)
+        {
+            XTranslateCoordinates(
+                fgDisplay.Display,
+                fgStructure.Window->Window.Handle,
+                w, 0, 0, &x, &y, &w
+            );
+
+            x = -x;
+            y = -y;
+        }
+        else
+        {
+            x = y = 0;
+        }
+
+        XMoveResizeWindow(
+            fgDisplay.Display,
+            fgStructure.Window->Window.Handle,
+            x, y,
+            fgDisplay.ScreenWidth,
+            fgDisplay.ScreenHeight
+        );
+        XFlush( fgDisplay.Display );
+    }
+#elif TARGET_HOST_WIN32
+    MoveWindow(
+        fgStructure.Window->Window.Handle,
+        0, 0,
         fgDisplay.ScreenWidth,
-        fgDisplay.ScreenHeight
+        fgDisplay.ScreenHeight,
+        TRUE
     );
+#endif
 }
 
 /*
@@ -1238,12 +1275,3 @@ void FGAPIENTRY glutSetWindowData(void* data)
 }
 
 /*** END OF FILE ***/
-
-
-
-
-
-
-
-
-
