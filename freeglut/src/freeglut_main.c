@@ -476,7 +476,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
      * Grab the next event to be processed...
      */
     XNextEvent( fgDisplay.Display, &event );
-    window = fgWindowByHandle ( event.xany.window ) ;
 
     /*
      * Check the event's type
@@ -496,7 +495,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
       /*
        * Call the window closure callback, remove from the structure, etc.
        */
-      fgStructure.Window = window ;
 /*      fgAddToWindowDestroyList ( window, FALSE ); */
 
       break;
@@ -507,7 +505,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
        */
       if( (Atom) event.xclient.data.l[ 0 ] == fgDisplay.DeleteWindow )
       {
-        fgStructure.Window = window ;
+        GETWINDOW( xclient ); 
 
         /*
          * Call the XWindows functions to close the window
@@ -532,7 +530,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
        * We are too dumb to process partial exposes...
        */
       if( event.xexpose.count == 0 )
-          fghRedrawWindowByHandle( window->Window.Handle );
+          fghRedrawWindowByHandle( event.xexpose.window );
       break;
 
     case ConfigureNotify:
@@ -559,6 +557,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * The window's visiblity might have changed
          */
+        GETWINDOW( xvisibility ); 
+
         /*
          * Break now if no window status callback has been hooked to that window
          */
@@ -609,7 +609,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * Mouse is over one of our windows
          */
-        GETMOUSE( xcrossing );
+        GETWINDOW( xcrossing ); GETMOUSE( xcrossing );
 
         /*
          * Is there an entry callback hooked to the window?
@@ -629,7 +629,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * Mouse is no longer over one of our windows
          */
-        GETMOUSE( xcrossing );
+        GETWINDOW( xcrossing ); GETMOUSE( xcrossing );
 
         /*
          * Is there an entry callback hooked to the window?
@@ -649,7 +649,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * The mouse cursor was moved...
          */
-        GETMOUSE( xmotion );
+        GETWINDOW( xmotion ); GETMOUSE( xmotion );
 
         /*
          * Set the current window
@@ -703,7 +703,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
          * A mouse button has been pressed or released. Traditionally,
          * break if the window was found within the freeglut structures.
          */
-        GETMOUSE( xbutton );
+        GETWINDOW( xbutton ); GETMOUSE( xbutton );
 
         /*
          * GLUT API assumes that you can't have more than three mouse buttons, so:
@@ -835,7 +835,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * A key has been pressed, find the window that had the focus:
          */
-        GETMOUSE( xkey );
+        GETWINDOW( xkey ); GETMOUSE( xkey );
 
         if( event.type == KeyPress )
         {
