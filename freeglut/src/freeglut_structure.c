@@ -150,7 +150,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
      * Create a window for the menu to reside in.
      */
 
-    fgCreateWindow( NULL, NULL, x, y, w, h, GL_FALSE, GL_TRUE );
+    fgCreateWindow( NULL, "freeglut menu", x, y, w, h, GL_FALSE, GL_TRUE );
     menu->Window = fgStructure.Window;
     glutDisplayFunc( fgDisplayMenu );
 
