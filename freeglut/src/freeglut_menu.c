@@ -861,15 +861,15 @@ void FGAPIENTRY glutChangeToSubMenu( int item, const char* label, int subMenuID 
     SFG_MenuEntry* menuEntry = NULL;
 
     freeglut_assert_ready;
-    freeglut_return_if_fail( fgStructure.Menu != NULL );
-    freeglut_return_if_fail( subMenu != NULL );
+    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( subMenu );
     menuEntry = fghFindMenuEntry( fgStructure.Menu, item );
-    freeglut_return_if_fail( menuEntry != NULL );
+    freeglut_return_if_fail( menuEntry );
 
     /*
      * We want it to become a sub menu entry, so:
      */
-    if( menuEntry->Text != NULL )
+    if( menuEntry->Text )
         free( menuEntry->Text );
 
     menuEntry->Text = strdup( label );
@@ -889,7 +889,7 @@ void FGAPIENTRY glutRemoveMenuItem( int item )
     freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Menu );
     menuEntry = fghFindMenuEntry( fgStructure.Menu, item );
-    freeglut_return_if_fail( menuEntry != NULL );
+    freeglut_return_if_fail( menuEntry );
     fgListRemove( &fgStructure.Menu->Entries, &menuEntry->Node );
     free( menuEntry->Text );
     free( menuEntry );
