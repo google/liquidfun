@@ -323,27 +323,316 @@ October 24, 2002:
 (110) Fixed compiliation of freeglut_joystick.c on FreeBSD
 
 *******************************************************************************************
+* Changes through September 24, 2003
+*******************************************************************************************
+
+(111) Fixed busy-wait bug in freeglut; now sleeps when there's nothing to do.
+
+(112) GLUT_SINGLE properly supported.
+
+(113) progs/demos/Fractals_random works.
+
+*******************************************************************************************
 * Freeglut 2.0.0 Released on  September 29, 2003!
 *******************************************************************************************
-	
+
+*******************************************************************************************
+* Changes on October 1, 2003
+*******************************************************************************************
+
+(114) Support for more than 3 mouse-buttons (this allows 3+scroll-wheel to
+workin X, for example).
+
+(115) Added 3rd party patch to make joystick code work on NetBSD (untested)
+and on older versions of FreeBSD (also untested)
+
 *******************************************************************************************
 * Changes on October 3, 2003
 *******************************************************************************************
 
-(110) Tweaking for the menu behavior on Linux regarding mice, etc. - John Fay
+(116) Tweaking for the menu behavior on Linux regarding mice, etc. - John Fay
 
 *******************************************************************************************
 * Changes on October 6, 2003
 *******************************************************************************************
 
-(111) freeglut_menu.c:328 Fix submenu triangle (John Fay)
+(117) freeglut_menu.c:328 Fix submenu triangle (John Fay)
 
 *******************************************************************************************
 * Changes on October 8, 2003
 *******************************************************************************************
 
-(112) freeglut_menu.c:217,519,532: Fix menus to stay in the window (John Fay)
+(118) freeglut_menu.c:217,519,532: Fix menus to stay in the window (John Fay)
+
+(119) Fixed menu callbacks to set the current window.
+
+(120) Numerous GLUT-alikeness corrections made to the menus (UNIX_X11
+freeglut menus now look more like old UNIX/X11 GLUT menus).  Placement
+and highlighting of menus is greatly improved as well, and (at least
+at compile-time) it is now easy to change fonts and colors for menus.
+
+(121) Fixed CreateNotify on X11 to act like ConfigureNotify.  This
+helps subwindows in freeglut behave more like top-level windows.  (In
+old GLUT, they behaved essentially the same, so we try to reproduce
+that here.)
+
+*******************************************************************************************
+* Changes on October 9, 2003
+*******************************************************************************************
+
+(122) Minor glutInit*() quibbles in some of the demos.  Also applied a
+change from John so that the affine-transform demos would work even if
+they couldn't find their default set of transforms or the one named on
+the command-line (a simpler one than even the default is built in).
+
+*******************************************************************************************
+* Changes on October 11, 2003
+*******************************************************************************************
+
+(123) Disallow people to pass NULL in for glutDisplayFunc().
+
+(124) More menu fixes from John.
+
+(125) Check the memory allocation of timers.
+
+(126) Some code style/readability issues.
+
+*******************************************************************************************
+* Changes on October 11, 2003
+*******************************************************************************************
+
+(127) Fleshed out all missing cursor types on NetBSD (UNIX_X11) for the
+glutSetCursor() call.  GLUT_CURSOR_NONE still required work.  Fixes
+included: Adding numerous types required by GLUT but previously missing
+in freeglut, reversing the left/right glyphs, and some just-plain-wrong
+glyphs corrected.
+
+*******************************************************************************************
+* Changes on October 13, 2003
+*******************************************************************************************
+
+(128) Removed obsolete hack (or ill-conceived dream) of fgDisplayCursor().
+
+(129) Modified the the fractal demos so that they don't clear/redraw quite
+so often.
+
+(129) Code readability/style issues.
+
+*******************************************************************************************
+* Changes on October 14, 2003
+*******************************************************************************************
+
+(130) More style issues.
 
 *******************************************************************************************
 * Freeglut 2.0.1 Released on 23 October, 2003!
 *******************************************************************************************
+
+*******************************************************************************************
+* Changes on October 26, 2003
+*******************************************************************************************
+
+(131) Made freeglut know the program's name (fetch from main()'s argv[0]).
+
+(132) Moved idle callback out of glutMainLoopEvent().
+
+(133) Committed Nigel's fix to make the joystick set the current window before
+invoking the callback.  (Completes the closeout of an open bug report,
+once verified.)
+
+(134) Added some error-checking of memory allocations.
+
+(135) More style issues.
+
+*******************************************************************************************
+* Changes on October 27, 2003
+*******************************************************************************************
+
+(136) Partially unified the UNIX_X11 and WIN32 branches of glutMainLoopEvent()
+
+(137) Updated comments, other style issues.  Check for some NULL pointers.
+
+*******************************************************************************************
+* Changes on October 28, 2003
+*******************************************************************************************
+
+(138) More style issues.
+
+(139) Mouse-wheel support added for WIN32.  API extension generally
+added to freeglut.
+
+*******************************************************************************************
+* Changes on October 29, 2003
+*******************************************************************************************
+
+(140) Fixed a bug in fgWarning()/fgError().  Added range-check to
+glutSetKeyRepeat().
+
+(141) More style issues.
+
+(142) Removed bogus references to "Linux" in freeglut_state.c.
+The references should have properly been to UNIX and/or X11.  GNU/LINUX
+emulates UNIX, and X11 is the windowing system that runs on most graphics-
+capable UNIX systems (including most GNU/LINUX systems).  freeglut should
+run on any sufficiently UNIX-like system with OpenGL and X11 (or at least
+XFree86's implementation of X11).
+
+(143) #include <sys/param.h> on the BSDs so that we can check the system
+version number at compile-time.
+
+*******************************************************************************************
+* Changes on October 30, 2003
+*******************************************************************************************
+
+(144) Numerous small fixes w.r.t. mouse-wheels on WIN32.
+
+(145) More style issues.
+
+*******************************************************************************************
+* Changes on October 31, 2003
+*******************************************************************************************
+
+(146) More style issues.
+
+(147) Converted an error-check from an assert() to an if().
+
+(148) Removal of the last ASCII TAB character from src/* files.  This
+conversion process ensures that the formatting appears more consistant
+for everyone.  (TABs can vary in their expansion from one system to
+another).
+
+*******************************************************************************************
+* Changes on November 3, 2003
+*******************************************************************************************
+
+(149) X11 mousewheel fixes.
+
+(150) Yet more style issues.
+
+(151) Added a case for {MapNotify} events in X11.
+
+(152) Re-(?)deleted 3 files from CVS, per John's request.  These were
+obsolete: freeglut13.dsp, freeglutdll.dsp, freeglutstatic.dsw
+
+(153) Marked a few pointer/int conversion warnings.  (I think that they
+only manifest for me on my AMD64 system, but they seem fairly harmless
+so I didn't try to fix them.)
+
+(154) Memory-leak fix from John.
+
+*******************************************************************************************
+* Changes on Novembber 4, 2003
+*******************************************************************************************
+
+(155) More style issues.
+
+(156) Removed G_LOG_DOMAIN junk, per mailing list discussion.
+
+(157) Added memory-leak detection support (WIN32) to a couple of the
+demos, and fixed at least one memory leak in the process.  Also
+converted Fractals_random to double-precision to avoid some compiler
+warnings.
+
+(158) Stripped CRs from fractals_random.c.
+
+(159) Fixed two bugs: Execution state was improperly set in the end
+of glutMainLoop(), and {ButtonPress} (an X11 constant) was used where
+the flag-variable {pressed} (in UNIX_X11 branch of glutMainLoop())
+should have been used.
+
+(160) Pointer-check before deallocation in the menu code.
+
+*******************************************************************************************
+* Changes on November 5, 2003
+*******************************************************************************************
+
+Remember, remember,
+the 5th of November.
+Gunpowder, treason and plot!   (Bacon?)
+
+I see no reason
+why gunpowder treason
+should ever be forgot.         (Shakespeare?)
+
+*******************************************************************************************
+* Changes on November 6, 2003
+*******************************************************************************************
+
+(161) Fractals_random demo now includes mouse support---including mouse-
+wheel.
+
+(162) Yet more fixes to the mouse wheel support in WIN32.
+
+(163) Converted freeglut to use an array to store window callbacks,
+rather than a struct.  This lets us loop over the array to fill it with
+NULL pointers in order to clear the callbacks.  (With a struct, we were
+reduced to either a ton of assignments---easy to miss one!---or memset(),
+which technically is not a legal way to fill a region with NULL pointers
+because the bit-pattern of a NULL pointer is not necessarily defined to
+be all-zero bits.)  This change also on the one hand provides macros
+to simplify most proper use of the callbacks (even simpler than with
+the struct form), while also making it irritating enough to bypass the
+macros that (it is hoped) abuse will be harder.  (E.g., the invocation
+macros set the current-window.  At least two bugs in the past occurred
+because callbacks were not setting the current window before invoking the
+client.)  See 
+https://sourceforge.net/mailarchive/message.php?msg_id=6467923 for more
+details.
+
+(164) Yet more style issues.  (You thought I'd forgotten about that?)
+
+*******************************************************************************************
+* Changes on November 7, 2003
+*******************************************************************************************
+
+(165) Mouse-wheel corrections in X11.
+
+(166) Style corrections.
+
+(167) Fixed GLUT_CURSOR_NONE support at long last in NetBSD.  (Should also
+apply to other X11 based systems, but I can only test NetBSD.)  Also
+deallocated some resources that glutSetCursor() was allocating in the
+X server.
+
+(168) Added {ReparentNotify} (event type 21) case to glutMainLoop().
+
+(169) Clear window callbacks during window destruction.
+
+(170) Implement visible/invisible support for WIN32.  (Partial?  No
+callback added at this time.)
+
+*******************************************************************************************
+* Changes on November 8, 2003
+*******************************************************************************************
+
+(171) Altered the way that {random} was chosen in the fractals_random.c
+program, in order to attempt to gain a longer cycle before repeating.
+
+(172) More style issues.
+
+*******************************************************************************************
+* Changes on November 9, 2003
+*******************************************************************************************
+
+(173) Added some error-checking to the glutSetCursor() code on my
+NetBSD (UNIX_X11) system.
+
+*******************************************************************************************
+* Changes on November 10, 2003
+*******************************************************************************************
+
+(174) Reversed the Fractals_random changes; they were bogus since they
+assumed that there were always exactly 4 affine transforms to choose
+from (which is certainly not guaranteed!).  Back to just shifting by
+10 bits and going modulo the number of transforms.
+
+*******************************************************************************************
+* Changes on November 11, 2003
+*******************************************************************************************
+
+(175) Retroactively updated the ChangeLog file for all of the commits by
+myself (rkrolib; a.k.a. Richard Rauch) (at least as visible via on the
+SourceForge "CVS message board"), summarzing changes for the sake of those
+who lack both web-browser and CVS access.  Also fixed a numbering error in
+the log where there were two "(110)" events.  (Plus added (174) from
+November 10th by memory.)

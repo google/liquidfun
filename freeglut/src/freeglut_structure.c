@@ -54,9 +54,12 @@ SFG_Structure fgStructure = { { NULL, NULL },  /* The list of windows       */
 
 void fgClearCallBacks( SFG_Window *window )
 {
-    int i;
-    for( i = 0; i < TOTAL_CALLBACKS; ++i )
-        window->CallBacks[ i ] = NULL;
+    if( window )
+    {
+        int i;
+        for( i = 0; i < TOTAL_CALLBACKS; ++i )
+            window->CallBacks[ i ] = NULL;
+    }
 }
 
 /*
@@ -314,12 +317,12 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
         window->Menu[menu_index]->ParentWindow = NULL ;
     }
 
+    fgClearCallBacks( window );
     if( needToClose == TRUE )
         fgCloseWindow( window );
     free( window );
     if( fgStructure.Window == window )
         fgStructure.Window = NULL;
-    fgClearCallBacks( window );
 }
 
 /*
