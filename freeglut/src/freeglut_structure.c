@@ -490,11 +490,11 @@ void fgDestroyStructure( void )
   /*
    * Make sure all windows and menus have been deallocated
    */
-  while( (window = (SFG_Window *)fgStructure.Windows.First) != NULL )
-    fgDestroyWindow( window, TRUE );
-
   while( (menu = (SFG_Menu *)fgStructure.Menus.First) != NULL )
     fgDestroyMenu( menu );
+
+  while( (window = (SFG_Window *)fgStructure.Windows.First) != NULL )
+    fgDestroyWindow( window, TRUE );
 }
 
 /*
