@@ -798,6 +798,18 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
     XResizeWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
                    width, height );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    /*
+     * XXX REALLY shouldn't be done.  GLUT docs state that this
+     * XXX isn't even processed immediately, but rather waits
+     * XXX for return to the mainloop.  "This allows multiple
+     * XXX glutReshapeWindow, glutPositionWindow, and glutFullScreen
+     * XXX requests to the same window to be coalesced."  (This is
+     * XXX having some deleterious effect on a sample program of mine.)
+     * XXX Not only does GLUT not flush at this point, GLUT doesn't even
+     * XXX *do* the reshape at this point!  We should probably rip this
+     * XXX out and do what GLUT promises.  It would be more efficient, and
+     * XXX might be more compatible.
+     */
 
 #elif TARGET_HOST_WIN32
 
