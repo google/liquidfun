@@ -35,10 +35,6 @@
 #    include <sys/param.h>
 #endif
 
-#ifdef HAVE_CONFIG_H
-#    include "config.h"
-#endif
-
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 

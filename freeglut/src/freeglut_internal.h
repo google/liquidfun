@@ -28,6 +28,10 @@
 #ifndef  FREEGLUT_INTERNAL_H
 #define  FREEGLUT_INTERNAL_H
 
+#ifdef HAVE_CONFIG_H
+#    include "config.h"
+#endif
+
 /* XXX Update these for each release! */
 #define  VERSION_MAJOR 2
 #define  VERSION_MINOR 2
