@@ -103,7 +103,8 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
 
 #if !TARGET_HOST_WINCE
     {
-        RECT rect;
+        RECT winRect;
+        int x, y, w, h;
 
         /*
          * For windowed mode, get the current position of the
@@ -111,24 +112,29 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
          * decorations into account.
          */
 
-        GetWindowRect( window->Window.Handle, &rect );
-        rect.right  = rect.left + width;
-        rect.bottom = rect.top  + height;
+        /* "GetWindowRect" returns the pixel coordinates of the outside of the window */
+        GetWindowRect( window->Window.Handle, &winRect );
+        x = winRect.left;
+        y = winRect.top;
+        w = width;
+        h = height;
 
         if ( window->Parent == NULL )
         {
             if ( ! window->IsMenu && !window->State.IsGameMode )
             {
-                rect.right  += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-                rect.bottom += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
-                               GetSystemMetrics( SM_CYCAPTION );
+                w += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
+                h += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
+                     GetSystemMetrics( SM_CYCAPTION );
             }
         }
         else
         {
-            GetWindowRect( window->Parent->Window.Handle, &rect );
-            AdjustWindowRect ( &rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS |
-                                      WS_CLIPCHILDREN, FALSE );
+            RECT parentRect;
+            GetWindowRect( window->Parent->Window.Handle, &parentRect );
+            x -= parentRect.left + GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
+            y -= parentRect.top  + GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
+                                   GetSystemMetrics( SM_CYCAPTION );
         }
 
         /*
@@ -140,10 +146,7 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
 
         SetWindowPos( window->Window.Handle,
                       HWND_TOP,
-                      rect.left,
-                      rect.top,
-                      rect.right  - rect.left,
-                      rect.bottom - rect.top,
+                      x, y, w, h,
                       SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
                       SWP_NOZORDER
         );

@@ -167,7 +167,7 @@ struct tagSFG_XYUse
 typedef struct tagSFG_Time SFG_Time;
 struct tagSFG_Time
 {
-#ifdef WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     DWORD Value;
 #else
     struct timeval  Value;
@@ -229,6 +229,7 @@ struct tagSFG_State
 
     fgExecutionState ExecState;           /* Used for GLUT termination       */
     char            *ProgramName;         /* Name of the invoking program    */
+    GLboolean        JoysticksInitialised;  /* Only initialize if application calls for them */
 };
 
 /* The structure used by display initialization in freeglut_init.c */

@@ -85,7 +85,8 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       72,                     /* GameModeRefresh */
                       GLUT_ACTION_EXIT,       /* ActionOnWindowClose */
                       GLUT_EXEC_STATE_INIT,   /* ExecState */
-                      NULL                    /* ProgramName */
+                      NULL,                   /* ProgramName */
+                      GL_FALSE                /* JoysticksInitialised */
 };
 
 
@@ -201,11 +202,6 @@ void fgInitialize( const char* displayName )
 
 #endif
 
-#if !TARGET_HOST_WINCE
-    fgJoystickInit( 0 );
-    fgJoystickInit( 1 );
-#endif /* !TARGET_HOST_WINCE */
-
     fgState.Initialised = GL_TRUE;
 }
 
@@ -247,8 +243,10 @@ void fgDeinitialize( void )
     }
 
 #if !TARGET_HOST_WINCE
-    fgJoystickClose( );
+    if ( fgState.JoysticksInitialised )
+        fgJoystickClose( );
 #endif /* !TARGET_HOST_WINCE */
+    fgState.JoysticksInitialised = GL_FALSE;
 
     fgState.Initialised = GL_FALSE;
 
