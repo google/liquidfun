@@ -48,6 +48,9 @@
  */
 void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
 {
+    if( !callback )
+	fgError ("Fatal error in program.  NULL display callback not "
+	    "permitted in GLUT 3.0+ or freeglut 2.0.1+\n");
     SET_CALLBACK( Display );
 
     /*
