@@ -1285,8 +1285,8 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         ReleaseDC( window->Window.Handle, window->Window.Device );
 
 #if TARGET_HOST_WINCE
-		// Take over button handling
-		wince_OpenInput();
+        // Take over button handling
+        wince_OpenInput();
 #endif //TARGET_HOST_WINCE
         break;
 
@@ -1708,27 +1708,27 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
 
 #if TARGET_HOST_WINCE
-		if(!(lParam & 0x40000000)) // Prevent auto-repeat
-		{
-			wince_GetDefaultKeys(&gxKeyList, 0x03);
+        if(!(lParam & 0x40000000)) // Prevent auto-repeat
+        {
+            wince_GetDefaultKeys(&gxKeyList, 0x03);
 
-			if(wParam==(unsigned)gxKeyList.vkRight)
-				keypress = GLUT_KEY_RIGHT;
-			else if(wParam==(unsigned)gxKeyList.vkLeft)
-				keypress = GLUT_KEY_LEFT;
-			else if(wParam==(unsigned)gxKeyList.vkUp)
-				keypress = GLUT_KEY_UP;
-			else if(wParam==(unsigned)gxKeyList.vkDown)
-				keypress = GLUT_KEY_DOWN;
-			else if(wParam==(unsigned)gxKeyList.vkA)
-				keypress = GLUT_KEY_F1;
-			else if(wParam==(unsigned)gxKeyList.vkB)
-				keypress = GLUT_KEY_F2;
-			else if(wParam==(unsigned)gxKeyList.vkC)
-				keypress = GLUT_KEY_F3;
-			else if(wParam==(unsigned)gxKeyList.vkStart)
-				keypress = GLUT_KEY_F4;
-		}
+            if(wParam==(unsigned)gxKeyList.vkRight)
+                keypress = GLUT_KEY_RIGHT;
+            else if(wParam==(unsigned)gxKeyList.vkLeft)
+                keypress = GLUT_KEY_LEFT;
+            else if(wParam==(unsigned)gxKeyList.vkUp)
+                keypress = GLUT_KEY_UP;
+            else if(wParam==(unsigned)gxKeyList.vkDown)
+                keypress = GLUT_KEY_DOWN;
+            else if(wParam==(unsigned)gxKeyList.vkA)
+                keypress = GLUT_KEY_F1;
+            else if(wParam==(unsigned)gxKeyList.vkB)
+                keypress = GLUT_KEY_F2;
+            else if(wParam==(unsigned)gxKeyList.vkC)
+                keypress = GLUT_KEY_F3;
+            else if(wParam==(unsigned)gxKeyList.vkStart)
+                keypress = GLUT_KEY_F4;
+        }
 #endif
 
         if( keypress != -1 )

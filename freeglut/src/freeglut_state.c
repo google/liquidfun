@@ -400,21 +400,21 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     case GLUT_WINDOW_BORDER_WIDTH :
 #if TARGET_HOST_WINCE
-		return 0;
+        return 0;
 #else
         return GetSystemMetrics( SM_CXSIZEFRAME );
 #endif //TARGET_HOST_WINCE
 
     case GLUT_WINDOW_HEADER_HEIGHT :
 #if TARGET_HOST_WINCE
-		return 0;
+        return 0;
 #else
         return GetSystemMetrics( SM_CYCAPTION );
 #endif //TARGET_HOST_WINCE
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
 #if TARGET_HOST_WINCE
-		return GL_FALSE;
+        return GL_FALSE;
 #else
         return fgSetupPixelFormat( fgStructure.Window, GL_TRUE,
                                     PFD_MAIN_PLANE );
@@ -535,7 +535,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
          * We are much more fortunate under Win32 about this...
          */
 #if TARGET_HOST_WINCE
-		return 1;
+        return 1;
 #else
         return GetSystemMetrics( SM_CMOUSEBUTTONS );
 #endif //TARGET_HOST_WINCE
