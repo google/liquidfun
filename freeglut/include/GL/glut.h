@@ -75,6 +75,9 @@
 #define  GLUT_API_VERSION     4
 #define  FREEGLUT_VERSION_1_3 1
 
+#define  VERSION_MAJOR        1
+#define  VERSION_MINOR        4
+#define  VERSION_PATCH        0
 
 /*
  * Always include OpenGL and GLU headers
