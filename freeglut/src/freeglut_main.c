@@ -1565,7 +1565,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         int keypress = -1;
         POINT mouse_pos ;
 
-        if( fgState.IgnoreKeyRepeat && (lParam & KF_REPEAT) )
+        if( fgState.IgnoreKeyRepeat && (HIWORD(lParam) & KF_REPEAT) )
             break;
 
         /*
@@ -1714,7 +1714,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_SYSCHAR:
     case WM_CHAR:
     {
-        if( fgState.IgnoreKeyRepeat && (lParam & KF_REPEAT) )
+        if( fgState.IgnoreKeyRepeat && (HIWORD(lParam) & KF_REPEAT) )
             break;
 
         fgState.Modifiers = fgGetWin32Modifiers( );
