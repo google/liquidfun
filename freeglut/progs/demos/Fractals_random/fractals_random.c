@@ -57,7 +57,7 @@ static void draw_level ( int num, double m00, double m01, double m10, double m11
 
   for ( i = 0; i < 10; i++ )
   {
-    int random = rand () * num_trans / RAND_MAX ;
+    int random = (rand() >> 10) % num_trans;
     float new_x = affine[random].a00 * current_x + affine[random].a01 * current_y + affine[random].b0 ;
     float new_y = affine[random].a10 * current_x + affine[random].a11 * current_y + affine[random].b1 ;
 
@@ -80,6 +80,8 @@ Display(void)
   glEnd () ;
 
   glPopMatrix();
+
+  //  glutSwapBuffers(); /* Should NOT be here... This is a Single-Buffered Program! */
   glutPostRedisplay();  /* Needed so that this function will be called again */
 }
 
@@ -186,7 +188,7 @@ void readConfigFile ( char *fnme )
 
   /* Read the window title */
   fgets ( inputline, 256, fptr ) ;
-  sscanf ( inputline, "%s", window_title ) ;
+  sscanf ( inputline, "%[a-zA-Z0-9!@#$%^&*()+=/\\_-\" ]", window_title ) ;
 
   /* Read a comment line */
   fgets ( inputline, 256, fptr ) ;
