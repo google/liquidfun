@@ -646,3 +646,7 @@ behavior.
 (178) Complete purge of all remaining TABs from freeglut's *.[ch] files.
 Also verified that (as far as I can tell) all CRs are removed from all
 files where they do not belong.
+	
+*******************************************************************************************
+* Freeglut 2.2.0 RC 1 Released on  December 10, 2003!
+*******************************************************************************************
