@@ -571,6 +571,7 @@ void fgJoystickPollWindow( SFG_Window* window )
     /*
      * Execute the freeglut joystick callback now
      */
+    fgSetWindow (window);
     window->Callbacks.Joystick(
         buttons,
         (int) (axes[ 0 ] * 1000.0f),
