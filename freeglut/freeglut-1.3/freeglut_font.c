@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-font"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -257,7 +257,7 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
   /*
        * Scan the font looking for the specified character
    */
-  return( *(font->Characters[ character - 1 ]) + 1 );
+  return( *(font->Characters[ character - 1 ]) );
 }
 
 /*
@@ -286,7 +286,7 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const char* string )
         this_line_length = 0 ;
       }
       else  /* Not a carriage return, increment the length of this line */
-        this_line_length += *(font->Characters[ string[ c ] - 1 ]) + 1 ;
+        this_line_length += *(font->Characters[ string[ c ] - 1 ]) ;
     }
   }
 
