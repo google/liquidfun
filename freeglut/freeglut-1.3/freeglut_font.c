@@ -164,7 +164,7 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
   glBitmap(
       face[ 0 ], font->Height,      /* The bitmap's width and height */
       font->xorig, font->yorig,     /* The origin -- what on earth?  */
-      (float)(face[ 0 ] + 1), 0.0,  /* The raster advance -- inc. x  */
+      (float)(face[ 0 ]), 0.0,      /* The raster advance -- inc. x  */
       (face + 1)                    /* The packed bitmap data...     */
   );
 
@@ -226,7 +226,7 @@ void FGAPIENTRY glutBitmapString( void* fontID, const char *string )
         glBitmap(
             face[ 0 ], font->Height,      /* The bitmap's width and height */
             font->xorig, font->yorig,     /* The origin -- what on earth?  */
-            (float)(face[ 0 ] + 1), 0.0,  /* The raster advance -- inc. x  */
+            (float)(face[ 0 ]), 0.0,      /* The raster advance -- inc. x  */
             (face + 1)                    /* The packed bitmap data...     */
         ) ;
       }
