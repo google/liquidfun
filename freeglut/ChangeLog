@@ -209,3 +209,10 @@ October 24, 2002:
 (86) Moved tests/one.c into progs/demos/One/one.c, updated configure.in and Makefile.in
 
 (87) Removed tests directory
+
+
+*******************************************************************************************
+* Changes on 03 July 2003
+*******************************************************************************************
+
+(88) Removed unused char *ptr from freeglut_misc.c

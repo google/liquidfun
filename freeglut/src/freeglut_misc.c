@@ -51,7 +51,6 @@
 int FGAPIENTRY glutExtensionSupported( const char* extension )
 {
   const char *extensions, *start;
-  const char *ptr;
   const int len = strlen( extension ) ;
 
   /*
