@@ -95,6 +95,14 @@ key(unsigned char key, int x, int y)
 {
     switch (key) 
     {
+        case 'n': glDisable ( GL_CULL_FACE ) ;
+                  break ;
+        case 'f': glEnable ( GL_CULL_FACE ) ;
+                  glCullFace ( GL_FRONT ) ;
+                  break ;
+        case 'b': glEnable ( GL_CULL_FACE ) ;
+                  glCullFace ( GL_BACK ) ;
+                  break ;
         case 27 : 
         case 'q':
             exit(0);
