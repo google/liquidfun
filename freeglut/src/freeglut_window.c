@@ -397,6 +397,10 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
          */
         fgState.DisplayMode |= GLUT_DOUBLE ;
         window->Window.VisualInfo = fgChooseVisual();
+	/* OK, we got a double-buffered window, but we only wanted
+	 * single-buffered.  Clear the double-buffer flag now.
+	 */
+	fgState.DisplayMode &= ~GLUT_DOUBLE ;
       }
 
       /*

@@ -454,6 +454,22 @@ static int fgHaveJoystick( void )
     fgEnumWindows( fgCheckJoystickCallback, &enumerator );
     return !!enumerator.data;
 }
+static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
+{
+    if( w->State.Redisplay )
+    {
+	e->found = TRUE;
+	e->data = w;
+    }
+}	
+static int fgHavePendingRedisplays (void)
+{
+    SFG_Enumerator enumerator;
+    enumerator.found = FALSE;
+    enumerator.data = NULL;
+    fgEnumWindows( fgHavePendingRedisplaysCallback, &enumerator );
+    return !!enumerator.data;
+}
 /*
  * Indicates whether there are any outstanding timers.
  */
@@ -490,6 +506,9 @@ static void fgSleepForEvents( void )
     struct timeval wait;
     long msec;    
     
+    if( fgState.IdleCallback ||
+	fgHavePendingRedisplays() )
+	return;
     socket = ConnectionNumber( fgDisplay.Display );
     FD_ZERO( &fdset );
     FD_SET( socket, &fdset );
@@ -1227,7 +1246,7 @@ void FGAPIENTRY glutMainLoop( void )
      */
     if ( fgStructure.Windows.First == NULL )
       fgState.ExecState = GLUT_EXEC_STATE_STOP ;
-    else if( !fgState.IdleCallback )
+    else
       fgSleepForEvents();
   }
 
