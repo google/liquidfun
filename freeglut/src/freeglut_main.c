@@ -34,6 +34,25 @@
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
 
+#include <limits.h>
+#if TARGET_HOST_UNIX_X11
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/stat.h>
+#elif TARGET_HOST_WIN32
+#endif
+
+#ifndef MAX
+#define MAX(a,b) (((a)>(b)) ? (a) : (b))
+#endif
+
+#ifndef MIN
+#define MIN(a,b) (((a)<(b)) ? (a) : (b))
+#endif
+
+
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
@@ -399,22 +418,6 @@ void fgWarning( const char *fmt, ... )
     va_end( ap );
 }
 
-#include <limits.h>
-#ifdef TARGET_HOST_UNIX_X11
-#include <sys/types.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/stat.h>
-#elif TARGET_HOST_WIN32
-#endif
-#ifndef MAX
-#define MAX(a,b) (((a)>(b)) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a,b) (((a)<(b)) ? (a) : (b))
-#endif
-
 /*
  * Indicates whether Joystick events are being used by ANY window.
  *
@@ -480,7 +483,7 @@ static long fgNextTimer( void )
  */
 static void fgSleepForEvents( void )
 {
-#ifdef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_UNIX_X11
     fd_set fdset;
     int err;
     int socket;
