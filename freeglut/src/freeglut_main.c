@@ -995,24 +995,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
     }
   }
 
-  {
-    /*
-     * Have all the timers checked.
-     */
-    fghCheckTimers();
-
-    /*
-     * Poll the joystick and notify all windows that want to be notified...
-     */
-    fghCheckJoystickPolls();
-
-    /*
-     * Remember about displaying all the windows that have
-     * been marked for a redisplay (possibly in the idle call):
-     */
-    fghDisplayAll();
-  }
-
 #elif TARGET_HOST_WIN32
 
   MSG stMsg;
@@ -1035,28 +1017,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
     DispatchMessage( &stMsg );
   }
 
-  {
-    /*
-     * Have all the timers checked.
-     */
-    fghCheckTimers();
-
-    /*
-     * Poll the joystick and notify all windows that want to be notified...
-     */
-    fghCheckJoystickPolls();
-
-    /*
-     * Remember about displaying all the windows that have
-     * been marked for a redisplay (possibly in the idle call):
-     */
-    fghDisplayAll();
-  }
 #endif
 
-    /* 
-     * If an event caused a window to be closed, do the actual closing here
-     */
+    fghCheckTimers ();
+    fghCheckJoystickPolls ();
+    fghDisplayAll ();
     fgCloseWindows () ;
 }
 
