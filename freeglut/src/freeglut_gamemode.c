@@ -132,6 +132,8 @@ void fghRememberState( void )
 void fghRestoreState( void )
 {
 #if TARGET_HOST_UNIX_X11
+
+#   ifdef X_XF86VidModeGetAllModeLines
     /*
      * Restore the remembered pointer position:
      */
@@ -143,7 +145,6 @@ void fghRestoreState( void )
     /*
      * This highly depends on the XFree86 extensions, not approved as X Consortium standards
      */
-#   ifdef X_XF86VidModeGetAllModeLines
 
     if (fgDisplay.DisplayModeValid)
     {
