@@ -47,6 +47,35 @@
 
 /* -- INTERNAL FUNCTIONS --------------------------------------------------- */
 
+#if TARGET_HOST_UNIX_X11
+
+fgGetCursorError( Cursor cursor )
+{
+    int ret = 0;
+    char buf[ 256 ];
+    
+    switch( cursor )
+    {
+    case BadAlloc:
+    case BadFont:
+    case BadMatch:
+    case BadPixmap:
+    case BadValue:
+        XGetErrorText( fgDisplay.Display, cursor, buf, sizeof buf );
+        fgWarning( "Error in setting cursor:\n %s.", buf );
+        ret = cursor;
+        break;
+    default:
+        /* no error */
+        break;
+    }
+
+    return ret;
+}
+
+#endif
+
+
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -60,20 +89,19 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 #if TARGET_HOST_UNIX_X11
     /*
      * Open issues:
-     * (X) GLUT_CURSOR_NONE doesn't do what it should.  We can probably
-     *     build an empty pixmap for it, though, quite painlessly.
-     * (X) Are we allocating resources, or causing X to do so?
-     *     If yes, we should arrange to deallocate!
-     * (c) No error checking.  Is that a problem?
-     * (d) FULL_CROSSHAIR demotes to plain CROSSHAIR.  Old GLUT allows
+     * (a) Partial error checking.  Is that a problem?
+     *     Is fgGetCursorError() correct?  Should we abort on errors?
+     *     Should there be a freeglut-wide X error handler?  Should
+     *     we use the X error-handler mechanism?
+     * (b) FULL_CROSSHAIR demotes to plain CROSSHAIR.  Old GLUT allows
      *     for this, but if there is a system that easily supports a full-
      *     window (or full-screen) crosshair, we might consider it.
-     * (e) Out-of-range cursor-types are ignored.  Should we abort?
-     *     Print a warning message?
+     * (c) Out-of-range cursor-types generate warnings.  Should we abort?
      */
     {
         Cursor cursor;
         Pixmap no_cursor;  /* Used for GLUT_CURSOR_NONE */
+        int error = 0;
 
 #define MAP_CURSOR(a,b)                                     \
     case a:                                                 \
@@ -107,6 +135,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
                         XC_bottom_right_corner);
             MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER, XC_bottom_left_corner);
             /* MAP_CURSOR( GLUT_CURSOR_NONE,        XC_bogosity); */
+
         case GLUT_CURSOR_NONE:
         {
             static unsigned char no_cursor_bits[ 32 ];
@@ -130,9 +159,13 @@ void FGAPIENTRY glutSetCursor( int cursorID )
         
         case GLUT_CURSOR_INHERIT:
             break;
+
         default:
+            fgWarning( "Unknown cursor type: %d\n", cursorID );
             return;
         }
+
+        error = fgGetCursorError( cursor );
 
         if( GLUT_CURSOR_INHERIT == cursorID )
             XUndefineCursor( fgDisplay.Display,
