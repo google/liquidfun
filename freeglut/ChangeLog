@@ -891,3 +891,7 @@ default.
 
 (232) Improved error message a bit when no suitable visual could be found
 (X11 only).
+
+(233) Fixed part of bug #926883 (Video mode matching code, memory leaks,
+fullscreen), i.e. memory leak caused by not freeing the mode lines returned
+by XF86VidModeGetAllModeLines

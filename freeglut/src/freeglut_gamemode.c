@@ -180,9 +180,10 @@ static void fghRestoreState( void )
                  */
                 XFlush( fgDisplay.Display );
 
-                return;
+                break;
             }
         }
+        XFree( displayModes );
     }
 
 #   else
@@ -217,6 +218,7 @@ static GLboolean fghCheckDisplayMode( int width, int height, int depth, int refr
  */
 static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 {
+    GLboolean success = GL_FALSE;
 #if TARGET_HOST_UNIX_X11
 
     /*
@@ -249,21 +251,20 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
                                      fgState.GameModeDepth,
                                      fgState.GameModeRefresh ) )
             {
-                if( haveToTest )
-                    return GL_TRUE;
                 /* OKi, this is the display mode we have been looking for... */
-                XF86VidModeSwitchToMode(
-                    fgDisplay.Display,
-                    fgDisplay.Screen,
-                    displayModes[ i ]
-                );
-                return GL_TRUE;
+                if( !haveToTest ) {
+                    XF86VidModeSwitchToMode(
+                        fgDisplay.Display,
+                        fgDisplay.Screen,
+                        displayModes[ i ]
+                    );
+                }
+                success = GL_TRUE;
+                break;
             }
         }
+        XFree( displayModes );
     }
-
-    /* Something must have gone wrong */
-    return GL_FALSE;
 
 #   else
     /*
@@ -275,7 +276,6 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     unsigned int    displayModes = 0, mode = 0xffffffff;
-    GLboolean success = GL_FALSE;
     /* HDC      desktopDC; */
     DEVMODE  devMode;
 
@@ -341,9 +341,9 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         }
     }
 
-    return success;
-
 #endif
+
+    return success;
 }
 
 
