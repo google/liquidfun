@@ -693,3 +693,9 @@ Only UNIX_X11 is supprted at this point, for lack of knowledge.
 
 (184) Per demands of project owner, offscreen rendering is now removed
 from freeglut.
+
+***************************************************************************
+* Changes on December 31, 2004.
+***************************************************************************
+
+(185) Fixed bug #1079530 (glutGetProcAddress and geometric objects).

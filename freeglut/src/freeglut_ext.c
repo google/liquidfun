@@ -178,8 +178,10 @@ static struct name_address_pair glut_functions[] =
    { "glutStrokeString", (void *) glutStrokeString },
    { "glutWireRhombicDodecahedron", (void *) glutWireRhombicDodecahedron },
    { "glutSolidRhombicDodecahedron", (void *) glutSolidRhombicDodecahedron },
-   { "glutWireSierpinskiSponge ", (void *) glutWireSierpinskiSponge },
-   { "glutSolidSierpinskiSponge ", (void *) glutSolidSierpinskiSponge },
+   { "glutWireSierpinskiSponge", (void *) glutWireSierpinskiSponge },
+   { "glutSolidSierpinskiSponge", (void *) glutSolidSierpinskiSponge },
+   { "glutWireCylinder", (void *) glutWireCylinder },
+   { "glutSolidCylinder", (void *) glutSolidCylinder },
    { "glutGetProcAddress", (void *) glutGetProcAddress },
    { "glutMouseWheelFunc", (void *) glutMouseWheelFunc },
    { NULL, NULL }
