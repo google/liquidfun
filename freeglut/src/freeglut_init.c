@@ -613,15 +613,9 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     }
 
     /*
-     * Have the display created now. As I am too lazy to implement
-     * the program arguments parsing, we will have the DISPLAY
-     * environment variable used for opening the X display:
-     *
-     * XXX The above comment is rather unclear.  We have just
-     * XXX completed parsing of the program arguments for GLUT
-     * XXX parameters.  We obviously canNOT parse the application-
-     * XXX specific parameters.  Can someone re-write the above
-     * XXX more clearly?
+     * Have the display created now. If there wasn't a "-display"
+     * in the program arguments, we will use the DISPLAY environment
+     * variable for opening the X display (see code above):
      */
     fgInitialize( displayName );
 
