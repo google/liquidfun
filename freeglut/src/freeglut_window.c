@@ -306,6 +306,8 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly, unsigned 
 void fgSetWindow ( SFG_Window *window )
 {
 #if TARGET_HOST_UNIX_X11
+  if ( window )
+  {
     /*
 	 * Make the selected window's GLX context the current one
      */
@@ -314,7 +316,7 @@ void fgSetWindow ( SFG_Window *window )
         window->Window.Handle,
         window->Window.Context
     );
-
+  }
 #elif TARGET_HOST_WIN32
 	/*
 	 * Release the previous' context's device context
