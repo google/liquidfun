@@ -222,3 +222,5 @@ October 24, 2002:
 *******************************************************************************************
 
 (89) Changed the overlay (freeglut_state.c:662) to return FALSE, as it's not implemented yet.
+
+(90) Applied John F. Fay's fixes to freeglut.dsp and freeglut_static.dsp
