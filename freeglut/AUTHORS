@@ -8,6 +8,18 @@ Andreas Umbach <marvin@dataway.ch>
 
 Steve Baker <sjbaker1@airmail.net>
     joystick code (from his great PLIB), numerous hints 
-    and tips on the freeglut usability
+    tips on the freeglut usability
+    and for taking the project over when Pawel bowed out
 
-...and all the opengl-gamedev-l people that made me to start this project :)
+Christopher John Purnell
+Don Heyse
+Dave McClurg
+John F. Fay
+Norman Vine
+    contributing the project, using the product, and generally keeping it going
+
+Brian Paul
+Eric Sandall
+    giving us the oomph! to make an official release
+
+...and all the opengl-gamedev-l people that made Pawel start this project :)
