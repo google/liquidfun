@@ -28,6 +28,11 @@
 #ifndef  FREEGLUT_INTERNAL_H
 #define  FREEGLUT_INTERNAL_H
 
+/* XXX Update these for each release! */
+#define  VERSION_MAJOR 1
+#define  VERSION_MINOR 4
+#define  VERSION_PATCH 0 
+
 /*
  * Freeglut is meant to be available under all Unix/X11 and Win32 platforms.
  */
