@@ -1042,10 +1042,25 @@ void FGAPIENTRY glutLeaveMainLoop( void )
     fgState.ExecState = GLUT_EXEC_STATE_STOP ;
 }
 
+
+#if TARGET_HOST_WIN32
+/*
+ * Determine a GLUT modifer mask based on MS-WINDOWS system info.
+ */
+int fgGetWin32Modifiers (void)
+{
+    return
+        ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
+            ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
+        ( ( ( GetKeyState( VK_LCONTROL ) < 0 ) ||
+            ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
+        ( ( ( GetKeyState( VK_LMENU    ) < 0 ) ||
+            ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+}
+
 /*
  * The window procedure for handling Win32 events
  */
-#if TARGET_HOST_WIN32
 LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                                LPARAM lParam )
 {
@@ -1145,32 +1160,38 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             (fgStructure.Window->State.Cursor == GLUT_CURSOR_NONE))
           SetCursor( NULL );
 #else
+
         /* Set the cursor AND change it for this window class. */
-#        define MAP_CURSOR(a,b) case a: SetCursor( LoadCursor( NULL, b ) ); \
-        break;
+#define MAP_CURSOR(a,b)                 \
+    case a:                             \
+    SetCursor( LoadCursor( NULL, b ) ); \
+    break;
+
         /* Nuke the cursor AND change it for this window class. */
-#        define ZAP_CURSOR(a,b) case a: SetCursor( NULL ); \
-        break;
+#define ZAP_CURSOR(a,b) \
+    case a:             \
+    SetCursor( NULL );  \
+    break;
 
         if( LOWORD( lParam ) == HTCLIENT )
-          switch( window->State.Cursor )
-          {
-              MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
-              MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
-              MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
-              MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
-              MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP           );
-              MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
-              MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
-              MAP_CURSOR( GLUT_CURSOR_WAIT,                 IDC_WAIT      );
-              MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
-              MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
-              /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO                   ); */
-              ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL           );
+            switch( window->State.Cursor )
+            {
+                MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
+                MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
+                MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
+                MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
+                MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP      );
+                MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
+                MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
+                MAP_CURSOR( GLUT_CURSOR_WAIT,        IDC_WAIT      );
+                MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
+                MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
+                /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO         ); */
+                ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL          );
 
-          default:
-              MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
-          }
+            default:
+                MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
+            }
 #endif
         else
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
@@ -1245,13 +1266,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
-        window->State.Modifiers = 
-            ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
-                ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
-            ( ( ( GetKeyState( VK_LCONTROL ) < 0 ) ||
-                ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
-            ( ( ( GetKeyState( VK_LMENU    ) < 0 ) ||
-                ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+        window->State.Modifiers = fgGetWin32Modifiers( );
 
         if( ( wParam & MK_LBUTTON ) ||
             ( wParam & MK_MBUTTON ) ||
@@ -1388,14 +1403,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
 
         fgSetWindow( window );
-
-        fgStructure.Window->State.Modifiers = 
-            ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
-                ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
-            ( ( ( GetKeyState( VK_LCONTROL ) < 0 ) ||
-                ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
-            ( ( ( GetKeyState( VK_LMENU    ) < 0 ) ||
-                ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+        fgStructure.Window->State.Modifiers = fgGetWin32Modifiers( );
 
         window->Callbacks.Mouse(
             button,
@@ -1436,13 +1444,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
 
         fgSetWindow( window );
-        fgStructure.Window->State.Modifiers = 
-            ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
-                ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
-            ( ( ( GetKeyState( VK_LCONTROL ) < 0 ) ||
-                ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
-            ( ( ( GetKeyState( VK_LMENU    ) < 0 ) ||
-                ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+        fgStructure.Window->State.Modifiers = fgGetWin32Modifiers( );
 
         while( ticks-- )
             if( window->Callbacks.MouseWheel )
@@ -1485,13 +1487,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Remember the current modifiers state. This is done here in order 
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
-        window->State.Modifiers = 
-            ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
-                ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
-            ( ( ( GetKeyState( VK_LCONTROL ) < 0 ) ||
-                ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
-            ( ( ( GetKeyState( VK_LMENU    ) < 0 ) ||
-                ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+        window->State.Modifiers = fgGetWin32Modifiers( );
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
@@ -1561,13 +1557,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Remember the current modifiers state. This is done here in order 
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
-        window->State.Modifiers = 
-            ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
-                ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
-            ( ( ( GetKeyState( VK_LCONTROL ) < 0 ) ||
-                ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
-            ( ( ( GetKeyState( VK_LMENU    ) < 0 ) ||
-                ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+        window->State.Modifiers = fgGetWin32Modifiers( );
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
@@ -1657,14 +1647,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( window->Callbacks.Keyboard )
         {
             fgSetWindow( window );
-            window->State.Modifiers = 
-                ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
-                    ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
-                ( ( ( GetKeyState( VK_LCONTROL ) < 0 ) ||
-                    ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
-                ( ( ( GetKeyState( VK_LMENU    ) < 0 ) ||
-                    ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
-
+            window->State.Modifiers = fgGetWin32Modifiers( );
             window->Callbacks.Keyboard( (char)wParam, window->State.MouseX,
                                         window->State.MouseY );
             window->State.Modifiers = 0xffffffff;

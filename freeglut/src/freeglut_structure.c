@@ -561,7 +561,7 @@ static void fghcbWindowByID( SFG_Window *window, SFG_Enumerator *enumerator )
     /*
      * Check the window's handle. Hope this works. Looks ugly. That's for sure.
      */
-    if( window->ID == (int) (enumerator->data) )
+    if( window->ID == (int) (enumerator->data) ) /* XXX int/ptr conversion! */
     {
         enumerator->found = TRUE;
         enumerator->data = window;
@@ -588,7 +588,7 @@ SFG_Window* fgWindowByID( int windowID )
      * Uses a method very similiar for fgWindowByHandle...
      */
     enumerator.found = FALSE;
-    enumerator.data = (void *) windowID;
+    enumerator.data = (void *) windowID; /* XXX int/pointer conversion! */
     fgEnumWindows( fghcbWindowByID, &enumerator );
     if( enumerator.found == TRUE )
         return( SFG_Window *) enumerator.data;
