@@ -1088,16 +1088,27 @@ void FGAPIENTRY glutMainLoop( void )
     fgState.ExecState = GLUT_EXEC_STATE_RUNNING ;
     while( fgState.ExecState == GLUT_EXEC_STATE_RUNNING )
     {
-        glutMainLoopEvent( );
+        SFG_Window *window;
 
-        if( fgStructure.Windows.First == NULL )
+        glutMainLoopEvent( );
+        /*
+         * Step through the list of windows, seeing if there are any
+         * that are not menus
+         */ 
+        for( window = ( SFG_Window * )fgStructure.Windows.First;
+             window;
+             window = ( SFG_Window * )window->Node.Next )
+            if ( ! ( window->IsMenu ) )
+                break;
+        
+        if( ! window )
             fgState.ExecState = GLUT_EXEC_STATE_STOP;
         else
         {
             if( fgState.IdleCallback )
                 fgState.IdleCallback( );
 
-            fgSleepForEvents();
+            fgSleepForEvents( );
         }
     }
 
@@ -1106,6 +1117,8 @@ void FGAPIENTRY glutMainLoop( void )
      * of a freeglut session, so that another glutInit() call can happen
      */
     fgDeinitialize( );
+    if( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
+        exit( 0 );
 }
 
 /*
