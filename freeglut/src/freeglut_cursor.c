@@ -40,9 +40,6 @@
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
- *
- *  fgDisplayCursor()   -- this waits for better times
- *                         XXX Just delete fgDisplayCursor?
  *  glutSetCursor()     -- Win32 mappings are incomplete
  *                         X mappings are nearly right.
  *
@@ -52,14 +49,6 @@
  */
 
 /* -- INTERNAL FUNCTIONS --------------------------------------------------- */
-
-/*
- * Display the mouse cursor using OpenGL calls
- */
-void fgDisplayCursor( void )
-{
-}
-
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 

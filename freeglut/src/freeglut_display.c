@@ -55,11 +55,9 @@ void FGAPIENTRY glutSwapBuffers( void )
     freeglut_assert_ready;
     freeglut_assert_window;
 
-    fgDisplayCursor();
     glFlush();
-
     if ( ! fgStructure.Window->Window.DoubleBuffered )
-	return ;
+	return;
 
 #if TARGET_HOST_UNIX_X11
     glXSwapBuffers( fgDisplay.Display, fgStructure.Window->Window.Handle );
