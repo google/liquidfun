@@ -697,7 +697,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
 
 /*
  * Window creation, opening, closing and destruction.
- * Also CallBack initialization.
+ * Also CallBack clearing/initialization.
  * Defined in freeglut_structure.c, freeglut_window.c.
  */
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
@@ -711,7 +711,7 @@ void        fgAddToWindowDestroyList ( SFG_Window* window,
                                        GLboolean needToClose ) ;
 void        fgCloseWindows ();
 void        fgDestroyWindow( SFG_Window* window, GLboolean needToClose );
-void        fgInitCallBacks( SFG_Window *window );
+void        fgClearCallBacks( SFG_Window *window );
 
 /*
  * Menu creation and destruction. Defined in freeglut_structure.c
