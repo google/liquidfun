@@ -106,10 +106,12 @@ void advance_in_time ( double time_step, double position[3], double new_position
 
 /* GLUT callbacks */
 
+#define INPUT_LINE_LENGTH 80
+
 void key_cb ( unsigned char key, int x, int y )
 {
   int i ;
-  char inputline [ 80 ] ;
+  char inputline [ INPUT_LINE_LENGTH ] ;
 
   switch ( key )
   {
@@ -137,15 +139,15 @@ void key_cb ( unsigned char key, int x, int y )
 
   case 'm' :  case 'M' :  /* Modify the Lorenz parameters */
     printf ( "Please enter new value for <sigma> (default %lf, currently %lf): ", s0, sigma ) ;
-    fgets ( inputline, 79, stdin ) ;
+    fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
     sscanf ( inputline, "%lf", &sigma ) ;
 
     printf ( "Please enter new value for <b> (default %lf, currently %lf): ", b0, b ) ;
-    fgets ( inputline, 79, stdin ) ;
+    fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
     sscanf ( inputline, "%lf", &b ) ;
 
     printf ( "Please enter new value for <r> (default %lf, currently %lf): ", r0, r ) ;
-    fgets ( inputline, 79, stdin ) ;
+    fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
     sscanf ( inputline, "%lf", &r ) ;
 
     break ;
@@ -205,7 +207,10 @@ void mouse_cb ( int button, int updown, int x, int y )
   if ( updown == GLUT_DOWN )
   {
     double dist = 1.0e20 ;  /* A very large number */
-    (void) dist; /* what's this all about? */
+    dist = 0.0 ;  /* so we don't get "unused variable" compiler warning */
+    /* The idea here is that we go into "pick" mode and pick the nearest point
+       to the mouse click position.  Unfortunately I don't have the time to implement
+       it at the moment. */
   }
 }
 
@@ -312,7 +317,6 @@ int main ( int argc, char *argv[] )
   srand ( 1023 ) ;
 
   /* Set up the OpenGL parameters */
-  /*  glDrawBuffer ( GL_BACK ) ;*/
   glEnable ( GL_DEPTH_TEST ) ;
   glClearColor ( 0.0, 0.0, 0.0, 0.0 ) ;
   glClearDepth ( 1.0 ) ;
@@ -339,6 +343,6 @@ int main ( int argc, char *argv[] )
   /* Enter the GLUT main loop */
   glutMainLoop () ;
 
-  return 0;
+  return 0 ;
 }
 
