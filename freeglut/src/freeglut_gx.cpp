@@ -26,6 +26,15 @@
  */
 
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "freeglut_internal.h"
+
+#if TARGET_HOST_WINCE
+
+
 #include <windows.h>
 #include <gx.h>
 
@@ -40,13 +49,16 @@ extern "C"
 
 void wince_GetDefaultKeys(void* nData, int iOptions)
 {
-	*(GXKeyList*)nData = GXGetDefaultKeys(iOptions);
+    *(GXKeyList*)nData = GXGetDefaultKeys(iOptions);
 };
 
 
 void wince_OpenInput()
 {
-	GXOpenInput();
+    GXOpenInput();
 }
 
 }
+
+
+#endif

@@ -210,8 +210,19 @@ DEP_CPP_FREEGLUT_GL=\
 
 SOURCE=.\src\freeglut_gx.cpp
 DEP_CPP_FREEGLUT_GX=\
+	".\src\freeglut_internal.h"\
 	{$(INCLUDE)}"gx.h"\
 	
+NODEP_CPP_FREEGLUT_GX=\
+	".\src\config.h"\
+	
+
+!IF  "$(CFG)" == "freeglut - Win32 (WCE ARMV4) Release"
+
+!ELSEIF  "$(CFG)" == "freeglut - Win32 (WCE ARMV4) Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -240,6 +251,7 @@ SOURCE=.\src\freeglut_joystick.c
 SOURCE=.\src\freeglut_main.c
 DEP_CPP_FREEGLUT_M=\
 	".\src\freeglut_internal.h"\
+	".\src\my_gx.h"\
 	{$(INCLUDE)}"GL\freeglut.h"\
 	{$(INCLUDE)}"GL\freeglut_ext.h"\
 	{$(INCLUDE)}"GL\freeglut_std.h"\

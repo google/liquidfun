@@ -113,7 +113,7 @@ static struct name_address_pair glut_functions[] =
    { "glutSpecialUpFunc", (void *) glutSpecialUpFunc },
 #if !TARGET_HOST_WINCE
    { "glutJoystickFunc", (void *) glutJoystickFunc },
-#endif //TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
    { "glutSetColor", (void *) glutSetColor },
    { "glutGetColor", (void *) glutGetColor },
    { "glutCopyColormap", (void *) glutCopyColormap },
@@ -160,7 +160,7 @@ static struct name_address_pair glut_functions[] =
    { "glutEnterGameMode", (void *) glutEnterGameMode },
    { "glutLeaveGameMode", (void *) glutLeaveGameMode },
    { "glutGameModeGet", (void *) glutGameModeGet },
-#endif //TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
    /* freeglut extensions */
    { "glutMainLoopEvent", (void *) glutMainLoopEvent },
    { "glutLeaveMainLoop", (void *) glutLeaveMainLoop },

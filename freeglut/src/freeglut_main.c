@@ -62,8 +62,22 @@ struct GXKeyList {
     short vkStart;
     POINT ptStart;
 };
+/*__declspec(dllimport) struct GXKeyList GXGetDefaultKeys(int iOptions);
+__declspec(dllimport) int GXOpenInput();
+#include "my_gx.h"*/
+
 extern void wince_GetDefaultKeys(void* nData, int iOptions);
 extern void wince_OpenInput();
+
+/*void wince_GetDefaultKeys(void* nData, int iOptions)
+{
+    *(struct GXKeyList*)nData = GXGetDefaultKeys(iOptions);
+}
+void wince_OpenInput()
+{
+    GXOpenInput();
+}*/
+
 #endif
 
 #ifndef MAX
@@ -157,7 +171,7 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
                       SWP_NOZORDER
         );
     }
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
     /*
      * XXX Should update {window->State.OldWidth, window->State.OldHeight}
@@ -290,7 +304,7 @@ static void fghcbCheckJoystickPolls( SFG_Window *window,
     {
 #if !TARGET_HOST_WINCE
         fgJoystickPollWindow( window );
-#endif //!TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
         window->State.JoystickLastPoll = checkTime;
     }
 
@@ -1287,7 +1301,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 #if TARGET_HOST_WINCE
         // Take over button handling
         wince_OpenInput();
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
         break;
 
     case WM_SIZE:
@@ -1305,7 +1319,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 #else
             window->State.Width  = LOWORD(lParam);
             window->State.Height = HIWORD(lParam);
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
         }
 
         break;
@@ -1405,7 +1419,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 #else
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
         if ( window->ActiveMenu )
         {
@@ -1445,7 +1459,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 #else
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
         switch( uMsg )
         {
@@ -1488,7 +1502,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 if( button == GLUT_RIGHT_BUTTON )
                     button = GLUT_LEFT_BUTTON;
         }
-#endif //!TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
 
         if( button == -1 )
             return DefWindowProc( hWnd, uMsg, lParam, wParam );
@@ -1650,7 +1664,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     {
 #if TARGET_HOST_WINCE
         struct GXKeyList gxKeyList;
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
         int keypress = -1;
         POINT mouse_pos ;
 
@@ -1812,7 +1826,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                         ( (char)wParam,
                           window->State.MouseX, window->State.MouseY )
             );
-#endif //!TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
         }
         }
 
@@ -1952,7 +1966,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 break ;
             }
         }
-#endif //!TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
 
         /* We need to pass the message on to the operating system as well */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );

@@ -386,7 +386,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
           winRect.top    += GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION );
           winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME );
         }
-#endif //TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
 
         switch( eWhat )
         {
@@ -403,14 +403,14 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         return 0;
 #else
         return GetSystemMetrics( SM_CXSIZEFRAME );
-#endif //TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
 
     case GLUT_WINDOW_HEADER_HEIGHT :
 #if TARGET_HOST_WINCE
         return 0;
 #else
         return GetSystemMetrics( SM_CYCAPTION );
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
 #if TARGET_HOST_WINCE
@@ -418,14 +418,14 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 #else
         return fgSetupPixelFormat( fgStructure.Window, GL_TRUE,
                                     PFD_MAIN_PLANE );
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
 
     case GLUT_WINDOW_FORMAT_ID:
 #if !TARGET_HOST_WINCE
         if( fgStructure.Window != NULL )
             return GetPixelFormat( fgStructure.Window->Window.Device );
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
         return 0;
 
 #endif
@@ -538,7 +538,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return 1;
 #else
         return GetSystemMetrics( SM_CMOUSEBUTTONS );
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
 #endif
 

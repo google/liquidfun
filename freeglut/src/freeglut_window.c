@@ -47,7 +47,7 @@ wchar_t* wstr_from_str(const char* str)
 }
 
 
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -231,7 +231,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     if( checkOnly )
         return GL_TRUE;
     return SetPixelFormat( window->Window.Device, pixelformat, ppfd );
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 }
 #endif
 
@@ -456,7 +456,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     sizeHints.y      = y;
     sizeHints.width  = w;
     sizeHints.height = h;
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
     wmHints.flags = StateHint;
     wmHints.initial_state = fgState.ForceIconic ? IconicState : NormalState;
@@ -521,7 +521,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 +
                 GetSystemMetrics( SM_CYCAPTION );
         }
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
         if( ! fgState.Position.Use )
         {
@@ -589,7 +589,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         fgDisplay.Instance,
         (LPVOID) window
     );
-#endif TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
     if( !( window->Window.Handle ) )
         fgError( "Failed to create a window (%s)!", title );
@@ -599,7 +599,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 #else
     ShowWindow( window->Window.Handle,
                 fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOW );
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
     UpdateWindow( window->Window.Handle );
     ShowCursor( TRUE );  /* XXX Old comments say "hide cusror"! */

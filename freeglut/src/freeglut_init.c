@@ -213,7 +213,7 @@ void fgInitialize( const char* displayName )
 #if !TARGET_HOST_WINCE
     fgJoystickInit( 0 );
     fgJoystickInit( 1 );
-#endif //!TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
 
     fgState.Initialised = GL_TRUE;
 }
@@ -259,7 +259,7 @@ void fgDeinitialize( void )
 
 #if !TARGET_HOST_WINCE
     fgJoystickClose( );
-#endif //!TARGET_HOST_WINCE
+#endif /* !TARGET_HOST_WINCE */
 
     fgState.Initialised = GL_FALSE;
 
@@ -623,7 +623,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         }
     }
 
-#endif //TARGET_HOST_WINCE
+#endif /* TARGET_HOST_WINCE */
 
     /*
      * Have the display created now. If there wasn't a "-display"
