@@ -333,7 +333,7 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
         }
     if( length < this_line_length )
         length = this_line_length;
-    return ( int )( length + 0.5 );
+    return( int )( length + 0.5 );
 }
 
 /*
@@ -342,7 +342,7 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
 GLfloat FGAPIENTRY glutStrokeHeight( void* fontID )
 {
     SFG_StrokeFont* font = fghStrokeByID( fontID );
-    return( font->Height );
+    return font->Height;
 }
 
 /*** END OF FILE ***/

@@ -97,7 +97,7 @@ void fghRememberState( void )
         &fgDisplay.DisplayMode
     );
 
-    if (!fgDisplay.DisplayModeValid)
+    if( !fgDisplay.DisplayModeValid )
             fgWarning( "Runtime use of XF86VidModeGetModeLine failed.\n" );
 
 #   else
@@ -148,7 +148,7 @@ void fghRestoreState( void )
      * not approved as X Consortium standards
      */
 
-    if (fgDisplay.DisplayModeValid)
+    if( fgDisplay.DisplayModeValid )
     {
         XF86VidModeModeInfo** displayModes;
         int i, displayModesCount;
@@ -216,10 +216,10 @@ GLboolean fghCheckDisplayMode( int width, int height, int depth, int refresh )
     /*
      * The desired values should be stored in fgState structure...
      */
-    return( (width == fgState.GameModeSize.X) &&
-            (height == fgState.GameModeSize.Y) &&
-            (depth == fgState.GameModeDepth) &&
-            (refresh == fgState.GameModeRefresh) );
+    return ( width == fgState.GameModeSize.X ) &&
+           ( height == fgState.GameModeSize.Y ) &&
+           ( depth == fgState.GameModeDepth ) &&
+           (refresh == fgState.GameModeRefresh );
 }
 
 /*
@@ -239,7 +239,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
      * This is also used by applcations which check modes by calling
      * glutGameModeGet(GLUT_GAME_MODE_POSSIBLE), so allow the check:
      */
-    if (haveToTest || fgDisplay.DisplayModeValid)
+    if( haveToTest || fgDisplay.DisplayModeValid )
     {
         XF86VidModeModeInfo** displayModes;
         int i, displayModesCount;
@@ -311,7 +311,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         displayModes++;
     }
 
-    if ( mode == 0xffffffff )
+    if( mode == 0xffffffff )
     {
         /* then try without Display Frequency */
         displayModes = 0;
@@ -479,7 +479,7 @@ int FGAPIENTRY glutEnterGameMode( void )
 
 #   ifdef X_XF86VidModeSetViewPort
 
-    if (fgDisplay.DisplayModeValid)
+    if( fgDisplay.DisplayModeValid )
     {
         int x, y;
         Window child;
