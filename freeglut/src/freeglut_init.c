@@ -76,6 +76,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       { { 0, 0 }, GL_FALSE },
 #endif
                       { NULL, NULL },         /* Timers */
+                      { NULL, NULL },         /* FreeTimers */
                       NULL,                   /* IdleCallback */
                       0,                      /* ActiveMenus */
                       NULL,                   /* MenuStateCallback */
@@ -235,9 +236,15 @@ void fgDeinitialize( void )
 
     fgDestroyStructure( );
 
-    while( timer = ( SFG_Timer * )fgState.Timers.First )
+    while( (timer = fgState.Timers.First) )
     {
-        fgListRemove ( &fgState.Timers, &timer->Node );
+        fgListRemove( &fgState.Timers, &timer->Node );
+        free( timer );
+    }
+
+    while( (timer = fgState.FreeTimers.First) )
+    {
+        fgListRemove( &fgState.FreeTimers, &timer->Node );
         free( timer );
     }
 
@@ -274,7 +281,9 @@ void fgDeinitialize( void )
 
     fgState.Time.Set = GL_FALSE;
 
-    fgState.Timers.First = fgState.Timers.Last = NULL;
+    fgListInit( &fgState.Timers );
+    fgListInit( &fgState.FreeTimers );
+
     fgState.IdleCallback = NULL;
     fgState.MenuStateCallback = ( FGCBMenuState )NULL;
     fgState.MenuStatusCallback = ( FGCBMenuStatus )NULL;

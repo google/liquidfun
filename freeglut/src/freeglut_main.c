@@ -277,37 +277,19 @@ static void fghCheckJoystickPolls( void )
 static void fghCheckTimers( void )
 {
     long checkTime = fgElapsedTime( );
-    SFG_Timer *timer, *next;
-    SFG_List timedOut;
+    SFG_Timer *timer;
 
-    fgListInit(&timedOut);
-
-    for( timer = (SFG_Timer *)fgState.Timers.First;
-         timer;
-         timer = (SFG_Timer *)next )
+    while( timer = fgState.Timers.First )
     {
-        next = (SFG_Timer *)timer->Node.Next;
+        if( timer->TriggerTime > checkTime )
+            break;
 
-        if( timer->TriggerTime <= checkTime )
-        {
-            fgListRemove( &fgState.Timers, &timer->Node );
-            fgListAppend( &timedOut, &timer->Node );
-        }
-    }
+        fgListRemove( &fgState.Timers, &timer->Node );
+        fgListAppend( &fgState.FreeTimers, &timer->Node );
 
-    /*
-     * Now feel free to execute all the hooked and timed out timer callbacks
-     * And delete the timed out timers...
-     */
-    while ( (timer = (SFG_Timer *)timedOut.First) )
-    {
-        if( timer->Callback != NULL )
-            timer->Callback( timer->ID );
-        fgListRemove( &timedOut, &timer->Node );
-        free( timer );
+        timer->Callback( timer->ID );
     }
 }
-
 
 /*
  * Elapsed Time
@@ -319,12 +301,12 @@ long fgElapsedTime( void )
 #if TARGET_HOST_UNIX_X11
         struct timeval now;
         long elapsed;
-        
+
         gettimeofday( &now, NULL );
-        
+
         elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
         elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
-        
+
         return elapsed;
 #elif TARGET_HOST_WIN32
         return timeGetTime() - fgState.Time.Value;
@@ -436,27 +418,15 @@ static int fgHavePendingRedisplays (void)
     return !!enumerator.data;
 }
 /*
- * Indicates whether there are any outstanding timers.
- */
-#if 0 /* Not used */
-static int fgHaveTimers( void )
-{
-    return !!fgState.Timers.First;
-}
-#endif
-/*
  * Returns the number of GLUT ticks (milliseconds) till the next timer event.
  */
 static long fgNextTimer( void )
 {
-    long now = fgElapsedTime();
     long ret = INT_MAX;
     SFG_Timer *timer;
 
-    for( timer = (SFG_Timer *)fgState.Timers.First;
-         timer;
-         timer = (SFG_Timer *)timer->Node.Next )
-        ret = MIN( ret, MAX( 0, timer->TriggerTime - now ) );
+    if( (timer = fgState.Timers.First) )
+        ret = timer->TriggerTime - fgElapsedTime();
 
     return ret;
 }
@@ -1011,7 +981,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
     }
 #endif
 
-    fghCheckTimers( );
+    if( fgState.Timers.First )
+        fghCheckTimers( );
     fghCheckJoystickPolls( );
     fghDisplayAll( );
 

@@ -643,4 +643,26 @@ int fgListLength(SFG_List *list)
     return length;
 }
 
+
+void fgListInsert(SFG_List *list, SFG_Node *next, SFG_Node *node)
+{
+    SFG_Node *prev;
+
+    if( (node->Next = next) )
+    {
+        prev = next->Prev;
+        next->Prev = node;
+    }
+    else
+    {
+        prev = list->Last;
+        list->Last = node;
+    }
+
+    if( (node->Prev = prev) )
+        prev->Next = node;
+    else
+        list->First = node;
+}
+
 /*** END OF FILE ***/

@@ -239,6 +239,7 @@ struct tagSFG_State
 
     SFG_Time         Time;                 /* Time that glutInit was called  */
     SFG_List         Timers;               /* The freeglut timer hooks       */
+    SFG_List         FreeTimers;           /* The unused timer hooks         */
 
     FGCBIdle         IdleCallback;         /* The global idle callback       */
 
