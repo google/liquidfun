@@ -62,15 +62,20 @@ extern SFG_StrokeFont fgStrokeMonoRoman;
  */
 static SFG_Font* fghFontByID( void* font )
 {
-  if( font == GLUT_BITMAP_8_BY_13        ) return( &fgFontFixed8x13    );
-  if( font == GLUT_BITMAP_9_BY_15        ) return( &fgFontFixed9x15    );
-  if( font == GLUT_BITMAP_HELVETICA_10   ) return( &fgFontHelvetica10  );
-  if( font == GLUT_BITMAP_HELVETICA_12   ) return( &fgFontHelvetica12  );
-  if( font == GLUT_BITMAP_HELVETICA_18   ) return( &fgFontHelvetica18  );
-  if( font == GLUT_BITMAP_TIMES_ROMAN_10 ) return( &fgFontTimesRoman10 );
-  if( font == GLUT_BITMAP_TIMES_ROMAN_24 ) return( &fgFontTimesRoman24 );
-  fgError( "font 0x%08x not found", font );
-  return 0; /*** XXX NOT REACHED ***/
+    /*
+     * XXX Use a macro, a table of some kind, or else split these
+     * XXX statements properly.  Jamming "return" on the end of an
+     * XXX "if" is just bad style, IMHO.
+     */
+    if( font == GLUT_BITMAP_8_BY_13        ) return( &fgFontFixed8x13    );
+    if( font == GLUT_BITMAP_9_BY_15        ) return( &fgFontFixed9x15    );
+    if( font == GLUT_BITMAP_HELVETICA_10   ) return( &fgFontHelvetica10  );
+    if( font == GLUT_BITMAP_HELVETICA_12   ) return( &fgFontHelvetica12  );
+    if( font == GLUT_BITMAP_HELVETICA_18   ) return( &fgFontHelvetica18  );
+    if( font == GLUT_BITMAP_TIMES_ROMAN_10 ) return( &fgFontTimesRoman10 );
+    if( font == GLUT_BITMAP_TIMES_ROMAN_24 ) return( &fgFontTimesRoman24 );
+    fgError( "font 0x%08x not found", font );
+    return 0; /*** NOT REACHED ***/
 }
 
 /*
@@ -79,10 +84,14 @@ static SFG_Font* fghFontByID( void* font )
  */
 static SFG_StrokeFont* fghStrokeByID( void* font )
 {
-  if( font == GLUT_STROKE_ROMAN      ) return( &fgStrokeRoman     );
-  if( font == GLUT_STROKE_MONO_ROMAN ) return( &fgStrokeMonoRoman );
-  fgError( "stroke font 0x%08x not found", font );
-  return 0; /*** XXX NOT REACHED ***/
+    /*
+     * XXX Same comment as above about jamming "return" in after an
+     * XXX "if".
+     */
+    if( font == GLUT_STROKE_ROMAN      ) return( &fgStrokeRoman     );
+    if( font == GLUT_STROKE_MONO_ROMAN ) return( &fgStrokeMonoRoman );
+    fgError( "stroke font 0x%08x not found", font );
+    return 0; /*** NOT REACHED ***/
 }
 
 
@@ -93,73 +102,71 @@ static SFG_StrokeFont* fghStrokeByID( void* font )
  */
 void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
 {
-  const GLubyte* face;
-  SFG_Font* font = fghFontByID( fontID );
+    const GLubyte* face;
+    SFG_Font* font = fghFontByID( fontID );
 
-  freeglut_return_if_fail( character >= 1 && character < 256 );
+    freeglut_return_if_fail( ( character >= 1 )&&( character < 256 ) );
 
-  /*
-   * Find the character we want to draw (???)
-   */
-  face = font->Characters[ character - 1 ];
+    /*
+     * Find the character we want to draw (???)
+     */
+    face = font->Characters[ character - 1 ];
 
-  glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
-  glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
-  glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
-  glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
-  glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
-  glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
-  glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
-  glBitmap(
-      face[ 0 ], font->Height,      /* The bitmap's width and height  */
-      font->xorig, font->yorig,     /* The origin in the font glyph   */
-      (float)(face[ 0 ]), 0.0,      /* The raster advance -- inc. x,y */
-      (face + 1)                    /* The packed bitmap data...      */
-  );
-  glPopClientAttrib();
+    glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
+    glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
+    glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
+    glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
+    glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
+    glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
+    glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
+    glBitmap(
+	face[ 0 ], font->Height,      /* The bitmap's width and height  */
+	font->xorig, font->yorig,     /* The origin in the font glyph   */
+	( float )( face[ 0 ] ), 0.0,  /* The raster advance -- inc. x,y */
+	( face + 1 )                  /* The packed bitmap data...      */
+    );
+    glPopClientAttrib( );
 }
 
 void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
 {
-  int c;
-  int numchar = strlen ( string ) ;
-  SFG_Font* font = fghFontByID( fontID );
-  float raster_position[4] ;
+    int c;
+    int numchar = strlen ( string ) ;
+    SFG_Font* font = fghFontByID( fontID );
+    float raster_position[4];
 
-  glGetFloatv ( GL_CURRENT_RASTER_POSITION, raster_position ) ;
-  glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
-  glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
-  glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
-  glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
-  glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
-  glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
-  glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
+    glGetFloatv ( GL_CURRENT_RASTER_POSITION, raster_position ) ;
+    glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
+    glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
+    glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
+    glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
+    glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
+    glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
+    glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
 
-  /*
-   * Step through the string, drawing each character.
-   * A newline will simply translate the next character's insertion
-   * point back to the start of the line and down one line.
-   */
-  for( c = 0; c < numchar; c++ )
-  {
-    if ( string[c] == '\n' )
-    {
-      raster_position[1] -= (float)font->Height ;
-      glRasterPos4fv ( raster_position ) ;
-    }
-    else  /* Not an EOL, draw the bitmap character */
-    {
-      const GLubyte* face = font->Characters[ string[ c ] - 1 ] ;
+    /*
+     * Step through the string, drawing each character.
+     * A newline will simply translate the next character's insertion
+     * point back to the start of the line and down one line.
+     */
+    for( c = 0; c < numchar; c++ )
+        if ( string[c] == '\n' )
+        {
+            raster_position[1] -= (float)font->Height ;
+            glRasterPos4fv ( raster_position ) ;
+        }
+        else  /* Not an EOL, draw the bitmap character */
+        {
+            const GLubyte* face = font->Characters[ string[ c ] - 1 ];
 
-      glBitmap(
-          face[ 0 ], font->Height,      /* The bitmap's width and height  */
-          font->xorig, font->yorig,     /* The origin in the font glyph   */
-          (float)(face[ 0 ]), 0.0,      /* The raster advance -- inc. x,y */
-          (face + 1)                    /* The packed bitmap data...      */
-      ) ;
-    }
-  }
-  glPopClientAttrib();
+            glBitmap(
+                face[ 0 ], font->Height,     /* Bitmap's width and height    */
+                font->xorig, font->yorig,    /* The origin in the font glyph */
+                ( float )( face[ 0 ] ), 0.0, /* The raster advance; inc. x,y */
+                ( face + 1 )                 /* The packed bitmap data...    */
+            );
+        }
+    glPopClientAttrib( );
 }
 
 /*
@@ -167,10 +174,10 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
  */
 int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
 {
-  SFG_Font* font = fghFontByID( fontID );
+    SFG_Font* font = fghFontByID( fontID );
 
-  freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
-  return( *(font->Characters[ character - 1 ]) );
+    freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
+    return *( font->Characters[ character - 1 ] );
 }
 
 /*
@@ -178,24 +185,25 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
  */
 int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
 {
-  int c, length = 0, this_line_length = 0;
-  SFG_Font* font = fghFontByID( fontID );
-  int numchar = strlen ( string ) ;
+    int c, length = 0, this_line_length = 0;
+    SFG_Font* font = fghFontByID( fontID );
+    int numchar = strlen ( string ) ;
 
-  for( c = 0; c < numchar; c++ )
-  {
-    if ( string[ c ] == '\n' )  /* EOL; reset the length of this line */
+    for( c = 0; c < numchar; c++ )
     {
-      if ( length < this_line_length ) length = this_line_length ;
-      this_line_length = 0 ;
+        if ( string[ c ] != '\n' )/* Not an EOL, increment length of line */
+            this_line_length += *( font->Characters[ string[ c ] - 1 ]);
+        else  /* EOL; reset the length of this line */
+        {
+            if( length < this_line_length )
+                length = this_line_length;
+            this_line_length = 0;
+        }
     }
-    else  /* Not an EOL, increment the length of this line */
-      this_line_length += *(font->Characters[ string[ c ] - 1 ]) ;
-  }
-  if ( length < this_line_length )
-    length = this_line_length ;
+    if ( length < this_line_length )
+        length = this_line_length;
 
-  return( length );
+    return length;
 }
 
 /*
@@ -203,8 +211,8 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
  */
 int FGAPIENTRY glutBitmapHeight( void* fontID )
 {
-  SFG_Font* font = fghFontByID( fontID );
-  return( font->Height );
+    SFG_Font* font = fghFontByID( fontID );
+    return font->Height;
 }
 
 /*
@@ -212,72 +220,69 @@ int FGAPIENTRY glutBitmapHeight( void* fontID )
  */
 void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
 {
-  const SFG_StrokeChar *schar;
-  const SFG_StrokeStrip *strip;
-  int i, j;
-  SFG_StrokeFont* font = fghStrokeByID( fontID );
+    const SFG_StrokeChar *schar;
+    const SFG_StrokeStrip *strip;
+    int i, j;
+    SFG_StrokeFont* font = fghStrokeByID( fontID );
 
-  freeglut_return_if_fail( character >= 0 && character < font->Quantity );
+    freeglut_return_if_fail( character >= 0 && character < font->Quantity );
 
-  schar = font->Characters[character];
-  freeglut_return_if_fail( schar );
-  strip = schar->Strips;
+    schar = font->Characters[character];
+    freeglut_return_if_fail( schar );
+    strip = schar->Strips;
 
-  for (i = 0; i < schar->Number; i++, strip++)
-  {
-    glBegin(GL_LINE_STRIP);
-    for(j = 0; j < strip->Number; j++)
+    for( i = 0; i < schar->Number; i++, strip++ )
     {
-      glVertex2f(strip->Vertices[j].X, strip->Vertices[j].Y);
+        glBegin( GL_LINE_STRIP );
+        for( j = 0; j < strip->Number; j++ )
+            glVertex2f( strip->Vertices[ j ].X, strip->Vertices[ j ].Y );
+        glEnd( );
     }
-    glEnd();
-  }
-  glTranslatef(schar->Right, 0.0, 0.0);
+    glTranslatef( schar->Right, 0.0, 0.0 );
 }
 
 void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 {
-  int c, i, j;
-  int numchar = strlen ( string ) ;
-  float length = 0.0 ;
-  SFG_StrokeFont* font = fghStrokeByID( fontID );
+    int c, i, j;
+    int numchar = strlen ( string );
+    float length = 0.0;
+    SFG_StrokeFont* font = fghStrokeByID( fontID );
 
-  /*
-   * Step through the string, drawing each character.
-   * A newline will simply translate the next character's insertion
-   * point back to the start of the line and down one line.
-   */
-  for( c = 0; c < numchar; c++ )
-  {
-    if ( string[ c ] < font->Quantity )
-    {
-      if ( string[c] == '\n' )
-      {
-        glTranslatef ( -length, -(float)(font->Height), 0.0 ) ;
-        length = 0.0 ;
-      }
-      else  /* Not an EOL, draw the bitmap character */
-      {
-        const SFG_StrokeChar *schar = font->Characters[string[c]];
-        if ( schar != NULL )
+    /*
+     * Step through the string, drawing each character.
+     * A newline will simply translate the next character's insertion
+     * point back to the start of the line and down one line.
+     */
+    for( c = 0; c < numchar; c++ )
+        if ( string[ c ] < font->Quantity )
         {
-          const SFG_StrokeStrip *strip = schar->Strips;
+            if( string[ c ] == '\n' )
+            {
+                glTranslatef ( -length, -(float)(font->Height), 0.0 );
+                length = 0.0;
+            }
+            else  /* Not an EOL, draw the bitmap character */
+            {
+                const SFG_StrokeChar *schar = font->Characters[ string[ c ] ];
+                if( schar )
+                {
+                    const SFG_StrokeStrip *strip = schar->Strips;
 
-          for (i = 0; i < schar->Number; i++, strip++)
-          {
-            glBegin(GL_LINE_STRIP);
-            for(j = 0; j < strip->Number; j++)
-              glVertex2f(strip->Vertices[j].X, strip->Vertices[j].Y);
+                    for(i = 0; i < schar->Number; i++, strip++)
+                    {
+                        glBegin( GL_LINE_STRIP );
+                        for( j = 0; j < strip->Number; j++ )
+                            glVertex2f( strip->Vertices[ j ].X,
+                                        strip->Vertices[ j ].Y);
 
-            glEnd();
-          }
-
-          length += schar->Right ;
-          glTranslatef(schar->Right, 0.0, 0.0);
+                        glEnd( );
+                    }
+                    
+                    length += schar->Right;
+                    glTranslatef( schar->Right, 0.0, 0.0 );
+                }
+            }
         }
-      }
-    }
-  }
 }
 
 /*
@@ -285,14 +290,16 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
  */
 int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
 {
-  const SFG_StrokeChar *schar;
-  SFG_StrokeFont* font = fghStrokeByID( fontID );
+    const SFG_StrokeChar *schar;
+    SFG_StrokeFont* font = fghStrokeByID( fontID );
 
-  freeglut_return_val_if_fail( character >= 0 && character < font->Quantity, 0 );
-  schar = font->Characters[character];
-  freeglut_return_val_if_fail( schar, 0 );
-
-  return ((int)(schar->Right + 0.5));
+    freeglut_return_val_if_fail( ( character >= 0 ) &&
+                                 ( character < font->Quantity ),
+                                 0  );
+    schar = font->Characters[ character ];
+    freeglut_return_val_if_fail( schar, 0 );
+    
+    return ( int )( schar->Right + 0.5 );
 }
 
 /*
@@ -300,32 +307,31 @@ int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
  */
 int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
 {
-  int c;
-  float length = 0.0;
-  float this_line_length = 0.0 ;
-  SFG_StrokeFont* font = fghStrokeByID( fontID );
-  int numchar = strlen ( string ) ;
+    int c;
+    float length = 0.0;
+    float this_line_length = 0.0;
+    SFG_StrokeFont* font = fghStrokeByID( fontID );
+    int numchar = strlen( string );
 
-  for( c = 0; c < numchar; c++ )
-  {
-    if ( string[ c ] < font->Quantity )
-    {
-      if ( string[ c ] == '\n' )  /* EOL; reset the length of this line */
-      {
-        if ( length < this_line_length ) length = this_line_length ;
-        this_line_length = 0.0 ;
-      }
-      else  /* Not an EOL, increment the length of this line */
-      {
-        const SFG_StrokeChar *schar = font->Characters[string[c]];
-        if ( schar != NULL )
-          this_line_length += schar->Right ;
-      }
-    }
-  }
-  if ( length < this_line_length )
-    length = this_line_length ;
-  return( (int)(length+0.5) );
+    for( c = 0; c < numchar; c++ )
+        if ( string[ c ] < font->Quantity )
+        {
+            if( string[ c ] == '\n' ) /* EOL; reset the length of this line */
+            {
+                if( length < this_line_length )
+                    length = this_line_length;
+                this_line_length = 0.0;
+            }
+            else  /* Not an EOL, increment the length of this line */
+            {
+                const SFG_StrokeChar *schar = font->Characters[ string[ c ] ];
+                if ( schar )
+                    this_line_length += schar->Right;
+            }
+        }
+    if( length < this_line_length )
+        length = this_line_length;
+    return ( int )( length + 0.5 );
 }
 
 /*
