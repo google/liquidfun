@@ -27,9 +27,7 @@
 
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
-#if HAVE_ERRNO_H
-#    include <errno.h>
-#endif
+#include <errno.h>
 #include <stdarg.h>
 #if HAVE_VPRINTF
 #    define VFPRINTF(s,f,a) vfprintf((s),(f),(a))
