@@ -445,6 +445,7 @@ static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
 	e->found = TRUE;
 	e->data = w;
     }
+    fgEnumSubWindows( w, fgCheckJoystickCallback, e );
 }
 static int fgHaveJoystick( void )
 {
@@ -461,6 +462,7 @@ static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
 	e->found = TRUE;
 	e->data = w;
     }
+    fgEnumSubWindows( w, fgHavePendingRedisplaysCallback, e );
 }	
 static int fgHavePendingRedisplays (void)
 {
