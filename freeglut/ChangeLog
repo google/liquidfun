@@ -136,8 +136,14 @@ October 24, 2002:
 
 (51) Changed "freeglut_state.c" so the "glutGet" calls with window position and size don't move the windows down and to the right one pixel.
 
+*******************************************************************************************
+* Changes starting in May 2003
+*******************************************************************************************
 
+(52) Implement single-buffered rendering (or its emulation) in Windows.
 
+(53) Implement Eero Pajarre's "GLUT_ICON" code.
 
+(54) Fixes for the window positioning problem.
 
-
+(55)  Fixed a couple of compiler warnings and other bugs. Changed "freeglut_main.c" to remove a compiler warning. Changed "freeglut_structure.c" to set the current window before calling the window closure callback.
