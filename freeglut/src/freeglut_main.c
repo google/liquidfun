@@ -653,10 +653,14 @@ void FGAPIENTRY glutMainLoopEvent( void )
                                               event.xmotion.y );
                 }
             }
-            else if( window->Callbacks.Passive )
+            else
             {
-                fgSetWindow ( window ) ;
-                window->Callbacks.Passive( event.xmotion.x, event.xmotion.y );
+                if( window->Callbacks.Passive )
+                {
+                    fgSetWindow( window );
+                    window->Callbacks.Passive( event.xmotion.x,
+                                               event.xmotion.y );
+                }
             }
         }
         break;
@@ -790,43 +794,40 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 if( window->Callbacks.Mouse )
                     fgStructure.Window->Callbacks.Mouse(
                         button,
-                        event.type == ButtonPress ? GLUT_DOWN : GLUT_UP,
+                        pressed ? GLUT_DOWN : GLUT_UP,
                         event.xbutton.x,
                         event.xbutton.y
                     );
             }
             else
             {
-                if( ( button >= 4 ) && window->Callbacks.MouseWheel )
-                {
-                    /*
-                     * Map 4 and 5 to wheel zero; EVEN to +1, ODD to -1
-                     *  "  6 and 7 "    "   one; ...
-                     *
-                     * XXX This *should* be behind some variables/macros,
-                     * XXX since the order and numbering isn't certain
-                     * XXX See XFree86 configuration docs (even back in the
-                     * XXX 3.x days, and especially with 4.x).
-                     */
-                    int wheel_number = (button - 4) / 2;
-                    int direction = (button & 1)*2 - 1;
-
-                    if( ButtonPress )
-                        fgStructure.Window->Callbacks.MouseWheel(
-                            wheel_number,
-                            direction,
-                            event.xbutton.x,
-                            event.xbutton.y
-                        );
-                }
+                /*
+                 * Map 4 and 5 to wheel zero; EVEN to +1, ODD to -1
+                 *  "  6 and 7 "    "   one; ...
+                 *
+                 * XXX This *should* be behind some variables/macros,
+                 * XXX since the order and numbering isn't certain
+                 * XXX See XFree86 configuration docs (even back in the
+                 * XXX 3.x days, and especially with 4.x).
+                 */
+                int wheel_number = (button - 4) / 2;
+                int direction = (button & 1)*2 - 1;
+                
+                if( pressed )
+                    fgStructure.Window->Callbacks.MouseWheel(
+                        wheel_number,
+                        direction,
+                        event.xbutton.x,
+                        event.xbutton.y
+                    );
             }
 
             /*
              * Trash the modifiers state
              */
             fgStructure.Window->State.Modifiers = 0xffffffff;
-            break;
         }
+        break;
 
         case KeyRelease:
         case KeyPress:
@@ -1018,7 +1019,7 @@ void FGAPIENTRY glutMainLoop( void )
     }
 
     {
-        fgExecutionState execState = fgState.ActionOnWindowClose;
+        fgExecutionState execState = fgState.ExecState;
         
         /*
          * When this loop terminates, destroy the display, state and structure
@@ -1381,7 +1382,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
-        if ( ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
+        if ( ( window->Menu[ button ] ) && ( pressed == TRUE ) )
         {
             window->State.Redisplay = TRUE;
             fgSetWindow( window );
