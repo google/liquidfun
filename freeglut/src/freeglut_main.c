@@ -399,6 +399,113 @@ void fgWarning( const char *fmt, ... )
     va_end( ap );
 }
 
+#include <limits.h>
+#ifdef TARGET_HOST_UNIX_X11
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/stat.h>
+#elif TARGET_HOST_WIN32
+#endif
+#ifndef MAX
+#define MAX(a,b) (((a)>(b)) ? (a) : (b))
+#endif
+#ifndef MIN
+#define MIN(a,b) (((a)<(b)) ? (a) : (b))
+#endif
+
+/*
+ * Indicates whether Joystick events are being used by ANY window.
+ *
+ * The current mechanism is to walk all of the windows and ask if
+ * there is a joystick callback.  Certainly in some cases, maybe
+ * in all cases, the joystick is attached to the system and accessed
+ * from ONE point by GLUT/freeglut, so this is not the right way,
+ * in general, to do this.  However, the Joystick code is segregated
+ * in its own little world, so we can't access the information that
+ * we need in order to do that nicely.
+ *
+ * Some alternatives:
+ *  * Store Joystick data into freeglut global state.
+ *  * Provide NON-static functions or data from Joystick *.c file.
+ *
+ * Basically, the RIGHT way to do this requires knowing something
+ * about the Joystick.  Right now, the Joystick code is behind
+ * an opaque wall.
+ *
+ */
+static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
+{
+    if( w->Callbacks.Joystick )
+    {
+	e->found = TRUE;
+	e->data = w;
+    }
+}
+static int fgHaveJoystick( void )
+{
+    SFG_Enumerator enumerator;
+    enumerator.found = FALSE;
+    enumerator.data = NULL;
+    fgEnumWindows( fgCheckJoystickCallback, &enumerator );
+    return !!enumerator.data;
+}
+/*
+ * Indicates whether there are any outstanding timers.
+ */
+static int fgHaveTimers( void )
+{
+    return !!fgState.Timers.First;
+}
+/*
+ * Returns the number of GLUT ticks (milliseconds) till the next timer event.
+ */
+static long fgNextTimer( void )
+{
+    long now = fgElapsedTime();
+    long ret = INT_MAX;
+    SFG_Timer *timer;
+
+    for( timer = (SFG_Timer *)fgState.Timers.First;
+	 timer;
+	 timer = (SFG_Timer *)timer->Node.Next )
+	ret = MIN( ret, MAX( 0, (timer->TriggerTime) - now ) );
+
+    return ret;
+}
+/*
+ * Does the magic required to relinquish the CPU until something interesting
+ * happens.
+ */
+static void fgSleepForEvents( void )
+{
+#ifdef TARGET_HOST_UNIX_X11
+    fd_set fdset;
+    int err;
+    int socket;
+    struct timeval wait;
+    long msec;    
+    
+    socket = ConnectionNumber( fgDisplay.Display );
+    FD_ZERO( &fdset );
+    FD_SET( socket, &fdset );
+    
+    msec = fgNextTimer();
+    if( fgHaveJoystick() )
+	msec = MIN( msec, 10 );
+    
+    wait.tv_sec = msec / 1000;
+    wait.tv_usec = (msec % 1000) * 1000;
+    err = select( socket+1, &fdset, NULL, NULL, &wait );
+
+    if( -1 == err )
+	printf( "freeglut select() error: %d\n", errno );
+    
+#elif TARGET_HOST_WIN32
+#endif
+}
+
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -425,7 +532,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
   /*
    * Do we have any event messages pending?
    */
-  if( XPending( fgDisplay.Display ) )
+  while( XPending( fgDisplay.Display ) )
   {
     /*
      * Grab the next event to be processed...
@@ -976,7 +1083,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
       break;
     }
   }
-  else
+
   {
     /*
      * Have all the timers checked.
@@ -1008,7 +1115,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
   /*
    * The windows processing is considerably smaller
    */
-  if( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
+  while( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
   {
     /*
      * Grab the message now, checking for WM_QUIT
@@ -1022,7 +1129,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
     TranslateMessage( &stMsg );
     DispatchMessage( &stMsg );
   }
-  else
+
   {
     /*
      * Have all the timers checked.
@@ -1117,6 +1224,8 @@ void FGAPIENTRY glutMainLoop( void )
      */
     if ( fgStructure.Windows.First == NULL )
       fgState.ExecState = GLUT_EXEC_STATE_STOP ;
+    else if( !fgState.IdleCallback )
+      fgSleepForEvents();
   }
 
   {
