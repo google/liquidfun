@@ -554,13 +554,34 @@ void fgCloseWindow( SFG_Window* window )
 
 #elif TARGET_HOST_WIN32
 
-    SendMessage( 
-        window->Window.Handle,
-        WM_CLOSE,
-        0,
-        0
-    );
+    /*
+     * Make sure we don't close a window with current context active
+     */
+    if( fgStructure.Window == window )
+        wglMakeCurrent( NULL, NULL );
 
+    /*
+     * Step through the list of windows.  If the rendering context
+     * is not being used by another window, then we delete it.
+     */
+    {
+        int used = FALSE ;
+        SFG_Window *iter ;
+
+        for( iter = (SFG_Window *)fgStructure.Windows.First;
+             iter;
+             iter = (SFG_Window *)iter->Node.Next )
+        {
+            if( ( iter->Window.Context == window->Window.Context ) &&
+                ( iter != window ) )
+                used = TRUE;
+        }
+
+        if( ! used )
+            wglDeleteContext( window->Window.Context );
+    }
+
+    DestroyWindow( hWnd );
 #endif
 }
 
@@ -601,7 +622,7 @@ void FGAPIENTRY glutDestroyWindow( int windowID )
     freeglut_return_if_fail( window != NULL );
     {
         fgExecutionState ExecState = fgState.ExecState;
-        fgAddToWindowDestroyList( window, GL_TRUE );
+        fgAddToWindowDestroyList( window );
         fgState.ExecState = ExecState;
     }
 }

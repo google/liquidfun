@@ -544,7 +544,6 @@ typedef struct tagSFG_WindowList SFG_WindowList ;
 struct tagSFG_WindowList
 {
     SFG_Window *window ;
-    GLboolean needToClose ;
     SFG_WindowList *next ;
 };
 
@@ -721,10 +720,9 @@ void        fgOpenWindow( SFG_Window* window, const char* title,
                           int x, int y, int w, int h, GLboolean gameMode,
                           GLboolean isSubWindow );
 void        fgCloseWindow( SFG_Window* window );
-void        fgAddToWindowDestroyList ( SFG_Window* window,
-                                       GLboolean needToClose );
+void        fgAddToWindowDestroyList ( SFG_Window* window );
 void        fgCloseWindows ();
-void        fgDestroyWindow( SFG_Window* window, GLboolean needToClose );
+void        fgDestroyWindow( SFG_Window* window );
 void        fgClearCallBacks( SFG_Window *window );
 
 /*

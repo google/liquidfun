@@ -553,8 +553,16 @@ void FGAPIENTRY glutMainLoopEvent( void )
             {
                 GETWINDOW( xclient ); 
 
-                fgCloseWindow ( window );
-                fgAddToWindowDestroyList ( window, GL_FALSE );
+                fgDestroyWindow ( window );
+
+                if( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
+                {
+                    fgDeinitialize( );
+                    exit( 0 );
+                }
+
+                fgState.ExecState = GLUT_EXEC_STATE_STOP;
+                return;
             }
             break;
 
@@ -584,7 +592,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * This is sent to confirm the XDestroyWindow call.
              * XXX WHY is this commented out?  Should we re-enable it?
              */
-            /* fgAddToWindowDestroyList ( window, GL_FALSE ); */
+            /* fgAddToWindowDestroyList ( window ); */
             break;
 
         case Expose:
@@ -988,7 +996,15 @@ void FGAPIENTRY glutMainLoopEvent( void )
     while( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
     {
         if( GetMessage( &stMsg, NULL, 0, 0 ) == 0 )
-            fgState.ExecState = GLUT_EXEC_STATE_STOP ;
+        {
+            if( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
+            {
+                fgDeinitialize( );
+                exit( 0 );
+            }
+            fgState.ExecState = GLUT_EXEC_STATE_STOP;
+            return;
+        }
 
         TranslateMessage( &stMsg );
         DispatchMessage( &stMsg );
@@ -1054,18 +1070,11 @@ void FGAPIENTRY glutMainLoop( void )
         }
     }
 
-    {
-        fgExecutionState execState = fgState.ExecState;
-        
-        /*
-         * When this loop terminates, destroy the display, state and structure
-         * of a freeglut session, so that another glutInit() call can happen
-         */
-        fgDeinitialize( );
-
-        if( execState == GLUT_ACTION_EXIT )
-            exit( 0 );
-    }
+    /*
+     * When this loop terminates, destroy the display, state and structure
+     * of a freeglut session, so that another glutInit() call can happen
+     */
+    fgDeinitialize( );
 }
 
 /*
@@ -1248,38 +1257,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 
     case WM_CLOSE:
-        /*
-         * Make sure we don't close a window with current context active
-         */
-        if( fgStructure.Window == window )
-        {
-            int used = FALSE ;
-            SFG_Window *iter ;
-
-            wglMakeCurrent( NULL, NULL );
-            /*
-             * Step through the list of windows.  If the rendering context
-             * is not being used by another window, then we delete it.
-             */
-            for( iter = (SFG_Window *)fgStructure.Windows.First;
-                 iter;
-                 iter = (SFG_Window *)iter->Node.Next )
-            {
-                if( ( iter->Window.Context == window->Window.Context ) &&
-                    ( iter != window ) )
-                    used = TRUE;
-            }
-
-            if( ! used )
-                wglDeleteContext( window->Window.Context );
-        }
-
-        /*
-         * Put on a linked list of windows to be removed after all the
-         * callbacks have returned
-         */
-        fgAddToWindowDestroyList( window, GL_FALSE );
-        DestroyWindow( hWnd );
+        fgDestroyWindow ( window );
+        if ( fgState.ActionOnWindowClose != GLUT_ACTION_CONTINUE_EXECUTION )
+            PostQuitMessage(0);
         break;
 
     case WM_DESTROY:

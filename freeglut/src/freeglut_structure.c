@@ -183,12 +183,11 @@ static SFG_WindowList* WindowsToDestroy = ( SFG_WindowList* )NULL;
  * Subwindows are automatically added because they hang from the window
  * structure.
  */
-void fgAddToWindowDestroyList( SFG_Window* window, GLboolean needToClose )
+void fgAddToWindowDestroyList( SFG_Window* window )
 {
     SFG_WindowList *new_list_entry =
         ( SFG_WindowList* )malloc( sizeof(SFG_WindowList ) );
     new_list_entry->window = window;
-    new_list_entry->needToClose = needToClose;
     new_list_entry->next = WindowsToDestroy;
     WindowsToDestroy = new_list_entry;
 
@@ -211,18 +210,6 @@ void fgAddToWindowDestroyList( SFG_Window* window, GLboolean needToClose )
         fgClearCallBacks( window );
         FETCH_WCB( *window, Destroy ) = destroy;
     }
-    
-    /*
-     * Check the execution state.  If this has been called from
-     * "glutDestroyWindow", a statement in that function will reset the
-     * "ExecState" after this function returns.
-     */
-    if( fgState.ActionOnWindowClose != GLUT_ACTION_CONTINUE_EXECUTION )
-        /*
-         * Set the execution state flag to drop out of the main loop.
-         */
-        if( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
-            fgState.ExecState = GLUT_EXEC_STATE_STOP;
 }
 
 /*
@@ -237,7 +224,7 @@ void fgCloseWindows( )
     while( window_ptr )
     {
         SFG_WindowList *next = window_ptr->next;
-        fgDestroyWindow( window_ptr->window, window_ptr->needToClose );
+        fgDestroyWindow( window_ptr->window );
         free( window_ptr );
         window_ptr = next;
 
@@ -254,7 +241,7 @@ void fgCloseWindows( )
  * another function, defined in freeglut_window.c is called, but this is
  * a whole different story...
  */
-void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
+void fgDestroyWindow( SFG_Window* window )
 {
     SFG_Window* subWindow;
     int menu_index ;
@@ -263,7 +250,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     freeglut_assert_ready;
 
     while( subWindow = ( SFG_Window * )window->Children.First )
-        fgDestroyWindow( subWindow, needToClose );
+        fgDestroyWindow( subWindow );
 
     {
         SFG_Window *activeWindow = fgStructure.Window ;
@@ -286,8 +273,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     }
 
     fgClearCallBacks( window );
-    if( needToClose )
-        fgCloseWindow( window );
+    fgCloseWindow( window );
     free( window );
     if( fgStructure.Window == window )
         fgStructure.Window = NULL;
@@ -393,7 +379,7 @@ void fgDestroyMenu( SFG_Menu* menu )
 
     if( fgStructure.Window == menu->Window )
         fgSetWindow( menu->ParentWindow );
-    fgDestroyWindow( menu->Window, GL_TRUE );
+    fgDestroyWindow( menu->Window );
     fgListRemove( &fgStructure.Menus, &menu->Node );
     if( fgStructure.Menu == menu )
         fgStructure.Menu = NULL;
@@ -438,7 +424,7 @@ void fgDestroyStructure( void )
         fgDestroyMenu( menu );
 
     while( window = ( SFG_Window * )fgStructure.Windows.First )
-        fgDestroyWindow( window, GL_TRUE );
+        fgDestroyWindow( window );
 }
 
 /*

@@ -413,7 +413,7 @@ void FGAPIENTRY glutGameModeString( const char* string )
 int FGAPIENTRY glutEnterGameMode( void )
 {
     if( fgStructure.GameMode )
-        fgAddToWindowDestroyList( fgStructure.GameMode, GL_TRUE );
+        fgAddToWindowDestroyList( fgStructure.GameMode );
     else
         fghRememberState( );
 
@@ -534,7 +534,7 @@ void FGAPIENTRY glutLeaveGameMode( void )
 {
     freeglut_return_if_fail( fgStructure.GameMode );
 
-    fgAddToWindowDestroyList( fgStructure.GameMode, GL_TRUE );
+    fgAddToWindowDestroyList( fgStructure.GameMode );
 
 #if TARGET_HOST_UNIX_X11
 
