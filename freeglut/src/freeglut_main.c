@@ -1377,11 +1377,14 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
-        if( GetSystemMetrics( SM_SWAPBUTTON ) )
-            if( button == GLUT_LEFT_BUTTON )
+        if ( GetSystemMetrics( SM_SWAPBUTTON ) )
+        {
+            if ( button == GLUT_LEFT_BUTTON )
                 button = GLUT_RIGHT_BUTTON;
-            else if( button == GLUT_RIGHT_BUTTON )
+            else
+                if ( button == GLUT_RIGHT_BUTTON )
                 button = GLUT_LEFT_BUTTON;
+        }
 
         if( button == -1 )
             return DefWindowProc( hWnd, uMsg, lParam, wParam );
