@@ -433,6 +433,15 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
 
     /*
+     * If this is a menu window we want the window manager to ignore it.
+     */
+    if ( fgState.BuildingAMenu )
+    {
+        winAttr.override_redirect = True;
+	mask |= CWOverrideRedirect;
+    }
+
+    /*
      * Have the window created now
      */
     window->Window.Handle = XCreateWindow(
@@ -555,15 +564,6 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
      * Finally, have the window mapped to our display
      */
     XMapWindow( fgDisplay.Display, window->Window.Handle );
-
-    /*
-     * If we're a menu, then we need to ask the WM to remove decorations.
-     * This is stolen shamelessly from Brian Paul
-     * (19 Sep 1995   brianp@ssec.wisc.edu)
-     */
-    if ( window->IsMenu ) {
-      set_mwm_border(fgDisplay.Display, window->Window.Handle, 0);
-    }
 
     /*
      * In game mode, move the viewport a bit to hide the decorations.
