@@ -101,7 +101,10 @@ void fghRememberState( void )
             fgWarning( "Runtime use of XF86VidModeGetModeLine failed.\n" );
 
 #   else
-#       warning fghRememberState: missing XFree86 video mode extensions, game mode will not change screen resolution when activated
+    /*
+     * XXX warning fghRememberState: missing XFree86 video mode extensions,
+     * XXX game mode will not change screen resolution when activated
+     */
 #   endif
 
 #elif TARGET_HOST_WIN32
@@ -195,7 +198,10 @@ void fghRestoreState( void )
     }
 
 #   else
-#       warning fghRestoreState: missing XFree86 video mode extensions, game mode will not change screen resolution when activated
+    /*
+     * XXX warning fghRestoreState: missing XFree86 video mode extensions,
+     * XXX game mode will not change screen resolution when activated
+     */
 #   endif
 
 #elif TARGET_HOST_WIN32
@@ -282,7 +288,10 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     return GL_FALSE;
 
 #   else
-#       warning fghChangeDisplayMode: missing XFree86 video mode extensions, game mode will not change screen resolution when activated
+    /*
+     * XXX warning fghChangeDisplayMode: missing XFree86 video mode extensions,
+     * XXX game mode will not change screen resolution when activated
+     */
 #   endif
 
 #elif TARGET_HOST_WIN32
