@@ -3,6 +3,18 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
+Project: "CallbackMaker"=.\CallbackMaker\CallbackMaker.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "Fractals"=.\Fractals\Fractals.dsp - Package Owner=<4>
 
 Package=<5>
