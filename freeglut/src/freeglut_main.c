@@ -952,6 +952,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
         }
         break;
 
+        case ReparentNotify:
+            break; /* XXX Should disable this event */
+
         default:
             fgWarning ("Unknown X event type: %d", event.type);
             break;
