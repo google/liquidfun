@@ -497,7 +497,7 @@ int FGAPIENTRY glutEnterGameMode( void )
      * (XSetInputFocus) is called with a not yet viewable window, it will exit
      * the application which we have to aviod, so wait until it's viewable:
      */
-    while (GrabSuccess =! XGrabPointer(
+    while (GrabSuccess != XGrabPointer(
 	    fgDisplay.Display, fgStructure.GameMode->Window.Handle,
 	    TRUE, ButtonPressMask|ButtonReleaseMask|ButtonMotionMask
 		|PointerMotionMask,
