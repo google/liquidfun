@@ -35,6 +35,7 @@ void PrintText( int nX, int nY, char* pszText )
     /*
      * Prepare the OpenGL state
      */
+    glDisable( GL_LIGHTING );
     glDisable( GL_DEPTH_TEST );   
     glMatrixMode( GL_PROJECTION );
     glPushMatrix();
@@ -86,6 +87,7 @@ void PrintText( int nX, int nY, char* pszText )
      */
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     glEnable( GL_DEPTH_TEST );
+    glEnable( GL_LIGHTING );
 }     
 
 /*
