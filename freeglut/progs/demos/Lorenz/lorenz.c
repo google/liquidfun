@@ -33,6 +33,9 @@
 #include <math.h>
 #include <time.h>
 #include <GL/freeglut.h>
+#ifdef WIN32
+#include <crtdbg.h>  // DUMP MEMORY LEAKS
+#endif
 
 
 /************************************** Defined Constants ***************************************/
@@ -342,6 +345,10 @@ int main ( int argc, char *argv[] )
 
   /* Enter the GLUT main loop */
   glutMainLoop () ;
+
+#ifdef WIN32
+  _CrtDumpMemoryLeaks () ;  // DUMP MEMORY LEAK INFORMATION
+#endif
 
   return 0 ;
 }
