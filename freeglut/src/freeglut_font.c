@@ -139,7 +139,7 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
 
   /*
    * Step through the string, drawing each character.
-   * A carriage return will simply translate the next character's insertion
+   * A newline will simply translate the next character's insertion
    * point back to the start of the line and down one line.
    */
   for( c = 0; c < numchar; c++ )
@@ -246,7 +246,7 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 
   /*
    * Step through the string, drawing each character.
-   * A carriage return will simply translate the next character's insertion
+   * A newline will simply translate the next character's insertion
    * point back to the start of the line and down one line.
    */
   for( c = 0; c < numchar; c++ )
