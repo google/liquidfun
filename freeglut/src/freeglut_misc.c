@@ -96,7 +96,7 @@ void FGAPIENTRY glutReportErrors( void )
 void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIgnoreKeyRepeat" );
 
     fgStructure.Window->State.IgnoreKeyRepeat = ignore ? GL_TRUE : GL_FALSE;
 }

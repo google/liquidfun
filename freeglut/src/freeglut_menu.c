@@ -394,7 +394,7 @@ void fgDisplayMenu( void )
     SFG_Window* window = fgStructure.Window;
     SFG_Menu* menu = NULL;
 
-    freeglut_assert_window;
+    freeglut_return_if_fail ( fgStructure.Window != NULL );
 
     /* Check if there is an active menu attached to this window... */
     menu = window->ActiveMenu;

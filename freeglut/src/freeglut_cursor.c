@@ -84,7 +84,7 @@ static int fghGetCursorError( Cursor cursor )
 void FGAPIENTRY glutSetCursor( int cursorID )
 {
     freeglut_assert_ready;  /* XXX WHY do we need the timer active for this? */
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetCursor" );
 
 #if TARGET_HOST_UNIX_X11
     /*
@@ -237,7 +237,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 void FGAPIENTRY glutWarpPointer( int x, int y )
 {
     freeglut_assert_ready; /* XXX WHY do we need the timer active for this? */
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutWarpPointer" );
 
 #if TARGET_HOST_UNIX_X11
 

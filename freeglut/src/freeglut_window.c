@@ -743,7 +743,7 @@ int FGAPIENTRY glutGetWindow( void )
 void FGAPIENTRY glutShowWindow( void )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutShowWindow" );
 
 #if TARGET_HOST_UNIX_X11
 
@@ -765,7 +765,7 @@ void FGAPIENTRY glutShowWindow( void )
 void FGAPIENTRY glutHideWindow( void )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutHideWindow" );
 
 #if TARGET_HOST_UNIX_X11
 
@@ -793,7 +793,7 @@ void FGAPIENTRY glutHideWindow( void )
 void FGAPIENTRY glutIconifyWindow( void )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIconifyWindow" );
 
     fgStructure.Window->State.Visible   = GL_FALSE;
 #if TARGET_HOST_UNIX_X11
@@ -817,7 +817,7 @@ void FGAPIENTRY glutIconifyWindow( void )
 void FGAPIENTRY glutSetWindowTitle( const char* title )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetWindowTitle" );
     if( ! fgStructure.Window->Parent )
     {
 #if TARGET_HOST_UNIX_X11
@@ -859,7 +859,7 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 void FGAPIENTRY glutSetIconTitle( const char* title )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetIconTitle" );
 
     if( ! fgStructure.Window->Parent )
     {
@@ -902,7 +902,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 void FGAPIENTRY glutReshapeWindow( int width, int height )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutReshapeWindow" );
 
     fgStructure.Window->State.NeedToResize = GL_TRUE;
     fgStructure.Window->State.Width  = width ;
@@ -915,7 +915,7 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
 void FGAPIENTRY glutPositionWindow( int x, int y )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPositionWindow" );
 
 #if TARGET_HOST_UNIX_X11
 
@@ -949,7 +949,7 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
 void FGAPIENTRY glutPushWindow( void )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPushWindow" );
 
 #if TARGET_HOST_UNIX_X11
 
@@ -973,7 +973,7 @@ void FGAPIENTRY glutPushWindow( void )
 void FGAPIENTRY glutPopWindow( void )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPopWindow" );
 
 #if TARGET_HOST_UNIX_X11
 
@@ -997,7 +997,7 @@ void FGAPIENTRY glutPopWindow( void )
 void FGAPIENTRY glutFullScreen( void )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreen" );
 
     {
 #if TARGET_HOST_UNIX_X11

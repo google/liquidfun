@@ -651,8 +651,13 @@ extern SFG_State fgState;
  * A call to those macros assures us that there is a current
  * window and menu set, respectively:
  */
-#define  freeglut_assert_window assert( fgStructure.Window != NULL );
 #define  freeglut_assert_menu   assert( fgStructure.Menu != NULL );
+#define  FREEGLUT_EXIT_IF_NO_WINDOW( string )                   \
+  if ( ! fgStructure.Window )                                   \
+  {                                                             \
+    fgError ( " ERROR:  Function <%s> called"                   \
+              " with no current window defined.", (string) ) ;  \
+  }
 
 /*
  * The deinitialize function gets called on glutMainLoop() end. It should clean up

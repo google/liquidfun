@@ -41,7 +41,7 @@
 void FGAPIENTRY glutPostRedisplay( void )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPostRedisplay" );
     fgStructure.Window->State.Redisplay = GL_TRUE;
 }
 
@@ -51,7 +51,7 @@ void FGAPIENTRY glutPostRedisplay( void )
 void FGAPIENTRY glutSwapBuffers( void )
 {
     freeglut_assert_ready;
-    freeglut_assert_window;
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSwapBuffers" );
 
     glFlush( );
     if( ! fgStructure.Window->Window.DoubleBuffered )
