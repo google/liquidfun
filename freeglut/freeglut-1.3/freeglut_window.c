@@ -389,8 +389,8 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
      */
     sizeHints.flags = 0;
 
-    sizeHints.flags |= (fgState.Position.Use == TRUE) ? USPosition : PPosition;
-    sizeHints.flags |= (fgState.Size.Use     == TRUE) ? USSize     : PSize;
+    if (fgState.Position.Use == TRUE) sizeHints.flags |= USPosition;
+    if (fgState.Size.Use     == TRUE) sizeHints.flags |= USSize;
 
     /*
      * Fill in the size hints values now (the x, y, width and height
@@ -438,7 +438,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     /*
      * This somehow fixes the glutGet() GLUT_WINDOW_X and GLUT_WINDOW_Y problem...
      */
-    XMoveWindow( fgDisplay.Display, window->Window.Handle, x, y );
+    //XMoveWindow( fgDisplay.Display, window->Window.Handle, x, y );
 
     /*
      * In game mode, move the viewport a bit to hide the decorations.
