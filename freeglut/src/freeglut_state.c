@@ -124,7 +124,7 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
  */
 int FGAPIENTRY glutGet( GLenum eWhat )
 {
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     int returnValue ;
     GLboolean boolValue ;
 #endif
@@ -281,7 +281,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         return fgStructure.Window->Window.VisualInfo->visualid;
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     /*
      * Handle the OpenGL inquiries
@@ -376,6 +376,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /*
          * ...then we've got to correct the results we've just received...
          */
+
+#if !TARGET_HOST_WINCE
         if ( ( fgStructure.GameMode != fgStructure.Window ) && ( fgStructure.Window->Parent == NULL ) &&
              ( ! fgStructure.Window->IsMenu ) )
         {
@@ -384,6 +386,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
           winRect.top    += GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION );
           winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME );
         }
+#endif //TARGET_HOST_WINCE
 
         switch( eWhat )
         {
@@ -396,18 +399,33 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     break;
 
     case GLUT_WINDOW_BORDER_WIDTH :
+#if TARGET_HOST_WINCE
+		return 0;
+#else
         return GetSystemMetrics( SM_CXSIZEFRAME );
+#endif //TARGET_HOST_WINCE
 
     case GLUT_WINDOW_HEADER_HEIGHT :
+#if TARGET_HOST_WINCE
+		return 0;
+#else
         return GetSystemMetrics( SM_CYCAPTION );
+#endif //TARGET_HOST_WINCE
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
+#if TARGET_HOST_WINCE
+		return GL_FALSE;
+#else
         return fgSetupPixelFormat( fgStructure.Window, GL_TRUE,
                                     PFD_MAIN_PLANE );
+#endif //TARGET_HOST_WINCE
+
 
     case GLUT_WINDOW_FORMAT_ID:
+#if !TARGET_HOST_WINCE
         if( fgStructure.Window != NULL )
             return GetPixelFormat( fgStructure.Window->Window.Device );
+#endif //TARGET_HOST_WINCE
         return 0;
 
 #endif
@@ -503,7 +521,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
          */
         return 3 ;
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     case GLUT_HAS_MOUSE:
         /*
@@ -516,7 +534,11 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         /*
          * We are much more fortunate under Win32 about this...
          */
+#if TARGET_HOST_WINCE
+		return 1;
+#else
         return GetSystemMetrics( SM_CMOUSEBUTTONS );
+#endif //TARGET_HOST_WINCE
 
 #endif
 
@@ -619,7 +641,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
     case GLUT_OVERLAY_DAMAGED:
         return -1;
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     case GLUT_OVERLAY_POSSIBLE:
 /*      return fgSetupPixelFormat( fgStructure.Window, GL_TRUE,

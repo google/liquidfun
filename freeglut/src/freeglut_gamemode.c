@@ -107,7 +107,7 @@ void fghRememberState( void )
      */
 #   endif
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
 /*    DEVMODE devMode; */
 
@@ -204,7 +204,7 @@ void fghRestoreState( void )
      */
 #   endif
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     /*
      * Restore the previously rememebered desktop display settings
@@ -294,7 +294,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
      */
 #   endif
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     unsigned int    displayModes = 0, mode = 0xffffffff;
     GLboolean success = GL_FALSE;

@@ -111,7 +111,9 @@ static struct name_address_pair glut_functions[] =
    { "glutWindowStatusFunc", (void *) glutWindowStatusFunc },
    { "glutKeyboardUpFunc", (void *) glutKeyboardUpFunc },
    { "glutSpecialUpFunc", (void *) glutSpecialUpFunc },
+#if !TARGET_HOST_WINCE
    { "glutJoystickFunc", (void *) glutJoystickFunc },
+#endif //TARGET_HOST_WINCE
    { "glutSetColor", (void *) glutSetColor },
    { "glutGetColor", (void *) glutGetColor },
    { "glutCopyColormap", (void *) glutCopyColormap },
@@ -152,11 +154,13 @@ static struct name_address_pair glut_functions[] =
    { "glutReportErrors", (void *) glutReportErrors },
    { "glutIgnoreKeyRepeat", (void *) glutIgnoreKeyRepeat },
    { "glutSetKeyRepeat", (void *) glutSetKeyRepeat },
+#if !TARGET_HOST_WINCE
    { "glutForceJoystickFunc", (void *) glutForceJoystickFunc },
    { "glutGameModeString", (void *) glutGameModeString },
    { "glutEnterGameMode", (void *) glutEnterGameMode },
    { "glutLeaveGameMode", (void *) glutLeaveGameMode },
    { "glutGameModeGet", (void *) glutGameModeGet },
+#endif //TARGET_HOST_WINCE
    /* freeglut extensions */
    { "glutMainLoopEvent", (void *) glutMainLoopEvent },
    { "glutLeaveMainLoop", (void *) glutLeaveMainLoop },
@@ -191,7 +195,7 @@ void *FGAPIENTRY glutGetProcAddress( const char *procName )
             return glut_functions[ i ].address;
 
     /* Try core GL functions */
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     return( void * )wglGetProcAddress( ( LPCSTR )procName );
 #elif TARGET_HOST_UNIX_X11 && defined( GLX_ARB_get_proc_address )
     return(void * )glXGetProcAddressARB( ( const GLubyte * )procName );

@@ -1,0 +1,384 @@
+# Microsoft eMbedded Visual Tools Project File - Name="freeglut" - Package Owner=<4>
+# Microsoft eMbedded Visual Tools Generated Build File, Format Version 6.02
+# ** DO NOT EDIT **
+
+# TARGTYPE "Win32 (WCE ARMV4) Dynamic-Link Library" 0xa302
+
+CFG=freeglut - Win32 (WCE ARMV4) Debug
+!MESSAGE This is not a valid makefile. To build this project using NMAKE,
+!MESSAGE use the Export Makefile command and run
+!MESSAGE 
+!MESSAGE NMAKE /f "freeglut_evc4.vcn".
+!MESSAGE 
+!MESSAGE You can specify a configuration when running NMAKE
+!MESSAGE by defining the macro CFG on the command line. For example:
+!MESSAGE 
+!MESSAGE NMAKE /f "freeglut_evc4.vcn" CFG="freeglut - Win32 (WCE ARMV4) Debug"
+!MESSAGE 
+!MESSAGE Possible choices for configuration are:
+!MESSAGE 
+!MESSAGE "freeglut - Win32 (WCE ARMV4) Release" (based on "Win32 (WCE ARMV4) Dynamic-Link Library")
+!MESSAGE "freeglut - Win32 (WCE ARMV4) Debug" (based on "Win32 (WCE ARMV4) Dynamic-Link Library")
+!MESSAGE 
+
+# Begin Project
+# PROP AllowPerConfigDependencies 0
+# PROP Scc_ProjName ""
+# PROP Scc_LocalPath ""
+# PROP ATL_Project 2
+CPP="C:\Program Files\Microsoft eMbedded C++ 4.0\EVC\WCE420\bin\xicle42"
+MTL=midl.exe
+RSC=rc.exe
+
+!IF  "$(CFG)" == "freeglut - Win32 (WCE ARMV4) Release"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "ARMV4Rel"
+# PROP BASE Intermediate_Dir "ARMV4Rel"
+# PROP BASE CPU_ID "{ECBEA43D-CD7B-4852-AD55-D4227B5D624B}"
+# PROP BASE Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "ARMV4Rel"
+# PROP Intermediate_Dir "ARMV4Rel"
+# PROP CPU_ID "{ECBEA43D-CD7B-4852-AD55-D4227B5D624B}"
+# PROP Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "NDEBUG" /d "UNICODE" /d "_UNICODE" /d "$(CePlatform)" /d "ARM" /d "_ARM_" /d "ARMV4" /r
+# ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "NDEBUG" /d "UNICODE" /d "_UNICODE" /d "$(CePlatform)" /d "ARM" /d "_ARM_" /d "ARMV4" /r
+# ADD BASE CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "ARM" /D "_ARM_" /D "ARMV4" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /D "FREEGLUT_EXPORTS" /YX /O2 /M$(CECrtMT) /c
+# ADD CPP /nologo /W3 /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "ARM" /D "_ARM_" /D "ARMV4" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "NDEBUG" /D "FREEGLUT_EXPORTS" /YX /O2 /M$(CECrtMT) /c
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
+# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o "NUL" /win32
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32="C:\Program Files\Microsoft eMbedded C++ 4.0\EVC\WCE420\bin\xilinke42"
+# ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00100000" /stack:0x10000,0x1000 /entry:"_DllMainCRTStartup" /dll /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /align:"4096" /MACHINE:ARM
+# ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00100000" /stack:0x10000,0x1000 /entry:"_DllMainCRTStartup" /dll /nodefaultlib:"$(CENoDefaultLib)" /out:"ARMV4Rel/freeglut.dll" /subsystem:$(CESubsystem) /align:"4096" /MACHINE:ARM
+
+!ELSEIF  "$(CFG)" == "freeglut - Win32 (WCE ARMV4) Debug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "ARMV4Dbg"
+# PROP BASE Intermediate_Dir "ARMV4Dbg"
+# PROP BASE CPU_ID "{ECBEA43D-CD7B-4852-AD55-D4227B5D624B}"
+# PROP BASE Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "ARMV4Dbg"
+# PROP Intermediate_Dir "ARMV4Dbg"
+# PROP CPU_ID "{ECBEA43D-CD7B-4852-AD55-D4227B5D624B}"
+# PROP Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "DEBUG" /d "UNICODE" /d "_UNICODE" /d "$(CePlatform)" /d "ARM" /d "_ARM_" /d "ARMV4" /r
+# ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "DEBUG" /d "UNICODE" /d "_UNICODE" /d "$(CePlatform)" /d "ARM" /d "_ARM_" /d "ARMV4" /r
+# ADD BASE CPP /nologo /W3 /Zi /Od /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "ARM" /D "_ARM_" /D "ARMV4" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "FREEGLUT_EXPORTS" /YX /M$(CECrtMTDebug) /c
+# ADD CPP /nologo /W3 /Zi /Od /D "DEBUG" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "ARM" /D "_ARM_" /D "ARMV4" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "FREEGLUT_EXPORTS" /YX /M$(CECrtMTDebug) /c
+# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
+# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32="C:\Program Files\Microsoft eMbedded C++ 4.0\EVC\WCE420\bin\xilinke42"
+# ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00100000" /stack:0x10000,0x1000 /entry:"_DllMainCRTStartup" /dll /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /align:"4096" /MACHINE:ARM
+# ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00100000" /stack:0x10000,0x1000 /entry:"_DllMainCRTStartup" /dll /debug /nodefaultlib:"$(CENoDefaultLib)" /out:"ARMV4Dbg/freeglutD.dll" /subsystem:$(CESubsystem) /align:"4096" /MACHINE:ARM
+
+!ENDIF 
+
+# Begin Target
+
+# Name "freeglut - Win32 (WCE ARMV4) Release"
+# Name "freeglut - Win32 (WCE ARMV4) Debug"
+# Begin Group "Resource Files"
+
+# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# End Group
+# Begin Group "Source Files"
+
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Source File
+
+SOURCE=.\src\freeglut_callbacks.c
+DEP_CPP_FREEG=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEG=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_cursor.c
+DEP_CPP_FREEGL=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGL=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_display.c
+DEP_CPP_FREEGLU=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLU=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_ext.c
+DEP_CPP_FREEGLUT=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_font.c
+DEP_CPP_FREEGLUT_=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_font_data.c
+DEP_CPP_FREEGLUT_F=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_F=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_gamemode.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_geometry.c
+DEP_CPP_FREEGLUT_G=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_G=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_glutfont_definitions.c
+DEP_CPP_FREEGLUT_GL=\
+	".\src\freeglut_internal.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_init.c
+DEP_CPP_FREEGLUT_I=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_I=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_internal.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_joystick.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_main.c
+DEP_CPP_FREEGLUT_M=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_M=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_menu.c
+DEP_CPP_FREEGLUT_ME=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_ME=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_misc.c
+DEP_CPP_FREEGLUT_MI=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_MI=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_overlay.c
+DEP_CPP_FREEGLUT_O=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_O=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_state.c
+DEP_CPP_FREEGLUT_S=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_S=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_stroke_mono_roman.c
+DEP_CPP_FREEGLUT_ST=\
+	".\src\freeglut_internal.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_stroke_roman.c
+DEP_CPP_FREEGLUT_STR=\
+	".\src\freeglut_internal.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_structure.c
+DEP_CPP_FREEGLUT_STRU=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_STRU=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_teapot.c
+DEP_CPP_FREEGLUT_T=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_T=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_videoresize.c
+DEP_CPP_FREEGLUT_V=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_V=\
+	".\src\config.h"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\freeglut_window.c
+DEP_CPP_FREEGLUT_W=\
+	".\src\freeglut_internal.h"\
+	{$(INCLUDE)}"GL\freeglut.h"\
+	{$(INCLUDE)}"GL\freeglut_ext.h"\
+	{$(INCLUDE)}"GL\freeglut_std.h"\
+	
+NODEP_CPP_FREEGLUT_W=\
+	".\src\config.h"\
+	
+# End Source File
+# End Group
+# Begin Group "Header Files"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\include\GL\freeglut.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\GL\freeglut_ext.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\GL\freeglut_std.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\GL\glut.h
+# End Source File
+# End Group
+# End Target
+# End Project

@@ -70,7 +70,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       0,                     /* FPSInterval */
                       0,                     /* SwapCount */
                       0,                     /* SwapTime */
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
                       { 0, GL_FALSE },       /* Time */
 #else
                       { { 0, 0 }, GL_FALSE },
@@ -142,7 +142,7 @@ void fgInitialize( const char* displayName )
         FALSE
     );
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     WNDCLASS wc;
     ATOM atom;
@@ -152,7 +152,8 @@ void fgInitialize( const char* displayName )
      */
     fgDisplay.Instance = GetModuleHandle( NULL );
 
-    atom = GetClassInfo( fgDisplay.Instance, "FREEGLUT", &wc );
+    atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
+
     if( atom == 0 )
     {
         ZeroMemory( &wc, sizeof(WNDCLASS) );
@@ -165,19 +166,24 @@ void fgInitialize( const char* displayName )
          * XXX Old code had "| CS_DBCLCKS" commented out.  Plans for the
          * XXX future?  Dead-end idea?
          */
-        wc.style          = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
         wc.lpfnWndProc    = fgWindowProc;
         wc.cbClsExtra     = 0;
         wc.cbWndExtra     = 0;
         wc.hInstance      = fgDisplay.Instance;
-        wc.hIcon          = LoadIcon( fgDisplay.Instance, "GLUT_ICON" );
+        wc.hIcon          = LoadIcon( fgDisplay.Instance, _T("GLUT_ICON") );
+
+#if TARGET_HOST_WIN32
+		wc.style          = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
         if (!wc.hIcon)
           wc.hIcon        = LoadIcon( NULL, IDI_WINLOGO );
+#else //TARGET_HOST_WINCE
+		wc.style          = CS_HREDRAW | CS_VREDRAW;
+#endif
 
         wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
         wc.hbrBackground  = NULL;
         wc.lpszMenuName   = NULL;
-        wc.lpszClassName  = "FREEGLUT";
+        wc.lpszClassName  = _T("FREEGLUT");
 
         /*
          * Register the window class
@@ -204,8 +210,10 @@ void fgInitialize( const char* displayName )
 
 #endif
 
+#if !TARGET_HOST_WINCE
     fgJoystickInit( 0 );
     fgJoystickInit( 1 );
+#endif //!TARGET_HOST_WINCE
 
     fgState.Initialised = GL_TRUE;
 }
@@ -249,7 +257,9 @@ void fgDeinitialize( void )
         free( timer );
     }
 
+#if !TARGET_HOST_WINCE
     fgJoystickClose( );
+#endif //!TARGET_HOST_WINCE
 
     fgState.Initialised = GL_FALSE;
 
@@ -321,7 +331,7 @@ void fgDeinitialize( void )
  * Everything inside the following #ifndef is copied from the X sources.
  */
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
 /*
 
@@ -516,6 +526,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     fgElapsedTime( );
 
     /* check if GLUT_FPS env var is set */
+#if !TARGET_HOST_WINCE
     {
         const char *fps = getenv( "GLUT_FPS" );
         if( fps )
@@ -611,6 +622,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             argv[ i ] = argv[ j ];
         }
     }
+
+#endif //TARGET_HOST_WINCE
 
     /*
      * Have the display created now. If there wasn't a "-display"

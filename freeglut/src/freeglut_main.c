@@ -84,8 +84,9 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
                    width, height );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
+#if !TARGET_HOST_WINCE
     {
         RECT rect;
 
@@ -132,6 +133,7 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
                       SWP_NOZORDER
         );
     }
+#endif //TARGET_HOST_WINCE
 
     /*
      * XXX Should update {window->State.OldWidth, window->State.OldHeight}
@@ -227,7 +229,7 @@ static void fghcbDisplayWindow( SFG_Window *window,
             INVOKE_WCB( *window, Display, ( ) );
             fgSetWindow( current_window );
         }
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
         RedrawWindow(
             window->Window.Handle, NULL, NULL,
             RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
@@ -262,7 +264,9 @@ static void fghcbCheckJoystickPolls( SFG_Window *window,
     if( window->State.JoystickLastPoll + window->State.JoystickPollRate <=
         checkTime )
     {
+#if !TARGET_HOST_WINCE
         fgJoystickPollWindow( window );
+#endif //!TARGET_HOST_WINCE
         window->State.JoystickLastPoll = checkTime;
     }
 
@@ -322,6 +326,8 @@ long fgElapsedTime( void )
         return elapsed;
 #elif TARGET_HOST_WIN32
         return timeGetTime() - fgState.Time.Value;
+#elif TARGET_HOST_WINCE
+        return GetTickCount() - fgState.Time.Value;
 #endif
     }
     else
@@ -330,6 +336,8 @@ long fgElapsedTime( void )
         gettimeofday( &fgState.Time.Value, NULL );
 #elif TARGET_HOST_WIN32
         fgState.Time.Value = timeGetTime ();
+#elif TARGET_HOST_WINCE
+        fgState.Time.Value = GetTickCount();
 #endif
         fgState.Time.Set = GL_TRUE ;
 
@@ -478,7 +486,7 @@ static void fgSleepForEvents( void )
         if( -1 == err )
             fgWarning ( "freeglut select() error: %d\n", errno );
     }
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLEVENTS );
 #endif
 }
@@ -1047,7 +1055,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         }
     }
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     MSG stMsg;
 
@@ -1085,13 +1093,13 @@ void FGAPIENTRY glutMainLoop( void )
 {
     int action;
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
 #endif
 
     freeglut_assert_ready;
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     /*
      * Processing before the main loop:  If there is a window which is open and
      * which has a visibility callback, call it.  I know this is an ugly hack,
@@ -1163,7 +1171,7 @@ void FGAPIENTRY glutLeaveMainLoop( void )
 }
 
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 /*
  * Determine a GLUT modifer mask based on MS-WINDOWS system info.
  */
@@ -1208,7 +1216,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         {
             unsigned int current_DisplayMode = fgState.DisplayMode;
             fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;
+#if !TARGET_HOST_WINCE
             fgSetupPixelFormat( window, GL_FALSE, PFD_MAIN_PLANE );
+#endif
             fgState.DisplayMode = current_DisplayMode;
 
             if( fgStructure.MenuContext )
@@ -1228,7 +1238,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
         else
         {
+#if !TARGET_HOST_WINCE
             fgSetupPixelFormat( window, GL_FALSE, PFD_MAIN_PLANE );
+#endif
 
             if( ! fgState.UseCurrentContext )
                 window->Window.Context =
@@ -1258,8 +1270,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( window->State.Visible )
         {
             window->State.NeedToResize = GL_TRUE;
+#if TARGET_HOST_WINCE
+            window->State.Width  = HIWORD(lParam);
+            window->State.Height = LOWORD(lParam);
+#else
             window->State.Width  = LOWORD(lParam);
             window->State.Height = HIWORD(lParam);
+#endif //TARGET_HOST_WINCE
         }
 
         break;
@@ -1423,6 +1440,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
+#if !TARGET_HOST_WINCE
         if( GetSystemMetrics( SM_SWAPBUTTON ) )
         {
             if( button == GLUT_LEFT_BUTTON )
@@ -1431,6 +1449,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 if( button == GLUT_RIGHT_BUTTON )
                     button = GLUT_LEFT_BUTTON;
         }
+#endif //!TARGET_HOST_WINCE
 
         if( button == -1 )
             return DefWindowProc( hWnd, uMsg, lParam, wParam );
@@ -1714,6 +1733,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         default:
         {
+#if !TARGET_HOST_WINCE
             BYTE state[ 256 ];
             WORD code[ 2 ];
 
@@ -1726,6 +1746,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                         ( (char)wParam,
                           window->State.MouseX, window->State.MouseY )
             );
+#endif //!TARGET_HOST_WINCE
         }
         }
 
@@ -1787,6 +1808,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 
+#if !TARGET_HOST_WINCE
     case WM_SYNCPAINT:  /* 0x0088 */
         /* Another window has moved, need to update this one */
         window->State.Redisplay = GL_TRUE;
@@ -1864,6 +1886,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 break ;
             }
         }
+#endif //!TARGET_HOST_WINCE
 
         /* We need to pass the message on to the operating system as well */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );

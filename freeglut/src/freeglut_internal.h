@@ -36,12 +36,18 @@
 /*
  * Freeglut is meant to be available under all Unix/X11 and Win32 platforms.
  */
-#if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
+#if defined(_WIN32_WCE)
+#   define  TARGET_HOST_UNIX_X11    0
+#   define  TARGET_HOST_WIN32       0
+#   define  TARGET_HOST_WINCE       1
+#elif defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
 #   define  TARGET_HOST_UNIX_X11    0
 #   define  TARGET_HOST_WIN32       1
+#   define  TARGET_HOST_WINCE       0
 #else
 #   define  TARGET_HOST_UNIX_X11    1
 #   define  TARGET_HOST_WIN32       0
+#   define  TARGET_HOST_WINCE       0
 #endif
 
 #define  FREEGLUT_MAX_MENUS         3
@@ -62,6 +68,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <mmsystem.h>
+#include <TCHAR.H>
 #endif
 
 #if defined(_MSC_VER)
@@ -288,7 +295,7 @@ struct tagSFG_Display
 
 #endif
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     HINSTANCE        Instance;          /* The application's instance        */
     DEVMODE         DisplayMode;        /* Desktop's display settings        */
 
@@ -322,7 +329,7 @@ struct tagSFG_Timer
 typedef Window     SFG_WindowHandleType ;
 typedef GLXContext SFG_WindowContextType ;
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
 typedef HWND    SFG_WindowHandleType ;
 typedef HGLRC   SFG_WindowContextType ;
@@ -343,7 +350,7 @@ struct tagSFG_Context
     XVisualInfo*    VisualInfo;      /* The window's visual information     */
     Pixmap          Pixmap;          /* Used for offscreen rendering        */
     /* GLXPixmap      GLXPixMap; */  /* Used for offscreen rendering        */
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     HDC             Device;          /* The window's device context         */
 #endif
 
@@ -735,7 +742,7 @@ XVisualInfo* fgChooseVisual( void );
 /*
  * The window procedure for Win32 events handling
  */
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg,
                                WPARAM wParam, LPARAM lParam );
 GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,

@@ -137,10 +137,12 @@ void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
  */
 void FGAPIENTRY glutForceJoystickFunc( void )
 {
+#if !TARGET_HOST_WINCE
     freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Window != NULL );
     freeglut_return_if_fail( FETCH_WCB( *( fgStructure.Window ), Joystick ) );
     fgJoystickPollWindow( fgStructure.Window );
+#endif //!TARGET_HOST_WINCE
 }
 
 /*

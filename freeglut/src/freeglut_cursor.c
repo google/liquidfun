@@ -186,7 +186,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
         }
     }
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     /*
      * This is a temporary solution only...
@@ -250,7 +250,7 @@ void FGAPIENTRY glutWarpPointer( int x, int y )
     );
     XFlush( fgDisplay.Display ); /* XXX Is this really necessary? */
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     {
         POINT coords;
