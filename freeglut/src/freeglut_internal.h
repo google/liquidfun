@@ -36,12 +36,12 @@
 /*
  * Freeglut is meant to be available under all Unix/X11 and Win32 platforms.
  */
-#if !defined(_WIN32)
-#   define  TARGET_HOST_UNIX_X11    1
-#   define  TARGET_HOST_WIN32       0
-#else
+#if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
 #   define  TARGET_HOST_UNIX_X11    0
 #   define  TARGET_HOST_WIN32       1
+#else
+#   define  TARGET_HOST_UNIX_X11    1
+#   define  TARGET_HOST_WIN32       0
 #endif
 
 #define  FREEGLUT_MAX_MENUS         3
@@ -61,7 +61,10 @@
 #if TARGET_HOST_WIN32
 #include <windows.h>
 #include <windowsx.h>
+#include <mmsystem.h>
+#endif
 
+#if defined(_MSC_VER)
 #define strdup   _strdup
 #endif
 
