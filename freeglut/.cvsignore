@@ -2,6 +2,7 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+autoscan.log
 config.guess
 config.h
 config.h.in
@@ -9,6 +10,7 @@ config.log
 config.status
 config.sub
 configure
+configure.scan
 freeglut-*.tar.gz
 libtool
 ltmain.sh
