@@ -364,7 +364,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /*
          * ...then we've got to correct the results we've just received...
          */
-        if ( fgStructure.Window->Parent == NULL )
+        if (fgStructure.GameMode != fgStructure.Window &&
+	    fgStructure.Window->Parent == NULL )
         {
           winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME );
           winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME );

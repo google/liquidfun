@@ -255,6 +255,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 
     /*
      * Enumerate the available display modes
+     * Try to get a complete match
      */
     while( EnumDisplaySettings( NULL, displayModes, &devMode ) == TRUE )
     {
@@ -262,7 +263,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
          * Does the enumerated display mode match the user's preferences?
          */
         if( fghCheckDisplayMode( devMode.dmPelsWidth,  devMode.dmPelsHeight,
-                                 devMode.dmBitsPerPel, fgState.GameModeRefresh ) )
+                                 devMode.dmBitsPerPel, devMode.dmDisplayFrequency ) )
         {
             /*
              * OKi, we've found a matching display mode, remember its number and break
@@ -275,6 +276,35 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
          * Switch to the next display mode, if any
          */
         displayModes++;
+    }
+
+    if( mode == 0xffffffff )
+    {
+      /* then try without Display Frequency */
+      displayModes=0;
+
+      /*
+       * Enumerate the available display modes
+       */
+      while( EnumDisplaySettings( NULL, displayModes, &devMode ) == TRUE )
+	{
+	  /* then try without Display Frequency */
+	
+	  if( fghCheckDisplayMode( devMode.dmPelsWidth,  devMode.dmPelsHeight,
+				   devMode.dmBitsPerPel, fgState.GameModeRefresh))
+	    {
+	      /*
+	       * OKi, we've found a matching display mode, remember its number and break
+	       */
+	      mode = displayModes;
+	      break;
+	    }
+	
+	  /*
+	   * Switch to the next display mode, if any
+	   */
+	  displayModes++;
+	}
     }
 
     /*
