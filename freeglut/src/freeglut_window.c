@@ -1218,6 +1218,15 @@ void FGAPIENTRY glutFullScreen( void )
         int x, y;
         Window w;
 
+        XMoveResizeWindow(
+            fgDisplay.Display,
+            fgStructure.Window->Window.Handle,
+            0, 0,
+            fgDisplay.ScreenWidth,
+            fgDisplay.ScreenHeight
+        );
+        XFlush( fgDisplay.Display );
+
         XTranslateCoordinates(
             fgDisplay.Display,
             fgStructure.Window->Window.Handle,
@@ -1225,30 +1234,15 @@ void FGAPIENTRY glutFullScreen( void )
             0, 0, &x, &y, &w
         );
 
-        if (w)
+        if (x || y)
         {
-            XTranslateCoordinates(
+            XMoveWindow(
                 fgDisplay.Display,
                 fgStructure.Window->Window.Handle,
-                w, 0, 0, &x, &y, &w
+                -x, -y
             );
-
-            x = -x;
-            y = -y;
+            XFlush( fgDisplay.Display );
         }
-        else
-        {
-            x = y = 0;
-        }
-
-        XMoveResizeWindow(
-            fgDisplay.Display,
-            fgStructure.Window->Window.Handle,
-            x, y,
-            fgDisplay.ScreenWidth,
-            fgDisplay.ScreenHeight
-        );
-        XFlush( fgDisplay.Display );
     }
 #elif TARGET_HOST_WIN32
     MoveWindow(
