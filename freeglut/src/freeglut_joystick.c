@@ -56,8 +56,12 @@
 #else
 #   include <unistd.h>
 #   include <fcntl.h>
-#   ifdef __FreeBSD__
+#   if defined(__FreeBSD__) || defined(__NetBSD__)
+#   if __FreeBSD_version >= 500000
 #       include <sys/joystick.h>
+#   else
+#       include <machine/joystick.h>
+#   endif
 #       define JS_DATA_TYPE joystick
 #       define JS_RETURN (sizeof(struct JS_DATA_TYPE))
 #   elif defined(__linux__)
@@ -253,7 +257,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, int* buttons, float* axes )
     }
 
     if( buttons )
-#       ifdef __FreeBSD__
+#       if defined(__FreeBSD__) || defined(__NetBSD__)
         *buttons = (joy->js.b1 ? 1 : 0) | (joy->js.b2 ? 2 : 0);
 #       else
         *buttons = joy->js.buttons;
