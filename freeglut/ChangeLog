@@ -1,5 +1,3 @@
-********** Hey Emacs, please use -*- fundamental -*- mode! **********
-
 Changes to Freeglut:
 
 Before and on October 22, 2002:
@@ -670,7 +668,7 @@ packaged with distributions
 
 
 ***************************************************************************
-* Changes on Februrary 5, 2004.
+* Changes on February 5, 2004.
 ***************************************************************************
 
 (182) With permission from Steve Baker, John Fay imported the latest joystick
@@ -680,7 +678,7 @@ compiling, and likely will require some debugging.
 
 	
 ***************************************************************************
-* Changes on Februrary 7, 2004.
+* Changes on February 7, 2004.
 ***************************************************************************
 
 (183) Richard Rauch added experimental support for a new feature:
@@ -690,43 +688,166 @@ and then open a "window" much as you would a regular top-level window.
 Only UNIX_X11 is supprted at this point, for lack of knowledge.
 
 *********************************
+* March 8, 2004.
+*********************************
+
+(184) Made the include path for "freeglut.h" global (in "<>") rather
+than local (in quotes).
+
+*********************************
+* March 14, 2004.
+*********************************
+
+(185) Stripped out tab characters and end-of-line whitespace.
+
+*********************************
 * Ides of March, 2004.
 *********************************
 
-(184) Per demands of project owner, offscreen rendering is now removed
+(186) Per demands of project owner, offscreen rendering is now removed
 from freeglut.
 
-***************************************************************************
-* Changes on December 31, 2004.
-***************************************************************************
+(187) Added support for Windows CE.
 
-(185) Fixed bug #1079530 (glutGetProcAddress and geometric objects).
+*********************************
+* March 17, 2004.
+*********************************
 
-(186) Fixed bug #1087642 (glutDeviceGet(GLUT_DEVICE_KEY_REPEAT)
-unimplemented).
+(188) Fixed an array-bounds error in X11 key-repeat detection
 
-(187) Fixed bug #1045054 (KeyReleaseMask typo).
+*********************************
+* May 12, 2004.
+*********************************
 
-(188) Fixed bug #1040435 (glutBitmapString() bug).
+(189) Fixed a bug in direct/indirect rendering context and generally made
+it rational.
 
-(189) Fixed first bug of #1064195 (two things when using signals):
-Don't issue a warning about select when a non-blocked signal was
-caught. This makes sense and is more compatible with GLUT.
+(190) Created "GLUT_XLIB_IMPLEMENTATION" defined constant
 
-***************************************************************************
-* Changes on January 1, 2005.
-***************************************************************************
+(191) Removed a false deprecation message of "glutSetKeyRepeat" function
 
-(190) Added eMbedded Visual Tools project/workspace files to
-distribution.
+(192) Implemented the upper-end ASCII characters and allowed for rotation
+of bitmapped text.
 
-(191) Renamed "configure.in" to the officially preferred
-"configure.ac".
+(193) Removed some obsolete defined constants.
 
-(192) Make "gcc -Wall -pedantic -Werror" happy.
+(194) Fixed a bug in the "behaviour on window close" code.
 
-(193) Modernized configure.ac a bit and added a rule to Makefile.am to
-update libtool. Note that all gcc compiler warnings are now on by
-default.
+(195) Added some comments about Windows window events.
 
-(194) Added missing files from "src" subdirectory to dist.
+(196) Implemented the GLUT teapot in Windows CE.
+
+*********************************
+* June 29, 2004.
+*********************************
+
+(197) Gave menu windows the name "freeglut menu" instead of NULL
+
+*********************************
+* August 4, 2004.
+*********************************
+
+(198) Fixed a bug in "glutBitmapString" so that it handles end-of-line
+characters correctly.
+
+*********************************
+* August 5, 2004.
+*********************************
+
+(199) Suppressed warnings about indirect rendering contexts for BSD per
+request from Richard Rauch.
+
+*********************************
+* August 11, 2004.
+*********************************
+
+(200) Fixed a very nasty game mode bug that was causing crashes with the
+screen in a changed (low) resolution.
+
+*********************************
+* September 10, 2004.
+*********************************
+
+(201) Modified the joystick initialization so that it only happens if the
+application defines a joystick callback.
+
+(202) Changed many three-line comments to single-line comments.
+
+*********************************
+* September 13, 2004.
+*********************************
+
+(203) Removed redundant end-of-line characters from error and warning
+messages.
+
+(204) Renamed "fgGetCursorError" and made it and some other functions static.
+
+(205) Added a warning message to game mode get function.
+
+*********************************
+* September 15, 2004.
+*********************************
+
+(206) Fixed a bug in the command line argument compaction code.
+
+*********************************
+* September 23, 2004.
+*********************************
+
+(207) Changed "fgError" calls in the font routines to "fgWarning" so that
+execution can continue even if text does not get printed.
+
+(208) Made the geometry functions more robust in case the application calls
+them with bad inputs (like zero layers in a cone).
+
+(209) Unified the tetrahedron and Sierpinski sponge code.
+
+(210) Made the Key Repeat default behaviour consistent between initialization
+and reinitialization.
+
+(211) Removed duplicate nested parentheses.
+
+(212) Changed some "window by handle" internal functions to receive the window
+pointer instead of looking up the window pointer right away.
+
+(213) Removed some redundant window resize code.
+
+*********************************
+* October 5, 2004.
+*********************************
+
+(214) Added British spellings to the display mode string processing.
+
+(215) Modified the mouse behaviour in Windows to match the X11 behaviour.  It's
+not perfect but it is much improved.  The question of multiple button presses
+at once remains.
+
+*********************************
+* October 6, 2004.
+*********************************
+
+(216) Moved the joystick initialization code to one function.
+
+(217) Added some functions to get joystick parameters (number of buttons, axes).
+It is not clear whether these should go into the API or not.
+
+*********************************
+* December 17, 2004.
+*********************************
+
+(218) Changed the "freeglut_assert_window" to "fgError" and had it print out
+the name of the function whose call created the error condition.
+
+(219) Changed the "freeglut_assert_ready" to "fgError" when it is invoked in
+an API function and had it print out the name of the function whose call
+created the error condition.  Removed some other "freeglut_assert_ready"
+invocations from functions which are only called from other functions which
+already check for initialization.
+ 
+
+
+
+
+
+
+
