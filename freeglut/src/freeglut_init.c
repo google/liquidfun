@@ -298,7 +298,7 @@ void fgDeinitialize( void )
         free( fgState.ProgramName );
         fgState.ProgramName = NULL;
     }
-    
+
 
 #if TARGET_HOST_UNIX_X11
 
@@ -369,7 +369,7 @@ from The Open Group.
  *   It returns a bitmask that indicates which of the four values
  *   were actually found in the string.  For each value found,
  *   the corresponding argument is updated;  for each value
- *   not found, the corresponding argument is left unchanged. 
+ *   not found, the corresponding argument is left unchanged.
  */
 
 static int
@@ -377,7 +377,7 @@ ReadInteger(char *string, char **NextString)
 {
     register int Result = 0;
     int Sign = 1;
-    
+
     if (*string == '+')
         string++;
     else if (*string == '-')
@@ -417,7 +417,7 @@ static int XParseGeometry (
     strind = (char *)string;
     if (*strind != '+' && *strind != '-' && *strind != 'x') {
         tempWidth = ReadInteger(strind, &nextCharacter);
-        if (strind == nextCharacter) 
+        if (strind == nextCharacter)
             return 0;
         strind = nextCharacter;
         mask |= WidthValue;
@@ -522,7 +522,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         {
             int interval;
             sscanf( fps, "%d", &interval );
-            
+
             if( interval <= 0 )
                 fgState.FPSInterval = 5000;  /* 5000 millisecond default */
             else

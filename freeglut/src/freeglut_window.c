@@ -203,7 +203,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
 
     pfd.cColorBits = (BYTE) GetDeviceCaps( window->Window.Device, BITSPIXEL );
     ppfd = &pfd;
-    
+
     pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
     if( pixelformat == 0 )
         return GL_FALSE;
@@ -235,8 +235,8 @@ void fgSetWindow ( SFG_Window *window )
     if ( window )
     {
         window->Window.Device = GetDC( window->Window.Handle );
-        wglMakeCurrent( 
-            window->Window.Device, 
+        wglMakeCurrent(
+            window->Window.Device,
             window->Window.Context
         );
     }
@@ -293,7 +293,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             window->Window.VisualInfo = fgChooseVisual( );
             fgState.DisplayMode &= ~GLUT_DOUBLE;
         }
-        
+
         /*
          * GLUT also checks for multi-sampling, but I don't see that
          * anywhere else in FREEGLUT so I won't bother with it for the moment.
@@ -471,13 +471,13 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             &wmHints,
             NULL
         );
-    
+
         XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
                          &fgDisplay.DeleteWindow, 1 );
-    
+
         XMapWindow( fgDisplay.Display, window->Window.Handle );
     }
-    
+
 #elif TARGET_HOST_WIN32
 
     WNDCLASS wc;
@@ -486,13 +486,13 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     ATOM atom;
 
     freeglut_assert_ready;
-    
+
     /*
      * Grab the window class we have registered on glutInit():
      */
     atom = GetClassInfo( fgDisplay.Instance, "FREEGLUT", &wc );
     assert( atom != 0 );
-    
+
     if( gameMode )
     {
         assert( window->Parent == NULL );
@@ -649,7 +649,7 @@ int FGAPIENTRY glutCreateWindow( const char* title )
 int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
 {
     int ret = 0;
-    
+
     if( GL_FALSE == fgStructure.Window->State.IsOffscreen )
     {
         SFG_Window* window = NULL;
@@ -804,18 +804,18 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 #if TARGET_HOST_UNIX_X11
 
         XTextProperty text;
-        
+
         text.value = (unsigned char *) title;
         text.encoding = XA_STRING;
         text.format = 8;
         text.nitems = strlen( title );
-        
+
         XSetWMName(
             fgDisplay.Display,
             fgStructure.Window->Window.Handle,
             &text
         );
-        
+
         XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
@@ -840,7 +840,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 #if TARGET_HOST_UNIX_X11
 
         XTextProperty text;
-        
+
         text.value = (unsigned char *) title;
         text.encoding = XA_STRING;
         text.format = 8;
@@ -898,7 +898,7 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
 #elif TARGET_HOST_WIN32
 
         RECT winRect;
-        
+
         GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
         MoveWindow(
             fgStructure.Window->Window.Handle,

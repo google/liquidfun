@@ -53,7 +53,7 @@ int fgGetCursorError( Cursor cursor )
 {
     int ret = 0;
     char buf[ 256 ];
-    
+
     switch( cursor )
     {
     case BadAlloc:
@@ -110,7 +110,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 
         if( GLUT_CURSOR_FULL_CROSSHAIR == cursorID )
             cursorID = GLUT_CURSOR_CROSSHAIR;
-        
+
         switch( cursorID )
         {
             MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, XC_right_ptr);
@@ -162,7 +162,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
                                           0, 0 );
             break;
         }
-        
+
         case GLUT_CURSOR_INHERIT:
             break;
 
@@ -222,7 +222,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
         MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
         /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO        ); */
         ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL           );
-        
+
     default:
         MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
     }

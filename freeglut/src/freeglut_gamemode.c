@@ -89,7 +89,7 @@ void fghRememberState( void )
     /*
      * Query the current display settings:
      */
-    fgDisplay.DisplayModeValid = 
+    fgDisplay.DisplayModeValid =
       XF86VidModeGetModeLine(
         fgDisplay.Display,
         fgDisplay.Screen,
@@ -110,7 +110,7 @@ void fghRememberState( void )
 #elif TARGET_HOST_WIN32
 
 /*    DEVMODE devMode; */
-    
+
     /*
      * Grab the current desktop settings...
      */
@@ -432,7 +432,7 @@ int FGAPIENTRY glutEnterGameMode( void )
         return FALSE;
     }
 
-    fgStructure.GameMode = fgCreateWindow( 
+    fgStructure.GameMode = fgCreateWindow(
         NULL, "FREEGLUT", 0, 0,
         fgState.GameModeSize.X, fgState.GameModeSize.Y, GL_TRUE, GL_FALSE
     );
@@ -453,7 +453,7 @@ int FGAPIENTRY glutEnterGameMode( void )
     /* Move the Pointer to the middle of the fullscreen window */
     XWarpPointer(
         fgDisplay.Display,
-        None, 
+        None,
         fgDisplay.RootWindow,
         0, 0, 0, 0,
         fgState.GameModeSize.X/2, fgState.GameModeSize.Y/2
@@ -476,7 +476,7 @@ int FGAPIENTRY glutEnterGameMode( void )
                GrabModeAsync, GrabModeAsync,
                fgStructure.GameMode->Window.Handle, None, CurrentTime) )
         usleep( 100 );
-    
+
     /*
      * Change input focus to the new window. This will exit the application
      * if the new window is not viewable yet, see the XGrabPointer loop above.

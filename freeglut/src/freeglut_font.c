@@ -280,7 +280,7 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 
                         glEnd( );
                     }
-                    
+
                     length += schar->Right;
                     glTranslatef( schar->Right, 0.0, 0.0 );
                 }
@@ -302,7 +302,7 @@ int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
     );
     schar = font->Characters[ character ];
     freeglut_return_val_if_fail( schar, 0 );
-    
+
     return ( int )( schar->Right + 0.5 );
 }
 

@@ -405,7 +405,7 @@ void fgDestroyStructure( void )
      */
     while( fgStructure.Menus.First )
         fgDestroyMenu( ( SFG_Menu * )fgStructure.Menus.First );
-    
+
     while( fgStructure.Windows.First )
         fgDestroyWindow( ( SFG_Window * )fgStructure.Windows.First );
 }

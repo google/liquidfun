@@ -507,7 +507,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
 
     case GLUT_HAS_MOUSE:
         /*
-         * The Windows can be booted without a mouse. 
+         * The Windows can be booted without a mouse.
          * It would be nice to have this reported.
          */
         return GetSystemMetrics( SM_MOUSEPRESENT );

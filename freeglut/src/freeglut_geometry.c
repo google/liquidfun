@@ -197,7 +197,7 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
         glVertex3d(0,0,radius);
 
         for (j=slices; j>=0; j--)
-        {       
+        {
             glNormal3d(cost1[j]*r1,        sint1[j]*r1,        z1       );
             glVertex3d(cost1[j]*r1*radius, sint1[j]*r1*radius, z1*radius);
         }
@@ -263,7 +263,7 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
     double x,y,z;
 
     /* Pre-computed circle */
-        
+
     double *sint1,*cost1;
     double *sint2,*cost2;
     circleTable(&sint1,&cost1,-slices  );

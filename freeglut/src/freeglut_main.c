@@ -180,7 +180,7 @@ static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
 
         fgSetWindow( window );
 
-        fghReshapeWindowByHandle( 
+        fghReshapeWindowByHandle(
             window->Window.Handle,
             window->State.Width,
             window->State.Height
@@ -205,7 +205,7 @@ static void fghcbDisplayWindow( SFG_Window *window,
 
         fgSetWindow( window );
 
-        fghReshapeWindowByHandle( 
+        fghReshapeWindowByHandle(
             window->Window.Handle,
             window->State.Width,
             window->State.Height
@@ -229,7 +229,7 @@ static void fghcbDisplayWindow( SFG_Window *window,
         }
 #elif TARGET_HOST_WIN32
         RedrawWindow(
-            window->Window.Handle, NULL, NULL, 
+            window->Window.Handle, NULL, NULL,
             RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
         );
 #endif
@@ -412,7 +412,7 @@ static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
         e->data = w;
     }
     fgEnumSubWindows( w, fgHavePendingRedisplaysCallback, e );
-}        
+}
 static int fgHavePendingRedisplays (void)
 {
     SFG_Enumerator enumerator;
@@ -497,7 +497,7 @@ int fgGetXModifiers( XEvent *event )
         ret |= GLUT_ACTIVE_CTRL;
     if( event->xkey.state & Mod1Mask )
         ret |= GLUT_ACTIVE_ALT;
-    
+
     return ret;
 }
 #endif
@@ -540,7 +540,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
              */
             if( (Atom) event.xclient.data.l[ 0 ] == fgDisplay.DeleteWindow )
             {
-                GETWINDOW( xclient ); 
+                GETWINDOW( xclient );
 
                 fgDestroyWindow ( window );
 
@@ -640,7 +640,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
         case VisibilityNotify:
         {
-            GETWINDOW( xvisibility ); 
+            GETWINDOW( xvisibility );
             /*
              * XXX INVOKE_WCB() does this check for us.
              */
@@ -660,13 +660,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 INVOKE_WCB( *window, WindowStatus, ( GLUT_FULLY_RETAINED ) );
                 window->State.Visible = GL_TRUE;
                 break;
-                
+
             case VisibilityPartiallyObscured:
                 INVOKE_WCB( *window, WindowStatus,
                             ( GLUT_PARTIALLY_RETAINED ) );
                 window->State.Visible = GL_TRUE;
                 break;
-                
+
             case VisibilityFullyObscured:
                 INVOKE_WCB( *window, WindowStatus, ( GLUT_FULLY_COVERED ) );
                 window->State.Visible = GL_FALSE;
@@ -741,7 +741,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
              */
             GETWINDOW( xbutton );
             GETMOUSE( xbutton );
-          
+
             /*
              * An X button (at least in XFree86) is numbered from 1.
              * A GLUT button is numbered from 0.
@@ -783,7 +783,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     window->ActiveMenu->Window->State.MouseY =
                         event.xbutton.y_root - window->ActiveMenu->Y;
                 }
-                
+
                 /* In the menu, invoke the callback and deactivate the menu*/
                 if( fgCheckActiveMenu( window->ActiveMenu->Window,
                                        window->ActiveMenu ) )
@@ -883,7 +883,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 int direction = -1;
                 if( button % 2 )
                     direction = 1;
-                
+
                 if( pressed )
                     INVOKE_WCB( *window, MouseWheel, ( wheel_number,
                                                        direction,
@@ -1082,7 +1082,7 @@ void FGAPIENTRY glutMainLoop( void )
             INVOKE_WCB( *window, Visibility, ( window->State.Visible ) );
             fgSetWindow( current_window );
         }
-        
+
         window = (SFG_Window *)window->Node.Next ;
     }
 #endif
@@ -1096,13 +1096,13 @@ void FGAPIENTRY glutMainLoop( void )
         /*
          * Step through the list of windows, seeing if there are any
          * that are not menus
-         */ 
+         */
         for( window = ( SFG_Window * )fgStructure.Windows.First;
              window;
              window = ( SFG_Window * )window->Node.Next )
             if ( ! ( window->IsMenu ) )
                 break;
-        
+
         if( ! window )
             fgState.ExecState = GLUT_EXEC_STATE_STOP;
         else
@@ -1236,12 +1236,12 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         break;
 #if 0
-    case WM_SETFOCUS: 
+    case WM_SETFOCUS:
         printf("WM_SETFOCUS: %p\n", window );
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 
-    case WM_ACTIVATE: 
+    case WM_ACTIVATE:
         if (LOWORD(wParam) != WA_INACTIVE)
         {
             /* glutSetCursor( fgStructure.Window->State.Cursor ); */
@@ -1262,7 +1262,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * XXX call glutSetCurdsor() instead of defining two macros
          * XXX and implementing a nested case in-line.
          */
-    case WM_SETCURSOR: 
+    case WM_SETCURSOR:
         /* Set the cursor AND change it for this window class. */
 #define MAP_CURSOR(a,b)                 \
     case a:                             \
@@ -1327,7 +1327,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     {
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
-        
+
         if ( window->ActiveMenu )
         {
             window->State.Redisplay = GL_TRUE;
@@ -1569,7 +1569,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
 
         /*
-         * Remember the current modifiers state. This is done here in order 
+         * Remember the current modifiers state. This is done here in order
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
         fgState.Modifiers = fgGetWin32Modifiers( );
@@ -1635,7 +1635,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         POINT mouse_pos;
 
         /*
-         * Remember the current modifiers state. This is done here in order 
+         * Remember the current modifiers state. This is done here in order
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
         fgState.Modifiers = fgGetWin32Modifiers( );
@@ -1688,9 +1688,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         {
             BYTE state[ 256 ];
             WORD code[ 2 ];
-            
+
             GetKeyboardState( state );
-            
+
             if( ToAscii( wParam, 0, state, code, 0 ) == 1 )
                 wParam=code[ 0 ];
 

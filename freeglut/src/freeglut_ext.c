@@ -179,7 +179,7 @@ static struct name_address_pair glut_functions[] =
    { "glutGetProcAddress", (void *) glutGetProcAddress },
    { "glutMouseWheelFunc", (void *) glutMouseWheelFunc },
    { NULL, NULL }
-};   
+};
 
 
 void *FGAPIENTRY glutGetProcAddress( const char *procName )

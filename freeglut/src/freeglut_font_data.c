@@ -33,7 +33,7 @@
 
 /*
  * Following fonts are defined in this file:
- * 
+ *
  * 1. fgFontFixed8x13 <-misc-fixed-medium-r-normal--13-120-75-75-C-80-iso8859-1>
  * 2. fgFontFixed9x15 <-misc-fixed-medium-r-normal--15-140-75-75-C-90-iso8859-1>
  * 3. fgFontHelvetica10 <-adobe-helvetica-medium-r-normal--10-100-75-75-p-56-iso8859-1>

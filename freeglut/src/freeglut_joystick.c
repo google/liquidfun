@@ -530,7 +530,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
             IOHIDEventStruct hidEvent;
             (*(joy->hidDev))->getElementValue ( joy->hidDev, buttonCookies[i], &hidEvent );
             if ( hidEvent.value )
-                *buttons |= 1 << i; 
+                *buttons |= 1 << i;
         }
     }
 
@@ -892,7 +892,7 @@ static CFDictionaryRef fghJoystickGetCFProperties ( SFG_Joystick *joy, io_object
     IOReturn rv;
     CFMutableDictionaryRef cfProperties;
 
-#if 0  
+#if 0
     /* comment copied from darwin/SDL_sysjoystick.c */
     /* Mac OS X currently is not mirroring all USB properties to HID page so need to look at USB device page also
      * get dictionary for usb properties: step up two levels and get CF dictionary for USB properties
@@ -913,7 +913,7 @@ static CFDictionaryRef fghJoystickGetCFProperties ( SFG_Joystick *joy, io_object
     }
 #endif
 
-    rv = IORegistryEntryCreateCFProperties( ioDev /*parent2*/, 
+    rv = IORegistryEntryCreateCFProperties( ioDev /*parent2*/,
         &cfProperties, kCFAllocatorDefault, kNilOptions);
     if (rv != kIOReturnSuccess || !cfProperties) {
         fgWarning ( "%s", "error getting device properties");
@@ -930,7 +930,7 @@ static void fghJoystickElementEnumerator ( SFG_Joystick *joy, void *element, voi
             return;
     }
 
-      static_cast<jsJoystick*>(vjs)->parseElement ( (CFDictionaryRef) element );        
+      static_cast<jsJoystick*>(vjs)->parseElement ( (CFDictionaryRef) element );
 }
 
 /** element enumerator function : pass NULL for top-level*/
@@ -939,7 +939,7 @@ static void fghJoystickEnumerateElements ( SFG_Joystick *joy, CFTypeRef element 
       assert(CFGetTypeID(element) == CFArrayGetTypeID());
 
       CFRange range = {0, CFArrayGetCount ((CFArrayRef)element)};
-      CFArrayApplyFunction((CFArrayRef) element, range, 
+      CFArrayApplyFunction((CFArrayRef) element, range,
             &fghJoystickElementEnumerator, joy );
 }
 
@@ -951,7 +951,7 @@ static void fghJoystickParseElement ( SFG_Joystick *joy, CFDictionaryRef element
     long type, page, usage;
 
     CFNumberGetValue((CFNumberRef)
-        CFDictionaryGetValue ((CFDictionaryRef) element, CFSTR(kIOHIDElementTypeKey)), 
+        CFDictionaryGetValue ((CFDictionaryRef) element, CFSTR(kIOHIDElementTypeKey)),
         kCFNumberLongType, &type);
 
     switch ( typ e) {
@@ -962,7 +962,7 @@ static void fghJoystickParseElement ( SFG_Joystick *joy, CFDictionaryRef element
         CFNumberGetValue( (CFNumberRef) refUsage, kCFNumberLongType, &usage );
         CFNumberGetValue( (CFNumberRef) refPage, kCFNumberLongType, &page );
 
-        if (page == kHIDPage_GenericDesktop) {    
+        if (page == kHIDPage_GenericDesktop) {
             switch ( usage ) /* look at usage to determine function */
             {
             case kHIDUsage_GD_X:
@@ -1000,7 +1000,7 @@ static void fghJoystickParseElement ( SFG_Joystick *joy, CFDictionaryRef element
 
     default:
         break;
-    }  
+    }
 }
 
 static void fghJoystickAddAxisElement ( SFG_Joystick *joy, CFDictionaryRef axis )
@@ -1009,17 +1009,17 @@ static void fghJoystickAddAxisElement ( SFG_Joystick *joy, CFDictionaryRef axis 
     int index = joy->num_axes++;
 
     CFNumberGetValue ((CFNumberRef)
-        CFDictionaryGetValue ( axis, CFSTR(kIOHIDElementCookieKey) ), 
+        CFDictionaryGetValue ( axis, CFSTR(kIOHIDElementCookieKey) ),
         kCFNumberLongType, &cookie);
 
     axisCookies[index] = (IOHIDElementCookie) cookie;
 
     CFNumberGetValue ((CFNumberRef)
-        CFDictionaryGetValue ( axis, CFSTR(kIOHIDElementMinKey) ), 
+        CFDictionaryGetValue ( axis, CFSTR(kIOHIDElementMinKey) ),
         kCFNumberLongType, &lmin);
 
     CFNumberGetValue ((CFNumberRef)
-        CFDictionaryGetValue ( axis, CFSTR(kIOHIDElementMaxKey) ), 
+        CFDictionaryGetValue ( axis, CFSTR(kIOHIDElementMaxKey) ),
         kCFNumberLongType, &lmax);
 
     joy->min[index] = lmin;
@@ -1033,7 +1033,7 @@ static void fghJoystickAddButtonElement ( SFG_Joystick *joy, CFDictionaryRef but
 {
     long cookie;
     CFNumberGetValue ((CFNumberRef)
-            CFDictionaryGetValue ( button, CFSTR(kIOHIDElementCookieKey) ), 
+            CFDictionaryGetValue ( button, CFSTR(kIOHIDElementCookieKey) ),
             kCFNumberLongType, &cookie);
 
     joy->buttonCookies[num_buttons++] = (IOHIDElementCookie) cookie;
@@ -1254,7 +1254,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     }
 
     /* create device interface */
-    rv = IOCreatePlugInInterfaceForService( ioDevices[ joy->id ], 
+    rv = IOCreatePlugInInterfaceForService( ioDevices[ joy->id ],
                                             kIOHIDDeviceUserClientTypeID,
                                             kIOCFPlugInInterfaceID,
                                             &plugin, &score );
@@ -1266,7 +1266,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     }
 
     pluginResult = ( *plugin )->QueryInterface(
-        plugin, 
+        plugin,
         CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID),
         &( LPVOID )joy->hidDev
     );
@@ -1289,7 +1289,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     props = getCFProperties( ioDevices[ joy->id ] );
 
     /* recursively enumerate all the bits */
-    CFTypeRef topLevelElement = 
+    CFTypeRef topLevelElement =
         CFDictionaryGetValue( props, CFSTR( kIOHIDElementKey ) );
     enumerateElements( topLevelElement );
 
@@ -1490,11 +1490,11 @@ static void fghJoystickOpen( SFG_Joystick* joy )
      * Set the correct number of axes for the linux driver
      */
 #    ifdef JS_NEW
-    /* Melchior Franz's fixes for big-endian Linuxes since writing 
-     *  to the upper byte of an uninitialized word doesn't work. 
-     *  9 April 2003 
+    /* Melchior Franz's fixes for big-endian Linuxes since writing
+     *  to the upper byte of an uninitialized word doesn't work.
+     *  9 April 2003
      */
-    ioctl( joy->fd, JSIOCGAXES, &u ); 
+    ioctl( joy->fd, JSIOCGAXES, &u );
     joy->num_axes = u;
     ioctl( joy->fd, JSIOCGBUTTONS, &u );
     joy->num_buttons = u;
@@ -1514,7 +1514,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     counter = 0;
 
     do
-    { 
+    {
         fghJoystickRawRead( joy, NULL, joy->center );
         counter++;
     } while( !joy->error &&
