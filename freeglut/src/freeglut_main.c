@@ -944,7 +944,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 special_cb  = FETCH_WCB( *window, SpecialUp  );
             }
 
-            /* Is there a keyboard/special callback hooked for this window? */
+            /*
+             * Is there a keyboard/special callback hooked for this window?
+             */
             if( keyboard_cb || special_cb )
             {
                 XComposeStatus composeStatus;
@@ -952,15 +954,21 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 KeySym keySym;
                 int len;
 
-                /* Check for the ASCII/KeySym codes associated with the event: */
+                /*
+                 * Check for the ASCII/KeySym codes associated with the event:
+                 */
                 len = XLookupString( &event.xkey, asciiCode, sizeof(asciiCode),
                                      &keySym, &composeStatus
                 );
 
-                /* GLUT API tells us to have two separate callbacks... */
+                /*
+                 * GLUT API tells us to have two separate callbacks...
+                 */
                 if( len > 0 )
                 {
-                    /* ...one for the ASCII translateable keypresses... */
+                    /*
+                     * ...one for the ASCII translateable keypresses...
+                     */
                     if( keyboard_cb )
                     {
                         fgSetWindow( window );
@@ -1303,7 +1311,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * XXX function (or perhaps invoke glutSetCursor())?
          * XXX That is, why are we duplicating code, here, from
          * XXX glutSetCursor()?  The WIN32 code should be able to just
-         * XXX call glutSetCursor() instead of defining two macros
+         * XXX call glutSetCurdsor() instead of defining two macros
          * XXX and implementing a nested case in-line.
          */
     case WM_SETCURSOR:
@@ -1658,7 +1666,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         window->State.MouseX = mouse_pos.x;
         window->State.MouseY = mouse_pos.y;
 
-        /* Convert the Win32 keystroke codes to GLUTtish way */
+        /*
+         * Convert the Win32 keystroke codes to GLUTtish way
+         */
 #       define KEY(a,b) case a: keypress = b; break;
 
         switch( wParam )
@@ -1686,7 +1696,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
 
         case VK_DELETE:
-            /* The delete key should be treated as an ASCII keypress: */
+            /*
+             * The delete key should be treated as an ASCII keypress:
+             */
             INVOKE_WCB( *window, Keyboard,
                         ( 127, window->State.MouseX, window->State.MouseY )
             );
@@ -1772,7 +1784,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
 
           case VK_DELETE:
-              /* The delete key should be treated as an ASCII keypress: */
+              /*
+               * The delete key should be treated as an ASCII keypress:
+               */
               INVOKE_WCB( *window, KeyboardUp,
                           ( 127, window->State.MouseX, window->State.MouseY )
               );
@@ -1829,7 +1843,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /*lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ); */
         break;
 
-        /* Other messages that I have seen and which are not handled already */
+        /*
+         * Other messages that I have seen and which are not handled already
+         */
     case WM_SETTEXT:  /* 0x000c */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         /* Pass it on to "DefWindowProc" to set the window text */
@@ -1948,7 +1964,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 
     default:
-        /* Handle unhandled messages */
+        /*
+         * Handle unhandled messages
+         */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
     }
