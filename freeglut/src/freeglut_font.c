@@ -135,22 +135,8 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
     int c;
     int numchar = strlen( (char *) string );
     SFG_Font* font = fghFontByID( fontID );
-    float raster_position[ 4 ];
+    float x = 0.0f ;
 
-    glPushAttrib( GL_TRANSFORM_BIT );
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix( );
-    glLoadIdentity( );
-    glMatrixMode( GL_PROJECTION );
-    glPushMatrix( );
-    glLoadIdentity( );
-    glOrtho(
-        0, glutGet( GLUT_WINDOW_WIDTH ),
-        0, glutGet( GLUT_WINDOW_HEIGHT ),
-        -10, 10
-    );
-
-    glGetFloatv ( GL_CURRENT_RASTER_POSITION, raster_position );
     glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
     glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
     glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
@@ -167,8 +153,8 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
     for( c = 0; c < numchar; c++ )
         if( string[c] == '\n' )
         {
-            raster_position[ 1 ] -= ( float )font->Height;
-            glRasterPos4fv( raster_position );
+            glBitmap ( 0, 0, 0, 0, -x, (float) -font->Height, NULL );
+            x = 0.0f;
         }
         else  /* Not an EOL, draw the bitmap character */
         {
@@ -180,13 +166,11 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
                 ( float )( face[ 0 ] ), 0.0, /* The raster advance; inc. x,y */
                 ( face + 1 )                 /* The packed bitmap data...    */
             );
+
+            x += ( float )( face[ 0 ] );
         }
 
     glPopClientAttrib( );
-    glPopMatrix( );
-    glMatrixMode( GL_MODELVIEW );
-    glPopMatrix( );
-    glPopAttrib( );
 }
 
 /*
