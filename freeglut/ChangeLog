@@ -895,3 +895,10 @@ default.
 (233) Fixed part of bug #926883 (Video mode matching code, memory leaks,
 fullscreen), i.e. memory leak caused by not freeing the mode lines returned
 by XF86VidModeGetAllModeLines
+
+(234) Fixed part of bug #926883 (Video mode matching code, memory leaks,
+fullscreen): Now we first try to get an exact mode match, ignoring the
+refresh rate if none could be found. This way the X11 part and the WinDoze
+behave similarly. NOTE: We still don't behave like GLUT, because it has a
+wider notion of "best" match. We have to refactor and extend freeglut quite
+a bit to do that.

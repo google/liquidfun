@@ -234,7 +234,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     if( haveToTest || fgDisplay.DisplayModeValid )
     {
         XF86VidModeModeInfo** displayModes;
-        int i, displayModesCount;
+        int i, ignoreRefreshRate, displayModesCount;
 
         XF86VidModeGetAllModeLines(
             fgDisplay.Display,
@@ -243,26 +243,33 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
             &displayModes
         );
 
-        /* Check every of the modes looking for one that matches our demands */
-        for( i = 0; i < displayModesCount; i++ )
+        /*
+         * Check every of the modes looking for one that matches our demands,
+         * ignoring the refresh rate if no exact match could be found.
+         */
+        for( ignoreRefreshRate = 0;
+             !success && ( ignoreRefreshRate <= 1 );
+             ignoreRefreshRate++)
         {
-            if( fghCheckDisplayMode( displayModes[ i ]->hdisplay,
-                                     displayModes[ i ]->vdisplay,
-                                     fgState.GameModeDepth,
-                                     fgState.GameModeRefresh ) )
+            for( i = 0;
+                 !success && ( i < displayModesCount );
+                 i++ )
             {
-                /* OKi, this is the display mode we have been looking for... */
-                if( !haveToTest ) {
-                    XF86VidModeSwitchToMode(
-                        fgDisplay.Display,
-                        fgDisplay.Screen,
-                        displayModes[ i ]
-                    );
-                }
-                success = GL_TRUE;
-                break;
+                /* Compute the displays refresh rate, dotclock comes in kHz. */
+                int refresh = ( displayModes[ i ]->dotclock * 1000 ) /
+                              ( displayModes[ i ]->htotal * displayModes[ i ]->vtotal );
+
+                success = fghCheckDisplayMode( displayModes[ i ]->hdisplay,
+                                               displayModes[ i ]->vdisplay,
+                                               fgState.GameModeDepth,
+                                               ( ignoreRefreshRate ? fgState.GameModeRefresh : refresh ) );
             }
         }
+
+        if( !haveToTest && success ) {
+          XF86VidModeSwitchToMode( fgDisplay.Display, fgDisplay.Screen, displayModes[ i ] );
+        }
+
         XFree( displayModes );
     }
 
