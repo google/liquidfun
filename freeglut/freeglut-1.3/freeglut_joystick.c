@@ -408,7 +408,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
         return;
 
 #   ifdef __FreeBSD__
-    fghJoystickRawRead( buttons, axes );
+    fghJoystickRawRead(joy, buttons, axes );
     joy->error = axes[ 0 ] < -1000000000.0f;
     if( joy->error )
       return ;
@@ -462,7 +462,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 
     do
     { 
-        fghJoystickRawRead( joy, NULL, joy->center )
+        fghJoystickRawRead( joy, NULL, joy->center );
         counter++;
     } while( !joy->error && counter < 100 && joy->center[ 0 ] == 512.0f && joy->center[ 1 ] == 512.0f );
    
