@@ -64,16 +64,19 @@ void FGAPIENTRY glutSwapBuffers( void )
 #endif
 
     /* GLUT_FPS env var support */
-    if (fgState.FPSInterval) {
-        GLint t = glutGet(GLUT_ELAPSED_TIME);
+    if( fgState.FPSInterval )
+    {
+        GLint t = glutGet( GLUT_ELAPSED_TIME );
         fgState.SwapCount++;
-        if (fgState.SwapTime == 0)
+        if( fgState.SwapTime == 0 )
             fgState.SwapTime = t;
-        else if (t - fgState.SwapTime > fgState.FPSInterval) {
-            float time = 0.001f * (t - fgState.SwapTime);
-            float fps = (float) fgState.SwapCount / time;
-            fprintf(stderr, "freeglut: %d frames in %.2f seconds = %.2f FPS\n",
-                    fgState.SwapCount, time, fps);
+        else if( t - fgState.SwapTime > fgState.FPSInterval )
+        {
+            float time = 0.001f * ( t - fgState.SwapTime );
+            float fps = ( float )fgState.SwapCount / time;
+            fprintf( stderr,
+                     "freeglut: %d frames in %.2f seconds = %.2f FPS\n",
+                     fgState.SwapCount, time, fps );
             fgState.SwapTime = t;
             fgState.SwapCount = 0;
         }
@@ -89,7 +92,7 @@ void FGAPIENTRY glutPostWindowRedisplay( int windowID )
 
     freeglut_assert_ready;
     window = fgWindowByID( windowID );
-    freeglut_return_if_fail( window != NULL );
+    freeglut_return_if_fail( window );
     window->State.Redisplay = TRUE;
 }
 
