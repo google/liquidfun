@@ -908,6 +908,34 @@ void FGAPIENTRY glutMainLoopEvent( void )
             GETWINDOW( xkey );
             GETMOUSE( xkey );
 
+            /* Detect auto repeated keys, if configured globally or per-window */
+
+            if ( fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE )
+            {
+                if (event.type==KeyRelease)
+                {
+                    /*
+                     * Look at X11 keystate to detect repeat mode.
+                     * While X11 says the key is actually held down, we'll ignore KeyRelease/KeyPress pairs.
+                     */
+
+                    char keys[32];
+                    XQueryKeymap( fgDisplay.Display, keys ); /* Look at X11 keystate to detect repeat mode */
+
+                    if ( keys[event.xkey.keycode>>3] & (1<<(event.xkey.keycode%8)) )
+                        window->State.KeyRepeating = GL_TRUE;
+                    else
+                        window->State.KeyRepeating = GL_FALSE;
+                }
+            }
+            else
+                window->State.KeyRepeating = GL_FALSE;
+
+            /* Cease processing this event if it is auto repeated */
+
+            if (window->State.KeyRepeating)
+                break;
+
             if( event.type == KeyPress )
             {
                 keyboard_cb = FETCH_WCB( *window, Keyboard );

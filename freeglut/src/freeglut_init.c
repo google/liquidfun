@@ -65,7 +65,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GL_FALSE,              /* UseCurrentContext */
                       GL_FALSE,              /* GLDebugSwitch */
                       GL_FALSE,              /* XSyncSwitch */
-                      GL_FALSE,              /* IgnoreKeyRepeat */
+                      GL_TRUE,               /* KeyRepeat */
                       0xffffffff,            /* Modifiers */
                       0,                     /* FPSInterval */
                       0,                     /* SwapCount */
@@ -272,7 +272,7 @@ void fgDeinitialize( void )
     fgState.ActionOnWindowClose = GLUT_ACTION_EXIT;
     fgState.ExecState           = GLUT_EXEC_STATE_INIT;
 
-    fgState.IgnoreKeyRepeat = GL_TRUE;
+    fgState.KeyRepeat       = GL_FALSE;
     fgState.Modifiers       = 0xffffffff;
 
     fgState.GameModeSize.X  = 640;

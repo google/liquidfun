@@ -233,7 +233,7 @@ struct tagSFG_State
     GLboolean        GLDebugSwitch;        /* OpenGL state debugging switch  */
     GLboolean        XSyncSwitch;          /* X11 sync protocol switch       */
 
-    GLboolean        IgnoreKeyRepeat;      /* Whether to ignore key repeat.  */
+    int              KeyRepeat;            /* Global key repeat mode.        */
     int              Modifiers;            /* Current ALT/SHIFT/CTRL state   */
 
     GLuint           FPSInterval;          /* Interval between FPS printfs   */
@@ -367,9 +367,12 @@ struct tagSFG_WindowState
     int             Cursor;             /* The currently selected cursor     */
 
     long            JoystickPollRate;   /* The joystick polling rate         */
-    long            JoystickLastPoll;   /* When the last poll has happened   */
+    long            JoystickLastPoll;   /* When the last poll happened       */
 
     int             MouseX, MouseY;     /* The most recent mouse position    */
+
+    GLboolean       IgnoreKeyRepeat;    /* Whether to ignore key repeat.     */
+    GLboolean       KeyRepeating;       /* Currently in repeat mode          */
 
     GLboolean       IsGameMode;         /* Is this the game mode window?     */
     GLboolean       NeedToResize;       /* Do we need to resize the window?  */

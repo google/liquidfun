@@ -542,7 +542,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return 0;
 
     case GLUT_DEVICE_IGNORE_KEY_REPEAT:
-        return fgState.IgnoreKeyRepeat;
+        return fgStructure.Window ? fgStructure.Window->State.IgnoreKeyRepeat : 0;
 
     case GLUT_DEVICE_KEY_REPEAT:
         /*

@@ -93,49 +93,43 @@ void FGAPIENTRY glutReportErrors( void )
 }
 
 /*
- * Turns the ignore key auto repeat feature on and off
- *
- * DEPRECATED 11/4/02 - Do not use
+ * Control the auto-repeat of keystrokes to the current window
  */
 void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
 {
-    fgState.IgnoreKeyRepeat = ignore ? GL_TRUE : GL_FALSE;
+    freeglut_assert_ready;
+    freeglut_assert_window;
+
+    fgStructure.Window->State.IgnoreKeyRepeat = ignore ? GL_TRUE : GL_FALSE;
 }
 
 /*
- * Hints the window system whether to generate key auto repeat, or not.
- * This is evil.
+ * Set global auto-repeat of keystrokes
  *
- * XXX Is this also deprecated as of 20021104?
+ * RepeatMode should be either:
+ *    GLUT_KEY_REPEAT_OFF
+ *    GLUT_KEY_REPEAT_ON
+ *    GLUT_KEY_REPEAT_DEFAULT
  */
 void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
 {
-#if TARGET_HOST_UNIX_X11
-
     freeglut_assert_ready;
 
     switch( repeatMode )
     {
-    case GLUT_KEY_REPEAT_OFF:   XAutoRepeatOff( fgDisplay.Display ); break;
-    case GLUT_KEY_REPEAT_ON:    XAutoRepeatOn( fgDisplay.Display );  break;
-    case GLUT_KEY_REPEAT_DEFAULT:
-        {
-            XKeyboardState keyboardState;
+    case GLUT_KEY_REPEAT_OFF:
+    case GLUT_KEY_REPEAT_ON:
+     fgState.KeyRepeat = repeatMode;
+     break;
 
-            XGetKeyboardControl( fgDisplay.Display, &keyboardState );
-            glutSetKeyRepeat(
-                keyboardState.global_auto_repeat == AutoRepeatModeOn ?
-                GLUT_KEY_REPEAT_ON : GLUT_KEY_REPEAT_OFF
-            );
-        }
-        break;
+    case GLUT_KEY_REPEAT_DEFAULT:
+     fgState.KeyRepeat = GLUT_KEY_REPEAT_ON;
+     break;
 
     default:
         fgError ("Invalid glutSetKeyRepeat mode: %d", repeatMode);
         break;
     }
-
-#endif
 }
 
 /*

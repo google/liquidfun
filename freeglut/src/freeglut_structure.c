@@ -110,6 +110,9 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 
     window->IsMenu = isMenu;
 
+    window->State.IgnoreKeyRepeat = GL_FALSE;
+    window->State.KeyRepeating    = GL_FALSE;
+
     /*
      * Open the window now. The fgOpenWindow() function is system
      * dependant, and resides in freeglut_window.c. Uses fgState.
