@@ -249,7 +249,9 @@ void fgSetWindow ( SFG_Window *window )
  * Opens a window. Requires a SFG_Window object created and attached
  * to the freeglut structure. OpenGL context is created here.
  */
-void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, int h, GLboolean gameMode, int isSubWindow )
+void fgOpenWindow( SFG_Window* window, const char* title,
+                   int x, int y, int w, int h,
+                   GLboolean gameMode, int isSubWindow )
 {
 #if TARGET_HOST_UNIX_X11
     XSetWindowAttributes winAttr;
@@ -261,95 +263,82 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     freeglut_assert_ready;
 
     /*
-     * Here we are upon the stage. Have the visual selected.
+     * XXX fgChooseVisual() is a common part of all three.
+     * XXX With a little thought, we should be able to greatly
+     * XXX simplify this.
      */
-    if ( fgState.BuildingAMenu )
+    if ( !fgState.BuildingAMenu )
+      window->Window.VisualInfo = fgChooseVisual();
+    else if ( fgStructure.MenuContext )
+        window->Window.VisualInfo = fgChooseVisual();
+    else
     {
-      /*
-       * If there isn't already an OpenGL rendering context for menu windows, make one
-       */
-      if ( !fgStructure.MenuContext )
-      {
         unsigned int current_DisplayMode = fgState.DisplayMode ;
         fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH ;
         window->Window.VisualInfo = fgChooseVisual();
         fgState.DisplayMode = current_DisplayMode ;
-      }
-      else
-        window->Window.VisualInfo = fgChooseVisual();
     }
-    else
-      window->Window.VisualInfo = fgChooseVisual();
 
     if ( ! window->Window.VisualInfo )
     {
-      /*
-       * The "fgChooseVisual" returned a null meaning that the visual context is not available.
-       * Try a couple of variations to see if they will work.
-       */
-      if ( ! ( fgState.DisplayMode & GLUT_DOUBLE ) )
-      {
         /*
-         * Single buffering--try it doubled
+         * The "fgChooseVisual" returned a null meaning that the visual
+         * context is not available.
+         * Try a couple of variations to see if they will work.
          */
-        fgState.DisplayMode |= GLUT_DOUBLE ;
-        window->Window.VisualInfo = fgChooseVisual();
-	/* OK, we got a double-buffered window, but we only wanted
-	 * single-buffered.  Clear the double-buffer flag now.
-	 */
-	fgState.DisplayMode &= ~GLUT_DOUBLE ;
-      }
-
-      /*
-       * GLUT also checks for multi-sampling, but I don't see that anywhere else in FREEGLUT
-       * so I won't bother with it for the moment.
-       */
+        if ( ! ( fgState.DisplayMode & GLUT_DOUBLE ) )
+        {
+            fgState.DisplayMode |= GLUT_DOUBLE ;
+            window->Window.VisualInfo = fgChooseVisual();
+            fgState.DisplayMode &= ~GLUT_DOUBLE ;
+        }
+        
+        /*
+         * GLUT also checks for multi-sampling, but I don't see that
+         * anywhere else in FREEGLUT so I won't bother with it for the moment.
+         */
     }
 
     assert( window->Window.VisualInfo != NULL );
 
     /*
-     * Have the windows attributes set
-     *
-     * HINT: the masks should be updated when adding/removing callbacks.
-     *       This might speed up message processing. Is that true?
+     * XXX HINT: the masks should be updated when adding/removing callbacks.
+     * XXX       This might speed up message processing. Is that true?
+     * XXX
+     * XXX A: Not appreciably, but it WILL make it easier to debug.
+     * XXX    Try tracing old GLUT and try tracing freeglut.  Old GLUT
+     * XXX    turns off events that it doesn't need and is a whole lot
+     * XXX    more pleasant to trace.  (Hint: Think mouse-motion!)
+     * XXX
+     * XXX    It may make a difference in networked environments or on
+     * XXX    some very slow systems, but I think that that is secondary
+     * XXX    to making debugging easier.
      */
-    winAttr.event_mask        = StructureNotifyMask | SubstructureNotifyMask | ExposureMask |
-                                ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyRelease |
-                                VisibilityChangeMask | EnterWindowMask | LeaveWindowMask |
-                                PointerMotionMask | ButtonMotionMask;
+    winAttr.event_mask        = StructureNotifyMask | SubstructureNotifyMask |
+        ExposureMask | ButtonPressMask | ButtonReleaseMask | KeyPressMask |
+        KeyRelease | VisibilityChangeMask | EnterWindowMask | LeaveWindowMask |
+        PointerMotionMask | ButtonMotionMask;
     winAttr.background_pixmap = None;
     winAttr.background_pixel  = 0;
     winAttr.border_pixel      = 0;
 
-    /*
-     * The color map is required, too
-     */
     winAttr.colormap = XCreateColormap(
         fgDisplay.Display, fgDisplay.RootWindow,
         window->Window.VisualInfo->visual, AllocNone
     );
 
-    /*
-     * This tells the XCreateWindow() what attributes are we supplying it with
-     */
     mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
 
-    /*
-     * If this is a menu window we want the window manager to ignore it.
-     */
     if ( fgState.BuildingAMenu )
     {
         winAttr.override_redirect = True;
-	mask |= CWOverrideRedirect;
+        mask |= CWOverrideRedirect;
     }
 
-    /*
-     * Have the window created now
-     */
     window->Window.Handle = XCreateWindow(
         fgDisplay.Display,
-        window->Parent == NULL ? fgDisplay.RootWindow : window->Parent->Window.Handle,
+        window->Parent == NULL ? fgDisplay.RootWindow :
+                                 window->Parent->Window.Handle,
         x, y, w, h, 0,
         window->Window.VisualInfo->depth, InputOutput,
         window->Window.VisualInfo->visual, mask,
@@ -362,21 +351,23 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
      */
     if ( fgState.BuildingAMenu )
     {
-      /*
-       * If there isn't already an OpenGL rendering context for menu windows, make one
-       */
-      if ( !fgStructure.MenuContext )
-      {
-        fgStructure.MenuContext = (SFG_MenuContext *)malloc ( sizeof(SFG_MenuContext) ) ;
-        fgStructure.MenuContext->VisualInfo = window->Window.VisualInfo ;
-        fgStructure.MenuContext->Context = glXCreateContext(
-            fgDisplay.Display, fgStructure.MenuContext->VisualInfo,
-            NULL, fgState.ForceDirectContext | fgState.TryDirectContext
-        );
-      }
+        /*
+         * If there isn't already an OpenGL rendering context for menu
+         * windows, make one
+         */
+        if ( !fgStructure.MenuContext )
+        {
+            fgStructure.MenuContext =
+                (SFG_MenuContext *)malloc ( sizeof(SFG_MenuContext) );
+            fgStructure.MenuContext->VisualInfo = window->Window.VisualInfo;
+            fgStructure.MenuContext->Context = glXCreateContext(
+                fgDisplay.Display, fgStructure.MenuContext->VisualInfo,
+                NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+            );
+        }
 
 /*      window->Window.Context = fgStructure.MenuContext->Context ; */
-      window->Window.Context = glXCreateContext(
+        window->Window.Context = glXCreateContext(
             fgDisplay.Display, window->Window.VisualInfo,
             NULL, fgState.ForceDirectContext | fgState.TryDirectContext
         );
@@ -392,20 +383,16 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
         );
     }
     else
-      window->Window.Context = glXCreateContext(
-          fgDisplay.Display, window->Window.VisualInfo,
-          NULL, fgState.ForceDirectContext | fgState.TryDirectContext
-      );
+        window->Window.Context = glXCreateContext(
+            fgDisplay.Display, window->Window.VisualInfo,
+            NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+        );
 
-    /*
-     * Make sure the context is direct when the user wants it forced
-     */
-    if( fgState.ForceDirectContext && !glXIsDirect( fgDisplay.Display, window->Window.Context ) )
-        fgError( "unable to force direct context rendering for window '%s'", title );
+    if( fgState.ForceDirectContext &&
+        !glXIsDirect( fgDisplay.Display, window->Window.Context ) )
+        fgError( "unable to force direct context rendering for window '%s'",
+                 title );
 
-    /*
-     * Set the new context as the current one. That's all about the window creation.
-     */
     glXMakeCurrent(
         fgDisplay.Display,
         window->Window.Handle,
@@ -413,39 +400,39 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     );
 
     /*
-     * Assume the new window is visible by default
+     * XXX Assume the new window is visible by default
+     * XXX Is this a  safe assumption?
      */
     window->State.Visible = TRUE;
 
-    /*
-     * For the position and size hints -- make sure we are passing valid values
-     */
     sizeHints.flags = 0;
-
-    if (fgState.Position.Use == TRUE) sizeHints.flags |= USPosition;
-    if (fgState.Size.Use     == TRUE) sizeHints.flags |= USSize;
+    if (fgState.Position.Use == TRUE)
+        sizeHints.flags |= USPosition;
+    if (fgState.Size.Use     == TRUE)
+        sizeHints.flags |= USSize;
 
     /*
      * Fill in the size hints values now (the x, y, width and height
      * settings are obsolote, are there any more WMs that support them?)
+     * Unless the X servers actually stop supporting these, we should
+     * continue to fill them in.  It is *not* our place to tell the user
+     * that they should replace a window manager that they like, and which
+     * works, just because *we* think that it's not "modern" enough.
      */
-    sizeHints.x      = x; sizeHints.y      = y;
-    sizeHints.width  = w; sizeHints.height = h;
+    sizeHints.x      = x;
+    sizeHints.y      = y;
+    sizeHints.width  = w;
+    sizeHints.height = h;
 
-    /*
-     * We can have forced all new windows start in iconified state:
-     */
     wmHints.flags = StateHint;
-    wmHints.initial_state = (fgState.ForceIconic == FALSE) ? NormalState : IconicState;
+    wmHints.initial_state =
+        (fgState.ForceIconic == FALSE) ? NormalState : IconicState;
 
     /*
      * Prepare the window and iconified window names...
      */
     XStringListToTextProperty( (char **) &title, 1, &textProperty );
 
-    /*
-     * Set the window's properties now
-     */
     XSetWMProperties(
         fgDisplay.Display,
         window->Window.Handle,
@@ -457,118 +444,107 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
         &wmHints,
         NULL
     );
-
-    /*
-     * Make sure we are informed about the window deletion commands
-     */
-    XSetWMProtocols( fgDisplay.Display, window->Window.Handle, &fgDisplay.DeleteWindow, 1 );
-
-    /*
-     * Finally, have the window mapped to our display
-     */
+    XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
+                     &fgDisplay.DeleteWindow, 1 );
     XMapWindow( fgDisplay.Display, window->Window.Handle );
 
 #elif TARGET_HOST_WIN32
 
-	WNDCLASS wc;
-	int flags;
-	ATOM atom;
+    WNDCLASS wc;
+    int flags;
+    ATOM atom;
 
     freeglut_assert_ready;
-
-	/*
-	 * Grab the window class we have registered on glutInit():
-	 */
-	atom = GetClassInfo( fgDisplay.Instance, "FREEGLUT", &wc );
-	assert( atom != 0 );
-
-    if( gameMode == FALSE )
+    
+    /*
+     * Grab the window class we have registered on glutInit():
+     */
+    atom = GetClassInfo( fgDisplay.Instance, "FREEGLUT", &wc );
+    assert( atom != 0 );
+    
+    if( gameMode != FALSE )
     {
-      if ( ( !isSubWindow ) && ( ! window->IsMenu ) )
-      {
-        /*
-         * Update the window dimensions, taking account of window decorations.
-         * "freeglut" is to create the window with the outside of its border at (x,y)
-         * and with dimensions (w,h).
-         */
-	    	w += (GetSystemMetrics( SM_CXSIZEFRAME ) )*2;
-	    	h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 + GetSystemMetrics( SM_CYCAPTION );
-      }
-
-      /*
-	     * Check if the user wants us to use the default position/size
-	     */
-	    if( fgState.Position.Use == FALSE ) { x = CW_USEDEFAULT; y = CW_USEDEFAULT; }
-	    if( fgState.Size    .Use == FALSE ) { w = CW_USEDEFAULT; h = CW_USEDEFAULT; }
-
-	    /*
-	     * There's a small difference between creating the top, child and game mode windows
-	     */
-	    flags = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
-
-      /*
-       * If we're a menu, set our flags to include WS_POPUP to remove decorations
-       */
-      if ( window->IsMenu )
-        flags |= WS_POPUP ;
-	    else if( window->Parent == NULL )
-		    flags |= WS_OVERLAPPEDWINDOW;
-	    else
-		    flags |= WS_CHILD;
-    }
-    else
-    {
-        /*
-         * In game mode, the story is a little bit different...
-         */
         assert( window->Parent == NULL );
 
         /*
-         * Set the window creation flags appropriately to make the window entirely visible:
+         * Set the window creation flags appropriately to make the window
+         * entirely visible:
          */
         flags = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
     }
+    else
+    {
+        if ( ( !isSubWindow ) && ( ! window->IsMenu ) )
+        {
+            /*
+             * Update the window dimensions, taking account of window
+             * decorations.  "freeglut" is to create the window with the
+             * outside of its border at (x,y) and with dimensions (w,h).
+             */
+            w += (GetSystemMetrics( SM_CXSIZEFRAME ) )*2;
+            h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 +
+                GetSystemMetrics( SM_CYCAPTION );
+        }
 
-    /*
-     * Create the window now, passing the freeglut window structure as the parameter
-     */
-	window->Window.Handle = CreateWindow( 
-		"FREEGLUT",
+        if( fgState.Position.Use == FALSE )
+        {
+            x = CW_USEDEFAULT;
+            y = CW_USEDEFAULT;
+        }
+        if( fgState.Size.Use == FALSE )
+        {
+            w = CW_USEDEFAULT;
+            h = CW_USEDEFAULT;
+        }
+
+        /*
+         * There's a small difference between creating the top, child and
+         * game mode windows
+         */
+        flags = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
+
+        if ( window->IsMenu )
+            flags |= WS_POPUP ;
+        else if( window->Parent == NULL )
+            flags |= WS_OVERLAPPEDWINDOW;
+        else
+            flags |= WS_CHILD;
+    }
+
+    window->Window.Handle = CreateWindow( 
+        "FREEGLUT",
         title,
-		flags,
+        flags,
         x, y, w, h,
-		(HWND) window->Parent == NULL ? NULL : window->Parent->Window.Handle,
-		(HMENU) NULL,
-		fgDisplay.Instance,
-		(LPVOID) window
-	);
-
-	/*
-     * Make sure window was created
-     */
-	assert( window->Window.Handle != NULL );
+        (HWND) window->Parent == NULL ? NULL : window->Parent->Window.Handle,
+        (HMENU) NULL,
+        fgDisplay.Instance,
+        (LPVOID) window
+    );
+    if( !( window->Window.Handle ) )
+        fgError( "Failed to create a window (%s)!", title );
 
     /*
-     * Show and update the main window. Hide the mouse cursor.
+     * Show and update the main window. Hide(???) the mouse cursor.
      */
-    ShowWindow( window->Window.Handle, fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOW );
+    ShowWindow( window->Window.Handle,
+                fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOW );
     UpdateWindow( window->Window.Handle );
     ShowCursor( TRUE );
 
 #endif
 
-    /*
-     * Save the window's single- or double-buffering state
-     */
-    window->Window.DoubleBuffered = ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0 ;
+    window->Window.DoubleBuffered =
+        ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0 ;
 
     /*
-     * If it's not double-buffered, make sure the rendering is done to the front buffer.
+     * If it's not double-buffered, make sure the rendering is done to the
+     * front buffer.
      */
     if ( ! window->Window.DoubleBuffered )
     {
-      glDrawBuffer ( GL_FRONT ) ;
-      glReadBuffer ( GL_FRONT ) ;
+        glDrawBuffer ( GL_FRONT ) ;
+        glReadBuffer ( GL_FRONT ) ;
     }
 
     /*
