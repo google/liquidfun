@@ -501,7 +501,7 @@ void fgJoystickInit( int ident )
     /*
      * Have the global joystick structure created
      */
-    fgJoystick = calloc( sizeof(SFG_Joystick), 1 );
+    fgJoystick = (SFG_Joystick *)calloc( sizeof(SFG_Joystick), 1 );
 
 #ifdef WIN32
     switch( ident )

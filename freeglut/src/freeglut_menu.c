@@ -62,7 +62,7 @@ static SFG_MenuEntry *fghFindMenuEntry( SFG_Menu* menu, int index )
     SFG_MenuEntry *entry;
     int i = 1;
 
-    for( entry = menu->Entries.First; entry; entry = entry->Node.Next)
+    for( entry = (SFG_MenuEntry *)menu->Entries.First; entry; entry = (SFG_MenuEntry *)entry->Node.Next)
     {
         if (i == index)
             break;
@@ -83,8 +83,8 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
   /*
    * First of all check any of the active sub menus...
    */
-  for( menuEntry = menu->Entries.First; menuEntry;
-       menuEntry = menuEntry->Node.Next )
+  for( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry;
+       menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
   {
     /*
      * Is that an active sub menu by any case?
@@ -117,8 +117,8 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
   /*
    * Mark all menu entries inactive...
    */
-  for( menuEntry = menu->Entries.First; menuEntry;
-       menuEntry = menuEntry->Node.Next )
+  for( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry;
+       menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
   {
     menuEntry->IsActive = FALSE;
   }
@@ -255,8 +255,8 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
   /*
    * Check if any of the submenus is currently active...
    */
-  for( menuEntry = menu->Entries.First; menuEntry;
-       menuEntry = menuEntry->Node.Next )
+  for( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry;
+       menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
   {
     /*
      * Has the menu been marked as active, maybe?
@@ -288,8 +288,8 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
    */
   glColor4f( 1, 1, 1, 1 );
 
-  for( menuEntry = menu->Entries.First, i=0; menuEntry;
-       menuEntry = menuEntry->Node.Next, ++i )
+  for( menuEntry = (SFG_MenuEntry *)menu->Entries.First, i=0; menuEntry;
+       menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next, ++i )
   {
     /*
      * Move the raster into position...
@@ -334,8 +334,8 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
   /*
    * Now we are ready to check if any of our children needs to be redrawn:
    */
-  for( menuEntry = menu->Entries.First; menuEntry;
-       menuEntry = menuEntry->Node.Next )
+  for( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry;
+       menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
   {
     /*
      * Is that an active sub menu by any case?
@@ -361,7 +361,7 @@ static void fghSetSubmenuParentWindow ( SFG_Window *window, SFG_Menu *menu )
 
   menu->ParentWindow = window ;
 
-  for ( menuEntry = menu->Entries.First; menuEntry; menuEntry = menuEntry->Node.Next )
+  for ( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry; menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
   {
     if ( menuEntry->SubMenu != NULL )
       fghSetSubmenuParentWindow ( window, menuEntry->SubMenu ) ;
@@ -514,7 +514,7 @@ void fgExecuteMenuCallback( SFG_Menu* menu )
   /*
    * First of all check any of the active sub menus...
    */
-  for( menuEntry = menu->Entries.First; menuEntry; menuEntry = menuEntry->Node.Next)
+  for( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry; menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next)
   {
     /*
      * Is this menu entry active?
@@ -584,8 +584,8 @@ void fgDeactivateMenu( SFG_Window *window )
     /*
      * Hide all submenu windows, and the root menu's window.
      */
-    for ( menuEntry = menu->Entries.First; menuEntry;
-          menuEntry = menuEntry->Node.Next )
+    for ( menuEntry = (SFG_MenuEntry *)menu->Entries.First; menuEntry;
+          menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next )
     {
       /*
        * Is that an active submenu by any case?
@@ -619,8 +619,8 @@ void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry )
     /*
      * Hide all submenu windows, and the root menu's window.
      */
-    for ( subMenuIter = menuEntry->SubMenu->Entries.First; subMenuIter;
-          subMenuIter = subMenuIter->Node.Next )
+    for ( subMenuIter = (SFG_MenuEntry *)menuEntry->SubMenu->Entries.First; subMenuIter;
+          subMenuIter = (SFG_MenuEntry *)subMenuIter->Node.Next )
     {
       /*
        * Is that an active submenu by any case?
@@ -648,8 +648,8 @@ void fghCalculateMenuBoxSize( void )
   /*
    * The menu's box size depends on the menu entries:
    */
-  for( menuEntry = fgStructure.Menu->Entries.First; menuEntry;
-       menuEntry = menuEntry->Node.Next)
+  for( menuEntry = (SFG_MenuEntry *)fgStructure.Menu->Entries.First; menuEntry;
+       menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next)
   {
     /*
      * Update the menu entry's width value
@@ -752,7 +752,7 @@ void FGAPIENTRY glutSetMenu( int menuID )
  */
 void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
 {
-    SFG_MenuEntry* menuEntry = calloc( sizeof(SFG_MenuEntry), 1 );
+    SFG_MenuEntry* menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
 
     /*
      * Make sure there is a current menu set
@@ -781,7 +781,7 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
  */
 void FGAPIENTRY glutAddSubMenu( const char* label, int subMenuID )
 {
-  SFG_MenuEntry* menuEntry = calloc( sizeof(SFG_MenuEntry), 1 );
+  SFG_MenuEntry* menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
   SFG_Menu*      subMenu = fgMenuByID( subMenuID );
 
   /*

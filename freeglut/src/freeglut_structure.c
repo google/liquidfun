@@ -65,7 +65,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title, int x, int y,
     /*
      * Have the window object created
      */
-    SFG_Window* window = calloc( sizeof(SFG_Window), 1 );
+    SFG_Window *window = (SFG_Window *)calloc( sizeof(SFG_Window), 1 );
     int fakeArgc = 0;
 
     /*
@@ -138,7 +138,7 @@ SFG_Menu* fgCreateMenu( FGCBmenu menuCallback )
     /*
      * Have the menu object created
      */
-    SFG_Menu* menu = calloc( sizeof(SFG_Menu), 1 );
+    SFG_Menu* menu = (SFG_Menu *)calloc( sizeof(SFG_Menu), 1 );
     int fakeArgc = 0;
 
     /*
@@ -280,7 +280,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
     /*
      * Does this window have any subwindows?
      */
-    while ( (subWindow = window->Children.First) != NULL )
+    while ( (subWindow = (SFG_Window *)window->Children.First) != NULL )
     {
         /*
          * Destroy the first window in the list (possibly destroying
@@ -345,8 +345,8 @@ static void fghRemoveMenuFromWindow( SFG_Window* window, SFG_Menu* menu )
     /*
      * Call this function for all of the window's children recursively:
      */
-    for( subWindow = window->Children.First; subWindow;
-         subWindow = subWindow->Node.Next)
+    for( subWindow = (SFG_Window *)window->Children.First; subWindow;
+         subWindow = (SFG_Window *)subWindow->Node.Next)
     {
         fghRemoveMenuFromWindow( subWindow, menu );
     }
@@ -360,7 +360,7 @@ static void fghRemoveMenuFromMenu( SFG_Menu* from, SFG_Menu* menu )
 {
   SFG_MenuEntry *entry;
 
-  for( entry = from->Entries.First; entry; entry = entry->Node.Next )
+  for( entry = (SFG_MenuEntry *)from->Entries.First; entry; entry = (SFG_MenuEntry *)entry->Node.Next )
   {
     if (entry->SubMenu == menu)
     {
@@ -385,7 +385,7 @@ void fgDestroyMenu( SFG_Menu* menu )
   /*
    * First of all, have all references to this menu removed from all windows:
    */
-  for( window = fgStructure.Windows.First; window; window = window->Node.Next )
+  for( window = (SFG_Window *)fgStructure.Windows.First; window; window = (SFG_Window *)window->Node.Next )
   {
     fghRemoveMenuFromWindow( window, menu );
   }
@@ -393,7 +393,7 @@ void fgDestroyMenu( SFG_Menu* menu )
   /*
    * Now proceed with removing menu entries that lead to this menu
    */
-  for( from = fgStructure.Menus.First; from; from = from->Node.Next )
+  for( from = (SFG_Menu *)fgStructure.Menus.First; from; from = (SFG_Menu *)from->Node.Next )
   {
     fghRemoveMenuFromMenu( from, menu );
   }
@@ -414,7 +414,7 @@ void fgDestroyMenu( SFG_Menu* menu )
    * Now we are pretty sure the menu is not used anywhere
    * and that we can remove all of its entries
    */
-  while( (entry = menu->Entries.First) != NULL )
+  while( (entry = (SFG_MenuEntry *)menu->Entries.First) != NULL )
   {
     fgListRemove(&menu->Entries, &entry->Node);
 
@@ -486,10 +486,10 @@ void fgDestroyStructure( void )
   /*
    * Make sure all windows and menus have been deallocated
    */
-  while( (window = fgStructure.Windows.First) != NULL )
+  while( (window = (SFG_Window *)fgStructure.Windows.First) != NULL )
     fgDestroyWindow( window, TRUE );
 
-  while( (menu = fgStructure.Menus.First) != NULL )
+  while( (menu = (SFG_Menu *)fgStructure.Menus.First) != NULL )
     fgDestroyMenu( menu );
 }
 
@@ -506,8 +506,8 @@ void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
   /*
    * Check every of the top-level windows
    */
-  for( window = fgStructure.Windows.First; window;
-       window = window->Node.Next )
+  for( window = (SFG_Window *)fgStructure.Windows.First; window;
+       window = (SFG_Window *)window->Node.Next )
   {
     /*
      * Execute the callback...
@@ -535,7 +535,7 @@ void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback, SFG_Enum
   /*
    * Check every of the window's children:
    */
-  for( child = window->Children.First; child; child = child->Node.Next )
+  for( child = (SFG_Window *)window->Children.First; child; child = (SFG_Window *)child->Node.Next )
   {
     /*
      * Execute the callback...
@@ -694,7 +694,7 @@ SFG_Menu* fgMenuByID( int menuID )
     /*
      * It's enough to check all entries in fgStructure.Menus...
      */
-    for( menu = fgStructure.Menus.First; menu; menu = menu->Node.Next )
+    for( menu = (SFG_Menu *)fgStructure.Menus.First; menu; menu = (SFG_Menu *)menu->Node.Next )
     {
         /*
          * Does the ID number match?
@@ -722,7 +722,7 @@ void fgListAppend(SFG_List *list, SFG_Node *node)
 {
     SFG_Node *ln;
 
-    if ( (ln = list->Last) != NULL )
+    if ( (ln = (SFG_Node *)list->Last) != NULL )
     {
         ln->Next = node;
         node->Prev = ln;
@@ -741,13 +741,13 @@ void fgListRemove(SFG_List *list, SFG_Node *node)
 {
     SFG_Node *ln;
 
-    if ( (ln = node->Next) != NULL )
+    if ( (ln = (SFG_Node *)node->Next) != NULL )
         ln->Prev = node->Prev;
-    if ( (ln = node->Prev) != NULL )
+    if ( (ln = (SFG_Node *)node->Prev) != NULL )
         ln->Next = node->Next;
-    if ( (ln = list->First) == node )
+    if ( (ln = (SFG_Node *)list->First) == node )
         list->First = node->Next;
-    if ( (ln = list->Last) == node )
+    if ( (ln = (SFG_Node *)list->Last) == node )
         list->Last = node->Prev;
 }
 
@@ -756,7 +756,7 @@ int fgListLength(SFG_List *list)
     SFG_Node *node;
     int length = 0;
 
-    for( node = list->First; node; node = node->Next )
+    for( node = (SFG_Node *)list->First; node; node = (SFG_Node *)node->Next )
         ++length;
 
     return( length );

@@ -287,7 +287,7 @@ void fgDeinitialize( void )
     /*
      * Delete all the timers and their storage list
      */
-    while ( (timer = fgState.Timers.First) != NULL )
+    while ( (timer = (SFG_Timer *)fgState.Timers.First) != NULL )
     {
       fgListRemove ( &fgState.Timers, &timer->Node ) ;
       free ( timer ) ;
@@ -985,7 +985,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
    */
   char *token ;
   int len = strlen ( displayMode ) ;
-  char *buffer = malloc ( (len+1) * sizeof(char) ) ;
+  char *buffer = (char *)malloc ( (len+1) * sizeof(char) ) ;
   memcpy ( buffer, displayMode, len ) ;
   buffer[len] = '\0' ;
 

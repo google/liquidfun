@@ -129,7 +129,7 @@ void FGAPIENTRY glutWireSphere( GLdouble dRadius, GLint slices, GLint stacks )
     /*
      * Allocate the vertices array
      */
-    vertex = calloc( sizeof(double), 3 * slices * (stacks - 1) );
+    vertex = (double *)calloc( sizeof(double), 3 * slices * (stacks - 1) );
 
     glPushMatrix();
     glScaled( radius, radius, radius );
@@ -207,8 +207,8 @@ void FGAPIENTRY glutSolidSphere( GLdouble dRadius, GLint slices, GLint stacks )
     glPushMatrix();
     /* glScalef( radius, radius, radius ); */
 
-    row  = calloc( sizeof(double), slices * 3 );
-    next = calloc( sizeof(double), slices * 3 );
+    row  = (double *)calloc( sizeof(double), slices * 3 );
+    next = (double *)calloc( sizeof(double), slices * 3 );
 
     dpsi = M_PI / (stacks + 1);
     dphi = 2 * M_PI / slices;
@@ -329,7 +329,7 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
   /*
    * We need 'slices' points on a circle
    */
-  vertices = calloc( sizeof(double), 2 * (slices + 1) );
+  vertices = (double *)calloc( sizeof(double), 2 * (slices + 1) );
 
   for( j=0; j<slices+1; j++ )
   {
@@ -415,7 +415,7 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
   /*
    * We need 'slices' points on a circle
    */
-  vertices = calloc( sizeof(double), 2 * (slices + 1) );
+  vertices = (double *)calloc( sizeof(double), 2 * (slices + 1) );
 
   for( j=0; j<slices+1; j++ )
   {
@@ -498,8 +498,8 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
   /*
    * Allocate the vertices array
    */
-  vertex = calloc( sizeof(double), 3 * nSides * nRings );
-  normal = calloc( sizeof(double), 3 * nSides * nRings );
+  vertex = (double *)calloc( sizeof(double), 3 * nSides * nRings );
+  normal = (double *)calloc( sizeof(double), 3 * nSides * nRings );
 
   glPushMatrix();
 
@@ -582,8 +582,8 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
   /*
    * Allocate the vertices array
    */
-  vertex = calloc( sizeof(double), 3 * nSides * nRings );
-  normal = calloc( sizeof(double), 3 * nSides * nRings );
+  vertex = (double *)calloc( sizeof(double), 3 * nSides * nRings );
+  normal = (double *)calloc( sizeof(double), 3 * nSides * nRings );
 
   glPushMatrix();
 

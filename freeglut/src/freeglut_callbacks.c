@@ -106,7 +106,7 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
     /*
      * Create a new freeglut timer hook structure
      */
-    timer = calloc( sizeof(SFG_Timer), 1 );
+    timer = (SFG_Timer *)calloc( sizeof(SFG_Timer), 1 );
 
     /*
      * Remember the callback address and timer hook's ID

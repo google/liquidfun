@@ -301,9 +301,9 @@ static void fghCheckTimers( void )
     /*
      * For every timer that is waiting for triggering
      */
-    for( timer = fgState.Timers.First; timer; timer = next )
+    for( timer = (SFG_Timer *)fgState.Timers.First; timer; timer = next )
     {
-	next = timer->Node.Next;
+	next = (SFG_Timer *)timer->Node.Next;
 
         /*
          * Check for the timeout:
@@ -322,7 +322,7 @@ static void fghCheckTimers( void )
      * Now feel free to execute all the hooked and timed out timer callbacks
      * And delete the timed out timers...
      */
-    while ( (timer = timedOut.First) )
+    while ( (timer = (SFG_Timer *)timedOut.First) )
     {
         if( timer->Callback != NULL )
             timer->Callback( timer->ID );
@@ -394,13 +394,13 @@ static void fgCleanUpGlutsMess( void )
 
   if ( fgStructure.Windows.First != NULL ) 
   {
-    SFG_Window *win = fgStructure.Windows.First ;
+    SFG_Window *win = (SFG_Window *)fgStructure.Windows.First ;
     glEnd();
     glFinish();
     glFlush();
     while ( win != NULL )
     {
-      SFG_Window *temp_win = win->Node.Next ;
+      SFG_Window *temp_win = (SFG_Window *)win->Node.Next ;
       fgDestroyWindow ( win, FALSE ) ;
       win = temp_win ;
     }
@@ -1076,7 +1076,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
 void FGAPIENTRY glutMainLoop( void )
 {
 #if TARGET_HOST_WIN32
-  SFG_Window *window = fgStructure.Windows.First ;
+  SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
 #endif
 
   /*
@@ -1098,7 +1098,7 @@ void FGAPIENTRY glutMainLoop( void )
     if ( window->Callbacks.Visibility != NULL )
       window->Callbacks.Visibility ( window->State.Visible ) ;
 
-    window = window->Node.Next ;
+    window = (SFG_Window *)window->Node.Next ;
   }
 #endif
 
@@ -1343,7 +1343,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             /* Step through the list of windows.  If the rendering context is notbeing used
              * by another window, then we delete it.
              */
-            for ( iter = fgStructure.Windows.First; iter; iter = iter->Node.Next )
+            for ( iter = (SFG_Window *)fgStructure.Windows.First; iter; iter = (SFG_Window *)iter->Node.Next )
             {
               if ( ( iter->Window.Context == window->Window.Context ) && ( iter != window ) )
                 used = TRUE ;
