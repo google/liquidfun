@@ -199,40 +199,25 @@ static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
 static void fghcbDisplayWindow( SFG_Window *window,
                                 SFG_Enumerator *enumerator )
 {
+    if( window->State.NeedToResize )
+    {
+        SFG_Window *current_window = fgStructure.Window;
+        
+        fgSetWindow( window );
+        
+        fghReshapeWindowByHandle( 
+            window->Window.Handle,
+            window->State.Width,
+            window->State.Height
+        );
+        
+        window->State.NeedToResize = GL_FALSE;
+        fgSetWindow( current_window );
+    }
+
     if( window->State.Redisplay &&
         window->State.Visible )
     {
-        /*
-         * XXX Resizing should *not* depend upon whether there
-         * XXX is a pending redisplay flag, as far as I can tell.
-         * XXX
-         * XXX Note, too, that the {NeedToResize} flag is a little
-         * XXX fuzzy in its meaning, since for WIN32, this also
-         * XXX means "we need to tell the application that the window has
-         * XXX changed size", while in X11, it only means "we need
-         * XXX to ask the window system to resize the window.
-         * XXX Splitting the flag's meaning might be desirable, but
-         * XXX that could complicate the code more.  (On X11, the
-         * XXX user callback is called as soon as the event is
-         * XXX discovered, but resizing the window is postponed
-         * XXX until after other events.)
-         */
-        if( window->State.NeedToResize )
-        {
-            SFG_Window *current_window = fgStructure.Window;
-
-            fgSetWindow( window );
-
-            fghReshapeWindowByHandle( 
-                window->Window.Handle,
-                window->State.Width,
-                window->State.Height
-            );
-
-            window->State.NeedToResize = GL_FALSE;
-            fgSetWindow ( current_window );
-        }
-
         window->State.Redisplay = GL_FALSE;
 
 #if TARGET_HOST_UNIX_X11
