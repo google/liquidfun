@@ -926,7 +926,7 @@ void FGAPIENTRY glutMainLoop( void )
             /*
              * We need to terminate the main loop if no windows are left
              */
-            bLoop = (g_list_length( fgStructure.Windows ) != 0);
+            bLoop = (fgStructure.Windows.First != NULL);
         }
     }
 
