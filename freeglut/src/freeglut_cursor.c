@@ -38,8 +38,7 @@
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
- *  glutSetCursor()     -- Win32 mappings are incomplete
- *                         X mappings are nearly right.
+ *  glutSetCursor()     -- Win32 mappings are incomplete.
  *
  * It would be good to use custom mouse cursor shapes, and introduce
  * an option to display them using glBitmap() and/or texture mapping,
@@ -61,9 +60,9 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 #if TARGET_HOST_UNIX_X11
     /*
      * Open issues:
-     * (a) GLUT_CURSOR_NONE doesn't do what it should.  We can probably
+     * (X) GLUT_CURSOR_NONE doesn't do what it should.  We can probably
      *     build an empty pixmap for it, though, quite painlessly.
-     * (b) Are we allocating resources, or causing X to do so?
+     * (X) Are we allocating resources, or causing X to do so?
      *     If yes, we should arrange to deallocate!
      * (c) No error checking.  Is that a problem?
      * (d) FULL_CROSSHAIR demotes to plain CROSSHAIR.  Old GLUT allows
@@ -74,6 +73,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
      */
     {
         Cursor cursor;
+        Pixmap no_cursor;  /* Used for GLUT_CURSOR_NONE */
 
 #define MAP_CURSOR(a,b)                                     \
     case a:                                                 \
@@ -105,7 +105,28 @@ void FGAPIENTRY glutSetCursor( int cursorID )
             MAP_CURSOR( GLUT_CURSOR_TOP_RIGHT_CORNER,    XC_top_right_corner);
             MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, XC_bottom_right_corner);
             MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER, XC_bottom_left_corner);
-            MAP_CURSOR( GLUT_CURSOR_NONE,        XC_bogosity);
+            /* MAP_CURSOR( GLUT_CURSOR_NONE,        XC_bogosity); */
+        case GLUT_CURSOR_NONE:
+        {
+            static unsigned char no_cursor_bits[ 32 ];
+            XColor black;
+            no_cursor = XCreatePixmapFromBitmapData( fgDisplay.Display,
+                                                     fgDisplay.RootWindow,
+                                                     no_cursor_bits,
+                                                     16, 16,
+                                                     1, 0, 1 );
+            XParseColor( fgDisplay.Display,
+                         DefaultColormap( fgDisplay.Display,
+                                          DefaultScreen( fgDisplay.Display ) ),
+                         "black",
+                         &black );
+            cursor = XCreatePixmapCursor( fgDisplay.Display,
+                                          no_cursor, no_cursor,
+                                          &black, &black,
+                                          0, 0 );
+            break;
+        }
+        
         case GLUT_CURSOR_INHERIT:
             break;
         default:
@@ -116,8 +137,13 @@ void FGAPIENTRY glutSetCursor( int cursorID )
             XUndefineCursor( fgDisplay.Display,
                              fgStructure.Window->Window.Handle );
         else
+        {
             XDefineCursor( fgDisplay.Display,
                            fgStructure.Window->Window.Handle, cursor );
+            XFreeCursor( fgDisplay.Display, cursor );
+            if( GLUT_CURSOR_NONE == cursorID )
+                XFreePixmap( fgDisplay.Display, no_cursor );
+        }
     }
 
 #elif TARGET_HOST_WIN32
