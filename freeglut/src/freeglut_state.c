@@ -559,8 +559,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return fgStructure.Window ? fgStructure.Window->State.IgnoreKeyRepeat : 0;
 
     case GLUT_DEVICE_KEY_REPEAT:
-        /* XXX WARNING: THIS IS A BIG LIE! */
-        return GLUT_KEY_REPEAT_DEFAULT;
+        return fgState.KeyRepeat;
 
     default:
         fgWarning( "glutDeviceGet(): missing enum handle %d", eWhat );

@@ -699,3 +699,6 @@ from freeglut.
 ***************************************************************************
 
 (185) Fixed bug #1079530 (glutGetProcAddress and geometric objects).
+
+(186) Fixed bug #1087642 (glutDeviceGet(GLUT_DEVICE_KEY_REPEAT)
+unimplemented).
