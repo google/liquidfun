@@ -33,6 +33,10 @@
  * FreeBSD port - courtesy of Stephen Montgomery-Smith <stephen@math.missouri.edu>
  */
 
+#if defined(__FreeBSD__) || defined(__NetBSD__)
+#include <sys/param.h>
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
