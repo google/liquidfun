@@ -28,7 +28,7 @@
 #ifndef  FREEGLUT_INTERNAL_H
 #define  FREEGLUT_INTERNAL_H
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #    include "config.h"
 #endif
 
