@@ -819,14 +819,14 @@ void FGAPIENTRY glutMainLoopEvent( void )
                  * XXX since the order and numbering isn't certain
                  * XXX See XFree86 configuration docs (even back in the
                  * XXX 3.x days, and especially with 4.x).
-		 *
-		 * XXX Note that {button} has already been decremeted
-		 * XXX in mapping from X button numbering to GLUT.
+                 *
+                 * XXX Note that {button} has already been decremeted
+                 * XXX in mapping from X button numbering to GLUT.
                  */
                 int wheel_number = (button - 3) / 2;
-		int direction = -1;
-		if( button % 2 )
-		    direction = 1;
+                int direction = -1;
+                if( button % 2 )
+                    direction = 1;
                 
                 if( pressed )
                     INVOKE_WCB( *window, MouseWheel, ( wheel_number,
