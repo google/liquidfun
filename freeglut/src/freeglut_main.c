@@ -619,20 +619,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
         break;
 
         case EnterNotify:
-        {
-            GETWINDOW( xcrossing );
-            GETMOUSE( xcrossing );
-            INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
-        }
-        break;
-        /* XXX Combine EnterNotify and LeaveNotify */
         case LeaveNotify:
-        {
             GETWINDOW( xcrossing );
             GETMOUSE( xcrossing );
-            INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
-        }
-        break;
+            INVOKE_WCB( *window, Entry, ( ( EnterNotify == event.type ) ?
+                                          GLUT_ENTERED :
+                                          GLUT_LEFT ) );
+            break;
 
         case MotionNotify:
         {
