@@ -12,9 +12,9 @@ Project's tools are:
 			"<Component 0xa>" with flags ""
 
 Creating temp file "C:\WINDOWS\TEMP\RSP170.TMP" with contents </nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"Debug/freeglut13.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /c 
-"C:\Project\freeglut\freeglut-1.3\freeglut_display.c"
-"C:\Project\freeglut\freeglut-1.3\freeglut_font.c"
-"C:\Project\freeglut\freeglut-1.3\freeglut_main.c"
+"C:\Project\freeglut\src\freeglut_display.c"
+"C:\Project\freeglut\src\freeglut_font.c"
+"C:\Project\freeglut\src\freeglut_main.c"
 >
 Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP170.TMP" 
 Creating temp file "C:\WINDOWS\TEMP\RSP0171.TMP" with contents <kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes /pdb:"Debug/freeglut13.pdb" /debug /machine:I386 /out:"Debug/freeglut13.dll" /implib:"Debug/freeglut13.lib" /pdbtype:sept 
@@ -40,7 +40,7 @@ Creating command line "link.exe @C:\WINDOWS\TEMP\RSP0171.TMP"
 Compiling...
 freeglut_display.c
 freeglut_font.c
-C:\Project\freeglut\freeglut-1.3\freeglut_font.c(133) : fatal error C1189: #error :  glPushClientAttrib declaration missing
+C:\Project\freeglut\src\freeglut_font.c(133) : fatal error C1189: #error :  glPushClientAttrib declaration missing
 freeglut_main.c
 Error executing cl.exe.
 

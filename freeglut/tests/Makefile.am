@@ -2,5 +2,5 @@
 
 bin_PROGRAMS = one
 one_SOURCES = one.c
-one_LDFLAGS = -export-dynamic -dlpreopen ../freeglut-1.3/libfreeglut-1.3.la
+one_LDFLAGS = -export-dynamic -dlpreopen ../src/libfreeglut-1.3.la
 
