@@ -399,67 +399,6 @@ void fgWarning( const char *fmt, ... )
     va_end( ap );
 }
 
-/*
- * Clean up on exit
- */
-static void fgCleanUpGlutsMess( void ) 
-{
-  int i;
-
-  i = 0;
-
-  if ( fgStructure.Windows.First != NULL ) 
-  {
-    SFG_Window *win = (SFG_Window *)fgStructure.Windows.First ;
-    glEnd();
-    glFinish();
-    glFlush();
-    while ( win != NULL )
-    {
-      SFG_Window *temp_win = (SFG_Window *)win->Node.Next ;
-      fgDestroyWindow ( win, FALSE ) ;
-      win = temp_win ;
-    }
-  }
-
-#if 0
-  /* these are pointers to external handles */
-
-  __glutWindowListSize    = 0;
-  __glutStaleWindowList   = NULL;
-  __glutWindowList        = NULL;
-  __glutCurrentWindow     = NULL;
-
-  /* make sure we no longer have a GL context */
-
-  if ( wglGetCurrentContext() != NULL ) 
-  {
-    wglDeleteContext( wglGetCurrentContext() );
-  }
-
-  hInstance = GetModuleHandle(NULL);
-  UnregisterClass( classname, hInstance );
-
-  /* clean up allocated timer memory */
-
-  tList = __glutTimerList;
-  i = 0;
-
-  while ( __glutTimerList ) 
-  {
-    i++;
-    tList = __glutTimerList;
-    
-    if ( __glutTimerList )
-      __glutTimerList = __glutTimerList->next;
-
-    if ( tList )
-      free( tList );
-  }
-#endif
-}
-
-
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -1180,23 +1119,21 @@ void FGAPIENTRY glutMainLoop( void )
       fgState.ExecState = GLUT_EXEC_STATE_STOP ;
   }
 
+  {
+    fgExecutionState execState = fgState.ActionOnWindowClose;
 
-  /*
-   * If we got here by the user closing a window or by the application closing down, there may still be windows open.
-   */
-  fgCleanUpGlutsMess () ;
+    /*
+     * When this loop terminates, destroy the display, state and structure
+     * of a freeglut session, so that another glutInit() call can happen
+     */
+    fgDeinitialize();
 
-  /*
-   * Check whether we return to the calling program or simply exit
-   */
-  if ( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
-    exit ( 0 ) ;
-
-  /*
-   * When this loop terminates, destroy the display, state and structure
-   * of a freeglut session, so that another glutInit() call can happen
-   */
-  fgDeinitialize();
+    /*
+     * Check whether we return to the calling program or simply exit
+     */
+    if ( execState == GLUT_ACTION_EXIT )
+      exit ( 0 ) ;
+  }
 }
 
 /*
