@@ -53,6 +53,8 @@ extern SFG_Font fgFontHelvetica12;
 extern SFG_Font fgFontHelvetica18;
 extern SFG_Font fgFontTimesRoman10;
 extern SFG_Font fgFontTimesRoman24;
+extern SFG_StrokeFont fgStrokeRoman;
+extern SFG_StrokeFont fgStrokeMonoRoman;
 
 /*
  * This is for GLUT binary compatibility, as suggested by Steve Baker
@@ -97,6 +99,26 @@ static SFG_Font* fghFontByID( void* font )
     return 0;
 }
 
+/*
+ * Matches a font ID with a SFG_StrokeFont structure pointer.
+ * This was changed to match the GLUT header style.
+ */
+static SFG_StrokeFont* fghStrokeByID( void* font )
+{
+    /*
+     * Try matching the font ID and the font data structure
+     */
+    if( font == GLUT_STROKE_ROMAN ) return( &fgStrokeRoman );
+    if( font == GLUT_STROKE_MONO_ROMAN ) return( &fgStrokeMonoRoman );
+
+    /*
+     * This probably is the library user's fault
+     */
+    fgError( "stroke font 0x%08x not found", font );
+
+    return 0;
+}
+
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
@@ -115,7 +137,7 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
     /*
      * Make sure the character we want to output is valid
      */
-    freeglut_return_if_fail( character > 0 && character < 256 );
+    freeglut_return_if_fail( character >= 0 && character < font->Quantity );
 
     /*
      * Then find the character we want to draw
@@ -174,7 +196,7 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
     /*
      * Make sure the character we want to output is valid
      */
-    freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
+    freeglut_return_val_if_fail( character > 0 && character < font->Quantity, 0 );
 
     /*
          * Scan the font looking for the specified character
@@ -187,10 +209,34 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
  */
 void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
 {
+    const SFG_StrokeChar *schar;
+    const SFG_StrokeStrip *strip;
+    int i, j;
+
     /*
-     * Stroke fonts are not supported yet, use a bitmap font instead
+     * First of all we'll need a font to use
      */
-    glutBitmapCharacter( GLUT_BITMAP_8_BY_13, character );
+    SFG_StrokeFont* font = fghStrokeByID( fontID );
+
+    /*
+     * Make sure the character we want to output is valid
+     */
+    freeglut_return_if_fail( character >= 0 && character < font->Quantity );
+
+    schar = font->Characters[character];
+
+    strip = schar->Strips;
+
+    for (i = 0; i < schar->Number; i++, strip++)
+    {
+        glBegin(GL_LINE_STRIP);
+        for(j = 0; j < strip->Number; j++)
+        {
+            glVertex2f(strip->Vertices[j].X, strip->Vertices[j].Y);
+        }
+        glEnd();
+    }
+    glTranslatef(schar->Right, 0.0, 0.0);
 }
 
 /*
@@ -199,9 +245,16 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
 int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
 {
     /*
-     * Stroke fonts are not supported yet, use a bitmap font instead
+     * First of all we'll need a font to use
      */
-    return( glutBitmapWidth( GLUT_BITMAP_8_BY_13, character ) );
+    SFG_StrokeFont* font = fghStrokeByID( fontID );
+
+    /*
+     * Make sure the character we want to output is valid
+     */
+    freeglut_return_if_fail( character >= 0 && character < font->Quantity );
+
+    return (font->Characters[character]->Right);
 }
 
 /*
@@ -261,13 +314,17 @@ int FGAPIENTRY glutBitmapHeight( void* fontID )
 /*
  * Returns the height of a stroke font
  */
-int FGAPIENTRY glutStrokeHeight( void* font )
+GLfloat FGAPIENTRY glutStrokeHeight( void* fontID )
 {
     /*
-     * Stroke fonts are currently not implemented.
-     * Using GLUT_BITMAP_8_BY_13 bitmap font instead
+     * See which font are we queried about
      */
-    return( glutBitmapHeight( GLUT_BITMAP_8_BY_13 ) );
+    SFG_StrokeFont* font = fghStrokeByID( fontID );
+
+    /*
+     * Return the character set's height
+     */
+    return( font->Height );
 }
 
 /*** END OF FILE ***/

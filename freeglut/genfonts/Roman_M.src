@@ -24,7 +24,7 @@
 
 # Mono-spaced version of Roman Simplex font.
 
-	FONTNAME Roman
+	FONTNAME MonoRoman
 	TOP 119.0476
 	BOTTOM -33.3333
 	NUM_CH 128

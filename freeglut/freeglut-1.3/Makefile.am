@@ -13,6 +13,8 @@ libfreeglut_1_3_la_SOURCES = freeglut_callbacks.c \
 			     freeglut_display.c \
 			     freeglut_font.c \
 			     freeglut_font_data.c \
+			     freeglut_stroke_roman.c \
+			     freeglut_stroke_mono_roman.c \
 			     freeglut_gamemode.c \
 			     freeglut_geometry.c \
 			     freeglut_init.c \

@@ -447,7 +447,7 @@ FGAPI int     FGAPIENTRY glutStrokeWidth( void* font, int character );
 FGAPI int     FGAPIENTRY glutBitmapLength( void* font, const char* string );
 FGAPI int     FGAPIENTRY glutStrokeLength( void* font, const char* string );
 FGAPI int     FGAPIENTRY glutBitmapHeight( void* font );
-FGAPI int     FGAPIENTRY glutStrokeHeight( void* font );
+FGAPI GLfloat FGAPIENTRY glutStrokeHeight( void* font );
 FGAPI void    FGAPIENTRY glutBitmapString( void* font, const char *string );
 FGAPI void    FGAPIENTRY glutStrokeString( void* font, const char *string );
 
