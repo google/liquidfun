@@ -51,8 +51,8 @@
 void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
 {
     if( !callback )
-        fgError ("Fatal error in program.  NULL display callback not "
-                 "permitted in GLUT 3.0+ or freeglut 2.0.1+\n");
+        fgError( "Fatal error in program.  NULL display callback not "
+                 "permitted in GLUT 3.0+ or freeglut 2.0.1+\n" );
     SET_CALLBACK( Display );
     fgStructure.Window->State.Redisplay = TRUE;
 }
@@ -102,9 +102,9 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ),
     freeglut_assert_ready;
 
     timer = (SFG_Timer *)calloc( sizeof(SFG_Timer), 1 );
-    if (!timer)
-      fgError ("Fatal error: "
-          "Memory allocation failure in glutTimerFunc()\n");
+    if( !timer )
+        fgError( "Fatal error: "
+                 "Memory allocation failure in glutTimerFunc()\n" );
 
     timer->Callback  = callback;
     timer->ID        = timerID;
@@ -229,9 +229,9 @@ void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
 /* A. Donev: Destruction callback for menus */
 void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
 {
-   if( fgStructure.Menu == NULL )
-       return;
-   fgStructure.Menu->Destroy = callback;
+    if( fgStructure.Menu == NULL )
+        return;
+    fgStructure.Menu->Destroy = callback;
 }
 
 /*
