@@ -1461,6 +1461,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /* THIS IS SPECULATIVE -- John Fay, 10/2/03 */
         int direction = HIWORD ( lParam ) / 120 ;
         /* Should be WHEEL_DELTA instead of 120 */
+        int ticks = abs( direction );
 
         /*
          * The mouse cursor has moved. Remember the new mouse cursor's position
@@ -1483,28 +1484,29 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) ||
                 ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 
-        if ( window->Callbacks.MouseWheel )
-          window->Callbacks.MouseWheel(
-              wheel_number,
-              direction,
-              window->State.MouseX,
-              window->State.MouseY
-          ) ;
-        else  /* No mouse wheel, call the mouse button callback twice */
-        {
-          int button = wheel_number * 2 + 4;
-          /*
-           * XXX The above assumes that you have no more than 3 mouse
-           * XXX buttons.  Sorry.
-           */
-          button += (1 + direction)/2;
-          window->Callbacks.Mouse ( button, GLUT_DOWN,
-                                    window->State.MouseX,
-                                    window->State.MouseY ) ;
-          window->Callbacks.Mouse ( button, GLUT_UP,
-                                    window->State.MouseX,
-                                    window->State.MouseY ) ;
-        }
+        while( ticks-- )
+            if ( window->Callbacks.MouseWheel )
+                window->Callbacks.MouseWheel(
+                    wheel_number,
+                    direction,
+                    window->State.MouseX,
+                    window->State.MouseY
+                ) ;
+            else  /* No mouse wheel, call the mouse button callback twice */
+            {
+                /*
+                 * XXX The below assumes that you have no more than 3 mouse
+                 * XXX buttons.  Sorry.
+                 */
+                int button = wheel_number * 2 + 4;
+                button += (1 + direction)/2;
+                window->Callbacks.Mouse ( button, GLUT_DOWN,
+                                          window->State.MouseX,
+                                          window->State.MouseY ) ;
+                window->Callbacks.Mouse ( button, GLUT_UP,
+                                          window->State.MouseX,
+                                          window->State.MouseY ) ;
+            }
 
         fgStructure.Window->State.Modifiers = 0xffffffff;
       }
