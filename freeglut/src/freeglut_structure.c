@@ -212,23 +212,6 @@ void fgAddToWindowDestroyList( SFG_Window* window, GLboolean needToClose )
         FETCH_WCB( *window, Destroy ) = destroy;
     }
     
-
-    /*
-     * If the destroyed window has the highest window ID number, decrement
-     * the window ID number.
-     *
-     * XXX Do we REALLY want to *ever* recycle window IDs?  Integers are
-     * XXX plentiful, and clients may rely upon the implied promise in
-     * XXX the GLUT docs to not recycle these.  (I can't remember if it
-     * XXX is explicit.)
-     *
-     * XXX If we *do* want to do this, we should actually recompute the
-     * XXX highest window-ID; the new highest may not in fact be one less
-     * XXX than what we have just deleted.
-     */
-    if ( window->ID == fgStructure.WindowID )
-        fgStructure.WindowID--;
-
     /*
      * Check the execution state.  If this has been called from
      * "glutDestroyWindow", a statement in that function will reset the
