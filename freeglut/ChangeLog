@@ -178,8 +178,16 @@ October 24, 2002:
 
 (81) Added 'freeglut.kdevelop' (Gideon [Kdevelop 3.0]) project file
 
+
 *******************************************************************************************
 * Changes on 24 June 2003
 *******************************************************************************************
 
 (82) Added 'freeglut_ext.c' to the project files 'freeglut.dsp' and 'freeglut_static.dsp' (New list #10)
+
+
+*******************************************************************************************
+* Changes on 27 June 2003
+*******************************************************************************************
+
+(83) Now installs freeglut_ext.h and glut.h to /usr/include/GL (was missing before)

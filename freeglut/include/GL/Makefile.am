@@ -3,5 +3,5 @@
 GLincludedir = $(includedir)/GL
 
 EXTRA_DIST 	  = freeglut.h freeglut_internal.h
-GLinclude_HEADERS = freeglut.h 
+GLinclude_HEADERS = freeglut.h  freeglut_ext.h glut.h
 
