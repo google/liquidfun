@@ -198,3 +198,12 @@ October 24, 2002:
 *******************************************************************************************
 
 (84) Fixed the 'ptr + len' problem in freeglut_misc.c:90
+
+
+*******************************************************************************************
+* Changes on 02 July 2003
+*******************************************************************************************
+
+(85) Removed genfonts/genstrokes code, updated configure.in and Makefile.in
+
+(86) Moved tests/one.c into progs/demos/One/one.c, updated configure.in and Makefile.in

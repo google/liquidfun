@@ -27,4 +27,4 @@ dnl Checks for library functions.
 AC_CHECK_LIBM
 AC_SUBST(LIBM)
 
-AC_OUTPUT(Makefile src/Makefile include/Makefile include/GL/Makefile genfonts/Makefile tests/Makefile )
+AC_OUTPUT(Makefile src/Makefile include/Makefile include/GL/Makefile)
