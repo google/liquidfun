@@ -215,50 +215,32 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
 #endif
 
 /*
- * Sets the OpenGL context and the fgStructure "Current Window" pointer to the window
- * structure passed in.
+ * Sets the OpenGL context and the fgStructure "Current Window" pointer to
+ * the window structure passed in.
  */
 void fgSetWindow ( SFG_Window *window )
 {
 #if TARGET_HOST_UNIX_X11
-  if ( window )
-  {
-    /*
-	 * Make the selected window's GLX context the current one
-     */
-    glXMakeCurrent(
-        fgDisplay.Display,
-        window->Window.Handle,
-        window->Window.Context
-    );
-  }
+    if ( window )
+        glXMakeCurrent(
+            fgDisplay.Display,
+            window->Window.Handle,
+            window->Window.Context
+        );
 #elif TARGET_HOST_WIN32
-	/*
-	 * Release the previous' context's device context
-	 */
-	if( fgStructure.Window != NULL )
-		ReleaseDC( fgStructure.Window->Window.Handle, fgStructure.Window->Window.Device );
+    if( fgStructure.Window )
+        ReleaseDC( fgStructure.Window->Window.Handle,
+                   fgStructure.Window->Window.Device );
 
-  if ( window )
-  {
-  	/*
-	   * We will care about releasing the device context later
-	   */
-  	window->Window.Device = GetDC( window->Window.Handle );
-
-  	/*
-	   * Set the new current context:
-	   */
-  	wglMakeCurrent( 
-	  	window->Window.Device, 
-		  window->Window.Context 
+    if ( window )
+    {
+        window->Window.Device = GetDC( window->Window.Handle );
+        wglMakeCurrent( 
+            window->Window.Device, 
+            window->Window.Context 
   	);
-  }
+    }
 #endif
-
-    /*
-     * Remember that we have changed the current window state
-     */
     fgStructure.Window = window;
 }
 
