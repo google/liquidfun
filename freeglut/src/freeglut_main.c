@@ -1411,9 +1411,9 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case 0x020a:
         /* Should be WM_MOUSEWHEEL but my compiler doesn't recognize it */
     {
-        int wheel_number = LOWORD( lParam );
+        int wheel_number = LOWORD( wParam );
         /* THIS IS SPECULATIVE -- John Fay, 10/2/03 */
-        int ticks = HIWORD( lParam ) / 120;
+        short ticks = HIWORD( lParam ) / 120;
         /* Should be WHEEL_DELTA instead of 120 */
         int direction = 1;
 
