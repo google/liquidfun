@@ -687,9 +687,10 @@ static char* Tokens[] =
     "xstaticgray", "xgrayscale", "xstaticcolor", "xpseudocolor",
     "xtruecolor", "xdirectcolor",
     "xstaticgrey", "xgreyscale", "xstaticcolour", "xpseudocolour",
-    "xtruecolour", "xdirectcolour", "borderless"
+    "xtruecolour", "xdirectcolour", "borderless", "aux"
 };
 
+/* XXX why the heck do we use this table instead of strlen(Tokens[i])? */
 static int TokenLengths[] =
 {
     5,       4,      3,     4,      6,        10,           5,       6,
@@ -698,7 +699,7 @@ static int TokenLengths[] =
     11,            10,           12,             12,
     10,           12,
     11,            10,           13,             13,
-    11,            13,              10
+    11,            13,              10,          3
 };
 
 void FGAPIENTRY glutInitDisplayString( const char* displayMode )
@@ -874,7 +875,11 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 #endif
             break ;
 
-        case 36 :  /* Unrecognized */
+        case 36 :  /* "aux":  some number of aux buffers */
+            glut_state_flag |= GLUT_AUX1;
+            break ;
+
+        case 37 :  /* Unrecognized */
             fgWarning ( "WARNING - Display string token not recognized:  %s",
                         token );
             break ;

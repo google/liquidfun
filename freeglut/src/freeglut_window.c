@@ -127,6 +127,16 @@ XVisualInfo* fgChooseVisual( void )
             ATTRIB_VAL( GLX_ACCUM_ALPHA_SIZE, 1 );
     }
 
+    if( fgState.DisplayMode & GLUT_AUX1 )
+        ATTRIB_VAL( GLX_AUX_BUFFERS, 1 );
+    if( fgState.DisplayMode & GLUT_AUX2 )
+        ATTRIB_VAL( GLX_AUX_BUFFERS, 2 );
+    if( fgState.DisplayMode & GLUT_AUX3 )
+        ATTRIB_VAL( GLX_AUX_BUFFERS, 3 );
+    if( fgState.DisplayMode & GLUT_AUX4 )
+        ATTRIB_VAL( GLX_AUX_BUFFERS, 4 );
+
+
     /* Push a null at the end of the list */
     ATTRIB( None );
 
