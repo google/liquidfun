@@ -126,6 +126,10 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
         );
     }
 
+    /*
+     * XXX Should update {window->State.OldWidth, window->State.OldHeight}
+     * XXX to keep in lockstep with UNIX_X11 code.
+     */
     if( FETCH_WCB( *window, Reshape ) )
         INVOKE_WCB( *window, Reshape, ( width, height ) );
     else
@@ -561,6 +565,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
              *
              * GLUT presumably does this because it generally tries to treat
              * sub-windows the same as windows.
+             *
+             * XXX Technically, GETWINDOW( xconfigure ) and
+             * XXX {event.xconfigure} may not be legit ways to get at
+             * XXX data for CreateNotify events.  In practice, the data
+             * XXX is in a union which is laid out much the same either
+             * XXX way.  But if you want to split hairs, this isn't legit,
+             * XXX and we should instead duplicate some code.
              */
         case CreateNotify:
         case ConfigureNotify:
@@ -597,10 +608,15 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case Expose:
             /*
              * We are too dumb to process partial exposes...
+             *
              * XXX Well, we could do it.  However, it seems to only
              * XXX be potentially useful for single-buffered (since
              * XXX double-buffered does not respect viewport when we
              * XXX do a buffer-swap).
+             *
+             * XXX GETWINDOW( xexpose );
+             * XXX fgSetWindow( window );
+             * XXX glutPostRedisplay( );
              */
             if( event.xexpose.count == 0 )
                 fghRedrawWindowByHandle( event.xexpose.window );
@@ -625,6 +641,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case VisibilityNotify:
         {
             GETWINDOW( xvisibility ); 
+            /*
+             * XXX INVOKE_WCB() does this check for us.
+             */
             if( ! FETCH_WCB( *window, WindowStatus ) )
                 break;
             fgSetWindow( window );
@@ -692,7 +711,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
             /*
              * XXX For more than 5 buttons, just check {event.xmotion.state},
-             * XXX rather than a host of bit-masks?
+             * XXX rather than a host of bit-masks?  Or maybe we need to
+             * XXX track ButtonPress/ButtonRelease events in our own
+             * XXX bit-mask?
              */
 #define BUTTON_MASK \
   ( Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask )
@@ -762,7 +783,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     window->ActiveMenu->Window->State.MouseY =
                         event.xbutton.y_root - window->ActiveMenu->Y;
                 }
-              
+                
                 /* In the menu, invoke the callback and deactivate the menu*/
                 if( fgCheckActiveMenu( window->ActiveMenu->Window,
                                        window->ActiveMenu ) )
@@ -789,12 +810,19 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 else if( pressed )
                     /*
                      * Outside the menu, deactivate if it's a downclick
+                     *
                      * XXX This isn't enough.  A downclick outside of
                      * XXX the interior of our freeglut windows should also
                      * XXX deactivate the menu.  This is more complicated.
                      */
                     fgDeactivateMenu( window->ActiveMenu->ParentWindow );
-              
+
+                /*
+                 * XXX Why does an active menu require a redisplay at
+                 * XXX this point?  If this can come out cleanly, then
+                 * XXX it probably should do so; if not, a comment should
+                 * XXX explain it.
+                 */
                 window->State.Redisplay = GL_TRUE;
                 break;
             }
@@ -807,6 +835,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 ( window->Menu[ button ] ) &&
                 pressed )
             {
+                /*
+                 * XXX Posting a requisite Redisplay seems bogus.
+                 */
                 window->State.Redisplay = GL_TRUE;
                 fgSetWindow( window );
                 fgActivateMenu( window, button );
@@ -826,7 +857,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             /*
              * Finally execute the mouse or mouse wheel callback
              *
-             * XXX Use a symbolic constant, *not* "4"!
+             * XXX Use a symbolic constant, *not* "4"!  ("3, sire!")
              */
             if( ( button < 3 ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
                 INVOKE_WCB( *window, Mouse, ( button,
@@ -1409,7 +1440,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
-        if ( window->Menu[ button ] && pressed )
+        if( window->Menu[ button ] && pressed )
         {
             window->State.Redisplay = GL_TRUE;
             fgSetWindow( window );
