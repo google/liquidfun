@@ -865,7 +865,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             SFG_Window *save_window = fgStructure.Window ;
             SFG_Menu *save_menu = fgStructure.Menu ;
             SFG_Window *parent_window = window->ActiveMenu->ParentWindow ;
-            fgSetWindow ( window ) ;
+            fgSetWindow ( parent_window ) ;
             fgStructure.Menu = window->ActiveMenu ;
 
             /* Execute the menu callback */
@@ -1643,7 +1643,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             SFG_Window *save_window = fgStructure.Window ;
             SFG_Menu *save_menu = fgStructure.Menu ;
             SFG_Window *parent_window = window->ActiveMenu->ParentWindow ;
-            fgSetWindow ( window ) ;
+            fgSetWindow ( parent_window ) ;
             fgStructure.Menu = window->ActiveMenu ;
 
             /* Execute the menu callback */
