@@ -115,19 +115,14 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ),
  */
 static void fghVisibility( int status )
 {
-    FGCBVisibility vis;
-    int glut_status;
+    int glut_status = GLUT_VISIBLE;
     
     freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Window );
-    vis = FETCH_WCB( ( *( fgStructure.Window ) ), Visibility );
-    freeglut_return_if_fail( vis );
 
-    if( status == GLUT_HIDDEN  || status == GLUT_FULLY_COVERED )
+    if( ( GLUT_HIDDEN == status )  || ( GLUT_FULLY_COVERED == status ) )
         glut_status = GLUT_NOT_VISIBLE;
-    else
-        glut_status = GLUT_VISIBLE;
-    vis( glut_status );
+    INVOKE_WCB( *( fgStructure.Window ), Visibility, ( glut_status ) );
 }
 
 void FGAPIENTRY glutVisibilityFunc( void (* callback)( int ) )
@@ -232,9 +227,8 @@ void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
 /* A. Donev: Destruction callback for menus */
 void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
 {
-    if( fgStructure.Menu == NULL )
-        return;
-    fgStructure.Menu->Destroy = callback;
+    if( fgStructure.Menu )
+        fgStructure.Menu->Destroy = callback;
 }
 
 /*
