@@ -114,7 +114,7 @@ typedef struct tagSFG_Joystick SFG_Joystick;
 struct tagSFG_Joystick
 {
 #ifdef __FreeBSD__
-    gint        id;
+    int         id;
 #endif
 
 #ifdef WIN32
@@ -123,19 +123,19 @@ struct tagSFG_Joystick
 #else
 #   ifdef JS_NEW
         struct js_event js;
-        gint        tmp_buttons;
+        int         tmp_buttons;
         float       tmp_axes[ _JS_MAX_AXES ];
 #   else
         JS_DATA_TYPE js;
 #   endif
 
-    gchar fname[ 128 ];
-    gint  fd;
+    char fname[ 128 ];
+    int  fd;
 #endif
 
-    gboolean  error;
-    gint      num_axes;
-    gint      num_buttons;
+    GLboolean error;
+    int       num_axes;
+    int       num_buttons;
 
     float dead_band[ _JS_MAX_AXES ];
     float saturate [ _JS_MAX_AXES ];
@@ -152,15 +152,15 @@ static SFG_Joystick* fgJoystick = NULL;
 /*
  * Read the raw joystick data
  */
-static void fghJoystickRawRead ( SFG_Joystick* joy, gint* buttons, float* axes )
+static void fghJoystickRawRead ( SFG_Joystick* joy, int* buttons, float* axes )
 {
 #ifdef WIN32
     MMRESULT status;
 #else
-    gint status;
+    int status;
 #endif
 
-    gint i;
+    int i;
 
     if( joy->error )
     {
@@ -184,7 +184,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, gint* buttons, float* axes )
     }
 
     if( buttons )
-        *buttons = (int) joy->js.dwButtons;
+        *buttons = joy->js.dwButtons;
 
     if( axes )
     {
@@ -206,7 +206,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, gint* buttons, float* axes )
 
     while( 1 )
     {
-        gint status = read( joy->fd, &joy->js, sizeof(struct js_event) );
+        status = read( joy->fd, &joy->js, sizeof(struct js_event) );
 
         if( status != sizeof(struct js_event) )
         {
@@ -220,7 +220,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, gint* buttons, float* axes )
                 return;
 	        }
 
-	        g_warning( joy->fname );
+	        fgWarning( "%s", joy->fname );
 	        joy->error = TRUE;
         	return;
         }
@@ -275,7 +275,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, gint* buttons, float* axes )
 /*
  * Correct the joystick axis data
  */
-static float fghJoystickFudgeAxis( SFG_Joystick* joy, float value, gint axis )
+static float fghJoystickFudgeAxis( SFG_Joystick* joy, float value, int axis )
 {
     if( value < joy->center[ axis ] )
     {
@@ -310,10 +310,10 @@ static float fghJoystickFudgeAxis( SFG_Joystick* joy, float value, gint axis )
 /*
  * Read the corrected joystick data
  */
-static void fghJoystickRead( SFG_Joystick* joy, gint* buttons, float* axes )
+static void fghJoystickRead( SFG_Joystick* joy, int* buttons, float* axes )
 {
     float raw_axes[ _JS_MAX_AXES ];
-    gint  i;
+    int  i;
 
     if( joy->error )
     {
@@ -339,7 +339,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 {
 #ifdef WIN32
     JOYCAPS jsCaps;
-    gint    i;
+    int     i;
 
     joy->js.dwFlags = JOY_RETURNALL;
     joy->js.dwSize  = sizeof( joy->js );
@@ -379,14 +379,17 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 
 #else
 #   ifdef __FreeBSD__
-    gint buttons[ _JS_MAX_AXES ];
+    int   buttons[ _JS_MAX_AXES ];
     float axes[ _JS_MAX_AXES ];
-    gint  noargs, in_no_axes;
-    gchar joyfname[ 1024 ];
+    int   noargs, in_no_axes;
+    char  joyfname[ 1024 ];
     FILE* joyfile;
+#   else
+#       ifndef JS_NEW
+    int counter;
+#       endif
 #   endif
-
-    gint i, counter;
+    int i;
 
     /*
      * Default for older Linux systems.
@@ -491,18 +494,18 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 /*
  *
  */
-void fgJoystickInit( gint ident )
+void fgJoystickInit( int ident )
 {
     /*
      * Make sure we don't get reinitialized
      */
     if( fgJoystick != NULL )
-        g_error( "illegal attemp to initialize joystick device" );
+        fgError( "illegal attemp to initialize joystick device" );
 
     /*
      * Have the global joystick structure created
      */
-    fgJoystick = g_new0( SFG_Joystick, 1 );
+    fgJoystick = calloc( sizeof(SFG_Joystick), 1 );
 
 #ifdef WIN32
     switch( ident )
@@ -533,7 +536,7 @@ void fgJoystickInit( gint ident )
 void fgJoystickClose( void )
 {
     if( fgJoystick == NULL )
-        g_error( "illegal attempt to deinitialize joystick device" );
+        fgError( "illegal attempt to deinitialize joystick device" );
 
 #ifndef WIN32
     if( fgJoystick->error != TRUE )
@@ -548,7 +551,7 @@ void fgJoystickClose( void )
 void fgJoystickPollWindow( SFG_Window* window )
 {
     float axes[ _JS_MAX_AXES ];
-    gint buttons;
+    int buttons;
 
     /*
      * Make sure the joystick device is initialized, the window seems valid
@@ -567,9 +570,9 @@ void fgJoystickPollWindow( SFG_Window* window )
      */
     window->Callbacks.Joystick(
         buttons,
-        (gint) (axes[ 0 ] * 1000.0f),
-        (gint) (axes[ 1 ] * 1000.0f),
-        (gint) (axes[ 2 ] * 1000.0f)
+        (int) (axes[ 0 ] * 1000.0f),
+        (int) (axes[ 1 ] * 1000.0f),
+        (int) (axes[ 2 ] * 1000.0f)
     );
 }
 

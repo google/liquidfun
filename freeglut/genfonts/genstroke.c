@@ -30,11 +30,10 @@
     #include <config.h>
 #endif
 
-#include <glib.h>
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 /*
  * Define the log domain
@@ -45,13 +44,13 @@
 /*
  * The alphabet we want to export.
  */
-gchar* g_Alphabet = " abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789`~!@#$%^&*()-_=+[{}];:,.<>/?\\\"";
-gint   g_AlphabetLength = 0;
+char* g_Alphabet = " abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789`~!@#$%^&*()-_=+[{}];:,.<>/?\\\"";
+int   g_AlphabetLength = 0;
 
 /*
  * All undefined characters will get replaced by this one:
  */
-gchar  g_NoChar = '*';
+char  g_NoChar = '*';
 
 /*
  * The stream we want to redirect our output to
@@ -59,9 +58,14 @@ gchar  g_NoChar = '*';
 FILE*  g_Output = NULL;
 
 /*
+ * Our argv[0]
+ */
+char *g_ProgName = "";
+
+/*
  * This function outputs the font file prologue
  */
-void OutputPrologue( gchar* fileName )
+void OutputPrologue( char* fileName )
 {
     /*
      * Output the copyright and permission notices:
@@ -92,7 +96,7 @@ void OutputPrologue( gchar* fileName )
 /*
  * This function outputs a font set
  */
-void OutputFont( gchar* freeglutFontName, gchar* fontName )
+void OutputFont( char* freeglutFontName, char* fontName )
 {
     /*
      * This is an easy one. I just have to write a parser for the SRC files
@@ -116,9 +120,11 @@ void OutputEpilogue( void )
  */
 int main( int argc, char** argv )
 {
-    gchar ourCharacter[ 2 ] = { 0, 0 };
-    gchar* outputFileName = NULL;
-    gint i = 1;
+    char ourCharacter[ 2 ] = { 0, 0 };
+    char* outputFileName = NULL;
+    int i = 1;
+
+    g_ProgName = argv[0];
 
     /*
      * Initialize the alphabet's length
@@ -131,12 +137,17 @@ int main( int argc, char** argv )
     ourCharacter[ 0 ] = g_NoChar;
 	 
     if( strstr( g_Alphabet, ourCharacter ) == NULL )
-	g_error( "the g_NoChar `%c' character not found in the alphabet `%s'", g_NoChar, g_Alphabet );
+    {
+	fprintf( stderr,
+                 "%s: the g_NoChar `%c' character not found in the alphabet `%s'\n",
+                 g_ProgName, g_NoChar, g_Alphabet );
+        exit( 1 );
+    }
  
     /*
      * Define the default output file name
      */
-    outputFileName = g_strdup( "freeglut_font_stroke.c" );
+    outputFileName = strdup( "freeglut_font_stroke.c" );
 
     /*
      * Process the command line arguments now. Command line arguments expected:
@@ -148,15 +159,15 @@ int main( int argc, char** argv )
         /*
          * See what the current token is
          */
-        if( g_strcasecmp( argv[ i ], "-file" ) == 0 )
+        if( strcasecmp( argv[ i ], "-file" ) == 0 )
         {
-            g_assert( (i + 1) < argc );
-            g_free( outputFileName );
+            assert( (i + 1) < argc );
+            free( outputFileName );
 
             /*
              * The next token is expected to contain the destination file name
              */
-            outputFileName = g_strdup( (gchar *) argv[ ++i ] );
+            outputFileName = strdup( argv[ ++i ] );
         }
 
         /*
@@ -169,7 +180,7 @@ int main( int argc, char** argv )
      * Have the destination file opened
      */
     g_Output = fopen( outputFileName, "wt" );
-    g_assert( g_Output != NULL );
+    assert( g_Output != NULL );
 
     /*
      * Output the file header first
@@ -195,7 +206,7 @@ int main( int argc, char** argv )
     /*
      * Clean up all the rest of the mess
      */
-    g_free( outputFileName );
+    free( outputFileName );
 
     /*
      * Return successful!

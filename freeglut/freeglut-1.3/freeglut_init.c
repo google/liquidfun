@@ -63,7 +63,7 @@ SFG_State fgState;
 /*
  * A call to this function should initialize all the display stuff...
  */
-void fgInitialize( const gchar* displayName )
+void fgInitialize( const char* displayName )
 {
 #if TARGET_HOST_UNIX_X11
     /*
@@ -76,7 +76,7 @@ void fgInitialize( const gchar* displayName )
         /*
          * Failed to open a display. That's no good.
          */
-        g_error( "failed to open display '%s'", XDisplayName( displayName ) );
+        fgError( "failed to open display '%s'", XDisplayName( displayName ) );
     }
 
     /*
@@ -87,7 +87,7 @@ void fgInitialize( const gchar* displayName )
         /*
          * GLX extensions have not been found...
          */
-        g_error( "OpenGL GLX extension not supported by display '%s'", XDisplayName( displayName ) );
+        fgError( "OpenGL GLX extension not supported by display '%s'", XDisplayName( displayName ) );
     }
 
     /*
@@ -229,14 +229,14 @@ void fgInitialize( const gchar* displayName )
  */
 void fgDeinitialize( void )
 {
-    gint i;
+    SFG_Timer *timer;
 
     /*
      * Check if initialization has been performed before
      */
-    if( fgState.Timer == NULL )
+    if( !fgState.Time.Set )
     {
-        g_warning( "fgDeinitialize(): fgState.Timer is null => no valid initialization has been performed" );
+        fgWarning( "fgDeinitialize(): fgState.Timer is null => no valid initialization has been performed" );
         return;
     }
 
@@ -248,18 +248,11 @@ void fgDeinitialize( void )
     /*
      * Delete all the timers and their storage list
      */
-    for( i=0; i<(gint) g_list_length( fgState.Timers ); i++ )
-        g_free( g_list_nth( fgState.Timers, i )->data );
-
-    g_list_free( fgState.Timers );
-    fgState.Timers = NULL;
-
-    /*
-     * Destroy the timer itself
-     */
-    g_timer_stop( fgState.Timer );
-    g_timer_destroy( fgState.Timer );
-    fgState.Timer = NULL;
+    while ( (timer = fgState.Timers.First) != NULL )
+    {
+	fgListRemove(&fgState.Timers, &timer->Node);
+	free(timer);
+    }
 
     /*
      * Deinitialize the joystick device
@@ -290,19 +283,19 @@ void fgDeinitialize( void )
  */
 void FGAPIENTRY glutInit( int* pargc, char** argv )
 {
-    gchar* geometrySettings = NULL;
-    gchar* displayName = NULL;
-    gint i, j, argc = *pargc;
+    char* geometrySettings = NULL;
+    char* displayName = NULL;
+    int i, j, argc = *pargc;
 
     /*
      * Do not allow multiple initialization of the library
      */
-    if( fgState.Timer != NULL )
+    if( fgState.Time.Set )
     {
         /*
          * We can't have multiple initialization performed
          */
-        g_error( "illegal glutInit() reinitialization attemp" );
+        fgError( "illegal glutInit() reinitialization attemp" );
     }
 
     /*
@@ -356,14 +349,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /*
      * Remember the function's call time
      */
-    fgState.Timer = g_timer_new();
-    g_timer_start( fgState.Timer );
+    gettimeofday(&fgState.Time.Value, NULL);
+    fgState.Time.Set = TRUE;
 
     /*
      * Grab the environment variable indicating the X display to use.
      * This is harmless under Win32, so let's let it stay here...
      */
-    displayName = (gchar *) strdup( (gchar *) g_getenv( "DISPLAY" ) );
+    displayName = strdup( getenv( "DISPLAY" ) );
 
     /*
      * Have the program arguments parsed.
@@ -379,12 +372,12 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
              * Check for possible lack of the next argument
              */
             if( ++i >= argc )
-                g_error( "-display parameter must be followed by display name" );
+                fgError( "-display parameter must be followed by display name" );
 
             /*
              * Release the previous display name (the one from app's environment)
              */
-            g_free( displayName );
+            free( displayName );
 
             /*
              * Make a working copy of the name for us to use
@@ -408,7 +401,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
              * Again, check if there is at least one more argument
              */
             if( ++i >= argc )
-                g_error( "-geometry parameter must be followed by window geometry settings" );
+                fgError( "-geometry parameter must be followed by window geometry settings" );
 
             /*
              * Otherwise make a duplicate of the geometry settings...
@@ -432,7 +425,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
              * We try to force direct rendering...
              */
             if( fgState.TryDirectContext == FALSE )
-                g_error( "parameters ambiguity, -direct and -indirect cannot be both specified" );
+                fgError( "parameters ambiguity, -direct and -indirect cannot be both specified" );
 
             fgState.ForceDirectContext = TRUE;
             argv[ i ] = NULL;
@@ -444,7 +437,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
              * We try to force indirect rendering...
              */
             if( fgState.ForceDirectContext == TRUE )
-                g_error( "parameters ambiguity, -direct and -indirect cannot be both specified" );
+                fgError( "parameters ambiguity, -direct and -indirect cannot be both specified" );
 
             fgState.TryDirectContext = FALSE;
             argv[ i ] = NULL;
@@ -516,13 +509,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      */
     if( geometrySettings != NULL )
     {
-        gint result, x, y, w, h;
+        int result, x, y;
+	unsigned int w, h;
 
         /*
          * Have the settings parsed now. This is easy.
          * We will use the XParseGeometry function.
          */
-        result = XParseGeometry( geometrySettings, &x, &y, (guint *) &w, (guint *) &h );
+        result = XParseGeometry( geometrySettings, &x, &y, &w, &h );
 
         /*
          * Check what we have been supplied with...
@@ -534,21 +528,25 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             fgState.Size.Y = h;
 
         if( result & XValue )
+        {
             if( result & XNegative )
                 fgState.Position.X = fgDisplay.ScreenWidth + x - fgState.Size.X;
             else
                 fgState.Position.X = x;
+        }
 
         if( result & YValue )
+        {
             if( result & YNegative )
                 fgState.Position.Y = fgDisplay.ScreenHeight + y - fgState.Size.Y;
             else
                 fgState.Position.Y = y;
+        }
 
         /*
          * Free the geometry settings string
          */
-        g_free( geometrySettings );
+        free( geometrySettings );
     }
 #endif
 
@@ -564,7 +562,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /*
      * Do not forget about releasing the display name string
      */
-    g_free( displayName );
+    free( displayName );
 }
 
 /*
@@ -637,6 +635,7 @@ void FGAPIENTRY glutInitDisplayMode( int displayMode )
 
 /* -- INIT DISPLAY STRING PARSING ------------------------------------------ */
 
+#if 0 /* FIXME: CJP */
 /*
  * There is a discrete number of comparison operators we can encounter:
  *
@@ -916,10 +915,10 @@ void FGAPIENTRY glutInitDisplayString( char* displayMode )
      */
     g_scanner_destroy( scanner );
 }
+#endif
+
+void FGAPIENTRY glutInitDisplayString( char* displayMode )
+{
+}
 
 /*** END OF FILE ***/
-
-
-
-
-

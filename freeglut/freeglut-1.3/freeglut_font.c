@@ -92,7 +92,9 @@ static SFG_Font* fghFontByID( void* font )
     /*
      * This probably is the library user's fault
      */
-    g_error( "font 0x%08x not found", font );
+    fgError( "font 0x%08x not found", font );
+
+    return 0;
 }
 
 
@@ -103,7 +105,7 @@ static SFG_Font* fghFontByID( void* font )
  */
 void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
 {
-    const guchar* face;
+    const GLubyte* face;
 
     /*
      * First of all we'll need a font to use
@@ -149,6 +151,14 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
      * Restore the old pixel store settings
      */
     glPopClientAttrib();
+}
+
+void FGAPIENTRY glutBitmapString( void* fontID, const char *string )
+{
+    int i;
+
+    for( i=0; i<strlen( string ); i++ )
+        glutBitmapCharacter( fontID, string[ i ] );
 }
 
 /*
@@ -199,12 +209,12 @@ int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
  */
 int FGAPIENTRY glutBitmapLength( void* fontID, const char* string )
 {
-    gint i, length = 0;
+    int i, length = 0;
 
     /*
      * Using glutBitmapWidth() function to calculate the result
      */
-    for( i=0; i<(gint) strlen( string ); i++ )
+    for( i=0; i<strlen( string ); i++ )
         length += glutBitmapWidth( fontID, string[ i ] );
 
     /*
@@ -218,12 +228,12 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const char* string )
  */
 int FGAPIENTRY glutStrokeLength( void* fontID, const char* string )
 {
-    gint i, length = 0;
+    int i, length = 0;
 
     /*
      * Using glutStrokeWidth() function to calculate the result
      */
-    for( i=0; i<(gint) strlen( string ); i++ )
+    for( i=0; i<strlen( string ); i++ )
         length += glutStrokeWidth( fontID, string[ i ] );
 
     /*

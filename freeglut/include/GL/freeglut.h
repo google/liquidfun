@@ -448,6 +448,8 @@ FGAPI int     FGAPIENTRY glutBitmapLength( void* font, const char* string );
 FGAPI int     FGAPIENTRY glutStrokeLength( void* font, const char* string );
 FGAPI int     FGAPIENTRY glutBitmapHeight( void* font );
 FGAPI int     FGAPIENTRY glutStrokeHeight( void* font );
+FGAPI void    FGAPIENTRY glutBitmapString( void* font, const char *string );
+FGAPI void    FGAPIENTRY glutStrokeString( void* font, const char *string );
 
 /*
  * Geometry functions, see freeglut_geometry.c
@@ -520,7 +522,3 @@ FGAPI void    FGAPIENTRY glutReportErrors( void );
 #endif /* FREEGLUT_H */
 
 /*** END OF FILE ***/
-
-
-
-

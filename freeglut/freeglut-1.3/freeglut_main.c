@@ -95,9 +95,9 @@ static void fghRedrawWindowByHandle
  */
 static void fghReshapeWindowByHandle
 #if TARGET_HOST_UNIX_X11
-    ( Window handle, gint width, gint height )
+    ( Window handle, int width, int height )
 #elif TARGET_HOST_WIN32
-    ( HWND handle, gint width, gint height )
+    ( HWND handle, int width, int height )
 #endif
 {
     /*
@@ -133,31 +133,31 @@ static void fghReshapeWindowByHandle
 /*
  * A static helper function to execute display callback for a window
  */
-static void fghcbDisplayWindow( gpointer window, gpointer enumerator )
+static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
 {
 #if TARGET_HOST_UNIX_X11
     /*
      * Check if there is an idle callback hooked
      */
-#   warning there is a redisplay hack here (see the code commented out)
-    if( (((SFG_Window *) window)->Callbacks.Display != NULL) /*&&
-        /*(((SFG_Window *) window)->State.Redisplay == TRUE)*/ &&
-        (((SFG_Window *) window)->State.Visible == TRUE) )
+// #   warning there is a redisplay hack here (see the code commented out)
+    if( (window->Callbacks.Display != NULL) &&
+        /*(window->State.Redisplay == TRUE) &&*/
+        (window->State.Visible == TRUE) )
     {
         /*
          * OKi, this is the case: have the window set as the current one
          */
-        glutSetWindow( ((SFG_Window *) window)->ID );
+        glutSetWindow( window->ID );
 
         /*
          * Do not exagerate with the redisplaying
          */
-        ((SFG_Window *) window)->State.Redisplay = FALSE;
+        window->State.Redisplay = FALSE;
 
         /*
          * And execute the display callback immediately after
          */
-        ((SFG_Window *) window)->Callbacks.Display();
+        window->Callbacks.Display();
     }
 
 #elif TARGET_HOST_WIN32
@@ -165,12 +165,12 @@ static void fghcbDisplayWindow( gpointer window, gpointer enumerator )
     /*
      * Do we need to explicitly resize the window?
      */
-    if( ((SFG_Window *) window)->State.NeedToResize )
+    if( window->State.NeedToResize )
     {
-        glutSetWindow( ((SFG_Window *) window)->ID );
+        glutSetWindow( window->ID );
 
         fghReshapeWindowByHandle( 
-            ((SFG_Window *) window)->Window.Handle,
+            window->Window.Handle,
             glutGet( GLUT_WINDOW_WIDTH ),
             glutGet( GLUT_WINDOW_HEIGHT )
         );
@@ -178,14 +178,14 @@ static void fghcbDisplayWindow( gpointer window, gpointer enumerator )
         /*
          * Never ever do that again:
          */
-        ((SFG_Window *) window)->State.NeedToResize = FALSE;
+        window->State.NeedToResize = FALSE;
     }
 
     /*
      * This is done in a bit different way under Windows
      */
     RedrawWindow( 
-        ((SFG_Window *) window)->Window.Handle, NULL, NULL, 
+        window->Window.Handle, NULL, NULL, 
         RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE 
     );
 
@@ -194,7 +194,7 @@ static void fghcbDisplayWindow( gpointer window, gpointer enumerator )
     /*
      * Process this window's children (if any)
      */
-    fgEnumSubWindows( (SFG_Window *) window, fghcbDisplayWindow, enumerator );
+    fgEnumSubWindows( window, fghcbDisplayWindow, enumerator );
 }
 
 /*
@@ -219,31 +219,30 @@ static void fghDisplayAll( void )
 /*
  * Window enumerator callback to check for the joystick polling code
  */
-static void fghcbCheckJoystickPolls( gpointer window, gpointer enumerator )
+static void fghcbCheckJoystickPolls( SFG_Window *window, SFG_Enumerator *enumerator )
 {
-    double checkTime = g_timer_elapsed( fgState.Timer, NULL );
-    SFG_Window* win = (SFG_Window *) window;
+    double checkTime = fgElapsedTime();
 
     /*
      * Check if actually need to do the poll for the currently enumerated window:
      */
-    if( win->State.JoystickLastPoll + win->State.JoystickPollRate >= checkTime )
+    if( window->State.JoystickLastPoll + window->State.JoystickPollRate >= checkTime )
     {
         /*
          * Yeah, that's it. Poll the joystick...
          */
-        fgJoystickPollWindow( (SFG_Window *) window );
+        fgJoystickPollWindow( window );
 
         /*
          * ...and reset the polling counters:
          */
-        win->State.JoystickLastPoll = checkTime;
+        window->State.JoystickLastPoll = checkTime;
     }
 
     /*
      * Process this window's children (if any)
      */
-    fgEnumSubWindows( (SFG_Window *) window, fghcbCheckJoystickPolls, enumerator );
+    fgEnumSubWindows( window, fghcbCheckJoystickPolls, enumerator );
 }
 
 /*
@@ -270,21 +269,18 @@ static void fghCheckJoystickPolls( void )
  */
 static void fghCheckTimers( void )
 {
-    double checkTime = g_timer_elapsed( fgState.Timer, NULL );
-    SFG_Timer* timer = NULL;
-    GList* timedOut = NULL;
-    gint i, length;
+    long checkTime = fgElapsedTime();
+    SFG_Timer *timer, *next;
+    SFG_List timedOut;
+
+    fgListInit(&timedOut);
 
     /*
      * For every timer that is waiting for triggering
      */
-    for( i=0; i<(gint) g_list_length( fgState.Timers ); i++ )
+    for( timer = fgState.Timers.First; timer; timer = next )
     {
-        /*
-         * ...grab the appropriate timer hook structure pointer
-         */
-        timer = (SFG_Timer *) g_list_nth( fgState.Timers, i )->data;
-        g_assert( timer != NULL );
+	next = timer->Node.Next;
 
         /*
          * Check for the timeout:
@@ -294,45 +290,70 @@ static void fghCheckTimers( void )
             /*
              * Add the timer to the timed out timers list
              */
-            timedOut = g_list_append( timedOut, timer );
+	    fgListRemove( &fgState.Timers, &timer->Node );
+            fgListAppend( &timedOut, &timer->Node );
         }
     }
 
     /*
-     * Now, have all the timed out timers removed from the window hooks
-     */
-    length = g_list_length( timedOut );
-
-    for( i=0; i<length; i++ )
-    {
-        fgState.Timers = g_list_remove(
-                            fgState.Timers,
-                            g_list_nth( timedOut, i )->data
-                         );
-    }
-
-    /*
      * Now feel free to execute all the hooked and timed out timer callbacks
+     * And delete the timed out timers...
      */
-    for( i=0; i<length; i++ )
+    while ( (timer = timedOut.First) )
     {
         if( timer->Callback != NULL )
             timer->Callback( timer->ID );
+	fgListRemove( &timedOut, &timer->Node );
+        free( timer );
     }
-
-    /*
-     * Finally, delete the timed out timers...
-     */
-    for( i=0; i<length; i++ )
-        g_free( g_list_nth( timedOut, i )->data );
-
-    /*
-     * Finally, have the timed out timers list released
-     */
-    if( timedOut != NULL )
-        g_list_free( timedOut );
 }
 
+/*
+ * Elapsed Time
+ */
+long fgElapsedTime( void )
+{
+	struct timeval now;
+	long elapsed;
+
+	gettimeofday( &now, NULL );
+
+	elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
+	elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
+
+	return( elapsed );
+}
+
+/*
+ * Error Messages.
+ */
+void fgError( const char *fmt, ... )
+{
+    va_list ap;
+
+    va_start( ap, fmt );
+
+    fprintf( stderr, "freeglut: ");
+    vfprintf( stderr, fmt, ap );
+    fprintf( stderr, "\n" );
+
+    va_end( ap );
+
+    exit( 1 );
+}
+
+void fgWarning( const char *fmt, ... )
+{
+    va_list ap;
+
+    va_start( ap, fmt );
+
+    fprintf( stderr, "freeglut: ");
+    vfprintf( stderr, fmt, ap );
+    fprintf( stderr, "\n" );
+
+    va_end( ap );
+}
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
@@ -360,7 +381,7 @@ void FGAPIENTRY glutMainLoop( void )
      * Enter the loop. Iterate as long as there are
      * any windows in the freeglut structure.
      */
-    while( fgStructure.Windows != NULL )
+    while( fgStructure.Windows.First != NULL )
     {
         /*
          * Do we have any event messages pending?
@@ -572,7 +593,7 @@ void FGAPIENTRY glutMainLoop( void )
             case ButtonRelease:
             case ButtonPress:
                 {
-                    gint button;
+                    int button;
 
                     /*
                      * A mouse button has been pressed or released. Traditionally,
@@ -679,9 +700,9 @@ void FGAPIENTRY glutMainLoop( void )
                     if( (window->Callbacks.Keyboard != NULL) || (window->Callbacks.Special != NULL) )
                     {
                         XComposeStatus composeStatus;
-                        gchar asciiCode[ 32 ];
+                        char asciiCode[ 32 ];
                         KeySym keySym;
-                        gint len;
+                        int len;
 
                         /*
                          * Check for the ASCII/KeySym codes associated with the event:
@@ -721,7 +742,7 @@ void FGAPIENTRY glutMainLoop( void )
                         }
                         else
                         {
-                            gint special = -1;
+                            int special = -1;
 
                             /*
                              * ...and one for all the others, which need to be translated to GLUT_KEY_Xs...
@@ -1286,9 +1307,3 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 #endif
 
 /*** END OF FILE ***/
-
-
-
-
-
-

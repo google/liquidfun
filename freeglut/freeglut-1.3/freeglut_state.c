@@ -76,9 +76,9 @@
 /*
  * Queries the GL context about some attributes
  */
-static gint fghGetConfig( gint attribute )
+static int fghGetConfig( int attribute )
 {
-    gint returnValue;
+    int returnValue;
 
     /*
      * Return nothing if there is no current window set
@@ -137,8 +137,6 @@ static gint fghGetConfig( gint attribute )
  */
 int FGAPIENTRY glutGet( GLenum eWhat )
 {
-    gint returnValue;
-
     freeglut_assert_ready;
 
     /*
@@ -150,7 +148,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /*
          * This is easy and nicely portable, as we are using GLib...
          */
-        return( (int) (g_timer_elapsed( fgState.Timer, NULL ) * 1000.0) );
+        return( fgElapsedTime() );
 
     /*
      * Following values are stored in fgState and fgDisplay global structures
@@ -226,7 +224,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     {
         XWindowAttributes winAttributes;
         Window another, window;
-        gint x, y;
+        int x, y;
 
         /*
          * Return zero if there is no current window set
@@ -393,7 +391,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         if( fgStructure.Window == NULL )
             return( 0 );
 
-        return( g_list_length( fgStructure.Window->Children ) );
+        return( fgListLength( &fgStructure.Window->Children ) );
 
     case GLUT_WINDOW_CURSOR:
         /*
@@ -411,20 +409,20 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         if( fgStructure.Menu == NULL )
             return( 0 );
 
-        return( g_list_length( fgStructure.Menu->Entries ) );
+        return( fgListLength( &fgStructure.Menu->Entries ) );
 
     default:
         /*
          * Just have it reported, so that we can see what needs to be implemented
          */
-        g_warning( "glutGet(): missing enum handle %i\n", eWhat );
+        fgWarning( "glutGet(): missing enum handle %i\n", eWhat );
         break;
     }
 
     /*
      * If nothing happens, then we are in deep trouble...
      */
-    g_assert_not_reached();
+    return( -1 );
 }
 
 /*
@@ -520,14 +518,14 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         /*
          * Complain.
          */
-        g_warning( "glutDeviceGet(): missing enum handle %i\n", eWhat );
+        fgWarning( "glutDeviceGet(): missing enum handle %i\n", eWhat );
         break;
     }
 
     /*
      * And now -- the failure.
      */
-    g_assert_not_reached();
+    return( -1 );
 }
 
 /*
@@ -543,7 +541,7 @@ int FGAPIENTRY glutGetModifiers( void )
 
     if( fgStructure.Window->State.Modifiers == 0xffffffff )
     {
-        g_warning( "glutGetModifiers() called outside an input callback" );
+        fgWarning( "glutGetModifiers() called outside an input callback" );
         return( 0 );
     }
 
@@ -605,14 +603,14 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
         /*
          * Complain to the user about the obvious bug
          */
-        g_warning( "glutLayerGet(): missing enum handle %i\n", eWhat );
+        fgWarning( "glutLayerGet(): missing enum handle %i\n", eWhat );
         break;
     }
 
     /*
      * And fail. That's good. Programs do love failing.
      */
-    g_assert_not_reached();
+    return( -1 );
 }
 
 /*** END OF FILE ***/

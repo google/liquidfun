@@ -55,20 +55,21 @@
  */
 #if TARGET_HOST_WIN32
     #include <windows.h>
-	#include <windowsx.h>
+    #include <windowsx.h>
 #endif
 
 /*
- * Those files should be available on every platform. GLib can be
- * downloaded from ftp.gtk.org. Ports are available for most Unix
- * systems and Win32 (for both native and posix-emulation modes).
+ * Those files should be available on every platform.
  */
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <glib.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <stdarg.h>
+#include <sys/time.h>
 
 /*
  * The system-dependant include files should go here:
@@ -89,9 +90,16 @@
  * Microsoft VisualC++ 5.0's <math.h> does not define the PI
  */
 #ifndef M_PI
-#	define  M_PI  3.14159265358979323846
+#    define  M_PI  3.14159265358979323846
 #endif
 
+#ifndef TRUE
+#    define  TRUE  1
+#endif
+
+#ifndef FALSE
+#    define  FALSE  0
+#endif
 
 /* -- GLOBAL TYPE DEFINITIONS ---------------------------------------------- */
 
@@ -134,14 +142,45 @@ typedef void (* FGCBtimer         )( int );
  */
 typedef void (* FGCBmenu          )( int );
 
+
+/*
+ * A list structure
+ */
+typedef struct tagSFG_List SFG_List;
+struct tagSFG_List
+{
+    void *First;
+    void *Last;
+};
+
+/*
+ * A list node structure
+ */
+typedef struct tagSFG_Node SFG_Node;
+struct tagSFG_Node
+{
+    void *Next;
+    void *Prev;
+};
+
 /*
  * A helper structure holding two ints and a boolean
  */
 typedef struct tagSFG_XYUse SFG_XYUse;
 struct tagSFG_XYUse
 {
-    gint            X, Y;               /* The two integers...               */
-    gboolean        Use;                /* ...and a single boolean.          */
+    GLint           X, Y;               /* The two integers...               */
+    GLboolean       Use;                /* ...and a single boolean.          */
+};
+
+/*
+ * A helper structure holding a timeval and a boolean
+ */
+typedef struct tagSFG_Time SFG_Time;
+struct tagSFG_Time
+{
+    struct timeval  Value;
+    GLboolean       Set;
 };
 
 /*
@@ -152,26 +191,26 @@ struct tagSFG_State
 {
     SFG_XYUse       Position;           /* The default windows' position     */
     SFG_XYUse       Size;               /* The default windows' size         */
-    guint           DisplayMode;        /* The display mode for new windows  */
+    unsigned int    DisplayMode;        /* The display mode for new windows  */
 
-    gboolean        ForceDirectContext; /* Should we force direct contexts?  */
-    gboolean        TryDirectContext;   /* What about giving a try to?       */
+    GLboolean       ForceDirectContext; /* Should we force direct contexts?  */
+    GLboolean       TryDirectContext;   /* What about giving a try to?       */
 
-    gboolean        ForceIconic;        /* All new top windows are iconified */
+    GLboolean       ForceIconic;        /* All new top windows are iconified */
 
-    gboolean        GLDebugSwitch;      /* OpenGL state debugging switch     */
-    gboolean        XSyncSwitch;        /* X11 sync protocol switch          */
+    GLboolean       GLDebugSwitch;      /* OpenGL state debugging switch     */
+    GLboolean       XSyncSwitch;        /* X11 sync protocol switch          */
 
-	gboolean		IgnoreKeyRepeat;	/* Whether to ignore key repeat...	 */
+    GLboolean       IgnoreKeyRepeat;    /* Whether to ignore key repeat...   */
 
-    GTimer*         Timer;              /* This timer is started on glutInit */
-    GList*          Timers;             /* The freeglut timer hooks          */
+    SFG_Time        Time;               /* The time that glutInit was called */
+    SFG_List        Timers;             /* The freeglut timer hooks          */
 
     FGCBidle        IdleCallback;       /* The global idle callback          */
 
     SFG_XYUse       GameModeSize;       /* The game mode screen's dimensions */
-    gint            GameModeDepth;      /* The pixel depth for game mode     */
-    gint            GameModeRefresh;    /* The refresh rate for game mode    */
+    int             GameModeDepth;      /* The pixel depth for game mode     */
+    int             GameModeRefresh;    /* The refresh rate for game mode    */
 };
 
 /*
@@ -182,26 +221,26 @@ struct tagSFG_Display
 {
 #if TARGET_HOST_UNIX_X11
     Display*        Display;            /* The display we are being run in.  */
-    gint            Screen;             /* The screen we are about to use.   */
+    int             Screen;             /* The screen we are about to use.   */
     Window          RootWindow;         /* The screen's root window.         */
-    gint            Connection;         /* The display's connection number   */
+    int             Connection;         /* The display's connection number   */
     Atom            DeleteWindow;       /* The window deletion atom          */
 
 #ifdef X_XF86VidModeGetModeLine
     XF86VidModeModeLine DisplayMode;    /* Current screen's display settings */
-    gint            DisplayModeClock;   /* The display mode's refresh rate   */
+    int             DisplayModeClock;   /* The display mode's refresh rate   */
 #endif
 
 #elif TARGET_HOST_WIN32
-	HINSTANCE		Instance;			/* The application's instance		 */
+    HINSTANCE        Instance;          /* The application's instance        */
     DEVMODE         DisplayMode;        /* Desktop's display settings        */
 
 #endif
 
-    gint            ScreenWidth;        /* The screen's width in pixels      */
-    gint            ScreenHeight;       /* The screen's height in pixels     */
-    gint            ScreenWidthMM;      /* The screen's width in milimeters  */
-    gint            ScreenHeightMM;     /* The screen's height in milimeters */
+    int             ScreenWidth;        /* The screen's width in pixels      */
+    int             ScreenHeight;       /* The screen's height in pixels     */
+    int             ScreenWidthMM;      /* The screen's width in milimeters  */
+    int             ScreenHeightMM;     /* The screen's height in milimeters */
 };
 
 
@@ -211,9 +250,10 @@ struct tagSFG_Display
 typedef struct tagSFG_Timer SFG_Timer;
 struct tagSFG_Timer
 {
-    gint32          ID;                 /* The timer ID integer              */
+    SFG_Node        Node;
+    int             ID;                 /* The timer ID integer              */
     FGCBtimer       Callback;           /* The timer callback                */
-    double          TriggerTime;        /* The timer trigger time            */
+    long            TriggerTime;        /* The timer trigger time            */
 };
 
 /*
@@ -230,8 +270,8 @@ struct tagSFG_Context
 
 #elif TARGET_HOST_WIN32
     HWND            Handle;             /* The window's handle               */
-	HDC				Device;				/* The window's device context		 */
-	HGLRC			Context;			/* The window's WGL context			 */
+    HDC             Device;             /* The window's device context       */
+    HGLRC           Context;            /* The window's WGL context          */
 
 #endif
 };
@@ -242,24 +282,24 @@ struct tagSFG_Context
 typedef struct tagSFG_WindowState SFG_WindowState;
 struct tagSFG_WindowState
 {
-    gint            Width;              /* Window's width in pixels          */
-    gint            Height;             /* The same about the height         */
+    int             Width;              /* Window's width in pixels          */
+    int             Height;             /* The same about the height         */
 
-    gboolean        Redisplay;          /* Do we have to redisplay?          */
-    gboolean        Visible;            /* Is the window visible now         */
+    GLboolean       Redisplay;          /* Do we have to redisplay?          */
+    GLboolean       Visible;            /* Is the window visible now         */
 
-    gint            Cursor;             /* The currently selected cursor     */
-    guint32         Modifiers;          /* The current ALT/SHIFT/CTRL state  */
+    int             Cursor;             /* The currently selected cursor     */
+    int             Modifiers;          /* The current ALT/SHIFT/CTRL state  */
 
-    double          JoystickPollRate;   /* The joystick polling rate         */
-    double          JoystickLastPoll;   /* When the last poll has happened   */
+    long            JoystickPollRate;   /* The joystick polling rate         */
+    long            JoystickLastPoll;   /* When the last poll has happened   */
 
-    gint            MouseX, MouseY;     /* The most recent mouse position    */
+    int             MouseX, MouseY;     /* The most recent mouse position    */
 
-    gboolean        IsGameMode;         /* Is this the game mode window?     */
+    GLboolean       IsGameMode;         /* Is this the game mode window?     */
 
 #if TARGET_HOST_WIN32
-	gboolean		NeedToResize;		/* Do we need to explicitly resize?  */
+    GLboolean       NeedToResize;       /* Do we need to explicitly resize?  */
 #endif
 };
 
@@ -313,13 +353,14 @@ struct tagSFG_WindowCallbacks
 typedef struct tagSFG_Menu SFG_Menu;
 struct tagSFG_Menu
 {
-    gint                ID;                     /* The global menu ID        */
-    GList*              Entries;                /* The menu entries list     */
+    SFG_Node            Node;
+    int                 ID;                     /* The global menu ID        */
+    SFG_List            Entries;                /* The menu entries list     */
     FGCBmenu            Callback;               /* The menu callback         */
-    gboolean            IsActive;               /* Is the menu selected?     */
-    gint                Width;                  /* Menu box width in pixels  */
-    gint                Height;                 /* Menu box height in pixels */
-    gint                X, Y;                   /* Menu box raster position  */
+    GLboolean           IsActive;               /* Is the menu selected?     */
+    int                 Width;                  /* Menu box width in pixels  */
+    int                 Height;                 /* Menu box height in pixels */
+    int                 X, Y;                   /* Menu box raster position  */
 };
 
 /*
@@ -328,12 +369,13 @@ struct tagSFG_Menu
 typedef struct tagSFG_MenuEntry SFG_MenuEntry;
 struct tagSFG_MenuEntry
 {
-    gint                ID;                     /* The menu entry ID (local) */
-    gint                Ordinal;                /* The menu's ordinal number */
-    GString*            Text;                   /* The text to be displayed  */
+    SFG_Node            Node;
+    int                 ID;                     /* The menu entry ID (local) */
+    int                 Ordinal;                /* The menu's ordinal number */
+    char*               Text;                   /* The text to be displayed  */
     SFG_Menu*           SubMenu;                /* Optional sub-menu tree    */
-    gboolean            IsActive;               /* Is the entry highlighted? */
-    gint                Width;                  /* Label's width in pixels   */
+    GLboolean           IsActive;               /* Is the entry highlighted? */
+    int                 Width;                  /* Label's width in pixels   */
 };
 
 /*
@@ -342,17 +384,18 @@ struct tagSFG_MenuEntry
 typedef struct tagSFG_Window SFG_Window;
 struct tagSFG_Window
 {
-    gint                ID;                     /* Window's ID number        */
+    SFG_Node            Node;
+    int                 ID;                     /* Window's ID number        */
 
     SFG_Context         Window;                 /* Window and OpenGL context */
     SFG_WindowState     State;                  /* The window state          */
     SFG_WindowCallbacks Callbacks;              /* The window callbacks      */
 
     SFG_Menu*       Menu[ FREEGLUT_MAX_MENUS ]; /* Menus appended to window  */
-    gboolean  MenuActive[ FREEGLUT_MAX_MENUS ]; /* The menus activity flags  */
+    GLboolean MenuActive[ FREEGLUT_MAX_MENUS ]; /* The menus activity flags  */
 
     SFG_Window*         Parent;                 /* The parent to this window */
-    GList*              Children;               /* The subwindows d.l. list  */
+    SFG_List            Children;               /* The subwindows d.l. list  */
 };
 
 /*
@@ -361,16 +404,16 @@ struct tagSFG_Window
 typedef struct tagSFG_Structure SFG_Structure;
 struct tagSFG_Structure
 {
-    GList*              Windows;                /* The global windows list   */
-    GList*              Menus;                  /* The global menus list     */
+    SFG_List            Windows;                /* The global windows list   */
+    SFG_List            Menus;                  /* The global menus list     */
 
     SFG_Window*         Window;                 /* The currently active win. */
     SFG_Menu*           Menu;                   /* Same, but menu...         */
 
     SFG_Window*         GameMode;               /* The game mode window      */
 
-    gint                WindowID;               /* The new current window ID */
-    gint                MenuID;                 /* The new current menu ID   */
+    int                 WindowID;               /* The new current window ID */
+    int                 MenuID;                 /* The new current menu ID   */
 };
 
 /*
@@ -382,9 +425,10 @@ struct tagSFG_Structure
 typedef struct tagSFG_Enumerator SFG_Enumerator;
 struct tagSFG_Enumerator
 {
-    gboolean    found;                          /* Used to terminate search  */
-    gpointer    data;                           /* Custom data pointer       */
+    GLboolean   found;                          /* Used to terminate search  */
+    void*       data;                           /* Custom data pointer       */
 };
+typedef void (* FGCBenumerator  )( SFG_Window *, SFG_Enumerator * );
 
 /*
  * The bitmap font structure
@@ -392,10 +436,10 @@ struct tagSFG_Enumerator
 typedef struct tagSFG_Font SFG_Font;
 struct tagSFG_Font
 {
-    gchar*          Name;                       /* The source font name      */
-    gint            Quantity;                   /* Number of chars in font   */
-    gint            Height;                     /* Height of the characters  */
-    const guchar**  Characters;                 /* The characters mapping    */
+    char*           Name;                       /* The source font name      */
+    int             Quantity;                   /* Number of chars in font   */
+    int             Height;                     /* Height of the characters  */
+    const GLubyte** Characters;                 /* The characters mapping    */
 };
 
 
@@ -423,7 +467,7 @@ extern SFG_State fgState;
  * A call to this function makes us sure that the Display and Structure
  * subsystems have been properly initialized and are ready to be used
  */
-#define  freeglut_assert_ready                      g_assert( fgState.Timer != NULL );
+#define  freeglut_assert_ready                      assert( fgState.Time.Set );
 
 /*
  * Following definitions are somewhat similiar to GLib's,
@@ -436,15 +480,15 @@ extern SFG_State fgState;
  * A call to those macros assures us that there is a current
  * window and menu set, respectively:
  */
-#define  freeglut_assert_window                     g_assert( fgStructure.Window != NULL );
-#define  freeglut_assert_menu                       g_assert( fgStructure.Menu != NULL );
+#define  freeglut_assert_window                     assert( fgStructure.Window != NULL );
+#define  freeglut_assert_menu                       assert( fgStructure.Menu != NULL );
 
 /*
  * The initialize and deinitialize functions get called on glutInit()
  * and glutMainLoop() end respectively. They should create/clean up
  * everything inside of the freeglut
  */
-void fgInitialize( const gchar* displayName );
+void fgInitialize( const char* displayName );
 void fgDeinitialize( void );
 
 /*
@@ -475,10 +519,10 @@ gboolean fgSetupPixelFormat( SFG_Window* window, gboolean checkOnly );
  * Window creation, opening, closing and destruction.
  * Defined in freeglut_structure.c, freeglut_window.c.
  */
-SFG_Window* fgCreateWindow( SFG_Window* parent, const gchar* title, gint x, gint y, gint w, gint h, gboolean gameMode );
-void        fgOpenWindow( SFG_Window* window, const gchar* title, gint x, gint y, gint w, gint h, gboolean gameMode );
+SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title, int x, int y, int w, int h, GLboolean gameMode );
+void        fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, int h, GLboolean gameMode );
 void        fgCloseWindow( SFG_Window* window );
-void		fgDestroyWindow( SFG_Window* window, gboolean needToClose );
+void        fgDestroyWindow( SFG_Window* window, GLboolean needToClose );
 
 /*
  * Menu creation and destruction. Defined in freeglut_structure.c
@@ -489,7 +533,7 @@ void        fgDestroyMenu( SFG_Menu* menu );
 /*
  * Joystick device management functions, defined in freeglut_joystick.c
  */
-void        fgJoystickInit( gint ident );
+void        fgJoystickInit( int ident );
 void        fgJoystickClose( void );
 void        fgJoystickPollWindow( SFG_Window* window );
 
@@ -505,8 +549,8 @@ void        fgJoystickPollWindow( SFG_Window* window );
  * and userData is the a custom user-supplied pointer. Functions
  * are defined and exported from freeglut_structure.c file.
  */
-void fgEnumWindows( GFunc enumCallback, SFG_Enumerator* enumerator );
-void fgEnumSubWindows( SFG_Window* window, GFunc enumCallback, SFG_Enumerator* enumerator );
+void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator );
+void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback, SFG_Enumerator* enumerator );
 
 /*
  * fgWindowByHandle returns a (SFG_Window *) value pointing to the
@@ -525,20 +569,20 @@ void fgEnumSubWindows( SFG_Window* window, GFunc enumCallback, SFG_Enumerator* e
  * looking for a specified (sub)window identifier. The function
  * is defined in freeglut_structure.c file.
  */
-SFG_Window* fgWindowByID( gint windowID );
+SFG_Window* fgWindowByID( int windowID );
 
 /*
  * Looks up a menu given it's ID. This is easier that fgWindowByXXX
  * as all menus are placed in a single doubly linked list...
  */
-SFG_Menu* fgMenuByID( gint menuID );
+SFG_Menu* fgMenuByID( int menuID );
 
 /*
  * The menu activation and deactivation the code. This is the meat
  * of the menu user interface handling code...
  */
-void fgActivateMenu( gint button );
-void fgDeactivateMenu( gint button );
+void fgActivateMenu( int button );
+void fgDeactivateMenu( int button );
 
 /*
  * This function gets called just before the buffers swap, so that
@@ -553,10 +597,25 @@ void fgDisplayMenu( void );
  */
 void fgDisplayCursor( void );
 
+/*
+ * Elapsed time as per glutGet(GLUT_ELAPSED_TIME).
+ */
+long fgElapsedTime( void );
+
+/*
+ * List functions
+ */
+void fgListInit(SFG_List *list);
+void fgListAppend(SFG_List *list, SFG_Node *node);
+void fgListRemove(SFG_List *list, SFG_Node *node);
+int fgListLength(SFG_List *list);
+
+/*
+ * Error Messages functions
+ */
+void fgError( const char *fmt, ... );
+void fgWarning( const char *fmt, ... );
+
 #endif /* FREEGLUT_INTERNAL_H */
 
 /*** END OF FILE ***/
-
-
-
-

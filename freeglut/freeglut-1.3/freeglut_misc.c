@@ -50,76 +50,54 @@
  */
 int FGAPIENTRY glutExtensionSupported( const char* extension )
 {
-    /*
-     * Grab the current context's OpenGL extensions
-     * and create a new GLib lexical analyzer...
-     */
-    gchar *glExtensions = (gchar *) glGetString( GL_EXTENSIONS );
-    GScanner* scanner = g_scanner_new( NULL );
-    gint i;
+    const char *extensions;
+    const char *ptr;
+    int i;
 
     /*
      * Make sure there is a current window, and thus -- a current context available
      */
-    freeglut_assert_ready; freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
+    freeglut_assert_ready;
+    freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
 
     /*
-     * Fail if there is no extension, extensions or scanner available
+     * Not it is safe to query the extenstions
      */
-    freeglut_return_val_if_fail( (scanner != NULL) && (strlen( extension ) > 0)
-                                          && (strlen( glExtensions ) > 0), 0 );
+    extensions = glGetString(GL_EXTENSIONS);
+
+    freeglut_return_val_if_fail( extensions != NULL, 0 );
 
     /*
      * Check if the extension itself looks valid
      */
-    for( i=0; i<(gint) strlen( extension ); i++ )
+    for( i=0; i<strlen( extension ); i++ )
         if( extension[ i ] == ' ' )
             return( 0 );
 
     /*
-     * Set the scanner's input name (for debugging)
+     * Look for our extension
      */
-    scanner->input_name = "glutExtensionSupported()";
-
-    /*
-     * Start the lexical analysis of the extensions string
-     */
-    g_scanner_input_text( scanner, glExtensions, strlen( glExtensions ) );
-
-    /*
-     * While there are any more tokens to be checked...
-     */
-    while( !g_scanner_eof( scanner ) )
+    for (ptr = extensions; *ptr;)
     {
-        /*
-         * Actually we're expecting only string tokens
-         */
-        GTokenType tokenType = g_scanner_get_next_token( scanner );
+        const char *str = extension;
+        char c;
 
-        /*
-         * We are looking for identifiers
-         */
-        if( tokenType == G_TOKEN_IDENTIFIER )
+        while ( (c = *(str++)) )
         {
-            /*
-             * Compare the token and the extension string
-             */
-            if( strcmp( scanner->value.v_identifier, extension ) == 0 )
-            {
-                /*
-                 * OKi, we have found the extension string we've been looking for
-                 */
-                g_scanner_destroy( scanner );
-                return( 1 );
-            }
+            if (*ptr != c)
+                goto next;
+            ptr++;
         }
+        if ( !(c = *ptr) || c == ' ' )
+            return 1;
+    next:
+        while ( (c = *ptr) && c != ' ' )
+            ptr++;
+        while (*ptr == ' ')
+            ptr++;
     }
 
-    /*
-     * Well, looks like we have failed to find the extension string
-     */
-    g_scanner_destroy( scanner );
-    return( 0 );
+    return 0;
 }
 
 /*
@@ -140,7 +118,7 @@ void FGAPIENTRY glutReportErrors( void )
 #       undef  G_LOG_DOMAIN
 #       define G_LOG_DOMAIN ((gchar *) 0)
 
-        g_warning( "GL error: %s", gluErrorString( error ) );
+        fgWarning( "GL error: %s", gluErrorString( error ) );
 
 #       undef   G_LOG_DOMAIN
 #       define  G_LOG_DOMAIN  "freeglut_misc.c"
@@ -202,7 +180,7 @@ void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
         /*
          * Whoops, this was not expected at all
          */
-        g_assert_not_reached();
+        break;
     }
 
 #endif

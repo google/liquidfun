@@ -123,12 +123,12 @@ void FGAPIENTRY glutWireSphere( GLdouble dRadius, GLint slices, GLint stacks )
 {
     float  radius = (float) dRadius, phi, psi, dpsi, dphi;
     float* vertex;
-    gint   i, j;
+    int    i, j;
 
     /*
      * Allocate the vertices array
      */
-    vertex = g_new0( float, 3 * slices * (stacks - 1) );
+    vertex = calloc( sizeof(float), 3 * slices * (stacks - 1) );
 
     glPushMatrix();
     glScalef( radius, radius, radius );
@@ -183,7 +183,7 @@ void FGAPIENTRY glutWireSphere( GLdouble dRadius, GLint slices, GLint stacks )
         glEnd();
     }
 
-    g_free( vertex );
+    free( vertex );
     glPopMatrix();
 }
 
@@ -194,13 +194,13 @@ void FGAPIENTRY glutSolidSphere( GLdouble dRadius, GLint slices, GLint stacks )
 {
     float  radius = (float) dRadius, phi, psi, dpsi, dphi;
     float *next, *tmp, *row;
-    gint   i, j;
+    int    i, j;
 
     glPushMatrix();
     //glScalef( radius, radius, radius );
 
-    row  = g_new0( float, slices * 3 );
-    next = g_new0( float, slices * 3 );
+    row  = calloc( sizeof(float), slices * 3 );
+    next = calloc( sizeof(float), slices * 3 );
 
     dpsi = M_PI / (stacks + 1);
     dphi = 2 * M_PI / slices;
@@ -294,8 +294,8 @@ void FGAPIENTRY glutSolidSphere( GLdouble dRadius, GLint slices, GLint stacks )
 
     glEnd();
 
-    g_free(row);
-    g_free(next);
+    free(row);
+    free(next);
     glPopMatrix();
 }
 
@@ -308,12 +308,12 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
     float  angle = (float) M_PI / (float) slices * 2.0f;
     float  slope = (float) tan( height / base );
     float* vertices = NULL;
-    gint   i, j;
+    int    i, j;
 
     /*
      * We need 'slices' points on a circle
      */
-    vertices = g_new0( float, 2 * (slices + 1) );
+    vertices = calloc( sizeof(float), 2 * (slices + 1) );
 
     for( i=0; i<slices+1; i++ )
     {
@@ -387,12 +387,12 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
     float  angle = (float) M_PI / (float) slices * 2.0f;
     float  slope = (float) tan( height / base );
     float* vertices = NULL;
-    gint   i, j;
+    int    i, j;
 
     /*
      * We need 'slices' points on a circle
      */
-    vertices = g_new0( float, 2 * (slices + 1) );
+    vertices = calloc( sizeof(float), 2 * (slices + 1) );
 
     for( i=0; i<slices+1; i++ )
     {

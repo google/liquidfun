@@ -31,11 +31,11 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <glib.h>
 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 /*
  * Define the log domain
@@ -46,13 +46,13 @@
 /*
  * The alphabet we want to export.
  */
-gchar* g_Alphabet = " abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789`~!@#$%^&*()-_=+[{}];:,.<>/?\\\"";
-gint   g_AlphabetLength = 0;
+char* g_Alphabet = " abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789`~!@#$%^&*()-_=+[{}];:,.<>/?\\\"";
+int   g_AlphabetLength = 0;
 
 /*
  * All undefined characters will get replaced by this one:
  */
-gchar  g_NoChar = '*';
+char  g_NoChar = '*';
 
 /*
  * The stream we want to redirect our output to
@@ -65,9 +65,14 @@ FILE*  g_Output = NULL;
 Display* g_Display;
 
 /*
+ * Our argv[0]
+ */
+char *g_ProgName = "";
+
+/*
  * This function outputs the font file prologue
  */
-void OutputPrologue( gchar* fileName )
+void OutputPrologue( char* fileName )
 {
     /*
      * Output the copyright and permission notices:
@@ -98,13 +103,13 @@ void OutputPrologue( gchar* fileName )
 /*
  * This function outputs a font set
  */
-void OutputFont( gchar* freeglutFontName, gchar* fontName )
+void OutputFont( char* freeglutFontName, char* fontName )
 {
-    gint character, lineWidth, maxWidth = 0, maxHeight = 0;
+    int character, lineWidth, maxWidth = 0, maxHeight = 0;
     XFontStruct* fontStruct = NULL;
     XGCValues contextValues;
     XImage* image = NULL;
-    guchar* lineBuffer;
+    unsigned char* lineBuffer;
     Pixmap buffer;
     GC context;
 
@@ -118,7 +123,9 @@ void OutputFont( gchar* freeglutFontName, gchar* fontName )
         /*
          * Whoops, the font was not found
          */
-        g_error( "couldn't get font `%s' using local display", fontName );
+        fprintf( stderr, "%s: couldn't get font `%s' using local display\n",
+		g_ProgName, fontName );
+	exit( 1 );
     }
 
     /*
@@ -130,7 +137,7 @@ void OutputFont( gchar* freeglutFontName, gchar* fontName )
     /*
      * Allocate the line buffer for storing the font bitmap lines
      */
-    lineBuffer = g_new0( guchar, maxWidth );
+    lineBuffer = malloc( maxWidth );
 
     /*
      * Create a pixmap buffer where we'll be rendering our fonts to.
@@ -163,7 +170,7 @@ void OutputFont( gchar* freeglutFontName, gchar* fontName )
      */
     for( character=0; character<g_AlphabetLength; character++ )
     {
-        gint x, y, start_x, stop_x;
+        int x, y, start_x, stop_x;
 
         /*
          * Clear the context black (0 is black in our case)...
@@ -229,8 +236,8 @@ void OutputFont( gchar* freeglutFontName, gchar* fontName )
         /*
          * Output the character we have just grabbed
          */
-        fprintf( g_Output, "static const guchar %s_Character_%03i[] = {%3i",
-            freeglutFontName, (gint) g_Alphabet[ character ], stop_x-start_x
+        fprintf( g_Output, "static const GLubyte %s_Character_%03i[] = {%3i",
+            freeglutFontName, (int) g_Alphabet[ character ], stop_x-start_x
         );
 
         for( y=maxHeight-1; y>=0; y-- )
@@ -266,33 +273,33 @@ void OutputFont( gchar* freeglutFontName, gchar* fontName )
      * Now we are ready to output the final data concerning the font charset
      */
     fprintf( g_Output, "\n/* The font characters mapping: */\n" );
-    fprintf( g_Output, "static const guchar* %s_Character_Map[] = {", freeglutFontName );
+    fprintf( g_Output, "static const GLubyte* %s_Character_Map[] = {", freeglutFontName );
 
     /*
      * I have decided to change the characters mapping a bit...
      */
     for( character=1; character<256; character++ )
     {
-	gchar ourCharacter[ 2 ] = { 0, 0 };
+	char ourCharacter[ 2 ] = { 0, 0 };
 	
 	/*
 	 * Do we have the character defined or not?
 	 */
-	ourCharacter[ 0 ] = (gchar) character;
+	ourCharacter[ 0 ] = (char) character;
 	 
 	if( strstr( g_Alphabet, ourCharacter ) == NULL )
 	{
 	    /*
 	     * Nope, output the g_NoChar character instead:
 	     */
-	    fprintf( g_Output, "%s_Character_%03i,", freeglutFontName, (gint) g_NoChar ); 	
+	    fprintf( g_Output, "%s_Character_%03i,", freeglutFontName, (int) g_NoChar ); 	
 	}
 	else
 	{
 	    /*
 	     * Otherwise we're welcome to output the character:
 	     */
-    	    fprintf( g_Output, "%s_Character_%03i,", freeglutFontName, (gint) ourCharacter[ 0 ] );
+    	    fprintf( g_Output, "%s_Character_%03i,", freeglutFontName, (int) ourCharacter[ 0 ] );
 	}
     }
 	
@@ -311,7 +318,7 @@ void OutputFont( gchar* freeglutFontName, gchar* fontName )
      */
     XFreeGC( g_Display, context );
     XFreePixmap( g_Display, buffer );
-    g_free( lineBuffer );
+    free( lineBuffer );
 }
 
 /*
@@ -328,16 +335,16 @@ void OutputEpilogue( void )
  */
 int main( int argc, char** argv )
 {
-    gchar ourCharacter[ 2 ] = { 0, 0 };
-    gchar* outputFileName = NULL;
-    gchar* displayName = NULL;
-    gint i = 1;
+    char ourCharacter[ 2 ] = { 0, 0 };
+    char* outputFileName = NULL;
+    char* displayName = NULL;
+    int i = 1;
 
     /*
      * The fonts that are going to be rasterized and added to the output file:
      */
-    gint   fontsQuantity = 7;
-    gchar* fontsList[] = {
+    int   fontsQuantity = 7;
+    char* fontsList[] = {
         "Fixed8x13",    "-misc-fixed-medium-r-normal--13-120-75-75-C-80-iso8859-1",
         "Fixed9x15",    "-misc-fixed-medium-r-normal--15-140-75-75-C-90-iso8859-1",
         "Helvetica10",  "-adobe-helvetica-medium-r-normal--10-100-75-75-p-56-iso8859-1",
@@ -346,6 +353,8 @@ int main( int argc, char** argv )
         "TimesRoman10", "-adobe-times-medium-r-normal--10-100-75-75-p-54-iso8859-1",
         "TimesRoman24", "-adobe-times-medium-r-normal--24-240-75-75-p-124-iso8859-1"
     };
+
+    g_ProgName = argv[0];
 
     /*
      * Initialize the alphabet's length
@@ -358,17 +367,21 @@ int main( int argc, char** argv )
     ourCharacter[ 0 ] = g_NoChar;
 	 
     if( strstr( g_Alphabet, ourCharacter ) == NULL )
-	g_error( "the g_NoChar `%c' character not found in the alphabet `%s'", g_NoChar, g_Alphabet );
+    {
+	fprintf( stderr, "%s the g_NoChar `%c' character not found in the alphabet `%s'\n",
+                 g_ProgName, g_NoChar, g_Alphabet );
+        exit( 1 );
+    }
  
     /*
      * Grab the display name to be used
      */
-    displayName = g_strdup( (gchar *) g_getenv( "DISPLAY" ) );
+    displayName = strdup( getenv( "DISPLAY" ) );
 
     /*
      * Define the default output file name
      */
-    outputFileName = g_strdup( "freeglut_font_data.c" );
+    outputFileName = strdup( "freeglut_font_data.c" );
 
     /*
      * Process the command line arguments now. Command line arguments expected:
@@ -381,25 +394,25 @@ int main( int argc, char** argv )
         /*
          * See what the current token is
          */
-        if( g_strcasecmp( argv[ i ], "-display" ) == 0 )
+        if( strcasecmp( argv[ i ], "-display" ) == 0 )
         {
-            g_assert( (i + 1) < argc );
-            g_free( displayName );
+            assert( (i + 1) < argc );
+            free( displayName );
 
             /*
              * The next token is expected to contain the X display name to use
              */
-            displayName = g_strdup( (gchar *) argv[ ++i ] );
+            displayName = strdup( argv[ ++i ] );
         }
-        else if( g_strcasecmp( argv[ i ], "-file" ) == 0 )
+        else if( strcasecmp( argv[ i ], "-file" ) == 0 )
         {
-            g_assert( (i + 1) < argc );
-            g_free( outputFileName );
+            assert( (i + 1) < argc );
+            free( outputFileName );
 
             /*
              * The next token is expected to contain the destination file name
              */
-            outputFileName = g_strdup( (gchar *) argv[ ++i ] );
+            outputFileName = strdup( argv[ ++i ] );
         }
 
         /*
@@ -412,13 +425,13 @@ int main( int argc, char** argv )
      * Connect to the X display
      */
     g_Display = XOpenDisplay( displayName );
-    g_assert( g_Display != NULL );
+    assert( g_Display != NULL );
 
     /*
      * Have the destination file opened
      */
     g_Output = fopen( outputFileName, "wt" );
-    g_assert( g_Output != NULL );
+    assert( g_Output != NULL );
 
     /*
      * Output the file header first
@@ -461,8 +474,8 @@ int main( int argc, char** argv )
     /*
      * Clean up all the rest of the mess
      */
-    g_free( outputFileName );
-    g_free( displayName );
+    free( outputFileName );
+    free( displayName );
 
     /*
      * Return successful!

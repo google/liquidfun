@@ -100,7 +100,7 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
     /*
      * Create a new freeglut timer hook structure
      */
-    timer = g_new0( SFG_Timer, 1 );
+    timer = calloc( sizeof(SFG_Timer), 1 );
 
     /*
      * Remember the callback address and timer hook's ID
@@ -111,13 +111,12 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
     /*
      * When will the time out happen (in terms of window's timer)
      */
-    timer->TriggerTime =
-        g_timer_elapsed( fgState.Timer, NULL ) + (((double) timeOut) / 1000.0);
+    timer->TriggerTime = fgElapsedTime() + timeOut;
 
     /*
      * Have the new hook attached to the current window
      */
-    fgState.Timers = g_list_append( fgState.Timers, timer );
+    fgListAppend( &fgState.Timers, &timer->Node );
 }
 
 /*
@@ -126,7 +125,7 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
  * I had to peer to GLUT sources to clean up the mess.
  * Can anyone please explain me what is going on here?!?
  */
-static void fghVisibility( gint status )
+static void fghVisibility( int status )
 {
     freeglut_assert_ready; freeglut_return_if_fail( fgStructure.Window != NULL );
     freeglut_return_if_fail( fgStructure.Window->Callbacks.Visibility != NULL );
@@ -175,13 +174,13 @@ void FGAPIENTRY glutJoystickFunc( void (* callback)( unsigned int, int, int, int
     /*
      * Do not forget setting the joystick poll rate
      */
-    fgStructure.Window->State.JoystickPollRate = ((double) pollInterval) / 1000.0;
+    fgStructure.Window->State.JoystickPollRate = pollInterval;
 
     /*
      * Make sure the joystick polling routine gets called as early as possible:
      */
     fgStructure.Window->State.JoystickLastPoll =
-        g_timer_elapsed( fgState.Timer, NULL ) - fgStructure.Window->State.JoystickPollRate;
+        fgElapsedTime() - fgStructure.Window->State.JoystickPollRate;
 
     if( fgStructure.Window->State.JoystickLastPoll < 0.0 )
         fgStructure.Window->State.JoystickLastPoll = 0.0;

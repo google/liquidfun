@@ -103,7 +103,7 @@ void fghRestoreState( void )
 #   ifdef X_XF86VidModeGetAllModeLines
 
     XF86VidModeModeInfo** displayModes;
-    gint i, displayModesCount;
+    int i, displayModesCount;
 
     /*
      * Query for all the display available...
@@ -154,7 +154,7 @@ void fghRestoreState( void )
 /*
  * Checks the display mode settings against user's preferences
  */
-gboolean fghCheckDisplayMode( gint width, gint height, gint depth, gint refresh )
+GLboolean fghCheckDisplayMode( int width, int height, int depth, int refresh )
 {
     /*
      * The desired values should be stored in fgState structure...
@@ -166,7 +166,7 @@ gboolean fghCheckDisplayMode( gint width, gint height, gint depth, gint refresh 
 /*
  * Changes the current display mode to match user's settings
  */
-gboolean fghChangeDisplayMode( gboolean haveToTest )
+GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 {
 #if TARGET_HOST_UNIX_X11
 
@@ -176,7 +176,7 @@ gboolean fghChangeDisplayMode( gboolean haveToTest )
 #   ifdef X_XF86VidModeGetAllModeLines
 
     XF86VidModeModeInfo** displayModes;
-    gint i, displayModesCount;
+    int i, displayModesCount;
 
     /*
      * Query for all the display available...
@@ -267,7 +267,7 @@ gboolean fghChangeDisplayMode( gboolean haveToTest )
      */
     if( mode != 0xffffffff )
     {
-        gint retVal = DISP_CHANGE_SUCCESSFUL;
+        int retVal = DISP_CHANGE_SUCCESSFUL;
 
         /*
          * Mark the values we want to modify in the display change call
@@ -310,9 +310,9 @@ gboolean fghChangeDisplayMode( gboolean haveToTest )
 /*
  * Sets the game mode display string
  */
-void FGAPIENTRY glutGameModeString( const gchar* string )
+void FGAPIENTRY glutGameModeString( const char* string )
 {
-    gint width = 640, height = 480, depth = 16, refresh = 72;
+    int width = 640, height = 480, depth = 16, refresh = 72;
 
     /*
      * This one seems a bit easier than glutInitDisplayString. The bad thing
@@ -327,7 +327,7 @@ void FGAPIENTRY glutGameModeString( const gchar* string )
                     if( sscanf( string, ":%i@%i", &depth, &refresh ) != 2 )
                         if( sscanf( string, ":%i", &depth ) != 1 )
                             if( sscanf( string, "@%i", &refresh ) != 1 )
-                                g_warning( "unable to parse game mode string `%s'", string );
+                                fgWarning( "unable to parse game mode string `%s'", string );
 
     /*
      * Hopefully it worked, and if not, we still have the default values
@@ -366,7 +366,7 @@ int FGAPIENTRY glutEnterGameMode( void )
      */
     if( fghChangeDisplayMode( FALSE ) == FALSE )
     {
-        g_warning( "failed to change screen settings" );
+	fgWarning( "failed to change screen settings" );
         return( FALSE );
     }
 
@@ -502,6 +502,8 @@ int FGAPIENTRY glutGameModeGet( GLenum eWhat )
          */
         return( fgStructure.GameMode != NULL );
     }
+
+    return( -1 );
 }
 
 /*** END OF FILE ***/

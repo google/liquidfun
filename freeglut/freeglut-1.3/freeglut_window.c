@@ -65,10 +65,10 @@
 #if TARGET_HOST_UNIX_X11
 XVisualInfo* fgChooseVisual( void )
 {
-    gint bufferSize[] = { 16, 12, 8, 4, 2, 1 };
-    gboolean wantIndexedMode = FALSE;
-    gint attributes[ 32 ];
-    gint where = 0;
+    int bufferSize[] = { 16, 12, 8, 4, 2, 1 };
+    GLboolean wantIndexedMode = FALSE;
+    int attributes[ 32 ];
+    int where = 0;
 
     /*
      * First we have to process the display mode settings...
@@ -300,14 +300,14 @@ gboolean fgSetupPixelFormat( SFG_Window* window, gboolean checkOnly )
  * Opens a window. Requires a SFG_Window object created and attached
  * to the freeglut structure. OpenGL context is created here.
  */
-void fgOpenWindow( SFG_Window* window, const gchar* title, gint x, gint y, gint w, gint h, gboolean gameMode )
+void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, int h, GLboolean gameMode )
 {
 #if TARGET_HOST_UNIX_X11
     XSetWindowAttributes winAttr;
     XTextProperty textProperty;
     XSizeHints sizeHints;
     XWMHints wmHints;
-    guint32 mask;
+    unsigned long mask;
 
     freeglut_assert_ready;
 
@@ -315,7 +315,7 @@ void fgOpenWindow( SFG_Window* window, const gchar* title, gint x, gint y, gint 
      * Here we are upon the stage. Have the visual selected.
      */
     window->Window.VisualInfo = fgChooseVisual();
-    g_assert( window->Window.VisualInfo != NULL );
+    assert( window->Window.VisualInfo != NULL );
 
     /*
      * Have the windows attributes set
@@ -368,7 +368,7 @@ void fgOpenWindow( SFG_Window* window, const gchar* title, gint x, gint y, gint 
      * Make sure the context is direct when the user wants it forced
      */
     if( fgState.ForceDirectContext && !glXIsDirect( fgDisplay.Display, window->Window.Context ) )
-        g_error( "unable to force direct context rendering for window '%s'", title );
+        fgError( "unable to force direct context rendering for window '%s'", title );
 
     /*
      * Set the new context as the current one. That's all about the window creation.
@@ -624,7 +624,7 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     /*
      * Fail if the parent has not been found
      */
-    g_return_val_if_fail( parent != NULL, 0 );
+    freeglut_return_val_if_fail( parent != NULL, 0 );
 
     /*
      * Create the new window
@@ -687,7 +687,7 @@ void FGAPIENTRY glutSetWindow( int ID )
         /*
          * ...issue a warning message and keep rolling on
          */
-        g_warning( "glutSetWindow(): window ID %i not found!", ID );
+        fgWarning( "glutSetWindow(): window ID %i not found!", ID );
         return;
     }
 
