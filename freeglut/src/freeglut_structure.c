@@ -199,7 +199,7 @@ void fgAddToWindowDestroyList( SFG_Window* window )
      * to ensure that they are no longer called after this point.
      */
     {
-        void *destroy = FETCH_WCB( *window, Destroy );
+        FGCBDestroy destroy = FETCH_WCB( *window, Destroy );
         fgClearCallBacks( window );
         SET_WCB( *window, Destroy, destroy );
     }
@@ -308,7 +308,6 @@ void fgDestroyMenu( SFG_Menu* menu )
 {
     SFG_Window *window;
     SFG_Menu *from;
-    SFG_MenuEntry *entry;
 
     assert( menu );
     freeglut_assert_ready;
@@ -345,8 +344,10 @@ void fgDestroyMenu( SFG_Menu* menu )
      * Now we are pretty sure the menu is not used anywhere
      * and that we can remove all of its entries
      */
-    while( entry = ( SFG_MenuEntry * )menu->Entries.First )
+    while( menu->Entries.First )
     {
+        SFG_MenuEntry *entry = ( SFG_MenuEntry * ) menu->Entries.First;
+
         fgListRemove( &menu->Entries, &entry->Node );
 
         if( entry->Text )
@@ -354,7 +355,6 @@ void fgDestroyMenu( SFG_Menu* menu )
         entry->Text = NULL;
 
         free( entry );
-        entry = NULL;
     }
 
     if( fgStructure.Window == menu->Window )
@@ -582,10 +582,9 @@ void fgListInit(SFG_List *list)
 
 void fgListAppend(SFG_List *list, SFG_Node *node)
 {
-    SFG_Node *ln;
-
-    if ( ln = (SFG_Node *)list->Last )
+    if ( list->Last )
     {
+        SFG_Node *ln = (SFG_Node *) list->Last;
         ln->Next = node;
         node->Prev = ln;
     }
@@ -603,9 +602,9 @@ void fgListRemove(SFG_List *list, SFG_Node *node)
 {
     SFG_Node *ln;
 
-    if( ln = (SFG_Node *)node->Next )
+    if( (ln = (SFG_Node *)node->Next) != NULL )
         ln->Prev = node->Prev;
-    if( ln = (SFG_Node *)node->Prev )
+    if( (ln = (SFG_Node *)node->Prev) != NULL )
         ln->Next = node->Next;
     if( (ln = (SFG_Node *)list->First) == node )
         list->First = node->Next;
