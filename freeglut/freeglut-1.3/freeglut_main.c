@@ -72,7 +72,7 @@ static void fghRedrawWindowByHandle
     /*
      * Return if the window is not visible
      */
-    freeglut_return_if_fail( window->State.Visible != TRUE );
+    freeglut_return_if_fail( window->State.Visible == TRUE );
 
     /*
      * Set the window as the current one. Calling glutSetWindow()
@@ -139,9 +139,8 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
     /*
      * Check if there is an idle callback hooked
      */
-#   warning there is a redisplay hack here (see the code commented out)
     if( (window->Callbacks.Display != NULL) &&
-        /*(window->State.Redisplay == TRUE) &&*/
+        (window->State.Redisplay == TRUE) &&
         (window->State.Visible == TRUE) )
     {
         /*
@@ -369,6 +368,7 @@ void FGAPIENTRY glutMainLoop( void )
 #if TARGET_HOST_UNIX_X11
     SFG_Window* window;
     XEvent event;
+    int modifiers;
 
     /*
      * This code was repeated constantly, so here it goes into a definition:
@@ -672,7 +672,14 @@ void FGAPIENTRY glutMainLoop( void )
                     /*
                      * Remember the current modifiers state
                      */
-                    window->State.Modifiers = event.xbutton.state;
+                    modifiers = 0;
+                    if (event.xbutton.state & (ShiftMask|LockMask))
+                        modifiers |= GLUT_ACTIVE_SHIFT;
+                    if (event.xbutton.state & ControlMask)
+                        modifiers |= GLUT_ACTIVE_CTRL;
+                    if (event.xbutton.state & Mod1Mask)
+                        modifiers |= GLUT_ACTIVE_ALT;
+                    window->State.Modifiers = modifiers;
 
                     /*
                      * Finally execute the mouse callback
@@ -731,7 +738,14 @@ void FGAPIENTRY glutMainLoop( void )
                                 /*
                                  * Remember the current modifiers state
                                  */
-                                window->State.Modifiers = event.xkey.state;
+                                modifiers = 0;
+                                if (event.xkey.state & (ShiftMask|LockMask))
+                                    modifiers |= GLUT_ACTIVE_SHIFT;
+                                if (event.xkey.state & ControlMask)
+                                    modifiers |= GLUT_ACTIVE_CTRL;
+                                if (event.xkey.state & Mod1Mask)
+                                    modifiers |= GLUT_ACTIVE_ALT;
+                                window->State.Modifiers = modifiers;
 
                                 /*
                                  * Execute the callback
@@ -784,17 +798,24 @@ void FGAPIENTRY glutMainLoop( void )
                              */
                             if( (window->Callbacks.Special != NULL) && (special != -1) )
                             {
-                                 /*
-                                  * Remember the current modifiers state
-                                  */
-                                 window->State.Modifiers = event.xkey.state;
+                                /*
+                                 * Remember the current modifiers state
+                                 */
+                                modifiers = 0;
+                                if (event.xkey.state & (ShiftMask|LockMask))
+                                    modifiers |= GLUT_ACTIVE_SHIFT;
+                                if (event.xkey.state & ControlMask)
+                                    modifiers |= GLUT_ACTIVE_CTRL;
+                                if (event.xkey.state & Mod1Mask)
+                                    modifiers |= GLUT_ACTIVE_ALT;
+                                window->State.Modifiers = modifiers;
 
-                                 window->Callbacks.Special( special, event.xkey.x, event.xkey.y );
+                                window->Callbacks.Special( special, event.xkey.x, event.xkey.y );
 
-                                 /*
-                                  * Trash the modifiers state
-                                  */
-                                 window->State.Modifiers = 0xffffffff;
+                                /*
+                                 * Trash the modifiers state
+                                 */
+                                window->State.Modifiers = 0xffffffff;
                             }
                         }
                     }
