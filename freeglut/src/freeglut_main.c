@@ -824,26 +824,15 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         GETWINDOW( xbutton ); GETMOUSE( xbutton );
 
-        /*
-         * GLUT API assumes that you can't have more than three mouse buttons, so:
-         */
-        switch( event.xbutton.button )
-        {
-        /*
-         * WARNING: this might be wrong, if we only have two mouse buttons,
-         *          Button2 might mean the right button, isn't that right?
-         */
-        case Button1:   button = GLUT_LEFT_BUTTON;   break;
-        case Button2:   button = GLUT_MIDDLE_BUTTON; break;
-        case Button3:   button = GLUT_RIGHT_BUTTON;  break;
-        default:        button = -1;                 break;
-        }
-
-        /*
-         * Skip the unwanted mouse buttons...
-         */
-        if( button == -1 )
-          break;
+	/*
+	 * An X button (at least in XFree86) is numbered from 1.
+	 * A GLUT button is numbered from 0.
+	 * Old GLUT passed through buttons other than just the first
+	 * three, though it only gave symbolic names and official
+	 * support to the first three.
+	 *
+	 */
+	button = event.xbutton.button - 1;
 
         /*
          * Do not execute the application's mouse callback if a menu is hooked to this button.
@@ -891,7 +880,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * No active menu, let's check whether we need to activate one.
          */
-        if ( ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
+        if (( 0 <= button ) && ( 2 >= button ) &&
+	    ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
         {
           /*
            * Let's make the window redraw as a result of the mouse click.
