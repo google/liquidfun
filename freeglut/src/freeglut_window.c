@@ -64,8 +64,6 @@
  */
 #if TARGET_HOST_UNIX_X11
 
-#include "mwmborder.c" /* Brian Paul's decoration-zapping code. */
-
 XVisualInfo* fgChooseVisual( void )
 {
     int bufferSize[] = { 16, 12, 8, 4, 2, 1 };

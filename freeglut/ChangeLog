@@ -263,3 +263,8 @@ October 24, 2002:
 *******************************************************************************************
 
 (97) src/freeglut_main.c:816 and :1571, set the current window (John F. Fay)
+
+(98) src/Makefile.am:34 Added mwmborder.c
+
+(99) src/freeglut_window.c:67  Removed #included "mwmborder.c"
+

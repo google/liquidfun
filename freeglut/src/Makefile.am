@@ -30,7 +30,8 @@ libglut_la_SOURCES = freeglut_callbacks.c \
 			 freeglut_structure.c \
 			 freeglut_teapot.c \
 			 freeglut_videoresize.c \
-			 freeglut_window.c
+			 freeglut_window.c \
+             mwmborder.c
 
 #
 # Additional linker flags
