@@ -95,19 +95,32 @@ void FGAPIENTRY glutIdleFunc( void (* callback)( void ) )
 void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ),
                                int timerID )
 {
-    SFG_Timer* timer;
+    SFG_Timer *timer, *node;
 
     freeglut_assert_ready;
 
-    timer = (SFG_Timer *)calloc( sizeof(SFG_Timer), 1 );
-    if( !timer )
-        fgError( "Fatal error: "
-                 "Memory allocation failure in glutTimerFunc()\n" );
+    if( (timer = fgState.FreeTimers.Last) )
+    {
+        fgListRemove( &fgState.FreeTimers, &timer->Node );
+    }
+    else
+    {
+        if( ! (timer = malloc(sizeof(SFG_Timer))) )
+            fgError( "Fatal error: "
+                     "Memory allocation failure in glutTimerFunc()\n" );
+    }
 
     timer->Callback  = callback;
     timer->ID        = timerID;
     timer->TriggerTime = fgElapsedTime() + timeOut;
-    fgListAppend( &fgState.Timers, &timer->Node );
+
+    for( node = fgState.Timers.First; node; node = node->Node.Next )
+    {
+        if( node->TriggerTime > timer->TriggerTime )
+            break;
+    }
+
+    fgListInsert( &fgState.Timers, &node->Node, &timer->Node );
 }
 
 /*
