@@ -100,7 +100,7 @@ void FGAPIENTRY glutSwapBuffers( void )
         if (fgState.SwapTime == 0)
             fgState.SwapTime = t;
         else if (t - fgState.SwapTime > fgState.FPSInterval) {
-            float time = 0.001 * (t - fgState.SwapTime);
+            float time = 0.001f * (t - fgState.SwapTime);
             float fps = (float) fgState.SwapCount / time;
             fprintf(stderr, "freeglut: %d frames in %.2f seconds = %.2f FPS\n",
                     fgState.SwapCount, time, fps);

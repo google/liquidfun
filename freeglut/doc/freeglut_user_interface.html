@@ -1065,7 +1065,7 @@ is not implemented in <i>freeglut</i>. </p>
                                       
 
 <p>
-The following state variables may be queried with glutGet.
+The following state variables may be queried with "<tt>glutGet</tt>".
 The returned value is an integer.
 </p>
 
@@ -1134,7 +1134,7 @@ These queries do not depend on the current window.
                                       
                                   <h2> 13.7&nbsp; glutGetProcAddress</h2>
                                   <p><tt>glutGetProcAddress</tt> returns
-a pointer to a named GL or freeglut function. </p>
+a pointer to a named GL or <i>freeglut</i> function. </p>
                                   <p><b>Usage</b></p>
                                   <p><tt>void *glutGetProcAddress ( const
 char *procName ) ;</tt></p>
@@ -1150,8 +1150,11 @@ the application will avoid this hard dependency and be more portable and interop
 better with various implementations of OpenGL. </p>
                                   <p> Both OpenGL functions and freeglut
 functions can be queried with this function. </p>
-                                  <p><b>NOTE</b>: this function is not supported
-in GLUT. </p>
+                                  <p><b>Changes From GLUT</b> </p>
+                                   
+                                  <p>GLUT does not include this function.
+                                   </p>
+                                   
                                   <h1> 14.0&nbsp;<a name="FontRendering"></a>
   Font Rendering Functions</h1>
   <i>Freeglut</i> supports two types of font rendering:&nbsp; bitmap fonts,
@@ -1872,15 +1875,17 @@ GLUT State</h1>
                                       
 
 <p>
-freeglut users should normally just include GL/glut.h in their programs.
-Programs which need freeglut-specific functions should also include
-GL/freeglut_ext.h as follows:
+Application programmers who are porting their GLUT programs to <i>freeglut</i> may continue
+to include <tt>&lt;GL/glut.h&gt;</tt> in their programs.
+Programs which use the <i>freeglut</i>-specific extensions to GLUT should include
+<tt>&lt;GL/freeglut.h&gt;</tt>.  One possible arrangement is as follows:
 </p>
 
 <pre>
-#include &lt;GL/glut.h&gt;
 #ifdef FREEGLUT
 #include &lt;GL/freeglut_ext.h&gt;
+#else
+#include &lt;GL/glut.h&gt;
 #endif
 </pre>
 

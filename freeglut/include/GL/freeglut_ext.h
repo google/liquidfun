@@ -46,7 +46,9 @@
 
 #define  GLUT_WINDOW_BORDER_WIDTH           0x01FA
 #define  GLUT_WINDOW_HEADER_HEIGHT          0x01FB
+
 #define  GLUT_VERSION                       0x01FC
+
 /*
  * Process loop function, see freeglut_main.c
  */
@@ -84,8 +86,8 @@ FGAPI void    FGAPIENTRY glutStrokeString( void* font, const char *string );
  */
 FGAPI void    FGAPIENTRY glutWireRhombicDodecahedron( void );
 FGAPI void    FGAPIENTRY glutSolidRhombicDodecahedron( void );
-FGAPI void    FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLfloat offset[3], GLfloat scale ) ;
-FGAPI void    FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLfloat offset[3], GLfloat scale ) ;
+FGAPI void    FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale ) ;
+FGAPI void    FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale ) ;
 
 /*
  * Extension functions, see freeglut_ext.c

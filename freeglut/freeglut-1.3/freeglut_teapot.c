@@ -80,9 +80,6 @@
 
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
-#ifdef TARGET_HOST_WIN32
-#pragma warning ( once:4305 )
-#endif
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
@@ -104,7 +101,7 @@ static int patchdata[][16] =
     {  80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95 }
 };
 
-static float cpdata[][3] =
+static double cpdata[][3] =
 {
     {0.2, 0, 2.7}, {0.2, -0.112, 2.7}, {0.112, -0.2, 2.7}, {0,
     -0.2, 2.7}, {1.3375, 0, 2.53125}, {1.3375, -0.749, 2.53125},
@@ -149,15 +146,15 @@ static float cpdata[][3] =
     {0.84, -1.5, 0.075}
 };
 
-static float tex[2][2][2] =
+static double tex[2][2][2] =
 {
-    { {0, 0}, {1, 0} },
-    { {0, 1}, {1, 1} }
+    { {0.0, 0.0}, {1.0, 0.0} },
+    { {0.0, 1.0}, {1.0, 1.0} }
 };
 
 static void teapot( GLint grid, GLdouble scale, GLenum type )
 {
-    float p[4][4][3], q[4][4][3], r[4][4][3], s[4][4][3];
+    double p[4][4][3], q[4][4][3], r[4][4][3], s[4][4][3];
     long i, j, k, l;
 
     glPushAttrib( GL_ENABLE_BIT | GL_EVAL_BIT );
@@ -167,9 +164,9 @@ static void teapot( GLint grid, GLdouble scale, GLenum type )
     glEnable( GL_MAP2_TEXTURE_COORD_2 );
 
     glPushMatrix();
-    glRotatef(270.0, 1.0, 0.0, 0.0);
+    glRotated(270.0, 1.0, 0.0, 0.0);
     glScaled(0.5 * scale, 0.5 * scale, 0.5 * scale);
-    glTranslatef(0.0, 0.0, -1.5);
+    glTranslated(0.0, 0.0, -1.5);
 
     for (i = 0; i < 10; i++) {
       for (j = 0; j < 4; j++) {
@@ -194,20 +191,20 @@ static void teapot( GLint grid, GLdouble scale, GLenum type )
         }
       }
 
-      glMap2f(GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2,
+      glMap2d(GL_MAP2_TEXTURE_COORD_2, 0.0, 1.0, 2, 2, 0.0, 1.0, 4, 2,
         &tex[0][0][0]);
-      glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4,
+      glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
         &p[0][0][0]);
-      glMapGrid2f(grid, 0.0, 1.0, grid, 0.0, 1.0);
+      glMapGrid2d(grid, 0.0, 1.0, grid, 0.0, 1.0);
       glEvalMesh2(type, 0, grid, 0, grid);
-      glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4,
+      glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
         &q[0][0][0]);
       glEvalMesh2(type, 0, grid, 0, grid);
       if (i < 6) {
-        glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4,
+        glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
           &r[0][0][0]);
         glEvalMesh2(type, 0, grid, 0, grid);
-        glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4,
+        glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
           &s[0][0][0]);
         glEvalMesh2(type, 0, grid, 0, grid);
       }

@@ -75,7 +75,7 @@ void fghRememberState( void )
 
 #elif TARGET_HOST_WIN32
 
-    DEVMODE devMode;
+/*    DEVMODE devMode; */
 
     /*
      * Grab the current desktop settings...
@@ -250,7 +250,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 
     unsigned int    displayModes = 0, mode = 0xffffffff;
     GLboolean success = FALSE;
-    HDC      desktopDC;
+/*    HDC      desktopDC; */
     DEVMODE  devMode;
 
     /*
@@ -278,33 +278,33 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         displayModes++;
     }
 
-    if( mode == 0xffffffff )
+    if ( mode == 0xffffffff )
     {
       /* then try without Display Frequency */
-      displayModes=0;
+      displayModes = 0;
 
       /*
        * Enumerate the available display modes
        */
       while( EnumDisplaySettings( NULL, displayModes, &devMode ) == TRUE )
-	{
-	  /* then try without Display Frequency */
+      {
+        /* then try without Display Frequency */
+
+        if( fghCheckDisplayMode( devMode.dmPelsWidth,  devMode.dmPelsHeight,
+                                 devMode.dmBitsPerPel, fgState.GameModeRefresh))
+        {
+          /*
+           * OKi, we've found a matching display mode, remember its number and break
+           */
+          mode = displayModes;
+          break;
+        }
 	
-	  if( fghCheckDisplayMode( devMode.dmPelsWidth,  devMode.dmPelsHeight,
-				   devMode.dmBitsPerPel, fgState.GameModeRefresh))
-	    {
-	      /*
-	       * OKi, we've found a matching display mode, remember its number and break
-	       */
-	      mode = displayModes;
-	      break;
-	    }
-	
-	  /*
-	   * Switch to the next display mode, if any
-	   */
-	  displayModes++;
-	}
+        /*
+         * Switch to the next display mode, if any
+         */
+        displayModes++;
+      }
     }
 
     /*
