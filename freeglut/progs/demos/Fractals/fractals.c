@@ -42,8 +42,8 @@ static AffineTrans *affine ;
 char window_title [ 80 ] ;
 
 /* The amount the view is translated and scaled */
-float xwin = 0.0, ywin = 0.0 ;
-float scale_factor = 1.0 ;
+double xwin = 0.0, ywin = 0.0 ;
+double scale_factor = 1.0 ;
 
 static void draw_level ( int num, double m00, double m01, double m10, double m11, double n0, double n1 )
 {
@@ -60,8 +60,8 @@ static void draw_level ( int num, double m00, double m01, double m10, double m11
       double x1 = m00 * affine[i].statx + m01 * affine[i].staty + n0 ;
       double y1 = m10 * affine[i].statx + m11 * affine[i].staty + n1 ;
 
-      glVertex2f ( x0, y0 ) ;
-      glVertex2f ( x1, y1 ) ;
+      glVertex2d ( x0, y0 ) ;
+      glVertex2d ( x1, y1 ) ;
 
       x0 = x1 ;
       y0 = y1 ;
@@ -102,16 +102,16 @@ static void
 Reshape(int width, int height)
 {
   float ar;
-  glViewport(0, 0, width, height);
-  glMatrixMode(GL_PROJECTION);
+  glViewport ( 0, 0, width, height ) ;
+  glMatrixMode ( GL_PROJECTION ) ;
   glLoadIdentity();
-  ar = (float) width / (float) height;
-  glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  ar = (float) width / (float) height ;
+  glFrustum ( -ar, ar, -1.0, 1.0, 2.0, 100.0 ) ;
+  glMatrixMode ( GL_MODELVIEW ) ;
+  glLoadIdentity () ;
   xwin = -1.0 ;
   ywin =  0.0 ;
-  glTranslatef(xwin, ywin, -5.0);
+  glTranslated ( xwin, ywin, -5.0 ) ;
 }
 
 static void 
@@ -119,7 +119,7 @@ Key(unsigned char key, int x, int y)
 {
   switch (key) {
   case 27:  /* Escape key */
-    glutLeaveMainLoop ();
+    glutLeaveMainLoop () ;
     break;
 
   case '+' :
@@ -127,16 +127,16 @@ Key(unsigned char key, int x, int y)
     break ;
 
   case '-' :
-     if (num_levels > 0)
-        --num_levels;
+    if ( num_levels > 0 )
+      --num_levels ;
     break ;
 
   case 'r' :  case 'R' :
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode ( GL_MODELVIEW ) ;
     glLoadIdentity();
     xwin = -1.0 ;
     ywin = 0.0 ;
-    glTranslatef(xwin, ywin, -5.0);
+    glTranslated ( xwin, ywin, -5.0 ) ;
 
     break ;
   }
@@ -149,42 +149,42 @@ Special(int key, int x, int y)
 {
   switch (key) {
   case GLUT_KEY_UP :
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode ( GL_MODELVIEW ) ;
     ywin += 0.1 * scale_factor ;
-    glTranslatef(0.0, 0.1 * scale_factor, 0.0);
+    glTranslated ( 0.0, 0.1 * scale_factor, 0.0 ) ;
     break ;
 
   case GLUT_KEY_DOWN :
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode ( GL_MODELVIEW ) ;
     ywin -= 0.1 * scale_factor ;
-    glTranslatef(0.0, -0.1 * scale_factor, 0.0);
+    glTranslated ( 0.0, -0.1 * scale_factor, 0.0 ) ;
     break ;
 
   case GLUT_KEY_LEFT :
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode ( GL_MODELVIEW ) ;
     xwin -= 0.1 * scale_factor ;
-    glTranslatef(-0.1 * scale_factor, 0.0, 0.0);
+    glTranslated ( -0.1 * scale_factor, 0.0, 0.0 ) ;
     break ;
 
   case GLUT_KEY_RIGHT :
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode ( GL_MODELVIEW ) ;
     xwin += 0.1 * scale_factor ;
-    glTranslatef(0.1 * scale_factor, 0.0, 0.0);
+    glTranslated ( 0.1 * scale_factor, 0.0, 0.0 ) ;
     break ;
 
   case GLUT_KEY_PAGE_UP :
-    glMatrixMode(GL_MODELVIEW);
-    glTranslatef ( -xwin, -ywin, 0.0 ) ;
-    glScalef(1.25, 1.25, 1.25);
-    glTranslatef ( xwin, ywin, 0.0 ) ;
+    glMatrixMode ( GL_MODELVIEW ) ;
+    glTranslated ( -xwin, -ywin, 0.0 ) ;
+    glScaled ( 1.25, 1.25, 1.25 ) ;
+    glTranslated ( xwin, ywin, 0.0 ) ;
     scale_factor *= 0.8 ;
     break ;
 
   case GLUT_KEY_PAGE_DOWN :
-    glMatrixMode(GL_MODELVIEW);
-    glTranslatef ( -xwin, -ywin, 0.0 ) ;
-    glScalef(0.8, 0.8, 0.8);
-    glTranslatef ( xwin, ywin, 0.0 ) ;
+    glMatrixMode ( GL_MODELVIEW ) ;
+    glTranslated ( -xwin, -ywin, 0.0 ) ;
+    glScaled ( 0.8, 0.8, 0.8 ) ;
+    glTranslated ( xwin, ywin, 0.0 ) ;
     scale_factor *= 1.25 ;
     break ;
   }
