@@ -168,3 +168,10 @@ October 24, 2002:
 (70) Updated aclocal.m4 with aclocal 1.7.3 (was created with aclocal 1.5)
 
 (71) Changed all references to the 'freeglut-1.3' directory to 'src', copied 'freeglut-1.3' to 'src' and added all files to the repository (TODO #34).
+
+
+*******************************************************************************************
+* Changes on 24 June 2003
+*******************************************************************************************
+
+(80) Fixed autogen.sh and removed aclocal.m4
