@@ -69,7 +69,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdarg.h>
+#if TARGET_HOST_UNIX_X11
 #include <sys/time.h>
+#endif
 
 /*
  * The system-dependant include files should go here:
@@ -130,6 +132,7 @@ typedef void (* FGCBdials         )( int, int );
 typedef void (* FGCBbuttonBox     )( int, int );
 typedef void (* FGCBtabletMotion  )( int, int );
 typedef void (* FGCBtabletButton  )( int, int, int, int );
+typedef void (* FGCBdestroy       )( void );
 
 /*
  * The global callbacks type definitions
@@ -188,36 +191,49 @@ struct tagSFG_Time
 };
 
 /*
+ * An enumeration containing the state of the GLUT execution:  initializing, running, or stopping
+ */
+typedef enum {
+  GLUT_EXEC_STATE_INIT,
+  GLUT_EXEC_STATE_RUNNING,
+  GLUT_EXEC_STATE_STOP
+} fgExecutionState ;
+
+/*
  * This structure holds different freeglut settings
  */
 typedef struct tagSFG_State SFG_State;
 struct tagSFG_State
 {
-    SFG_XYUse       Position;           /* The default windows' position     */
-    SFG_XYUse       Size;               /* The default windows' size         */
-    unsigned int    DisplayMode;        /* The display mode for new windows  */
+    SFG_XYUse        Position;             /* The default windows' position     */
+    SFG_XYUse        Size;                 /* The default windows' size         */
+    unsigned int     DisplayMode;          /* The display mode for new windows  */
 
-    GLboolean       ForceDirectContext; /* Should we force direct contexts?  */
-    GLboolean       TryDirectContext;   /* What about giving a try to?       */
+    GLboolean        ForceDirectContext;   /* Should we force direct contexts?  */
+    GLboolean        TryDirectContext;     /* What about giving a try to?       */
 
-    GLboolean       ForceIconic;        /* All new top windows are iconified */
+    GLboolean        ForceIconic;          /* All new top windows are iconified */
 
-    GLboolean       GLDebugSwitch;      /* OpenGL state debugging switch     */
-    GLboolean       XSyncSwitch;        /* X11 sync protocol switch          */
+    GLboolean        GLDebugSwitch;        /* OpenGL state debugging switch     */
+    GLboolean        XSyncSwitch;          /* X11 sync protocol switch          */
 
-    GLboolean       IgnoreKeyRepeat;    /* Whether to ignore key repeat...   */
+    GLboolean        IgnoreKeyRepeat;      /* Whether to ignore key repeat...   */
 
-    SFG_Time        Time;               /* The time that glutInit was called */
-    SFG_List        Timers;             /* The freeglut timer hooks          */
+    SFG_Time         Time;                 /* The time that glutInit was called */
+    SFG_List         Timers;               /* The freeglut timer hooks          */
 
-    FGCBidle        IdleCallback;       /* The global idle callback          */
+    FGCBidle         IdleCallback;         /* The global idle callback          */
 
-    FGCBmenuState   MenuStateCallback;  /* Menu callbacks are global         */
-    FGCBmenuStatus  MenuStatusCallback;
+    FGCBmenuState    MenuStateCallback;    /* Menu callbacks are global         */
+    FGCBmenuStatus   MenuStatusCallback;
 
-    SFG_XYUse       GameModeSize;       /* The game mode screen's dimensions */
-    int             GameModeDepth;      /* The pixel depth for game mode     */
-    int             GameModeRefresh;    /* The refresh rate for game mode    */
+    SFG_XYUse        GameModeSize;         /* The game mode screen's dimensions */
+    int              GameModeDepth;        /* The pixel depth for game mode     */
+    int              GameModeRefresh;      /* The refresh rate for game mode    */
+
+    int              ActionOnWindowClose ; /* Action when user clicks "x" on window header bar */
+
+    fgExecutionState ExecState ;           /* Current state of the GLUT execution */
 };
 
 /*
@@ -264,7 +280,7 @@ struct tagSFG_Timer
 };
 
 /*
- * A window and it's OpenGL context. The contents of this structure
+ * A window and its OpenGL context. The contents of this structure
  * are highly dependant on the target operating system we aim at...
  */
 typedef struct tagSFG_Context SFG_Context;
@@ -333,6 +349,7 @@ struct tagSFG_WindowCallbacks
     FGCBvisibility      Visibility;
     FGCBwindowStatus    WindowStatus;
     FGCBjoystick        Joystick;
+    FGCBdestroy         Destroy;
 
     /*
      * Those callbacks are being ignored for the moment
@@ -393,11 +410,22 @@ struct tagSFG_Window
     SFG_WindowCallbacks Callbacks;              /* The window callbacks      */
 
     SFG_Menu*       Menu[ FREEGLUT_MAX_MENUS ]; /* Menus appended to window  */
-    GLboolean MenuActive[ FREEGLUT_MAX_MENUS ]; /* The menus activity flags  */
+    SFG_Menu*       ActiveMenu;                 /* The window's active menu  */
 
     SFG_Window*         Parent;                 /* The parent to this window */
     SFG_List            Children;               /* The subwindows d.l. list  */
 };
+
+/*
+ * A linked list structure of windows
+ */
+typedef struct tagSFG_WindowList SFG_WindowList ;
+struct tagSFG_WindowList
+{
+  SFG_Window *window ;
+  GLboolean needToClose ;
+  SFG_WindowList *next ;
+} ;
 
 /*
  * This holds information about all the windows, menus etc.
@@ -419,9 +447,9 @@ struct tagSFG_Structure
 
 /*
  * This structure is used for the enumeration purposes.
- * You can easily extend it's functionalities by declaring
+ * You can easily extend its functionalities by declaring
  * a structure containing enumerator's contents and custom
- * data, then casting it's pointer to (SFG_Enumerator *).
+ * data, then casting its pointer to (SFG_Enumerator *).
  */
 typedef struct tagSFG_Enumerator SFG_Enumerator;
 struct tagSFG_Enumerator
@@ -441,6 +469,8 @@ struct tagSFG_Font
     int             Quantity;                   /* Number of chars in font   */
     int             Height;                     /* Height of the characters  */
     const GLubyte** Characters;                 /* The characters mapping    */
+
+    float           xorig, yorig ;              /* The origin of the character relative to the draw location */
 };
 
 /*
@@ -554,8 +584,10 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly );
  * Defined in freeglut_structure.c, freeglut_window.c.
  */
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title, int x, int y, int w, int h, GLboolean gameMode );
-void        fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, int h, GLboolean gameMode );
+void        fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, int h, GLboolean gameMode, int isSubWindow );
 void        fgCloseWindow( SFG_Window* window );
+void        fgAddToWindowDestroyList ( SFG_Window* window, GLboolean needToClose ) ;
+void        fgCloseWindows () ;
 void        fgDestroyWindow( SFG_Window* window, GLboolean needToClose );
 
 /*
@@ -606,7 +638,7 @@ void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback, SFG_Enum
 SFG_Window* fgWindowByID( int windowID );
 
 /*
- * Looks up a menu given it's ID. This is easier that fgWindowByXXX
+ * Looks up a menu given its ID. This is easier that fgWindowByXXX
  * as all menus are placed in a single doubly linked list...
  */
 SFG_Menu* fgMenuByID( int menuID );
@@ -615,8 +647,10 @@ SFG_Menu* fgMenuByID( int menuID );
  * The menu activation and deactivation the code. This is the meat
  * of the menu user interface handling code...
  */
-void fgActivateMenu( int button );
-void fgDeactivateMenu( int button );
+void fgActivateMenu( SFG_Window* window, int button );
+void fgExecuteMenuCallback( SFG_Menu* menu ) ;
+GLboolean fgCheckActiveMenu ( SFG_Window *window, SFG_Menu *menu ) ;
+void fgDeactivateMenu( SFG_Window *window );
 
 /*
  * This function gets called just before the buffers swap, so that

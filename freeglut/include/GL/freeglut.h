@@ -36,12 +36,27 @@
  * Under windows, we've got some issues to solve
  */
 #if defined(WIN32)
+#if 0
 #	if defined(FREEGLUT_LIBRARY_BUILD)
 #		define FGAPI __declspec(dllexport)
 #	else
 #		define FGAPI __declspec(dllimport)
 #	endif
 #	define FGAPIENTRY __stdcall
+#else
+#    include <windows.h>
+#    include <windowsx.h>
+#    include <mmsystem.h>
+#    define WINDOWS
+#    define FGAPI
+#    define FGAPIENTRY
+#endif
+
+#pragma comment (lib, "winmm.lib")       /* link with Windows MultiMedia lib */
+#pragma comment (lib, "opengl32.lib")    /* link with Microsoft OpenGL lib */
+#pragma comment (lib, "glu32.lib")       /* link with OpenGL Utility lib */
+#pragma comment (lib, "freeglut.lib")    /* link with Win32 freeglut lib */
+
 #else
 #	define FGAPI
 #	define FGAPIENTRY
@@ -167,6 +182,13 @@
 #endif
 
 /*
+ * GLUT API Extension macro definitions -- behaviour when the user clicks on an "x" to close a window
+ */
+#define GLUT_ACTION_EXIT                         0
+#define GLUT_ACTION_GLUTMAINLOOP_RETURNS         1
+#define GLUT_ACTION_CONTINUE_EXECUTION           2
+
+/*
  * GLUT API macro definitions -- the glutGet parameters
  */
 #define  GLUT_WINDOW_X                      0x0064
@@ -206,6 +228,8 @@
 #define  GLUT_INIT_DISPLAY_MODE             0x01F8
 #define  GLUT_ELAPSED_TIME                  0x02BC
 #define  GLUT_WINDOW_FORMAT_ID              0x007B
+
+#define  GLUT_ACTION_ON_WINDOW_CLOSE        0x01F9
 
 /*
  * GLUT API macro definitions -- the glutDeviceGet parameters
@@ -335,6 +359,8 @@ FGAPI void    FGAPIENTRY glutInitDisplayString( char* displayMode );
  * Process loop function, see freeglut_main.c
  */
 FGAPI void    FGAPIENTRY glutMainLoop( void );
+FGAPI void    FGAPIENTRY glutMainLoopEvent( void );
+FGAPI void    FGAPIENTRY glutLeaveMainLoop( void );
 
 /*
  * Window management functions, see freeglut_window.c
@@ -412,6 +438,8 @@ FGAPI void    FGAPIENTRY glutMouseFunc( void (* callback)( int, int, int, int ) 
 FGAPI void    FGAPIENTRY glutMotionFunc( void (* callback)( int, int ) );
 FGAPI void    FGAPIENTRY glutPassiveMotionFunc( void (* callback)( int, int ) );
 FGAPI void    FGAPIENTRY glutEntryFunc( void (* callback)( int ) );
+FGAPI void    FGAPIENTRY glutCloseFunc( void (* callback)( void ) );
+FGAPI void    FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) );
 
 FGAPI void    FGAPIENTRY glutKeyboardUpFunc( void (* callback)( unsigned char, int, int ) );
 FGAPI void    FGAPIENTRY glutSpecialUpFunc( void (* callback)( int, int, int ) );
@@ -424,14 +452,16 @@ FGAPI void    FGAPIENTRY glutWindowStatusFunc( void (* callback)( int ) );
 FGAPI void    FGAPIENTRY glutSpaceballMotionFunc( void (* callback)( int, int, int ) );
 FGAPI void    FGAPIENTRY glutSpaceballRotateFunc( void (* callback)( int, int, int ) );
 FGAPI void    FGAPIENTRY glutSpaceballButtonFunc( void (* callback)( int, int ) );
-FGAPI void    FGAPIENTRY glutBottonBoxFunc( void (* callback)( int, int ) );
+FGAPI void    FGAPIENTRY glutButtonBoxFunc( void (* callback)( int, int ) );
 FGAPI void    FGAPIENTRY glutDialsFunc( void (* callback)( int, int ) );
 FGAPI void    FGAPIENTRY glutTabletMotionFunc( void (* callback)( int, int ) );
 FGAPI void    FGAPIENTRY glutTabletButtonFunc( void (* callback)( int, int, int, int ) );
 
 /*
- * State retrieval functions, see freeglut_state.c
+ * State setting and retrieval functions, see freeglut_state.c
  */
+FGAPI void    FGAPIENTRY glutSetOption ( GLenum option_flag, int value ) ;
+
 FGAPI int     FGAPIENTRY glutGet( GLenum query );
 FGAPI int     FGAPIENTRY glutDeviceGet( GLenum query );
 FGAPI int     FGAPIENTRY glutGetModifiers( void );
@@ -471,6 +501,10 @@ FGAPI void    FGAPIENTRY glutWireTetrahedron( void );
 FGAPI void    FGAPIENTRY glutSolidTetrahedron( void );
 FGAPI void    FGAPIENTRY glutWireIcosahedron( void );
 FGAPI void    FGAPIENTRY glutSolidIcosahedron( void );
+FGAPI void    FGAPIENTRY glutWireRhombicDodecahedron( void );
+FGAPI void    FGAPIENTRY glutSolidRhombicDodecahedron( void );
+FGAPI void    FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLfloat offset[3], GLfloat scale ) ;
+FGAPI void    FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLfloat offset[3], GLfloat scale ) ;
 
 /*
  * Teapot rendering functions, found in freeglut_teapot.c
@@ -506,7 +540,7 @@ FGAPI void    FGAPIENTRY glutCopyColormap( int window );
  * Misc keyboard and joystick functions, see freeglut_misc.c
  */
 FGAPI void    FGAPIENTRY glutIgnoreKeyRepeat( int ignore );
-FGAPI void    FGAPIENTRY glutSetKeyRepeat( int repeatMode );
+FGAPI void    FGAPIENTRY glutSetKeyRepeat( int repeatMode );  /* DEPRECATED 11/4/02 - Do not use */
 FGAPI void    FGAPIENTRY glutForceJoystickFunc( void );
 
 /*
