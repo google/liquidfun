@@ -596,6 +596,7 @@ void fgListAppend(SFG_List *list, SFG_Node *node)
 
     if ( (ln = list->Last) != NULL )
     {
+        ln->Next = node;
         node->Prev = ln;
     }
     else
