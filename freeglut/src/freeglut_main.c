@@ -125,8 +125,8 @@ static void fghReshapeWindowByHandle
      */
     window->State.Redisplay = TRUE ;
 
-    if ( window->IsMenu )
-        fgSetWindow ( current_window ) ;
+    if( window->IsMenu )
+        fgSetWindow( current_window ) ;
 }
 
 /*
@@ -169,11 +169,11 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
         (window->State.Redisplay == TRUE) &&
         (window->State.Visible == TRUE) )
     {
-      window->State.Redisplay = FALSE;
+        window->State.Redisplay = FALSE;
 
-      RedrawWindow( 
-        window->Window.Handle, NULL, NULL, 
-        RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
+        RedrawWindow( 
+            window->Window.Handle, NULL, NULL, 
+            RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
         );
     }
 
