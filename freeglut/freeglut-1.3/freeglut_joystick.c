@@ -126,7 +126,7 @@ struct tagSFG_Joystick
         int         tmp_buttons;
         float       tmp_axes[ _JS_MAX_AXES ];
 #   else
-        JS_DATA_TYPE js;
+        struct JS_DATA_TYPE js;
 #   endif
 
     char fname[ 128 ];
@@ -251,7 +251,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, int* buttons, float* axes )
 
     if( status != JS_RETURN )
     {
-        g_warning( fname );
+        g_warning( joy->fname );
         joy->error = TRUE;
         return;
     }
@@ -466,9 +466,9 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 
     do
     { 
-        fghJoystickRawRead( joy, NULL, center );
+        fghJoystickRawRead( joy, NULL, joy->center )
         counter++;
-    } while( !joy->error && counter < 100 && center[ 0 ] == 512.0f && center[ 1 ] == 512.0f );
+    } while( !joy->error && counter < 100 && joy->center[ 0 ] == 512.0f && joy->center[ 1 ] == 512.0f );
    
     if( counter >= 100 )
         joy->error = TRUE;
@@ -481,7 +481,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
         joy->center[ i ] =      0.0f;
         joy->min   [ i ] = -32767.0f;
 #       else
-        joy->max[ i ] = center[ i ] * 2.0f;
+        joy->max[ i ] = joy->center[ i ] * 2.0f;
         joy->min[ i ] = 0.0f;
 #       endif
         joy->dead_band[ i ] = 0.0f ;
@@ -542,6 +542,8 @@ void fgJoystickClose( void )
     if( fgJoystick->error != TRUE )
         close( fgJoystick->fd );
 #endif
+
+    free ( fgJoystick ) ;
 }
 
 /*
@@ -557,8 +559,8 @@ void fgJoystickPollWindow( SFG_Window* window )
      * Make sure the joystick device is initialized, the window seems valid
      * and that there is a joystick callback hooked to it:
      */
-    freeglut_return_if_fail( fgJoystick == NULL || window == NULL );
-    freeglut_return_if_fail( window->Callbacks.Joystick == NULL );
+    freeglut_return_if_fail( fgJoystick != NULL && window != NULL );
+    freeglut_return_if_fail( window->Callbacks.Joystick != NULL );
 
     /*
      * Poll the joystick now:
