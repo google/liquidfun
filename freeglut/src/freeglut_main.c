@@ -289,7 +289,9 @@ void fgError( const char *fmt, ... )
 
     va_start( ap, fmt );
 
-    fprintf( stderr, "freeglut (%s): ", fgState.ProgramName || "");
+    fprintf( stderr, "freeglut ");
+    if( fgState.ProgramName )
+        fprintf (stderr, "(%s): ", fgState.ProgramName);
     vfprintf( stderr, fmt, ap );
     fprintf( stderr, "\n" );
 
@@ -304,7 +306,9 @@ void fgWarning( const char *fmt, ... )
 
     va_start( ap, fmt );
 
-    fprintf( stderr, "freeglut (%s): ", fgState.ProgramName || "");
+    fprintf( stderr, "freeglut ");
+    if( fgState.ProgramName )
+        fprintf( stderr, "(%s): ", fgState.ProgramName );
     vfprintf( stderr, fmt, ap );
     fprintf( stderr, "\n" );
 

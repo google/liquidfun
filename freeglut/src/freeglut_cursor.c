@@ -74,14 +74,14 @@ void FGAPIENTRY glutSetCursor( int cursorID )
    * (e) Out-of-range cursor-types are ignored.  Should we abort?
    *     Print a warning message?
    */
-	{
-		Cursor cursor;
-#		define MAP_CURSOR(a,b) case a: cursor = XCreateFontCursor( fgDisplay.Display, b ); break;
-	  if( GLUT_CURSOR_FULL_CROSSHAIR == cursorID )
-	    cursorID = GLUT_CURSOR_CROSSHAIR;
-
-	  switch( cursorID )
     {
+	Cursor cursor;
+#define MAP_CURSOR(a,b) case a: cursor = XCreateFontCursor( fgDisplay.Display, b ); break;
+	if( GLUT_CURSOR_FULL_CROSSHAIR == cursorID )
+	    cursorID = GLUT_CURSOR_CROSSHAIR;
+	
+	switch( cursorID )
+        {
 	    MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, XC_right_ptr);
 	    MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  XC_left_ptr);
 	    MAP_CURSOR( GLUT_CURSOR_INFO,        XC_hand1);
@@ -103,17 +103,17 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 	    MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, XC_bottom_right_corner);
 	    MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER, XC_bottom_left_corner);
 	    MAP_CURSOR( GLUT_CURSOR_NONE,        XC_bogosity);
-    case GLUT_CURSOR_INHERIT:
-      break;
-    default:
-      return;
-    }
+	case GLUT_CURSOR_INHERIT:
+	    break;
+	default:
+	    return;
+	}
 
-    if( GLUT_CURSOR_INHERIT == cursorID )
-      XUndefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle );
-    else
-      XDefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle, cursor );
-  }
+	if( GLUT_CURSOR_INHERIT == cursorID )
+	    XUndefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle );
+	else
+	    XDefineCursor( fgDisplay.Display, fgStructure.Window->Window.Handle, cursor );
+    }
 
 #elif TARGET_HOST_WIN32
 
@@ -131,21 +131,21 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 
 	switch( cursorID )
 	{
-		MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
-		MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
-		MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
-		MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
-		MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP	   );
-		MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
-		MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
-		MAP_CURSOR( GLUT_CURSOR_WAIT,		 IDC_WAIT      );
-		MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
-		MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
-		/* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   ); */
-		ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL	   );
-
-		default:
-		MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
+	    MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
+	    MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
+	    MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
+	    MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
+	    MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP	   );
+	    MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
+	    MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
+	    MAP_CURSOR( GLUT_CURSOR_WAIT,		 IDC_WAIT      );
+	    MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
+	    MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
+	    /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   ); */
+	    ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL	   );
+	    
+	default:
+	    MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
 	}
 #endif
 
