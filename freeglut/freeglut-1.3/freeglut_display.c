@@ -76,6 +76,11 @@ void FGAPIENTRY glutSwapBuffers( void )
 
 #if TARGET_HOST_UNIX_X11
     /*
+     * If it's single-buffered, we shouldn't be here.
+     */
+    if ( ! fgStructure.Window->Window.DoubleBuffered ) return ;
+
+    /*
      * Issue the glXSwapBuffers call and be done with it
      */
     glXSwapBuffers( fgDisplay.Display, fgStructure.Window->Window.Handle );

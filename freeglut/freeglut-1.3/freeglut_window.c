@@ -361,9 +361,35 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     freeglut_assert_ready;
 
     /*
+     * Save the window's single- or double-buffering state
+     */
+    window->Window.DoubleBuffered = ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0 ;
+
+    /*
      * Here we are upon the stage. Have the visual selected.
      */
     window->Window.VisualInfo = fgChooseVisual();
+    if ( ! window->Window.VisualInfo )
+    {
+      /*
+       * The "fgChooseVisual" returned a null meaning that the visual context is not available.
+       * Try a couple of variations to see if they will work.
+       */
+      if ( ! ( fgState.DisplayMode & GLUT_DOUBLE ) )
+      {
+        /*
+         * Single buffering--try it doubled
+         */
+        fgState.DisplayMode |= GLUT_DOUBLE ;
+        window->Window.VisualInfo = fgChooseVisual();
+      }
+
+      /*
+       * GLUT also checks for multi-sampling, but I don't see that anywhere else in FREEGLUT
+       * so I won't bother with it for the moment.
+       */
+    }
+
     assert( window->Window.VisualInfo != NULL );
 
     /*
@@ -513,6 +539,15 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
         );
 
 #       endif
+    }
+
+    /*
+     * If it's not double-buffered, make sure the rendering is done to the front buffer.
+     */
+    if ( ! window->Window.DoubleBuffered )
+    {
+      glDrawBuffer ( GL_FRONT ) ;
+      glReadBuffer ( GL_FRONT ) ;
     }
 
 #elif TARGET_HOST_WIN32

@@ -209,27 +209,24 @@ void FGAPIENTRY glutBitmapString( void* fontID, const char *string )
    */
   for( c = 0; c < numchar; c++ )
   {
-    if ( ( string[ c ] >= 0 ) && ( string[ c ] < 256 ) )
+    if ( string[c] == '\n' )
     {
-      if ( string[c] == '\n' )
-      {
-        raster_position[1] -= (float)font->Height ;
-        glRasterPos4fv ( raster_position ) ;
-      }
-      else  /* Not a carriage return, draw the bitmap character */
-      {
-        const GLubyte* face = font->Characters[ string[ c ] - 1 ] ;
+      raster_position[1] -= (float)font->Height ;
+      glRasterPos4fv ( raster_position ) ;
+    }
+    else  /* Not a carriage return, draw the bitmap character */
+    {
+      const GLubyte* face = font->Characters[ string[ c ] - 1 ] ;
 
-        /*
-         * We'll use a glBitmap call to draw the font.
-         */
-        glBitmap(
-            face[ 0 ], font->Height,      /* The bitmap's width and height */
-            font->xorig, font->yorig,     /* The origin -- what on earth?  */
-            (float)(face[ 0 ]), 0.0,      /* The raster advance -- inc. x  */
-            (face + 1)                    /* The packed bitmap data...     */
-        ) ;
-      }
+      /*
+       * We'll use a glBitmap call to draw the font.
+       */
+      glBitmap(
+          face[ 0 ], font->Height,      /* The bitmap's width and height */
+          font->xorig, font->yorig,     /* The origin -- what on earth?  */
+          (float)(face[ 0 ]), 0.0,      /* The raster advance -- inc. x  */
+          (face + 1)                    /* The packed bitmap data...     */
+      ) ;
     }
   }
 
@@ -278,16 +275,13 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const char* string )
   int numchar = strlen ( string ) ;
   for( c = 0; c < numchar; c++ )
   {
-    if ( ( string[ c ] >= 0 ) && ( string[ c ] < 256 ) )
+    if ( string[ c ] == '\n' )  /* Carriage return, reset the length of this line */
     {
-      if ( string[ c ] == '\n' )  /* Carriage return, reset the length of this line */
-      {
-        if ( length < this_line_length ) length = this_line_length ;
-        this_line_length = 0 ;
-      }
-      else  /* Not a carriage return, increment the length of this line */
-        this_line_length += *(font->Characters[ string[ c ] - 1 ]) ;
+      if ( length < this_line_length ) length = this_line_length ;
+      this_line_length = 0 ;
     }
+    else  /* Not a carriage return, increment the length of this line */
+      this_line_length += *(font->Characters[ string[ c ] - 1 ]) ;
   }
 
   if ( length < this_line_length ) length = this_line_length ;

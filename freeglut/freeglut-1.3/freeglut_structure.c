@@ -209,7 +209,7 @@ void fgAddToWindowDestroyList ( SFG_Window* window, GLboolean needToClose )
 void fgCloseWindows ()
 {
   SFG_WindowList *window_ptr = WindowsToDestroy ;
-  WindowsToDestroy = (SFG_WindowList*)NULL ;  // In case the destroy callbacks cause more windows to be closed
+  WindowsToDestroy = (SFG_WindowList*)NULL ;  /* In case the destroy callbacks cause more windows to be closed */
 
   while ( window_ptr )
   {

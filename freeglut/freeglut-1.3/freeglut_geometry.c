@@ -205,7 +205,7 @@ void FGAPIENTRY glutSolidSphere( GLdouble dRadius, GLint slices, GLint stacks )
     float cphi, sphi, cpsi, spsi ;
 
     glPushMatrix();
-    //glScalef( radius, radius, radius );
+    /* glScalef( radius, radius, radius ); */
 
     row  = calloc( sizeof(float), slices * 3 );
     next = calloc( sizeof(float), slices * 3 );
@@ -984,7 +984,7 @@ void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLfloat offset[3], GL
   }
   else
   {
-    GLfloat local_offset[3] ;  // Use a local variable to avoid buildup of roundoff errors
+    GLfloat local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
     num_levels -- ;
     scale /= 2.0 ;
     local_offset[0] = offset[0] + scale * tetrahedron_v[0][0] ;
@@ -1026,7 +1026,7 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLfloat offset[3], G
   }
   else
   {
-    GLfloat local_offset[3] ;  // Use a local variable to avoid buildup of roundoff errors
+    GLfloat local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
     num_levels -- ;
     scale /= 2.0 ;
     local_offset[0] = offset[0] + scale * tetrahedron_v[0][0] ;

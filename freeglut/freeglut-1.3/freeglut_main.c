@@ -1189,7 +1189,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_ACTIVATE: 
         if (LOWORD(wParam) != WA_INACTIVE)
         {
-          //glutSetCursor( fgStructure.Window->State.Cursor );
+          /* glutSetCursor( fgStructure.Window->State.Cursor ); */
 	        printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window, window->State.Cursor );
 
           glutSetCursor( window->State.Cursor );
@@ -1208,10 +1208,10 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	    (fgStructure.Window->State.Cursor == GLUT_CURSOR_NONE))
 	  SetCursor( NULL );
 #else
-	// Set the cursor AND change it for this window class. 
+	/* Set the cursor AND change it for this window class. */
 #	define MAP_CURSOR(a,b) case a: SetCursor( LoadCursor( NULL, b ) ); \
         break;
-	// Nuke the cursor AND change it for this window class. 
+	/* Nuke the cursor AND change it for this window class. */
 #	define ZAP_CURSOR(a,b) case a: SetCursor( NULL ); \
         break;
 
@@ -1228,7 +1228,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		MAP_CURSOR( GLUT_CURSOR_WAIT,		 IDC_WAIT      );
 		MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
 		MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
-		//MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   );
+		/* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   ); */
 		ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL	   );
 
 		default:
@@ -1697,7 +1697,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       if ( window->Callbacks.Display )
         window->Callbacks.Display () ;
 
-//      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ) ;
+/*      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ) ; */
       break ;
 
       /*

@@ -111,11 +111,11 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 	/*
 	 * This is a temporary solution only...
 	 */
-	// Set the cursor AND change it for this window class. 
+	/* Set the cursor AND change it for this window class. */
 #	define MAP_CURSOR(a,b) case a: SetCursor( LoadCursor( NULL, b ) ); \
         SetClassLong(fgStructure.Window->Window.Handle,GCL_HCURSOR,(LONG)LoadCursor(NULL,b)); \
         break;
-	// Nuke the cursor AND change it for this window class. 
+	/* Nuke the cursor AND change it for this window class. */
 #	define ZAP_CURSOR(a,b) case a: SetCursor( NULL ); \
         SetClassLong(fgStructure.Window->Window.Handle,GCL_HCURSOR,(LONG)NULL); \
         break;
@@ -132,7 +132,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 		MAP_CURSOR( GLUT_CURSOR_WAIT,		 IDC_WAIT      );
 		MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
 		MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
-		//MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   );
+		/* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   ); */
 		ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL	   );
 
 		default:

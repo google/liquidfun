@@ -540,7 +540,7 @@ void fgJoystickClose( void )
 #endif
 
     free ( fgJoystick ) ;
-    fgJoystick = NULL ;  // show joystick has been deinitialized
+    fgJoystick = NULL ;  /* show joystick has been deinitialized */
 }
 
 /*

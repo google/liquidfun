@@ -84,10 +84,9 @@
     #include <X11/Xatom.h>
     #include <X11/keysym.h>
 
-    /*
-     * This will generate errors, but I don't have any idea how to fix it (will autoconf help?)
-     */
+    #ifndef __sgi
     #include <X11/extensions/xf86vmode.h>
+    #endif
 #endif
 
 /*
@@ -289,14 +288,15 @@ typedef struct tagSFG_Context SFG_Context;
 struct tagSFG_Context
 {
 #if TARGET_HOST_UNIX_X11
-    Window          Handle;             /* The window's handle               */
-    GLXContext      Context;            /* The OpenGL context                */
-    XVisualInfo*    VisualInfo;         /* The window's visual information   */
+    Window          Handle;             /* The window's handle                 */
+    GLXContext      Context;            /* The OpenGL context                  */
+    XVisualInfo*    VisualInfo;         /* The window's visual information     */
+    int             DoubleBuffered;     /* Treat the window as double-buffered */
 
 #elif TARGET_HOST_WIN32
-    HWND            Handle;             /* The window's handle               */
-    HDC             Device;             /* The window's device context       */
-    HGLRC           Context;            /* The window's WGL context          */
+    HWND            Handle;             /* The window's handle                 */
+    HDC             Device;             /* The window's device context         */
+    HGLRC           Context;            /* The window's WGL context            */
 
 #endif
 };
