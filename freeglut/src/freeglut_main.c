@@ -126,15 +126,15 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
         );
     }
 
-#endif
-
-    if( !( FETCH_WCB( *window, Reshape ) ) )
+    if( FETCH_WCB( *window, Reshape ) )
+        INVOKE_WCB( *window, Reshape, ( width, height ) );
+    else
     {
         fgSetWindow( window );
         glViewport( 0, 0, width, height );
     }
-    else
-        INVOKE_WCB( *window, Reshape, ( width, height ) );
+
+#endif
 
     /*
      * Force a window redraw.  In Windows at least this is only a partial
@@ -552,9 +552,19 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case CreateNotify:
         case ConfigureNotify:
             GETWINDOW( xconfigure );
-            window->State.NeedToResize = GL_TRUE ;
-            window->State.Width  = event.xconfigure.width ;
-            window->State.Height = event.xconfigure.height;
+            {
+                int width = event.xconfigure.width;
+                int height = event.xconfigure.height;
+
+                GETWINDOW( xconfigure );
+                if( FETCH_WCB( *window, Reshape ) )
+                    INVOKE_WCB( *window, Reshape, ( width, height ) );
+                else
+                {
+                    fgSetWindow( window );
+                    glViewport( 0, 0, width, height );
+                }
+            }
             break;
 
         case DestroyNotify:
