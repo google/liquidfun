@@ -33,7 +33,6 @@
 
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
-#include "mwmborder.c"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -64,6 +63,9 @@
  * Chooses a visual basing on the current display mode settings
  */
 #if TARGET_HOST_UNIX_X11
+
+#include "mwmborder.c" /* Brian Paul's decoration-zapping code. */
+
 XVisualInfo* fgChooseVisual( void )
 {
     int bufferSize[] = { 16, 12, 8, 4, 2, 1 };
