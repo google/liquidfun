@@ -392,12 +392,12 @@ struct tagSFG_WindowState
  * and for no other reason.  Since it's hidden in the macro, the
  * ugliness is felt to be rather benign.
  */
-#define SET_WCB(window,cbname,func)                   \
-do                                                    \
-{                                                     \
-    if( FETCH_WCB( window, cbname ) != func )         \
-        (((window).CallBacks[CB_ ## cbname]) = func); \
-} while( 0 )                                          \
+#define SET_WCB(window,cbname,func)                            \
+do                                                             \
+{                                                              \
+    if( FETCH_WCB( window, cbname ) != func )                  \
+        (((window).CallBacks[CB_ ## cbname]) = (void *) func); \
+} while( 0 )                                                   \
 
 /*
  * FETCH_WCB() is used as:
