@@ -3,12 +3,12 @@
 #
 # The library we want to build
 #
-lib_LTLIBRARIES = libfreeglut-1.3.la
+lib_LTLIBRARIES = libfreeglut-2.0.la
 
 #
 # Those source files build the freeglut library
 #
-libfreeglut_1_3_la_SOURCES = freeglut_callbacks.c \
+libfreeglut_2_0_la_SOURCES = freeglut_callbacks.c \
 			     freeglut_cursor.c \
 			     freeglut_display.c \
 			     freeglut_ext.c \
@@ -34,8 +34,8 @@ libfreeglut_1_3_la_SOURCES = freeglut_callbacks.c \
 #
 # Additional linker flags
 #	 
-libfreeglut_1_3_la_LIBADD = $(LIBM) $(X_LIBS) -lGL -lGLU -lXext -lX11 -lXxf86vm
-libfreeglut_1_3_la_LDFLAGS = -version-info 0:0:0
+libfreeglut_2_0_la_LIBADD = $(LIBM) $(X_LIBS) -lGL -lGLU -lXext -lX11 -lXxf86vm
+libfreeglut_2_0_la_LDFLAGS = -version-info 0:0:0
 
 #
 # End of file
