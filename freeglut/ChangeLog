@@ -665,3 +665,24 @@ packaged with distributions
 *******************************************************************************************
 * Freeglut 2.2.0 Released on  December 12, 2003!
 *******************************************************************************************
+
+
+***************************************************************************
+* Changes on Februrary 5, 2004.
+***************************************************************************
+
+(182) With permission from Steve Baker, John Fay imported the latest joystick
+code from PLIB into freeglut.  This is expected to provide better support
+joysticks such as USB joysticks.  However, it is largely untested beyond
+compiling, and likely will require some debugging.
+
+	
+***************************************************************************
+* Changes on Februrary 7, 2004.
+***************************************************************************
+
+(183) Richard Rauch added experimental support for a new feature:
+GLUT_OFFSCREEN as a rendering mode (as proposed by Nigel Stewart).
+The intent is that you specify GLUT_OFFSCREEN as a GLUT display mode,
+and then open a "window" much as you would a regular top-level window.
+Only UNIX_X11 is supprted at this point, for lack of knowledge.
