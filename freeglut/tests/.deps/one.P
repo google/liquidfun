@@ -1,0 +1,40 @@
+one.o: one.c ../config.h /usr/include/stdio.h /usr/include/features.h \
+ /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
+ /usr/lib/gcc-lib/i486-suse-linux/2.95.2/include/stddef.h \
+ /usr/lib/gcc-lib/i486-suse-linux/2.95.2/include/stdarg.h \
+ /usr/include/bits/types.h /usr/include/libio.h \
+ /usr/include/_G_config.h /usr/include/bits/stdio_lim.h \
+ /usr/include/bits/stdio.h /usr/include/stdlib.h \
+ /usr/include/sys/types.h /usr/include/time.h /usr/include/endian.h \
+ /usr/include/bits/endian.h /usr/include/sys/select.h \
+ /usr/include/bits/select.h /usr/include/bits/sigset.h \
+ /usr/include/sys/sysmacros.h /usr/include/alloca.h \
+ ../include/GL/freeglut.h /usr/include/GL/gl.h /usr/include/GL/glext.h \
+ /usr/include/GL/glu.h
+one.c :
+../config.h :
+/usr/include/stdio.h :
+/usr/include/features.h :
+/usr/include/sys/cdefs.h :
+/usr/include/gnu/stubs.h :
+/usr/lib/gcc-lib/i486-suse-linux/2.95.2/include/stddef.h :
+/usr/lib/gcc-lib/i486-suse-linux/2.95.2/include/stdarg.h :
+/usr/include/bits/types.h :
+/usr/include/libio.h :
+/usr/include/_G_config.h :
+/usr/include/bits/stdio_lim.h :
+/usr/include/bits/stdio.h :
+/usr/include/stdlib.h :
+/usr/include/sys/types.h :
+/usr/include/time.h :
+/usr/include/endian.h :
+/usr/include/bits/endian.h :
+/usr/include/sys/select.h :
+/usr/include/bits/select.h :
+/usr/include/bits/sigset.h :
+/usr/include/sys/sysmacros.h :
+/usr/include/alloca.h :
+../include/GL/freeglut.h :
+/usr/include/GL/gl.h :
+/usr/include/GL/glext.h :
+/usr/include/GL/glu.h :

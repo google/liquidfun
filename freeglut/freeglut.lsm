@@ -1,0 +1,14 @@
+Begin3
+Title:          freeglut-1.3
+Version:        0.1 alpha
+Entered-date:   
+Description:    The free OpenGL utility toolkit, alternative to the GLUT library
+Keywords:        
+Author:         Pawel W. Olszta <olszta@users.sourceforge.net> 
+Maintained-by:  Pawel W. Olszta <olszta@users.sourceforge.net> 
+Primary-site:   http://freeglut.sourceforge.net	        
+Home-page:      http://freeglut.sourceforge.net
+Original-site:  
+Platforms:      Linux and other Unices
+Copying-policy: X-Consortium style license
+End

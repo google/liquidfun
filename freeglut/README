@@ -1,0 +1,80 @@
+
+    BRIEF OVERVIEW
+    ==============
+
+    This is an alpha release of the freeglut package. Currently only
+    the alpha version of freeglut-1.3 library is available.
+    
+    Freeglut, the Free openGL Utility Toolkit, is meant to be a free alter-
+    native to Mark Kilgard's GLUT library. It is distributed under an X-Consor-
+    tium style license (see COPYING for details), to offer you a chance to use 
+    and/or modify the source.
+    
+    It makes use of OpenGL, GLU, GLib and pthreads-win32 libraries. GLib is 
+    LGPL'ed and I hope I do not violate it's license by using it. In case this 
+    is true, please notify me so that I remove GLib usage from the project.
+    
+    The library does not make use of any GLUT code and is not 100% compatible.
+    Code recompilation and/or slight modifications might be required for your
+    applications to work with freeglut.
+    
+
+    PORTS
+    =====
+
+    Both X11 and Win32 ports are in an advanced alpha stage, which means that
+    they provide limited functionality of GLUT API 3. There is an investigation
+    en course to check if the BeOS port could be easily done using the current
+    freeglut structure.
+
+
+    INSTALLATION
+    ============
+
+    See the INSTALL file.
+    
+    
+    CONTRIBUTING
+    ============
+    
+    Bug and missing features patches are certainly welcome. Just as comments 
+    and FREEGLUT API 1 propositions are.
+
+    Just please to make the fixes look visually just as the rest of the code 
+    does (tabs converted 4 white spaces). Comments are really welcome, as I 
+    believe it would be nice for people fresh new to OpenGL see how the things
+    are done... 
+    
+    
+    WEB SITE AND CONTACTING THE AUTHOR
+    ==================================
+
+    Freeglut project has moved to the SourceForge:
+    http://freeglut.sourceforge.net
+        
+    
+    THE HOPE
+    ========
+    
+    Hope you find my work somehow useful.
+    Pawel W. Olszta, <olszta@sourceforge.net>
+
+
+    PASSING THE BATON
+    =================
+
+    In late December 2000, Pawel decided that he no longer
+    wished to maintain freeglut because he has moved out of
+    the graphics field.  I volunteered to take over from him
+    and have been running the project since Jan 13th 2001.
+
+    I'm also the author and maintainer of the PLIB library suite
+    and 'freeglut' really fits in well with that work.
+
+    I just hope I can live up to Pawel's high standards. Pawel
+    remains on the active developers list.
+
+    Steve Baker <sjbaker1@airmail.net>
+                http://plib.sourceforge.net
+
+

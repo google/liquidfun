@@ -1,0 +1,13 @@
+
+Pawel W. Olszta <olszta@sourceforge.net>
+    the person to be blamed for freeglut
+
+Andreas Umbach <marvin@dataway.ch>
+    the first person to contribute to the freeglut project,
+    contributed the cube and sphere geometry code
+
+Steve Baker <sjbaker1@airmail.net>
+    joystick code (from his great PLIB), numerous hints 
+    and tips on the freeglut usability
+
+...and all the opengl-gamedev-l people that made me to start this project :)
