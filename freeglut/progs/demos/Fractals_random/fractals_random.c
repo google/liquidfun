@@ -188,6 +188,11 @@ void readConfigFile ( char *fnme )
 
   /* Read the window title */
   fgets ( inputline, 256, fptr ) ;
+  /* We assume here that this line will not exceed 79 characters plus a 
+     newline (window_title is 80 characters long). That'll cause a buffer 
+     overflow. For a simple program like  this, though, we're letting it 
+     slide! 
+  */
   sscanf ( inputline, "%[a-zA-Z0-9!@#$%^&*()+=/\\_-\" ]", window_title ) ;
 
   /* Read a comment line */
