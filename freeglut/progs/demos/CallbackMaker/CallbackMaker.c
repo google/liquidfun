@@ -149,7 +149,7 @@ main(int argc, char *argv[])
   glutVisibilityFunc( Visibility );
   glutKeyboardUpFunc( KeyUp );
   glutSpecialUpFunc( SpecialUp );
-//  glutJoystickFunc( Joystick, 10 );
+  glutJoystickFunc( Joystick, 10 );
   glutMouseFunc ( Mouse ) ;
   glutMouseWheelFunc ( MouseWheel ) ;
   glutMotionFunc ( Motion ) ;
