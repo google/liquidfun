@@ -636,3 +636,13 @@ SourceForge "CVS message board"), summarzing changes for the sake of those
 who lack both web-browser and CVS access.  Also fixed a numbering error in
 the log where there were two "(110)" events.  (Plus added (174) from
 November 10th by memory.)
+
+(176) Style cleanup to the "one" demo.  (Removal of CRs, TABs, mostly.)
+
+(177) Changed the "one" demo to do glutInit*() calls before glutInit(),
+proper.  This allows command-line parameters to override built-in
+behavior.
+
+(178) Complete purge of all remaining TABs from freeglut's *.[ch] files.
+Also verified that (as far as I can tell) all CRs are removed from all
+files where they do not belong.
