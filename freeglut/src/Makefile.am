@@ -5,7 +5,13 @@
 #
 lib_LTLIBRARIES = lib@LIBRARY@.la
 
-noinst_HEADERS = freeglut_internal.h
+#
+# Headers and extra stuff we want to distribute
+#
+noinst_HEADERS = freeglut_internal.h freeglut_teapot_data.h
+
+EXTRA_DIST = freeglutdll.def
+
 #
 # Those source files build the freeglut library
 #
