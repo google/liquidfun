@@ -57,7 +57,7 @@
 #   include <unistd.h>
 #   include <fcntl.h>
 #   ifdef __FreeBSD__
-#       include <machine/joystick.h>
+#       include <sys/joystick.h>
 #       define JS_DATA_TYPE joystick
 #       define JS_RETURN (sizeof(struct JS_DATA_TYPE))
 #   elif defined(__linux__)
