@@ -116,10 +116,10 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
         }
 
         /*
-         * SWP_NOACTIVATE	Do not activate the window
-         * SWP_NOOWNERZORDER	Do not change position in z-order
-         * SWP_NOSENDCHANGING	Supress WM_WINDOWPOSCHANGING message
-         * SWP_NOZORDER		Retains the current Z order (ignore 2nd param)
+         * SWP_NOACTIVATE      Do not activate the window
+         * SWP_NOOWNERZORDER   Do not change position in z-order
+         * SWP_NOSENDCHANGING  Supress WM_WINDOWPOSCHANGING message
+         * SWP_NOZORDER        Retains the current Z order (ignore 2nd param)
          */
 
         SetWindowPos( window->Window.Handle,
@@ -187,7 +187,7 @@ static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
         );
 
         window->State.NeedToResize = GL_FALSE;
-        fgSetWindow ( current_window );
+        fgSetWindow( current_window );
     }
 
     INVOKE_WCB( *window, Display, ( ) );
@@ -450,7 +450,7 @@ static long fgNextTimer( void )
  */
 static void fgSleepForEvents( void )
 {
-    long msec;    
+    long msec;
 
     if( fgState.IdleCallback || fgHavePendingRedisplays( ) )
         return;
@@ -465,10 +465,10 @@ static void fgSleepForEvents( void )
         int err;
         int socket;
         struct timeval wait;
+
         socket = ConnectionNumber( fgDisplay.Display );
         FD_ZERO( &fdset );
         FD_SET( socket, &fdset );
-
         wait.tv_sec = msec / 1000;
         wait.tv_usec = (msec % 1000) * 1000;
         err = select( socket+1, &fdset, NULL, NULL, &wait );
@@ -477,7 +477,7 @@ static void fgSleepForEvents( void )
             fgWarning ( "freeglut select() error: %d\n", errno );
     }
 #elif TARGET_HOST_WIN32
-    MsgWaitForMultipleObjects ( 0, NULL, FALSE, msec, QS_ALLEVENTS );
+    MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLEVENTS );
 #endif
 }
 
