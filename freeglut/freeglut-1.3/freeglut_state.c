@@ -122,11 +122,11 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
  */
 int FGAPIENTRY glutGet( GLenum eWhat )
 {
-  int returnValue ;
-  GLboolean boolValue ;
+    int returnValue ;
+    GLboolean boolValue ;
 
-  if ( eWhat == GLUT_INIT_STATE )
-    return ( fgState.Time.Set ) ;
+    if ( eWhat == GLUT_INIT_STATE )
+	return ( fgState.Time.Set ) ;
 
     freeglut_assert_ready;
 
@@ -450,7 +450,11 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         return( fgListLength( &fgStructure.Menu->Entries ) );
 
-    case GLUT_ACTION_ON_WINDOW_CLOSE: return ( fgState.ActionOnWindowClose ) ;
+    case GLUT_ACTION_ON_WINDOW_CLOSE:
+	return fgState.ActionOnWindowClose;
+
+    case GLUT_VERSION:
+	return VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_PATCH;
 
     default:
         /*

@@ -48,6 +48,12 @@
 #define  GLUT_WINDOW_HEADER_HEIGHT          0x01FB
 
 /*
+ * Runtime version checking with glutGet
+ */
+#define GLUT_VERSION                        0x01FC
+
+
+/*
  * Process loop function, see freeglut_main.c
  */
 FGAPI void    FGAPIENTRY glutMainLoopEvent( void );

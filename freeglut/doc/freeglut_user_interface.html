@@ -807,6 +807,67 @@ have them fixed.
 <h2>
 13.2&nbsp; glutGet</h2>
 
+<p>
+The following state variables may be queried with glutGet.
+The returned value is an integer.
+</p>
+
+<p>
+These queries are with respect to the current window:
+</p>
+
+<ul>
+<li>GLUT_WINDOW_X - window X position
+<li>GLUT_WINDOW_Y - window Y position
+<li>GLUT_WINDOW_WIDTH - window width
+<li>GLUT_WINDOW_HEIGHT - window height
+<li>GLUT_WINDOW_BUFFER_SIZE - number of color or color index bits per pixel
+<li>GLUT_WINDOW_STENCIL_SIZE - number of bits per stencil value
+<li>GLUT_WINDOW_DEPTH_SIZE - number of bits per depth value
+<li>GLUT_WINDOW_RED_SIZE - number of bits per red value
+<li>GLUT_WINDOW_GREEN_SIZE - number of bits per green value
+<li>GLUT_WINDOW_BLUE_SIZE - number of bits per blue value
+<li>GLUT_WINDOW_ALPHA_SIZE - number of bits per alpha value
+<li>GLUT_WINDOW_ACCUM_RED_SIZE - number of red bits in the accumulation buffer
+<li>GLUT_WINDOW_ACCUM_GREEN_SIZE - number of green bits in the accumulation buffer
+<li>GLUT_WINDOW_ACCUM_BLUE_SIZE - number of blue bits in the accumulation buffer
+<li>GLUT_WINDOW_ACCUM_ALPHA_SIZE - number of alpha bits in the accumulation buffer
+<li>GLUT_WINDOW_DOUBLEBUFFER - 1 if the color buffer is double buffered, 0 otherwise
+<li>GLUT_WINDOW_RGBA - 1 if the color buffers are RGB[A], 0 for color index
+<li>GLUT_WINDOW_PARENT - parent window ID
+<li>GLUT_WINDOW_NUM_CHILDREN - number of child windows
+<li>GLUT_WINDOW_COLORMAP_SIZE - number of entries in the window's colormap
+<li>GLUT_WINDOW_NUM_SAMPLES - number of samples per pixel if using multisampling
+<li>GLUT_WINDOW_STEREO - 1 if the window supports stereo, 0 otherwise
+<li>GLUT_WINDOW_CURSOR - current cursor
+<li>GLUT_WINDOW_FORMAT_ID - on Windows, return the pixel format number of the current window
+</ul>
+
+<p>
+These queries do not depend on the current window.
+</p>
+
+<ul>
+<li>GLUT_SCREEN_WIDTH - width of the screen in pixels
+<li>GLUT_SCREEN_HEIGHT - height of the screen in pixels
+<li>GLUT_SCREEN_WIDTH_MM - width of the screen in millimeters
+<li>GLUT_SCREEN_HEIGHT_MM - height of the screen in millimeters
+<li>GLUT_MENU_NUM_ITEMS - number of items in the current menu
+<li>GLUT_DISPLAY_MODE_POSSIBLE - return 1 if the current display mode is supported, 0 otherwise
+<li>GLUT_INIT_WINDOW_X - X position last set by glutInitWindowPosition
+<li>GLUT_INIT_WINDOW_Y - Y position last set by glutInitWindowPosition
+<li>GLUT_INIT_WINDOW_WIDTH - width last set by glutInitWindowSize
+<li>GLUT_INIT_WINDOW_HEIGHT - height last set by glutInitWindowSize
+<li>GLUT_INIT_DISPLAY_MODE - display mode last set by glutInitDisplayMode
+<li>GLUT_ELAPSED_TIME - time (in milliseconds) elapsed since glutInit or glutGet(GLUT_ELAPSED_TIME) was first called
+<li>GLUT_INIT_STATE - ?
+<li>GLUT_VERSION - Return value will be X*10000+Y*100+Z where X is the
+    major version, Y is the minor version and Z is the patch level.
+    This query is only supported in FreeGLUT (version 1.3 or later).
+</ul>
+
+
+
 <h2>
 13.3&nbsp; glutDeviceGet</h2>
 
@@ -839,6 +900,8 @@ interoperate better with various implementations of OpenGL.
 </p>
 <p>
 Both OpenGL functions and FreeGLUT functions can be queried with this function.
+Since WGL returns context-dependent function pointers, glutGetProcAddress
+should be queried per FreeGLUT window.
 </p>
 <p>
 <b>NOTE</b>: this function is not supported in GLUT.
@@ -1364,6 +1427,52 @@ interval.
 
 <h1>
 23.0&nbsp;<a NAME="Freeglut.h_Header"></a> "freeglut.h" Header File</h1>
+
+<p>
+FreeGLUT users should normally just include GL/glut.h in their programs.
+Programs which need FreeGLUT-specific functions should also include
+GL/freeglut_ext.h as follows:
+</p>
+
+<pre>
+#include &lt;GL/glut.h&gt;
+#ifdef FREEGLUT
+#include &lt;GL/freeglut_ext.h&gt;
+#endif
+</pre>
+
+<p>
+Compile-time FreeGLUT version testing can be done as follows:
+</p>
+
+<pre>
+#ifdef FREEGLUT_VERSION_1_3
+  code specific to FreeGLUT 1.3 or later here
+#endif
+</pre>
+
+<p>
+In future releases, FREEGLUT_VERSION_1_4, FREEGLUT_VERSION_1_5, etc will
+be defined.  This scheme mimics OpenGL conventions.
+</p>
+
+<p>
+The FreeGLUT version can be queried at runtime by calling
+glutGet(GLUT_VERSION).
+The result will be X*10000+Y*100+Z where X is the major version, Y is the
+minor version and Z is the patch level.
+</p>
+<p>
+This may be used as follows:
+</p>
+
+<pre>
+if (glutGet(GLUT_VERSION) < 10300) {
+    printf("Sorry, you need FreeGLUT version 1.3.0 or later to run this program.\n");
+    exit(1);
+}
+</pre>
+
 
 <h1>
 24.0&nbsp;<a NAME="References"></a> References</h1>

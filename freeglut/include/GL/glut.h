@@ -71,8 +71,10 @@
 /*
  * The freeglut and GLUT API versions
  */
-#define  FREEGLUT          1
-#define  GLUT_API_VERSION  4
+#define  FREEGLUT             1
+#define  GLUT_API_VERSION     4
+#define  FREEGLUT_VERSION_1_3 1
+
 
 /*
  * Always include OpenGL and GLU headers
