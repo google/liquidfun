@@ -450,31 +450,34 @@ static long fgNextTimer( void )
  */
 static void fgSleepForEvents( void )
 {
-#if TARGET_HOST_UNIX_X11
-    fd_set fdset;
-    int err;
-    int socket;
-    struct timeval wait;
-    long msec;    
-    
+    long msec;
+
     if( fgState.IdleCallback || fgHavePendingRedisplays( ) )
         return;
-    socket = ConnectionNumber( fgDisplay.Display );
-    FD_ZERO( &fdset );
-    FD_SET( socket, &fdset );
     
     msec = fgNextTimer( );
-    if( fgHaveJoystick( ) )
-        msec = MIN( msec, 10 );
+    if( fgHaveJoystick( ) )     /* XXX Use GLUT timers for joysticks... */
+        msec = MIN( msec, 10 ); /* XXX Dumb; forces granularity to .01sec */
 
-    wait.tv_sec = msec / 1000;
-    wait.tv_usec = (msec % 1000) * 1000;
-    err = select( socket+1, &fdset, NULL, NULL, &wait );
+#if TARGET_HOST_UNIX_X11
+    {
+        fd_set fdset;
+        int err;
+        int socket;
+        struct timeval wait;
 
-    if( -1 == err )
-        fgWarning ( "freeglut select() error: %d\n", errno );
-    
+        socket = ConnectionNumber( fgDisplay.Display );
+        FD_ZERO( &fdset );
+        FD_SET( socket, &fdset );
+        wait.tv_sec = msec / 1000;
+        wait.tv_usec = (msec % 1000) * 1000;
+        err = select( socket+1, &fdset, NULL, NULL, &wait );
+
+        if( -1 == err )
+            fgWarning ( "freeglut select() error: %d\n", errno );
+    }
 #elif TARGET_HOST_WIN32
+    MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLEVENTS );
 #endif
 }
 
