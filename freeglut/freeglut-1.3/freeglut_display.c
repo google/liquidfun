@@ -7,10 +7,6 @@
  * Written by Pawel W. Olszta, <olszta@sourceforge.net>
  * Creation date: Fri Dec 3 1999
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
