@@ -431,6 +431,24 @@ static void fgSleepForEvents( void )
 #endif
 }
 
+/*
+ * Returns GLUT modifier mask for an XEvent.
+ */
+int fgGetXModifiers(XEvent *event)
+{
+    int ret = 0;
+
+    if( event->xkey.state & ( ShiftMask | LockMask ) )
+        ret |= GLUT_ACTIVE_SHIFT;
+    if( event->xkey.state & ControlMask )
+        ret |= GLUT_ACTIVE_CTRL;
+    if( event->xkey.state & Mod1Mask )
+        ret |= GLUT_ACTIVE_ALT;
+    
+    return ret;
+}
+
+
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -441,7 +459,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
 #if TARGET_HOST_UNIX_X11
     SFG_Window* window;
     XEvent event;
-    int modifiers;
 
     /*
      * This code was repeated constantly, so here it goes into a definition:
@@ -759,14 +776,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
             fgSetWindow( window );
 
-            modifiers = 0;
-            if( event.xbutton.state & ( ShiftMask | LockMask ) )
-                modifiers |= GLUT_ACTIVE_SHIFT;
-            if( event.xbutton.state & ControlMask )
-                modifiers |= GLUT_ACTIVE_CTRL;
-            if( event.xbutton.state & Mod1Mask )
-                modifiers |= GLUT_ACTIVE_ALT;
-            fgStructure.Window->State.Modifiers = modifiers;
+            /*
+             * XXX Why don't we use {window}?  Other code here does...
+             */
+            fgStructure.Window->State.Modifiers = fgGetXModifiers( &event );
 
             /*
              * Finally execute the mouse or mouse wheel callback
@@ -863,25 +876,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     if( keyboard_cb )
                     {
                         fgSetWindow( window );
-
-                        /*
-                         * Remember the current modifiers state
-                         */
-                        modifiers = 0;
-                        if( event.xkey.state & ( ShiftMask | LockMask ) )
-                            modifiers |= GLUT_ACTIVE_SHIFT;
-                        if( event.xkey.state & ControlMask )
-                            modifiers |= GLUT_ACTIVE_CTRL;
-                        if( event.xkey.state & Mod1Mask )
-                            modifiers |= GLUT_ACTIVE_ALT;
-                        window->State.Modifiers = modifiers;
-
+                        window->State.Modifiers = fgGetXModifiers( &event );
                         keyboard_cb( asciiCode[ 0 ],
                                      event.xkey.x, event.xkey.y );
-
-                        /*
-                         * Trash the modifiers state
-                         */
                         window->State.Modifiers = 0xffffffff;
                     }
                 }
@@ -932,24 +929,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     if( special_cb && (special != -1) )
                     {
                         fgSetWindow( window );
-
-                        /*
-                         * Remember the current modifiers state
-                         */
-                        modifiers = 0;
-                        if( event.xkey.state & ( ShiftMask | LockMask ) )
-                            modifiers |= GLUT_ACTIVE_SHIFT;
-                        if( event.xkey.state & ControlMask )
-                            modifiers |= GLUT_ACTIVE_CTRL;
-                        if( event.xkey.state & Mod1Mask )
-                            modifiers |= GLUT_ACTIVE_ALT;
-                        window->State.Modifiers = modifiers;
-
+                        window->State.Modifiers = fgGetXModifiers( &event );
                         special_cb( special, event.xkey.x, event.xkey.y );
-
-                        /*
-                         * Trash the modifiers state
-                         */
                         window->State.Modifiers = 0xffffffff;
                     }
                 }
