@@ -201,7 +201,7 @@ void fgAddToWindowDestroyList( SFG_Window* window )
     {
         void *destroy = FETCH_WCB( *window, Destroy );
         fgClearCallBacks( window );
-        FETCH_WCB( *window, Destroy ) = destroy;
+        SET_WCB( *window, Destroy, destroy );
     }
 }
 

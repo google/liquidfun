@@ -373,6 +373,38 @@ struct tagSFG_WindowState
 
 
 /*
+ * SET_WCB() is used as:
+ *
+ *     SET_WCB( window, Visibility, func );
+ *
+ * ...where {window} is the freeglut window to set the callback,
+ *          {Visibility} is the window-specific callback to set,
+ *          {func} is a function-pointer.
+ *
+ * Originally, {FETCH_WCB( ... ) = func} was rather sloppily used,
+ * but this can cause warnings because the FETCH_WCB() macro type-
+ * casts its result, and a type-cast value shouldn't be an lvalue.
+ *
+ * XXX Note that there is no type-checking to make sure that {func} is
+ * XXX a suitable type.  We could add a safety-check of the form:
+ * XXX
+ * XXX     if( FETCH_WCB( ... ) != func )
+ * XXX         ...
+ * XXX
+ * XXX ...is this desired?
+ *
+ * XXX The {if( FETCH_WCB( ... ) != func )} test is to do type-checking
+ * XXX and for no other reason.  Since it's hidden in the macro, the
+ * XXX ugliness is felt to be rather benign.
+ */
+#define SET_WCB(window,cbname,func)                   \
+do                                                    \
+{                                                     \
+    if( FETCH_WCB( window, cbname ) != func )         \
+        (((window).CallBacks[CB_ ## cbname]) = func); \
+} while( 0 )                                          \
+
+/*
  * FETCH_WCB() is used as:
  *
  *     FETCH_WCB( window, Visibility );

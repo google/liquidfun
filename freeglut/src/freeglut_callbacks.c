@@ -41,7 +41,7 @@
 #define SET_CALLBACK(a)              \
     if( fgStructure.Window == NULL ) \
         return;                      \
-    FETCH_WCB( ( *( fgStructure.Window ) ), a ) = callback;
+    SET_WCB( ( *( fgStructure.Window ) ), a, callback );
 
 /*
  * Sets the Display callback for the current window
