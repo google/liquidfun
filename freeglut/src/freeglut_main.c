@@ -480,7 +480,7 @@ static void fgSleepForEvents( void )
      * it is possible to have our socket drained but still have
      * unprocessed events.  (Or, this may just be normal with
      * X, anyway?)  We do non-trivial processing of X events
-     * after tham in event-reading loop, in any case, so we
+     * after the event-reading loop, in any case, so we
      * need to allow that we may have an empty socket but non-
      * empty event queue.
      */
@@ -537,9 +537,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
     SFG_Window* window;
     XEvent event;
 
-    /*
-     * This code was repeated constantly, so here it goes into a definition:
-     */
+    /* This code was repeated constantly, so here it goes into a definition: */
 #define GETWINDOW(a)                             \
     window = fgWindowByHandle( event.a.window ); \
     if( window == NULL )                         \
@@ -558,9 +556,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         switch( event.type )
         {
         case ClientMessage:
-            /*
-             * Destroy the window when the WM_DELETE_WINDOW message arrives
-             */
+            /* Destroy the window when the WM_DELETE_WINDOW message arrives */
             if( (Atom) event.xclient.data.l[ 0 ] == fgDisplay.DeleteWindow )
             {
                 GETWINDOW( xclient );
@@ -851,17 +847,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 break;
             }
 
-            /*
-             * No active menu, let's check whether we need to activate one.
-             */
+            /* No active menu, let's check whether we need to activate one. */
             if( ( 0 <= button ) &&
                 ( FREEGLUT_MAX_MENUS > button ) &&
                 ( window->Menu[ button ] ) &&
                 pressed )
             {
-                /*
-                 * XXX Posting a requisite Redisplay seems bogus.
-                 */
+                /* XXX Posting a requisite Redisplay seems bogus. */
                 window->State.Redisplay = GL_TRUE;
                 fgSetWindow( window );
                 fgActivateMenu( window, button );
@@ -916,9 +908,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     );
             }
 
-            /*
-             * Trash the modifiers state
-             */
+            /* Trash the modifiers state */
             fgState.Modifiers = 0xffffffff;
         }
         break;
@@ -1225,9 +1215,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     switch( uMsg )
     {
     case WM_CREATE:
-        /*
-         * The window structure is passed as the creation structure paramter...
-         */
+        /* The window structure is passed as the creation structure paramter... */
         window = (SFG_Window *) (((LPCREATESTRUCT) lParam)->lpCreateParams);
         assert( window != NULL );
 
@@ -1321,7 +1309,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 #if 0
     case WM_SETFOCUS:
-        /* printf("WM_SETFOCUS: %p\n", window ); */
+/*        printf("WM_SETFOCUS: %p\n", window ); */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 
@@ -1329,7 +1317,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if (LOWORD(wParam) != WA_INACTIVE)
         {
             /* glutSetCursor( fgStructure.Window->State.Cursor ); */
-            /* printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window,
+/*            printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window,
                    window->State.Cursor ); */
             glutSetCursor( window->State.Cursor );
         }

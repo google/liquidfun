@@ -53,9 +53,7 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
   const char *extensions, *start;
   const int len = strlen( extension );
 
-  /*
-   * Make sure there is a current window, and thus a current context available
-   */
+  /* Make sure there is a current window, and thus a current context available */
   freeglut_assert_ready;
   freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
 
@@ -150,9 +148,7 @@ void FGAPIENTRY glutForceJoystickFunc( void )
  */
 void FGAPIENTRY glutSetColor( int nColor, GLfloat red, GLfloat green, GLfloat blue )
 {
-    /*
-     *
-     */
+    /* We really need to do something here. */
 }
 
 /*
@@ -160,9 +156,7 @@ void FGAPIENTRY glutSetColor( int nColor, GLfloat red, GLfloat green, GLfloat bl
  */
 GLfloat FGAPIENTRY glutGetColor( int color, int component )
 {
-    /*
-     *
-     */
+    /* We really need to do something here. */
     return( 0.0f );
 }
 
@@ -171,9 +165,7 @@ GLfloat FGAPIENTRY glutGetColor( int color, int component )
  */
 void FGAPIENTRY glutCopyColormap( int window )
 {
-    /*
-     *
-     */
+    /* We really need to do something here. */
 }
 
 /*** END OF FILE ***/

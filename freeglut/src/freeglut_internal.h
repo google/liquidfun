@@ -33,9 +33,7 @@
 #define  VERSION_MINOR 2
 #define  VERSION_PATCH 0
 
-/*
- * Freeglut is meant to be available under all Unix/X11 and Win32 platforms.
- */
+/* Freeglut is meant to be available under all Unix/X11 and Win32 platforms. */
 #if defined(_WIN32_WCE)
 #   define  TARGET_HOST_UNIX_X11    0
 #   define  TARGET_HOST_WIN32       0
@@ -52,9 +50,7 @@
 
 #define  FREEGLUT_MAX_MENUS         3
 
-/*
- * Somehow all Win32 include headers depend on this one:
- */
+/* Somehow all Win32 include headers depend on this one: */
 #if TARGET_HOST_WIN32
 #include <windows.h>
 #include <windowsx.h>
@@ -66,9 +62,7 @@
 #define strdup   _strdup
 #endif
 
-/*
- * Those files should be available on every platform.
- */
+/* Those files should be available on every platform. */
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdio.h>
@@ -82,9 +76,7 @@
 #include <sys/time.h>
 #endif
 
-/*
- * The system-dependant include files should go here:
- */
+/* The system-dependant include files should go here: */
 #if TARGET_HOST_UNIX_X11
     #include <GL/glx.h>
     #include <X11/Xlib.h>
@@ -96,9 +88,7 @@
     #endif
 #endif
 
-/*
- * Microsoft VisualC++ 5.0's <math.h> does not define the PI
- */
+/* Microsoft VisualC++ 5.0's <math.h> does not define the PI */
 #ifndef M_PI
 #    define  M_PI  3.14159265358979323846
 #endif
@@ -113,9 +103,7 @@
 
 /* -- GLOBAL TYPE DEFINITIONS ---------------------------------------------- */
 
-/*
- * Freeglut callbacks type definitions
- */
+/* Freeglut callbacks type definitions */
 typedef void (* FGCBDisplay       )( void );
 typedef void (* FGCBReshape       )( int, int );
 typedef void (* FGCBVisibility    )( int );
@@ -141,23 +129,17 @@ typedef void (* FGCBTabletMotion  )( int, int );
 typedef void (* FGCBTabletButton  )( int, int, int, int );
 typedef void (* FGCBDestroy       )( void );
 
-/*
- * The global callbacks type definitions
- */
+/* The global callbacks type definitions */
 typedef void (* FGCBIdle          )( void );
 typedef void (* FGCBTimer         )( int );
 typedef void (* FGCBMenuState     )( int );
 typedef void (* FGCBMenuStatus    )( int, int, int );
 
-/*
- * The callback used when creating/using menus
- */
+/* The callback used when creating/using menus */
 typedef void (* FGCBMenu          )( int );
 
 
-/*
- * A list structure
- */
+/* A list structure */
 typedef struct tagSFG_List SFG_List;
 struct tagSFG_List
 {
@@ -165,9 +147,7 @@ struct tagSFG_List
     void *Last;
 };
 
-/*
- * A list node structure
- */
+/* A list node structure */
 typedef struct tagSFG_Node SFG_Node;
 struct tagSFG_Node
 {
@@ -175,9 +155,7 @@ struct tagSFG_Node
     void *Prev;
 };
 
-/*
- * A helper structure holding two ints and a boolean
- */
+/* A helper structure holding two ints and a boolean */
 typedef struct tagSFG_XYUse SFG_XYUse;
 struct tagSFG_XYUse
 {
@@ -185,13 +163,11 @@ struct tagSFG_XYUse
     GLboolean       Use;                /* ...and a single boolean.          */
 };
 
-/*
- * A helper structure holding a timeval and a boolean
- */
+/* A helper structure holding a timeval and a boolean */
 typedef struct tagSFG_Time SFG_Time;
 struct tagSFG_Time
 {
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#ifdef WIN32
     DWORD Value;
 #else
     struct timeval  Value;
@@ -210,9 +186,7 @@ typedef enum
   GLUT_EXEC_STATE_STOP
 } fgExecutionState ;
 
-/*
- * This structure holds different freeglut settings
- */
+/* This structure holds different freeglut settings */
 typedef struct tagSFG_State SFG_State;
 struct tagSFG_State
 {
@@ -257,9 +231,7 @@ struct tagSFG_State
     char            *ProgramName;         /* Name of the invoking program    */
 };
 
-/*
- * The structure used by display initialization in freeglut_init.c
- */
+/* The structure used by display initialization in freeglut_init.c */
 typedef struct tagSFG_Display SFG_Display;
 struct tagSFG_Display
 {
@@ -298,9 +270,7 @@ struct tagSFG_Display
 };
 
 
-/*
- * The user can create any number of timer hooks
- */
+/* The user can create any number of timer hooks */
 typedef struct tagSFG_Timer SFG_Timer;
 struct tagSFG_Timer
 {
@@ -347,9 +317,7 @@ struct tagSFG_Context
     int             DoubleBuffered;  /* Treat the window as double-buffered */
 };
 
-/*
- * Window's state description. This structure should be kept portable.
- */
+/* Window's state description. This structure should be kept portable. */
 typedef struct tagSFG_WindowState SFG_WindowState;
 struct tagSFG_WindowState
 {
@@ -493,9 +461,7 @@ enum
 };
 
 
-/*
- * This structure holds the OpenGL rendering context for all the menu windows
- */
+/* This structure holds the OpenGL rendering context for all the menu windows */
 typedef struct tagSFG_MenuContext SFG_MenuContext;
 struct tagSFG_MenuContext
 {
@@ -506,9 +472,7 @@ struct tagSFG_MenuContext
     SFG_WindowContextType Context;        /* The menu window's WGL context   */
 };
 
-/*
- * This structure describes a menu
- */
+/* This structure describes a menu */
 typedef struct tagSFG_Window SFG_Window;
 typedef struct tagSFG_MenuEntry SFG_MenuEntry;
 typedef struct tagSFG_Menu SFG_Menu;
@@ -530,9 +494,7 @@ struct tagSFG_Menu
     SFG_Window         *ParentWindow; /* Window in which the menu is defined */
 };
 
-/*
- * This is a menu entry
- */
+/* This is a menu entry */
 struct tagSFG_MenuEntry
 {
     SFG_Node            Node;
@@ -568,9 +530,7 @@ struct tagSFG_Window
 };
 
 
-/*
- * A linked list structure of windows
- */
+/* A linked list structure of windows */
 typedef struct tagSFG_WindowList SFG_WindowList ;
 struct tagSFG_WindowList
 {
@@ -578,9 +538,7 @@ struct tagSFG_WindowList
     SFG_Window *window ;
 };
 
-/*
- * This holds information about all the windows, menus etc.
- */
+/* This holds information about all the windows, menus etc. */
 typedef struct tagSFG_Structure SFG_Structure;
 struct tagSFG_Structure
 {
@@ -613,9 +571,7 @@ struct tagSFG_Enumerator
 };
 typedef void (* FGCBenumerator  )( SFG_Window *, SFG_Enumerator * );
 
-/*
- * The bitmap font structure
- */
+/* The bitmap font structure */
 typedef struct tagSFG_Font SFG_Font;
 struct tagSFG_Font
 {
@@ -627,9 +583,7 @@ struct tagSFG_Font
     float           xorig, yorig; /* Relative origin of the character */
 };
 
-/*
- * The stroke font structures
- */
+/* The stroke font structures */
 
 typedef struct tagSFG_StrokeVertex SFG_StrokeVertex;
 struct tagSFG_StrokeVertex
@@ -663,19 +617,13 @@ struct tagSFG_StrokeFont
 
 /* -- GLOBAL VARIABLES EXPORTS --------------------------------------------- */
 
-/*
- * Freeglut display related stuff (initialized once per session)
- */
+/* Freeglut display related stuff (initialized once per session) */
 extern SFG_Display fgDisplay;
 
-/*
- * Freeglut internal structure
- */
+/* Freeglut internal structure */
 extern SFG_Structure fgStructure;
 
-/*
- * The current freeglut settings
- */
+/* The current freeglut settings */
 extern SFG_State fgState;
 
 
@@ -722,16 +670,12 @@ void fgDeinitialize( void );
 void fgCreateStructure( void );
 void fgDestroyStructure( void );
 
-/*
- * A helper function to check if a display mode is possible to use
- */
+/* A helper function to check if a display mode is possible to use */
 #if TARGET_HOST_UNIX_X11
 XVisualInfo* fgChooseVisual( void );
 #endif
 
-/*
- * The window procedure for Win32 events handling
- */
+/* The window procedure for Win32 events handling */
 #if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg,
                                WPARAM wParam, LPARAM lParam );
@@ -757,15 +701,11 @@ void        fgCloseWindows ();
 void        fgDestroyWindow( SFG_Window* window );
 void        fgClearCallBacks( SFG_Window *window );
 
-/*
- * Menu creation and destruction. Defined in freeglut_structure.c
- */
+/* Menu creation and destruction. Defined in freeglut_structure.c */
 SFG_Menu*   fgCreateMenu( FGCBMenu menuCallback );
 void        fgDestroyMenu( SFG_Menu* menu );
 
-/*
- * Joystick device management functions, defined in freeglut_joystick.c
- */
+/* Joystick device management functions, defined in freeglut_joystick.c */
 void        fgJoystickInit( int ident );
 void        fgJoystickClose( void );
 void        fgJoystickPollWindow( SFG_Window* window );
@@ -829,23 +769,17 @@ void fgDisplayMenu( void );
  */
 void fgDisplayCursor( void );
 
-/*
- * Elapsed time as per glutGet(GLUT_ELAPSED_TIME).
- */
+/* Elapsed time as per glutGet(GLUT_ELAPSED_TIME). */
 long fgElapsedTime( void );
 
-/*
- * List functions
- */
+/* List functions */
 void fgListInit(SFG_List *list);
 void fgListAppend(SFG_List *list, SFG_Node *node);
 void fgListRemove(SFG_List *list, SFG_Node *node);
 int fgListLength(SFG_List *list);
 void fgListInsert(SFG_List *list, SFG_Node *next, SFG_Node *node);
 
-/*
- * Error Messages functions
- */
+/* Error Message functions */
 void fgError( const char *fmt, ... );
 void fgWarning( const char *fmt, ... );
 

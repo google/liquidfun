@@ -91,8 +91,8 @@ XVisualInfo* fgChooseVisual( void )
      * First we have to process the display mode settings...
      */
 /*
- * Why is there a semi-colon in this #define?  The code
- * that uses the macro seems to always add more semicolons...
+ * XXX Why is there a semi-colon in this #define?  The code
+ * XXX that uses the macro seems to always add more semicolons...
  */
 #define ATTRIB(a) attributes[where++]=a;
 #define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
@@ -447,13 +447,13 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     /*
      * Fill in the size hints values now (the x, y, width and height
-     * settings are obsolote, are there any more WMs that support them?)
+     * settings are obsolete, are there any more WMs that support them?)
      * Unless the X servers actually stop supporting these, we should
      * continue to fill them in.  It is *not* our place to tell the user
      * that they should replace a window manager that they like, and which
      * works, just because *we* think that it's not "modern" enough.
      */
-#if TARGET_HOST_WINCE
+#if TARGET_HOST_WINCE /* Since this is in the X11 branch, it's pretty dumb */
     sizeHints.x      = 0;
     sizeHints.y      = 0;
     sizeHints.width  = 320;
@@ -467,9 +467,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     wmHints.flags = StateHint;
     wmHints.initial_state = fgState.ForceIconic ? IconicState : NormalState;
-    /*
-     * Prepare the window and iconified window names...
-     */
+    /* Prepare the window and iconified window names... */
     XStringListToTextProperty( (char **) &title, 1, &textProperty );
 
     XSetWMProperties(
@@ -498,9 +496,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     freeglut_assert_ready;
 
-    /*
-     * Grab the window class we have registered on glutInit():
-     */
+    /* Grab the window class we have registered on glutInit(): */
     atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
     assert( atom != 0 );
 
@@ -640,9 +636,7 @@ void fgCloseWindow( SFG_Window* window )
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
-    /*
-     * Make sure we don't close a window with current context active
-     */
+    /* Make sure we don't close a window with current context active */
     if( fgStructure.Window == window )
         wglMakeCurrent( NULL, NULL );
 
@@ -690,7 +684,6 @@ int FGAPIENTRY glutCreateWindow( const char* title )
 int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
 {
     int ret = 0;
-
     SFG_Window* window = NULL;
     SFG_Window* parent = NULL;
 
@@ -941,6 +934,7 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
     {
         RECT winRect;
 
+        /* "GetWindowRect" returns the pixel coordinates of the outside of the window */
         GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
         MoveWindow(
             fgStructure.Window->Window.Handle,

@@ -73,9 +73,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
                             int x, int y, int w, int h,
                             GLboolean gameMode, GLboolean isMenu )
 {
-    /*
-     * Have the window object created
-     */
+    /* Have the window object created */
     SFG_Window *window = (SFG_Window *)calloc( sizeof(SFG_Window), 1 );
     int fakeArgc = 0;
 
@@ -88,9 +86,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
     if( !fgState.Initialised )
         glutInit( &fakeArgc, NULL );
 
-    /*
-     * Initialize the object properties
-     */
+    /* Initialize the object properties */
     window->ID = ++fgStructure.WindowID;
     window->State.OldHeight = window->State.OldWidth = -1;
 
@@ -103,9 +99,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
     else
         fgListAppend( &fgStructure.Windows, &window->Node );
 
-    /*
-     * Set the default mouse cursor and reset the modifiers value
-     */
+    /* Set the default mouse cursor and reset the modifiers value */
     window->State.Cursor    = GLUT_CURSOR_INHERIT;
 
     window->IsMenu = isMenu;
@@ -131,9 +125,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     int x = 100, y = 100, w = 100, h = 100;
     SFG_Window *current_window = fgStructure.Window;
 
-    /*
-     * Have the menu object created
-     */
+    /* Have the menu object created */
     SFG_Menu* menu = (SFG_Menu *)calloc( sizeof(SFG_Menu), 1 );
     int fakeArgc = 0;
 
@@ -146,9 +138,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
 
     menu->ParentWindow = fgStructure.Window;
 
-    /*
-     * Create a window for the menu to reside in.
-     */
+    /* Create a window for the menu to reside in. */
 
     fgCreateWindow( NULL, "freeglut menu", x, y, w, h, GL_FALSE, GL_TRUE );
     menu->Window = fgStructure.Window;
@@ -157,9 +147,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     glutHideWindow( );  /* Hide the window for now */
     fgSetWindow( current_window );
 
-    /*
-     * Initialize the object properties:
-     */
+    /* Initialize the object properties: */
     menu->ID       = ++fgStructure.MenuID;
     menu->Callback = menuCallback;
     menu->ActiveEntry = NULL;
@@ -167,9 +155,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     fgListInit( &menu->Entries );
     fgListAppend( &fgStructure.Menus, &menu->Node );
 
-    /*
-     * Newly created menus implicitly become current ones
-     */
+    /* Newly created menus implicitly become current ones */
     fgStructure.Menu = menu;
 
     return menu;
@@ -187,9 +173,7 @@ void fgAddToWindowDestroyList( SFG_Window* window )
     new_list_entry->window = window;
     fgListAppend( &fgStructure.WindowsToDestroy, &new_list_entry->node );
 
-    /*
-     * Check if the window is the current one...
-     */
+    /* Check if the window is the current one... */
     if( fgStructure.Window == window )
         fgStructure.Window = NULL;
 
@@ -279,9 +263,7 @@ static void fghRemoveMenuFromWindow( SFG_Window* window, SFG_Menu* menu )
         if( window->Menu[ i ] == menu )
             window->Menu[ i ] = NULL;
 
-    /*
-     * Call this function for all of the window's children recursively:
-     */
+    /* Call this function for all of the window's children recursively: */
     for( subWindow = (SFG_Window *)window->Children.First;
          subWindow;
          subWindow = (SFG_Window *)subWindow->Node.Next)
@@ -315,17 +297,13 @@ void fgDestroyMenu( SFG_Menu* menu )
     assert( menu );
     freeglut_assert_ready;
 
-    /*
-     * First of all, have all references to this menu removed from all windows:
-     */
+    /* First of all, have all references to this menu removed from all windows: */
     for( window = (SFG_Window *)fgStructure.Windows.First;
          window;
          window = (SFG_Window *)window->Node.Next )
         fghRemoveMenuFromWindow( window, menu );
 
-    /*
-     * Now proceed with removing menu entries that lead to this menu
-     */
+    /* Now proceed with removing menu entries that lead to this menu */
     for( from = ( SFG_Menu * )fgStructure.Menus.First;
          from;
          from = ( SFG_Menu * )from->Node.Next )
@@ -398,14 +376,10 @@ void fgDestroyStructure( void )
 {
     freeglut_assert_ready;
 
-    /*
-     * Clean up the WindowsToDestroy list.
-     */
+    /* Clean up the WindowsToDestroy list. */
     fgCloseWindows( );
 
-    /*
-     * Make sure all windows and menus have been deallocated
-     */
+    /* Make sure all windows and menus have been deallocated */
     while( fgStructure.Menus.First )
         fgDestroyMenu( ( SFG_Menu * )fgStructure.Menus.First );
 
@@ -423,9 +397,7 @@ void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
     assert( enumCallback && enumerator );
     freeglut_assert_ready;
 
-    /*
-     * Check every of the top-level windows
-     */
+    /* Check every of the top-level windows */
     for( window = ( SFG_Window * )fgStructure.Windows.First;
          window;
          window = ( SFG_Window * )window->Node.Next )
@@ -467,9 +439,7 @@ static void fghcbWindowByHandle( SFG_Window *window,
     if ( enumerator->found )
         return;
 
-    /*
-     * Check the window's handle. Hope this works. Looks ugly. That's for sure.
-     */
+    /* Check the window's handle. Hope this works. Looks ugly. That's for sure. */
     if( window->Window.Handle == (SFG_WindowHandleType) (enumerator->data) )
     {
         enumerator->found = GL_TRUE;
@@ -478,9 +448,7 @@ static void fghcbWindowByHandle( SFG_Window *window,
         return;
     }
 
-    /*
-     * Otherwise, check this window's children
-     */
+    /* Otherwise, check this window's children */
     fgEnumSubWindows( window, fghcbWindowByHandle, enumerator );
 }
 
@@ -493,9 +461,7 @@ SFG_Window* fgWindowByHandle ( SFG_WindowHandleType hWindow )
 {
     SFG_Enumerator enumerator;
 
-    /*
-     * This is easy and makes use of the windows enumeration defined above
-     */
+    /* This is easy and makes use of the windows enumeration defined above */
     enumerator.found = GL_FALSE;
     enumerator.data = (void *)hWindow;
     fgEnumWindows( fghcbWindowByHandle, &enumerator );
@@ -510,15 +476,11 @@ SFG_Window* fgWindowByHandle ( SFG_WindowHandleType hWindow )
  */
 static void fghcbWindowByID( SFG_Window *window, SFG_Enumerator *enumerator )
 {
-    /*
-     * Make sure we do not overwrite our precious results...
-     */
+    /* Make sure we do not overwrite our precious results... */
     if( enumerator->found )
         return;
 
-    /*
-     * Check the window's handle. Hope this works. Looks ugly. That's for sure.
-     */
+    /* Check the window's handle. Hope this works. Looks ugly. That's for sure. */
     if( window->ID == *( int *)(enumerator->data) )
     {
         enumerator->found = GL_TRUE;
@@ -527,9 +489,7 @@ static void fghcbWindowByID( SFG_Window *window, SFG_Enumerator *enumerator )
         return;
     }
 
-    /*
-     * Otherwise, check this window's children
-     */
+    /* Otherwise, check this window's children */
     fgEnumSubWindows( window, fghcbWindowByID, enumerator );
 }
 
@@ -542,9 +502,7 @@ SFG_Window* fgWindowByID( int windowID )
 {
     SFG_Enumerator enumerator;
 
-    /*
-     * Uses a method very similiar for fgWindowByHandle...
-     */
+    /* Uses a method very similiar for fgWindowByHandle... */
     enumerator.found = GL_FALSE;
     enumerator.data = ( void * )&windowID;
     fgEnumWindows( fghcbWindowByID, &enumerator );
@@ -555,7 +513,7 @@ SFG_Window* fgWindowByID( int windowID )
 
 /*
  * Looks up a menu given its ID. This is easier that fgWindowByXXX
- * as all menus are placed in a single doubly linked list...
+ * as all menus are placed in one doubly linked list...
  */
 SFG_Menu* fgMenuByID( int menuID )
 {
@@ -563,9 +521,7 @@ SFG_Menu* fgMenuByID( int menuID )
 
     freeglut_assert_ready;
 
-    /*
-     * It's enough to check all entries in fgStructure.Menus...
-     */
+    /* It's enough to check all entries in fgStructure.Menus... */
     for( menu = (SFG_Menu *)fgStructure.Menus.First;
          menu;
          menu = (SFG_Menu *)menu->Node.Next )

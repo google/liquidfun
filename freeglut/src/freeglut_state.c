@@ -144,14 +144,10 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     freeglut_assert_ready;
 
-    /*
-     * XXX In chronological code add order.  (WHY in that order?)
-     */
+    /* XXX In chronological code add order.  (WHY in that order?) */
     switch( eWhat )
     {
-    /*
-     * Following values are stored in fgState and fgDisplay global structures
-     */
+    /* Following values are stored in fgState and fgDisplay global structures */
     case GLUT_SCREEN_WIDTH:         return fgDisplay.ScreenWidth   ;
     case GLUT_SCREEN_HEIGHT:        return fgDisplay.ScreenHeight  ;
     case GLUT_SCREEN_WIDTH_MM:      return fgDisplay.ScreenWidthMM ;
@@ -167,9 +163,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
      * fghGetConfig().
      */
     case GLUT_WINDOW_NUM_SAMPLES:
-        /*
-         * XXX Multisampling. Return what I know about multisampling.
-         */
+        /* XXX Multisampling. Return what I know about multisampling. */
         return 0;
 
 #if TARGET_HOST_UNIX_X11
@@ -196,9 +190,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
 #   undef GLX_QUERY
 
-    /*
-     * Colormap size is handled in a bit different way than all the rest
-     */
+    /* Colormap size is handled in a bit different way than all the rest */
     case GLUT_WINDOW_COLORMAP_SIZE:
         if( (fghGetConfig( GLX_RGBA )) || (fgStructure.Window == NULL) )
         {
@@ -270,15 +262,11 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         }
     }
 
-    /*
-     * I do not know yet if there will be a fgChooseVisual() function for Win32
-     */
+    /* I do not know yet if there will be a fgChooseVisual() function for Win32 */
     case GLUT_DISPLAY_MODE_POSSIBLE:
         return( fgChooseVisual() == NULL ? 0 : 1 );
 
-    /*
-     * This is system-dependant
-     */
+    /* This is system-dependant */
     case GLUT_WINDOW_FORMAT_ID:
         if( fgStructure.Window == NULL )
             return 0;
@@ -287,9 +275,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
-    /*
-     * Handle the OpenGL inquiries
-     */
+    /* Handle the OpenGL inquiries */
     case GLUT_WINDOW_RGBA:
       glGetBooleanv ( GL_RGBA_MODE, &boolValue );
       returnValue = boolValue ? 1 : 0;
@@ -377,9 +363,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
          */
         GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
 
-        /*
-         * ...then we've got to correct the results we've just received...
-         */
+        /* ...then we've got to correct the results we've just received... */
 
 #if !TARGET_HOST_WINCE
         if ( ( fgStructure.GameMode != fgStructure.Window ) && ( fgStructure.Window->Parent == NULL ) &&
@@ -434,9 +418,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
 #endif
 
-    /*
-     * The window structure queries
-     */
+    /* The window structure queries */
     case GLUT_WINDOW_PARENT:
         if( fgStructure.Window         == NULL ) return 0;
         if( fgStructure.Window->Parent == NULL ) return 0;
@@ -485,9 +467,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
 {
     freeglut_assert_ready;
 
-    /*
-     * XXX WARNING: we are mostly lying in this function.
-     */
+    /* XXX WARNING: we are mostly lying in this function. */
     switch( eWhat )
     {
     case GLUT_HAS_KEYBOARD:
@@ -539,9 +519,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return GetSystemMetrics( SM_MOUSEPRESENT );
 
     case GLUT_NUM_MOUSE_BUTTONS:
-        /*
-         * We are much more fortunate under Win32 about this...
-         */
+        /* We are much more fortunate under Win32 about this... */
 #if TARGET_HOST_WINCE
         return 1;
 #else
@@ -555,9 +533,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
     case GLUT_OWNS_JOYSTICK:
     case GLUT_JOYSTICK_BUTTONS:
     case GLUT_JOYSTICK_AXES:
-        /*
-         * XXX WARNING: THIS IS A BIG LIE!
-         */
+        /* XXX WARNING: THIS IS A BIG LIE! */
         return 0;
 
     case GLUT_HAS_SPACEBALL:
@@ -575,9 +551,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return fgStructure.Window ? fgStructure.Window->State.IgnoreKeyRepeat : 0;
 
     case GLUT_DEVICE_KEY_REPEAT:
-        /*
-         * XXX WARNING: THIS IS A BIG LIE!
-         */
+        /* XXX WARNING: THIS IS A BIG LIE! */
         return GLUT_KEY_REPEAT_DEFAULT;
 
     default:
@@ -585,9 +559,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         break;
     }
 
-    /*
-     * And now -- the failure.
-     */
+    /* And now -- the failure. */
     return -1;
 }
 
@@ -641,9 +613,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
         return 0;
 
     case GLUT_NORMAL_DAMAGED:
-        /*
-         * XXX Actually I do not know. Maybe.
-         */
+        /* XXX Actually I do not know. Maybe. */
         return FALSE;
 
     case GLUT_OVERLAY_DAMAGED:
@@ -671,9 +641,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
         return 0;
 
     case GLUT_NORMAL_DAMAGED:
-        /*
-         * XXX Actually I do not know. Maybe.
-         */
+        /* XXX Actually I do not know. Maybe. */
         return FALSE;
 
     case GLUT_OVERLAY_DAMAGED:
@@ -685,9 +653,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
         break;
     }
 
-    /*
-     * And fail. That's good. Programs do love failing.
-     */
+    /* And fail. That's good. Programs do love failing. */
     return -1;
 }
 

@@ -257,9 +257,7 @@ void FGAPIENTRY glutWarpPointer( int x, int y )
         coords.x = x;
         coords.y = y;
 
-        /*
-         * ClientToScreen() translates {coords} for us.
-         */
+        /* ClientToScreen() translates {coords} for us. */
         ClientToScreen( fgStructure.Window->Window.Handle, &coords );
         SetCursorPos( coords.x, coords.y );
     }

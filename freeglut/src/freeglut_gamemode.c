@@ -86,9 +86,7 @@ void fghRememberState( void )
         );
     }
 
-    /*
-     * Query the current display settings:
-     */
+    /* Query the current display settings: */
     fgDisplay.DisplayModeValid =
       XF86VidModeGetModeLine(
         fgDisplay.Display,
@@ -111,9 +109,7 @@ void fghRememberState( void )
 
 /*    DEVMODE devMode; */
 
-    /*
-     * Grab the current desktop settings...
-     */
+    /* Grab the current desktop settings... */
 
 /* hack to get around my stupid cross-gcc headers */
 #define FREEGLUT_ENUM_CURRENT_SETTINGS -1
@@ -121,9 +117,7 @@ void fghRememberState( void )
     EnumDisplaySettings( NULL, FREEGLUT_ENUM_CURRENT_SETTINGS,
                          &fgDisplay.DisplayMode );
 
-    /*
-     * Make sure we will be restoring all settings needed
-     */
+    /* Make sure we will be restoring all settings needed */
     fgDisplay.DisplayMode.dmFields |=
         DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
 
@@ -138,9 +132,7 @@ void fghRestoreState( void )
 #if TARGET_HOST_UNIX_X11
 
 #   ifdef X_XF86VidModeGetAllModeLines
-    /*
-     * Restore the remembered pointer position:
-     */
+    /* Restore the remembered pointer position: */
     XWarpPointer(
         fgDisplay.Display, None, fgDisplay.RootWindow, 0, 0, 0, 0,
         fgDisplay.DisplayPointerX, fgDisplay.DisplayPointerY
@@ -206,9 +198,7 @@ void fghRestoreState( void )
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
-    /*
-     * Restore the previously rememebered desktop display settings
-     */
+    /* Restore the previously rememebered desktop display settings */
     ChangeDisplaySettings( &fgDisplay.DisplayMode, 0 );
 
 #endif
@@ -219,9 +209,7 @@ void fghRestoreState( void )
  */
 GLboolean fghCheckDisplayMode( int width, int height, int depth, int refresh )
 {
-    /*
-     * The desired values should be stored in fgState structure...
-     */
+    /* The desired values should be stored in fgState structure... */
     return ( width == fgState.GameModeSize.X ) &&
            ( height == fgState.GameModeSize.Y ) &&
            ( depth == fgState.GameModeDepth ) &&
@@ -257,9 +245,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
             &displayModes
         );
 
-        /*
-         * Check every of the modes looking for one that matches our demands
-         */
+        /* Check every of the modes looking for one that matches our demands */
         for( i = 0; i < displayModesCount; i++ )
         {
             if( fghCheckDisplayMode( displayModes[ i ]->hdisplay,
@@ -269,9 +255,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
             {
                 if( haveToTest )
                     return GL_TRUE;
-                /*
-                 * OKi, this is the display mode we have been looking for...
-                 */
+                /* OKi, this is the display mode we have been looking for... */
                 XF86VidModeSwitchToMode(
                     fgDisplay.Display,
                     fgDisplay.Screen,
@@ -282,9 +266,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         }
     }
 
-    /*
-     * Something must have went wrong
-     */
+    /* Something must have gone wrong */
     return GL_FALSE;
 
 #   else
@@ -307,9 +289,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
      */
     while( EnumDisplaySettings( NULL, displayModes, &devMode ) )
     {
-        /*
-         * Does the enumerated display mode match the user's preferences?
-         */
+        /* Does the enumerated display mode match the user's preferences? */
         if( fghCheckDisplayMode( devMode.dmPelsWidth,  devMode.dmPelsHeight,
                                  devMode.dmBitsPerPel,
                                  devMode.dmDisplayFrequency ) )
@@ -325,9 +305,7 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         /* then try without Display Frequency */
         displayModes = 0;
 
-        /*
-         * Enumerate the available display modes
-         */
+        /* Enumerate the available display modes */
         while( EnumDisplaySettings( NULL, displayModes, &devMode ) )
         {
             /* then try without Display Frequency */
@@ -343,24 +321,18 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         }
     }
 
-    /*
-     * Did we find a matching display mode?
-     */
+    /* Did we find a matching display mode? */
     if( mode != 0xffffffff )
     {
         int retVal = DISP_CHANGE_SUCCESSFUL;
 
-        /*
-         * Mark the values we want to modify in the display change call
-         */
+        /* Mark the values we want to modify in the display change call */
         devMode.dmFields |=
             DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
 
         retVal = ChangeDisplaySettings( &devMode, haveToTest ? CDS_TEST : 0 );
 
-        /*
-         * I don't know if it's really needed, but looks nice:
-         */
+        /* I don't know if it's really needed, but looks nice: */
         success = (retVal == DISP_CHANGE_SUCCESSFUL) ||
             (retVal == DISP_CHANGE_NOTUPDATED);
 
@@ -407,9 +379,7 @@ void FGAPIENTRY glutGameModeString( const char* string )
                                     string
                                 );
 
-    /*
-     * Hopefully it worked, and if not, we still have the default values
-     */
+    /* Hopefully it worked, and if not, we still have the default values */
     fgState.GameModeSize.X  = width;
     fgState.GameModeSize.Y  = height;
     fgState.GameModeDepth   = depth;
@@ -495,9 +465,7 @@ int FGAPIENTRY glutEnterGameMode( void )
         int x, y;
         Window child;
 
-        /*
-         * Change to viewport to the window topleft edge:
-         */
+        /* Change to viewport to the window topleft edge: */
         XF86VidModeSetViewPort( fgDisplay.Display, fgDisplay.Screen, 0, 0 );
 
         /*
@@ -522,9 +490,7 @@ int FGAPIENTRY glutEnterGameMode( void )
 
 #endif
 
-    /*
-     * Grab the keyboard, too
-     */
+    /* Grab the keyboard, too */
     XGrabKeyboard(
         fgDisplay.Display,
         fgStructure.GameMode->Window.Handle,
@@ -549,7 +515,7 @@ void FGAPIENTRY glutLeaveGameMode( void )
 
     fgAddToWindowDestroyList( fgStructure.GameMode );
 
-    fgStructure.GameMode = NULL ;
+    fgStructure.GameMode = NULL;
 
 #if TARGET_HOST_UNIX_X11
 

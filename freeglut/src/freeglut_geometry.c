@@ -75,9 +75,7 @@ void FGAPIENTRY glutWireCube( GLdouble dSize )
 #   define V(a,b,c) glVertex3d( a size, b size, c size );
 #   define N(a,b,c) glNormal3d( a, b, c );
 
-    /*
-     * PWO: I dared to convert the code to use macros...
-     */
+    /* PWO: I dared to convert the code to use macros... */
     glBegin( GL_LINE_LOOP ); N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+); glEnd();
     glBegin( GL_LINE_LOOP ); N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+); glEnd();
     glBegin( GL_LINE_LOOP ); N( 0.0, 0.0, 1.0); V(+,+,+); V(-,+,+); V(-,-,+); V(+,-,+); glEnd();
@@ -99,9 +97,7 @@ void FGAPIENTRY glutSolidCube( GLdouble dSize )
 #   define V(a,b,c) glVertex3d( a size, b size, c size );
 #   define N(a,b,c) glNormal3d( a, b, c );
 
-    /*
-     * PWO: Again, I dared to convert the code to use macros...
-     */
+    /* PWO: Again, I dared to convert the code to use macros... */
     glBegin( GL_QUADS );
         N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+);
         N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+);
@@ -593,9 +589,7 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
   int    i, j;
   double spsi, cpsi, sphi, cphi ;
 
-  /*
-   * Allocate the vertices array
-   */
+  /* Allocate the vertices array */
   vertex = (double *)calloc( sizeof(double), 3 * nSides * nRings );
   normal = (double *)calloc( sizeof(double), 3 * nSides * nRings );
 
@@ -671,15 +665,11 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
   int    i, j;
   double spsi, cpsi, sphi, cphi ;
 
-  /*
-   * Increment the number of sides and rings to allow for one more point than surface
-   */
+  /* Increment the number of sides and rings to allow for one more point than surface */
   nSides ++ ;
   nRings ++ ;
 
-  /*
-   * Allocate the vertices array
-   */
+  /* Allocate the vertices array */
   vertex = (double *)calloc( sizeof(double), 3 * nSides * nRings );
   normal = (double *)calloc( sizeof(double), 3 * nSides * nRings );
 
@@ -744,7 +734,8 @@ void FGAPIENTRY glutWireDodecahedron( void )
   /* Magic Numbers:  It is possible to create a dodecahedron by attaching two pentagons to each face of
    * of a cube.  The coordinates of the points are:
    *   (+-x,0, z); (+-1, 1, 1); (0, z, x )
-   * where x = 0.61803398875 and z = 1.61803398875.
+   * where x = (-1 + sqrt(5))/2, z = (1 + sqrt(5))/2  or
+   *       x = 0.61803398875 and z = 1.61803398875.
    */
   glBegin ( GL_LINE_LOOP ) ;
   glNormal3d (  0.0,  0.525731112119,  0.850650808354 ) ; glVertex3d (  0.0,  1.61803398875,  0.61803398875 ) ; glVertex3d ( -1.0,  1.0,  1.0 ) ; glVertex3d ( -0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d (  0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d (  1.0,  1.0,  1.0 ) ;
@@ -794,7 +785,8 @@ void FGAPIENTRY glutSolidDodecahedron( void )
   /* Magic Numbers:  It is possible to create a dodecahedron by attaching two pentagons to each face of
    * of a cube.  The coordinates of the points are:
    *   (+-x,0, z); (+-1, 1, 1); (0, z, x )
-   * where x = 0.61803398875 and z = 1.61803398875.
+   * where x = (-1 + sqrt(5))/2, z = (1 + sqrt(5))/2 or
+   *       x = 0.61803398875 and z = 1.61803398875.
    */
   glBegin ( GL_POLYGON ) ;
   glNormal3d (  0.0,  0.525731112119,  0.850650808354 ) ; glVertex3d (  0.0,  1.61803398875,  0.61803398875 ) ; glVertex3d ( -1.0,  1.0,  1.0 ) ; glVertex3d ( -0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d (  0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d (  1.0,  1.0,  1.0 ) ;

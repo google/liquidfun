@@ -182,9 +182,7 @@ static void teapot( GLint grid, GLdouble scale, GLenum type )
  */
 void FGAPIENTRY glutWireTeapot( GLdouble size )
 {
-    /*
-     * We will use the general teapot rendering code
-     */
+    /* We will use the general teapot rendering code */
     teapot( 10, size, GL_LINE );
 }
 
@@ -193,9 +191,7 @@ void FGAPIENTRY glutWireTeapot( GLdouble size )
  */
 void FGAPIENTRY glutSolidTeapot( GLdouble size )
 {
-    /*
-     * We will use the general teapot rendering code
-     */
+    /* We will use the general teapot rendering code */
     teapot( 7, size, GL_FILL );
 }
 

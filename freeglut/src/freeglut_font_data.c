@@ -13,7 +13,7 @@
  * The original freeglut fonts were extracted by a utility written
  * by Pawel W. Olszta (see below) and the generated fonts contained
  * his copyright exclusively.  Steve Baker asserts that Pawel
- * assigned intellectual property writes to Steve Baker.  Steve
+ * assigned intellectual property rights to Steve Baker.  Steve
  * Baker also asserts that fonts cannot be copyrighted.  He has
  * neither stripped the copyright from the freeglut fonts nor
  * formally retitled anything in his name.  Since that time, the

@@ -132,9 +132,7 @@ void fgInitialize( const char* displayName )
 
     fgDisplay.Connection = ConnectionNumber( fgDisplay.Display );
 
-    /*
-     * Create the window deletion atom
-     */
+    /* Create the window deletion atom */
     fgDisplay.DeleteWindow = XInternAtom(
         fgDisplay.Display,
         "WM_DELETE_WINDOW",
@@ -146,9 +144,7 @@ void fgInitialize( const char* displayName )
     WNDCLASS wc;
     ATOM atom;
 
-    /*
-     * What we need to do is to initialize the fgDisplay global structure here.
-     */
+    /* What we need to do is to initialize the fgDisplay global structure here. */
     fgDisplay.Instance = GetModuleHandle( NULL );
 
     atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
@@ -184,16 +180,12 @@ void fgInitialize( const char* displayName )
         wc.lpszMenuName   = NULL;
         wc.lpszClassName  = _T("FREEGLUT");
 
-        /*
-         * Register the window class
-         */
+        /* Register the window class */
         atom = RegisterClass( &wc );
         assert( atom );
     }
 
-    /*
-     * The screen dimensions can be obtained via GetSystemMetrics() calls
-     */
+    /* The screen dimensions can be obtained via GetSystemMetrics() calls */
     fgDisplay.ScreenWidth  = GetSystemMetrics( SM_CXSCREEN );
     fgDisplay.ScreenHeight = GetSystemMetrics( SM_CYSCREEN );
 
@@ -233,9 +225,7 @@ void fgDeinitialize( void )
 
     /* fgState.Initialised = GL_FALSE; */
 
-    /*
-     * If there was a menu created, destroy the rendering context
-     */
+    /* If there was a menu created, destroy the rendering context */
     if( fgStructure.MenuContext )
     {
         free( fgStructure.MenuContext );
@@ -688,9 +678,7 @@ void FGAPIENTRY glutInitWindowSize( int width, int height )
  */
 void FGAPIENTRY glutInitDisplayMode( unsigned int displayMode )
 {
-    /*
-     * We will make use of this value when creating a new OpenGL context...
-     */
+    /* We will make use of this value when creating a new OpenGL context... */
     fgState.DisplayMode = displayMode;
 }
 
@@ -732,9 +720,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
     token = strtok ( buffer, " \t" );
     while ( token )
     {
-        /*
-         * Process this token
-         */
+        /* Process this token */
         int i ;
         for ( i = 0; i < NUM_TOKENS; i++ )
         {
@@ -890,9 +876,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 
     free ( buffer );
 
-    /*
-     * We will make use of this value when creating a new OpenGL context...
-     */
+    /* We will make use of this value when creating a new OpenGL context... */
     fgState.DisplayMode = glut_state_flag;
 }
 

@@ -73,9 +73,7 @@
 #if TARGET_HOST_UNIX_X11
 #    define _JS_MAX_AXES 16
 #    if defined(__FreeBSD__) || defined(__NetBSD__)
-/*
- * XXX The below hack is done until freeglut's autoconf is updated.
- */
+/* XXX The below hack is done until freeglut's autoconf is updated. */
 #        define HAVE_USB_JS    1
 
 #        include <sys/ioctl.h>
@@ -133,17 +131,13 @@
 #define JS_TRUE  1
 #define JS_FALSE 0
 
-/*
- * BSD defines from "jsBSD.cxx" around lines 42-270
- */
+/* BSD defines from "jsBSD.cxx" around lines 42-270 */
 
 #if defined(__NetBSD__) || defined(__FreeBSD__)
 
 #    ifdef HAVE_USB_JS
 #        if defined(__NetBSD__)
-/*
- * XXX The below hack is done until freeglut's autoconf is updated.
- */
+/* XXX The below hack is done until freeglut's autoconf is updated. */
 #            define HAVE_USBHID_H 1
 #            ifdef HAVE_USBHID_H
 #                include <usbhid.h>
@@ -154,9 +148,7 @@
 #            if __FreeBSD_version < 500000
 #                include <libusbhid.h>
 #            else
-/*
- * XXX The below hack is done until freeglut's autoconf is updated.
- */
+/* XXX The below hack is done until freeglut's autoconf is updated. */
 #                define HAVE_USBHID_H 1
 #                include <usbhid.h>
 #            endif
@@ -1145,9 +1137,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     joy->name[ 0 ] = '\0';
 
 #if TARGET_HOST_MACINTOSH
-    /*
-     * XXX FIXME: get joystick name in Mac
-     */
+    /* XXX FIXME: get joystick name in Mac */
 
     err = ISpStartup( );
 
@@ -1349,9 +1339,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
         joy->max[ 0 ] = ( float )joy->jsCaps.wXmax;
     }
 
-    /*
-     * Guess all the rest judging on the axes extremals
-     */
+    /* Guess all the rest judging on the axes extremals */
     for( i = 0; i < joy->num_axes; i++ )
     {
         joy->center   [ i ] = ( joy->max[ i ] + joy->min[ i ] ) * 0.5f;
@@ -1466,9 +1454,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 #endif
 
 #if defined( __linux__ )
-    /*
-     * Default for older Linux systems.
-     */
+    /* Default for older Linux systems. */
     joy->num_axes    =  2;
     joy->num_buttons = 32;
 
@@ -1486,9 +1472,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     if( joy->error )
         return;
 
-    /*
-     * Set the correct number of axes for the linux driver
-     */
+    /* Set the correct number of axes for the linux driver */
 #    ifdef JS_NEW
     /* Melchior Franz's fixes for big-endian Linuxes since writing
      *  to the upper byte of an uninitialized word doesn't work.
@@ -1741,7 +1725,6 @@ void fgJoystickPollWindow( SFG_Window* window )
 
 /*
  * PWO: These jsJoystick class methods have not been implemented.
- *      We might consider adding such functions to freeglut-2.0.
  */
 int  glutJoystickGetNumAxes( int ident )
 {
