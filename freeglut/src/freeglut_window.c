@@ -389,14 +389,14 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             fgStructure.MenuContext->VisualInfo = window->Window.VisualInfo;
             fgStructure.MenuContext->Context = glXCreateContext(
                 fgDisplay.Display, fgStructure.MenuContext->VisualInfo,
-                NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+                NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
             );
         }
 
         /* window->Window.Context = fgStructure.MenuContext->Context; */
         window->Window.Context = glXCreateContext(
             fgDisplay.Display, window->Window.VisualInfo,
-            NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+            NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
         );
     }
     else if( fgState.UseCurrentContext )
@@ -406,19 +406,24 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         if( ! window->Window.Context )
             window->Window.Context = glXCreateContext(
                 fgDisplay.Display, window->Window.VisualInfo,
-                NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+                NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
             );
     }
     else
         window->Window.Context = glXCreateContext(
             fgDisplay.Display, window->Window.VisualInfo,
-            NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+            NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
         );
 
-    if( fgState.ForceDirectContext &&
-        !glXIsDirect( fgDisplay.Display, window->Window.Context ) )
-        fgError( "unable to force direct context rendering for window '%s'",
+    if(  !glXIsDirect( fgDisplay.Display, window->Window.Context ) )
+    {
+      if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
+        fgError( "Unable to force direct context rendering for window '%s'",
                  title );
+      else if( fgState.DirectContext == GLUT_TRY_DIRECT_CONTEXT )
+        fgWarning( "Unable to create direct context rendering for window '%s'\nThis may hurt performance.",
+                 title );
+    }
 
     glXMakeCurrent(
         fgDisplay.Display,

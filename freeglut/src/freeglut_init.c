@@ -59,8 +59,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       { 300, 300, GL_TRUE }, /* Size */
                       GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,  /* DisplayMode */
                       GL_FALSE,              /* Initialised */
-                      GL_FALSE,              /* ForceDirectContext */
-                      GL_TRUE,               /* TryDirectContext */
+                      GLUT_TRY_DIRECT_CONTEXT,  /* DirectContext */
                       GL_FALSE,              /* ForceIconic */
                       GL_FALSE,              /* UseCurrentContext */
                       GL_FALSE,              /* GLDebugSwitch */
@@ -273,8 +272,7 @@ void fgDeinitialize( void )
 
     fgState.DisplayMode = GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH;
 
-    fgState.ForceDirectContext  = GL_FALSE;
-    fgState.TryDirectContext    = GL_TRUE;
+    fgState.DirectContext  = GLUT_TRY_DIRECT_CONTEXT;
     fgState.ForceIconic         = GL_FALSE;
     fgState.UseCurrentContext   = GL_FALSE;
     fgState.GLDebugSwitch       = GL_FALSE;
@@ -570,21 +568,21 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         }
         else if( strcmp( argv[ i ], "-direct" ) == 0)
         {
-            if( ! fgState.TryDirectContext )
+            if( fgState.DirectContext == GLUT_FORCE_INDIRECT_CONTEXT )
                 fgError( "parameters ambiguity, -direct and -indirect "
                     "cannot be both specified" );
 
-            fgState.ForceDirectContext = GL_TRUE;
+            fgState.DirectContext = GLUT_FORCE_DIRECT_CONTEXT;
             argv[ i ] = NULL;
             ( *pargc )--;
         }
         else if( strcmp( argv[ i ], "-indirect" ) == 0 )
         {
-            if( fgState.ForceDirectContext )
+            if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
                 fgError( "parameters ambiguity, -direct and -indirect "
                     "cannot be both specified" );
 
-            fgState.TryDirectContext = GL_FALSE;
+            fgState.DirectContext = GLUT_FORCE_INDIRECT_CONTEXT;
             argv[ i ] = NULL;
             (*pargc)--;
         }

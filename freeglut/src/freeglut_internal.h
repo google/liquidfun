@@ -222,8 +222,7 @@ struct tagSFG_State
 
     GLboolean        Initialised;          /* freeglut has been initialised  */
 
-    GLboolean        ForceDirectContext;   /* Force direct rendering?        */
-    GLboolean        TryDirectContext;     /* What about giving a try to?    */
+    int              DirectContext;        /* Direct rendering state         */
 
     GLboolean        ForceIconic;          /* New top windows are iconified  */
     GLboolean        UseCurrentContext;    /* New windows share with current */

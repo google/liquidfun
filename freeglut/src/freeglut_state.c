@@ -72,51 +72,55 @@ static int fghGetConfig( int attribute )
  */
 void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
 {
-  freeglut_assert_ready;
+    freeglut_assert_ready;
 
-  /*
-   * XXX In chronological code add order.  (WHY in that order?)
-   */
-  switch( eWhat )
-  {
-  case GLUT_INIT_WINDOW_X:
-      fgState.Position.X = (GLint)value;
-      break;
+    /*
+     * XXX In chronological code add order.  (WHY in that order?)
+     */
+    switch( eWhat )
+    {
+    case GLUT_INIT_WINDOW_X:
+        fgState.Position.X = (GLint)value;
+        break;
 
-  case GLUT_INIT_WINDOW_Y:
-      fgState.Position.Y = (GLint)value;
-      break;
+    case GLUT_INIT_WINDOW_Y:
+        fgState.Position.Y = (GLint)value;
+        break;
 
-  case GLUT_INIT_WINDOW_WIDTH:
-      fgState.Size.X = (GLint)value;
-      break;
+    case GLUT_INIT_WINDOW_WIDTH:
+        fgState.Size.X = (GLint)value;
+        break;
 
-  case GLUT_INIT_WINDOW_HEIGHT:
-      fgState.Size.Y = (GLint)value;
-      break;
+    case GLUT_INIT_WINDOW_HEIGHT:
+        fgState.Size.Y = (GLint)value;
+        break;
 
-  case GLUT_INIT_DISPLAY_MODE:
-      fgState.DisplayMode = (unsigned int)value;
-      break;
+    case GLUT_INIT_DISPLAY_MODE:
+        fgState.DisplayMode = (unsigned int)value;
+        break;
 
-  case GLUT_ACTION_ON_WINDOW_CLOSE:
-      fgState.ActionOnWindowClose = value;
-      break;
+    case GLUT_ACTION_ON_WINDOW_CLOSE:
+        fgState.ActionOnWindowClose = value;
+        break;
 
-  case GLUT_RENDERING_CONTEXT:
-      fgState.UseCurrentContext =
-          ( value == GLUT_USE_CURRENT_CONTEXT ) ? GL_TRUE : GL_FALSE;
-      break;
+    case GLUT_RENDERING_CONTEXT:
+        fgState.UseCurrentContext =
+            ( value == GLUT_USE_CURRENT_CONTEXT ) ? GL_TRUE : GL_FALSE;
+        break;
 
-  case GLUT_WINDOW_CURSOR:
-      if( fgStructure.Window != NULL )
-          fgStructure.Window->State.Cursor = value;
-      break;
+    case GLUT_DIRECT_RENDERING:
+        fgState.DirectContext = value;
+        break;
 
-  default:
-      fgWarning( "glutSetOption(): missing enum handle %i\n", eWhat );
-      break;
-  }
+    case GLUT_WINDOW_CURSOR:
+        if( fgStructure.Window != NULL )
+            fgStructure.Window->State.Cursor = value;
+        break;
+
+    default:
+        fgWarning( "glutSetOption(): missing enum handle %i\n", eWhat );
+        break;
+    }
 }
 
 /*
@@ -462,6 +466,10 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_RENDERING_CONTEXT:
         return fgState.UseCurrentContext ? GLUT_USE_CURRENT_CONTEXT
                                          : GLUT_CREATE_NEW_CONTEXT;
+
+    case GLUT_DIRECT_RENDERING:
+        return fgState.DirectContext;
+        break;
 
     default:
         fgWarning( "glutGet(): missing enum handle %i\n", eWhat );
