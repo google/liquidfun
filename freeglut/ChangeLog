@@ -238,3 +238,10 @@ October 24, 2002:
 *******************************************************************************************
 
 (92) freeglut.lsm:3  Removed 'beta' label for next release, thanks to Bernhard Kaindl.
+
+
+*******************************************************************************************
+* Changes on 23 July 2003
+*******************************************************************************************
+
+(93) doc/Makefile.am:4  Removed trailing backslash and added an empty last line
