@@ -164,3 +164,5 @@ October 24, 2002:
 *******************************************************************************************
 
 (60) Added autogen.sh (#30 from todo.txt)
+
+(70) Updated aclocal.m4 with aclocal 1.7.3 (was created with aclocal 1.5)
