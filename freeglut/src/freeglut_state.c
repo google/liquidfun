@@ -37,8 +37,10 @@
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
- *  glutGet()               -- X11 tests passed, but check if all enums handled (what about Win32?)
- *  glutDeviceGet()         -- X11 tests passed, but check if all enums handled (what about Win32?)
+ *  glutGet()               -- X11 tests passed, but check if all enums
+ *                             handled (what about Win32?)
+ *  glutDeviceGet()         -- X11 tests passed, but check if all enums
+ *                             handled (what about Win32?)
  *  glutGetModifiers()      -- OK, but could also remove the limitation
  *  glutLayerGet()          -- what about GLUT_NORMAL_DAMAGED?
  *
@@ -55,24 +57,13 @@
  */
 static int fghGetConfig( int attribute )
 {
-  int returnValue ;
+  int returnValue = 0;
 
-  /*
-   * Return nothing if there is no current window set
-   */
-  if( fgStructure.Window == NULL )
-    return( 0 );
+  if( fgStructure.Window )
+      glXGetConfig( fgDisplay.Display, fgStructure.Window->Window.VisualInfo,
+	  attribute, &returnValue );
 
-  /*
-   * glXGetConfig should work fine
-   */
-  glXGetConfig( fgDisplay.Display, fgStructure.Window->Window.VisualInfo, attribute, &returnValue );
-
-
-  /*
-   * Have the query results returned
-   */
-  return ( returnValue ) ;
+  return returnValue;
 }
 #endif
 
@@ -90,26 +81,39 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
    */
   switch( eWhat )
   {
-  case GLUT_INIT_WINDOW_X:          fgState.Position.X          = (GLint)value ;
-                                    break ;
-  case GLUT_INIT_WINDOW_Y:          fgState.Position.Y          = (GLint)value ;
-                                    break ;
-  case GLUT_INIT_WINDOW_WIDTH:      fgState.Size.X              = (GLint)value ;
-                                    break ;
-  case GLUT_INIT_WINDOW_HEIGHT:     fgState.Size.Y              = (GLint)value ;
-                                    break ;
-  case GLUT_INIT_DISPLAY_MODE:      fgState.DisplayMode         = (unsigned int)value ;
-                                    break ;
+  case GLUT_INIT_WINDOW_X:
+      fgState.Position.X = (GLint)value;
+      break;
 
-  case GLUT_ACTION_ON_WINDOW_CLOSE: fgState.ActionOnWindowClose = value ;
-                                    break ;
+  case GLUT_INIT_WINDOW_Y:
+      fgState.Position.Y = (GLint)value;
+      break;
 
-  case GLUT_RENDERING_CONTEXT:      fgState.UseCurrentContext   = ( value == GLUT_USE_CURRENT_CONTEXT ) ? TRUE : FALSE ;
-                                    break ;
+  case GLUT_INIT_WINDOW_WIDTH:
+      fgState.Size.X = (GLint)value;
+      break;
+
+  case GLUT_INIT_WINDOW_HEIGHT:
+      fgState.Size.Y = (GLint)value;
+      break;
+
+  case GLUT_INIT_DISPLAY_MODE:
+      fgState.DisplayMode = (unsigned int)value;
+      break;
+
+  case GLUT_ACTION_ON_WINDOW_CLOSE:
+      fgState.ActionOnWindowClose = value;
+      break;
+
+  case GLUT_RENDERING_CONTEXT:
+      fgState.UseCurrentContext =
+	  ( value == GLUT_USE_CURRENT_CONTEXT ) ? TRUE : FALSE;
+      break;
 
   case GLUT_WINDOW_CURSOR:
-      if( fgStructure.Window != NULL ) fgStructure.Window->State.Cursor = value ;
-      break ;
+      if( fgStructure.Window != NULL )
+	  fgStructure.Window->State.Cursor = value;
+      break;
 
   default:
       /*
