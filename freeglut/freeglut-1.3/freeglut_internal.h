@@ -291,7 +291,6 @@ struct tagSFG_Context
     Window          Handle;             /* The window's handle                 */
     GLXContext      Context;            /* The OpenGL context                  */
     XVisualInfo*    VisualInfo;         /* The window's visual information     */
-    int             DoubleBuffered;     /* Treat the window as double-buffered */
 
 #elif TARGET_HOST_WIN32
     HWND            Handle;             /* The window's handle                 */
@@ -299,6 +298,8 @@ struct tagSFG_Context
     HGLRC           Context;            /* The window's WGL context            */
 
 #endif
+
+    int             DoubleBuffered;     /* Treat the window as double-buffered */
 };
 
 /*

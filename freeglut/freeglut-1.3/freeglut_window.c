@@ -361,11 +361,6 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     freeglut_assert_ready;
 
     /*
-     * Save the window's single- or double-buffering state
-     */
-    window->Window.DoubleBuffered = ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0 ;
-
-    /*
      * Here we are upon the stage. Have the visual selected.
      */
     window->Window.VisualInfo = fgChooseVisual();
@@ -541,15 +536,6 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 #       endif
     }
 
-    /*
-     * If it's not double-buffered, make sure the rendering is done to the front buffer.
-     */
-    if ( ! window->Window.DoubleBuffered )
-    {
-      glDrawBuffer ( GL_FRONT ) ;
-      glReadBuffer ( GL_FRONT ) ;
-    }
-
 #elif TARGET_HOST_WIN32
 
 	WNDCLASS wc;
@@ -635,6 +621,20 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     ShowCursor( TRUE );
 
 #endif
+
+    /*
+     * Save the window's single- or double-buffering state
+     */
+    window->Window.DoubleBuffered = ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0 ;
+
+    /*
+     * If it's not double-buffered, make sure the rendering is done to the front buffer.
+     */
+    if ( ! window->Window.DoubleBuffered )
+    {
+      glDrawBuffer ( GL_FRONT ) ;
+      glReadBuffer ( GL_FRONT ) ;
+    }
 
     /*
      * Set the newly created window as the current one
