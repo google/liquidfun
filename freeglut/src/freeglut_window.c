@@ -268,7 +268,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      * XXX simplify this.
      */
     if( !window->IsMenu )
-	window->Window.VisualInfo = fgChooseVisual( );
+        window->Window.VisualInfo = fgChooseVisual( );
     else if( fgStructure.MenuContext )
         window->Window.VisualInfo = fgChooseVisual( );
     else
@@ -310,7 +310,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     window->State.IsOffscreen = GL_FALSE;
     if( fgState.DisplayMode & GLUT_OFFSCREEN )
     {
-	window->State.IsOffscreen = GL_TRUE;
+        window->State.IsOffscreen = GL_TRUE;
         window->Window.Pixmap = XCreatePixmap(
             fgDisplay.Display, fgDisplay.RootWindow,
             w, h,
