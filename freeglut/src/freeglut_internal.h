@@ -90,7 +90,9 @@
     #include <X11/keysym.h>
 
     #ifndef __sgi
-    #include <X11/extensions/xf86vmode.h>
+      #ifndef SOLARIS
+        #include <X11/extensions/xf86vmode.h>
+      #endif
     #endif
 #endif
 

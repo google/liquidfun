@@ -247,3 +247,10 @@ October 24, 2002:
 (93) doc/Makefile.am:4  Removed trailing backslash and added an empty last line
 
 (94) src/freeglut_window.c  Windowing fixes from John F.
+
+
+*******************************************************************************************
+* Changes on 23 July 2003
+*******************************************************************************************
+
+(95) src/freeglut_initial.c:91  Added check for SOLARIS OS
