@@ -272,31 +272,31 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
     /* a non-black dark version of the below. */
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     glBegin( GL_QUAD_STRIP );
-        glVertex2i( menu->Width       , 0                  );
-        glVertex2i( menu->Width-border,              border);
-        glVertex2i( 0                 , 0                  );
-        glVertex2i(             border,              border);
-        glVertex2i( 0                 , menu->Height       );
-        glVertex2i(             border, menu->Height-border);
+        glVertex2i( menu->Width         , 0                    );
+        glVertex2i( menu->Width - border,                border);
+        glVertex2i( 0                   , 0                    );
+        glVertex2i(               border,                border);
+        glVertex2i( 0                   , menu->Height         );
+        glVertex2i(               border, menu->Height - border);
     glEnd( );
 
     /* a non-black dark version of the below. */
     glColor4f( 0.5f, 0.5f, 0.5f, 1.0f );
     glBegin( GL_QUAD_STRIP );
-        glVertex2i( 0                 , menu->Height       );
-        glVertex2i(             border, menu->Height-border);
-        glVertex2i( menu->Width       , menu->Height       );
-        glVertex2i( menu->Width-border, menu->Height-border);
-        glVertex2i( menu->Width       , 0                  );
-        glVertex2i( menu->Width-border,              border);
+        glVertex2i( 0                   , menu->Height         );
+        glVertex2i(               border, menu->Height - border);
+        glVertex2i( menu->Width         , menu->Height         );
+        glVertex2i( menu->Width - border, menu->Height - border);
+        glVertex2i( menu->Width         , 0                    );
+        glVertex2i( menu->Width - border,                border);
     glEnd( );
 
     glColor4fv( menu_pen_back ) ;
     glBegin( GL_QUADS );
-        glVertex2i(             border,              border);
-        glVertex2i( menu->Width-border,              border);
-        glVertex2i( menu->Width-border, menu->Height-border);
-        glVertex2i(             border, menu->Height-border);
+        glVertex2i(               border,                border);
+        glVertex2i( menu->Width - border,                border);
+        glVertex2i( menu->Width - border, menu->Height - border);
+        glVertex2i(               border, menu->Height - border);
     glEnd( );
 
     /*
@@ -323,18 +323,14 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
              */
             glColor4fv( menu_pen_hback );
             glBegin( GL_QUADS );
-                glVertex2i( FREEGLUT_MENU_BORDER,
-                            (menuID + 0)*FREEGLUT_MENU_HEIGHT +
-                            FREEGLUT_MENU_BORDER );
-                glVertex2i( menu->Width-FREEGLUT_MENU_BORDER,
-                            (menuID + 0)*FREEGLUT_MENU_HEIGHT +
-                            FREEGLUT_MENU_BORDER );
-                glVertex2i( menu->Width-FREEGLUT_MENU_BORDER,
-                            (menuID + 1)*FREEGLUT_MENU_HEIGHT +
-                            FREEGLUT_MENU_BORDER );
-                glVertex2i( FREEGLUT_MENU_BORDER,
-                            (menuID + 1)*FREEGLUT_MENU_HEIGHT +
-                            FREEGLUT_MENU_BORDER );
+                glVertex2i( border,
+                            (menuID + 0)*FREEGLUT_MENU_HEIGHT + border );
+                glVertex2i( menu->Width - border,
+                            (menuID + 0)*FREEGLUT_MENU_HEIGHT + border );
+                glVertex2i( menu->Width - border,
+                            (menuID + 1)*FREEGLUT_MENU_HEIGHT + border );
+                glVertex2i( border,
+                            (menuID + 1)*FREEGLUT_MENU_HEIGHT + border );
             glEnd( );
         }
     }
@@ -360,9 +356,9 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
          */
         /* Try to center the text - JCJ 31 July 2003*/
         glRasterPos2i(
-            2 * FREEGLUT_MENU_BORDER,
-            (i + 1)*FREEGLUT_MENU_HEIGHT-(int)( FREEGLUT_MENU_HEIGHT*0.3 -
-                                                FREEGLUT_MENU_BORDER )
+            2 * border,
+            (i + 1)*FREEGLUT_MENU_HEIGHT -
+            (int)( FREEGLUT_MENU_HEIGHT*0.3 - border )
         );
 
         /*
@@ -377,14 +373,12 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
         {
             int width = glutBitmapWidth( FREEGLUT_MENU_FONT, '_' );
             int x_base = menu->Width - 2 - width;
-            int y_base = i*FREEGLUT_MENU_HEIGHT + FREEGLUT_MENU_BORDER;
+            int y_base = i*FREEGLUT_MENU_HEIGHT + border;
             glBegin( GL_TRIANGLES );
-                glVertex2i( x_base, y_base + 2*FREEGLUT_MENU_BORDER);
+                glVertex2i( x_base, y_base + 2 * border);
                 glVertex2i( menu->Width - 2, y_base +
-                            ( FREEGLUT_MENU_HEIGHT +
-                              FREEGLUT_MENU_BORDER) / 2 );
-                glVertex2i( x_base, y_base + FREEGLUT_MENU_HEIGHT -
-                            FREEGLUT_MENU_BORDER);
+                            ( FREEGLUT_MENU_HEIGHT + border) / 2 );
+                glVertex2i( x_base, y_base + FREEGLUT_MENU_HEIGHT - border );
             glEnd( );
         }
 
