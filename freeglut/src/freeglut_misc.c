@@ -152,20 +152,8 @@ void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
 void FGAPIENTRY glutForceJoystickFunc( void )
 {
     freeglut_assert_ready;
-
-    /*
-     * Is there a current window selected?
-     */
     freeglut_return_if_fail( fgStructure.Window != NULL );
-
-    /*
-     * Check if there is a joystick callback hooked to the current window
-     */
     freeglut_return_if_fail( fgStructure.Window->Callbacks.Joystick != NULL );
-
-    /*
-     * Poll the joystick now, using the current window's joystick callback
-     */
     fgJoystickPollWindow( fgStructure.Window );
 }
 
