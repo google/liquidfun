@@ -1,3 +1,5 @@
+********** Hey Emacs, please use -*- fundamental -*- mode! **********
+
 Changes to Freeglut:
 
 Before and on October 22, 2002:
@@ -843,11 +845,44 @@ an API function and had it print out the name of the function whose call
 created the error condition.  Removed some other "freeglut_assert_ready"
 invocations from functions which are only called from other functions which
 already check for initialization.
- 
 
+***************************************************************************
+* Changes on December 31, 2004.
+***************************************************************************
 
+(220) Fixed bug #1079530 (glutGetProcAddress and geometric objects).
 
+(221) Fixed bug #1087642 (glutDeviceGet(GLUT_DEVICE_KEY_REPEAT)
+unimplemented).
 
+(222) Fixed bug #1045054 (KeyReleaseMask typo).
 
+(223) Fixed bug #1040435 (glutBitmapString() bug).
 
+(224) Fixed first bug of #1064195 (two things when using signals):
+Don't issue a warning about select when a non-blocked signal was
+caught. This makes sense and is more compatible with GLUT.
 
+***************************************************************************
+* Changes on January 1, 2005.
+***************************************************************************
+
+(225) Added eMbedded Visual Tools project/workspace files to
+distribution.
+
+(226) Renamed "configure.in" to the officially preferred
+"configure.ac".
+
+(227) Make "gcc -Wall -pedantic -Werror" happy.
+
+(228) Modernized configure.ac a bit and added a rule to Makefile.am to
+update libtool. Note that all gcc compiler warnings are now on by
+default.
+
+(229) Added missing files from "src" subdirectory to dist.
+
+***************************************************************************
+* Changes on January 3, 2005.
+***************************************************************************
+
+(230) Removed acconfig.h, it is deprecated and we don't need it.
