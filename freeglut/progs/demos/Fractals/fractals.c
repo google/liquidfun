@@ -206,7 +206,7 @@ void readConfigFile ( char *fnme )
 
   /* Read the window title */
   fgets ( inputline, 256, fptr ) ;
-  sscanf ( inputline, "%s", window_title ) ;
+  sscanf ( inputline, "%[a-zA-Z0-9!@#$%^&*()+=/\\_-\" ]", window_title ) ;
 
   /* Read a comment line */
   fgets ( inputline, 256, fptr ) ;
