@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-window"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -214,7 +214,7 @@ XVisualInfo* fgChooseVisual( void )
  * Setup the pixel format for a Win32 window
  */
 #if TARGET_HOST_WIN32
-GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly )
+GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly, unsigned char layer_type )
 {
 	PIXELFORMATDESCRIPTOR* ppfd, pfd;
 	int flags, pixelformat;
@@ -232,56 +232,56 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly )
 	/*
 	 * It might be the case for us to use double buffering
 	 */
-    if( fgState.DisplayMode & GLUT_DOUBLE )
-		flags |= PFD_DOUBLEBUFFER;
+  if( fgState.DisplayMode & GLUT_DOUBLE )
+	flags |= PFD_DOUBLEBUFFER;
 
-    /*
-     * Specify which pixel format do we opt for...
-     */
+  /*
+   * Specify which pixel format do we opt for...
+   */
 #	pragma message( "fgSetupPixelFormat(): there is still some work to do here!" )
 
-    pfd.nSize				= sizeof(PIXELFORMATDESCRIPTOR);
-    pfd.nVersion			= 1;
-    pfd.dwFlags				= flags;
-    pfd.iPixelType			= PFD_TYPE_RGBA;
-    pfd.cColorBits			= 24;
-    pfd.cRedBits			= 0;
-    pfd.cRedShift			= 0;
-    pfd.cGreenBits			= 0;
-    pfd.cGreenShift			= 0;
-    pfd.cBlueBits			= 0;
-    pfd.cBlueShift			= 0;
-    pfd.cAlphaBits			= 0;
-    pfd.cAlphaShift			= 0;
-    pfd.cAccumBits			= 0;
-    pfd.cAccumRedBits		= 0;
-    pfd.cAccumGreenBits		= 0;
-    pfd.cAccumBlueBits		= 0;
-    pfd.cAccumAlphaBits		= 0;
+  pfd.nSize				= sizeof(PIXELFORMATDESCRIPTOR);
+  pfd.nVersion			= 1;
+  pfd.dwFlags				= flags;
+  pfd.iPixelType			= PFD_TYPE_RGBA;
+  pfd.cColorBits			= 24;
+  pfd.cRedBits			= 0;
+  pfd.cRedShift			= 0;
+  pfd.cGreenBits			= 0;
+  pfd.cGreenShift			= 0;
+  pfd.cBlueBits			= 0;
+  pfd.cBlueShift			= 0;
+  pfd.cAlphaBits			= 0;
+  pfd.cAlphaShift			= 0;
+  pfd.cAccumBits			= 0;
+  pfd.cAccumRedBits		= 0;
+  pfd.cAccumGreenBits		= 0;
+  pfd.cAccumBlueBits		= 0;
+  pfd.cAccumAlphaBits		= 0;
 #if 0
-    pfd.cDepthBits			= 32;
-    pfd.cStencilBits		= 0;
+  pfd.cDepthBits			= 32;
+  pfd.cStencilBits		= 0;
 #else
-    pfd.cDepthBits			= 24;
-    pfd.cStencilBits		= 8;
+  pfd.cDepthBits			= 24;
+  pfd.cStencilBits		= 8;
 #endif
-    pfd.cAuxBuffers			= 0;
-    pfd.iLayerType			= PFD_MAIN_PLANE;
-    pfd.bReserved			= 0;
-    pfd.dwLayerMask			= 0;
-    pfd.dwVisibleMask		= 0;
-    pfd.dwDamageMask		= 0;
+  pfd.cAuxBuffers			= 0;
+  pfd.iLayerType			= layer_type;
+  pfd.bReserved			= 0;
+  pfd.dwLayerMask			= 0;
+  pfd.dwVisibleMask		= 0;
+  pfd.dwDamageMask		= 0;
 
-    /*
-     * Fill in the color bits...
-     */
-    pfd.cColorBits = (BYTE) GetDeviceCaps( window->Window.Device, BITSPIXEL );
-    ppfd = &pfd;
+  /*
+   * Fill in the color bits...
+   */
+  pfd.cColorBits = (BYTE) GetDeviceCaps( window->Window.Device, BITSPIXEL );
+  ppfd = &pfd;
 
 	/*
 	 * Choose the pixel format that matches our demand
 	 */
-    pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
+  pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
 	if( pixelformat == 0 )
 		return( FALSE );
 
@@ -294,12 +294,56 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly )
 	/*
 	 * Finally, set the window's pixel format
 	 */
-	if( SetPixelFormat( window->Window.Device, pixelformat, ppfd ) == FALSE )
-		return( FALSE );
-
-    return( TRUE );
+	return ( SetPixelFormat( window->Window.Device, pixelformat, ppfd ) ) ;
 }
 #endif
+
+/*
+ * Sets the OpenGL context and the fgStructure "Current Window" pointer to the window
+ * structure passed in.
+ */
+void fgSetWindow ( SFG_Window *window )
+{
+#if TARGET_HOST_UNIX_X11
+    /*
+	 * Make the selected window's GLX context the current one
+     */
+    glXMakeCurrent(
+        fgDisplay.Display,
+        window->Window.Handle,
+        window->Window.Context
+    );
+
+#elif TARGET_HOST_WIN32
+	/*
+	 * Release the previous' context's device context
+	 */
+	if( fgStructure.Window != NULL )
+		ReleaseDC( fgStructure.Window->Window.Handle, fgStructure.Window->Window.Device );
+
+  if ( window )
+  {
+  	/*
+	   * We will care about releasing the device context later
+	   */
+  	window->Window.Device = GetDC( window->Window.Handle );
+
+  	/*
+	   * Set the new current context:
+	   */
+  	wglMakeCurrent( 
+	  	window->Window.Device, 
+		  window->Window.Context 
+  	);
+  }
+#endif
+
+    /*
+     * Remember that we have changed the current window state
+     */
+    fgStructure.Window = window;
+}
+
 
 /*
  * Opens a window. Requires a SFG_Window object created and attached
@@ -456,7 +500,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
         /*
          * Set the newly created window as the current one...
          */
-        glutSetWindow( window->ID );
+        fgSetWindow( window );
 
         /*
          * Move the viewport a bit down and right from top-left corner to hide the decorations
@@ -560,7 +604,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     /*
      * Set the newly created window as the current one
      */
-    glutSetWindow( window->ID );
+    fgSetWindow( window );
 }
 
 /*
@@ -651,17 +695,25 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
  */
 void FGAPIENTRY glutDestroyWindow( int windowID )
 {
-    /*
-     * Grab the freeglut window pointer from the structure
-     */
-    SFG_Window* window = fgWindowByID( windowID );
-    freeglut_return_if_fail( window != NULL );
+  fgExecutionState ExecState = fgState.ExecState ;
 
-    /*
-     * There is a function that performs all needed steps
-     * defined in freeglut_structure.c. Let's use it:
-     */
-    fgAddToWindowDestroyList( window, TRUE );
+  /*
+   * Grab the freeglut window pointer from the structure
+   */
+  SFG_Window* window = fgWindowByID( windowID );
+  freeglut_return_if_fail( window != NULL );
+
+  /*
+   * There is a function that performs all needed steps
+   * defined in freeglut_structure.c. Let's use it:
+   */
+  fgAddToWindowDestroyList( window, TRUE );
+
+  /*
+   * Since the "fgAddToWindowDestroyList" function could easily have set the "ExecState"
+   * to stop, let's set it back to what it was.
+   */
+  fgState.ExecState = ExecState ;
 }
 
 /*
@@ -700,42 +752,7 @@ void FGAPIENTRY glutSetWindow( int ID )
         return;
     }
 
-#if TARGET_HOST_UNIX_X11
-    /*
-	 * Make the selected window's GLX context the current one
-     */
-    glXMakeCurrent(
-        fgDisplay.Display,
-        window->Window.Handle,
-        window->Window.Context
-    );
-
-#elif TARGET_HOST_WIN32
-	/*
-	 * Release the previous' context's device context
-	 */
-	if( fgStructure.Window != NULL )
-		ReleaseDC( fgStructure.Window->Window.Handle, fgStructure.Window->Window.Device );
-
-	/*
-	 * We will care about releasing the device context later
-	 */
-	window->Window.Device = GetDC( window->Window.Handle );
-
-	/*
-	 * Set the new current context:
-	 */
-	wglMakeCurrent( 
-		window->Window.Device, 
-		window->Window.Context 
-	);
-
-#endif
-
-    /*
-     * Remember that we have changed the current window state
-     */
-    fgStructure.Window = window;
+    fgSetWindow ( window ) ;
 }
 
 /*
@@ -852,7 +869,7 @@ void FGAPIENTRY glutIconifyWindow( void )
 /*
  * Set the current window's title
  */
-void FGAPIENTRY glutSetWindowTitle( char* title )
+void FGAPIENTRY glutSetWindowTitle( const char* title )
 {
 	freeglut_assert_ready; freeglut_assert_window;
 
@@ -901,7 +918,7 @@ void FGAPIENTRY glutSetWindowTitle( char* title )
 /*
  * Set the current window's iconified title
  */
-void FGAPIENTRY glutSetIconTitle( char* title )
+void FGAPIENTRY glutSetIconTitle( const char* title )
 {
     freeglut_assert_ready; freeglut_assert_window;
 
@@ -985,7 +1002,7 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
     {
       GetWindowRect ( fgStructure.Window->Parent->Window.Handle, &winRect ) ;
       x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME ) ;
-      y -= winRect.top + GetSystemMetrics( SM_CXSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION ) ;
+      y -= winRect.top + GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION ) ;
     }
 
 		/*

@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-menu"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -420,7 +420,7 @@ void fgActivateMenu( SFG_Window* window, int button )
   menu->X = x ;
   menu->Y = y ;
 
-  glutSetWindow ( window->ID ) ;
+  fgSetWindow ( window ) ;
 
   if( x > ( glutGet( GLUT_WINDOW_WIDTH ) - menu->Width ) )
     menu->X = glutGet( GLUT_WINDOW_WIDTH ) - menu->Width;
@@ -665,7 +665,7 @@ void FGAPIENTRY glutAddSubMenu( const char* label, int subMenuID )
   /*
    * Fill in the appropriate values
    */
-  menuEntry->Text    = strdup( label );
+  menuEntry->Text = strdup( label );
   menuEntry->SubMenu = subMenu;
   menuEntry->ID      = -1;
 
@@ -708,7 +708,7 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
     if( menuEntry->Text != NULL )
         free( menuEntry->Text );
 
-    menuEntry->Text    = strdup( label );
+    menuEntry->Text = strdup( label );
     menuEntry->ID      = value;
     menuEntry->SubMenu = NULL;
 
@@ -748,7 +748,7 @@ void FGAPIENTRY glutChangeToSubMenu( int item, const char* label, int subMenuID 
     if( menuEntry->Text != NULL )
         free( menuEntry->Text );
 
-    menuEntry->Text    = strdup( label );
+    menuEntry->Text = strdup( label );
     menuEntry->SubMenu = subMenu;
     menuEntry->ID      = -1;
 

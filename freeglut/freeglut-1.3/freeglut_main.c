@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-main"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -51,6 +51,7 @@
  * Calls a window's redraw method. This is used when
  * a redraw is forced by the incoming window messages.
  */
+
 static void fghRedrawWindowByHandle
 #if TARGET_HOST_UNIX_X11
     ( Window handle )
@@ -75,10 +76,9 @@ static void fghRedrawWindowByHandle
     freeglut_return_if_fail( window->State.Visible == TRUE );
 
     /*
-     * Set the window as the current one. Calling glutSetWindow()
-     * might seem slow and generally redundant, but it is portable.
+     * Set the window as the current one.
      */
-    glutSetWindow( window->ID );
+    fgSetWindow( window );
 
     /*
      * Do not exagerate with the redisplaying
@@ -115,7 +115,7 @@ static void fghReshapeWindowByHandle
     /*
      * Remember about setting the current window...
      */
-    glutSetWindow( window->ID );
+    fgSetWindow( window );
 
     /*
      * Check if there is a reshape callback hooked
@@ -160,7 +160,7 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
         /*
          * OKi, this is the case: have the window set as the current one
          */
-        glutSetWindow( window->ID );
+        fgSetWindow( window );
 
         /*
          * Do not exagerate with the redisplaying
@@ -180,7 +180,7 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
      */
     if( window->State.NeedToResize )
     {
-        glutSetWindow( window->ID );
+        fgSetWindow( window );
 
         fghReshapeWindowByHandle( 
             window->Window.Handle,
@@ -208,7 +208,7 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
 
       RedrawWindow( 
         window->Window.Handle, NULL, NULL, 
-        RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE 
+        RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
 	);
     }
 
@@ -557,7 +557,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * We're going to send a callback to a window. Make it current.
          */
-        glutSetWindow( window->ID );
+        fgSetWindow( window );
 
         /*
          * Sending this event, the X server can notify us that the window has just
@@ -725,8 +725,19 @@ void FGAPIENTRY glutMainLoopEvent( void )
         {
           if ( fgCheckActiveMenu ( window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
           {
+            /* Save the current window and menu and set the current window to the window whose menu this is */
+            SFG_Window *save_window = fgStructure.Window ;
+            SFG_Menu *save_menu = fgStructure.Menu ;
+            fgSetWindow ( window ) ;
+            fgStructure.Menu = window->ActiveMenu ;
+
+            /* Execute the menu callback */
             fgExecuteMenuCallback ( window->ActiveMenu ) ;
             fgDeactivateMenu ( window ) ;
+
+            /* Restore the current window and menu */
+            fgSetWindow ( save_window ) ;
+            fgStructure.Menu = save_menu ;
           }
           else  /* Outside the menu, deactivate the menu if it's a downclick */
           {
@@ -768,7 +779,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * Set the current window
          */
-        glutSetWindow( window->ID );
+        fgSetWindow( window );
 
         /*
          * Remember the current modifiers state
@@ -839,7 +850,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
           /*
            * Get ready to calling the keyboard/special callbacks
            */
-          glutSetWindow( window->ID );
+          fgSetWindow( window );
 
           /*
            * GLUT API tells us to have two separate callbacks...
@@ -1119,7 +1130,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     if ( ( window == NULL ) && ( uMsg != WM_CREATE ) )
       return( DefWindowProc( hWnd, uMsg, wParam, lParam ) );
 
-/*    if ( uMsg != 0x000f ) printf ( "message <%x>\n", uMsg ) ; */
+/*    printf ( "Window %3d message <%04x> %12d %12d\n", window?window->ID:0, uMsg, wParam, lParam ) ; */
     /*
      * Check what type of message are we receiving
      */
@@ -1145,7 +1156,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /*
          * Setup the pixel format of our window
          */
-        fgSetupPixelFormat( window, FALSE );
+        fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
 
         /*
          * Create the OpenGL rendering context now
@@ -1323,7 +1334,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 /*
                  * Make sure the current window is set...
                  */
-                glutSetWindow( window->ID );
+                fgSetWindow( window );
 
                 /*
                  * Execute the active mouse motion callback now
@@ -1341,7 +1352,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 /*
                  * Make sure the current window is set
                  */
-                glutSetWindow( window->ID );
+                fgSetWindow( window );
 
                 /*
                  * Execute the passive mouse motion callback
@@ -1415,8 +1426,19 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         {
           if ( fgCheckActiveMenu ( window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
           {
+            /* Save the current window and menu and set the current window to the window whose menu this is */
+            SFG_Window *save_window = fgStructure.Window ;
+            SFG_Menu *save_menu = fgStructure.Menu ;
+            fgSetWindow ( window ) ;
+            fgStructure.Menu = window->ActiveMenu ;
+
+            /* Execute the menu callback */
             fgExecuteMenuCallback ( window->ActiveMenu ) ;
             fgDeactivateMenu ( window ) ;
+
+            /* Restore the current window and menu */
+            fgSetWindow ( save_window ) ;
+            fgStructure.Menu = save_menu ;
           }
           else  /* Outside the menu, deactivate the menu if it's a downclick */
           {
@@ -1458,7 +1480,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /*
          * Set the current window
          */
-        glutSetWindow( window->ID );
+        fgSetWindow( window );
 
         /*
          * Remember the current modifiers state.
@@ -1499,7 +1521,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /*
          * Set the current window
          */
-        glutSetWindow( window->ID );
+        fgSetWindow( window );
 
         /*
          * Remember the current modifiers state. This is done here in order 
@@ -1569,7 +1591,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /*
          * Set the current window
          */
-        glutSetWindow( window->ID );
+        fgSetWindow( window );
 
         /*
          * Remember the current modifiers state. This is done here in order 
@@ -1676,6 +1698,40 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         window->Callbacks.Display () ;
 
 //      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ) ;
+      break ;
+
+      /*
+       * Other messages that I have seen and which are not handled already
+       */
+    case WM_SETTEXT :  /* 0x000c */
+      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );  /* Pass it on to "DefWindowProc" to set the window text */
+      break ;
+
+    case WM_GETTEXT :  /* 0x000d */
+      /* Ideally we would copy the title of the window into "lParam" */
+/*      strncpy ( (char *)lParam, "Window Title", wParam ) ;
+      lRet = ( wParam > 12 ) ? 12 : wParam ;  */ /* the number of characters copied */
+      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+      break ;
+
+    case WM_GETTEXTLENGTH :  /* 0x000e */
+      /* Ideally we would get the length of the title of the window */
+      lRet = 12 ;  /* the number of characters in "Window Title\0" (see above) */
+      break ;
+
+    case WM_ERASEBKGND :  /* 0x0014 */
+      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+      break ;
+
+    case WM_SYNCPAINT :  /* 0x0088 */
+      /* Another window has moved, need to update this one */
+      window->State.Redisplay = TRUE ;
+      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );  /* Help screen says this message must be passed to "DefWindowProc" */
+      break ;
+
+    case WM_NCPAINT :  /* 0x0085 */
+      /* Need to update the border of this window */
+      lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );  /* Pass it on to "DefWindowProc" to repaint a standard border */
       break ;
 
     default:

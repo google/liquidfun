@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-state"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -124,6 +124,10 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 {
   int returnValue ;
   GLboolean boolValue ;
+
+  if ( eWhat == GLUT_INIT_STATE )
+    return ( fgState.Time.Set ) ;
+
     freeglut_assert_ready;
 
     /*
@@ -375,10 +379,13 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /*
          * ...then we've got to correct the results we've just received...
          */
-        winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME ) - 1;
-        winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME ) - 1;
-        winRect.top    += GetSystemMetrics( SM_CYSIZEFRAME ) - 1 + GetSystemMetrics( SM_CYCAPTION );
-        winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME ) + 1;
+        if ( fgStructure.Window->Parent == NULL )
+        {
+          winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME ) - 1;
+          winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME ) - 1;
+          winRect.top    += GetSystemMetrics( SM_CYSIZEFRAME ) - 1 + GetSystemMetrics( SM_CYCAPTION );
+          winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME ) + 1;
+        }
 
         /*
          * ...and finally return the caller the desired value:
@@ -397,7 +404,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /*
          * Check if the current display mode is possible
          */
-        return( fgSetupPixelFormat( fgStructure.Window, TRUE ) );
+        return( fgSetupPixelFormat( fgStructure.Window, TRUE, PFD_MAIN_PLANE ) );
 
     case GLUT_WINDOW_FORMAT_ID:
         /*
@@ -606,6 +613,9 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
      */
     switch( eWhat )
     {
+
+#if TARGET_HOST_UNIX_X11
+
     case GLUT_OVERLAY_POSSIBLE:
         /*
          * Nope, overlays are not possible.
@@ -641,6 +651,45 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
          * Return minus one to mark that no layer is in use
          */
         return( -1 );
+
+#elif TARGET_HOST_WIN32
+
+    case GLUT_OVERLAY_POSSIBLE:
+        /*
+         * Check if an overlay display mode is possible
+         */
+        return( fgSetupPixelFormat( fgStructure.Window, TRUE, PFD_OVERLAY_PLANE ) );
+
+    case GLUT_LAYER_IN_USE:
+        /*
+         * The normal plane is always in use
+         */
+        return( GLUT_NORMAL );
+
+    case GLUT_HAS_OVERLAY:
+        /*
+         * No window is allowed to have an overlay
+         */
+        return( FALSE );
+
+    case GLUT_TRANSPARENT_INDEX:
+        /*
+         * Return just anything, which is always defined as zero
+         */
+        return( 0 );
+
+    case GLUT_NORMAL_DAMAGED:
+        /*
+         * Actually I do not know. Maybe.
+         */
+        return( FALSE );
+
+    case GLUT_OVERLAY_DAMAGED:
+        /*
+         * Return minus one to mark that no layer is in use
+         */
+        return( -1 );
+#endif
 
     default:
         /*
