@@ -61,6 +61,7 @@ SFG_State fgState = { { -1, -1, FALSE },  /* Position */
                       FALSE, /* ForceDirectContext */
                       TRUE,  /* TryDirectContext */
                       FALSE, /* ForceIconic */
+                      FALSE, /* UseCurrentContext */
                       FALSE, /* GLDebugSwitch */
                       FALSE, /* XSyncSwitch */
                       TRUE,  /* IgnoreKeyRepeat */
@@ -81,7 +82,7 @@ SFG_State fgState = { { -1, -1, FALSE },  /* Position */
                       72,  /* GameModeRefresh */
                       GLUT_ACTION_EXIT, /* ActionOnWindowClose */
                       GLUT_EXEC_STATE_INIT /* ExecState */
-};
+} ;
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -306,6 +307,7 @@ void fgDeinitialize( void )
     fgState.ForceDirectContext  = FALSE;
     fgState.TryDirectContext    = TRUE;
     fgState.ForceIconic         = FALSE;
+    fgState.UseCurrentContext   = FALSE;
     fgState.GLDebugSwitch       = FALSE;
     fgState.XSyncSwitch         = FALSE;
     fgState.ActionOnWindowClose = GLUT_ACTION_EXIT ;
@@ -394,12 +396,13 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 
     /* check if GLUT_FPS env var is set */
     {
-        const char *fps = getenv("GLUT_FPS");
-        if (fps) {
-            sscanf(fps, "%d", &fgState.FPSInterval);
-            if (fgState.FPSInterval <= 0)
-                fgState.FPSInterval = 5000;  /* 5000 milliseconds */
-        }
+      const char *fps = getenv ( "GLUT_FPS" );
+      if ( fps )
+      {
+        sscanf ( fps, "%d", &fgState.FPSInterval ) ;
+        if ( fgState.FPSInterval <= 0 )
+          fgState.FPSInterval = 5000 ;  /* 5000 milliseconds */
+      }
     }
 
     /*

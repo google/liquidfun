@@ -104,6 +104,9 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
   case GLUT_ACTION_ON_WINDOW_CLOSE: fgState.ActionOnWindowClose = value ;
                                     break ;
 
+  case GLUT_RENDERING_CONTEXT:      fgState.UseCurrentContext   = ( value == GLUT_USE_CURRENT_CONTEXT ) ? TRUE : FALSE ;
+                                    break ;
+
   case GLUT_WINDOW_CURSOR:
       if( fgStructure.Window != NULL ) fgStructure.Window->State.Cursor = value ;
       break ;
@@ -122,11 +125,11 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
  */
 int FGAPIENTRY glutGet( GLenum eWhat )
 {
-    int returnValue ;
-    GLboolean boolValue ;
+  int returnValue ;
+  GLboolean boolValue ;
 
-    if ( eWhat == GLUT_INIT_STATE )
-	return ( fgState.Time.Set ) ;
+  if ( eWhat == GLUT_INIT_STATE )
+    return ( fgState.Time.Set ) ;
 
     freeglut_assert_ready;
 
@@ -364,8 +367,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /*
          * ...then we've got to correct the results we've just received...
          */
-        if (fgStructure.GameMode != fgStructure.Window &&
-	    fgStructure.Window->Parent == NULL )
+        if ( ( fgStructure.GameMode != fgStructure.Window ) && ( fgStructure.Window->Parent == NULL ) )
         {
           winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME );
           winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME );
@@ -452,10 +454,13 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         return( fgListLength( &fgStructure.Menu->Entries ) );
 
     case GLUT_ACTION_ON_WINDOW_CLOSE:
-	return fgState.ActionOnWindowClose;
+        return fgState.ActionOnWindowClose ;
 
-    case GLUT_VERSION:
-	return VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_PATCH;
+    case GLUT_VERSION :
+        return VERSION_MAJOR * 10000 + VERSION_MINOR * 100 + VERSION_PATCH ;
+
+    case GLUT_RENDERING_CONTEXT:
+        return ( fgState.UseCurrentContext ? GLUT_USE_CURRENT_CONTEXT : GLUT_CREATE_NEW_CONTEXT ) ;
 
     default:
         /*

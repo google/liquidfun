@@ -40,6 +40,12 @@
 #define GLUT_ACTION_CONTINUE_EXECUTION           2
 
 /*
+ * Create a new rendering context when the user opens a new window?
+ */
+#define GLUT_CREATE_NEW_CONTEXT                  0
+#define GLUT_USE_CURRENT_CONTEXT                 1
+
+/*
  * GLUT API Extension macro definitions -- the glutGet parameters
  */
 #define  GLUT_ACTION_ON_WINDOW_CLOSE        0x01F9
@@ -48,6 +54,8 @@
 #define  GLUT_WINDOW_HEADER_HEIGHT          0x01FB
 
 #define  GLUT_VERSION                       0x01FC
+
+#define  GLUT_RENDERING_CONTEXT             0x01FD
 
 /*
  * Process loop function, see freeglut_main.c

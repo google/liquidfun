@@ -219,6 +219,7 @@ struct tagSFG_State
     GLboolean        TryDirectContext;     /* What about giving a try to?       */
 
     GLboolean        ForceIconic;          /* All new top windows are iconified */
+    GLboolean        UseCurrentContext;    /* New windows use current window's rendering context */
 
     GLboolean        GLDebugSwitch;        /* OpenGL state debugging switch     */
     GLboolean        XSyncSwitch;          /* X11 sync protocol switch          */
@@ -260,6 +261,11 @@ struct tagSFG_Display
     Atom            DeleteWindow;       /* The window deletion atom          */
 
 #ifdef X_XF86VidModeGetModeLine
+    /*
+     * XF86VidMode may be compilable even if it fails at runtime.  Therefore,
+     * the validity of the VidMode has to be tracked
+     */
+    int             DisplayModeValid;   /* Flag that indicates runtime status*/
     XF86VidModeModeLine DisplayMode;    /* Current screen's display settings */
     int             DisplayModeClock;   /* The display mode's refresh rate   */
 #endif

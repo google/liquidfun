@@ -1175,9 +1175,12 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
 
         /*
-         * Create the OpenGL rendering context now
+         * Create or get the OpenGL rendering context now
          */
-        window->Window.Context = wglCreateContext( window->Window.Device );
+        if ( fgState.UseCurrentContext == TRUE )
+          window->Window.Context = wglGetCurrentContext();
+        else
+          window->Window.Context = wglCreateContext( window->Window.Device );
 
         /*
          * Still, we'll be needing to explicitly resize the window
@@ -1287,8 +1290,20 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
          */
         if( fgStructure.Window == window )
         {
+          int used = FALSE ;
+          SFG_Window *iter ;
+
             wglMakeCurrent( NULL, NULL );
-            wglDeleteContext( window->Window.Context );
+            /* Step through the list of windows.  If the rendering context is notbeing used
+             * by another window, then we delete it.
+             */
+            for ( iter = fgStructure.Windows.First; iter; iter = iter->Node.Next )
+            {
+              if ( ( iter->Window.Context == window->Window.Context ) && ( iter != window ) )
+                used = TRUE ;
+            }
+
+            if ( used == FALSE ) wglDeleteContext( window->Window.Context );
         }
 
         /*
