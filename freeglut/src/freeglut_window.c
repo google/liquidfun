@@ -610,7 +610,6 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     parent = fgWindowByID( parentID );
     freeglut_return_val_if_fail( parent != NULL, 0 );
     window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
-    window->State.OldHeight = window->State.OldWidth = -1;
     return window->ID;
 }
 
