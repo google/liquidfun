@@ -68,19 +68,9 @@
  * Handle a window configuration change. When no reshape
  * callback is hooked, the viewport size is updated to
  * match the new window size.
- *
- * XXX We can/should make a "unified" window handle type so that
- * XXX the function headers don't need this silly #ifdef junk.
- * XXX Make the type, say, {fgWindow}.  On UNIX_X11, this is
- * XXX {Window}.  On WIN32, it is {HWND}.  Then do the #ifdef
- * XXX junk *once* in "freeglut_internal.h".
  */
-static void fghReshapeWindowByHandle
-#if TARGET_HOST_UNIX_X11
-    ( Window handle, int width, int height )
-#elif TARGET_HOST_WIN32
-    ( HWND handle, int width, int height )
-#endif
+static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
+                                       int width, int height )
 {
     SFG_Window *current_window = fgStructure.Window;
 
@@ -175,12 +165,7 @@ static void fghReshapeWindowByHandle
  * Calls a window's redraw method. This is used when
  * a redraw is forced by the incoming window messages.
  */
-static void fghRedrawWindowByHandle
-#if TARGET_HOST_UNIX_X11
-    ( Window handle )
-#elif TARGET_HOST_WIN32
-    ( HWND handle )
-#endif
+static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
 {
     SFG_Window* window = fgWindowByHandle( handle );
     freeglut_return_if_fail( window != NULL );

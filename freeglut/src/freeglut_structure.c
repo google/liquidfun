@@ -518,16 +518,10 @@ static void fghcbWindowByHandle( SFG_Window *window,
     if ( enumerator->found )
         return;
 
-#if TARGET_HOST_UNIX_X11
-    #define WBHANDLE (Window)
-#elif TARGET_HOST_WIN32
-    #define WBHANDLE (HWND)
-#endif
-
     /*
      * Check the window's handle. Hope this works. Looks ugly. That's for sure.
      */
-    if( window->Window.Handle == WBHANDLE (enumerator->data) )
+    if( window->Window.Handle == (SFG_WindowHandleType) (enumerator->data) )
     {
         enumerator->found = GL_TRUE;
         enumerator->data = window;
@@ -539,8 +533,6 @@ static void fghcbWindowByHandle( SFG_Window *window,
      * Otherwise, check this window's children
      */
     fgEnumSubWindows( window, fghcbWindowByHandle, enumerator );
-
-#undef WBHANDLE
 }
 
 /*
@@ -548,12 +540,7 @@ static void fghcbWindowByHandle( SFG_Window *window,
  * first window in the queue matching the specified window handle.
  * The function is defined in freeglut_structure.c file.
  */
-SFG_Window* fgWindowByHandle
-#if TARGET_HOST_UNIX_X11
-( Window hWindow )
-#elif TARGET_HOST_WIN32
-( HWND hWindow )
-#endif
+SFG_Window* fgWindowByHandle ( SFG_WindowHandleType hWindow )
 {
     SFG_Enumerator enumerator;
 

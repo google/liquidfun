@@ -310,22 +310,35 @@ struct tagSFG_Timer
 };
 
 /*
+ * Make "freeglut" window handle and context types so that we don't need so
+ * much conditionally-compiled code later in the library.
+ */
+#if TARGET_HOST_UNIX_X11
+
+typedef Window     SFG_WindowHandleType ;
+typedef GLXContext SFG_WindowContextType ;
+
+#elif TARGET_HOST_WIN32
+
+typedef HWND    SFG_WindowHandleType ;
+typedef HGLRC   SFG_WindowContextType ;
+
+#endif
+
+/*
  * A window and its OpenGL context. The contents of this structure
  * are highly dependant on the target operating system we aim at...
  */
 typedef struct tagSFG_Context SFG_Context;
 struct tagSFG_Context
 {
+    SFG_WindowHandleType  Handle;    /* The window's handle                 */
+    SFG_WindowContextType Context;   /* The window's OpenGL/WGL context     */
+
 #if TARGET_HOST_UNIX_X11
-    Window          Handle;          /* The window's handle                 */
-    GLXContext      Context;         /* The OpenGL context                  */
     XVisualInfo*    VisualInfo;      /* The window's visual information     */
-
 #elif TARGET_HOST_WIN32
-    HWND            Handle;          /* The window's handle                 */
     HDC             Device;          /* The window's device context         */
-    HGLRC           Context;         /* The window's WGL context            */
-
 #endif
 
     int             DoubleBuffered;  /* Treat the window as double-buffered */
@@ -456,12 +469,10 @@ typedef struct tagSFG_MenuContext SFG_MenuContext;
 struct tagSFG_MenuContext
 {
 #if TARGET_HOST_UNIX_X11
-    GLXContext          Context;          /* The menu OpenGL context         */
     XVisualInfo*        VisualInfo;       /* The window's visual information */
-#elif TARGET_HOST_WIN32
-    HGLRC               Context;          /* The menu window's WGL context   */
 #endif
 
+    SFG_WindowContextType Context;        /* The menu window's WGL context   */
 };
 
 /*
@@ -750,11 +761,7 @@ void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback,
  * first window in the queue matching the specified window handle.
  * The function is defined in freeglut_structure.c file.
  */
-#if TARGET_HOST_UNIX_X11
-    SFG_Window* fgWindowByHandle( Window hWindow );
-#elif TARGET_HOST_WIN32
-    SFG_Window* fgWindowByHandle( HWND hWindow );
-#endif
+SFG_Window* fgWindowByHandle( SFG_WindowHandleType hWindow );
 
 /*
  * This function is similiar to the previous one, except it is
