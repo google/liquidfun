@@ -214,7 +214,17 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     pfd.cDepthBits      = 24;
     pfd.cStencilBits    = 8;
 #endif
-    pfd.cAuxBuffers     = 0;
+    if( fgState.DisplayMode & GLUT_AUX4 )
+        pfd.cAuxBuffers = 4;
+    else if( fgState.DisplayMode & GLUT_AUX3 )
+        pfd.cAuxBuffers = 3;
+    else if( fgState.DisplayMode & GLUT_AUX2 )
+        pfd.cAuxBuffers = 2;
+    else if( fgState.DisplayMode & GLUT_AUX1 )
+        pfd.cAuxBuffers = 1;
+    else
+        pfd.cAuxBuffers = 0;
+
     pfd.iLayerType      = layer_type;
     pfd.bReserved       = 0;
     pfd.dwLayerMask     = 0;

@@ -690,18 +690,6 @@ static char* Tokens[] =
     "xtruecolour", "xdirectcolour", "borderless", "aux"
 };
 
-/* XXX why the heck do we use this table instead of strlen(Tokens[i])? */
-static int TokenLengths[] =
-{
-    5,       4,      3,     4,      6,        10,           5,       6,
-    5,       5,       3,     3,     4,      3,     9,           7,
-    6,        6,        7,         4,      8,          8,          7,
-    11,            10,           12,             12,
-    10,           12,
-    11,            10,           13,             13,
-    11,            13,              10,          3
-};
-
 void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 {
     int glut_state_flag = 0 ;
@@ -722,7 +710,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
         int i ;
         for ( i = 0; i < NUM_TOKENS; i++ )
         {
-            if ( strncmp ( token, Tokens[i], TokenLengths[i] ) == 0 ) break ;
+            if ( strcmp ( token, Tokens[i] ) == 0 ) break ;
         }
 
         switch ( i )
