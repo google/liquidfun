@@ -110,6 +110,9 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ), i
      * Create a new freeglut timer hook structure
      */
     timer = (SFG_Timer *)calloc( sizeof(SFG_Timer), 1 );
+    if (!timer)
+	fgError ("Fatal error: "
+	    "Memory allocation failure in glutTimerFunc()\n");
 
     /*
      * Remember the callback address and timer hook's ID
