@@ -312,44 +312,44 @@ int FGAPIENTRY glutGet( GLenum eWhat )
      * Handle the OpenGL inquiries
      */
     case GLUT_WINDOW_RGBA:
-      glGetBooleanv ( GL_RGBA_MODE, &boolValue ) ;         /* True if color buffers store RGBA */
+      glGetBooleanv ( GL_RGBA_MODE, &boolValue ) ;
       returnValue = boolValue ? 1 : 0 ;
       return ( returnValue ) ;
     case GLUT_WINDOW_DOUBLEBUFFER:
-      glGetBooleanv ( GL_DOUBLEBUFFER, &boolValue ) ;      /* True if front and back buffers exist */
+      glGetBooleanv ( GL_DOUBLEBUFFER, &boolValue ) ;
       returnValue = boolValue ? 1 : 0 ;
       return ( returnValue ) ;
     case GLUT_WINDOW_STEREO:
-      glGetBooleanv ( GL_STEREO, &boolValue ) ;            /* True if left and right buffers exist */
+      glGetBooleanv ( GL_STEREO, &boolValue ) ;
       returnValue = boolValue ? 1 : 0 ;
       return ( returnValue ) ;
 
     case GLUT_WINDOW_RED_SIZE:
-      glGetIntegerv ( GL_RED_BITS, &returnValue ) ;          /* Number of bits per red component in color buffers */
+      glGetIntegerv ( GL_RED_BITS, &returnValue ) ;
       return ( returnValue ) ;
     case GLUT_WINDOW_GREEN_SIZE:
-      glGetIntegerv ( GL_GREEN_BITS, &returnValue ) ;        /* Number of bits per green component in color buffers */
+      glGetIntegerv ( GL_GREEN_BITS, &returnValue ) ;
       return ( returnValue ) ;
     case GLUT_WINDOW_BLUE_SIZE:
-      glGetIntegerv ( GL_BLUE_BITS, &returnValue ) ;         /* Number of bits per blue component in color buffers */
+      glGetIntegerv ( GL_BLUE_BITS, &returnValue ) ;
       return ( returnValue ) ;
     case GLUT_WINDOW_ALPHA_SIZE:
-      glGetIntegerv ( GL_ALPHA_BITS, &returnValue ) ;        /* Number of bits per alpha component in color buffers */
+      glGetIntegerv ( GL_ALPHA_BITS, &returnValue ) ;
       return ( returnValue ) ;
     case GLUT_WINDOW_ACCUM_RED_SIZE:
-      glGetIntegerv ( GL_ACCUM_RED_BITS, &returnValue ) ;    /* Number of bits per red component in the accumulation buffer */
+      glGetIntegerv ( GL_ACCUM_RED_BITS, &returnValue ) ;
       return ( returnValue ) ;
     case GLUT_WINDOW_ACCUM_GREEN_SIZE:
-      glGetIntegerv ( GL_ACCUM_GREEN_BITS, &returnValue ) ;  /* Number of bits per green component in the accumulation buffer */
+      glGetIntegerv ( GL_ACCUM_GREEN_BITS, &returnValue ) ;
       return ( returnValue ) ;
     case GLUT_WINDOW_ACCUM_BLUE_SIZE:
-      glGetIntegerv ( GL_ACCUM_BLUE_BITS, &returnValue ) ;   /* Number of bits per blue component in the accumulation buffer */
+      glGetIntegerv ( GL_ACCUM_BLUE_BITS, &returnValue ) ;
       return ( returnValue ) ;
     case GLUT_WINDOW_ACCUM_ALPHA_SIZE:
-      glGetIntegerv ( GL_ACCUM_ALPHA_BITS, &returnValue ) ;  /* Number of bits per alpha component in the accumulation buffer */
+      glGetIntegerv ( GL_ACCUM_ALPHA_BITS, &returnValue ) ;
       return ( returnValue ) ;
     case GLUT_WINDOW_DEPTH_SIZE:
-      glGetIntegerv ( GL_DEPTH_BITS, &returnValue ) ;        /* Number of depth-buffer bitplanes */
+      glGetIntegerv ( GL_DEPTH_BITS, &returnValue ) ;
       return ( returnValue ) ;
 
     case GLUT_WINDOW_BUFFER_SIZE:
@@ -393,9 +393,6 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         RECT winRect;
 
-        /*
-         * Check if there is a window to be queried for dimensions:
-         */
         freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
 
         /*
@@ -416,9 +413,6 @@ int FGAPIENTRY glutGet( GLenum eWhat )
           winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME );
         }
 
-        /*
-         * ...and finally return the caller the desired value:
-         */
         switch( eWhat )
         {
         case GLUT_WINDOW_X:      return( winRect.left                 );
@@ -436,15 +430,9 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         return ( GetSystemMetrics( SM_CYCAPTION ) ) ;
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
-        /*
-         * Check if the current display mode is possible
-         */
         return( fgSetupPixelFormat( fgStructure.Window, TRUE, PFD_MAIN_PLANE ) );
 
     case GLUT_WINDOW_FORMAT_ID:
-        /*
-         * Return the pixel format of the current window
-         */
         if( fgStructure.Window != NULL )
             return( GetPixelFormat( fgStructure.Window->Window.Device ) );
 
