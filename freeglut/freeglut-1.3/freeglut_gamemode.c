@@ -137,6 +137,15 @@ void fghRestoreState( void )
                 displayModes[ i ]
             );
 
+	    /*
+	     * In case this will be the last X11 call we do before exit,
+	     * we've to flush the X11 output queue to be sure the command
+	     * is really brought onto it's way to the X server.
+	     * The application should not do this because it
+	     * would not be platform independent then.
+	     */
+	    XFlush(fgDisplay.Display);
+
             return;
         }
     }
@@ -200,6 +209,8 @@ GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         if( fghCheckDisplayMode( displayModes[ i ]->hdisplay, displayModes[ i ]->vdisplay,
                                  fgState.GameModeDepth, fgState.GameModeRefresh ) )
         {
+	    if( haveToTest )
+		return( TRUE );
             /*
              * OKi, this is the display mode we have been looking for...
              */
