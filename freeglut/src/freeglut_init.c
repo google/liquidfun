@@ -65,7 +65,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GL_FALSE,              /* UseCurrentContext */
                       GL_FALSE,              /* GLDebugSwitch */
                       GL_FALSE,              /* XSyncSwitch */
-                      GL_TRUE,               /* IgnoreKeyRepeat */
+                      GL_FALSE,              /* IgnoreKeyRepeat */
                       0xffffffff,            /* Modifiers */
                       0,                     /* FPSInterval */
                       0,                     /* SwapCount */
