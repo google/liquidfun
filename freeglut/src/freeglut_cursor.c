@@ -49,7 +49,7 @@
 
 #if TARGET_HOST_UNIX_X11
 
-fgGetCursorError( Cursor cursor )
+int fgGetCursorError( Cursor cursor )
 {
     int ret = 0;
     char buf[ 256 ];
@@ -99,8 +99,8 @@ void FGAPIENTRY glutSetCursor( int cursorID )
      * (c) Out-of-range cursor-types generate warnings.  Should we abort?
      */
     {
-        Cursor cursor;
-        Pixmap no_cursor;  /* Used for GLUT_CURSOR_NONE */
+        Cursor cursor = None;
+        Pixmap no_cursor = None ;  /* Used for GLUT_CURSOR_NONE */
         int error = 0;
 
 #define MAP_CURSOR(a,b)                                     \

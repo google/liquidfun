@@ -127,7 +127,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
         if( menuEntry->SubMenu && menuEntry->IsActive )
         {
             /*
-             * OK, have the sub-menu checked, too. If it returns TRUE, it
+             * OK, have the sub-menu checked, too. If it returns GL_TRUE, it
              * will mean that it caught the mouse cursor and we do not need
              * to regenerate the activity list, and so our parents do...
              */

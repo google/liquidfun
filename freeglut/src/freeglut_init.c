@@ -84,8 +84,8 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       16,                     /* GameModeDepth */
                       72,                     /* GameModeRefresh */
                       GLUT_ACTION_EXIT,       /* ActionOnWindowClose */
-                      GLUT_EXEC_STATE_INIT    /* ExecState */
-                      NULL,                   /* ProgramName */
+                      GLUT_EXEC_STATE_INIT,   /* ExecState */
+                      NULL                    /* ProgramName */
 };
 
 
@@ -230,7 +230,7 @@ void fgDeinitialize( void )
 
     fgDestroyStructure( );
 
-    while( timer = ( SFG_Timer * )fgState.Timers.First )
+    while( (timer = ( SFG_Timer * )fgState.Timers.First) )
     {
         fgListRemove ( &fgState.Timers, &timer->Node );
         free( timer );
@@ -306,7 +306,7 @@ void fgDeinitialize( void )
  * Everything inside the following #ifndef is copied from the X sources.
  */
 
-#ifndef TARGET_HOST_UNIX_X11
+#if TARGET_HOST_WIN32
 
 /*
 
@@ -382,7 +382,7 @@ ReadInteger(char *string, char **NextString)
 }
 
 static int XParseGeometry (
-    _Xconst char *string,
+    const char *string,
     int *x,
     int *y,
     unsigned int *width,    /* RETURN */
@@ -485,7 +485,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     int i, j, argc = *pargc;
 
     if( fgState.Initialised )
-        fgError( "illegal glutInit() reinitialization attemp" );
+        fgError( "illegal glutInit() reinitialization attempt" );
 
     if (pargc && *pargc && argv && *argv && **argv)
     {

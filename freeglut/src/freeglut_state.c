@@ -124,8 +124,10 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
  */
 int FGAPIENTRY glutGet( GLenum eWhat )
 {
+#if TARGET_HOST_WIN32
     int returnValue ;
     GLboolean boolValue ;
+#endif
 
     switch (eWhat)
     {

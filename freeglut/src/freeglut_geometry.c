@@ -426,8 +426,6 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
    */
   for( j=0; j<slices; j++ )
   {
-    double scl = height / slope;
-
     glBegin( GL_TRIANGLES );
       glNormal3d( 0.0, 0.0, -1.0 );
       glVertex3d( vertices[ (j+0)*2+0 ] * sBase, vertices[ (j+0)*2+1 ] * sBase, 0 );

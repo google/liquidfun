@@ -320,6 +320,8 @@ long fgElapsedTime( void )
         fgState.Time.Value = timeGetTime( );
 #endif
         fgState.Time.Set = GL_TRUE;
+
+        return 0;
     }
 }
 
@@ -418,10 +420,12 @@ static int fgHavePendingRedisplays( void )
 /*
  * Indicates whether there are any outstanding timers.
  */
+#if 0 /* Not used */
 static int fgHaveTimers( void )
 {
     return !!fgState.Timers.First;
 }
+#endif
 /*
  * Returns the number of GLUT ticks (milliseconds) till the next timer event.
  */
@@ -1256,7 +1260,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                     used = TRUE;
             }
 
-            if( used == FALSE )
+            if( ! used )
                 wglDeleteContext( window->Window.Context );
         }
 

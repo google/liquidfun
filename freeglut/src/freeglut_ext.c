@@ -29,6 +29,8 @@
 #include "config.h"
 #endif
 
+#define GLX_GLXEXT_PROTOTYPES
+
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
 
