@@ -14,6 +14,7 @@ libglut_la_SOURCES = freeglut_callbacks.c \
 			 freeglut_display.c \
 			 freeglut_ext.c \
 			 freeglut_font.c \
+			 freeglut_glutfont_definitions.c \
 			 freeglut_font_data.c \
 			 freeglut_stroke_roman.c \
 			 freeglut_stroke_mono_roman.c \
