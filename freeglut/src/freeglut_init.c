@@ -594,11 +594,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         }
     }
 
-    /*
-     * Compact {argv}.
-     */
-    j = 1;
-    for( i = 1; i < *pargc; i++, j++ )
+    /* Compact {argv}. */
+    for( i = j = 1; i < *pargc; i++, j++ )
     {
         /* Guaranteed to end because there are "*pargc" arguments left */
         while ( argv[ j ] == NULL )

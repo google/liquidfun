@@ -87,9 +87,7 @@ XVisualInfo* fgChooseVisual( void )
     int attributes[ 32 ];
     int where = 0;
 
-    /*
-     * First we have to process the display mode settings...
-     */
+    /* First we have to process the display mode settings... */
 /*
  * XXX Why is there a semi-colon in this #define?  The code
  * XXX that uses the macro seems to always add more semicolons...
@@ -133,9 +131,7 @@ XVisualInfo* fgChooseVisual( void )
             ATTRIB_VAL( GLX_ACCUM_ALPHA_SIZE, 1 );
     }
 
-    /*
-     * Push a null at the end of the list
-     */
+    /* Push a null at the end of the list */
     ATTRIB( None );
 
     if( ! wantIndexedMode )
@@ -186,9 +182,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
 #pragma message( "fgSetupPixelFormat(): there is still some work to do here!" )
 #endif
 
-    /*
-     * Specify which pixel format do we opt for...
-     */
+    /* Specify which pixel format do we opt for... */
     pfd.nSize           = sizeof(PIXELFORMATDESCRIPTOR);
     pfd.nVersion        = 1;
     pfd.dwFlags         = flags;

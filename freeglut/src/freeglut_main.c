@@ -944,9 +944,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 special_cb  = FETCH_WCB( *window, SpecialUp  );
             }
 
-            /*
-             * Is there a keyboard/special callback hooked for this window?
-             */
+            /* Is there a keyboard/special callback hooked for this window? */
             if( keyboard_cb || special_cb )
             {
                 XComposeStatus composeStatus;
@@ -954,21 +952,15 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 KeySym keySym;
                 int len;
 
-                /*
-                 * Check for the ASCII/KeySym codes associated with the event:
-                 */
+                /* Check for the ASCII/KeySym codes associated with the event: */
                 len = XLookupString( &event.xkey, asciiCode, sizeof(asciiCode),
                                      &keySym, &composeStatus
                 );
 
-                /*
-                 * GLUT API tells us to have two separate callbacks...
-                 */
+                /* GLUT API tells us to have two separate callbacks... */
                 if( len > 0 )
                 {
-                    /*
-                     * ...one for the ASCII translateable keypresses...
-                     */
+                    /* ...one for the ASCII translateable keypresses... */
                     if( keyboard_cb )
                     {
                         fgSetWindow( window );
@@ -1311,7 +1303,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * XXX function (or perhaps invoke glutSetCursor())?
          * XXX That is, why are we duplicating code, here, from
          * XXX glutSetCursor()?  The WIN32 code should be able to just
-         * XXX call glutSetCurdsor() instead of defining two macros
+         * XXX call glutSetCursor() instead of defining two macros
          * XXX and implementing a nested case in-line.
          */
     case WM_SETCURSOR:
@@ -1384,6 +1376,10 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
 #endif /* TARGET_HOST_WINCE */
+        /* Restrict to [-32768, 32767] to match X11 behaviour       */
+        /* See comment in "freeglut_developer" mailing list 10/4/04 */
+        if ( window->State.MouseX > 32767 ) window->State.MouseX -= 65536;
+        if ( window->State.MouseY > 32767 ) window->State.MouseY -= 65536;
 
         if ( window->ActiveMenu )
         {
@@ -1424,6 +1420,11 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
 #endif /* TARGET_HOST_WINCE */
+
+        /* Restrict to [-32768, 32767] to match X11 behaviour       */
+        /* See comment in "freeglut_developer" mailing list 10/4/04 */
+        if ( window->State.MouseX > 32767 ) window->State.MouseX -= 65536;
+        if ( window->State.MouseY > 32767 ) window->State.MouseY -= 65536;
 
         switch( uMsg )
         {
@@ -1540,6 +1541,19 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
+        /* Set capture so that the window captures all the mouse messages */
+        /*
+         * XXX - Multiple button support:  Under X11, the mouse is not released
+         * XXX - from the window until all buttons have been released, even if the
+         * XXX - user presses a button in another window.  This will take more
+         * XXX - code changes than I am up to at the moment (10/5/04).  The present
+         * XXX - is a 90 percent solution.
+         */
+        if ( pressed == GL_TRUE )
+          SetCapture ( window->Window.Handle ) ;
+        else
+          ReleaseCapture () ;
+
         if( ! FETCH_WCB( *window, Mouse ) )
             break;
 
@@ -1644,9 +1658,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         window->State.MouseX = mouse_pos.x;
         window->State.MouseY = mouse_pos.y;
 
-        /*
-         * Convert the Win32 keystroke codes to GLUTtish way
-         */
+        /* Convert the Win32 keystroke codes to GLUTtish way */
 #       define KEY(a,b) case a: keypress = b; break;
 
         switch( wParam )
@@ -1674,9 +1686,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
 
         case VK_DELETE:
-            /*
-             * The delete key should be treated as an ASCII keypress:
-             */
+            /* The delete key should be treated as an ASCII keypress: */
             INVOKE_WCB( *window, Keyboard,
                         ( 127, window->State.MouseX, window->State.MouseY )
             );
@@ -1762,9 +1772,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
 
           case VK_DELETE:
-              /*
-               * The delete key should be treated as an ASCII keypress:
-               */
+              /* The delete key should be treated as an ASCII keypress: */
               INVOKE_WCB( *window, KeyboardUp,
                           ( 127, window->State.MouseX, window->State.MouseY )
               );
@@ -1821,9 +1829,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /*lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ); */
         break;
 
-        /*
-         * Other messages that I have seen and which are not handled already
-         */
+        /* Other messages that I have seen and which are not handled already */
     case WM_SETTEXT:  /* 0x000c */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         /* Pass it on to "DefWindowProc" to set the window text */
@@ -1942,9 +1948,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 
     default:
-        /*
-         * Handle unhandled messages
-         */
+        /* Handle unhandled messages */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
     }
