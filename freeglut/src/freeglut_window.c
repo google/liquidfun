@@ -553,7 +553,7 @@ void fgCloseWindow( SFG_Window* window )
 
     glXDestroyContext( fgDisplay.Display, window->Window.Context );
     XDestroyWindow( fgDisplay.Display, window->Window.Handle );
-    XFlush( fgDisplay.Display );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
@@ -652,7 +652,7 @@ void FGAPIENTRY glutShowWindow( void )
 #if TARGET_HOST_UNIX_X11
 
     XMapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
-    XFlush( fgDisplay.Display );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
@@ -678,7 +678,7 @@ void FGAPIENTRY glutHideWindow( void )
                          fgDisplay.Screen );
     else
         XUnmapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
-    XFlush( fgDisplay.Display );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
@@ -701,7 +701,7 @@ void FGAPIENTRY glutIconifyWindow( void )
 
     XIconifyWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
                     fgDisplay.Screen );
-    XFlush( fgDisplay.Display );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
@@ -738,7 +738,7 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
             &text
         );
         
-        XFlush( fgDisplay.Display );
+        XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
     }
 
 #elif TARGET_HOST_WIN32
@@ -776,7 +776,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
             &text
         );
 
-        XFlush( fgDisplay.Display );
+        XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
     }
 
 #elif TARGET_HOST_WIN32
@@ -799,7 +799,7 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
 
     XResizeWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
                    width, height );
-    XFlush( fgDisplay.Display );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
@@ -858,7 +858,7 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
 #if TARGET_HOST_UNIX_X11
 
     XMoveWindow( fgDisplay.Display, fgStructure.Window->Window.Handle, x, y );
-    XFlush( fgDisplay.Display );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_WIN32
 
@@ -950,7 +950,7 @@ void FGAPIENTRY glutFullScreen( void )
             fgDisplay.ScreenWidth,
             fgDisplay.ScreenHeight
         );
-        XFlush( fgDisplay.Display );
+        XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
         XTranslateCoordinates(
             fgDisplay.Display,
@@ -966,7 +966,7 @@ void FGAPIENTRY glutFullScreen( void )
                 fgStructure.Window->Window.Handle,
                 -x, -y
             );
-            XFlush( fgDisplay.Display );
+            XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
         }
     }
 #elif TARGET_HOST_WIN32
