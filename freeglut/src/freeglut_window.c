@@ -153,87 +153,64 @@ XVisualInfo* fgChooseVisual( void )
  * Setup the pixel format for a Win32 window
  */
 #if TARGET_HOST_WIN32
-GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly, unsigned char layer_type )
+GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
+                              unsigned char layer_type )
 {
-	PIXELFORMATDESCRIPTOR* ppfd, pfd;
-	int flags, pixelformat;
+    PIXELFORMATDESCRIPTOR* ppfd, pfd;
+    int flags, pixelformat;
 
-	/*
-	 * Check if the window seems valid
-	 */
-	freeglut_return_val_if_fail( window != NULL, 0 );
+    freeglut_return_val_if_fail( window != NULL, 0 );
+    flags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL;
+    if( fgState.DisplayMode & GLUT_DOUBLE )
+        flags |= PFD_DOUBLEBUFFER;
 
-	/*
-	 * The pixel format should allow us to draw to the window using OpenGL
-	 */
-	flags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL;
-	
-	/*
-	 * It might be the case for us to use double buffering
-	 */
-  if( fgState.DisplayMode & GLUT_DOUBLE )
-    flags |= PFD_DOUBLEBUFFER;
+#pragma message( "fgSetupPixelFormat(): there is still some work to do here!" )
 
-  /*
-   * Specify which pixel format do we opt for...
-   */
-#	pragma message( "fgSetupPixelFormat(): there is still some work to do here!" )
-
-  pfd.nSize				= sizeof(PIXELFORMATDESCRIPTOR);
-  pfd.nVersion			= 1;
-  pfd.dwFlags				= flags;
-  pfd.iPixelType			= PFD_TYPE_RGBA;
-  pfd.cColorBits			= 24;
-  pfd.cRedBits			= 0;
-  pfd.cRedShift			= 0;
-  pfd.cGreenBits			= 0;
-  pfd.cGreenShift			= 0;
-  pfd.cBlueBits			= 0;
-  pfd.cBlueShift			= 0;
-  pfd.cAlphaBits			= 0;
-  pfd.cAlphaShift			= 0;
-  pfd.cAccumBits			= 0;
-  pfd.cAccumRedBits		= 0;
-  pfd.cAccumGreenBits		= 0;
-  pfd.cAccumBlueBits		= 0;
-  pfd.cAccumAlphaBits		= 0;
+    /*
+     * Specify which pixel format do we opt for...
+     */
+    pfd.nSize           = sizeof(PIXELFORMATDESCRIPTOR);
+    pfd.nVersion        = 1;
+    pfd.dwFlags         = flags;
+    pfd.iPixelType      = PFD_TYPE_RGBA;
+    pfd.cColorBits      = 24;
+    pfd.cRedBits        = 0;
+    pfd.cRedShift       = 0;
+    pfd.cGreenBits      = 0;
+    pfd.cGreenShift     = 0;
+    pfd.cBlueBits       = 0;
+    pfd.cBlueShift      = 0;
+    pfd.cAlphaBits      = 0;
+    pfd.cAlphaShift     = 0;
+    pfd.cAccumBits      = 0;
+    pfd.cAccumRedBits   = 0;
+    pfd.cAccumGreenBits = 0;
+    pfd.cAccumBlueBits  = 0;
+    pfd.cAccumAlphaBits = 0;
 #if 0
-  pfd.cDepthBits			= 32;
-  pfd.cStencilBits		= 0;
+    pfd.cDepthBits      = 32;
+    pfd.cStencilBits    = 0;
 #else
-  pfd.cDepthBits			= 24;
-  pfd.cStencilBits		= 8;
+    pfd.cDepthBits      = 24;
+    pfd.cStencilBits    = 8;
 #endif
-  pfd.cAuxBuffers			= 0;
-  pfd.iLayerType			= layer_type;
-  pfd.bReserved			= 0;
-  pfd.dwLayerMask			= 0;
-  pfd.dwVisibleMask		= 0;
-  pfd.dwDamageMask		= 0;
+    pfd.cAuxBuffers     = 0;
+    pfd.iLayerType      = layer_type;
+    pfd.bReserved       = 0;
+    pfd.dwLayerMask     = 0;
+    pfd.dwVisibleMask   = 0;
+    pfd.dwDamageMask    = 0;
 
-  /*
-   * Fill in the color bits...
-   */
-  pfd.cColorBits = (BYTE) GetDeviceCaps( window->Window.Device, BITSPIXEL );
-  ppfd = &pfd;
+    pfd.cColorBits = (BYTE) GetDeviceCaps( window->Window.Device, BITSPIXEL );
+    ppfd = &pfd;
+    
+    pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
+    if( pixelformat == 0 )
+        return FALSE;
 
-	/*
-	 * Choose the pixel format that matches our demand
-	 */
-  pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
-	if( pixelformat == 0 )
-		return( FALSE );
-
-	/*
-	 * We might have been called to check if the pixel format exists only
-	 */
-	if( checkOnly )
-		return( TRUE );
-
-	/*
-	 * Finally, set the window's pixel format
-	 */
-	return ( SetPixelFormat( window->Window.Device, pixelformat, ppfd ) ) ;
+    if( checkOnly )
+        return TRUE;
+    return SetPixelFormat( window->Window.Device, pixelformat, ppfd );
 }
 #endif
 
