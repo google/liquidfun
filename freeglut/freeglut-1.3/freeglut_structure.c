@@ -254,7 +254,12 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
      * If the programmer defined a destroy callback, call it
      */
     if ( window->Callbacks.Destroy != NULL )
+    {
+      SFG_Window *activeWindow = fgStructure.Window ;
+      fgStructure.Window = window ;
       window->Callbacks.Destroy () ;
+      fgStructure.Window = activeWindow ;
+    }
 
     /*
      * Now we should remove the reference to this window from its parent
