@@ -476,6 +476,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
      * Grab the next event to be processed...
      */
     XNextEvent( fgDisplay.Display, &event );
+    window = fgWindowByHandle ( event.xany.window ) ;
 
     /*
      * Check the event's type
@@ -495,7 +496,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
       /*
        * Call the window closure callback, remove from the structure, etc.
        */
-      fgAddToWindowDestroyList ( window, FALSE );
+      fgStructure.Window = window ;
+/*      fgAddToWindowDestroyList ( window, FALSE ); */
 
       break;
 
@@ -505,6 +507,17 @@ void FGAPIENTRY glutMainLoopEvent( void )
        */
       if( (Atom) event.xclient.data.l[ 0 ] == fgDisplay.DeleteWindow )
       {
+        fgStructure.Window = window ;
+
+        /*
+         * Call the XWindows functions to close the window
+         */
+        fgCloseWindow ( window ) ;
+
+        /*
+         * Call the window closure callback, remove from the structure, etc.
+         */
+        fgAddToWindowDestroyList ( window, FALSE );
       }
       break;
 
@@ -519,7 +532,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
        * We are too dumb to process partial exposes...
        */
       if( event.xexpose.count == 0 )
-          fghRedrawWindowByHandle( event.xexpose.window );
+          fghRedrawWindowByHandle( window->Window.Handle );
       break;
 
     case ConfigureNotify:
@@ -546,8 +559,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * The window's visiblity might have changed
          */
-        GETWINDOW( xvisibility );
-
         /*
          * Break now if no window status callback has been hooked to that window
          */
@@ -598,7 +609,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * Mouse is over one of our windows
          */
-        GETWINDOW( xcrossing ); GETMOUSE( xcrossing );
+        GETMOUSE( xcrossing );
 
         /*
          * Is there an entry callback hooked to the window?
@@ -618,7 +629,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * Mouse is no longer over one of our windows
          */
-        GETWINDOW( xcrossing ); GETMOUSE( xcrossing );
+        GETMOUSE( xcrossing );
 
         /*
          * Is there an entry callback hooked to the window?
@@ -638,7 +649,12 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * The mouse cursor was moved...
          */
-        GETWINDOW( xmotion ); GETMOUSE( xmotion );
+        GETMOUSE( xmotion );
+
+        /*
+         * Set the current window
+         */
+        fgStructure.Window = window ;
 
         /*
          * What kind of a movement was it?
@@ -687,7 +703,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
          * A mouse button has been pressed or released. Traditionally,
          * break if the window was found within the freeglut structures.
          */
-        GETWINDOW( xbutton ); GETMOUSE( xbutton );
+        GETMOUSE( xbutton );
 
         /*
          * GLUT API assumes that you can't have more than three mouse buttons, so:
@@ -819,7 +835,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * A key has been pressed, find the window that had the focus:
          */
-        GETWINDOW( xkey ); GETMOUSE( xkey );
+        GETMOUSE( xkey );
 
         if( event.type == KeyPress )
         {
@@ -1511,6 +1527,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_KEYDOWN:
     {
         int keypress = -1;
+        POINT mouse_pos ;
 
         /*
          * Ignore the automatic key repetition if needed:
@@ -1531,6 +1548,15 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
             ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+
+        /*
+         * Set the mouse position
+         */
+        GetCursorPos ( &mouse_pos ) ;
+        ScreenToClient ( window->Window.Handle, &mouse_pos ) ;
+
+        window->State.MouseX = mouse_pos.x ;
+        window->State.MouseY = mouse_pos.y ;
 
         /*
          * Convert the Win32 keystroke codes to GLUTtish way
@@ -1587,6 +1613,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     case WM_KEYUP:
     {
         int keypress = -1;
+        POINT mouse_pos ;
 
         /*
          * Set the current window
@@ -1601,6 +1628,15 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
             ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
+
+        /*
+         * Set the mouse position
+         */
+        GetCursorPos ( &mouse_pos ) ;
+        ScreenToClient ( window->Window.Handle, &mouse_pos ) ;
+
+        window->State.MouseX = mouse_pos.x ;
+        window->State.MouseY = mouse_pos.y ;
 
         /*
          * Convert the Win32 keystroke codes to GLUTtish way.  "KEY(a,b)" was defined under "WM_KEYDOWN"
