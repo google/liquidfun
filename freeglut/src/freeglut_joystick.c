@@ -247,7 +247,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, int* buttons, float* axes )
 
     if( status != JS_RETURN )
     {
-        fgWarning( joy->fname );
+        fgWarning( "%s", joy->fname );
         joy->error = TRUE;
         return;
     }
