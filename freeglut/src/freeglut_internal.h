@@ -218,7 +218,7 @@ struct tagSFG_State
     SFG_XYUse        Size;                 /* The default windows' size      */
     unsigned int     DisplayMode;          /* Display mode for new windows   */
 
-    GLboolean        Initalized;           /* Freeglut has been initalized   */
+    GLboolean        Initialised;          /* Freeglut has been initialised  */
 
     GLboolean        ForceDirectContext;   /* Force direct rendering?        */
     GLboolean        TryDirectContext;     /* What about giving a try to?    */
@@ -644,7 +644,7 @@ extern SFG_State fgState;
  * A call to this function makes us sure that the Display and Structure
  * subsystems have been properly initialized and are ready to be used
  */
-#define  freeglut_assert_ready  assert( fgState.Initalized );
+#define  freeglut_assert_ready  assert( fgState.Initialised );
 
 /*
  * Following definitions are somewhat similiar to GLib's,

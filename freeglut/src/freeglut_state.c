@@ -130,7 +130,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     switch (eWhat)
     {
     case GLUT_INIT_STATE:
-        return ( fgState.Initalized ) ;
+        return ( fgState.Initialised ) ;
 
     case GLUT_ELAPSED_TIME:
         return( fgElapsedTime() );

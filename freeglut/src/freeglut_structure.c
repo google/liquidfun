@@ -84,7 +84,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
      * If the freeglut internals haven't been initialized yet,
      * do it now. Hack's idea courtesy of Chris Purnell...
      */
-    if( !fgState.Initalized )
+    if( !fgState.Initialised )
         glutInit( &fakeArgc, NULL );
 
     /*
@@ -136,7 +136,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
      * If the freeglut internals haven't been initialized yet,
      * do it now. Hack's idea courtesy of Chris Purnell...
      */
-    if( !fgState.Initalized )
+    if( !fgState.Initialised )
         glutInit( &fakeArgc, NULL );
 
     menu->ParentWindow = fgStructure.Window;

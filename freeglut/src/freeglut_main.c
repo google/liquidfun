@@ -340,7 +340,7 @@ void fgError( const char *fmt, ... )
 
     va_end( ap );
 
-    if ( fgState.Initalized )
+    if ( fgState.Initialised )
         fgDeinitialize( );
 
     exit( 1 );

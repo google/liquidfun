@@ -58,7 +58,7 @@ SFG_Display fgDisplay;
 SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       { 300, 300, GL_TRUE }, /* Size */
                       GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,  /* DisplayMode */
-                      GL_FALSE,              /* Initalized */
+                      GL_FALSE,              /* Initialised */
                       GL_FALSE,              /* ForceDirectContext */
                       GL_TRUE,               /* TryDirectContext */
                       GL_FALSE,              /* ForceIconic */
@@ -159,7 +159,7 @@ void fgInitialize( const char* displayName )
         /*
          * Each of the windows should have its own device context...
          */
-        wc.style          = CS_OWNDC;
+        wc.style          = CS_OWNDC /* | CS_DBLCLKS */;
         wc.lpfnWndProc    = fgWindowProc;
         wc.cbClsExtra     = 0;
         wc.cbWndExtra     = 0;
@@ -200,7 +200,7 @@ void fgInitialize( const char* displayName )
 
     fgJoystickInit( 0 );
 
-    fgState.Initalized = GL_TRUE;
+    fgState.Initialised = GL_TRUE;
 }
 
 /*
@@ -210,14 +210,14 @@ void fgDeinitialize( void )
 {
     SFG_Timer *timer;
 
-    if( !fgState.Initalized )
+    if( !fgState.Initialised )
     {
         fgWarning( "fgDeinitialize(): "
                    "no valid initialization has been performed" );
         return;
     }
 
-    /* fgState.Initalized = GL_FALSE; */
+    /* fgState.Initialised = GL_FALSE; */
 
     /*
      * If there was a menu created, destroy the rendering context
@@ -238,7 +238,7 @@ void fgDeinitialize( void )
 
     fgJoystickClose( );
 
-    fgState.Initalized = GL_FALSE;
+    fgState.Initialised = GL_FALSE;
 
     fgState.Position.X = -1;
     fgState.Position.Y = -1;
@@ -307,6 +307,34 @@ void fgDeinitialize( void )
  */
 
 #ifndef TARGET_HOST_UNIX_X11
+
+/*
+
+Copyright 1985, 1986, 1987,1998  The Open Group
+
+Permission to use, copy, modify, distribute, and sell this software and its
+documentation for any purpose is hereby granted without fee, provided that
+the above copyright notice appear in all copies and that both that
+copyright notice and this permission notice appear in supporting
+documentation.
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE OPEN GROUP BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+Except as contained in this notice, the name of The Open Group shall
+not be used in advertising or otherwise to promote the sale, use or
+other dealings in this Software without prior written authorization
+from The Open Group.
+
+*/
 
 #define NoValue         0x0000
 #define XValue          0x0001
@@ -456,7 +484,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     char* geometry = NULL;
     int i, j, argc = *pargc;
 
-    if( fgState.Initalized )
+    if( fgState.Initialised )
         fgError( "illegal glutInit() reinitialization attemp" );
 
     if (pargc && *pargc && argv && *argv && **argv)
