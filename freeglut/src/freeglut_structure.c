@@ -600,15 +600,13 @@ void fgListAppend(SFG_List *list, SFG_Node *node)
 
 void fgListRemove(SFG_List *list, SFG_Node *node)
 {
-    SFG_Node *ln;
-
-    if( (ln = (SFG_Node *)node->Next) != NULL )
-        ln->Prev = node->Prev;
-    if( (ln = (SFG_Node *)node->Prev) != NULL )
-        ln->Next = node->Next;
-    if( (ln = (SFG_Node *)list->First) == node )
+    if( node->Next )
+        ( ( SFG_Node * )node->Next )->Prev = node->Prev;
+    if( node->Prev )
+        ( ( SFG_Node * )node->Prev )->Next = node->Next;
+    if( ( ( SFG_Node * )list->First ) == node )
         list->First = node->Next;
-    if( (ln = (SFG_Node *)list->Last) == node )
+    if( ( ( SFG_Node * )list->Last ) == node )
         list->Last = node->Prev;
 }
 
