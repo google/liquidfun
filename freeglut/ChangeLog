@@ -905,3 +905,16 @@ a bit to do that.
 
 (235) Fixed part of bug #926883 (Video mode matching code, memory leaks,
 fullscreen), i.e. issue warnings when XF86VidModeFOO fails.
+
+(236) Reworked the X11 part of glutSetCursor, fixing bug #764187 (Variable
+mouse pointers don't work) on the way:
+   * Use slightly more compatible cursor shapes for GLUT_CURSOR_RIGHT_ARROW
+     and GLUT_CURSOR_LEFT_ARROW.
+   * Refactored and fixed the erroneous code for GLUT_CURSOR_NONE.
+   * Removed the incorrect use of XFreeCursor and use a cache of cursors
+     instead. Cursors are never freed now, we could do this e.g. via
+     reference countig if this is really needed.
+   * Fixed error handling.
+   * Unknown cursor types are an error now.
+   * Now the window state always corresponds to the wanted cursorID, even in
+     the case of GLUT_CURSOR_FULL_CROSSHAIR.
