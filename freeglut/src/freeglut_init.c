@@ -37,11 +37,13 @@
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
- *  fgDeinitialize()        -- Win32's OK, X11 needs the OS-specific deinitialization done
+ *  fgDeinitialize()        -- Win32's OK, X11 needs the OS-specific
+ *                             deinitialization done
  *  glutInitDisplayString() -- display mode string parsing
  *
- * Wouldn't it be cool to use gettext() for error messages? I just love bash saying 
- * "nie znaleziono pliku" instead of "file not found" :) Is gettext easily portable?
+ * Wouldn't it be cool to use gettext() for error messages? I just love
+ * bash saying  "nie znaleziono pliku" instead of "file not found" :)
+ * Is gettext easily portable?
  */
 
 /* -- GLOBAL VARIABLES ----------------------------------------------------- */
@@ -216,29 +218,29 @@ void fgDeinitialize( void )
     /*
      * If there was a menu created, destroy the rendering context
      */
-    if ( fgStructure.MenuContext )
+    if( fgStructure.MenuContext )
     {
-      free ( fgStructure.MenuContext ) ;
-      fgStructure.MenuContext = NULL ;
+        free( fgStructure.MenuContext );
+        fgStructure.MenuContext = NULL;
     }
 
     fgDestroyStructure();
 
-    while ( (timer = (SFG_Timer *)fgState.Timers.First) != NULL )
+    while( timer = (SFG_Timer *)fgState.Timers.First )
     {
-      fgListRemove ( &fgState.Timers, &timer->Node ) ;
-      free ( timer ) ;
+        fgListRemove ( &fgState.Timers, &timer->Node );
+        free( timer );
     }
 
-    fgJoystickClose();
+    fgJoystickClose( );
 
-    fgState.Position.X = -1 ;
-    fgState.Position.Y = -1 ;
-    fgState.Position.Use = FALSE ;
+    fgState.Position.X = -1;
+    fgState.Position.Y = -1;
+    fgState.Position.Use = FALSE;
 
-    fgState.Size.X = 300 ;
-    fgState.Size.Y = 300 ;
-    fgState.Size.Use = TRUE ;
+    fgState.Size.X = 300;
+    fgState.Size.Y = 300;
+    fgState.Size.Use = TRUE;
 
     fgState.DisplayMode = GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH;
 
@@ -258,26 +260,35 @@ void fgDeinitialize( void )
     fgState.GameModeDepth   =  16;
     fgState.GameModeRefresh =  72;
 
-    fgState.Time.Set = FALSE ;
+    fgState.Time.Set = FALSE;
 
-    fgState.Timers.First = fgState.Timers.Last = NULL ;
-    fgState.IdleCallback = NULL ;
-    fgState.MenuStateCallback = (FGCBmenuState)NULL ;
-    fgState.MenuStatusCallback = (FGCBmenuStatus)NULL ;
+    fgState.Timers.First = fgState.Timers.Last = NULL;
+    fgState.IdleCallback = NULL;
+    fgState.MenuStateCallback = (FGCBmenuState)NULL;
+    fgState.MenuStatusCallback = (FGCBmenuStatus)NULL;
 
     fgState.SwapCount   = 0;
     fgState.SwapTime    = 0;
     fgState.FPSInterval = 0;
 
+    if( fgState.ProgramName )
+    {
+        free( fgState.ProgramName );
+        fgState.ProgramName = NULL;
+    }
+    
+
 #if TARGET_HOST_UNIX_X11
 
     /*
-     * Make sure all X-client data we have created will be destroyed on display closing
+     * Make sure all X-client data we have created will be destroyed on
+     * display closing
      */
     XSetCloseDownMode( fgDisplay.Display, DestroyAll );
 
     /*
-     * Close the display connection, destroying all windows we have created so far
+     * Close the display connection, destroying all windows we have
+     * created so far
      */
     XCloseDisplay( fgDisplay.Display );
 
@@ -317,22 +328,22 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 
     /* check if GLUT_FPS env var is set */
     {
-      const char *fps = getenv ( "GLUT_FPS" );
-      if ( fps )
-      {
-        sscanf ( fps, "%d", &fgState.FPSInterval ) ;
-        if ( fgState.FPSInterval <= 0 )
-          fgState.FPSInterval = 5000 ;  /* 5000 milliseconds */
-      }
+        const char *fps = getenv ( "GLUT_FPS" );
+        if( fps )
+        {
+            sscanf( fps, "%d", &fgState.FPSInterval );
+            if( fgState.FPSInterval <= 0 )
+                fgState.FPSInterval = 5000;  /* 5000 milliseconds */
+        }
     }
 
 #if TARGET_HOST_WIN32
-    if ( !getenv ( "DISPLAY" ) )
-        displayName = strdup ( "" ) ;
+    if( !getenv( "DISPLAY" ) )
+        displayName = strdup( "" );
     else
 #endif
         displayName = strdup( getenv( "DISPLAY" ) );
-    if (!displayName)
+    if( !displayName )
         fgError ("Could not allocate space for display name.");
 
     for( i=1; i<argc; i++ )
@@ -478,7 +489,6 @@ void FGAPIENTRY glutInitWindowPosition( int x, int y )
 {
     if( (x >= 0) && (y >= 0) )
     {
-
         fgState.Position.X   =    x;
         fgState.Position.Y   =    y;
         fgState.Position.Use = TRUE;
