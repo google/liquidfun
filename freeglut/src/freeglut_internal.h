@@ -777,8 +777,8 @@ SFG_Menu* fgMenuByID( int menuID );
  * of the menu user interface handling code...
  */
 void fgActivateMenu( SFG_Window* window, int button );
-void fgExecuteMenuCallback( SFG_Menu* menu );
-GLboolean fgCheckActiveMenu ( SFG_Window *window, SFG_Menu *menu );
+GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
+                              int mouse_x, int mouse_y );
 void fgDeactivateMenu( SFG_Window *window );
 void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry );
 

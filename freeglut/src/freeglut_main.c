@@ -754,93 +754,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
             button = event.xbutton.button - 1;
 
             /*
-             * XXX This comment is replicated in the WIN32 section and
-             * XXX maybe also in the menu code.  Can we move the info
-             * XXX to one central place and *reference* it from here?
-             *
              * Do not execute the application's mouse callback if a menu
              * is hooked to this button.  In that case an appropriate
              * private call should be generated.
-             * Near as I can tell, this is the menu behaviour:
-             *  - Down-click the menu button, menu not active:  activate
-             *    the menu with its upper left-hand corner at the mouse
-             *    location.
-             *  - Down-click any button outside the menu, menu active:
-             *    deactivate the menu
-             *  - Down-click any button inside the menu, menu active:
-             *    select the menu entry and deactivate the menu
-             *  - Up-click the menu button, menu not active:  nothing happens
-             *  - Up-click the menu button outside the menu, menu active:
-             *    nothing happens
-             *  - Up-click the menu button inside the menu, menu active:
-             *    select the menu entry and deactivate the menu
              */
-            /* Window has an active menu, it absorbs any mouse click */
-            if( window->ActiveMenu )
-            {
-                if( window == window->ActiveMenu->ParentWindow )
-                {
-                    window->ActiveMenu->Window->State.MouseX =
-                        event.xbutton.x_root - window->ActiveMenu->X;
-                    window->ActiveMenu->Window->State.MouseY =
-                        event.xbutton.y_root - window->ActiveMenu->Y;
-                }
-
-                /* In the menu, invoke the callback and deactivate the menu*/
-                if( fgCheckActiveMenu( window->ActiveMenu->Window,
-                                       window->ActiveMenu ) )
-                {
-                    /*
-                     * Save the current window and menu and set the current
-                     * window to the window whose menu this is
-                     */
-                    SFG_Window *save_window = fgStructure.Window;
-                    SFG_Menu *save_menu = fgStructure.Menu;
-                    SFG_Window *parent_window =
-                        window->ActiveMenu->ParentWindow;
-                    fgSetWindow( parent_window );
-                    fgStructure.Menu = window->ActiveMenu;
-
-                    /* Execute the menu callback */
-                    fgExecuteMenuCallback( window->ActiveMenu );
-                    fgDeactivateMenu( parent_window );
-
-                    /* Restore the current window and menu */
-                    fgSetWindow( save_window );
-                    fgStructure.Menu = save_menu;
-                }
-                else if( pressed )
-                    /*
-                     * Outside the menu, deactivate if it's a downclick
-                     *
-                     * XXX This isn't enough.  A downclick outside of
-                     * XXX the interior of our freeglut windows should also
-                     * XXX deactivate the menu.  This is more complicated.
-                     */
-                    fgDeactivateMenu( window->ActiveMenu->ParentWindow );
-
-                /*
-                 * XXX Why does an active menu require a redisplay at
-                 * XXX this point?  If this can come out cleanly, then
-                 * XXX it probably should do so; if not, a comment should
-                 * XXX explain it.
-                 */
-                window->State.Redisplay = GL_TRUE;
+            if( fgCheckActiveMenu( window, button, pressed,
+                                   event.xbutton.x_root, event.xbutton.y_root ) )
                 break;
-            }
-
-            /* No active menu, let's check whether we need to activate one. */
-            if( ( 0 <= button ) &&
-                ( FREEGLUT_MAX_MENUS > button ) &&
-                ( window->Menu[ button ] ) &&
-                pressed )
-            {
-                /* XXX Posting a requisite Redisplay seems bogus. */
-                window->State.Redisplay = GL_TRUE;
-                fgSetWindow( window );
-                fgActivateMenu( window, button );
-                break;
-            }
 
             /*
              * Check if there is a mouse or mouse wheel callback hooked to the
@@ -1329,6 +1249,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     SetCursor( NULL );  \
     break;
 
+/*      printf ( "Cursor event %x %x %x %x\n", window, window->State.Cursor, lParam, wParam ) ; */
         if( LOWORD( lParam ) == HTCLIENT )
             switch( window->State.Cursor )
             {
@@ -1483,64 +1404,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             return DefWindowProc( hWnd, uMsg, lParam, wParam );
 
         /*
-         * XXX This comment is duplicated in two other spots.
-         * XXX Can we centralize it?
-         *
-         * Do not execute the application's mouse callback if a
-         * menu is hooked to this button.
-         * In that case an appropriate private call should be generated.
-         * Near as I can tell, this is the menu behaviour:
-         *  - Down-click the menu button, menu not active:  activate
-         *    the menu with its upper left-hand corner at the mouse location.
-         *  - Down-click any button outside the menu, menu active:
-         *    deactivate the menu
-         *  - Down-click any button inside the menu, menu active:
-         *    select the menu entry and deactivate the menu
-         *  - Up-click the menu button, menu not active:  nothing happens
-         *  - Up-click the menu button outside the menu, menu active:
-         *    nothing happens
-         *  - Up-click the menu button inside the menu, menu active:
-         *    select the menu entry and deactivate the menu
+         * Do not execute the application's mouse callback if a menu
+         * is hooked to this button.  In that case an appropriate
+         * private call should be generated.
          */
-        /* Window has an active menu, it absorbs any mouse click */
-        if( window->ActiveMenu )
-        {
-            /* Outside the menu, deactivate the menu if it's a downclick */
-            if( ! fgCheckActiveMenu( window, window->ActiveMenu ) )
-            {
-                if( pressed )
-                    fgDeactivateMenu( window->ActiveMenu->ParentWindow );
-            }
-            else  /* In menu, invoke the callback and deactivate the menu*/
-            {
-                /*
-                 * Save the current window and menu and set the current
-                 * window to the window whose menu this is
-                 */
-                SFG_Window *save_window = fgStructure.Window;
-                SFG_Menu *save_menu = fgStructure.Menu;
-                SFG_Window *parent_window = window->ActiveMenu->ParentWindow;
-                fgSetWindow( parent_window );
-                fgStructure.Menu = window->ActiveMenu;
-
-                /* Execute the menu callback */
-                fgExecuteMenuCallback( window->ActiveMenu );
-                fgDeactivateMenu( parent_window );
-
-                /* Restore the current window and menu */
-                fgSetWindow( save_window );
-                fgStructure.Menu = save_menu;
-            }
-
-            /*
-             * Let's make the window redraw as a result of the mouse
-             * click and menu activity.
-             */
-            if( ! window->IsMenu )
-                window->State.Redisplay = GL_TRUE;
-
+        if( fgCheckActiveMenu( window, button, pressed,
+                               window->State.MouseX, window->State.MouseY ) )
             break;
-        }
 
         if( window->Menu[ button ] && pressed )
         {

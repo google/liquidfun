@@ -274,24 +274,16 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     XSizeHints sizeHints;
     XWMHints wmHints;
     unsigned long mask;
+    unsigned int current_DisplayMode = fgState.DisplayMode ;
 
-    /*
-     * XXX fgChooseVisual() is a common part of all three.
-     * XXX With a little thought, we should be able to greatly
-     * XXX simplify this.
-     */
-    if( !window->IsMenu )
-        window->Window.VisualInfo = fgChooseVisual( );
-    else if( fgStructure.MenuContext )
-        window->Window.VisualInfo = fgChooseVisual( );
-    else
-    {
-        /* XXX Why are menus double- and depth-buffered? */
-        unsigned int current_DisplayMode = fgState.DisplayMode ;
-        fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH ;
-        window->Window.VisualInfo = fgChooseVisual( );
+    /* Save the display mode if we are creating a menu window */
+    if( window->IsMenu && ( ! fgStructure.MenuContext ) )
+        fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB ;
+
+    window->Window.VisualInfo = fgChooseVisual( );
+
+    if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = current_DisplayMode ;
-    }
 
     if( ! window->Window.VisualInfo )
     {
@@ -439,17 +431,10 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      * that they should replace a window manager that they like, and which
      * works, just because *we* think that it's not "modern" enough.
      */
-#if TARGET_HOST_WINCE /* Since this is in the X11 branch, it's pretty dumb */
-    sizeHints.x      = 0;
-    sizeHints.y      = 0;
-    sizeHints.width  = 320;
-    sizeHints.height = 240;
-#else
     sizeHints.x      = x;
     sizeHints.y      = y;
     sizeHints.width  = w;
     sizeHints.height = h;
-#endif /* TARGET_HOST_WINCE */
 
     wmHints.flags = StateHint;
     wmHints.initial_state = fgState.ForceIconic ? IconicState : NormalState;

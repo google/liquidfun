@@ -386,6 +386,30 @@ static void fghSetSubmenuParentWindow( SFG_Window *window, SFG_Menu *menu )
             fghSetSubmenuParentWindow( window, menuEntry->SubMenu );
 }
 
+/*
+ * Function to check for menu entry selection on menu deactivation
+ */
+static void fghExecuteMenuCallback( SFG_Menu* menu )
+{
+    SFG_MenuEntry *menuEntry;
+
+    /* First of all check any of the active sub menus... */
+    for( menuEntry = (SFG_MenuEntry *)menu->Entries.First;
+         menuEntry;
+         menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next)
+    {
+        if( menuEntry->IsActive )
+        {
+            if( menuEntry->SubMenu )
+                fghExecuteMenuCallback( menuEntry->SubMenu );
+            else
+                if( menu->Callback )
+                    menu->Callback( menuEntry->ID );
+            return;
+        }
+    }
+}
+
 
 /*
  * Displays the currently active menu for the current window
@@ -474,45 +498,93 @@ void fgActivateMenu( SFG_Window* window, int button )
 /*
  * Check whether an active menu absorbs a mouse click
  */
-GLboolean fgCheckActiveMenu ( SFG_Window *window, SFG_Menu *menu )
+GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
+                              int mouse_x, int mouse_y )
 {
     /*
-     * Near as I can tell, this is the active menu behaviour:
+     * Near as I can tell, this is the menu behaviour:
+     *  - Down-click the menu button, menu not active:  activate
+     *    the menu with its upper left-hand corner at the mouse
+     *    location.
      *  - Down-click any button outside the menu, menu active:
      *    deactivate the menu
      *  - Down-click any button inside the menu, menu active:
      *    select the menu entry and deactivate the menu
+     *  - Up-click the menu button, menu not active:  nothing happens
      *  - Up-click the menu button outside the menu, menu active:
      *    nothing happens
      *  - Up-click the menu button inside the menu, menu active:
      *    select the menu entry and deactivate the menu
      * Since menus can have submenus, we need to check this recursively.
      */
-  return fghCheckMenuStatus( window, menu );
-}
-
-/*
- * Function to check for menu entry selection on menu deactivation
- */
-void fgExecuteMenuCallback( SFG_Menu* menu )
-{
-    SFG_MenuEntry *menuEntry;
-
-    /* First of all check any of the active sub menus... */
-    for( menuEntry = (SFG_MenuEntry *)menu->Entries.First;
-         menuEntry;
-         menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next)
+    if( window->ActiveMenu )
     {
-        if( menuEntry->IsActive )
+        if( window == window->ActiveMenu->ParentWindow )
         {
-            if( menuEntry->SubMenu )
-                fgExecuteMenuCallback( menuEntry->SubMenu );
-            else
-                if( menu->Callback )
-                    menu->Callback( menuEntry->ID );
-            return;
+            window->ActiveMenu->Window->State.MouseX =
+                                       mouse_x - window->ActiveMenu->X;
+            window->ActiveMenu->Window->State.MouseY =
+                                       mouse_y - window->ActiveMenu->Y;
         }
+
+        /* In the menu, invoke the callback and deactivate the menu */
+        if( fghCheckMenuStatus( window->ActiveMenu->Window,
+                                window->ActiveMenu ) )
+        {
+            /*
+             * Save the current window and menu and set the current
+             * window to the window whose menu this is
+             */
+            SFG_Window *save_window = fgStructure.Window;
+            SFG_Menu *save_menu = fgStructure.Menu;
+            SFG_Window *parent_window = window->ActiveMenu->ParentWindow;
+            fgSetWindow( parent_window );
+            fgStructure.Menu = window->ActiveMenu;
+
+            /* Execute the menu callback */
+            fghExecuteMenuCallback( window->ActiveMenu );
+            fgDeactivateMenu( parent_window );
+
+            /* Restore the current window and menu */
+            fgSetWindow( save_window );
+            fgStructure.Menu = save_menu;
+        }
+        else if( pressed )
+            /*
+             * Outside the menu, deactivate if it's a downclick
+             *
+             * XXX This isn't enough.  A downclick outside of
+             * XXX the interior of our freeglut windows should also
+             * XXX deactivate the menu.  This is more complicated.
+             */
+            fgDeactivateMenu( window->ActiveMenu->ParentWindow );
+
+        /*
+         * XXX Why does an active menu require a redisplay at
+         * XXX this point?  If this can come out cleanly, then
+         * XXX it probably should do so; if not, a comment should
+         * XXX explain it.
+         */
+        if( ! window->IsMenu )
+            window->State.Redisplay = GL_TRUE;
+
+        return GL_TRUE;
     }
+
+    /* No active menu, let's check whether we need to activate one. */
+    if( ( 0 <= button ) &&
+        ( FREEGLUT_MAX_MENUS > button ) &&
+        ( window->Menu[ button ] ) &&
+        pressed )
+    {
+        /* XXX Posting a requisite Redisplay seems bogus. */
+        window->State.Redisplay = GL_TRUE;
+        fgSetWindow( window );
+        fgActivateMenu( window, button );
+        return GL_TRUE;
+    }
+
+    return GL_FALSE;
 }
 
 /*
