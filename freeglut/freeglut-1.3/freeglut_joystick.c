@@ -544,6 +544,7 @@ void fgJoystickClose( void )
 #endif
 
     free ( fgJoystick ) ;
+    fgJoystick = NULL ;
 }
 
 /*
