@@ -89,8 +89,10 @@
     #include <X11/Xatom.h>
     #include <X11/keysym.h>
 
-    #if HAVE_X11_EXTENSIONS_XF86VMODE_H
-        #include <X11/extensions/xf86vmode.h>
+    #ifndef __sgi
+    #ifndef SOLARIS
+    #include <X11/extensions/xf86vmode.h>
+    #endif
     #endif
 #endif
 
@@ -235,6 +237,7 @@ struct tagSFG_State
 
     FGCBidle         IdleCallback;         /* The global idle callback          */
 
+    GLboolean        BuildingAMenu;        /* True if we are presently making a menu */
     FGCBmenuState    MenuStateCallback;    /* Menu callbacks are global         */
     FGCBmenuStatus   MenuStatusCallback;
 
@@ -384,8 +387,25 @@ struct tagSFG_WindowCallbacks
 };
 
 /*
+ * This structure holds the OpenGL rendering context for all the menu windows
+ */
+typedef struct tagSFG_MenuContext SFG_MenuContext;
+struct tagSFG_MenuContext
+{
+#if TARGET_HOST_UNIX_X11
+    GLXContext          Context;                /* The menu OpenGL context   */
+    XVisualInfo*        VisualInfo;             /* The window's visual information */
+#elif TARGET_HOST_WIN32
+    HGLRC               Context;                /* The menu window's WGL context    */
+#endif
+
+};
+
+/*
  * This structure describes a menu
  */
+typedef struct tagSFG_Window SFG_Window;
+typedef struct tagSFG_MenuEntry SFG_MenuEntry;
 typedef struct tagSFG_Menu SFG_Menu;
 struct tagSFG_Menu
 {
@@ -399,12 +419,15 @@ struct tagSFG_Menu
     int                 Width;                  /* Menu box width in pixels  */
     int                 Height;                 /* Menu box height in pixels */
     int                 X, Y;                   /* Menu box raster position  */
+
+    SFG_MenuEntry      *ActiveEntry ;           /* Currently active entry in the menu */
+    SFG_Window         *Window ;                /* OpenGL window for menu    */
+    SFG_Window         *ParentWindow ;          /* OpenGL window in which the menu is defined */
 };
 
 /*
  * This is a menu entry
  */
-typedef struct tagSFG_MenuEntry SFG_MenuEntry;
 struct tagSFG_MenuEntry
 {
     SFG_Node            Node;
@@ -419,7 +442,6 @@ struct tagSFG_MenuEntry
 /*
  * A window, making part of freeglut windows hierarchy. Should be kept portable.
  */
-typedef struct tagSFG_Window SFG_Window;
 struct tagSFG_Window
 {
     SFG_Node            Node;
@@ -435,6 +457,8 @@ struct tagSFG_Window
 
     SFG_Window*         Parent;                 /* The parent to this window */
     SFG_List            Children;               /* The subwindows d.l. list  */
+
+    GLboolean           IsMenu;                 /* Set to 1 if we are a menu */
 };
 
 /*
@@ -459,6 +483,8 @@ struct tagSFG_Structure
 
     SFG_Window*         Window;                 /* The currently active win. */
     SFG_Menu*           Menu;                   /* Same, but menu...         */
+
+    SFG_MenuContext*    MenuContext;            /* OpenGL rendering context for menus */
 
     SFG_Window*         GameMode;               /* The game mode window      */
 
@@ -673,6 +699,7 @@ void fgActivateMenu( SFG_Window* window, int button );
 void fgExecuteMenuCallback( SFG_Menu* menu ) ;
 GLboolean fgCheckActiveMenu ( SFG_Window *window, SFG_Menu *menu ) ;
 void fgDeactivateMenu( SFG_Window *window );
+void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry );
 
 /*
  * This function gets called just before the buffers swap, so that

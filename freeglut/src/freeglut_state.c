@@ -367,7 +367,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /*
          * ...then we've got to correct the results we've just received...
          */
-        if ( ( fgStructure.GameMode != fgStructure.Window ) && ( fgStructure.Window->Parent == NULL ) )
+        if ( ( fgStructure.GameMode != fgStructure.Window ) && ( fgStructure.Window->Parent == NULL ) &&
+             ( ! fgStructure.Window->IsMenu ) )
         {
           winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME );
           winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME );
@@ -659,7 +660,8 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
         /*
          * Check if an overlay display mode is possible
          */
-        return  FALSE;
+/*        return( fgSetupPixelFormat( fgStructure.Window, TRUE, PFD_OVERLAY_PLANE ) ); */
+      return FALSE ;
 
     case GLUT_LAYER_IN_USE:
         /*

@@ -41,7 +41,15 @@
  * The SFG_Structure container holds information about windows and menus
  * created between glutInit() and glutMainLoop() return.
  */
-SFG_Structure fgStructure;
+
+SFG_Structure fgStructure = { { NULL, NULL },  /* The list of windows       */
+                              { NULL, NULL },  /* The list of menus         */
+                              NULL,            /* The current window        */
+                              NULL,            /* The current menu          */
+                              NULL,            /* The menu OpenGL context   */
+                              NULL,            /* The game mode window      */
+                              0,               /* The current new window ID */
+                              0 };             /* The current new menu ID   */
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -103,6 +111,11 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title, int x, int y,
     window->State.Modifiers = 0xffffffff;
 
     /*
+     * If this window is a menu, set IsMenu in the structure
+     */
+    window->IsMenu = fgState.BuildingAMenu ;
+
+    /*
      * Open the window now. The fgOpenWindow() function is system
      * dependant, and resides in freeglut_window.c. Uses fgState.
      */
@@ -119,6 +132,9 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title, int x, int y,
  */
 SFG_Menu* fgCreateMenu( FGCBmenu menuCallback )
 {
+  int x = 100, y = 100, w = 100, h = 100 ;
+  SFG_Window *current_window = fgStructure.Window ;
+
     /*
      * Have the menu object created
      */
@@ -132,11 +148,34 @@ SFG_Menu* fgCreateMenu( FGCBmenu menuCallback )
     if( !fgState.Time.Set )
         glutInit( &fakeArgc, NULL );
 
+    menu->ParentWindow = fgStructure.Window ;
+
+    /*
+     * Create a window for the menu to reside in.  Set the
+     * global variable BuildingAMenu to true so we can ensure
+     * it is created without decorations.
+     */
+    fgState.BuildingAMenu = TRUE ;
+
+    fgCreateWindow ( NULL, NULL, x, y, w, h, FALSE ) ;
+    menu->Window = fgStructure.Window ;
+    glutDisplayFunc ( fgDisplayMenu ) ;
+
+    /*
+     * While BuildingAMenu is true, all windows built have no decorations.  That's
+     * not a good default behavior, so let's set it false again.
+     */
+    fgState.BuildingAMenu = FALSE ;
+
+    glutHideWindow () ;  /* Hide the window for now */
+    fgStructure.Window = current_window ;
+
     /*
      * Initialize the object properties:
      */
     menu->ID       = ++fgStructure.MenuID;
     menu->Callback = menuCallback;
+    menu->ActiveEntry = NULL ;
 
     /*
      * Initialize the entries list
@@ -389,6 +428,11 @@ void fgDestroyMenu( SFG_Menu* menu )
      */
     free( entry );
   }
+
+  /*
+   * Destroy the window associated with the menu
+   */
+  fgDestroyWindow ( menu->Window, TRUE ) ;
 
   /*
    * Remove the menu from the menus list

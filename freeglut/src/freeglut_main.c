@@ -652,9 +652,17 @@ void FGAPIENTRY glutMainLoopEvent( void )
         GETWINDOW( xmotion ); GETMOUSE( xmotion );
 
         /*
-         * Set the current window
+         * Fallback if there's an active menu hooked to this window
          */
-        fgStructure.Window = window ;
+        if( window->ActiveMenu != NULL )
+        {
+            /*
+             * Let's make the window redraw as a result of the mouse motion.
+             */
+            window->State.Redisplay = TRUE ;
+
+            break;
+        }
 
         /*
          * What kind of a movement was it?
@@ -670,6 +678,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
           if( window->Callbacks.Motion != NULL )
           {
             /*
+             * Set the current window
+             */
+            fgStructure.Window = window ;
+
+            /*
              * Yup. Have it executed immediately
              */
             window->Callbacks.Motion( event.xmotion.x, event.xmotion.y );
@@ -682,6 +695,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
            */
           if( window->Callbacks.Passive != NULL )
           {
+            /*
+             * Set the current window
+             */
+            fgStructure.Window = window ;
+
             /*
              * That's right, and there is a passive callback, too.
              */
@@ -749,7 +767,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
             /* Execute the menu callback */
             fgExecuteMenuCallback ( window->ActiveMenu ) ;
-            fgDeactivateMenu ( window ) ;
+            fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
 
             /* Restore the current window and menu */
             fgSetWindow ( save_window ) ;
@@ -757,7 +775,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
           }
           else  /* Outside the menu, deactivate the menu if it's a downclick */
           {
-            if ( pressed == TRUE ) fgDeactivateMenu ( window ) ;
+            if ( pressed == TRUE ) fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
           }
 
           /*
@@ -779,6 +797,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
           window->State.Redisplay = TRUE ;
 
           /*
+           * Set the current window
+           */
+          fgSetWindow( window );
+
+          /*
            * Activate the appropriate menu structure...
            */
           fgActivateMenu( window, button );
@@ -789,13 +812,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * Check if there is a mouse callback hooked to the window
          */
-        if( window->Callbacks.Mouse == NULL )
+        if( fgStructure.Window->Callbacks.Mouse == NULL )
           break;
-
-        /*
-         * Set the current window
-         */
-        fgSetWindow( window );
 
         /*
          * Remember the current modifiers state
@@ -807,12 +825,12 @@ void FGAPIENTRY glutMainLoopEvent( void )
           modifiers |= GLUT_ACTIVE_CTRL;
         if (event.xbutton.state & Mod1Mask)
           modifiers |= GLUT_ACTIVE_ALT;
-        window->State.Modifiers = modifiers;
+        fgStructure.Window->State.Modifiers = modifiers;
 
         /*
          * Finally execute the mouse callback
          */
-        window->Callbacks.Mouse(
+        fgStructure.Window->Callbacks.Mouse(
             button,
             event.type == ButtonPress ? GLUT_DOWN : GLUT_UP,
             event.xbutton.x,
@@ -822,7 +840,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         /*
          * Trash the modifiers state
          */
-        window->State.Modifiers = 0xffffffff;
+        fgStructure.Window->State.Modifiers = 0xffffffff;
       }
       break;
 
@@ -1170,17 +1188,48 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         window->Window.Device = GetDC( hWnd );
 
         /*
-         * Setup the pixel format of our window
-         */
-        fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
-
-        /*
          * Create or get the OpenGL rendering context now
          */
-        if ( fgState.UseCurrentContext == TRUE )
-          window->Window.Context = wglGetCurrentContext();
-        else
+        if ( fgState.BuildingAMenu )
+        {
+          /*
+           * Setup the pixel format of our window
+           */
+          unsigned int current_DisplayMode = fgState.DisplayMode ;
+          fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH ;
+          fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
+          fgState.DisplayMode = current_DisplayMode ;
+
+          /*
+           * If there isn't already an OpenGL rendering context for menu windows, make one
+           */
+          if ( !fgStructure.MenuContext )
+          {
+            fgStructure.MenuContext = (SFG_MenuContext *)malloc ( sizeof(SFG_MenuContext) ) ;
+            fgStructure.MenuContext->Context = wglCreateContext( window->Window.Device );
+          }
+          else
+            wglMakeCurrent ( window->Window.Device, fgStructure.MenuContext->Context ) ;
+
+/*          window->Window.Context = wglGetCurrentContext () ;   */
           window->Window.Context = wglCreateContext( window->Window.Device );
+        }
+        else
+        {
+          /*
+           * Setup the pixel format of our window
+           */
+          fgSetupPixelFormat( window, FALSE, PFD_MAIN_PLANE );
+
+          if ( fgState.UseCurrentContext == TRUE )
+          {
+            window->Window.Context = wglGetCurrentContext();
+            if ( ! window->Window.Context )
+              window->Window.Context = wglCreateContext( window->Window.Device );
+          }
+          else
+            window->Window.Context = wglCreateContext( window->Window.Device );
+        }
 
         /*
          * Still, we'll be needing to explicitly resize the window
@@ -1465,7 +1514,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
             /* Execute the menu callback */
             fgExecuteMenuCallback ( window->ActiveMenu ) ;
-            fgDeactivateMenu ( window ) ;
+            fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
 
             /* Restore the current window and menu */
             fgSetWindow ( save_window ) ;
@@ -1473,13 +1522,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
           }
           else  /* Outside the menu, deactivate the menu if it's a downclick */
           {
-            if ( pressed == TRUE ) fgDeactivateMenu ( window ) ;
+            if ( pressed == TRUE ) fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
           }
 
           /*
            * Let's make the window redraw as a result of the mouse click and menu activity.
            */
-          window->State.Redisplay = TRUE ;
+          if ( ! window->IsMenu ) window->State.Redisplay = TRUE ;
 
           break ;
         }
@@ -1495,6 +1544,11 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             window->State.Redisplay = TRUE ;
 
             /*
+             * Set the current window
+             */
+            fgSetWindow( window );
+
+            /*
              * Activate the appropriate menu structure...
              */
             fgActivateMenu( window, button );
@@ -1505,18 +1559,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /*
          * Check if there is a mouse callback hooked to the window
          */
-        if( window->Callbacks.Mouse == NULL )
+        if( fgStructure.Window->Callbacks.Mouse == NULL )
             break;
-
-        /*
-         * Set the current window
-         */
-        fgSetWindow( window );
 
         /*
          * Remember the current modifiers state.
          */
-        window->State.Modifiers = 
+        fgStructure.Window->State.Modifiers = 
             ( ( (GetKeyState( VK_LSHIFT   ) < 0 ) || ( GetKeyState( VK_RSHIFT   ) < 0 )) ? GLUT_ACTIVE_SHIFT : 0 ) |
             ( ( (GetKeyState( VK_LCONTROL ) < 0 ) || ( GetKeyState( VK_RCONTROL ) < 0 )) ? GLUT_ACTIVE_CTRL  : 0 ) |
             ( ( (GetKeyState( VK_LMENU    ) < 0 ) || ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
@@ -1524,7 +1573,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /*
          * Finally execute the mouse callback
          */
-        window->Callbacks.Mouse(
+        fgStructure.Window->Callbacks.Mouse(
             button,
             pressed == TRUE ? GLUT_DOWN : GLUT_UP,
             window->State.MouseX,
@@ -1534,7 +1583,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         /*
          * Trash the modifiers state
          */
-        window->State.Modifiers = 0xffffffff;
+        fgStructure.Window->State.Modifiers = 0xffffffff;
     }
     break;
 

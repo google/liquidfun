@@ -75,6 +75,7 @@ SFG_State fgState = { { -1, -1, FALSE },  /* Position */
 #endif
                       { NULL, NULL }, /* Timers */
                       NULL, /* IdleCallback */
+                      FALSE, /* BuildingAMenu */
                       NULL, /* MenuStateCallback */
                       NULL, /* MenuStatusCallback */
                       { 640, 480, TRUE }, /* GameModeSize */
@@ -266,6 +267,15 @@ void fgDeinitialize( void )
     {
         fgWarning( "fgDeinitialize(): fgState.Timer is null => no valid initialization has been performed" );
         return;
+    }
+
+    /*
+     * If there was a menu created, destroy the rendering context
+     */
+    if ( fgStructure.MenuContext )
+    {
+      free ( fgStructure.MenuContext ) ;
+      fgStructure.MenuContext = NULL ;
     }
 
     /*

@@ -96,7 +96,14 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
        * that it caught the mouse cursor and we do not need to regenerate
        * the activity list, and so our parents do...
        */
-      if( fghCheckMenuStatus( window, menuEntry->SubMenu ) == TRUE )
+      GLboolean return_status = fghCheckMenuStatus( window, menuEntry->SubMenu ) ;
+
+      /*
+       * Reactivate the submenu as the checkMenuStatus may have turned it off if the mouse
+       * is in its parent menu entry.
+       */
+      menuEntry->SubMenu->IsActive = TRUE ;
+      if ( return_status == TRUE )
         return( TRUE );
     }
   }
@@ -104,8 +111,8 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
   /*
    * That much about our sub menus, let's get to checking the current menu:
    */
-  x = window->State.MouseX - menu->X;
-  y = window->State.MouseY - menu->Y;
+  x = window->State.MouseX;
+  y = window->State.MouseY;
 
   /*
    * Mark all menu entries inactive...
@@ -116,12 +123,13 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
     menuEntry->IsActive = FALSE;
   }
 
+
   menu->IsActive = FALSE;
 
   /*
    * Check if the mouse cursor is contained within the current menu box
    */
-  if( x >= 0 && x < menu->Width && y >= 0 && y < menu->Height )
+  if ( ( x >= 0 ) && ( x < menu->Width ) && ( y >= 0 ) && ( y < menu->Height ) && ( window == menu->Window ) )
   {
     /*
      * Calculation of the highlighted menu item is easy enough now:
@@ -141,8 +149,21 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
     menuEntry->Ordinal = menuID;
 
     /*
+     * If this is not the same as the last active menu entry, deactivate the previous entry.
+     * Specifically, if the previous active entry was a submenu then deactivate it.
+     */
+    if ( menu->ActiveEntry && ( menuEntry != menu->ActiveEntry ) )
+    {
+      if ( menu->ActiveEntry->SubMenu != NULL )
+        fgDeactivateSubMenu ( menu->ActiveEntry ) ;
+    }
+
+    menu->ActiveEntry = menuEntry ;
+
+    /*
      * Don't forget about marking the current menu as active, too:
      */
+
     menu->IsActive = TRUE;
 
     /*
@@ -152,21 +173,31 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
      */
     if( menuEntry->SubMenu != NULL )
     {
-      /*
-       * Set up the initial menu position now...
-       */
-
-      menuEntry->SubMenu->X = menu->X + menu->Width ;
-      menuEntry->SubMenu->Y = menu->Y + menuEntry->Ordinal * FREEGLUT_MENU_HEIGHT ;
-
-      /*
-       * Make sure the submenu stays within the window
-       */
-      if ( menuEntry->SubMenu->X + menuEntry->SubMenu->Width > glutGet ( GLUT_WINDOW_WIDTH ) )
+      if ( ! menuEntry->SubMenu->IsActive )
       {
-        menuEntry->SubMenu->X = menu->X - menuEntry->SubMenu->Width ;
-        if ( menuEntry->SubMenu->X < 0 )
-          menuEntry->SubMenu->X = glutGet ( GLUT_WINDOW_WIDTH ) - menuEntry->SubMenu->Width ;
+        SFG_Window *current_window = fgStructure.Window ;
+
+        /*
+         * Set up the initial menu position now...
+         */
+
+        /*
+         * Mark the menu as active, so that it gets displayed:
+         */
+        menuEntry->SubMenu->IsActive = TRUE ;
+
+        /*
+         * Set up the initial submenu position now:
+         */
+        menuEntry->SubMenu->X = menu->X + menu->Width ;
+        menuEntry->SubMenu->Y = menu->Y + menuEntry->Ordinal * FREEGLUT_MENU_HEIGHT ;
+
+        fgSetWindow ( menuEntry->SubMenu->Window ) ;
+        glutShowWindow () ;
+        glutPositionWindow ( menuEntry->SubMenu->X, menuEntry->SubMenu->Y ) ;
+        glutReshapeWindow ( menuEntry->SubMenu->Width, menuEntry->SubMenu->Height ) ;
+        menuEntry->SubMenu->Window->ActiveMenu = menuEntry->SubMenu ;
+        fgSetWindow ( current_window ) ;
       }
 
       /*
@@ -204,20 +235,20 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
    * Have the menu box drawn first. The +- values are
    * here just to make it more nice-looking...
    */
-  glColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
+  glColor4f( 0.1289f, 0.2257f, 0.28516f, 1.0f ); /* a non-black dark version of the below. */
   glBegin( GL_QUADS );
-    glVertex2i( menu->X              , menu->Y - 1                );
-    glVertex2i( menu->X + menu->Width, menu->Y - 1                );
-    glVertex2i( menu->X + menu->Width, menu->Y + 4 + menu->Height );
-    glVertex2i( menu->X              , menu->Y + 4 + menu->Height );
+    glVertex2i( 0          , 0            );
+    glVertex2i( menu->Width, 0            );
+    glVertex2i( menu->Width, menu->Height );
+    glVertex2i( 0          , menu->Height );
   glEnd();
 
   glColor4f( 0.3f, 0.4f, 0.5f, 1.0f );
   glBegin( GL_QUADS );
-    glVertex2i( menu->X - 2              , menu->Y + 1                );
-    glVertex2i( menu->X - 2 + menu->Width, menu->Y + 1                );
-    glVertex2i( menu->X - 2 + menu->Width, menu->Y + 2 + menu->Height );
-    glVertex2i( menu->X - 2              , menu->Y + 2 + menu->Height );
+    glVertex2i(             1, 1             );
+    glVertex2i( menu->Width-1, 1             );
+    glVertex2i( menu->Width-1, menu->Height-1);
+    glVertex2i(             1, menu->Height-1);
   glEnd();
 
   /*
@@ -243,10 +274,10 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
        */
       glColor4f( 0.2f, 0.3f, 0.4f, 1.0f );
       glBegin( GL_QUADS );
-        glVertex2i( menu->X - 2              , menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
-        glVertex2i( menu->X - 2 + menu->Width, menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
-        glVertex2i( menu->X - 2 + menu->Width, menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
-        glVertex2i( menu->X - 2              , menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
+        glVertex2i( 2            , (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
+        glVertex2i( menu->Width-2, (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
+        glVertex2i( menu->Width-2, (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
+        glVertex2i( 2            , (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
       glEnd();
     }
   }
@@ -263,8 +294,8 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
      * Move the raster into position...
      */
     glRasterPos2i(
-        menu->X + FREEGLUT_MENU_BORDER,
-        menu->Y + (i + 1)*FREEGLUT_MENU_HEIGHT
+        FREEGLUT_MENU_BORDER,
+        (i + 1)*FREEGLUT_MENU_HEIGHT-(int)(FREEGLUT_MENU_HEIGHT*0.3) /* Try to center the text - JCJ 31 July 2003*/
     );
 
     /*
@@ -292,8 +323,8 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
       glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
       glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
 
-      glRasterPos2i ( menu->X + menu->Width - 2 - width,
-                      menu->Y + (i + 1)*FREEGLUT_MENU_HEIGHT ) ;
+      glRasterPos2i ( menu->Width - 2 - width,
+                      (i + 1)*FREEGLUT_MENU_HEIGHT ) ;
       glBitmap ( width, FREEGLUT_MENU_HEIGHT, 0, 0, 0.0, 0.0, arrow_char ) ;
       glPopClientAttrib();
     }
@@ -313,10 +344,29 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
       /*
        * Yeah, indeed. Have it redrawn now:
        */
+      fgSetWindow ( menuEntry->SubMenu->Window ) ;
       fghDisplayMenuBox( menuEntry->SubMenu );
+      fgSetWindow ( menu->Window ) ;
     }
   }
 }
+
+/*
+ * Private static function to set the parent window of a submenu and all of its submenus
+ */
+static void fghSetSubmenuParentWindow ( SFG_Window *window, SFG_Menu *menu )
+{
+  SFG_MenuEntry *menuEntry ;
+
+  menu->ParentWindow = window ;
+
+  for ( menuEntry = menu->Entries.First; menuEntry; menuEntry = menuEntry->Node.Next )
+  {
+    if ( menuEntry->SubMenu != NULL )
+      fghSetSubmenuParentWindow ( window, menuEntry->SubMenu ) ;
+  }
+}
+
 
 /*
  * Displays the currently active menu for the current window
@@ -337,9 +387,12 @@ void fgDisplayMenu( void )
     menu = window->ActiveMenu;
 
     /*
-     * Did we find an active window?
+     * Did we find an active menu?
      */
     freeglut_return_if_fail( menu != NULL );
+
+    fgSetWindow ( menu->Window ) ;
+
     /*
      * Prepare the OpenGL state to do the rendering first:
      */
@@ -388,6 +441,13 @@ void fgDisplayMenu( void )
     glPopMatrix();
     glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
+
+    glutSwapBuffers () ;
+
+    /*
+     * Restore the current window
+     */
+    fgSetWindow ( window ) ;
 }
 
 /*
@@ -395,8 +455,6 @@ void fgDisplayMenu( void )
  */
 void fgActivateMenu( SFG_Window* window, int button )
 {
-  int x, y;
-
   /*
    * We'll be referencing this menu a lot, so remember its address:
    */
@@ -409,23 +467,22 @@ void fgActivateMenu( SFG_Window* window, int button )
   menu->IsActive = TRUE ;
 
   /*
-   * Grab the mouse cursor position respective to the current window
-   */
-  x = window->State.MouseX;
-  y = window->State.MouseY;
-
-  /*
    * Set up the initial menu position now:
    */
-  menu->X = x ;
-  menu->Y = y ;
 
-  fgSetWindow ( window ) ;
+  menu->X = window->State.MouseX + glutGet ( GLUT_WINDOW_X ) ;
+  menu->Y = window->State.MouseY + glutGet ( GLUT_WINDOW_Y ) ;
 
-  if( x > ( glutGet( GLUT_WINDOW_WIDTH ) - menu->Width ) )
+  fgSetWindow ( menu->Window ) ;
+  glutShowWindow () ;
+  glutPositionWindow ( menu->X, menu->Y ) ;
+  glutReshapeWindow ( menu->Width, menu->Height ) ;
+  menu->Window->ActiveMenu = menu ;
+
+/*  if( x > ( glutGet( GLUT_WINDOW_WIDTH ) - menu->Width ) )
     menu->X = glutGet( GLUT_WINDOW_WIDTH ) - menu->Width;
   if( y > ( glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height) )
-    menu->Y = glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height;
+    menu->Y = glutGet( GLUT_WINDOW_HEIGHT ) - menu->Height; */
 }
 
 /*
@@ -493,10 +550,13 @@ void fgExecuteMenuCallback( SFG_Menu* menu )
  */
 void fgDeactivateMenu( SFG_Window *window )
 {
+  SFG_Window *current_window = fgStructure.Window ;
+
     /*
      * Check if there is an active menu attached to this window...
      */
     SFG_Menu* menu = window->ActiveMenu;
+    SFG_MenuEntry *menuEntry ;
 
     /*
      * Did we find an active window?
@@ -504,10 +564,67 @@ void fgDeactivateMenu( SFG_Window *window )
     freeglut_return_if_fail( menu != NULL );
 
     /*
+     * Hide the present menu's window
+     */
+    fgSetWindow ( menu->Window ) ;
+    glutHideWindow () ;
+
+    /*
      * Forget about having that menu active anymore, now:
      */
-    window->ActiveMenu = NULL;
+    menu->Window->ActiveMenu = NULL ;
+    menu->ParentWindow->ActiveMenu = NULL ;
     menu->IsActive = FALSE ;
+
+    /*
+     * Hide all submenu windows, and the root menu's window.
+     */
+    for ( menuEntry = menu->Entries.First; menuEntry;
+          menuEntry = menuEntry->Node.Next )
+    {
+      /*
+       * Is that an active submenu by any case?
+       */
+      if ( ( menuEntry->SubMenu != NULL ) && menuEntry->SubMenu->IsActive )
+        fgDeactivateSubMenu ( menuEntry ) ;
+    }
+
+    fgStructure.Window = current_window ;
+}
+
+/*
+ * Deactivates a menu pointed by the function argument.
+ */
+void fgDeactivateSubMenu( SFG_MenuEntry *menuEntry )
+{
+  SFG_Window *current_window = fgStructure.Window ;
+  SFG_MenuEntry *subMenuIter ;
+    /*
+     * Hide the present menu's window
+     */
+    fgSetWindow ( menuEntry->SubMenu->Window ) ;
+    glutHideWindow () ;
+
+    /*
+     * Forget about having that menu active anymore, now:
+     */
+    menuEntry->SubMenu->Window->ActiveMenu = NULL ;
+    menuEntry->SubMenu->IsActive = FALSE ;
+
+    /*
+     * Hide all submenu windows, and the root menu's window.
+     */
+    for ( subMenuIter = menuEntry->SubMenu->Entries.First; subMenuIter;
+          subMenuIter = subMenuIter->Node.Next )
+    {
+      /*
+       * Is that an active submenu by any case?
+       */
+      if ( ( subMenuIter->SubMenu != NULL ) && subMenuIter->SubMenu->IsActive )
+        fgDeactivateSubMenu ( subMenuIter ) ;
+    }
+
+    fgStructure.Window = current_window ;
 }
 
 /*
@@ -533,6 +650,13 @@ void fghCalculateMenuBoxSize( void )
      * Update the menu entry's width value
      */
     menuEntry->Width = glutBitmapLength( FREEGLUT_MENU_FONT, menuEntry->Text );
+
+    /*
+     * If the entry is a submenu, then it needs to be wider to accomodate the arrow. JCJ 31 July 2003
+     */
+
+    if (menuEntry->SubMenu != NULL)
+       menuEntry->Width += glutBitmapLength( FREEGLUT_MENU_FONT, " " );
 
     /*
      * Check if it's the biggest we've found
@@ -668,6 +792,11 @@ void FGAPIENTRY glutAddSubMenu( const char* label, int subMenuID )
   menuEntry->Text = strdup( label );
   menuEntry->SubMenu = subMenu;
   menuEntry->ID      = -1;
+
+  /*
+   * Make the submenu's parent window be the menu's parent window
+   */
+  fghSetSubmenuParentWindow ( fgStructure.Menu->ParentWindow, subMenu ) ;
 
   /*
    * Have the new menu entry attached to the current menu
@@ -819,6 +948,11 @@ void FGAPIENTRY glutAttachMenu( int button )
      * It is safe now to attach the menu
      */
     fgStructure.Window->Menu[ button ] = fgStructure.Menu;
+
+    /*
+     * Make the parent window of the menu (and all submenus) the current window
+     */
+    fghSetSubmenuParentWindow ( fgStructure.Window, fgStructure.Menu ) ;
 }
 
 /*

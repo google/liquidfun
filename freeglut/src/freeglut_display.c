@@ -64,9 +64,8 @@ void FGAPIENTRY glutSwapBuffers( void )
     freeglut_assert_ready; freeglut_assert_window;
 
     /*
-     * Have the mouse cursor and/or the menus drawn for the current window
+     * Have the mouse cursor drawn for the current window
      */
-    fgDisplayMenu();
     fgDisplayCursor();
 
     /*

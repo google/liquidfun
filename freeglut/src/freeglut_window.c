@@ -233,7 +233,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly, unsigned 
 	 * It might be the case for us to use double buffering
 	 */
   if( fgState.DisplayMode & GLUT_DOUBLE )
-	flags |= PFD_DOUBLEBUFFER;
+    flags |= PFD_DOUBLEBUFFER;
 
   /*
    * Specify which pixel format do we opt for...
@@ -363,7 +363,24 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     /*
      * Here we are upon the stage. Have the visual selected.
      */
-    window->Window.VisualInfo = fgChooseVisual();
+    if ( fgState.BuildingAMenu )
+    {
+      /*
+       * If there isn't already an OpenGL rendering context for menu windows, make one
+       */
+      if ( !fgStructure.MenuContext )
+      {
+        unsigned int current_DisplayMode = fgState.DisplayMode ;
+        fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH ;
+        window->Window.VisualInfo = fgChooseVisual();
+        fgState.DisplayMode = current_DisplayMode ;
+      }
+      else
+        window->Window.VisualInfo = fgChooseVisual();
+    }
+    else
+      window->Window.VisualInfo = fgChooseVisual();
+
     if ( ! window->Window.VisualInfo )
     {
       /*
@@ -430,7 +447,28 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
      * The GLX context creation, possibly trying the direct context rendering
      *  or else use the current context if the user has so specified
      */
-    if ( fgState.UseCurrentContext == TRUE )
+    if ( fgState.BuildingAMenu )
+    {
+      /*
+       * If there isn't already an OpenGL rendering context for menu windows, make one
+       */
+      if ( !fgStructure.MenuContext )
+      {
+        fgStructure.MenuContext = (SFG_MenuContext *)malloc ( sizeof(SFG_MenuContext) ) ;
+        fgStructure.MenuContext->VisualInfo = window->Window.VisualInfo ;
+        fgStructure.MenuContext->Context = glXCreateContext(
+            fgDisplay.Display, fgStructure.MenuContext->VisualInfo,
+            NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+        );
+      }
+
+/*      window->Window.Context = fgStructure.MenuContext->Context ; */
+      window->Window.Context = glXCreateContext(
+            fgDisplay.Display, window->Window.VisualInfo,
+            NULL, fgState.ForceDirectContext | fgState.TryDirectContext
+        );
+    }
+    else if ( fgState.UseCurrentContext == TRUE )
     {
       window->Window.Context = glXGetCurrentContext();
 
@@ -564,7 +602,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 
     if( gameMode == FALSE )
     {
-      if ( !isSubWindow )
+      if ( ( !isSubWindow ) && ( ! window->IsMenu ) )
       {
         /*
          * Update the window dimensions, taking account of window decorations.
@@ -575,26 +613,27 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
 	    	h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 + GetSystemMetrics( SM_CYCAPTION );
       }
 
-
       /*
 	     * Check if the user wants us to use the default position/size
 	     */
 	    if( fgState.Position.Use == FALSE ) { x = CW_USEDEFAULT; y = CW_USEDEFAULT; }
-	  
-  if( fgState.Size    .Use == FALSE ) { w = CW_USEDEFAULT; h = CW_USEDEFAULT; }
+	    if( fgState.Size    .Use == FALSE ) { w = CW_USEDEFAULT; h = CW_USEDEFAULT; }
 
-	
-    /*
+	    /*
 	     * There's a small difference between creating the top, child and game mode windows
 	     */
 	    flags = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
 
-	    if( window->Parent == NULL )
+      /*
+       * If we're a menu, set our flags to include WS_POPUP to remove decorations
+       */
+      if ( window->IsMenu )
+        flags |= WS_POPUP ;
+	    else if( window->Parent == NULL )
 		    flags |= WS_OVERLAPPEDWINDOW;
 	    else
 		    flags |= WS_CHILD;
     }
-
     else
     {
         /*
@@ -607,7 +646,6 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
          */
         flags = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
     }
-
 
     /*
      * Create the window now, passing the freeglut window structure as the parameter
@@ -651,13 +689,11 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
       glReadBuffer ( GL_FRONT ) ;
     }
 
-
     /*
      * Set the newly created window as the current one
      */
     fgSetWindow( window );
 }
-
 
 /*
  * Closes a window, destroying the frame and OpenGL context
@@ -697,7 +733,6 @@ void fgCloseWindow( SFG_Window* window )
 }
 
 
-
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -711,7 +746,6 @@ int FGAPIENTRY glutCreateWindow( const char* title )
     return( fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
                             fgState.Size.X, fgState.Size.Y, FALSE )->ID );
 }
-
 
 /*
  * This function creates a sub window.
@@ -744,7 +778,6 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     return( window->ID );
 }
 
-
 /*
  * Destroys a window and all of its subwindows
  */
@@ -770,7 +803,6 @@ void FGAPIENTRY glutDestroyWindow( int windowID )
    */
   fgState.ExecState = ExecState ;
 }
-
 
 /*
  * This function selects the current window
@@ -808,10 +840,8 @@ void FGAPIENTRY glutSetWindow( int ID )
         return;
     }
 
-
     fgSetWindow ( window ) ;
 }
-
 
 /*
  * This function returns the ID number of the current window, 0 if none exists
@@ -831,13 +861,11 @@ int FGAPIENTRY glutGetWindow( void )
         return( 0 );
     }
 
-
     /*
      * Otherwise, return the ID of the current window
      */
     return( fgStructure.Window->ID );
 }
-
 
 /*
  * This function makes the current window visible
@@ -860,8 +888,13 @@ void FGAPIENTRY glutShowWindow( void )
 	ShowWindow( fgStructure.Window->Window.Handle, SW_SHOW );
 
 #endif
-}
 
+  /*
+   * Since the window is visible, we need to redisplay it ...
+   */
+  fgStructure.Window->State.Redisplay = TRUE;
+
+}
 
 /*
  * This function hides the current window
@@ -882,7 +915,6 @@ void FGAPIENTRY glutHideWindow( void )
          */
         XWithdrawWindow( fgDisplay.Display, fgStructure.Window->Window.Handle, fgDisplay.Screen );
     }
-
     else
     {
         /*
@@ -890,7 +922,6 @@ void FGAPIENTRY glutHideWindow( void )
          */
         XUnmapWindow( fgDisplay.Display, fgStructure.Window->Window.Handle );
     }
-
 
     /*
      * Flush the X state now
@@ -904,8 +935,12 @@ void FGAPIENTRY glutHideWindow( void )
 	ShowWindow( fgStructure.Window->Window.Handle, SW_HIDE );
 
 #endif
-}
 
+  /*
+   * Since the window is hidden, we don't need to redisplay it ...
+   */
+  fgStructure.Window->State.Redisplay = FALSE;
+}
 
 /*
  * Iconify the current window (top-level windows only)
@@ -928,8 +963,13 @@ void FGAPIENTRY glutIconifyWindow( void )
 	ShowWindow( fgStructure.Window->Window.Handle, SW_MINIMIZE );
 
 #endif
-}
 
+  /*
+   * Since the window is just an icon, we don't need to redisplay it ...
+   */
+  fgStructure.Window->State.Redisplay = FALSE;
+
+}
 
 /*
  * Set the current window's title
@@ -971,7 +1011,6 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 		XFlush( fgDisplay.Display );
 	}
 
-
 #elif TARGET_HOST_WIN32
 	/*
 	 * This seems to be a bit easier under Win32
@@ -980,7 +1019,6 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 
 #endif
 }
-
 
 /*
  * Set the current window's iconified title
@@ -1022,7 +1060,6 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 		XFlush( fgDisplay.Display );
 	}
 
-
 #elif TARGET_HOST_WIN32
 	/*
 	 * This seems to be a bit easier under Win32
@@ -1031,7 +1068,6 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 
 #endif
 }
-
 
 /*
  * Change the current window's size
@@ -1062,19 +1098,20 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
     if ( fgStructure.Window->Parent == NULL )  /* If this is not a subwindow ... */
     {
       /*
-       * Adjust the size of the window to allow for the size of the frame
+       * Adjust the size of the window to allow for the size of the frame, if we are not a menu
        */
-  		width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-	  	height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 + GetSystemMetrics( SM_CYCAPTION );
+      if ( ! fgStructure.Window->IsMenu )
+      {
+    		width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
+	    	height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 + GetSystemMetrics( SM_CYCAPTION );
+      }
     }
-
     else  /* This is a subwindow, get the parent window's position and subtract it off */
     {
       GetWindowRect ( fgStructure.Window->Parent->Window.Handle, &winRect ) ;
       x -= winRect.left + GetSystemMetrics( SM_CXSIZEFRAME ) ;
       y -= winRect.top + GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION ) ;
     }
-
 
 		/*
 		 * Resize the window, forcing a redraw to happen
@@ -1088,10 +1125,8 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
 			TRUE
 		);
 	}
-
 #endif
 }
-
 
 /*
  * Change the current window's position
@@ -1129,10 +1164,8 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
 		);
 	}
 
-
 #endif
 }
-
 
 /*
  * Lowers the current window (by Z order change)
@@ -1161,7 +1194,6 @@ void FGAPIENTRY glutPushWindow( void )
 #endif
 }
 
-
 /*
  * Raises the current window (by Z order change)
  */
@@ -1189,7 +1221,6 @@ void FGAPIENTRY glutPopWindow( void )
 #endif
 }
 
-
 /*
  * Resize the current window so that it fits the whole screen
  */
@@ -1208,7 +1239,6 @@ void FGAPIENTRY glutFullScreen( void )
     );
 }
 
-
 /*
  * A.Donev: Set and retrieve the window's user data
  */
@@ -1217,11 +1247,18 @@ void* FGAPIENTRY glutGetWindowData( void )
    return(fgStructure.Window->UserData);
 }
 
-
 void FGAPIENTRY glutSetWindowData(void* data)
 {
   fgStructure.Window->UserData=data;
 }
 
-
 /*** END OF FILE ***/
+
+
+
+
+
+
+
+
+

@@ -49,6 +49,12 @@
 void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
 {
     SET_CALLBACK( Display );
+
+    /*
+     * Force a redisplay with the new callback
+     */
+    fgStructure.Window->State.Redisplay = TRUE;
+
 }
 
 /*
