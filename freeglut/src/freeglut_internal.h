@@ -30,8 +30,8 @@
 
 /* XXX Update these for each release! */
 #define  VERSION_MAJOR 2
-#define  VERSION_MINOR 0
-#define  VERSION_PATCH 2 
+#define  VERSION_MINOR 2
+#define  VERSION_PATCH 0 
 
 /*
  * Freeglut is meant to be available under all Unix/X11 and Win32 platforms.
