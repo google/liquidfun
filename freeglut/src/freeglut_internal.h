@@ -341,6 +341,8 @@ struct tagSFG_Context
 
 #if TARGET_HOST_UNIX_X11
     XVisualInfo*    VisualInfo;      /* The window's visual information     */
+    Pixmap          Pixmap;          /* Used for offscreen rendering        */
+    //GLXPixmap       GLXPixMap;       /* Used for offscreen rendering        */
 #elif TARGET_HOST_WIN32
     HDC             Device;          /* The window's device context         */
 #endif
@@ -370,8 +372,8 @@ struct tagSFG_WindowState
     int             MouseX, MouseY;     /* The most recent mouse position    */
 
     GLboolean       IsGameMode;         /* Is this the game mode window?     */
-
     GLboolean       NeedToResize;       /* Do we need to resize the window?  */
+    GLboolean       IsOffscreen;        /* Tags a `window' as on/offscreen.  */
 };
 
 
