@@ -4,18 +4,7 @@
 
 Issues in Freeglut (so we don't forget):
 
-Issues to Settle in 2.0.0:
-
-(A) We need a "configure" script.
-
-(B) We need to settle on MSVC workspace and project names for the static and dynamic "freeglut" libraries.
-
-(C) We need a "configure" script.
-
 (D) I'd like to change the names of the Windows target directories from names like "Debug__Win32_freeglut_static" (or something like that) to names like "DebugStatic".
-
-(E) We seem to have a problem with binary font compatibility.
-
 
 Issues that can Wait until 2.2.0:
 
