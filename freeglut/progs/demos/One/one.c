@@ -1,7 +1,7 @@
 /*
  * one.c
  *
- * Hey! This was the original file where freeglut development started. Just 
+ * Hey! This was the original file where freeglut development started. Just
  * note what I have written here at the time. And see the creation date :)
  *
  * : This is a wrapper. I still have to figure out
@@ -31,16 +31,16 @@ void PrintText( int nX, int nY, char* pszText )
 {
     int lines;
     char *p;
-    
+
     /*
      * Prepare the OpenGL state
      */
     glDisable( GL_LIGHTING );
-    glDisable( GL_DEPTH_TEST );   
+    glDisable( GL_DEPTH_TEST );
     glMatrixMode( GL_PROJECTION );
     glPushMatrix();
     glLoadIdentity();
-    
+
     /*
      * Have an orthogonal projection matrix set
      */
@@ -55,12 +55,12 @@ void PrintText( int nX, int nY, char* pszText )
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
     glLoadIdentity();
-    
+
     /*
-     * Now the main text        
+     * Now the main text
      */
-    glColor3ub( 0, 0, 0 ); 
-    glRasterPos2i( nX, nY ); 
+    glColor3ub( 0, 0, 0 );
+    glRasterPos2i( nX, nY );
 
     for( p=pszText, lines=0; *p; p++ )
     {
@@ -69,26 +69,26 @@ void PrintText( int nX, int nY, char* pszText )
             lines++;
             glRasterPos2i( nX, nY-(lines*18) );
         }
-        
+
         glutBitmapCharacter( GLUT_BITMAP_HELVETICA_18,  *p );
     }
-        
+
     /*
      * Revert to the old matrix modes
-     */   
+     */
     glMatrixMode( GL_PROJECTION );
     glPopMatrix();
-    
+
     glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
-    
+
     /*
      * Restore the old OpenGL states
      */
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     glEnable( GL_DEPTH_TEST );
     glEnable( GL_LIGHTING );
-}     
+}
 
 /*
  * This is the display routine for our sample FreeGLUT windows
@@ -132,10 +132,10 @@ void SampleDisplay( void )
     /*
      * Draw a silly text
      */
-    if( g_InGameMode == 0 ) 
+    if( g_InGameMode == 0 )
         PrintText( 20, 20, "Hello there cruel world!" );
     else
-        PrintText( 20, 20, "Press ESC to leave the game mode!" ); 
+        PrintText( 20, 20, "Press ESC to leave the game mode!" );
 
     /*
      * And swap this context's buffers
@@ -156,7 +156,7 @@ void SampleIdle( void )
         g_LeaveGameMode = 0;
         g_InGameMode = 0;
     }
-}    
+}
 
 /*
  * The reshape function
@@ -242,7 +242,7 @@ void SampleMenu( int menuID )
     /*
      * Just print something funny
      */
-    printf( "SampleMenu() callback executed, menuID is %i\n", menuID ); 
+    printf( "SampleMenu() callback executed, menuID is %i\n", menuID );
 }
 
 /*
@@ -262,7 +262,7 @@ int main( int argc, char** argv )
     glutAddMenuEntry( "Sub menu A1 (01)", 1 );
     glutAddMenuEntry( "Sub menu A2 (02)", 2 );
     glutAddMenuEntry( "Sub menu A3 (03)", 3 );
-    
+
     subMenuB = glutCreateMenu( SampleMenu );
     glutAddMenuEntry( "Sub menu B1 (04)", 4 );
     glutAddMenuEntry( "Sub menu B2 (05)", 5 );
@@ -300,7 +300,7 @@ int main( int argc, char** argv )
     glutGameModeString( "640x480:16@72" );
     glutGameModeString( "1024x768" );
     glutGameModeString( ":32@120" );
-    glutGameModeString( "Toudi glupcze, Danwin bedzie moj!" ); 
+    glutGameModeString( "Toudi glupcze, Danwin bedzie moj!" );
     glutGameModeString( "640x480:16@72" );
 
     glutEnterGameMode();
@@ -313,7 +313,7 @@ int main( int argc, char** argv )
     printf( "current window is %ix%i+%i+%i",
             glutGet( GLUT_WINDOW_X ), glutGet( GLUT_WINDOW_Y ),
             glutGet( GLUT_WINDOW_WIDTH ), glutGet( GLUT_WINDOW_HEIGHT )
-    );        
+    );
 
     /*
      * Enter the main FreeGLUT processing loop
