@@ -55,6 +55,7 @@ AC_OUTPUT(\
 	doc/Makefile \
 	progs/Makefile \
 	progs/demos/Makefile \
+	progs/demos/CallbackMaker/Makefile \
 	progs/demos/Fractals/Makefile \
 	progs/demos/Fractals_random/Makefile \
 	progs/demos/Lorenz/Makefile \

@@ -63,12 +63,9 @@ static void draw_level ( int num, double m00, double m01, double m10, double m11
 
   for ( i = 0; i < 10; i++ )
   {
-    int random = rand( );
-    double new_x;
-    double new_y;
-    random = (((random >> 10)) & 2) + (((random >> 20) ) & 1);
-    new_x = affine[random].a00 * current_x + affine[random].a01 * current_y + affine[random].b0 ;
-    new_y = affine[random].a10 * current_x + affine[random].a11 * current_y + affine[random].b1 ;
+    int random = ( rand( ) >> 10 ) % num_trans;
+    double new_x = affine[random].a00 * current_x + affine[random].a01 * current_y + affine[random].b0 ;
+    double new_y = affine[random].a10 * current_x + affine[random].a11 * current_y + affine[random].b1 ;
     
     glVertex2d ( new_x, new_y ) ;
     current_x = new_x ;
