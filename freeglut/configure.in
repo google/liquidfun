@@ -26,7 +26,7 @@ AC_HAVE_HEADERS( GL/gl.h GL/glu.h GL/glx.h )
 
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $X_CFLAGS"
-AC_CHECK_HEADERS( X11/extensions/xf86vmode.h )
+AC_CHECK_HEADERS(X11/extensions/xf86vmode.h,,,[#include <X11/Xlib.h>])
 CFLAGS="$save_CFLAGS"
 
 dnl Checks for typedefs, structures, and compiler characteristics.
