@@ -265,7 +265,7 @@ static void fghcbCheckJoystickPolls( SFG_Window *window, SFG_Enumerator *enumera
     /*
      * Check if actually need to do the poll for the currently enumerated window:
      */
-    if( window->State.JoystickLastPoll + window->State.JoystickPollRate >= checkTime )
+    if( window->State.JoystickLastPoll + window->State.JoystickPollRate <= checkTime )
     {
         /*
          * Yeah, that's it. Poll the joystick...
