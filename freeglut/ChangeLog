@@ -283,7 +283,7 @@ October 24, 2002:
      fghChangeDisplayMode(): remove superflous attempt to change ViewPort
      glutEnterGameMode():    move special XMoveWindow() from generic code here
      glutEnterGameMode():    call XSync() to avoid races with XPointer calls
-     glutEnterGameMode():    call to XWrapPointer() to ensure that the pointer is grabbed
+     glutEnterGameMode():    call to XWarpPointer() to ensure that the pointer is grabbed
      glutEnterGameMode():    wait until window is viewable to avoid exit on XSetInputFocus
      glutEnterGameMode():    move decorations away to fix fullscreen w/ max resolution
 
@@ -292,4 +292,35 @@ October 24, 2002:
 
   src/freeglut_window.c:
      fgOpenWindow():         remove obsolete special case for GameModeEnter()
+
+*******************************************************************************************
+* Changes up to September 12, 2003
+*******************************************************************************************
+
+(101) Include files:  Underscores added to the defined constants which prevent multiple inclusions
+
+(102) String functions:  Arguments changed from "char *" to "unsigned char *" for compatibility with GLUT
+
+(103) Added several explicit type casts to allow compilation with "Dev C++" compiler
+
+(104) Quite a bit of debugging of the menus in their menu windows
+
+(105) Removed "glib" dependency from joystick code; now it compiles under FreeBSD
+
+(106) Removed the "fgCleanUpGlutsMess" function because it was redundant
+
+
+*******************************************************************************************
+* Changes on September 13, 2003
+*******************************************************************************************
+
+(107) Repaired DOS line endings in the MSVC project and workspace files
+
+(108) Fixed some relative paths in the MSVC demo project files
+
+(109) Fixed all the demo makefiles to ensure they compiled properly; included minor changes to some of the sources.
+
+(110) Fixed compiliation of freeglut_joystick.c on FreeBSD
+
+
 
