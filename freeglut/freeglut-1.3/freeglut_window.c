@@ -555,12 +555,10 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
       if ( !isSubWindow )
       {
         /*
-         * Update the window position and dimensions, taking account of window decorations
+         * Update the window dimensions, taking account of window decorations.
+         * "freeglut" is to create the window with the outside of its border at (x,y)
+         * and with dimensions (w,h).
          */
-
-		    x -= (GetSystemMetrics( SM_CXSIZEFRAME ) ); 
-	    	y -= (GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION ) );
-        if ( y < 0 ) y = 0 ;
 	    	w += (GetSystemMetrics( SM_CXSIZEFRAME ) )*2;
 	    	h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 + GetSystemMetrics( SM_CYCAPTION );
       }
@@ -1030,8 +1028,8 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
       /*
        * Adjust the size of the window to allow for the size of the frame
        */
-  		width += (GetSystemMetrics( SM_CXSIZEFRAME ) - 1)*2;
-	  	height += (GetSystemMetrics( SM_CYSIZEFRAME ) - 1)*2 + GetSystemMetrics( SM_CYCAPTION );
+  		width += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
+	  	height += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 + GetSystemMetrics( SM_CYCAPTION );
     }
     else  /* This is a subwindow, get the parent window's position and subtract it off */
     {
@@ -1077,16 +1075,6 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
 		 * First off, grab the current window's position
 		 */
 		GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
-
-    if ( fgStructure.Window->Parent == NULL )  /* If this is not a subwindow ... */
-    {
-      /*
-       * Adjust the position of the window to allow for the size of the frame
-       */
-  		x -= (GetSystemMetrics( SM_CXSIZEFRAME ) - 1); 
-	  	y -= (GetSystemMetrics( SM_CYSIZEFRAME ) - 1 + GetSystemMetrics( SM_CYCAPTION ));
-      if ( y < 0 ) y = 0 ;
-    }
 
     /*
 		 * Reposition the window, forcing a redraw to happen
@@ -1174,6 +1162,19 @@ void FGAPIENTRY glutFullScreen( void )
         fgDisplay.ScreenWidth,
         fgDisplay.ScreenHeight
     );
+}
+
+/*
+ * A.Donev: Set and retrieve the window's user data
+ */
+void* FGAPIENTRY glutGetWindowData( void )
+{
+   return(fgStructure.Window->UserData);
+}
+
+void FGAPIENTRY glutSetWindowData(void* data)
+{
+  fgStructure.Window->UserData=data;
 }
 
 /*** END OF FILE ***/

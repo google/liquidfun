@@ -204,20 +204,20 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
    * Have the menu box drawn first. The +- values are
    * here just to make it more nice-looking...
    */
-  glColor4f( 0.0, 0.0, 0.0, 1.0 );
+  glColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
   glBegin( GL_QUADS );
-    glVertex2f( menu->X              , menu->Y - 1                );
-    glVertex2f( menu->X + menu->Width, menu->Y - 1                );
-    glVertex2f( menu->X + menu->Width, menu->Y + 4 + menu->Height );
-    glVertex2f( menu->X              , menu->Y + 4 + menu->Height );
+    glVertex2i( menu->X              , menu->Y - 1                );
+    glVertex2i( menu->X + menu->Width, menu->Y - 1                );
+    glVertex2i( menu->X + menu->Width, menu->Y + 4 + menu->Height );
+    glVertex2i( menu->X              , menu->Y + 4 + menu->Height );
   glEnd();
 
-  glColor4f( 0.3, 0.4, 0.5, 1.0 );
+  glColor4f( 0.3f, 0.4f, 0.5f, 1.0f );
   glBegin( GL_QUADS );
-    glVertex2f( menu->X - 2              , menu->Y + 1                );
-    glVertex2f( menu->X - 2 + menu->Width, menu->Y + 1                );
-    glVertex2f( menu->X - 2 + menu->Width, menu->Y + 2 + menu->Height );
-    glVertex2f( menu->X - 2              , menu->Y + 2 + menu->Height );
+    glVertex2i( menu->X - 2              , menu->Y + 1                );
+    glVertex2i( menu->X - 2 + menu->Width, menu->Y + 1                );
+    glVertex2i( menu->X - 2 + menu->Width, menu->Y + 2 + menu->Height );
+    glVertex2i( menu->X - 2              , menu->Y + 2 + menu->Height );
   glEnd();
 
   /*
@@ -241,12 +241,12 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
       /*
        * So have the highlight drawn...
        */
-      glColor4f( 0.2, 0.3, 0.4, 1.0 );
+      glColor4f( 0.2f, 0.3f, 0.4f, 1.0f );
       glBegin( GL_QUADS );
-        glVertex2f( menu->X - 2              , menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
-        glVertex2f( menu->X - 2 + menu->Width, menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
-        glVertex2f( menu->X - 2 + menu->Width, menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
-        glVertex2f( menu->X - 2              , menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
+        glVertex2i( menu->X - 2              , menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
+        glVertex2i( menu->X - 2 + menu->Width, menu->Y + (menuID + 0)*FREEGLUT_MENU_HEIGHT + 1 );
+        glVertex2i( menu->X - 2 + menu->Width, menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
+        glVertex2i( menu->X - 2              , menu->Y + (menuID + 1)*FREEGLUT_MENU_HEIGHT + 2 );
       glEnd();
     }
   }
@@ -842,6 +842,19 @@ void FGAPIENTRY glutDetachMenu( int button )
      * It is safe now to detach the menu
      */
     fgStructure.Window->Menu[ button ] = NULL;
+}
+
+/*
+ * A.Donev: Set and retrieve the menu's user data
+ */
+void* FGAPIENTRY glutGetMenuData( void )
+{
+   return(fgStructure.Menu->UserData);
+}
+
+void FGAPIENTRY glutSetMenuData(void* data)
+{
+  fgStructure.Menu->UserData=data;
 }
 
 /*** END OF FILE ***/

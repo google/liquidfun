@@ -29,13 +29,6 @@
 #define  FREEGLUT_INTERNAL_H
 
 /*
- * Be sure to update these for every release!
- */
-#define VERSION_MAJOR      1
-#define VERSION_MINOR      3
-#define VERSION_PATCH      0
-
-/*
  * Freeglut is meant to be available under all Unix/X11 and Win32 platforms.
  */
 #if !defined(_WIN32)
@@ -126,8 +119,6 @@ typedef void (* FGCBmotion        )( int, int );
 typedef void (* FGCBpassive       )( int, int );
 typedef void (* FGCBentry         )( int );
 typedef void (* FGCBwindowStatus  )( int );
-typedef void (* FGCBmenuState     )( int );
-typedef void (* FGCBmenuStatus    )( int, int, int );
 typedef void (* FGCBselect        )( int, int, int );
 typedef void (* FGCBjoystick      )( unsigned int, int, int, int );
 typedef void (* FGCBkeyboardUp    )( unsigned char, int, int );
@@ -147,6 +138,8 @@ typedef void (* FGCBdestroy       )( void );
  */
 typedef void (* FGCBidle          )( void );
 typedef void (* FGCBtimer         )( int );
+typedef void (* FGCBmenuState     )( int );
+typedef void (* FGCBmenuStatus    )( int, int, int );
 
 /*
  * The callback used when creating/using menus
@@ -386,9 +379,11 @@ typedef struct tagSFG_Menu SFG_Menu;
 struct tagSFG_Menu
 {
     SFG_Node            Node;
+    void               *UserData ;              /* A. Donev:  User data passed back at callback */
     int                 ID;                     /* The global menu ID        */
     SFG_List            Entries;                /* The menu entries list     */
     FGCBmenu            Callback;               /* The menu callback         */
+    FGCBdestroy         Destroy;                /* A. Donev:  Destruction callback         */
     GLboolean           IsActive;               /* Is the menu selected?     */
     int                 Width;                  /* Menu box width in pixels  */
     int                 Height;                 /* Menu box height in pixels */
@@ -422,6 +417,7 @@ struct tagSFG_Window
     SFG_Context         Window;                 /* Window and OpenGL context */
     SFG_WindowState     State;                  /* The window state          */
     SFG_WindowCallbacks Callbacks;              /* The window callbacks      */
+    void               *UserData ;              /* A. Donev:  A pointer to user data used in rendering */
 
     SFG_Menu*       Menu[ FREEGLUT_MAX_MENUS ]; /* Menus appended to window  */
     SFG_Menu*       ActiveMenu;                 /* The window's active menu  */

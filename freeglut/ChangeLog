@@ -136,24 +136,26 @@ October 24, 2002:
 
 (51) Changed "freeglut_state.c" so the "glutGet" calls with window position and size don't move the windows down and to the right one pixel.
 
-*******************************************************************************************
-* Changes starting in May 2003
-*******************************************************************************************
-
 (52) Implement single-buffered rendering (or its emulation) in Windows.
 
 (53) Implement Eero Pajarre's "GLUT_ICON" code.
 
 (54) Fixes for the window positioning problem.
 
-(55)  Fixed a couple of compiler warnings and other bugs. Changed "freeglut_main.c" to remove a compiler warning. Changed "freeglut_structure.c" to set the current window before calling the window closure callback.
+(55) Fixed a couple of compiler warnings and other bugs. Changed "freeglut_main.c" to remove a compiler warning. Changed "freeglut_structure.c" to set the current window before calling the window closure callback.
 
 
 *******************************************************************************************
-* Changes on 17 June 2003
+* Changes on 17-19 June 2003
 *******************************************************************************************
 
-(56)  Added glutGetProcAddress()
+(56) Added glutGetProcAddress()
 
-(57)  Added GLUT_FPS env var.
+(57) Added GLUT_FPS env var.
+
+(58) Implemented Aleksandar Donev's user data changes:  added user data fields to window and menu structures and implemented functions to get and set them
+
+(59) Added a "MenuDestroy" callback which sets a function that "freeglut" calls when a menu is destroyed.
+
+
 

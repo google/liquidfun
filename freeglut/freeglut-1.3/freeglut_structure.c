@@ -252,6 +252,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
 
     /*
      * If the programmer defined a destroy callback, call it
+     * A. Donev: But first make this the active window
      */
     if ( window->Callbacks.Destroy != NULL )
     {
@@ -357,6 +358,18 @@ void fgDestroyMenu( SFG_Menu* menu )
   {
     fghRemoveMenuFromMenu( from, menu );
   }
+
+  /*
+   * If the programmer defined a destroy callback, call it
+   * A. Donev: But first make this the active menu
+   */    
+  if ( menu->Destroy != NULL )
+  {
+    SFG_Menu *activeMenu=fgStructure.Menu;
+    fgStructure.Menu = menu;    
+    menu->Destroy () ;  
+    fgStructure.Menu = activeMenu;     
+  }        
 
   /*
    * Now we are pretty sure the menu is not used anywhere

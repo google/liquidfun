@@ -231,6 +231,13 @@ void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
     glutCloseFunc( callback );
 }
 
+/* A. Donev: Destruction callback for menus */
+void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
+{
+   if( fgStructure.Menu == NULL ) return;
+   fgStructure.Menu->Destroy = callback;
+}
+
 /*
  * Deprecated version of glutMenuStatusFunc callback setting method
  */

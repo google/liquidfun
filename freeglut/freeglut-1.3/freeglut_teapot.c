@@ -80,7 +80,9 @@
 
 #include "../include/GL/freeglut.h"
 #include "freeglut_internal.h"
-
+#ifdef TARGET_HOST_WIN32
+#pragma warning ( once:4305 )
+#endif
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
@@ -166,7 +168,7 @@ static void teapot( GLint grid, GLdouble scale, GLenum type )
 
     glPushMatrix();
     glRotatef(270.0, 1.0, 0.0, 0.0);
-    glScalef(0.5 * scale, 0.5 * scale, 0.5 * scale);
+    glScaled(0.5 * scale, 0.5 * scale, 0.5 * scale);
     glTranslatef(0.0, 0.0, -1.5);
 
     for (i = 0; i < 10; i++) {

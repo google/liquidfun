@@ -48,12 +48,6 @@
 #define  GLUT_WINDOW_HEADER_HEIGHT          0x01FB
 
 /*
- * Runtime version checking with glutGet
- */
-#define GLUT_VERSION                        0x01FC
-
-
-/*
  * Process loop function, see freeglut_main.c
  */
 FGAPI void    FGAPIENTRY glutMainLoopEvent( void );
@@ -64,11 +58,18 @@ FGAPI void    FGAPIENTRY glutLeaveMainLoop( void );
  */
 FGAPI void    FGAPIENTRY glutCloseFunc( void (* callback)( void ) );
 FGAPI void    FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) );
+/* A. Donev: Also a destruction callback for menus */
+FGAPI void    FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) );
 
 /*
  * State setting and retrieval functions, see freeglut_state.c
  */
 FGAPI void    FGAPIENTRY glutSetOption ( GLenum option_flag, int value ) ;
+/* A.Donev: User-data manipulation */
+FGAPI void*   FGAPIENTRY glutGetWindowData( void );
+FGAPI void    FGAPIENTRY glutSetWindowData(void* data);
+FGAPI void*   FGAPIENTRY glutGetMenuData( void );
+FGAPI void    FGAPIENTRY glutSetMenuData(void* data);
 
 /*
  * Font stuff, see freeglut_font.c
