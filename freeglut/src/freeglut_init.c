@@ -299,6 +299,148 @@ void fgDeinitialize( void )
 #endif
 }
 
+/*
+ * Everything inside the following #ifndef is copied from the X sources.
+ */
+
+#ifndef TARGET_HOST_UNIX_X11
+
+#define NoValue         0x0000
+#define XValue          0x0001
+#define YValue          0x0002
+#define WidthValue      0x0004
+#define HeightValue     0x0008
+#define AllValues       0x000F
+#define XNegative       0x0010
+#define YNegative       0x0020
+
+/*
+ *    XParseGeometry parses strings of the form
+ *   "=<width>x<height>{+-}<xoffset>{+-}<yoffset>", where
+ *   width, height, xoffset, and yoffset are unsigned integers.
+ *   Example:  "=80x24+300-49"
+ *   The equal sign is optional.
+ *   It returns a bitmask that indicates which of the four values
+ *   were actually found in the string.  For each value found,
+ *   the corresponding argument is updated;  for each value
+ *   not found, the corresponding argument is left unchanged. 
+ */
+
+static int
+ReadInteger(char *string, char **NextString)
+{
+    register int Result = 0;
+    int Sign = 1;
+    
+    if (*string == '+')
+	string++;
+    else if (*string == '-')
+    {
+	string++;
+	Sign = -1;
+    }
+    for (; (*string >= '0') && (*string <= '9'); string++)
+    {
+	Result = (Result * 10) + (*string - '0');
+    }
+    *NextString = string;
+    if (Sign >= 0)
+	return (Result);
+    else
+	return (-Result);
+}
+
+static int XParseGeometry (
+_Xconst char *string,
+int *x,
+int *y,
+unsigned int *width,    /* RETURN */
+unsigned int *height)    /* RETURN */
+{
+	int mask = NoValue;
+	register char *strind;
+	unsigned int tempWidth = 0, tempHeight = 0;
+	int tempX = 0, tempY = 0;
+	char *nextCharacter;
+
+	if ( (string == NULL) || (*string == '\0')) return(mask);
+	if (*string == '=')
+		string++;  /* ignore possible '=' at beg of geometry spec */
+
+	strind = (char *)string;
+	if (*strind != '+' && *strind != '-' && *strind != 'x') {
+		tempWidth = ReadInteger(strind, &nextCharacter);
+		if (strind == nextCharacter) 
+		    return (0);
+		strind = nextCharacter;
+		mask |= WidthValue;
+	}
+
+	if (*strind == 'x' || *strind == 'X') {	
+		strind++;
+		tempHeight = ReadInteger(strind, &nextCharacter);
+		if (strind == nextCharacter)
+		    return (0);
+		strind = nextCharacter;
+		mask |= HeightValue;
+	}
+
+	if ((*strind == '+') || (*strind == '-')) {
+		if (*strind == '-') {
+  			strind++;
+			tempX = -ReadInteger(strind, &nextCharacter);
+			if (strind == nextCharacter)
+			    return (0);
+			strind = nextCharacter;
+			mask |= XNegative;
+
+		}
+		else
+		{	strind++;
+			tempX = ReadInteger(strind, &nextCharacter);
+			if (strind == nextCharacter)
+			    return(0);
+			strind = nextCharacter;
+		}
+		mask |= XValue;
+		if ((*strind == '+') || (*strind == '-')) {
+			if (*strind == '-') {
+				strind++;
+				tempY = -ReadInteger(strind, &nextCharacter);
+				if (strind == nextCharacter)
+			    	    return(0);
+				strind = nextCharacter;
+				mask |= YNegative;
+
+			}
+			else
+			{
+				strind++;
+				tempY = ReadInteger(strind, &nextCharacter);
+				if (strind == nextCharacter)
+			    	    return(0);
+				strind = nextCharacter;
+			}
+			mask |= YValue;
+		}
+	}
+	
+	/* If strind isn't at the end of the string the it's an invalid
+		geometry specification. */
+
+	if (*strind != '\0') return (0);
+
+	if (mask & XValue)
+	    *x = tempX;
+ 	if (mask & YValue)
+	    *y = tempY;
+	if (mask & WidthValue)
+            *width = tempWidth;
+	if (mask & HeightValue)
+            *height = tempHeight;
+	return (mask);
+}
+#endif
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
@@ -309,6 +451,7 @@ void fgDeinitialize( void )
 void FGAPIENTRY glutInit( int* pargc, char** argv )
 {
     char* displayName = NULL;
+    char* geometry = NULL;
     int i, j, argc = *pargc;
 
     if (pargc && *pargc && argv && *argv && **argv)
@@ -336,14 +479,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         }
     }
 
-#if TARGET_HOST_WIN32
-    if( !getenv( "DISPLAY" ) )
-        displayName = strdup( "" );
-    else
-#endif
-        displayName = strdup( getenv( "DISPLAY" ) );
-    if( !displayName )
-        fgError( "Could not allocate space for display name." );
+    displayName = getenv( "DISPLAY");
 
     for( i = 1; i < argc; i++ )
     {
@@ -352,12 +488,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             if( ++i >= argc )
                 fgError( "-display parameter must be followed by display name" );
 
-            if( displayName )
-                free( displayName );
-            displayName = strdup( argv[ i ] );
-            if( !displayName )
-                fgError( "Could not allocate space for display name (%s)",
-                    argv [ i ] );
+            displayName = argv[ i ];
 
             argv[ i - 1 ] = NULL;
             argv[ i     ] = NULL;
@@ -365,36 +496,11 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         }
         else if( strcmp( argv[ i ], "-geometry" ) == 0 )
         {
-            int result, x, y;
-            unsigned int w, h;
-
             if( ++i >= argc )
                 fgError( "-geometry parameter must be followed by window "
                          "geometry settings" );
-            result = sscanf( argv[ i ], "%dx%d+%d+%d", &x, &y, &w, &h );
 
-            if( result > 3 )
-                fgState.Size.Y = h;
-            if( result > 2 )
-                fgState.Size.X = w;
-
-            if( result > 1 )
-            {
-                if( y < 0 )
-                    fgState.Position.Y =
-                        fgDisplay.ScreenHeight + y - fgState.Size.Y;
-                else
-                    fgState.Position.Y = y;
-            }
-
-            if( result > 0 )
-            {
-                if( x < 0 )
-                    fgState.Position.X =
-                        fgDisplay.ScreenWidth + x - fgState.Size.X;
-                else
-                    fgState.Position.X = x;
-            }
+            geometry = argv[ i ];
 
             argv[ i - 1 ] = NULL;
             argv[ i     ] = NULL;
@@ -469,16 +575,28 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     fgInitialize( displayName );
 
     /*
-     * Check for the minus one settings for both position and size...
+     * Geometry parsing deffered until here because we may need the screen
+     * size.
      */
-    if( fgState.Position.X < 0 || fgState.Position.Y < 0 )
-        fgState.Position.Use = GL_FALSE;
 
-    if( fgState.Size.X < 0 || fgState.Size.Y < 0 )
-        fgState.Size.Use = GL_FALSE;
+    if (geometry )
+    {
+        int mask = XParseGeometry( geometry,
+                                   &fgState.Position.X, &fgState.Position.Y,
+                                   &fgState.Size.X, &fgState.Size.Y );
 
-    if( displayName )
-        free( displayName );
+        if( (mask & (WidthValue|HeightValue)) == (WidthValue|HeightValue) )
+            fgState.Size.Use = GL_TRUE;
+
+        if( mask & XNegative )
+            fgState.Position.X += fgDisplay.ScreenWidth - fgState.Size.X;
+
+        if( mask & YNegative )
+            fgState.Position.Y += fgDisplay.ScreenHeight - fgState.Size.Y;
+
+        if( (mask & (XValue|YValue)) == (XValue|YValue) )
+            fgState.Position.Use = GL_TRUE;
+    }
 }
 
 /*
@@ -486,18 +604,13 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
  */
 void FGAPIENTRY glutInitWindowPosition( int x, int y )
 {
+    fgState.Position.X = x;
+    fgState.Position.Y = y;
+
     if( ( x >= 0 ) && ( y >= 0 ) )
-    {
-        fgState.Position.X   =       x;
-        fgState.Position.Y   =       y;
         fgState.Position.Use = GL_TRUE;
-    }
     else
-    {
-        fgState.Position.X   =       -1;
-        fgState.Position.Y   =       -1;
         fgState.Position.Use = GL_FALSE;
-    }
 }
 
 /*
@@ -505,18 +618,13 @@ void FGAPIENTRY glutInitWindowPosition( int x, int y )
  */
 void FGAPIENTRY glutInitWindowSize( int width, int height )
 {
+    fgState.Size.X = width;
+    fgState.Size.Y = height;
+
     if( ( width > 0 ) && ( height > 0 ) )
-    {
-        fgState.Size.X   =   width;
-        fgState.Size.Y   =  height;
         fgState.Size.Use = GL_TRUE;
-    }
     else
-    {
-        fgState.Size.X   =       -1;
-        fgState.Size.Y   =       -1;
         fgState.Size.Use = GL_FALSE;
-    }
 }
 
 /*
