@@ -253,4 +253,4 @@ October 24, 2002:
 * Changes on 23 July 2003
 *******************************************************************************************
 
-(95) src/freeglut_initial.c:91  Added check for SOLARIS OS
+(95) src/freeglut_initial.c:91  Added check for SOLARIS OS (Dave Reed)
