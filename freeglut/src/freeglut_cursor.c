@@ -138,6 +138,12 @@ void FGAPIENTRY glutSetCursor( int cursorID )
 
         case GLUT_CURSOR_NONE:
         {
+            /*
+             * Note that we *never* change {no_cursor_bits} from anything
+             * but all-zeros.  It is our image and mask.  We also apparently
+             * need to pick a color for foreground/background---but what
+             * one we pick doesn't matter for GLUT_CURSOR_NONE.
+             */
             static unsigned char no_cursor_bits[ 32 ];
             XColor black;
             no_cursor = XCreatePixmapFromBitmapData( fgDisplay.Display,
@@ -194,7 +200,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
                           ( LONG )LoadCursor( NULL, b ) );       \
         break;
 
-        /* Nuke the cursor AND change it for this window class. */
+    /* Nuke the cursor AND change it for this window class. */
 #       define ZAP_CURSOR(a,b)                                   \
         case a:                                                  \
             SetCursor( NULL );                                   \
@@ -202,27 +208,27 @@ void FGAPIENTRY glutSetCursor( int cursorID )
                           GCL_HCURSOR, ( LONG )NULL );           \
         break;
 
-        switch( cursorID )
-        {
-            MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
-            MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
-            MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
-            MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
-            MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP      );
-            MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
-            MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
-            MAP_CURSOR( GLUT_CURSOR_WAIT,        IDC_WAIT      );
-            MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
-            MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
-            /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO        ); */
-            ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL           );
-            
-        default:
-            MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
-        }
+    switch( cursorID )
+    {
+        MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
+        MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
+        MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
+        MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
+        MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP      );
+        MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
+        MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
+        MAP_CURSOR( GLUT_CURSOR_WAIT,        IDC_WAIT      );
+        MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
+        MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
+        /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO        ); */
+        ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL           );
+        
+    default:
+        MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
+    }
 #endif
 
-  fgStructure.Window->State.Cursor = cursorID;
+    fgStructure.Window->State.Cursor = cursorID;
 }
 
 /*
