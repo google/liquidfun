@@ -50,7 +50,7 @@ void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
 {
     if( !callback )
         fgError( "Fatal error in program.  NULL display callback not "
-                 "permitted in GLUT 3.0+ or freeglut 2.0.1+\n" );
+                 "permitted in GLUT 3.0+ or freeglut 2.0.1+" );
     SET_CALLBACK( Display );
 }
 
@@ -106,7 +106,7 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ),
     {
         if( ! (timer = malloc(sizeof(SFG_Timer))) )
             fgError( "Fatal error: "
-                     "Memory allocation failure in glutTimerFunc()\n" );
+                     "Memory allocation failure in glutTimerFunc()" );
     }
 
     timer->Callback  = callback;

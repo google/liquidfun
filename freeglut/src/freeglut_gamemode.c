@@ -96,7 +96,7 @@ static void fghRememberState( void )
     );
 
     if( !fgDisplay.DisplayModeValid )
-            fgWarning( "Runtime use of XF86VidModeGetModeLine failed.\n" );
+            fgWarning( "Runtime use of XF86VidModeGetModeLine failed." );
 
 #   else
     /*
@@ -559,6 +559,7 @@ int FGAPIENTRY glutGameModeGet( GLenum eWhat )
         return !!fgStructure.GameMode;
     }
 
+    fgWarning( "Unknown gamemode get: %d", eWhat );
     return -1;
 }
 

@@ -502,7 +502,7 @@ static void fghSleepForEvents( void )
         err = select( socket+1, &fdset, NULL, NULL, &wait );
 
         if( -1 == err )
-            fgWarning ( "freeglut select() error: %d\n", errno );
+            fgWarning ( "freeglut select() error: %d", errno );
     }
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLEVENTS );
@@ -696,7 +696,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 break;
 
             default:
-                fgWarning( "Uknown X visibility state: %d",
+                fgWarning( "Unknown X visibility state: %d",
                            event.xvisibility.state );
                 break;
             }
@@ -1953,7 +1953,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
             default:
 #if _DEBUG
-                fgWarning( "Unknown wParam type 0x%x\n", wParam );
+                fgWarning( "Unknown wParam type 0x%x", wParam );
 #endif
                 break;
             }

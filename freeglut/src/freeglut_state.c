@@ -118,7 +118,7 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
         break;
 
     default:
-        fgWarning( "glutSetOption(): missing enum handle %i\n", eWhat );
+        fgWarning( "glutSetOption(): missing enum handle %d", eWhat );
         break;
     }
 }
@@ -454,7 +454,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         break;
 
     default:
-        fgWarning( "glutGet(): missing enum handle %i\n", eWhat );
+        fgWarning( "glutGet(): missing enum handle %d", eWhat );
         break;
     }
     return -1;
@@ -555,7 +555,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return GLUT_KEY_REPEAT_DEFAULT;
 
     default:
-        fgWarning( "glutDeviceGet(): missing enum handle %i\n", eWhat );
+        fgWarning( "glutDeviceGet(): missing enum handle %d", eWhat );
         break;
     }
 
@@ -649,7 +649,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
 #endif
 
     default:
-        fgWarning( "glutLayerGet(): missing enum handle %i\n", eWhat );
+        fgWarning( "glutLayerGet(): missing enum handle %d", eWhat );
         break;
     }
 

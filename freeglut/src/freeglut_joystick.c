@@ -241,8 +241,7 @@ static int fghJoystickFindUSBdev(char *name, char *out, int outlen)
         return 1;
     } else if (errno == EACCES) {
       if (!protection_warned) {
-        fprintf(stderr, "Can't open %s for read!\n",
-          buf);
+        fgWarning ( "Can't open %s for read!", buf );
         protection_warned = 1;
       }
     }
@@ -263,7 +262,7 @@ static int fghJoystickInitializeHID(struct os_specific_s *os,
 
     if ( ( rd = hid_get_report_desc( os->fd ) ) == 0 )
     {
-        fprintf( stderr, "error: %s: %s", os->fname, strerror( errno ) );
+        fgWarning ( "error: %s: %s", os->fname, strerror( errno ) );
         return FALSE;
     }
 
@@ -273,8 +272,7 @@ static int fghJoystickInitializeHID(struct os_specific_s *os,
         if( ioctl( os->fd, USB_GET_REPORT_ID, &report_id ) < 0)
         {
             /*** XXX {report_id} may not be the right variable? ***/
-            fprintf( stderr, "error: %s%d: %s",
-                     UHIDDEV, report_id, strerror( errno ) );
+            fgWarning ( "error: %s%d: %s", UHIDDEV, report_id, strerror( errno ) );
             return FALSE;
         }
 
@@ -724,7 +722,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
             break;
 
         default:
-            fgWarning ( "%s", "PLIB_JS: Unrecognised /dev/js return!?!" );
+            fgWarning ( "PLIB_JS: Unrecognised /dev/js return!?!" );
 
             /* use the old values */
 
@@ -851,7 +849,7 @@ static int fghJoystickFindDevices ( SFG_Joystick *joy, mach_port_t masterPort )
 
     rv = IOServiceGetMatchingServices(masterPort, hidMatch, &hidIterator);
     if (rv != kIOReturnSuccess || !hidIterator) {
-      fgWarning( "%s", "no joystick (HID) devices found" );
+      fgWarning( "no joystick (HID) devices found" );
       return;
     }
 
@@ -894,13 +892,13 @@ static CFDictionaryRef fghJoystickGetCFProperties ( SFG_Joystick *joy, io_object
 
     rv = IORegistryEntryGetParentEntry (ioDev, kIOServicePlane, &parent1);
     if (rv != kIOReturnSuccess) {
-        fgWarning ( "%s", "error getting device entry parent");
+        fgWarning ( "error getting device entry parent");
         return NULL;
     }
 
     rv = IORegistryEntryGetParentEntry (parent1, kIOServicePlane, &parent2);
     if (rv != kIOReturnSuccess) {
-        fgWarning ( "%s", "error getting device entry parent 2");
+        fgWarning ( "error getting device entry parent 2");
         return NULL;
     }
 #endif
@@ -908,7 +906,7 @@ static CFDictionaryRef fghJoystickGetCFProperties ( SFG_Joystick *joy, io_object
     rv = IORegistryEntryCreateCFProperties( ioDev /*parent2*/,
         &cfProperties, kCFAllocatorDefault, kNilOptions);
     if (rv != kIOReturnSuccess || !cfProperties) {
-        fgWarning ( "%s", "error getting device properties");
+        fgWarning ( "error getting device properties");
         return NULL;
     }
 
@@ -974,14 +972,14 @@ static void fghJoystickParseElement ( SFG_Joystick *joy, CFDictionaryRef element
                 break;
 
             default:
-                printf("input type element has weird usage (%x)\n", usage);
+                fgWarning ( "input type element has weird usage (%x)", usage);
                 break;
             }
         } else if (page == kHIDPage_Button) {
             printf(" button\n");
             fghJoystickAddButtonElement((CFDictionaryRef) element);
         } else
-            printf("input type element has weird page (%x)\n", page);
+            fgWarning ( "input type element has weird page (%x)", page);
         break;
 
     case kIOHIDElementTypeCollection:
@@ -1239,7 +1237,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 #if TARGET_HOST_MAC_OSX
     if( joy->id >= numDevices )
     {
-        fgWarning( "%s", "device index out of range in fgJoystickOpen()" );
+        fgWarning( "device index out of range in fgJoystickOpen()" );
         return;
     }
 
@@ -1251,7 +1249,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 
     if( rv != kIOReturnSuccess )
     {
-        fgWarning( "%s", "error creating plugin for io device" );
+        fgWarning( "error creating plugin for io device" );
         return;
     }
 
@@ -1262,7 +1260,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     );
 
     if( pluginResult != S_OK )
-        fgWarning ( "%s", "QI-ing IO plugin to HID Device interface failed" );
+        fgWarning ( "QI-ing IO plugin to HID Device interface failed" );
 
     ( *plugin )->Release( plugin ); /* don't leak a ref */
     if( joy->hidDev == NULL )
@@ -1358,7 +1356,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     joy->os->fd = open( joy->os->fname, O_RDONLY | O_NONBLOCK);
 
     if( joy->os->fd < 0 && errno == EACCES )
-        fgWarning ( "%s exists but is not readable by you\n", joy->os->fname );
+        fgWarning ( "%s exists but is not readable by you", joy->os->fname );
 
     joy->error =( joy->os->fd < 0 );
 
@@ -1533,10 +1531,10 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 void fgJoystickInit( int ident )
 {
     if( ident >= MAX_NUM_JOYSTICKS )
-      fgError( "Too large a joystick number" );
+      fgError( "Too large a joystick number: %d", ident );
 
     if( fgJoystick[ ident ] )
-        fgError( "illegal attempt to initialize joystick device" );
+        fgError( "illegal attempt to initialize joystick device again" );
 
     fgJoystick[ ident ] =
         ( SFG_Joystick * )calloc( sizeof( SFG_Joystick ), 1 );
@@ -1566,7 +1564,7 @@ void fgJoystickInit( int ident )
         IOReturn rv = IOMasterPort( bootstrap_port, &masterPort );
         if( rv != kIOReturnSuccess )
         {
-            fgWarning( "%s", "error getting master Mach port" );
+            fgWarning( "error getting master Mach port" );
             return;
         }
         fghJoystickFindDevices( masterPort );
@@ -1589,7 +1587,7 @@ void fgJoystickInit( int ident )
         !CFStringGetCString( ( CFStringRef )ref, name, 128,
                              CFStringGetSystemEncoding( ) ) )
     {
-        fgWarning( "%s", "error getting device name" );
+        fgWarning( "error getting device name" );
         name[ 0 ] = '\0';
     }
 #endif

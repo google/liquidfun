@@ -167,7 +167,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
             break;
 
         default:
-            fgWarning( "Unknown cursor type: %d\n", cursorID );
+            fgWarning( "Unknown cursor type: %d", cursorID );
             return;
         }
 

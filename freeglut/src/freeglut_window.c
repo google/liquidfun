@@ -725,7 +725,7 @@ void FGAPIENTRY glutSetWindow( int ID )
     window = fgWindowByID( ID );
     if( window == NULL )
     {
-        fgWarning( "glutSetWindow(): window ID %i not found!", ID );
+        fgWarning( "glutSetWindow(): window ID %d not found!", ID );
         return;
     }
 

@@ -864,8 +864,8 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
             break ;
 
         case 28 :  /* Unrecognized */
-            printf ( "WARNING - Display string token not recognized:  %s\n",
-                     token );
+            fgWarning ( "WARNING - Display string token not recognized:  %s",
+                        token );
             break ;
         }
 

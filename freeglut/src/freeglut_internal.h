@@ -698,7 +698,6 @@ void        fgCloseWindow( SFG_Window* window );
 void        fgAddToWindowDestroyList ( SFG_Window* window );
 void        fgCloseWindows ();
 void        fgDestroyWindow( SFG_Window* window );
-void        fgClearCallBacks( SFG_Window *window );
 
 /* Menu creation and destruction. Defined in freeglut_structure.c */
 SFG_Menu*   fgCreateMenu( FGCBMenu menuCallback );
