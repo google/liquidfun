@@ -102,7 +102,7 @@ void fgInitialize( const char* displayName )
 
     if( !glXQueryExtension( fgDisplay.Display, NULL, NULL ) )
         fgError( "OpenGL GLX extension not supported by display '%s'",
-	    XDisplayName( displayName ) );
+            XDisplayName( displayName ) );
 
     fgDisplay.Screen = DefaultScreen( fgDisplay.Display );
     fgDisplay.RootWindow = RootWindow(
@@ -124,8 +124,8 @@ void fgInitialize( const char* displayName )
         fgDisplay.Screen
     );
     fgDisplay.ScreenHeightMM = DisplayHeightMM(
-	fgDisplay.Display,
-	fgDisplay.Screen
+        fgDisplay.Display,
+        fgDisplay.Screen
     );
 
     fgDisplay.Connection = ConnectionNumber( fgDisplay.Display );
@@ -209,7 +209,7 @@ void fgDeinitialize( void )
     if( !fgState.Time.Set )
     {
         fgWarning( "fgDeinitialize(): fgState.Timer is null => "
-	    "no valid initialization has been performed" );
+            "no valid initialization has been performed" );
         return;
     }
 
@@ -297,14 +297,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     int i, j, argc = *pargc;
 
     if (pargc && *pargc && argv && *argv && **argv)
-	fgState.ProgramName = strdup (*argv);
+        fgState.ProgramName = strdup (*argv);
     else
-	fgState.ProgramName = strdup ("");
+        fgState.ProgramName = strdup ("");
     if (!fgState.ProgramName)
-	fgError ("Could not allocate space for the program's name.");
+        fgError ("Could not allocate space for the program's name.");
 
     if( fgState.Time.Set )
-	fgError( "illegal glutInit() reinitialization attemp" );
+        fgError( "illegal glutInit() reinitialization attemp" );
 
     fgCreateStructure();
 
@@ -328,12 +328,12 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 
 #if TARGET_HOST_WIN32
     if ( !getenv ( "DISPLAY" ) )
-	displayName = strdup ( "" ) ;
+        displayName = strdup ( "" ) ;
     else
 #endif
-	displayName = strdup( getenv( "DISPLAY" ) );
+        displayName = strdup( getenv( "DISPLAY" ) );
     if (!displayName)
-	fgError ("Could not allocate space for display name.");
+        fgError ("Could not allocate space for display name.");
 
     for( i=1; i<argc; i++ )
     {
@@ -343,11 +343,11 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
                 fgError( "-display parameter must be followed by display name" );
 
             if( displayName )
-		free( displayName );
+                free( displayName );
             displayName = strdup( argv[ i ] );
-	    if (!displayName)
-		fgError( "Could not allocate space for display name (%s)",
-		    argv [i]);
+            if (!displayName)
+                fgError( "Could not allocate space for display name (%s)",
+                    argv [i]);
 
             argv[ i - 1 ] = NULL;
             argv[ i     ] = NULL;
@@ -355,46 +355,46 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         }
         else if( strcmp( argv[ i ], "-geometry" ) == 0 )
         {
-	    int result, x, y;
-	    unsigned int w, h;
+            int result, x, y;
+            unsigned int w, h;
 
-	    if ( ++i >= argc )
+            if ( ++i >= argc )
             fgError( "-geometry parameter must be followed by window "
-		"geometry settings" );
-	    result = sscanf ( argv[i], "%dx%d+%d+%d", &x, &y, &w, &h );
+                "geometry settings" );
+            result = sscanf ( argv[i], "%dx%d+%d+%d", &x, &y, &w, &h );
 
-	    if ( result > 3 )
-		fgState.Size.Y = h;
-	    if ( result > 2 )
-		fgState.Size.X = w;
+            if ( result > 3 )
+                fgState.Size.Y = h;
+            if ( result > 2 )
+                fgState.Size.X = w;
 
-	    if( result > 1 )
+            if( result > 1 )
             {
-		if( y < 0 )
-		    fgState.Position.Y =
-			fgDisplay.ScreenHeight + y - fgState.Size.Y;
-		else
-		    fgState.Position.Y = y;
-	    }
+                if( y < 0 )
+                    fgState.Position.Y =
+                        fgDisplay.ScreenHeight + y - fgState.Size.Y;
+                else
+                    fgState.Position.Y = y;
+            }
 
-	    if( result > 0 )
+            if( result > 0 )
             {
-		if( x < 0 )
-		    fgState.Position.X =
-			fgDisplay.ScreenWidth + x - fgState.Size.X;
-		else
-		    fgState.Position.X = x;
-	    }
+                if( x < 0 )
+                    fgState.Position.X =
+                        fgDisplay.ScreenWidth + x - fgState.Size.X;
+                else
+                    fgState.Position.X = x;
+            }
 
-	    argv[ i - 1 ] = NULL;
-	    argv[ i     ] = NULL;
-	    (*pargc) -= 2;
+            argv[ i - 1 ] = NULL;
+            argv[ i     ] = NULL;
+            (*pargc) -= 2;
         }
         else if( strcmp( argv[ i ], "-direct" ) == 0)
         {
             if( fgState.TryDirectContext == FALSE )
                 fgError( "parameters ambiguity, -direct and -indirect "
-		    "cannot be both specified" );
+                    "cannot be both specified" );
 
             fgState.ForceDirectContext = TRUE;
             argv[ i ] = NULL;
@@ -404,7 +404,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         {
             if( fgState.ForceDirectContext == TRUE )
                 fgError( "parameters ambiguity, -direct and -indirect "
-		    "cannot be both specified" );
+                    "cannot be both specified" );
 
             fgState.TryDirectContext = FALSE;
             argv[ i ] = NULL;
@@ -436,13 +436,13 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     j = 2 ;
     for( i = 1; i < *pargc; i++, j++ )
     {
-	if( argv[ i ] == NULL )
+        if( argv[ i ] == NULL )
         {
-	    /* Guaranteed to end because there are "*pargc" arguments left */
-	    while ( argv[j] == NULL )
-		j++;
-	    argv[i] = argv[j] ;
-	}
+            /* Guaranteed to end because there are "*pargc" arguments left */
+            while ( argv[j] == NULL )
+                j++;
+            argv[i] = argv[j] ;
+        }
     }
 
     /*
@@ -468,7 +468,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         fgState.Size.Use = FALSE;
 
     if( displayName )
-	free( displayName );
+        free( displayName );
 }
 
 /*
@@ -576,7 +576,7 @@ static GScannerConfig fgInitDisplayStringScannerConfig =
         G_CSET_a_2_z
         "_"
         G_CSET_A_2_Z
-    )			                /* cset_identifier_first    */,
+    )                                        /* cset_identifier_first    */,
     (
         G_CSET_a_2_z
         "_0123456789"
@@ -584,29 +584,29 @@ static GScannerConfig fgInitDisplayStringScannerConfig =
         G_CSET_LATINS
         G_CSET_LATINC
         "<>!=~"
-    )			                /* cset_identifier_nth      */,
-    ( "#\n" )		            /* cpair_comment_single     */,
-    FALSE			            /* case_sensitive           */,
-    TRUE			            /* skip_comment_multi       */,
-    TRUE			            /* skip_comment_single      */,
-    TRUE			            /* scan_comment_multi       */,
-    TRUE			            /* scan_identifier          */,
-    FALSE			            /* scan_identifier_1char    */,
-    FALSE			            /* scan_identifier_NULL     */,
-    TRUE			            /* scan_symbols             */,
-    FALSE			            /* scan_binary              */,
-    TRUE			            /* scan_octal               */,
-    TRUE			            /* scan_float               */,
-    TRUE			            /* scan_hex                 */,
-    FALSE			            /* scan_hex_dollar          */,
-    TRUE			            /* scan_string_sq           */,
-    TRUE			            /* scan_string_dq           */,
-    TRUE			            /* numbers_2_int            */,
-    FALSE			            /* int_2_float              */,
-    FALSE			            /* identifier_2_string      */,
-    TRUE			            /* char_2_token             */,
-    FALSE			            /* symbol_2_token           */,
-    FALSE			            /* scope_0_fallback         */,
+    )                                        /* cset_identifier_nth      */,
+    ( "#\n" )                            /* cpair_comment_single     */,
+    FALSE                                    /* case_sensitive           */,
+    TRUE                                    /* skip_comment_multi       */,
+    TRUE                                    /* skip_comment_single      */,
+    TRUE                                    /* scan_comment_multi       */,
+    TRUE                                    /* scan_identifier          */,
+    FALSE                                    /* scan_identifier_1char    */,
+    FALSE                                    /* scan_identifier_NULL     */,
+    TRUE                                    /* scan_symbols             */,
+    FALSE                                    /* scan_binary              */,
+    TRUE                                    /* scan_octal               */,
+    TRUE                                    /* scan_float               */,
+    TRUE                                    /* scan_hex                 */,
+    FALSE                                    /* scan_hex_dollar          */,
+    TRUE                                    /* scan_string_sq           */,
+    TRUE                                    /* scan_string_dq           */,
+    TRUE                                    /* numbers_2_int            */,
+    FALSE                                    /* int_2_float              */,
+    FALSE                                    /* identifier_2_string      */,
+    TRUE                                    /* char_2_token             */,
+    FALSE                                    /* symbol_2_token           */,
+    FALSE                                    /* scope_0_fallback         */,
 };
 
 /*
@@ -723,9 +723,9 @@ void FGAPIENTRY glutInitDisplayString( char* displayMode )
             if( comparison != FG_NONE && i < (gint) strlen( scanner->value.v_identifier ) )
             {
                 valueString = strdup( scanner->value.v_identifier + i );
-		if (!valueString)
-		    fgError ("Could not allocate an internal string.");
-	    }		
+                if (!valueString)
+                    fgError ("Could not allocate an internal string.");
+            }                
 
             /*
              * If there was a value string, convert it to integer...

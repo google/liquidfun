@@ -241,7 +241,7 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, int* buttons, float* axes )
         case JS_EVENT_BUTTON:
             if ( joy->js.value == 0 ) /* clear the flag */
                 joy->tmp_buttons &= ~(1 << joy->js.number);
-    	    else
+                else
                 joy->tmp_buttons |= (1 << joy->js.number);
             break;
 

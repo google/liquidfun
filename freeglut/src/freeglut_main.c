@@ -169,7 +169,7 @@ static void fghcbDisplayWindow( SFG_Window *window, SFG_Enumerator *enumerator )
       RedrawWindow( 
         window->Window.Handle, NULL, NULL, 
         RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
-	);
+        );
     }
 
 #endif
@@ -237,7 +237,7 @@ static void fghCheckTimers( void )
          timer;
          timer = (SFG_Timer *)next )
     {
-	      next = (SFG_Timer *)timer->Node.Next;
+              next = (SFG_Timer *)timer->Node.Next;
 
         if( timer->TriggerTime <= checkTime )
         {
@@ -339,8 +339,8 @@ static void fgCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
 {
     if( w->Callbacks.Joystick )
     {
-	e->found = TRUE;
-	e->data = w;
+        e->found = TRUE;
+        e->data = w;
     }
     fgEnumSubWindows( w, fgCheckJoystickCallback, e );
 }
@@ -356,11 +356,11 @@ static void fgHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
 {
     if( w->State.Redisplay )
     {
-	e->found = TRUE;
-	e->data = w;
+        e->found = TRUE;
+        e->data = w;
     }
     fgEnumSubWindows( w, fgHavePendingRedisplaysCallback, e );
-}	
+}        
 static int fgHavePendingRedisplays (void)
 {
     SFG_Enumerator enumerator;
@@ -386,9 +386,9 @@ static long fgNextTimer( void )
     SFG_Timer *timer;
 
     for( timer = (SFG_Timer *)fgState.Timers.First;
-	 timer;
-	 timer = (SFG_Timer *)timer->Node.Next )
-	ret = MIN( ret, MAX( 0, (timer->TriggerTime) - now ) );
+         timer;
+         timer = (SFG_Timer *)timer->Node.Next )
+        ret = MIN( ret, MAX( 0, (timer->TriggerTime) - now ) );
 
     return ret;
 }
@@ -406,22 +406,22 @@ static void fgSleepForEvents( void )
     long msec;    
     
     if( fgState.IdleCallback ||
-	fgHavePendingRedisplays() )
-	return;
+        fgHavePendingRedisplays() )
+        return;
     socket = ConnectionNumber( fgDisplay.Display );
     FD_ZERO( &fdset );
     FD_SET( socket, &fdset );
     
     msec = fgNextTimer();
     if( fgHaveJoystick() )
-	msec = MIN( msec, 10 );
+        msec = MIN( msec, 10 );
     
     wait.tv_sec = msec / 1000;
     wait.tv_usec = (msec % 1000) * 1000;
     err = select( socket+1, &fdset, NULL, NULL, &wait );
 
     if( -1 == err )
-	printf( "freeglut select() error: %d\n", errno );
+        printf( "freeglut select() error: %d\n", errno );
     
 #elif TARGET_HOST_WIN32
 #endif
@@ -650,10 +650,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         if( window->ActiveMenu != NULL )
         {
-	    if ( window == window->ActiveMenu->ParentWindow )
+            if ( window == window->ActiveMenu->ParentWindow )
             {
-		window->ActiveMenu->Window->State.MouseX = event.xmotion.x_root - window->ActiveMenu->X ;
-		window->ActiveMenu->Window->State.MouseY = event.xmotion.y_root - window->ActiveMenu->Y ;
+                window->ActiveMenu->Window->State.MouseX = event.xmotion.x_root - window->ActiveMenu->X ;
+                window->ActiveMenu->Window->State.MouseY = event.xmotion.y_root - window->ActiveMenu->Y ;
             }
 
             /*
@@ -729,14 +729,14 @@ void FGAPIENTRY glutMainLoopEvent( void )
         GETWINDOW( xbutton ); GETMOUSE( xbutton );
 
         /*
-      	 * An X button (at least in XFree86) is numbered from 1.
-      	 * A GLUT button is numbered from 0.
-      	 * Old GLUT passed through buttons other than just the first
-      	 * three, though it only gave symbolic names and official
-      	 * support to the first three.
-      	 *
-      	 */
-      	button = event.xbutton.button - 1;
+               * An X button (at least in XFree86) is numbered from 1.
+               * A GLUT button is numbered from 0.
+               * Old GLUT passed through buttons other than just the first
+               * three, though it only gave symbolic names and official
+               * support to the first three.
+               *
+               */
+              button = event.xbutton.button - 1;
 
         /*
          * Do not execute the application's mouse callback if a menu is hooked to this button.
@@ -751,46 +751,46 @@ void FGAPIENTRY glutMainLoopEvent( void )
          */
         if ( window->ActiveMenu != NULL )  /* Window has an active menu, it absorbs any mouse click */
         {
-	    if ( window == window->ActiveMenu->ParentWindow )
+            if ( window == window->ActiveMenu->ParentWindow )
             {
-		window->ActiveMenu->Window->State.MouseX = event.xbutton.x_root - window->ActiveMenu->X ;
-		window->ActiveMenu->Window->State.MouseY = event.xbutton.y_root - window->ActiveMenu->Y ;
-	    }
-	    
-	    if ( fgCheckActiveMenu ( window->ActiveMenu->Window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
+                window->ActiveMenu->Window->State.MouseX = event.xbutton.x_root - window->ActiveMenu->X ;
+                window->ActiveMenu->Window->State.MouseY = event.xbutton.y_root - window->ActiveMenu->Y ;
+            }
+            
+            if ( fgCheckActiveMenu ( window->ActiveMenu->Window, window->ActiveMenu ) == TRUE )  /* Inside the menu, invoke the callback and deactivate the menu*/
             {
-		/* Save the current window and menu and set the current window to the window whose menu this is */
-		SFG_Window *save_window = fgStructure.Window ;
-		SFG_Menu *save_menu = fgStructure.Menu ;
-		SFG_Window *parent_window = window->ActiveMenu->ParentWindow ;
-		fgSetWindow ( parent_window ) ;
-		fgStructure.Menu = window->ActiveMenu ;
+                /* Save the current window and menu and set the current window to the window whose menu this is */
+                SFG_Window *save_window = fgStructure.Window ;
+                SFG_Menu *save_menu = fgStructure.Menu ;
+                SFG_Window *parent_window = window->ActiveMenu->ParentWindow ;
+                fgSetWindow ( parent_window ) ;
+                fgStructure.Menu = window->ActiveMenu ;
 
-		/* Execute the menu callback */
-		fgExecuteMenuCallback ( window->ActiveMenu ) ;
-		fgDeactivateMenu ( parent_window ) ;
+                /* Execute the menu callback */
+                fgExecuteMenuCallback ( window->ActiveMenu ) ;
+                fgDeactivateMenu ( parent_window ) ;
 
-		/* Restore the current window and menu */
-		fgSetWindow ( save_window ) ;
-		fgStructure.Menu = save_menu ;
-	    }
-	    else  /* Outside the menu, deactivate the menu if it's a downclick */
-		if ( pressed == TRUE )
-		    fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
+                /* Restore the current window and menu */
+                fgSetWindow ( save_window ) ;
+                fgStructure.Menu = save_menu ;
+            }
+            else  /* Outside the menu, deactivate the menu if it's a downclick */
+                if ( pressed == TRUE )
+                    fgDeactivateMenu ( window->ActiveMenu->ParentWindow ) ;
 
-	    /*
-	     * Let's make the window redraw as a result of the mouse click and menu activity.
-	     */
-	    window->State.Redisplay = TRUE ;
-	    
-	    break ;
+            /*
+             * Let's make the window redraw as a result of the mouse click and menu activity.
+             */
+            window->State.Redisplay = TRUE ;
+            
+            break ;
         }
 
         /*
          * No active menu, let's check whether we need to activate one.
          */
         if (( 0 <= button ) && ( 2 >= button ) &&
-      	    ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
+                  ( window->Menu[ button ] != NULL ) && ( pressed == TRUE ) )
         {
           /*
            * Let's make the window redraw as a result of the mouse click.
@@ -874,7 +874,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 event.type == ButtonPress ? GLUT_DOWN : GLUT_UP,
                 event.xbutton.x,
                 event.xbutton.y
-		);
+                );
           }
         }
 
@@ -895,7 +895,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
          * A key has been pressed, find the window that had the focus:
          */
         GETWINDOW( xkey );
-	GETMOUSE( xkey );
+        GETMOUSE( xkey );
 
         if( event.type == KeyPress )
         {
@@ -1212,7 +1212,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         if (LOWORD(wParam) != WA_INACTIVE)
         {
           /* glutSetCursor( fgStructure.Window->State.Cursor ); */
-	        printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window, window->State.Cursor );
+                printf("WM_ACTIVATE: glutSetCursor( %p, %d)\n", window, window->State.Cursor );
 
           glutSetCursor( window->State.Cursor );
         }
@@ -1227,39 +1227,39 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
          */
 #if 0
         if ((LOWORD(lParam) == HTCLIENT) &&
-	    (fgStructure.Window->State.Cursor == GLUT_CURSOR_NONE))
-	  SetCursor( NULL );
+            (fgStructure.Window->State.Cursor == GLUT_CURSOR_NONE))
+          SetCursor( NULL );
 #else
-	/* Set the cursor AND change it for this window class. */
-#	define MAP_CURSOR(a,b) case a: SetCursor( LoadCursor( NULL, b ) ); \
+        /* Set the cursor AND change it for this window class. */
+#        define MAP_CURSOR(a,b) case a: SetCursor( LoadCursor( NULL, b ) ); \
         break;
-	/* Nuke the cursor AND change it for this window class. */
-#	define ZAP_CURSOR(a,b) case a: SetCursor( NULL ); \
+        /* Nuke the cursor AND change it for this window class. */
+#        define ZAP_CURSOR(a,b) case a: SetCursor( NULL ); \
         break;
 
         if (LOWORD(lParam) == HTCLIENT)
-	  switch( window->State.Cursor )
-	  {
-		MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
-		MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
-		MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
-		MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
-		MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP	   );
-		MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
-		MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
-		MAP_CURSOR( GLUT_CURSOR_WAIT,		 IDC_WAIT      );
-		MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
-		MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
-		/* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO		   ); */
-		ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL	   );
+          switch( window->State.Cursor )
+          {
+                MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW     );
+                MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,  IDC_ARROW     );
+                MAP_CURSOR( GLUT_CURSOR_INFO,        IDC_HELP      );
+                MAP_CURSOR( GLUT_CURSOR_DESTROY,     IDC_CROSS     );
+                MAP_CURSOR( GLUT_CURSOR_HELP,        IDC_HELP           );
+                MAP_CURSOR( GLUT_CURSOR_CYCLE,       IDC_SIZEALL   );
+                MAP_CURSOR( GLUT_CURSOR_SPRAY,       IDC_CROSS     );
+                MAP_CURSOR( GLUT_CURSOR_WAIT,                 IDC_WAIT      );
+                MAP_CURSOR( GLUT_CURSOR_TEXT,        IDC_UPARROW   );
+                MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,   IDC_CROSS     );
+                /* MAP_CURSOR( GLUT_CURSOR_NONE,        IDC_NO                   ); */
+                ZAP_CURSOR( GLUT_CURSOR_NONE,        NULL           );
 
-		default:
-		MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
-	  }
+                default:
+                MAP_CURSOR( GLUT_CURSOR_UP_DOWN,     IDC_ARROW     );
+          }
 #endif
-	else
-	  lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
-	break;
+        else
+          lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        break;
 
     case WM_SHOWWINDOW:
         window->State.Visible = TRUE;

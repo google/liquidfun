@@ -230,7 +230,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         case GLUT_WINDOW_Y: return y;
         }
 
-	if ( w == 0 )
+        if ( w == 0 )
             return( 0 );
         XTranslateCoordinates(
             fgDisplay.Display,

@@ -229,7 +229,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
 
         if ( menuEntry->SubMenu->Y + menuEntry->SubMenu->Height > glutGet (GLUT_SCREEN_HEIGHT ) )
         menuEntry->SubMenu->Y -= (menuEntry->SubMenu->Height -
-	    FREEGLUT_MENU_HEIGHT - 2*FREEGLUT_MENU_BORDER);
+            FREEGLUT_MENU_HEIGHT - 2*FREEGLUT_MENU_BORDER);
 
         fgSetWindow ( menuEntry->SubMenu->Window ) ;
         glutPositionWindow ( menuEntry->SubMenu->X, menuEntry->SubMenu->Y ) ;
