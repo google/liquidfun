@@ -362,7 +362,7 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
         /*
          * Have the label drawn, character after character:
          */
-        glutBitmapString( FREEGLUT_MENU_FONT, menuEntry->Text);
+        glutBitmapString( FREEGLUT_MENU_FONT, (unsigned char *) menuEntry->Text);
 
         /*
          * If it's a submenu, draw a right arrow
@@ -675,14 +675,14 @@ void fghCalculateMenuBoxSize( void )
          * Update the menu entry's width value
          */
         menuEntry->Width = glutBitmapLength( FREEGLUT_MENU_FONT,
-                                             menuEntry->Text );
+                                             (unsigned char *) menuEntry->Text );
 
         /*
          * If the entry is a submenu, then it needs to be wider to
          * accomodate the arrow. JCJ 31 July 2003
          */
         if (menuEntry->SubMenu )
-            menuEntry->Width += glutBitmapLength( FREEGLUT_MENU_FONT, "_" );
+            menuEntry->Width += glutBitmapLength( FREEGLUT_MENU_FONT, (unsigned char *) "_" );
 
         /*
          * Check if it's the biggest we've found
