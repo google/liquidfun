@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-videoresize"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * NOTE: functions declared in this file probably will not be implemented.

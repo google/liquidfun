@@ -44,7 +44,7 @@
 #define G_LOG_DOMAIN "freeglut-joystick"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * PWO: I don't like it at all. It's a mess. Could it be cleared?
@@ -544,7 +544,7 @@ void fgJoystickClose( void )
 #endif
 
     free ( fgJoystick ) ;
-    fgJoystick = NULL ;
+    fgJoystick = NULL ;  // show joystick has been deinitialized
 }
 
 /*

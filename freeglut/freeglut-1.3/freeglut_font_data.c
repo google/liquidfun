@@ -29,7 +29,7 @@
 #endif
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * Following fonts are defined in this file:

@@ -32,7 +32,7 @@
 #define G_LOG_DOMAIN "freeglut-init"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -367,8 +367,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * This is harmless under Win32, so let's let it stay here...
      */
 #if TARGET_HOST_WIN32
-    if ( !getenv( "DISPLAY" ) )
-      displayName = strdup( "" );
+    if ( !getenv ( "DISPLAY" ) )
+      displayName = strdup ( "" ) ;
     else
 #endif
     displayName = strdup( getenv( "DISPLAY" ) );
@@ -613,7 +613,7 @@ void FGAPIENTRY glutInitWindowSize( int width, int height )
 /*
  * Sets the default display mode for all new windows
  */
-void FGAPIENTRY glutInitDisplayMode( int displayMode )
+void FGAPIENTRY glutInitDisplayMode( unsigned int displayMode )
 {
     /*
      * We will make use of this value when creating a new OpenGL context...
@@ -821,7 +821,7 @@ void FGAPIENTRY glutInitDisplayString( char* displayMode )
              * Grab the value string that must follow the comparison operator...
              */
             if( comparison != FG_NONE && i < (gint) strlen( scanner->value.v_identifier ) )
-                valueString = g_strdup( scanner->value.v_identifier + i );
+                valueString = strdup( scanner->value.v_identifier + i );
 
             /*
              * If there was a value string, convert it to integer...
@@ -923,7 +923,7 @@ static int TokenLengths[] =
              10,             12
 };
 
-void FGAPIENTRY glutInitDisplayString( char* displayMode )
+void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 {
   int glut_state_flag = 0 ;
   /*

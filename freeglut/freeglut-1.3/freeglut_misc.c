@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-misc"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:

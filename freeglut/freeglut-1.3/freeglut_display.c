@@ -36,7 +36,7 @@
 #define  G_LOG_DOMAIN  "freeglut-display"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */

@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-cursor"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 #if TARGET_HOST_UNIX_X11
     #include <X11/cursorfont.h>
