@@ -522,6 +522,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
 
     case GLUT_JOYSTICK_POLL_RATE:
     case GLUT_HAS_JOYSTICK:
+    case GLUT_OWNS_JOYSTICK:
     case GLUT_JOYSTICK_BUTTONS:
     case GLUT_JOYSTICK_AXES:
         /*
