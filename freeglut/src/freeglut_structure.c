@@ -79,13 +79,6 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 
     fghClearCallBacks( window );
 
-    /*
-     * If the freeglut internals haven't been initialized yet,
-     * do it now. Hack's idea courtesy of Chris Purnell...
-     */
-    if( !fgState.Initialised )
-        glutInit( &fakeArgc, NULL );
-
     /* Initialize the object properties */
     window->ID = ++fgStructure.WindowID;
     window->State.OldHeight = window->State.OldWidth = -1;
@@ -128,13 +121,6 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     /* Have the menu object created */
     SFG_Menu* menu = (SFG_Menu *)calloc( sizeof(SFG_Menu), 1 );
     int fakeArgc = 0;
-
-    /*
-     * If the freeglut internals haven't been initialized yet,
-     * do it now. Hack's idea courtesy of Chris Purnell...
-     */
-    if( !fgState.Initialised )
-        glutInit( &fakeArgc, NULL );
 
     menu->ParentWindow = fgStructure.Window;
 
@@ -215,8 +201,8 @@ void fgDestroyWindow( SFG_Window* window )
 {
     int menu_index;
 
-    assert( window );
-    freeglut_assert_ready;
+    FREEGLUT_INTERNAL_ERROR_EXIT ( window, "Window destroy function called with null window",
+                                   "fgDestroyWindow" );
 
     while( window->Children.First )
         fgDestroyWindow( ( SFG_Window * )window->Children.First );
@@ -294,8 +280,8 @@ void fgDestroyMenu( SFG_Menu* menu )
     SFG_Window *window;
     SFG_Menu *from;
 
-    assert( menu );
-    freeglut_assert_ready;
+    FREEGLUT_INTERNAL_ERROR_EXIT ( menu, "Menu destroy function called with null menu",
+                                   "fgDestroyMenu" );
 
     /* First of all, have all references to this menu removed from all windows: */
     for( window = (SFG_Window *)fgStructure.Windows.First;
@@ -374,8 +360,6 @@ void fgCreateStructure( void )
  */
 void fgDestroyStructure( void )
 {
-    freeglut_assert_ready;
-
     /* Clean up the WindowsToDestroy list. */
     fgCloseWindows( );
 
@@ -394,8 +378,9 @@ void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
 {
     SFG_Window *window;
 
-    assert( enumCallback && enumerator );
-    freeglut_assert_ready;
+    FREEGLUT_INTERNAL_ERROR_EXIT ( enumCallback && enumerator,
+                                   "Enumerator or callback missing from window enumerator call",
+                                   "fgEnumWindows" );
 
     /* Check every of the top-level windows */
     for( window = ( SFG_Window * )fgStructure.Windows.First;
@@ -417,8 +402,10 @@ void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback,
 {
     SFG_Window *child;
 
-    assert( enumCallback && enumerator );
-    freeglut_assert_ready;
+    FREEGLUT_INTERNAL_ERROR_EXIT ( enumCallback && enumerator,
+                                   "Enumerator or callback missing from subwindow enumerator call",
+                                   "fgEnumSubWindows" );
+    FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Window Enumeration" );
 
     for( child = ( SFG_Window * )window->Children.First;
          child;
@@ -518,8 +505,6 @@ SFG_Window* fgWindowByID( int windowID )
 SFG_Menu* fgMenuByID( int menuID )
 {
     SFG_Menu *menu = NULL;
-
-    freeglut_assert_ready;
 
     /* It's enough to check all entries in fgStructure.Menus... */
     for( menu = (SFG_Menu *)fgStructure.Menus.First;

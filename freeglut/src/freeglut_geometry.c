@@ -72,6 +72,8 @@ void FGAPIENTRY glutWireCube( GLdouble dSize )
 {
     double size = dSize * 0.5;
 
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCube" );
+
 #   define V(a,b,c) glVertex3d( a size, b size, c size );
 #   define N(a,b,c) glNormal3d( a, b, c );
 
@@ -93,6 +95,8 @@ void FGAPIENTRY glutWireCube( GLdouble dSize )
 void FGAPIENTRY glutSolidCube( GLdouble dSize )
 {
     double size = dSize * 0.5;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCube" );
 
 #   define V(a,b,c) glVertex3d( a size, b size, c size );
 #   define N(a,b,c) glNormal3d( a, b, c );
@@ -180,6 +184,9 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 
     double *sint1,*cost1;
     double *sint2,*cost2;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSphere" );
+
     fghCircleTable(&sint1,&cost1,-slices);
     fghCircleTable(&sint2,&cost2,stacks*2);
 
@@ -265,6 +272,9 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
 
     double *sint1,*cost1;
     double *sint2,*cost2;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSphere" );
+
     fghCircleTable(&sint1,&cost1,-slices  );
     fghCircleTable(&sint2,&cost2, stacks*2);
 
@@ -339,6 +349,9 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
     /* Pre-computed circle */
 
     double *sint,*cost;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCone" );
+
     fghCircleTable(&sint,&cost,-slices);
 
     /* Cover the circular base with a triangle fan... */
@@ -423,6 +436,9 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
     /* Pre-computed circle */
 
     double *sint,*cost;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCone" );
+
     fghCircleTable(&sint,&cost,-slices);
 
     /* Draw the stacks... */
@@ -480,6 +496,9 @@ void FGAPIENTRY glutSolidCylinder(GLdouble radius, GLdouble height, GLint slices
     /* Pre-computed circle */
 
     double *sint,*cost;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCylinder" );
+
     fghCircleTable(&sint,&cost,-slices);
 
     /* Cover the base and top */
@@ -541,6 +560,9 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
     /* Pre-computed circle */
 
     double *sint,*cost;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCylinder" );
+
     fghCircleTable(&sint,&cost,-slices);
 
     /* Draw the stacks... */
@@ -591,6 +613,9 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
   double *vertex, *normal;
   int    i, j;
   double spsi, cpsi, sphi, cphi ;
+
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTorus" );
+
   if ( nSides < 1 ) nSides = 1;
   if ( nRings < 1 ) nRings = 1;
 
@@ -669,6 +694,9 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
   double *vertex, *normal;
   int    i, j;
   double spsi, cpsi, sphi, cphi ;
+
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTorus" );
+
   if ( nSides < 1 ) nSides = 1;
   if ( nRings < 1 ) nRings = 1;
 
@@ -738,6 +766,8 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
  */
 void FGAPIENTRY glutWireDodecahedron( void )
 {
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireDodecahedron" );
+
   /* Magic Numbers:  It is possible to create a dodecahedron by attaching two pentagons to each face of
    * of a cube.  The coordinates of the points are:
    *   (+-x,0, z); (+-1, 1, 1); (0, z, x )
@@ -789,6 +819,8 @@ void FGAPIENTRY glutWireDodecahedron( void )
  */
 void FGAPIENTRY glutSolidDodecahedron( void )
 {
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidDodecahedron" );
+
   /* Magic Numbers:  It is possible to create a dodecahedron by attaching two pentagons to each face of
    * of a cube.  The coordinates of the points are:
    *   (+-x,0, z); (+-1, 1, 1); (0, z, x )
@@ -840,6 +872,8 @@ void FGAPIENTRY glutSolidDodecahedron( void )
  */
 void FGAPIENTRY glutWireOctahedron( void )
 {
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireOctahedron" );
+
 #define RADIUS    1.0f
   glBegin( GL_LINE_LOOP );
     glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
@@ -859,6 +893,8 @@ void FGAPIENTRY glutWireOctahedron( void )
  */
 void FGAPIENTRY glutSolidOctahedron( void )
 {
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidOctahedron" );
+
 #define RADIUS    1.0f
   glBegin( GL_TRIANGLES );
     glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
@@ -900,6 +936,8 @@ static GLint tet_i[4][3] =  /* Vertex indices */
  */
 void FGAPIENTRY glutWireTetrahedron( void )
 {
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTetrahedron" );
+
   glBegin( GL_LINE_LOOP ) ;
     glNormal3d ( -tet_r[0][0], -tet_r[0][1], -tet_r[0][2] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[2] ) ;
     glNormal3d ( -tet_r[1][0], -tet_r[1][1], -tet_r[1][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[2] ) ; glVertex3dv ( tet_r[3] ) ;
@@ -913,6 +951,8 @@ void FGAPIENTRY glutWireTetrahedron( void )
  */
 void FGAPIENTRY glutSolidTetrahedron( void )
 {
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTetrahedron" );
+
   glBegin( GL_TRIANGLES ) ;
     glNormal3d ( -tet_r[0][0], -tet_r[0][1], -tet_r[0][2] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[2] ) ;
     glNormal3d ( -tet_r[1][0], -tet_r[1][1], -tet_r[1][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[2] ) ; glVertex3dv ( tet_r[3] ) ;
@@ -936,6 +976,9 @@ int icos_v [20][3] = { { 0, 1, 2 }, { 0, 2, 3 }, { 0, 3, 4 }, { 0, 4, 5 }, { 0, 
 void FGAPIENTRY glutWireIcosahedron( void )
 {
   int i ;
+
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireIcosahedron" );
+
   for ( i = 0; i < 20; i++ )
   {
     double normal[3] ;
@@ -957,6 +1000,8 @@ void FGAPIENTRY glutWireIcosahedron( void )
 void FGAPIENTRY glutSolidIcosahedron( void )
 {
   int i ;
+
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidIcosahedron" );
 
   glBegin ( GL_TRIANGLES ) ;
   for ( i = 0; i < 20; i++ )
@@ -994,6 +1039,9 @@ double rdod_n[12][3] = {
 void FGAPIENTRY glutWireRhombicDodecahedron( void )
 {
   int i ;
+
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireRhombicDodecahedron" );
+
   for ( i = 0; i < 12; i++ )
   {
     glBegin ( GL_LINE_LOOP ) ;
@@ -1013,6 +1061,8 @@ void FGAPIENTRY glutSolidRhombicDodecahedron( void )
 {
   int i ;
 
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidRhombicDodecahedron" );
+
   glBegin ( GL_QUADS ) ;
   for ( i = 0; i < 12; i++ )
   {
@@ -1029,6 +1079,8 @@ void FGAPIENTRY glutSolidRhombicDodecahedron( void )
 void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
 {
   int i, j ;
+
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSierpinskiSponge" );
 
   if ( num_levels == 0 )
   {
@@ -1066,6 +1118,8 @@ void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], G
 void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
 {
   int i, j ;
+
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSierpinskiSponge" );
 
   if ( num_levels == 0 )
   {

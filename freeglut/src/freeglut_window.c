@@ -275,8 +275,6 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     XWMHints wmHints;
     unsigned long mask;
 
-    freeglut_assert_ready;
-
     /*
      * XXX fgChooseVisual() is a common part of all three.
      * XXX With a little thought, we should be able to greatly
@@ -315,14 +313,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
          */
     }
 
-    /*
-     * XXX This seems to be abusing an assert() for error-checking.
-     * XXX It is possible that the visual simply can't be found,
-     * XXX in which case we should print an error and return a 0
-     * XXX for the window id, I think.
-     */
-    assert( window->Window.VisualInfo != NULL );
-
+    FREEGLUT_INTERNAL_ERROR_EXIT( window->Window.VisualInfo != NULL,
+                                  "Unable to get window visual info", "fgOpenWindow" );
 
     /*
      * XXX HINT: the masks should be updated when adding/removing callbacks.
@@ -336,7 +328,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      */
     winAttr.event_mask        =
         StructureNotifyMask | SubstructureNotifyMask | ExposureMask |
-        ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask |
+        ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyRelease |
         VisibilityChangeMask | EnterWindowMask | LeaveWindowMask |
         PointerMotionMask | ButtonMotionMask;
     winAttr.background_pixmap = None;
@@ -488,15 +480,16 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     DWORD exFlags = 0;
     ATOM atom;
 
-    freeglut_assert_ready;
-
     /* Grab the window class we have registered on glutInit(): */
     atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
-    assert( atom != 0 );
+    FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Info Not Found",
+                                   "fgOpenWindow" );
 
     if( gameMode )
     {
-        assert( window->Parent == NULL );
+        FREEGLUT_INTERNAL_ERROR_EXIT ( window->Parent == NULL,
+                                       "Game mode being invoked on a subwindow",
+                                       "fgOpenWindow" );
 
         /*
          * Set the window creation flags appropriately to make the window
@@ -620,8 +613,6 @@ void fgOpenWindow( SFG_Window* window, const char* title,
  */
 void fgCloseWindow( SFG_Window* window )
 {
-    freeglut_assert_ready;
-
 #if TARGET_HOST_UNIX_X11
 
     glXDestroyContext( fgDisplay.Display, window->Window.Context );
@@ -667,6 +658,8 @@ void fgCloseWindow( SFG_Window* window )
  */
 int FGAPIENTRY glutCreateWindow( const char* title )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateWindow" );
+
     return fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
                            fgState.Size.X, fgState.Size.Y, GL_FALSE,
                            GL_FALSE )->ID;
@@ -681,7 +674,7 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     SFG_Window* window = NULL;
     SFG_Window* parent = NULL;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateSubWindow" );
     parent = fgWindowByID( parentID );
     freeglut_return_val_if_fail( parent != NULL, 0 );
     window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
@@ -695,7 +688,9 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
  */
 void FGAPIENTRY glutDestroyWindow( int windowID )
 {
-    SFG_Window* window = fgWindowByID( windowID );
+    SFG_Window* window;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDestroyWindow" );
+    window = fgWindowByID( windowID );
     freeglut_return_if_fail( window != NULL );
     {
         fgExecutionState ExecState = fgState.ExecState;
@@ -711,7 +706,7 @@ void FGAPIENTRY glutSetWindow( int ID )
 {
     SFG_Window* window = NULL;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetWindow" );
     if( fgStructure.Window != NULL )
         if( fgStructure.Window->ID == ID )
             return;
@@ -731,7 +726,7 @@ void FGAPIENTRY glutSetWindow( int ID )
  */
 int FGAPIENTRY glutGetWindow( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetWindow" );
     if( fgStructure.Window == NULL )
         return 0;
     return fgStructure.Window->ID;
@@ -742,7 +737,7 @@ int FGAPIENTRY glutGetWindow( void )
  */
 void FGAPIENTRY glutShowWindow( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutShowWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutShowWindow" );
 
 #if TARGET_HOST_UNIX_X11
@@ -764,7 +759,7 @@ void FGAPIENTRY glutShowWindow( void )
  */
 void FGAPIENTRY glutHideWindow( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutHideWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutHideWindow" );
 
 #if TARGET_HOST_UNIX_X11
@@ -792,7 +787,7 @@ void FGAPIENTRY glutHideWindow( void )
  */
 void FGAPIENTRY glutIconifyWindow( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutIconifyWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIconifyWindow" );
 
     fgStructure.Window->State.Visible   = GL_FALSE;
@@ -816,7 +811,7 @@ void FGAPIENTRY glutIconifyWindow( void )
  */
 void FGAPIENTRY glutSetWindowTitle( const char* title )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetWindowTitle" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetWindowTitle" );
     if( ! fgStructure.Window->Parent )
     {
@@ -858,7 +853,7 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
  */
 void FGAPIENTRY glutSetIconTitle( const char* title )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetIconTitle" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetIconTitle" );
 
     if( ! fgStructure.Window->Parent )
@@ -901,7 +896,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
  */
 void FGAPIENTRY glutReshapeWindow( int width, int height )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutReshapeWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutReshapeWindow" );
 
     fgStructure.Window->State.NeedToResize = GL_TRUE;
@@ -914,7 +909,7 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
  */
 void FGAPIENTRY glutPositionWindow( int x, int y )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPositionWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPositionWindow" );
 
 #if TARGET_HOST_UNIX_X11
@@ -948,7 +943,7 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
  */
 void FGAPIENTRY glutPushWindow( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPushWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPushWindow" );
 
 #if TARGET_HOST_UNIX_X11
@@ -972,7 +967,7 @@ void FGAPIENTRY glutPushWindow( void )
  */
 void FGAPIENTRY glutPopWindow( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPopWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPopWindow" );
 
 #if TARGET_HOST_UNIX_X11
@@ -996,7 +991,7 @@ void FGAPIENTRY glutPopWindow( void )
  */
 void FGAPIENTRY glutFullScreen( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreen" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreen" );
 
     {
@@ -1071,11 +1066,15 @@ void FGAPIENTRY glutFullScreen( void )
  */
 void* FGAPIENTRY glutGetWindowData( void )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetWindowData" );
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutGetWindowData" );
     return fgStructure.Window->UserData;
 }
 
 void FGAPIENTRY glutSetWindowData(void* data)
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetWindowData" );
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetWindowData" );
     fgStructure.Window->UserData = data;
 }
 

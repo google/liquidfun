@@ -48,6 +48,7 @@
  */
 void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDisplayFunc" );
     if( !callback )
         fgError( "Fatal error in program.  NULL display callback not "
                  "permitted in GLUT 3.0+ or freeglut 2.0.1+" );
@@ -59,6 +60,7 @@ void FGAPIENTRY glutDisplayFunc( void (* callback)( void ) )
  */
 void FGAPIENTRY glutReshapeFunc( void (* callback)( int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutReshapeFunc" );
     SET_CALLBACK( Reshape );
 }
 
@@ -68,6 +70,7 @@ void FGAPIENTRY glutReshapeFunc( void (* callback)( int, int ) )
 void FGAPIENTRY glutKeyboardFunc( void (* callback)
                                   ( unsigned char, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutKeyboardFunc" );
     SET_CALLBACK( Keyboard );
 }
 
@@ -76,6 +79,7 @@ void FGAPIENTRY glutKeyboardFunc( void (* callback)
  */
 void FGAPIENTRY glutSpecialFunc( void (* callback)( int, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSpecialFunc" );
     SET_CALLBACK( Special );
 }
 
@@ -84,7 +88,7 @@ void FGAPIENTRY glutSpecialFunc( void (* callback)( int, int, int ) )
  */
 void FGAPIENTRY glutIdleFunc( void (* callback)( void ) )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutIdleFunc" );
     fgState.IdleCallback = callback;
 }
 
@@ -96,7 +100,7 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, void (* callback)( int ),
 {
     SFG_Timer *timer, *node;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutTimerFunc" );
 
     if( (timer = fgState.FreeTimers.Last) )
     {
@@ -129,7 +133,6 @@ static void fghVisibility( int status )
 {
     int glut_status = GLUT_VISIBLE;
 
-    freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Window );
 
     if( ( GLUT_HIDDEN == status )  || ( GLUT_FULLY_COVERED == status ) )
@@ -139,6 +142,7 @@ static void fghVisibility( int status )
 
 void FGAPIENTRY glutVisibilityFunc( void (* callback)( int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutVisibilityFunc" );
     SET_CALLBACK( Visibility );
 
     if( callback )
@@ -153,6 +157,7 @@ void FGAPIENTRY glutVisibilityFunc( void (* callback)( int ) )
 void FGAPIENTRY glutKeyboardUpFunc( void (* callback)
                                     ( unsigned char, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutKeyboardUpFunc" );
     SET_CALLBACK( KeyboardUp );
 }
 
@@ -161,6 +166,7 @@ void FGAPIENTRY glutKeyboardUpFunc( void (* callback)
  */
 void FGAPIENTRY glutSpecialUpFunc( void (* callback)( int, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSpecialUpFunc" );
     SET_CALLBACK( SpecialUp );
 }
 
@@ -171,6 +177,7 @@ void FGAPIENTRY glutJoystickFunc( void (* callback)
                                   ( unsigned int, int, int, int ),
                                   int pollInterval )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickFunc" );
     fgInitialiseJoysticks ();
 
     SET_CALLBACK( Joystick );
@@ -188,6 +195,7 @@ void FGAPIENTRY glutJoystickFunc( void (* callback)
  */
 void FGAPIENTRY glutMouseFunc( void (* callback)( int, int, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMouseFunc" );
     SET_CALLBACK( Mouse );
 }
 
@@ -196,6 +204,7 @@ void FGAPIENTRY glutMouseFunc( void (* callback)( int, int, int, int ) )
  */
 void FGAPIENTRY glutMouseWheelFunc( void (* callback)( int, int, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMouseWheelFunc" );
     SET_CALLBACK( MouseWheel );
 }
 
@@ -205,6 +214,7 @@ void FGAPIENTRY glutMouseWheelFunc( void (* callback)( int, int, int, int ) )
  */
 void FGAPIENTRY glutMotionFunc( void (* callback)( int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMotionFunc" );
     SET_CALLBACK( Motion );
 }
 
@@ -214,6 +224,7 @@ void FGAPIENTRY glutMotionFunc( void (* callback)( int, int ) )
  */
 void FGAPIENTRY glutPassiveMotionFunc( void (* callback)( int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPassiveMotionFunc" );
     SET_CALLBACK( Passive );
 }
 
@@ -222,6 +233,7 @@ void FGAPIENTRY glutPassiveMotionFunc( void (* callback)( int, int ) )
  */
 void FGAPIENTRY glutEntryFunc( void (* callback)( int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutEntryFunc" );
     SET_CALLBACK( Entry );
 }
 
@@ -230,17 +242,20 @@ void FGAPIENTRY glutEntryFunc( void (* callback)( int ) )
  */
 void FGAPIENTRY glutCloseFunc( void (* callback)( void ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCloseFunc" );
     SET_CALLBACK( Destroy );
 }
 
 void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWMCloseFunc" );
     glutCloseFunc( callback );
 }
 
 /* A. Donev: Destruction callback for menus */
 void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMenuDestroyFunc" );
     if( fgStructure.Menu )
         fgStructure.Menu->Destroy = callback;
 }
@@ -250,7 +265,7 @@ void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
  */
 void FGAPIENTRY glutMenuStateFunc( void (* callback)( int ) )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMenuStateFunc" );
     fgState.MenuStateCallback = callback;
 }
 
@@ -259,7 +274,7 @@ void FGAPIENTRY glutMenuStateFunc( void (* callback)( int ) )
  */
 void FGAPIENTRY glutMenuStatusFunc( void (* callback)( int, int, int ) )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMenuStatusFunc" );
     fgState.MenuStatusCallback = callback;
 }
 
@@ -268,6 +283,7 @@ void FGAPIENTRY glutMenuStatusFunc( void (* callback)( int, int, int ) )
  */
 void FGAPIENTRY glutOverlayDisplayFunc( void (* callback)( void ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutOverlayDisplayFunc" );
     SET_CALLBACK( OverlayDisplay );
 }
 
@@ -276,6 +292,7 @@ void FGAPIENTRY glutOverlayDisplayFunc( void (* callback)( void ) )
  */
 void FGAPIENTRY glutWindowStatusFunc( void (* callback)( int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWindowStatusFunc" );
     SET_CALLBACK( WindowStatus );
 }
 
@@ -284,6 +301,7 @@ void FGAPIENTRY glutWindowStatusFunc( void (* callback)( int ) )
  */
 void FGAPIENTRY glutSpaceballMotionFunc( void (* callback)( int, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSpaceballMotionFunc" );
     SET_CALLBACK( SpaceMotion );
 }
 
@@ -292,6 +310,7 @@ void FGAPIENTRY glutSpaceballMotionFunc( void (* callback)( int, int, int ) )
  */
 void FGAPIENTRY glutSpaceballRotateFunc( void (* callback)( int, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSpaceballRotateFunc" );
     SET_CALLBACK( SpaceRotation );
 }
 
@@ -300,6 +319,7 @@ void FGAPIENTRY glutSpaceballRotateFunc( void (* callback)( int, int, int ) )
  */
 void FGAPIENTRY glutSpaceballButtonFunc( void (* callback)( int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSpaceballButtonFunc" );
     SET_CALLBACK( SpaceButton );
 }
 
@@ -308,6 +328,7 @@ void FGAPIENTRY glutSpaceballButtonFunc( void (* callback)( int, int ) )
  */
 void FGAPIENTRY glutButtonBoxFunc( void (* callback)( int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutButtonBoxFunc" );
     SET_CALLBACK( ButtonBox );
 }
 
@@ -316,6 +337,7 @@ void FGAPIENTRY glutButtonBoxFunc( void (* callback)( int, int ) )
  */
 void FGAPIENTRY glutDialsFunc( void (* callback)( int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDialsFunc" );
     SET_CALLBACK( Dials );
 }
 
@@ -324,6 +346,7 @@ void FGAPIENTRY glutDialsFunc( void (* callback)( int, int ) )
  */
 void FGAPIENTRY glutTabletMotionFunc( void (* callback)( int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutTabletMotionFunc" );
     SET_CALLBACK( TabletMotion );
 }
 
@@ -332,6 +355,7 @@ void FGAPIENTRY glutTabletMotionFunc( void (* callback)( int, int ) )
  */
 void FGAPIENTRY glutTabletButtonFunc( void (* callback)( int, int, int, int ) )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutTabletButtonFunc" );
     SET_CALLBACK( TabletButton );
 }
 

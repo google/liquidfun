@@ -178,10 +178,8 @@ static struct name_address_pair glut_functions[] =
    { "glutStrokeString", (void *) glutStrokeString },
    { "glutWireRhombicDodecahedron", (void *) glutWireRhombicDodecahedron },
    { "glutSolidRhombicDodecahedron", (void *) glutSolidRhombicDodecahedron },
-   { "glutWireSierpinskiSponge", (void *) glutWireSierpinskiSponge },
-   { "glutSolidSierpinskiSponge", (void *) glutSolidSierpinskiSponge },
-   { "glutWireCylinder", (void *) glutWireCylinder },
-   { "glutSolidCylinder", (void *) glutSolidCylinder },
+   { "glutWireSierpinskiSponge ", (void *) glutWireSierpinskiSponge },
+   { "glutSolidSierpinskiSponge ", (void *) glutSolidSierpinskiSponge },
    { "glutGetProcAddress", (void *) glutGetProcAddress },
    { "glutMouseWheelFunc", (void *) glutMouseWheelFunc },
    { NULL, NULL }
@@ -192,6 +190,7 @@ void *FGAPIENTRY glutGetProcAddress( const char *procName )
 {
     /* Try GLUT functions first */
     int i;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetProcAddress" );
     for( i = 0; glut_functions[ i ].name; i++ )
         if( strcmp( glut_functions[ i ].name, procName ) == 0)
             return glut_functions[ i ].address;

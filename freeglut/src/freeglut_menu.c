@@ -164,7 +164,8 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
 
         /* The mouse cursor is somewhere over our box, check it out. */
         menuEntry = fghFindMenuEntry( menu, menuID + 1 );
-        assert( menuEntry );
+        FREEGLUT_INTERNAL_ERROR_EXIT( menuEntry, "Cannot find menu entry",
+                                      "fghCheckMenuStatus" );
 
         menuEntry->IsActive = GL_TRUE;
         menuEntry->Ordinal = menuID;
@@ -394,7 +395,8 @@ void fgDisplayMenu( void )
     SFG_Window* window = fgStructure.Window;
     SFG_Menu* menu = NULL;
 
-    freeglut_return_if_fail ( fgStructure.Window != NULL );
+    FREEGLUT_INTERNAL_ERROR_EXIT ( fgStructure.Window, "Displaying menu in nonexistent window",
+                                   "fgDisplayMenu" );
 
     /* Check if there is an active menu attached to this window... */
     menu = window->ActiveMenu;
@@ -588,7 +590,6 @@ void fghCalculateMenuBoxSize( void )
     int width = 0, height = 0;
 
     /* Make sure there is a current menu set */
-    freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Menu );
 
     /* The menu's box size depends on the menu entries: */
@@ -633,6 +634,7 @@ void fghCalculateMenuBoxSize( void )
 int FGAPIENTRY glutCreateMenu( void(* callback)( int ) )
 {
     /* The menu object creation code resides in freeglut_structure.c */
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateMenu" );
     return fgCreateMenu( callback )->ID;
 }
 
@@ -641,9 +643,11 @@ int FGAPIENTRY glutCreateMenu( void(* callback)( int ) )
  */
 void FGAPIENTRY glutDestroyMenu( int menuID )
 {
-    SFG_Menu* menu = fgMenuByID( menuID );
+    SFG_Menu* menu;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDestroyMenu" );
+    menu = fgMenuByID( menuID );
+
     freeglut_return_if_fail( menu );
 
     /* The menu object destruction code resides in freeglut_structure.c */
@@ -655,7 +659,7 @@ void FGAPIENTRY glutDestroyMenu( int menuID )
  */
 int FGAPIENTRY glutGetMenu( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetMenu" );
 
     if( fgStructure.Menu )
         return fgStructure.Menu->ID;
@@ -668,9 +672,11 @@ int FGAPIENTRY glutGetMenu( void )
  */
 void FGAPIENTRY glutSetMenu( int menuID )
 {
-    SFG_Menu* menu = fgMenuByID( menuID );
+    SFG_Menu* menu;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetMenu" );
+    menu = fgMenuByID( menuID );
+
     freeglut_return_if_fail( menu );
 
     fgStructure.Menu = menu;
@@ -681,10 +687,9 @@ void FGAPIENTRY glutSetMenu( int menuID )
  */
 void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
 {
-    SFG_MenuEntry* menuEntry =
-        (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
-
-    freeglut_assert_ready;
+    SFG_MenuEntry* menuEntry;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAddMenuEntry" );
+    menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
     freeglut_return_if_fail( fgStructure.Menu );
 
     menuEntry->Text = strdup( label );
@@ -701,11 +706,13 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
  */
 void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
 {
-    SFG_MenuEntry *menuEntry =
-        ( SFG_MenuEntry * )calloc( sizeof( SFG_MenuEntry ), 1 );
-    SFG_Menu *subMenu = fgMenuByID( subMenuID );
+    SFG_MenuEntry *menuEntry;
+    SFG_Menu *subMenu;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAddSubMenu" );
+    menuEntry = ( SFG_MenuEntry * )calloc( sizeof( SFG_MenuEntry ), 1 );
+    subMenu = fgMenuByID( subMenuID );
+
     freeglut_return_if_fail( fgStructure.Menu );
     freeglut_return_if_fail( subMenu );
 
@@ -727,7 +734,7 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
 {
     SFG_MenuEntry* menuEntry = NULL;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutChangeToMenuEntry" );
     freeglut_return_if_fail( fgStructure.Menu );
 
     /* Get n-th menu entry in the current menu, starting from one: */
@@ -751,10 +758,13 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
 void FGAPIENTRY glutChangeToSubMenu( int item, const char* label,
                                      int subMenuID )
 {
-    SFG_Menu*      subMenu = fgMenuByID( subMenuID );
-    SFG_MenuEntry* menuEntry = NULL;
+    SFG_Menu*      subMenu;
+    SFG_MenuEntry* menuEntry;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutChangeToSubMenu" );
+    subMenu = fgMenuByID( subMenuID );
+    menuEntry = NULL;
+
     freeglut_return_if_fail( fgStructure.Menu );
     freeglut_return_if_fail( subMenu );
 
@@ -780,7 +790,7 @@ void FGAPIENTRY glutRemoveMenuItem( int item )
 {
     SFG_MenuEntry* menuEntry;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutRemoveMenuItem" );
     freeglut_return_if_fail( fgStructure.Menu );
 
     /* Get n-th menu entry in the current menu, starting from one: */
@@ -801,7 +811,7 @@ void FGAPIENTRY glutRemoveMenuItem( int item )
  */
 void FGAPIENTRY glutAttachMenu( int button )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAttachMenu" );
 
     freeglut_return_if_fail( fgStructure.Window );
     freeglut_return_if_fail( fgStructure.Menu );
@@ -820,7 +830,7 @@ void FGAPIENTRY glutAttachMenu( int button )
  */
 void FGAPIENTRY glutDetachMenu( int button )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDetachMenu" );
 
     freeglut_return_if_fail( fgStructure.Window );
     freeglut_return_if_fail( fgStructure.Menu );
@@ -836,11 +846,13 @@ void FGAPIENTRY glutDetachMenu( int button )
  */
 void* FGAPIENTRY glutGetMenuData( void )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetMenuData" );
     return fgStructure.Menu->UserData;
 }
 
 void FGAPIENTRY glutSetMenuData(void* data)
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetMenuData" );
     fgStructure.Menu->UserData=data;
 }
 

@@ -925,7 +925,9 @@ static void fghJoystickElementEnumerator ( SFG_Joystick *joy, void *element, voi
 /** element enumerator function : pass NULL for top-level*/
 static void fghJoystickEnumerateElements ( SFG_Joystick *joy, CFTypeRef element )
 {
-      assert(CFGetTypeID(element) == CFArrayGetTypeID());
+      FREEGLUT_INTERNAL_ERROR_EXIT( (CFGetTypeID(element) == CFArrayGetTypeID(),
+                                    "Joystick element type mismatch",
+                                    "fghJoystickEnumerateElements" );
 
       CFRange range = {0, CFArrayGetCount ((CFArrayRef)element)};
       CFArrayApplyFunction((CFArrayRef) element, range,
@@ -943,7 +945,7 @@ static void fghJoystickParseElement ( SFG_Joystick *joy, CFDictionaryRef element
         CFDictionaryGetValue ((CFDictionaryRef) element, CFSTR(kIOHIDElementTypeKey)),
         kCFNumberLongType, &type);
 
-    switch ( typ e) {
+    switch ( type ) {
     case kIOHIDElementTypeInput_Misc:
     case kIOHIDElementTypeInput_Axis:
     case kIOHIDElementTypeInput_Button:
@@ -1763,63 +1765,76 @@ int fgJoystickDetect( void )
  */
 int  glutJoystickGetNumAxes( int ident )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickGetNumAxes" );
     return fgJoystick[ ident ]->num_axes;
 }
 int  glutJoystickGetNumButtons( int ident )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickGetNumButtons" );
     return fgJoystick[ ident ]->num_buttons;
 }
 int  glutJoystickNotWorking( int ident )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickNotWorking" );
     return fgJoystick[ ident ]->error;
 }
 
 float glutJoystickGetDeadBand( int ident, int axis )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickGetDeadBand" );
     return fgJoystick[ ident ]->dead_band [ axis ];
 }
 void  glutJoystickSetDeadBand( int ident, int axis, float db )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickSetDeadBand" );
     fgJoystick[ ident ]->dead_band[ axis ] = db;
 }
 
 float glutJoystickGetSaturation( int ident, int axis )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickGetSaturation" );
     return fgJoystick[ ident ]->saturate[ axis ];
 }
 void  glutJoystickSetSaturation( int ident, int axis, float st )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickSetSaturation" );
     fgJoystick[ ident ]->saturate [ axis ] = st;
 }
 
 void glutJoystickSetMinRange( int ident, float *axes )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickSetMinRange" );
     memcpy( fgJoystick[ ident ]->min, axes,
             fgJoystick[ ident ]->num_axes * sizeof( float ) );
 }
 void glutJoystickSetMaxRange( int ident, float *axes )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickSetMaxRange" );
     memcpy( fgJoystick[ ident ]->max, axes,
             fgJoystick[ ident ]->num_axes * sizeof( float ) );
 }
 void glutJoystickSetCenter( int ident, float *axes )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickSetCenter" );
     memcpy( fgJoystick[ ident ]->center, axes,
             fgJoystick[ ident ]->num_axes * sizeof( float ) );
 }
 
 void glutJoystickGetMinRange( int ident, float *axes )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickGetMinRange" );
     memcpy( axes, fgJoystick[ ident ]->min,
             fgJoystick[ ident ]->num_axes * sizeof( float ) );
 }
 void glutJoystickGetMaxRange( int ident, float *axes )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickGetMaxRange" );
     memcpy( axes, fgJoystick[ ident ]->max,
             fgJoystick[ ident ]->num_axes * sizeof( float ) );
 }
 void glutJoystickGetCenter( int ident, float *axes )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickGetCenter" );
     memcpy( axes, fgJoystick[ ident ]->center,
             fgJoystick[ ident ]->num_axes * sizeof( float ) );
 }

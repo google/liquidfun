@@ -183,7 +183,7 @@ static void fghInitialize( const char* displayName )
 
         /* Register the window class */
         atom = RegisterClass( &wc );
-        assert( atom );
+        FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Not Registered", "fghInitialize" );
     }
 
     /* The screen dimensions can be obtained via GetSystemMetrics() calls */
@@ -219,8 +219,6 @@ void fgDeinitialize( void )
         return;
     }
 
-    /* fgState.Initialised = GL_FALSE; */
-
     /* If there was a menu created, destroy the rendering context */
     if( fgStructure.MenuContext )
     {
@@ -230,13 +228,13 @@ void fgDeinitialize( void )
 
     fgDestroyStructure( );
 
-    while( ( timer = fgState.Timers.First ) )
+    while( timer = fgState.Timers.First )
     {
         fgListRemove( &fgState.Timers, &timer->Node );
         free( timer );
     }
 
-    while( ( timer = fgState.FreeTimers.First) )
+    while( timer = fgState.FreeTimers.First )
     {
         fgListRemove( &fgState.FreeTimers, &timer->Node );
         free( timer );
@@ -311,6 +309,8 @@ void fgDeinitialize( void )
     XCloseDisplay( fgDisplay.Display );
 
 #endif
+
+    fgState.Initialised = GL_FALSE;
 }
 
 /*
@@ -618,15 +618,11 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * size.
      */
 
-    if( geometry )
+    if (geometry )
     {
-        unsigned int parsedWidth, parsedHeight;
         int mask = XParseGeometry( geometry,
                                    &fgState.Position.X, &fgState.Position.Y,
-                                   &parsedWidth, &parsedHeight );
-        /* TODO: Check for overflow? */
-        fgState.Size.X = parsedWidth;
-        fgState.Size.Y = parsedHeight;
+                                   &fgState.Size.X, &fgState.Size.Y );
 
         if( (mask & (WidthValue|HeightValue)) == (WidthValue|HeightValue) )
             fgState.Size.Use = GL_TRUE;

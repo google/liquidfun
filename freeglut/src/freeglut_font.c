@@ -105,8 +105,9 @@ static SFG_StrokeFont* fghStrokeByID( void* font )
 void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
 {
     const GLubyte* face;
-    SFG_Font* font = fghFontByID( fontID );
-
+    SFG_Font* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapCharacter" );
+    font = fghFontByID( fontID );
     freeglut_return_if_fail( ( character >= 1 )&&( character < 256 ) );
     freeglut_return_if_fail( font );
 
@@ -134,9 +135,10 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
 void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
 {
     unsigned char c;
-    SFG_Font* font = fghFontByID( fontID );
     float x = 0.0f ;
-
+    SFG_Font* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapString" );
+    font = fghFontByID( fontID );
     freeglut_return_if_fail( font );
     if ( !string || ! *string )
         return;
@@ -154,8 +156,8 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
      * A newline will simply translate the next character's insertion
      * point back to the start of the line and down one line.
      */
-    while( ( c = *string++ ) )
-        if( c == '\n' )
+    while( c = *string++ )
+        if( string[c] == '\n' )
         {
             glBitmap ( 0, 0, 0, 0, -x, (float) -font->Height, NULL );
             x = 0.0f;
@@ -182,8 +184,9 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
  */
 int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
 {
-    SFG_Font* font = fghFontByID( fontID );
-
+    SFG_Font* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapWidth" );
+    font = fghFontByID( fontID );
     freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
     freeglut_return_val_if_fail( font, 0 );
     return *( font->Characters[ character ] );
@@ -196,13 +199,14 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
 {
     unsigned char c;
     int length = 0, this_line_length = 0;
-    SFG_Font* font = fghFontByID( fontID );
-
+    SFG_Font* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapLength" );
+    font = fghFontByID( fontID );
     freeglut_return_val_if_fail( font, 0 );
     if ( !string || ! *string )
         return 0;
 
-    while( ( c = *string++) )
+    while( c = *string++ )
     {
         if( c != '\n' )/* Not an EOL, increment length of line */
             this_line_length += *( font->Characters[ c ]);
@@ -224,7 +228,9 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
  */
 int FGAPIENTRY glutBitmapHeight( void* fontID )
 {
-    SFG_Font* font = fghFontByID( fontID );
+    SFG_Font* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapHeight" );
+    font = fghFontByID( fontID );
     freeglut_return_val_if_fail( font, 0 );
     return font->Height;
 }
@@ -237,8 +243,9 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
     int i, j;
-    SFG_StrokeFont* font = fghStrokeByID( fontID );
-
+    SFG_StrokeFont* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeCharacter" );
+    font = fghStrokeByID( fontID );
     freeglut_return_if_fail( character >= 0 );
     freeglut_return_if_fail( character < font->Quantity );
     freeglut_return_if_fail( font );
@@ -262,8 +269,9 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
     unsigned char c;
     int i, j;
     float length = 0.0;
-    SFG_StrokeFont* font = fghStrokeByID( fontID );
-
+    SFG_StrokeFont* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeString" );
+    font = fghStrokeByID( fontID );
     freeglut_return_if_fail( font );
     if ( !string || ! *string )
         return;
@@ -273,7 +281,7 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
      * A newline will simply translate the next character's insertion
      * point back to the start of the line and down one line.
      */
-    while( ( c = *string++) )
+    while( c = *string++ )
         if( c < font->Quantity )
         {
             if( c == '\n' )
@@ -311,8 +319,9 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
 {
     const SFG_StrokeChar *schar;
-    SFG_StrokeFont* font = fghStrokeByID( fontID );
-
+    SFG_StrokeFont* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeWidth" );
+    font = fghStrokeByID( fontID );
     freeglut_return_val_if_fail( ( character >= 0 ) &&
                                  ( character < font->Quantity ),
                                  0
@@ -332,13 +341,14 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
     unsigned char c;
     float length = 0.0;
     float this_line_length = 0.0;
-    SFG_StrokeFont* font = fghStrokeByID( fontID );
-
+    SFG_StrokeFont* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeLength" );
+    font = fghStrokeByID( fontID );
     freeglut_return_val_if_fail( font, 0 );
     if ( !string || ! *string )
         return 0;
 
-    while( ( c = *string++ ) )
+    while( c = *string++ )
         if( c < font->Quantity )
         {
             if( c == '\n' ) /* EOL; reset the length of this line */
@@ -364,7 +374,9 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
  */
 GLfloat FGAPIENTRY glutStrokeHeight( void* fontID )
 {
-    SFG_StrokeFont* font = fghStrokeByID( fontID );
+    SFG_StrokeFont* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeHeight" );
+    font = fghStrokeByID( fontID );
     freeglut_return_val_if_fail( font, 0.0 );
     return font->Height;
 }

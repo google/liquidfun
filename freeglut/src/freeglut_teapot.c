@@ -182,6 +182,7 @@ static void fghTeapot( GLint grid, GLdouble scale, GLenum type )
  */
 void FGAPIENTRY glutWireTeapot( GLdouble size )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTeapot" );
     /* We will use the general teapot rendering code */
     fghTeapot( 10, size, GL_LINE );
 }
@@ -191,6 +192,7 @@ void FGAPIENTRY glutWireTeapot( GLdouble size )
  */
 void FGAPIENTRY glutSolidTeapot( GLdouble size )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTeapot" );
     /* We will use the general teapot rendering code */
     fghTeapot( 7, size, GL_FILL );
 }

@@ -72,7 +72,7 @@ static int fghGetConfig( int attribute )
  */
 void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetOption" );
 
     /*
      * XXX In chronological code add order.  (WHY in that order?)
@@ -142,7 +142,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         return fgElapsedTime();
     }
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGet" );
 
     /* XXX In chronological code add order.  (WHY in that order?) */
     switch( eWhat )
@@ -465,7 +465,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
  */
 int FGAPIENTRY glutDeviceGet( GLenum eWhat )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDeviceGet" );
 
     /* XXX WARNING: we are mostly lying in this function. */
     switch( eWhat )
@@ -537,7 +537,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
     case GLUT_JOYSTICK_POLL_RATE:
         return fgStructure.Window ? fgStructure.Window->State.JoystickPollRate : 0;
 
-    /* The following two are only for Joystick 0 but this is an improvement */
+    /* XXX The following two are only for Joystick 0 but this is an improvement */
     case GLUT_JOYSTICK_BUTTONS:
         return glutJoystickGetNumButtons ( 0 );
 
@@ -559,7 +559,8 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return fgStructure.Window ? fgStructure.Window->State.IgnoreKeyRepeat : 0;
 
     case GLUT_DEVICE_KEY_REPEAT:
-        return fgState.KeyRepeat;
+        /* XXX WARNING: THIS IS A BIG LIE! */
+        return GLUT_KEY_REPEAT_DEFAULT;
 
     default:
         fgWarning( "glutDeviceGet(): missing enum handle %d", eWhat );
@@ -575,6 +576,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
  */
 int FGAPIENTRY glutGetModifiers( void )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetModifiers" );
     if( fgState.Modifiers == 0xffffffff )
     {
         fgWarning( "glutGetModifiers() called outside an input callback" );
@@ -589,7 +591,7 @@ int FGAPIENTRY glutGetModifiers( void )
  */
 int FGAPIENTRY glutLayerGet( GLenum eWhat )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutLayerGet" );
 
     /*
      * This is easy as layers are not implemented ;-)

@@ -69,7 +69,6 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <stdarg.h>
 #if TARGET_HOST_UNIX_X11
 #include <unistd.h>
@@ -634,7 +633,26 @@ extern SFG_State fgState;
  * A call to this function makes us sure that the Display and Structure
  * subsystems have been properly initialized and are ready to be used
  */
-#define  freeglut_assert_ready  assert( fgState.Initialised );
+#define  FREEGLUT_EXIT_IF_NOT_INITIALISED( string )               \
+  if ( ! fgState.Initialised )                                    \
+  {                                                               \
+    fgError ( " ERROR:  Function <%s> called"                     \
+              " without first calling 'glutInit'.", (string) ) ;  \
+  }
+
+#define  FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED( string )  \
+  if ( ! fgState.Initialised )                                      \
+  {                                                                 \
+    fgError ( " ERROR:  Internal <%s> function called"              \
+              " without first calling 'glutInit'.", (string) ) ;    \
+  }
+
+#define  FREEGLUT_INTERNAL_ERROR_EXIT( cond, string, function )  \
+  if ( ! ( cond ) )                                              \
+  {                                                              \
+    fgError ( " ERROR:  Internal error <%s> in function %s",     \
+              (string), (function) ) ;                           \
+  }
 
 /*
  * Following definitions are somewhat similiar to GLib's,
@@ -649,9 +667,8 @@ extern SFG_State fgState;
 
 /*
  * A call to those macros assures us that there is a current
- * window and menu set, respectively:
+ * window set, respectively:
  */
-#define  freeglut_assert_menu   assert( fgStructure.Menu != NULL );
 #define  FREEGLUT_EXIT_IF_NO_WINDOW( string )                   \
   if ( ! fgStructure.Window )                                   \
   {                                                             \

@@ -40,7 +40,7 @@
  */
 void FGAPIENTRY glutPostRedisplay( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPostRedisplay" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPostRedisplay" );
     fgStructure.Window->State.Redisplay = GL_TRUE;
 }
@@ -50,7 +50,7 @@ void FGAPIENTRY glutPostRedisplay( void )
  */
 void FGAPIENTRY glutSwapBuffers( void )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSwapBuffers" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSwapBuffers" );
 
     glFlush( );
@@ -90,7 +90,7 @@ void FGAPIENTRY glutPostWindowRedisplay( int windowID )
 {
     SFG_Window* window;
 
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPostWindowRedisplay" );
     window = fgWindowByID( windowID );
     freeglut_return_if_fail( window );
     window->State.Redisplay = GL_TRUE;

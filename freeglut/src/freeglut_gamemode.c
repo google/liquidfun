@@ -360,6 +360,8 @@ void FGAPIENTRY glutGameModeString( const char* string )
 {
     int width = 640, height = 480, depth = 16, refresh = 72;
 
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGameModeString" );
+
     /*
      * This one seems a bit easier than glutInitDisplayString. The bad thing
      * about it that I was unable to find the game mode string definition, so
@@ -391,6 +393,8 @@ void FGAPIENTRY glutGameModeString( const char* string )
  */
 int FGAPIENTRY glutEnterGameMode( void )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutEnterGameMode" );
+
     if( fgStructure.GameMode )
         fgAddToWindowDestroyList( fgStructure.GameMode );
     else
@@ -509,12 +513,13 @@ int FGAPIENTRY glutEnterGameMode( void )
  */
 void FGAPIENTRY glutLeaveGameMode( void )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutLeaveGameMode" );
+
     freeglut_return_if_fail( fgStructure.GameMode );
 
     fgStructure.GameMode->State.IsGameMode = GL_FALSE;
 
     fgAddToWindowDestroyList( fgStructure.GameMode );
-
     fgStructure.GameMode = NULL;
 
 #if TARGET_HOST_UNIX_X11
@@ -532,6 +537,8 @@ void FGAPIENTRY glutLeaveGameMode( void )
  */
 int FGAPIENTRY glutGameModeGet( GLenum eWhat )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGameModeGet" );
+
     switch( eWhat )
     {
     case GLUT_GAME_MODE_ACTIVE:

@@ -54,7 +54,7 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
   const int len = strlen( extension );
 
   /* Make sure there is a current window, and thus a current context available */
-  freeglut_assert_ready;
+  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutExtensionSupported" );
   freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
 
   if (strchr(extension, ' '))
@@ -86,6 +86,7 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
 void FGAPIENTRY glutReportErrors( void )
 {
     GLenum error;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutReportErrors" );
     while( ( error = glGetError() ) != GL_NO_ERROR )
         fgWarning( "GL error: %s", gluErrorString( error ) );
 }
@@ -95,7 +96,7 @@ void FGAPIENTRY glutReportErrors( void )
  */
 void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutIgnoreKeyRepeat" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIgnoreKeyRepeat" );
 
     fgStructure.Window->State.IgnoreKeyRepeat = ignore ? GL_TRUE : GL_FALSE;
@@ -111,7 +112,7 @@ void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
  */
 void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
 {
-    freeglut_assert_ready;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetKeyRepeat" );
 
     switch( repeatMode )
     {
@@ -135,8 +136,8 @@ void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
  */
 void FGAPIENTRY glutForceJoystickFunc( void )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutForceJoystickFunc" );
 #if !TARGET_HOST_WINCE
-    freeglut_assert_ready;
     freeglut_return_if_fail( fgStructure.Window != NULL );
     freeglut_return_if_fail( FETCH_WCB( *( fgStructure.Window ), Joystick ) );
     fgJoystickPollWindow( fgStructure.Window );
@@ -148,6 +149,7 @@ void FGAPIENTRY glutForceJoystickFunc( void )
  */
 void FGAPIENTRY glutSetColor( int nColor, GLfloat red, GLfloat green, GLfloat blue )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetColor" );
     /* We really need to do something here. */
 }
 
@@ -156,6 +158,7 @@ void FGAPIENTRY glutSetColor( int nColor, GLfloat red, GLfloat green, GLfloat bl
  */
 GLfloat FGAPIENTRY glutGetColor( int color, int component )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetColor" );
     /* We really need to do something here. */
     return( 0.0f );
 }
@@ -165,6 +168,7 @@ GLfloat FGAPIENTRY glutGetColor( int color, int component )
  */
 void FGAPIENTRY glutCopyColormap( int window )
 {
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCopyColormap" );
     /* We really need to do something here. */
 }
 

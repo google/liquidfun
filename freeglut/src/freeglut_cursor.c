@@ -83,7 +83,7 @@ static int fghGetCursorError( Cursor cursor )
  */
 void FGAPIENTRY glutSetCursor( int cursorID )
 {
-    freeglut_assert_ready;  /* XXX WHY do we need the timer active for this? */
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetCursor" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetCursor" );
 
 #if TARGET_HOST_UNIX_X11
@@ -144,7 +144,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
              * need to pick a color for foreground/background---but what
              * one we pick doesn't matter for GLUT_CURSOR_NONE.
              */
-            static char no_cursor_bits[ 32 ];
+            static unsigned char no_cursor_bits[ 32 ];
             XColor black;
             no_cursor = XCreatePixmapFromBitmapData( fgDisplay.Display,
                                                      fgDisplay.RootWindow,
@@ -236,7 +236,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
  */
 void FGAPIENTRY glutWarpPointer( int x, int y )
 {
-    freeglut_assert_ready; /* XXX WHY do we need the timer active for this? */
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWarpPointer" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutWarpPointer" );
 
 #if TARGET_HOST_UNIX_X11
