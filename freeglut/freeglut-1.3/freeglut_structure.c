@@ -32,7 +32,7 @@
 #define  G_LOG_DOMAIN  "freeglut-structure"
 
 #include "../include/GL/freeglut.h"
-#include "../include/GL/freeglut_internal.h"
+#include "freeglut_internal.h"
 
 
 /* -- GLOBAL EXPORTS ------------------------------------------------------- */
@@ -179,6 +179,17 @@ void fgAddToWindowDestroyList ( SFG_Window* window, GLboolean needToClose )
   WindowsToDestroy = new_list_entry ;
 
   /*
+   * Check if the window is the current one...
+   */
+  if ( fgStructure.Window == window )
+    fgStructure.Window = NULL;
+
+  /*
+   * If the destroyed window has the highest window ID number, decrement the window ID number
+   */
+  if ( window->ID == fgStructure.WindowID ) fgStructure.WindowID-- ;
+
+  /*
    * Check the execution state.  If this has been called from "glutDestroyWindow",
    * a statement in that function will reset the "ExecState" after this function returns.
    */
@@ -197,8 +208,6 @@ void fgAddToWindowDestroyList ( SFG_Window* window, GLboolean needToClose )
  */
 void fgCloseWindows ()
 {
-  fgExecutionState ExecState = fgState.ExecState ;
-
   SFG_WindowList *window_ptr = WindowsToDestroy ;
   WindowsToDestroy = (SFG_WindowList*)NULL ;  // In case the destroy callbacks cause more windows to be closed
 
@@ -209,14 +218,12 @@ void fgCloseWindows ()
     free ( window_ptr ) ;
     window_ptr = next ;
 
-    if ( !window_ptr ) window_ptr = WindowsToDestroy ;
+    if ( !window_ptr )
+    {
+      window_ptr = WindowsToDestroy ;
+      WindowsToDestroy = (SFG_WindowList*)NULL ;
+    }
   }
-
-  /*
-   * Since the "fgDestroyWindow" function could easily have set the "ExecState" to stop,
-   * let's set it back to what it was.
-   */
-  fgState.ExecState = ExecState ;
 }
 
 /*
@@ -263,12 +270,6 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
      */
     if( needToClose == TRUE )
         fgCloseWindow( window );
-
-    /*
-     * Check if the window is the current one...
-     */
-    if( fgStructure.Window == window )
-        fgStructure.Window = NULL;
 
     /*
      * Finally, we can delete the window's object. It hopefully does
