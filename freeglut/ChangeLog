@@ -886,3 +886,5 @@ default.
 ***************************************************************************
 
 (230) Removed acconfig.h, it is deprecated and we don't need it.
+
+(231) Cleaned up and autoconf'd the header inclusion story a bit.

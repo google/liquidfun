@@ -27,12 +27,11 @@
 
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
+#if HAVE_ERRNO_H
+#    include <errno.h>
+#endif
 
-#if TARGET_HOST_UNIX_X11
-#include <errno.h>
-#include <sys/stat.h>
-#elif TARGET_HOST_WIN32
-#elif TARGET_HOST_WINCE
+#if TARGET_HOST_WINCE
 
 typedef struct GXDisplayProperties GXDisplayProperties;
 typedef struct GXKeyList GXKeyList;

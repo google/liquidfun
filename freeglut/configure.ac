@@ -23,7 +23,7 @@ AC_SUBST([LIBXXF86VM])
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
+AC_CHECK_HEADERS([GL/gl.h GL/glu.h GL/glx.h errno.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
 AC_HEADER_TIME
 
 save_CFLAGS="$CFLAGS"

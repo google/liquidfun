@@ -73,6 +73,9 @@
 #    if HAVE_FCNTL_H
 #        include <fcntl.h>
 #    endif
+#    if HAVE_ERRNO_H
+#        include <errno.h>
+#    endif
 #    if defined(__FreeBSD__) || defined(__NetBSD__)
 /* XXX The below hack is done until freeglut's autoconf is updated. */
 #        define HAVE_USB_JS    1
@@ -92,8 +95,6 @@
 #        define JS_DATA_TYPE joystick
 #        define JS_RETURN (sizeof(struct JS_DATA_TYPE))
 #    endif
-
-#    include <errno.h>
 
 #    if defined(__linux__)
 #        include <linux/joystick.h>
