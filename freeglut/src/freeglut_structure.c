@@ -210,10 +210,9 @@ void fgAddToWindowDestroyList( SFG_Window* window )
  */
 void fgCloseWindows( )
 {
-    SFG_WindowList *window_ptr;
-
-    while( window_ptr = fgStructure.WindowsToDestroy.First )
+    while( fgStructure.WindowsToDestroy.First )
     {
+        SFG_WindowList *window_ptr = fgStructure.WindowsToDestroy.First;
         fgDestroyWindow( window_ptr->window );
         fgListRemove( &fgStructure.WindowsToDestroy, &window_ptr->node );
         free( window_ptr );
@@ -227,19 +226,18 @@ void fgCloseWindows( )
  */
 void fgDestroyWindow( SFG_Window* window )
 {
-    SFG_Window* subWindow;
-    int menu_index ;
+    int menu_index;
 
     assert( window );
     freeglut_assert_ready;
 
-    while( subWindow = ( SFG_Window * )window->Children.First )
-        fgDestroyWindow( subWindow );
+    while( window->Children.First )
+        fgDestroyWindow( ( SFG_Window * )window->Children.First );
 
     {
-        SFG_Window *activeWindow = fgStructure.Window ;
+        SFG_Window *activeWindow = fgStructure.Window;
         INVOKE_WCB( *window, Destroy, ( ) );
-        fgSetWindow ( activeWindow );
+        fgSetWindow( activeWindow );
     }
 
     if( window->Parent )
@@ -250,11 +248,9 @@ void fgDestroyWindow( SFG_Window* window )
     if( window->ActiveMenu )
       fgDeactivateMenu( window );
 
-    for ( menu_index = 0; menu_index < 3; menu_index ++ )
-    {
-      if ( window->Menu[menu_index] )
-        window->Menu[menu_index]->ParentWindow = NULL ;
-    }
+    for( menu_index = 0; menu_index < 3; menu_index ++ )
+        if( window->Menu[ menu_index ] )
+            window->Menu[ menu_index ]->ParentWindow = NULL;
 
     fgClearCallBacks( window );
     fgCloseWindow( window );
@@ -397,24 +393,21 @@ void fgCreateStructure( void )
  */
 void fgDestroyStructure( void )
 {
-    SFG_Window *window;
-    SFG_Menu *menu;
-
     freeglut_assert_ready;
 
     /*
      * Clean up the WindowsToDestroy list.
      */
-    fgCloseWindows();
+    fgCloseWindows( );
 
     /*
      * Make sure all windows and menus have been deallocated
      */
-    while( menu = ( SFG_Menu * )fgStructure.Menus.First )
-        fgDestroyMenu( menu );
-
-    while( window = ( SFG_Window * )fgStructure.Windows.First )
-        fgDestroyWindow( window );
+    while( fgStructure.Menus.First )
+        fgDestroyMenu( ( SFG_Menu * )fgStructure.Menus.First );
+    
+    while( fgStructure.Windows.First )
+        fgDestroyWindow( ( SFG_Window * )fgStructure.Windows.First );
 }
 
 /*
@@ -517,13 +510,13 @@ static void fghcbWindowByID( SFG_Window *window, SFG_Enumerator *enumerator )
     /*
      * Make sure we do not overwrite our precious results...
      */
-    if ( enumerator->found )
+    if( enumerator->found )
         return;
 
     /*
      * Check the window's handle. Hope this works. Looks ugly. That's for sure.
      */
-    if( window->ID == (int) (enumerator->data) ) /* XXX int/ptr conversion! */
+    if( window->ID == ( int )(enumerator->data) ) /* XXX int/ptr conversion! */
     {
         enumerator->found = GL_TRUE;
         enumerator->data = window;
@@ -550,10 +543,10 @@ SFG_Window* fgWindowByID( int windowID )
      * Uses a method very similiar for fgWindowByHandle...
      */
     enumerator.found = GL_FALSE;
-    enumerator.data = (void *) windowID; /* XXX int/pointer conversion! */
+    enumerator.data = ( void * )windowID; /* XXX int/pointer conversion! */
     fgEnumWindows( fghcbWindowByID, &enumerator );
     if( enumerator.found )
-        return( SFG_Window *) enumerator.data;
+        return ( SFG_Window * )enumerator.data;
     return NULL;
 }
 

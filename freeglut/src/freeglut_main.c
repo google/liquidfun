@@ -303,10 +303,11 @@ static void fghCheckJoystickPolls( void )
 static void fghCheckTimers( void )
 {
     long checkTime = fgElapsedTime( );
-    SFG_Timer *timer;
 
-    while( timer = fgState.Timers.First )
+    while( fgState.Timers.First )
     {
+        SFG_Timer *timer = fgState.Timers.First;
+
         if( timer->TriggerTime > checkTime )
             break;
 
