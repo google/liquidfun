@@ -484,6 +484,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             }
             break;
 
+        case MapNotify:
         case UnmapNotify:
             /*
              * If we never do anything with this, can we just not ask to
