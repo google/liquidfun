@@ -25,12 +25,13 @@
  */
 
 /*
- * PWO: this is not exactly what Steve Baker has done for PLIB, as I had to convert
- *      it from C++ to C. And I've also reformatted it a bit (that's my little
- *      personal deviation :]) I don't really know if it is still portable...
+ * PWO: This is not exactly what Steve Baker has done for PLIB, as I had to
+ *      convert it from C++ to C. And I've also reformatted it a bit (that's
+ *      my little personal deviation :]) I don't really know if it is still
+ *      portable...
  *      Steve: could you please add some comments to the code? :)
  *
- * FreeBSD port - courtesy of Stephen Montgomery-Smith <stephen@math.missouri.edu>
+ * FreeBSD port by Stephen Montgomery-Smith <stephen@math.missouri.edu>
  */
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
@@ -85,7 +86,7 @@
 #       ifndef JS_DATA_TYPE
 
             /*
-             * Not Windoze and no joystick driver...
+             * Not Windoze and no (known) joystick driver...
              *
              * Well - we'll put these values in and that should
              * allow the code to at least compile. The JS open
@@ -197,12 +198,12 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, int* buttons, float* axes )
          */
         switch( joy->num_axes )
         {
-	    case 6: axes[5] = (float) joy->js.dwVpos;
-	    case 5: axes[4] = (float) joy->js.dwUpos;
-	    case 4: axes[3] = (float) joy->js.dwRpos;
-	    case 3: axes[2] = (float) joy->js.dwZpos;
-	    case 2: axes[1] = (float) joy->js.dwYpos;
-	    case 1: axes[0] = (float) joy->js.dwXpos;
+        case 6: axes[5] = (float) joy->js.dwVpos;
+        case 5: axes[4] = (float) joy->js.dwUpos;
+        case 4: axes[3] = (float) joy->js.dwRpos;
+        case 3: axes[2] = (float) joy->js.dwZpos;
+        case 2: axes[1] = (float) joy->js.dwYpos;
+        case 1: axes[0] = (float) joy->js.dwXpos;
         }
     }
 #else
@@ -214,40 +215,43 @@ static void fghJoystickRawRead ( SFG_Joystick* joy, int* buttons, float* axes )
 
         if( status != sizeof(struct js_event) )
         {
-	        if( errno == EAGAIN )
-	        {
-	            /*
-	             * Use the old values
-	             */
-                if( buttons ) *buttons = joy->tmp_buttons;
-	            if( axes    ) memcpy( axes, joy->tmp_axes, sizeof(float) * joy->num_axes );
+            if( errno == EAGAIN )
+            {
+                /*
+                 * Use the old values
+                 */
+                if( buttons )
+                    *buttons = joy->tmp_buttons;
+                if( axes )
+                    memcpy( axes, joy->tmp_axes,
+                            sizeof(float) * joy->num_axes );
                 return;
-	        }
+            }
 
-	        fgWarning( "%s", joy->fname );
-	        joy->error = TRUE;
-        	return;
+            fgWarning( "%s", joy->fname );
+            joy->error = TRUE;
+            return;
         }
 
         switch( joy->js.type & ~JS_EVENT_INIT )
         {
-	    case JS_EVENT_BUTTON:
-	        if ( joy->js.value == 0 ) /* clear the flag */
-	            joy->tmp_buttons &= ~(1 << joy->js.number);
+        case JS_EVENT_BUTTON:
+            if ( joy->js.value == 0 ) /* clear the flag */
+                joy->tmp_buttons &= ~(1 << joy->js.number);
     	    else
-	            joy->tmp_buttons |= (1 << joy->js.number);
-	        break;
+                joy->tmp_buttons |= (1 << joy->js.number);
+            break;
 
-	    case JS_EVENT_AXIS:
-	        joy->tmp_axes[ joy->js.number ] = (float) joy->js.value;
-
-        	if( axes )
-	            memcpy( axes, joy->tmp_axes, sizeof(float) * joy->num_axes );
-	        break;
+        case JS_EVENT_AXIS:
+            joy->tmp_axes[ joy->js.number ] = (float) joy->js.value;
+            
+            if( axes )
+                memcpy( axes, joy->tmp_axes, sizeof(float) * joy->num_axes );
+            break;
         }
 
         if( buttons )
-	        *buttons = joy->tmp_buttons;
+            *buttons = joy->tmp_buttons;
     }
 #   else
 
@@ -283,29 +287,33 @@ static float fghJoystickFudgeAxis( SFG_Joystick* joy, float value, int axis )
 {
     if( value < joy->center[ axis ] )
     {
-        float xx = (value - joy->center[ axis ]) / (joy->center[ axis ] - joy->min[ axis ]);
+        float xx = (value - joy->center[ axis ]) / (joy->center[ axis ] -
+                                                    joy->min[ axis ]);
 
         if( xx < -joy->saturate[ axis ] )
-	        return( -1.0f );
+            return( -1.0f );
 
         if( xx > -joy->dead_band [ axis ] )
-	        return(  0.0f );
+            return(  0.0f );
 
-        xx = (xx + joy->dead_band[ axis ]) / (joy->saturate[ axis ] - joy->dead_band[ axis ]);
+        xx = (xx + joy->dead_band[ axis ]) / (joy->saturate[ axis ] -
+                                              joy->dead_band[ axis ]);
 
         return( ( xx < -1.0f ) ? -1.0f : xx );
     }
     else
     {
-        float xx = (value - joy->center [ axis ]) / (joy->max[ axis ] - joy->center[ axis ]);
+        float xx = (value - joy->center [ axis ]) / (joy->max[ axis ] -
+                                                     joy->center[ axis ]);
 
         if( xx > joy->saturate[ axis ] )
             return 1.0f ;
 
         if( xx < joy->dead_band[ axis ] )
-	        return 0.0f ;
+            return 0.0f ;
 
-        xx = (xx - joy->dead_band[ axis ]) / (joy->saturate[ axis ] - joy->dead_band[ axis ]);
+        xx = (xx - joy->dead_band[ axis ]) / (joy->saturate[ axis ] -
+                                              joy->dead_band[ axis ]);
 
         return( ( xx > 1.0f ) ? 1.0f : xx );
     }
@@ -350,25 +358,43 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 
     memset( &jsCaps, 0, sizeof(jsCaps) );
 
-    joy->error    = (joyGetDevCaps( joy->js_id, &jsCaps, sizeof(jsCaps) ) != JOYERR_NOERROR);
-    joy->num_axes = (jsCaps.wNumAxes < _JS_MAX_AXES ) ? jsCaps.wNumAxes : _JS_MAX_AXES;
+    joy->error =
+        (joyGetDevCaps( joy->js_id, &jsCaps, sizeof(jsCaps) ) !=
+         JOYERR_NOERROR);
+    joy->num_axes =
+        (jsCaps.wNumAxes < _JS_MAX_AXES ) ? jsCaps.wNumAxes : _JS_MAX_AXES;
 
     /*
      * WARNING - Fall through case clauses!!
      */
     switch( joy->num_axes )
     {
-    case 6 : joy->min[ 5 ] = (float) jsCaps.wVmin; joy->max[ 5 ] = (float) jsCaps.wVmax;
-    case 5 : joy->min[ 4 ] = (float) jsCaps.wUmin; joy->max[ 4 ] = (float) jsCaps.wUmax;
-    case 4 : joy->min[ 3 ] = (float) jsCaps.wRmin; joy->max[ 3 ] = (float) jsCaps.wRmax;
-    case 3 : joy->min[ 2 ] = (float) jsCaps.wZmin; joy->max[ 2 ] = (float) jsCaps.wZmax;
-    case 2 : joy->min[ 1 ] = (float) jsCaps.wYmin; joy->max[ 1 ] = (float) jsCaps.wYmax;
-    case 1 : joy->min[ 0 ] = (float) jsCaps.wXmin; joy->max[ 0 ] = (float) jsCaps.wXmax; break;
+    case 6:
+        joy->min[ 5 ] = (float) jsCaps.wVmin;
+        joy->max[ 5 ] = (float) jsCaps.wVmax;
+    case 5:
+        joy->min[ 4 ] = (float) jsCaps.wUmin;
+        joy->max[ 4 ] = (float) jsCaps.wUmax;
+    case 4:
+        joy->min[ 3 ] = (float) jsCaps.wRmin;
+        joy->max[ 3 ] = (float) jsCaps.wRmax;
+    case 3:
+        joy->min[ 2 ] = (float) jsCaps.wZmin;
+        joy->max[ 2 ] = (float) jsCaps.wZmax;
+    case 2:
+        joy->min[ 1 ] = (float) jsCaps.wYmin;
+        joy->max[ 1 ] = (float) jsCaps.wYmax;
+    case 1:
+        joy->min[ 0 ] = (float) jsCaps.wXmin;
+        joy->max[ 0 ] = (float) jsCaps.wXmax;
+        break;
 
     /*
      * I guess we have no axes at all
      */
-    default: joy->error = TRUE; break;
+    default:
+        joy->error = TRUE;
+        break;
     }
 
     /*
@@ -419,7 +445,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     fghJoystickRawRead(joy, buttons, axes );
     joy->error = axes[ 0 ] < -1000000000.0f;
     if( joy->error )
-      return ;
+        return ;
 
     sprintf( joyfname, "%s/.joy%drc", getenv( "HOME" ), joy->id );
 
@@ -438,7 +464,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     joy->error = (noargs != 7) || (in_no_axes != _JS_MAX_AXES);
     fclose( joyfile );
     if( joy->error )
-      return;
+        return;
 
     for( i=0 ; i<_JS_MAX_AXES ; i++ )
     {
@@ -500,15 +526,9 @@ static void fghJoystickOpen( SFG_Joystick* joy )
  */
 void fgJoystickInit( int ident )
 {
-    /*
-     * Make sure we don't get reinitialized
-     */
     if( fgJoystick != NULL )
         fgError( "illegal attemp to initialize joystick device" );
 
-    /*
-     * Have the global joystick structure created
-     */
     fgJoystick = (SFG_Joystick *)calloc( sizeof(SFG_Joystick), 1 );
 
 #ifdef WIN32
@@ -527,9 +547,6 @@ void fgJoystickInit( int ident )
     sprintf( fgJoystick->fname, "/dev/js%d", ident );
 #   endif
 
-    /*
-     * Let's try opening the joystick device now:
-     */
     fghJoystickOpen( fgJoystick );
 #endif
 }
@@ -560,21 +577,11 @@ void fgJoystickPollWindow( SFG_Window* window )
     float axes[ _JS_MAX_AXES ];
     int buttons;
 
-    /*
-     * Make sure the joystick device is initialized, the window seems valid
-     * and that there is a joystick callback hooked to it:
-     */
     freeglut_return_if_fail( fgJoystick != NULL && window != NULL );
     freeglut_return_if_fail( window->Callbacks.Joystick != NULL );
 
-    /*
-     * Poll the joystick now:
-     */
     fghJoystickRead( fgJoystick, &buttons, axes );
 
-    /*
-     * Execute the freeglut joystick callback now
-     */
     fgSetWindow (window);
     window->Callbacks.Joystick(
         buttons,
@@ -608,7 +615,3 @@ void fgJoystickPollWindow( SFG_Window* window )
 #endif
 
 /*** END OF FILE ***/
-
-
-
-
