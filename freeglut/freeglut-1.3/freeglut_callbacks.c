@@ -223,7 +223,9 @@ void FGAPIENTRY glutEntryFunc( void (* callback)( int ) )
  */
 void FGAPIENTRY glutMenuStateFunc( void (* callback)( int ) )
 {
-    SET_CALLBACK( MenuState );
+    freeglut_assert_ready;
+
+    fgState.MenuStateCallback = callback;
 }
 
 /*
@@ -231,7 +233,9 @@ void FGAPIENTRY glutMenuStateFunc( void (* callback)( int ) )
  */
 void FGAPIENTRY glutMenuStatusFunc( void (* callback)( int, int, int ) )
 {
-    SET_CALLBACK( MenuStatus );
+    freeglut_assert_ready;
+
+    fgState.MenuStatusCallback = callback;
 }
 
 /*

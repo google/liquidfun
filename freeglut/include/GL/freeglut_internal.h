@@ -212,6 +212,9 @@ struct tagSFG_State
 
     FGCBidle        IdleCallback;       /* The global idle callback          */
 
+    FGCBmenuState   MenuStateCallback;  /* Menu callbacks are global         */
+    FGCBmenuStatus  MenuStatusCallback;
+
     SFG_XYUse       GameModeSize;       /* The game mode screen's dimensions */
     int             GameModeDepth;      /* The pixel depth for game mode     */
     int             GameModeRefresh;    /* The refresh rate for game mode    */
@@ -320,27 +323,21 @@ struct tagSFG_WindowCallbacks
     FGCBdisplay         Display;
     FGCBreshape         Reshape;
     FGCBkeyboard        Keyboard;
+    FGCBkeyboardUp      KeyboardUp;
     FGCBspecial         Special;
+    FGCBspecialUp       SpecialUp;
     FGCBmouse           Mouse;
     FGCBmotion          Motion;
     FGCBpassive         Passive;
     FGCBentry           Entry;
     FGCBvisibility      Visibility;
     FGCBwindowStatus    WindowStatus;
-
-    /*
-     * Those callbacks are required for the initial version
-     */
-    FGCBmenuState       MenuState;
-    FGCBmenuStatus      MenuStatus;
-    FGCBselect          Select;
     FGCBjoystick        Joystick;
-    FGCBkeyboardUp      KeyboardUp;
-    FGCBspecialUp       SpecialUp;
 
     /*
      * Those callbacks are being ignored for the moment
      */
+    FGCBselect          Select;
     FGCBoverlayDisplay  OverlayDisplay;
     FGCBspaceMotion     SpaceMotion;
     FGCBspaceRotate     SpaceRotation;

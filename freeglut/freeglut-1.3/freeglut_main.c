@@ -698,17 +698,32 @@ void FGAPIENTRY glutMainLoop( void )
                 }
                 break;
 
+            case KeyRelease:
             case KeyPress:
                 {
+                    FGCBkeyboard keyboard_cb;
+                    FGCBspecial special_cb;
+
                     /*
                      * A key has been pressed, find the window that had the focus:
                      */
                     GETWINDOW( xkey ); GETMOUSE( xkey );
 
+                    if( event.type == KeyPress )
+                    {
+                        keyboard_cb = window->Callbacks.Keyboard;
+                        special_cb = window->Callbacks.Special;
+                    }
+                    else
+                    {
+                        keyboard_cb = window->Callbacks.KeyboardUp;
+                        special_cb = window->Callbacks.SpecialUp;
+                    }
+
                     /*
                      * Is there a keyboard/special callback hooked for this window?
                      */
-                    if( (window->Callbacks.Keyboard != NULL) || (window->Callbacks.Special != NULL) )
+                    if( (keyboard_cb != NULL) || (special_cb != NULL) )
                     {
                         XComposeStatus composeStatus;
                         char asciiCode[ 32 ];
@@ -733,7 +748,7 @@ void FGAPIENTRY glutMainLoop( void )
                             /*
                              * ...one for the ASCII translateable keypresses...
                              */
-                            if( window->Callbacks.Keyboard != NULL )
+                            if( keyboard_cb != NULL )
                             {
                                 /*
                                  * Remember the current modifiers state
@@ -750,7 +765,7 @@ void FGAPIENTRY glutMainLoop( void )
                                 /*
                                  * Execute the callback
                                  */
-                                window->Callbacks.Keyboard( asciiCode[ 0 ], event.xkey.x, event.xkey.y );
+                                keyboard_cb( asciiCode[ 0 ], event.xkey.x, event.xkey.y );
 
                                 /*
                                  * Trash the modifiers state
@@ -790,13 +805,24 @@ void FGAPIENTRY glutMainLoop( void )
                             case XK_Right:  special = GLUT_KEY_RIGHT;  break;
                             case XK_Up:     special = GLUT_KEY_UP;     break;
                             case XK_Down:   special = GLUT_KEY_DOWN;   break;
+
+                            case XK_KP_Prior:
+                            case XK_Prior:  special = GLUT_KEY_PAGE_UP; break;
+                            case XK_KP_Next:
+                            case XK_Next:   special = GLUT_KEY_PAGE_DOWN; break;
+                            case XK_KP_Home:
+                            case XK_Home:   special = GLUT_KEY_HOME;   break;
+                            case XK_KP_End:
+                            case XK_End:    special = GLUT_KEY_END;    break;
+                            case XK_KP_Insert:
+                            case XK_Insert: special = GLUT_KEY_INSERT; break;
                             }
 
                             /*
                              * Execute the callback (if one has been specified),
                              * given that the special code seems to be valid...
                              */
-                            if( (window->Callbacks.Special != NULL) && (special != -1) )
+                            if( (special_cb != NULL) && (special != -1) )
                             {
                                 /*
                                  * Remember the current modifiers state
@@ -810,7 +836,7 @@ void FGAPIENTRY glutMainLoop( void )
                                     modifiers |= GLUT_ACTIVE_ALT;
                                 window->State.Modifiers = modifiers;
 
-                                window->Callbacks.Special( special, event.xkey.x, event.xkey.y );
+                                special_cb( special, event.xkey.x, event.xkey.y );
 
                                 /*
                                  * Trash the modifiers state

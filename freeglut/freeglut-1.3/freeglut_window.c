@@ -324,7 +324,7 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
      *       This might speed up message processing. Is that true?
      */
     winAttr.event_mask        = StructureNotifyMask | SubstructureNotifyMask | ExposureMask |
-                                ButtonPressMask | ButtonReleaseMask | KeyPressMask |
+                                ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyRelease |
                                 VisibilityChangeMask | EnterWindowMask | LeaveWindowMask |
                                 PointerMotionMask | ButtonMotionMask;
     winAttr.background_pixmap = None;
@@ -442,8 +442,8 @@ void fgOpenWindow( SFG_Window* window, const char* title, int x, int y, int w, i
     if( gameMode == TRUE )
     {
         /*
-	 * This somehow fixes the glutGet() GLUT_WINDOW_X and GLUT_WINDOW_Y problem...
-	 */
+         * This somehow fixes the glutGet() GLUT_WINDOW_X and GLUT_WINDOW_Y problem...
+         */
         XMoveWindow( fgDisplay.Display, window->Window.Handle, x, y );
 
 #       ifdef X_XF86VidModeSetViewPort
