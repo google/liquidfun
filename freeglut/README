@@ -2,8 +2,7 @@
     BRIEF OVERVIEW
     ==============
 
-    This is an alpha release of the freeglut package. Currently only
-    the alpha version of freeglut-1.3 library is available.
+    This is the freeglut package.
     
     Freeglut, the Free openGL Utility Toolkit, is meant to be a free alter-
     native to Mark Kilgard's GLUT library. It is distributed under an X-Consor-
