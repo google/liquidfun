@@ -80,6 +80,12 @@ FGAPI void    FGAPIENTRY glutSolidRhombicDodecahedron( void );
 FGAPI void    FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLfloat offset[3], GLfloat scale ) ;
 FGAPI void    FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLfloat offset[3], GLfloat scale ) ;
 
+/*
+ * Extension functions, see freeglut_ext.c
+ */
+FGAPI void * FGAPIENTRY glutGetProcAddress( const char *procName );
+
+
 #ifdef __cplusplus
     }
 #endif

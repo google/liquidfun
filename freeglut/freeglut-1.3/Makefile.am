@@ -11,6 +11,7 @@ lib_LTLIBRARIES = libfreeglut-1.3.la
 libfreeglut_1_3_la_SOURCES = freeglut_callbacks.c \
 			     freeglut_cursor.c \
 			     freeglut_display.c \
+			     freeglut_ext.c \
 			     freeglut_font.c \
 			     freeglut_font_data.c \
 			     freeglut_stroke_roman.c \
