@@ -74,7 +74,7 @@ static void
 Display(void)
 {
   if (needClear) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     needClear = GL_FALSE;
   }
 
@@ -101,7 +101,10 @@ Reshape(int width, int height)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   ar = (float) width / (float) height;
-  glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+  if( ar > 1 )
+      glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+  else
+      glFrustum(-1.0, 1.0, -1/ar, 1/ar, 2.0, 100.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   xwin = -1.0 ;
@@ -250,16 +253,16 @@ main(int argc, char *argv[])
 {
   int fractal_window ;
 
+  glutInitDisplayMode( GLUT_RGB | GLUT_SINGLE );
+
+  glutInitWindowSize(500, 250);
+  glutInitWindowPosition ( 140, 140 ) ;
+  glutInit(&argc, argv);
+
   if ( argc > 1 )
     readConfigFile ( argv[1] ) ;
   else
     readConfigFile ( "fractals.dat" ) ;
-
-  glutInit(&argc, argv);
-  glutInitWindowSize(500, 250);
-  glutInitWindowPosition ( 140, 140 ) ;
-
-  glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH);
 
   fractal_window = glutCreateWindow( window_title );
 
