@@ -195,7 +195,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
         fgSetWindow ( menuEntry->SubMenu->Window ) ;
         glutPositionWindow ( menuEntry->SubMenu->X, menuEntry->SubMenu->Y ) ;
         glutReshapeWindow ( menuEntry->SubMenu->Width, menuEntry->SubMenu->Height ) ;
-	glutPopWindow () ;
+        glutPopWindow () ;
         glutShowWindow () ;
         menuEntry->SubMenu->Window->ActiveMenu = menuEntry->SubMenu ;
         fgSetWindow ( current_window ) ;
@@ -466,6 +466,7 @@ void fgActivateMenu( SFG_Window* window, int button )
    */
   window->ActiveMenu = menu;
   menu->IsActive = TRUE ;
+  fgState.ActiveMenus ++ ;
 
   /*
    * Set up the initial menu position now:
@@ -577,6 +578,8 @@ void fgDeactivateMenu( SFG_Window *window )
     menu->Window->ActiveMenu = NULL ;
     menu->ParentWindow->ActiveMenu = NULL ;
     menu->IsActive = FALSE ;
+
+    fgState.ActiveMenus -- ;
 
     /*
      * Hide all submenu windows, and the root menu's window.

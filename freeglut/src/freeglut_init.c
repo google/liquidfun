@@ -76,6 +76,7 @@ SFG_State fgState = { { -1, -1, FALSE },  /* Position */
                       { NULL, NULL }, /* Timers */
                       NULL, /* IdleCallback */
                       FALSE, /* BuildingAMenu */
+                      0,    /* ActiveMenus */
                       NULL, /* MenuStateCallback */
                       NULL, /* MenuStatusCallback */
                       { 640, 480, TRUE }, /* GameModeSize */

@@ -236,6 +236,7 @@ struct tagSFG_State
     FGCBidle         IdleCallback;         /* The global idle callback          */
 
     GLboolean        BuildingAMenu;        /* True if we are presently making a menu */
+    int              ActiveMenus;          /* Number of currently active menus  */
     FGCBmenuState    MenuStateCallback;    /* Menu callbacks are global         */
     FGCBmenuStatus   MenuStatusCallback;
 
