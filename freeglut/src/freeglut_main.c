@@ -84,12 +84,10 @@ struct GXKeyList gxKeyList;
  * callback is hooked, the viewport size is updated to
  * match the new window size.
  */
-static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
-                                       int width, int height )
+static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 {
     SFG_Window *current_window = fgStructure.Window;
 
-    SFG_Window* window = fgWindowByHandle( handle );
     freeglut_return_if_fail( window != NULL );
 
 
@@ -184,9 +182,10 @@ static void fghReshapeWindowByHandle ( SFG_WindowHandleType handle,
  * Calls a window's redraw method. This is used when
  * a redraw is forced by the incoming window messages.
  */
-static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
+static void fghRedrawWindow ( SFG_Window *window )
 {
-    SFG_Window* window = fgWindowByHandle( handle );
+    SFG_Window *current_window = fgStructure.Window;
+
     freeglut_return_if_fail( window );
     freeglut_return_if_fail( FETCH_WCB ( *window, Display ) );
 
@@ -194,23 +193,22 @@ static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
 
     freeglut_return_if_fail( window->State.Visible );
 
+    fgSetWindow( window );
+
     if( window->State.NeedToResize )
     {
-        SFG_Window *current_window = fgStructure.Window;
-
-        fgSetWindow( window );
-
-        fghReshapeWindowByHandle(
-            window->Window.Handle,
+        fghReshapeWindow(
+            window,
             window->State.Width,
             window->State.Height
         );
 
         window->State.NeedToResize = GL_FALSE;
-        fgSetWindow( current_window );
     }
 
     INVOKE_WCB( *window, Display, ( ) );
+
+    fgSetWindow( current_window );
 }
 
 /*
@@ -219,34 +217,13 @@ static void fghRedrawWindowByHandle ( SFG_WindowHandleType handle )
 static void fghcbDisplayWindow( SFG_Window *window,
                                 SFG_Enumerator *enumerator )
 {
-    if( window->State.NeedToResize )
-    {
-        SFG_Window *current_window = fgStructure.Window;
-
-        fgSetWindow( window );
-
-        fghReshapeWindowByHandle(
-            window->Window.Handle,
-            window->State.Width,
-            window->State.Height
-        );
-
-        window->State.NeedToResize = GL_FALSE;
-        fgSetWindow ( current_window );
-    }
-
     if( window->State.Redisplay &&
         window->State.Visible )
     {
         window->State.Redisplay = GL_FALSE;
 
 #if TARGET_HOST_UNIX_X11
-        {
-            SFG_Window *current_window = fgStructure.Window;
-
-            INVOKE_WCB( *window, Display, ( ) );
-            fgSetWindow( current_window );
-        }
+        fghRedrawWindow ( window ) ;
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
         RedrawWindow(
             window->Window.Handle, NULL, NULL,
@@ -1382,7 +1359,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /* Turn on the visibility in case it was turned off somehow */
         window->State.Visible = GL_TRUE;
         BeginPaint( hWnd, &ps );
-        fghRedrawWindowByHandle( hWnd );
+        fghRedrawWindow( window );
         EndPaint( hWnd, &ps );
         break;
 
