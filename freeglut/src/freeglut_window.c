@@ -415,6 +415,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
         );
 
+#if !defined( __FreeBSD__ ) && !defined( __NetBSD__ )
     if(  !glXIsDirect( fgDisplay.Display, window->Window.Context ) )
     {
       if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
@@ -424,6 +425,13 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         fgWarning( "Unable to create direct context rendering for window '%s'\nThis may hurt performance.",
                  title );
     }
+#endif
+
+    glXMakeCurrent(
+        fgDisplay.Display,
+        window->Window.Handle,
+        window->Window.Context
+    );
 
     /*
      * XXX Assume the new window is visible by default
@@ -478,12 +486,6 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
                      &fgDisplay.DeleteWindow, 1 );
-
-    glXMakeCurrent(
-        fgDisplay.Display,
-        window->Window.Handle,
-        window->Window.Context
-    );
 
     XMapWindow( fgDisplay.Display, window->Window.Handle );
 
