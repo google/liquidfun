@@ -301,9 +301,9 @@ static void fghCheckTimers( void )
     /*
      * For every timer that is waiting for triggering
      */
-    for( timer = (SFG_Timer *)fgState.Timers.First; timer; timer = next )
+    for( timer = (SFG_Timer *)fgState.Timers.First; timer; timer = (SFG_Timer *)next )
     {
-	next = (SFG_Timer *)timer->Node.Next;
+	      next = (SFG_Timer *)timer->Node.Next;
 
         /*
          * Check for the timeout:
@@ -1004,9 +1004,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
     /*
      * No messages in the queue, which means we are idling...
-     * Don't call this if there is a menu active
      */
-    if( ( fgState.IdleCallback != NULL ) && ( fgState.ActiveMenus == 0 ) )
+    if ( fgState.IdleCallback != NULL )
         fgState.IdleCallback();
 
     /*
@@ -1051,9 +1050,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
     /*
      * No messages in the queue, which means we are idling...
-     * Don't call this if there is a menu active
      */
-    if( ( fgState.IdleCallback != NULL ) && ( fgState.ActiveMenus == 0 ) )
+    if ( fgState.IdleCallback != NULL )
       fgState.IdleCallback();
 
     /*
