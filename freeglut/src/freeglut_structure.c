@@ -191,72 +191,85 @@ static SFG_WindowList* WindowsToDestroy = (SFG_WindowList*)NULL ;
  */
 void fgAddToWindowDestroyList ( SFG_Window* window, GLboolean needToClose )
 {
-  SFG_WindowList *new_list_entry =
-      (SFG_WindowList*)malloc ( sizeof(SFG_WindowList) ) ;
-  new_list_entry->window = window ;
-  new_list_entry->needToClose = needToClose ;
-  new_list_entry->next = WindowsToDestroy ;
-  WindowsToDestroy = new_list_entry ;
+    SFG_WindowList *new_list_entry =
+        ( SFG_WindowList* )malloc( sizeof(SFG_WindowList ) );
+    new_list_entry->window = window;
+    new_list_entry->needToClose = needToClose;
+    new_list_entry->next = WindowsToDestroy;
+    WindowsToDestroy = new_list_entry;
 
-  /*
-   * Check if the window is the current one...
-   */
-  if ( fgStructure.Window == window )
-    fgStructure.Window = NULL;
-
-  /*
-   * If the destroyed window has the highest window ID number, decrement
-   * the window ID number.
-   *
-   * XXX Do we REALLY want to *ever* recycle window IDs?  Integers are
-   * XXX plentiful, and clients may rely upon the implied promise in
-   * XXX the GLUT docs to not recycle these.  (I can't remember if it
-   * XXX is explicit.)
-   *
-   * XXX If we *do* want to do this, we should actually recompute the
-   * XXX highest window-ID; the new highest may not in fact be one less
-   * XXX than what we have just deleted.
-   */
-  if ( window->ID == fgStructure.WindowID )
-      fgStructure.WindowID-- ;
-
-  /*
-   * Check the execution state.  If this has been called from
-   * "glutDestroyWindow", a statement in that function will reset the
-   * "ExecState" after this function returns.
-   */
-  if ( fgState.ActionOnWindowClose != GLUT_ACTION_CONTINUE_EXECUTION )
-  {
     /*
-     * Set the execution state flag to drop out of the main loop.
+     * Check if the window is the current one...
      */
-    if ( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
-      fgState.ExecState = GLUT_EXEC_STATE_STOP ;
-  }
+    if( fgStructure.Window == window )
+        fgStructure.Window = NULL;
+
+    /*
+     * Clear all window callbacks except Destroy, which will
+     * be invoked later.  Right now, we are potentially carrying
+     * out a freeglut operation at the behest of a client callback,
+     * so we are reluctant to re-enter the client with the Destroy
+     * callback, right now.  The others are all wiped out, however,
+     * to ensure that they are no longer called after this point.
+     */
+    {
+        void *destroy = FETCH_WCB( *window, Destroy );
+        fgClearCallBacks( window );
+        FETCH_WCB( *window, Destroy ) = destroy;
+    }
+    
+
+    /*
+     * If the destroyed window has the highest window ID number, decrement
+     * the window ID number.
+     *
+     * XXX Do we REALLY want to *ever* recycle window IDs?  Integers are
+     * XXX plentiful, and clients may rely upon the implied promise in
+     * XXX the GLUT docs to not recycle these.  (I can't remember if it
+     * XXX is explicit.)
+     *
+     * XXX If we *do* want to do this, we should actually recompute the
+     * XXX highest window-ID; the new highest may not in fact be one less
+     * XXX than what we have just deleted.
+     */
+    if ( window->ID == fgStructure.WindowID )
+        fgStructure.WindowID--;
+
+    /*
+     * Check the execution state.  If this has been called from
+     * "glutDestroyWindow", a statement in that function will reset the
+     * "ExecState" after this function returns.
+     */
+    if( fgState.ActionOnWindowClose != GLUT_ACTION_CONTINUE_EXECUTION )
+        /*
+         * Set the execution state flag to drop out of the main loop.
+         */
+        if( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
+            fgState.ExecState = GLUT_EXEC_STATE_STOP;
 }
 
 /*
  * Function to close down all the windows in the "WindowsToDestroy" list
  */
-void fgCloseWindows ()
+void fgCloseWindows( )
 {
-  SFG_WindowList *window_ptr = WindowsToDestroy ;
-  WindowsToDestroy = (SFG_WindowList*)NULL ;
-  /* In case the destroy callbacks cause more windows to be closed */
+    SFG_WindowList *window_ptr = WindowsToDestroy;
+    WindowsToDestroy = ( SFG_WindowList* )NULL;
+    /* In case the destroy callbacks cause more windows to be closed */
 
-  while ( window_ptr )
-  {
-    SFG_WindowList *next = window_ptr->next ;
-    fgDestroyWindow ( window_ptr->window, window_ptr->needToClose ) ;
-    free ( window_ptr ) ;
-    window_ptr = next ;
-
-    if ( !window_ptr )
+    while( window_ptr )
     {
-      window_ptr = WindowsToDestroy ;
-      WindowsToDestroy = (SFG_WindowList*)NULL ;
+        SFG_WindowList *next = window_ptr->next;
+        fgDestroyWindow( window_ptr->window, window_ptr->needToClose );
+        free( window_ptr );
+        window_ptr = next;
+
+        if( !window_ptr )
+        {
+            window_ptr = WindowsToDestroy;
+            WindowsToDestroy = ( SFG_WindowList* )NULL;
+        }
     }
-  }
 }
 
 /*
@@ -285,6 +298,7 @@ void fgDestroyWindow( SFG_Window* window, GLboolean needToClose )
       SFG_Window *activeWindow = fgStructure.Window ;
       INVOKE_WCB( *window, Destroy, ( ) );
       fgSetWindow ( activeWindow ) ;
+      fgClearCallBacks( window );
     }
 
     if ( window->Parent != NULL )
