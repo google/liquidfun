@@ -5,7 +5,7 @@
  *
  * Copyright (c) 1999-2000 Pawel W. Olszta. All Rights Reserved.
  * Written by Pawel W. Olszta, <olszta@sourceforge.net>
- * Creation date: ?????
+ * Creation date: Thu Dec 16 1999
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
