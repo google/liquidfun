@@ -960,10 +960,10 @@ void FGAPIENTRY glutFullScreen( void )
                                   WS_CLIPCHILDREN, FALSE );
 
         /*
-         * SWP_NOACTIVATE	Do not activate the window
-         * SWP_NOOWNERZORDER	Do not change position in z-order
-         * SWP_NOSENDCHANGING	Supress WM_WINDOWPOSCHANGING message
-         * SWP_NOZORDER		Retains the current Z order (ignore 2nd param)
+         * SWP_NOACTIVATE     Do not activate the window
+         * SWP_NOOWNERZORDER  Do not change position in z-order
+         * SWP_NOSENDCHANGING Supress WM_WINDOWPOSCHANGING message
+         * SWP_NOZORDER       Retains the current Z order (ignore 2nd param)
          */
 
         SetWindowPos( fgStructure.Window->Window.Handle,
