@@ -1048,6 +1048,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
     fghDisplayAll();
   }
 #endif
+
+    /* 
+     * If an event caused a window to be closed, do the actual closing here
+     */
+    fgCloseWindows () ;
 }
 
 /*
@@ -1093,11 +1098,6 @@ void FGAPIENTRY glutMainLoop( void )
   while ( fgState.ExecState == GLUT_EXEC_STATE_RUNNING )
   {
     glutMainLoopEvent () ;
-
-    /*
-     * If an event caused a window to be closed, do the actual closing here
-     */
-    fgCloseWindows () ;
 
     /*
      * If there are no more windows open, stop execution
