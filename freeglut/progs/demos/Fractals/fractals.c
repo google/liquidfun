@@ -195,48 +195,66 @@ Special(int key, int x, int y)
   glutPostRedisplay();
 }
 
+
 void readConfigFile ( char *fnme )
 {
   FILE *fptr = fopen ( fnme, "rt" ) ;
   int i ;
   char inputline [ 256 ] ;
 
-  /* Read a header line */
-  fgets ( inputline, 256, fptr ) ;
+  if ( fptr )
+  {
+    /* Read a header line */
+    fgets ( inputline, 256, fptr ) ;
 
-  /* Read a comment line */
-  fgets ( inputline, 256, fptr ) ;
+    /* Read a comment line */
+    fgets ( inputline, 256, fptr ) ;
 
-  /* Read the window title */
-  fgets ( inputline, 256, fptr ) ;
-  /* We assume here that this line will not exceed 79 characters plus a 
-     newline (window_title is 80 characters long). That'll cause a buffer 
-     overflow. For a simple program like  this, though, we're letting it 
-     slide! 
-  */
-  sscanf ( inputline, "%[a-zA-Z0-9!@#$%^&*()+=/\\_-\" ]", window_title ) ; 
+    /* Read the window title */
+    fgets ( inputline, 256, fptr ) ;
+    /* We assume here that this line will not exceed 79 characters plus a 
+       newline (window_title is 80 characters long). That'll cause a buffer 
+       overflow. For a simple program like  this, though, we're letting it 
+       slide! 
+    */
+    sscanf ( inputline, "%[a-zA-Z0-9!@#$%^&*()+=/\\_-\" ]", window_title ) ; 
 
-  /* Read a comment line */
-  fgets ( inputline, 256, fptr ) ;
+    /* Read a comment line */
+    fgets ( inputline, 256, fptr ) ;
 
-  /* Read the number of affine transformations */
-  fgets ( inputline, 256, fptr ) ;
-  sscanf ( inputline, "%d", &num_trans ) ;
+    /* Read the number of affine transformations */
+    fgets ( inputline, 256, fptr ) ;
+    sscanf ( inputline, "%d", &num_trans ) ;
 
-  affine = (AffineTrans *)malloc ( num_trans * sizeof(AffineTrans) ) ;
+    affine = (AffineTrans *)malloc ( num_trans * sizeof(AffineTrans) ) ;
 
-  /* Read a comment line */
-  fgets ( inputline, 256, fptr ) ;
+    /* Read a comment line */
+    fgets ( inputline, 256, fptr ) ;
+
+    for ( i = 0; i < num_trans; i++ )
+    {
+      /* Read an affine transformation definition */
+      fgets ( inputline, 256, fptr ) ;
+      sscanf ( inputline, "%lf %lf %lf %lf %lf %lf", &affine[i].a00, &affine[i].a01,
+                       &affine[i].a10, &affine[i].a11, &affine[i].b0, &affine[i].b1 ) ;
+    }
+  }
+  else  /* No data file, set a default */
+  {
+    printf ( "ERROR opening file <%s>\n", fnme ) ;
+    strcpy ( window_title, "Cantor Dust" ) ;
+    num_trans = 2 ;
+    affine = (AffineTrans *)malloc ( num_trans * sizeof(AffineTrans) ) ;
+    affine[0].a00 = 0.25 ;  affine[0].a01 = 0.00 ;  affine[0].a10 = 0.00 ;  affine[0].a11 = 0.25 ;
+    affine[0].b0 = 0.0 ;    affine[0].b1 = 0.0 ;
+    affine[1].a00 = 0.25 ;  affine[1].a01 = 0.00 ;  affine[1].a10 = 0.00 ;  affine[1].a11 = 0.25 ;
+    affine[1].b0 = 0.5 ;    affine[1].b1 = 0.0 ;
+  }
 
   for ( i = 0; i < num_trans; i++ )
   {
     double m00, m01, m10, m11 ;  /* Matrix "I" minus "A" */
     double determ ;              /* Determinant of this matrix */
-
-    /* Read an affine transformation definition */
-    fgets ( inputline, 256, fptr ) ;
-    sscanf ( inputline, "%lf %lf %lf %lf %lf %lf", &affine[i].a00, &affine[i].a01,
-                     &affine[i].a10, &affine[i].a11, &affine[i].b0, &affine[i].b1 ) ;
 
     /* Calculate the stationary point */
 
