@@ -686,3 +686,10 @@ GLUT_OFFSCREEN as a rendering mode (as proposed by Nigel Stewart).
 The intent is that you specify GLUT_OFFSCREEN as a GLUT display mode,
 and then open a "window" much as you would a regular top-level window.
 Only UNIX_X11 is supprted at this point, for lack of knowledge.
+
+*********************************
+* Ides of March, 2004.
+*********************************
+
+(184) Per demands of project owner, offscreen rendering is now removed
+from freeglut.
