@@ -83,7 +83,7 @@ static void draw_level ( int num, double m00, double m01, double m10, double m11
 static void 
 Display(void)
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear( GL_COLOR_BUFFER_BIT );
 
   /* the curve */
   glPushMatrix();
@@ -106,7 +106,10 @@ Reshape(int width, int height)
   glMatrixMode ( GL_PROJECTION ) ;
   glLoadIdentity();
   ar = (float) width / (float) height ;
-  glFrustum ( -ar, ar, -1.0, 1.0, 2.0, 100.0 ) ;
+  if( ar > 1 )
+      glFrustum ( -ar, ar, -1.0, 1.0, 2.0, 100.0 ) ;
+  else
+      glFrustum ( -1.0, 1.0, -1/ar, 1/ar, 2.0, 100.0 );
   glMatrixMode ( GL_MODELVIEW ) ;
   glLoadIdentity () ;
   xwin = -1.0 ;
@@ -259,16 +262,15 @@ main(int argc, char *argv[])
 {
   int fractal_window ;
 
+  glutInitWindowSize(500, 250);
+  glutInitWindowPosition ( 140, 140 );
+  glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE );
+  glutInit(&argc, argv);
+
   if ( argc > 1 )
     readConfigFile ( argv[1] ) ;
   else
     readConfigFile ( "fractals.dat" ) ;
-
-  glutInit(&argc, argv);
-  glutInitWindowSize(500, 250);
-  glutInitWindowPosition ( 140, 140 ) ;
-
-  glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 
   fractal_window = glutCreateWindow( window_title );
 
