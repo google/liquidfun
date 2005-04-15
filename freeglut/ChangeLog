@@ -918,3 +918,9 @@ mouse pointers don't work) on the way:
    * Unknown cursor types are an error now.
    * Now the window state always corresponds to the wanted cursorID, even in
      the case of GLUT_CURSOR_FULL_CROSSHAIR.
+
+**************************************************************************
+* Gap in log between January 3 and April 15, 2005.
+**************************************************************************
+(237) Changed some comments in "freeglut_internal.h" as a test for the new
+      pCVSc project.
