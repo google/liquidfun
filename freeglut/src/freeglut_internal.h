@@ -370,10 +370,10 @@ typedef void (*SFG_Proc)();
 /*
  * SET_WCB() is used as:
  *
- *     SET_WCB( window, Visibility, func );
+ *     SET_WCB( window, cbname, func );
  *
  * ...where {window} is the freeglut window to set the callback,
- *          {Visibility} is the window-specific callback to set,
+ *          {cbname} is the window-specific callback to set,
  *          {func} is a function-pointer.
  *
  * Originally, {FETCH_WCB( ... ) = func} was rather sloppily used,
@@ -394,10 +394,10 @@ do                                                             \
 /*
  * FETCH_WCB() is used as:
  *
- *     FETCH_WCB( window, Visibility );
+ *     FETCH_WCB( window, cbname );
  *
  * ...where {window} is the freeglut window to fetch the callback from,
- *          {Visibility} is the window-specific callback to fetch.
+ *          {cbname} is the window-specific callback to fetch.
  *
  * The result is correctly type-cast to the callback function pointer
  * type.
@@ -408,15 +408,15 @@ do                                                             \
 /*
  * INVOKE_WCB() is used as:
  *
- *     INVOKE_WCB( window, Visibility, ( status ) );
+ *     INVOKE_WCB( window, cbname, ( arg_list ) );
  *
  * ...where {window} is the freeglut window,
- *          {Visibility} is the window-specific callback,
- *          {(status)} is the parameter list.
+ *          {cbname} is the window-specific callback to be invoked,
+ *          {(arg_list)} is the parameter list.
  *
  * The callback is invoked as:
  *
- *    callback( status );
+ *    callback( arg_list );
  *
  * ...so the parentheses are REQUIRED in the {arg_list}.
  *
