@@ -53,8 +53,8 @@ static int fghGetConfig( int attribute )
 {
   int returnValue = 0;
 
-  if( fgStructure.Window )
-      glXGetConfig( fgDisplay.Display, fgStructure.Window->Window.VisualInfo,
+  if( fgStructure.CurrentWindow )
+      glXGetConfig( fgDisplay.Display, fgStructure.CurrentWindow->Window.VisualInfo,
                     attribute, &returnValue );
 
   return returnValue;
@@ -109,8 +109,8 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
         break;
 
     case GLUT_WINDOW_CURSOR:
-        if( fgStructure.Window != NULL )
-            fgStructure.Window->State.Cursor = value;
+        if( fgStructure.CurrentWindow != NULL )
+            fgStructure.CurrentWindow->State.Cursor = value;
         break;
 
     default:
@@ -188,7 +188,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     /* Colormap size is handled in a bit different way than all the rest */
     case GLUT_WINDOW_COLORMAP_SIZE:
-        if( (fghGetConfig( GLX_RGBA )) || (fgStructure.Window == NULL) )
+        if( (fghGetConfig( GLX_RGBA )) || (fgStructure.CurrentWindow == NULL) )
         {
             /*
              * We've got a RGBA visual, so there is no colormap at all.
@@ -196,7 +196,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
              */
             return 0;
         }
-        return fgStructure.Window->Window.VisualInfo->visual->map_entries;
+        return fgStructure.CurrentWindow->Window.VisualInfo->visual->map_entries;
 
     /*
      * Those calls are somewhat similiar, as they use XGetWindowAttributes()
@@ -210,12 +210,12 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         int x, y;
         Window w;
 
-        if( fgStructure.Window == NULL )
+        if( fgStructure.CurrentWindow == NULL )
             return 0;
 
         XTranslateCoordinates(
             fgDisplay.Display,
-            fgStructure.Window->Window.Handle,
+            fgStructure.CurrentWindow->Window.Handle,
             fgDisplay.RootWindow,
             0, 0, &x, &y, &w);
 
@@ -229,7 +229,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
             return 0;
         XTranslateCoordinates(
             fgDisplay.Display,
-            fgStructure.Window->Window.Handle,
+            fgStructure.CurrentWindow->Window.Handle,
             w, 0, 0, &x, &y, &w);
 
         switch ( eWhat )
@@ -244,11 +244,11 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     {
         XWindowAttributes winAttributes;
 
-        if( fgStructure.Window == NULL )
+        if( fgStructure.CurrentWindow == NULL )
             return 0;
         XGetWindowAttributes(
             fgDisplay.Display,
-            fgStructure.Window->Window.Handle,
+            fgStructure.CurrentWindow->Window.Handle,
             &winAttributes
         );
         switch ( eWhat )
@@ -264,10 +264,10 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     /* This is system-dependant */
     case GLUT_WINDOW_FORMAT_ID:
-        if( fgStructure.Window == NULL )
+        if( fgStructure.CurrentWindow == NULL )
             return 0;
 
-        return fgStructure.Window->Window.VisualInfo->visualid;
+        return fgStructure.CurrentWindow->Window.VisualInfo->visualid;
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
@@ -351,19 +351,19 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         RECT winRect;
 
-        freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
+        freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
 
         /*
          * We need to call GetWindowRect() first...
          *  (this returns the pixel coordinates of the outside of the window)
          */
-        GetWindowRect( fgStructure.Window->Window.Handle, &winRect );
+        GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect );
 
         /* ...then we've got to correct the results we've just received... */
 
 #if !TARGET_HOST_WINCE
-        if ( ( fgStructure.GameMode != fgStructure.Window ) && ( fgStructure.Window->Parent == NULL ) &&
-             ( ! fgStructure.Window->IsMenu ) )
+        if ( ( fgStructure.GameMode != fgStructure.CurrentWindow ) && ( fgStructure.CurrentWindow->Parent == NULL ) &&
+             ( ! fgStructure.CurrentWindow->IsMenu ) )
         {
           winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME );
           winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME );
@@ -400,15 +400,15 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 #if TARGET_HOST_WINCE
         return GL_FALSE;
 #else
-        return fgSetupPixelFormat( fgStructure.Window, GL_TRUE,
+        return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
                                     PFD_MAIN_PLANE );
 #endif /* TARGET_HOST_WINCE */
 
 
     case GLUT_WINDOW_FORMAT_ID:
 #if !TARGET_HOST_WINCE
-        if( fgStructure.Window != NULL )
-            return GetPixelFormat( fgStructure.Window->Window.Device );
+        if( fgStructure.CurrentWindow != NULL )
+            return GetPixelFormat( fgStructure.CurrentWindow->Window.Device );
 #endif /* TARGET_HOST_WINCE */
         return 0;
 
@@ -416,24 +416,24 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     /* The window structure queries */
     case GLUT_WINDOW_PARENT:
-        if( fgStructure.Window         == NULL ) return 0;
-        if( fgStructure.Window->Parent == NULL ) return 0;
-        return fgStructure.Window->Parent->ID;
+        if( fgStructure.CurrentWindow         == NULL ) return 0;
+        if( fgStructure.CurrentWindow->Parent == NULL ) return 0;
+        return fgStructure.CurrentWindow->Parent->ID;
 
     case GLUT_WINDOW_NUM_CHILDREN:
-        if( fgStructure.Window == NULL )
+        if( fgStructure.CurrentWindow == NULL )
             return 0;
-        return fgListLength( &fgStructure.Window->Children );
+        return fgListLength( &fgStructure.CurrentWindow->Children );
 
     case GLUT_WINDOW_CURSOR:
-        if( fgStructure.Window == NULL )
+        if( fgStructure.CurrentWindow == NULL )
             return 0;
-        return fgStructure.Window->State.Cursor;
+        return fgStructure.CurrentWindow->State.Cursor;
 
     case GLUT_MENU_NUM_ITEMS:
-        if( fgStructure.Menu == NULL )
+        if( fgStructure.CurrentMenu == NULL )
             return 0;
-        return fgListLength( &fgStructure.Menu->Entries );
+        return fgListLength( &fgStructure.CurrentMenu->Entries );
 
     case GLUT_ACTION_ON_WINDOW_CLOSE:
         return fgState.ActionOnWindowClose;
@@ -531,7 +531,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return fgState.JoysticksInitialised;
 
     case GLUT_JOYSTICK_POLL_RATE:
-        return fgStructure.Window ? fgStructure.Window->State.JoystickPollRate : 0;
+        return fgStructure.CurrentWindow ? fgStructure.CurrentWindow->State.JoystickPollRate : 0;
 
     /* XXX The following two are only for Joystick 0 but this is an improvement */
     case GLUT_JOYSTICK_BUTTONS:
@@ -552,7 +552,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return 0;
 
     case GLUT_DEVICE_IGNORE_KEY_REPEAT:
-        return fgStructure.Window ? fgStructure.Window->State.IgnoreKeyRepeat : 0;
+        return fgStructure.CurrentWindow ? fgStructure.CurrentWindow->State.IgnoreKeyRepeat : 0;
 
     case GLUT_DEVICE_KEY_REPEAT:
         return fgState.KeyRepeat;
@@ -626,7 +626,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     case GLUT_OVERLAY_POSSIBLE:
-/*      return fgSetupPixelFormat( fgStructure.Window, GL_TRUE,
+/*      return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
                                    PFD_OVERLAY_PLANE ); */
       return FALSE ;
 

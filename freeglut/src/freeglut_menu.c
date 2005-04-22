@@ -110,7 +110,7 @@ static SFG_MenuEntry *fghFindMenuEntry( SFG_Menu* menu, int index )
  */
 static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
 {
-    SFG_Window *current_window = fgStructure.Window;
+    SFG_Window *current_window = fgStructure.CurrentWindow;
     SFG_MenuEntry *subMenuIter;
     /* Hide the present menu's window */
     fgSetWindow( menuEntry->SubMenu->Window );
@@ -215,7 +215,7 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
         {
             if ( ! menuEntry->SubMenu->IsActive )
             {
-                SFG_Window *current_window = fgStructure.Window;
+                SFG_Window *current_window = fgStructure.CurrentWindow;
 
                 /* Set up the initial menu position now... */
                 menuEntry->SubMenu->IsActive = GL_TRUE;
@@ -440,10 +440,10 @@ static void fghExecuteMenuCallback( SFG_Menu* menu )
  */
 void fgDisplayMenu( void )
 {
-    SFG_Window* window = fgStructure.Window;
+    SFG_Window* window = fgStructure.CurrentWindow;
     SFG_Menu* menu = NULL;
 
-    FREEGLUT_INTERNAL_ERROR_EXIT ( fgStructure.Window, "Displaying menu in nonexistent window",
+    FREEGLUT_INTERNAL_ERROR_EXIT ( fgStructure.CurrentWindow, "Displaying menu in nonexistent window",
                                    "fgDisplayMenu" );
 
     /* Check if there is an active menu attached to this window... */
@@ -564,11 +564,11 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
              * Save the current window and menu and set the current
              * window to the window whose menu this is
              */
-            SFG_Window *save_window = fgStructure.Window;
-            SFG_Menu *save_menu = fgStructure.Menu;
+            SFG_Window *save_window = fgStructure.CurrentWindow;
+            SFG_Menu *save_menu = fgStructure.CurrentMenu;
             SFG_Window *parent_window = window->ActiveMenu->ParentWindow;
             fgSetWindow( parent_window );
-            fgStructure.Menu = window->ActiveMenu;
+            fgStructure.CurrentMenu = window->ActiveMenu;
 
             /* Execute the menu callback */
             fghExecuteMenuCallback( window->ActiveMenu );
@@ -576,7 +576,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
 
             /* Restore the current window and menu */
             fgSetWindow( save_window );
-            fgStructure.Menu = save_menu;
+            fgStructure.CurrentMenu = save_menu;
         }
         else if( pressed )
             /*
@@ -621,7 +621,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
  */
 void fgDeactivateMenu( SFG_Window *window )
 {
-    SFG_Window *current_window = fgStructure.Window;
+    SFG_Window *current_window = fgStructure.CurrentWindow;
 
     /* Check if there is an active menu attached to this window... */
     SFG_Menu* menu = window->ActiveMenu;
@@ -664,10 +664,10 @@ void fghCalculateMenuBoxSize( void )
     int width = 0, height = 0;
 
     /* Make sure there is a current menu set */
-    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
 
     /* The menu's box size depends on the menu entries: */
-    for( menuEntry = ( SFG_MenuEntry * )fgStructure.Menu->Entries.First;
+    for( menuEntry = ( SFG_MenuEntry * )fgStructure.CurrentMenu->Entries.First;
          menuEntry;
          menuEntry = ( SFG_MenuEntry * )menuEntry->Node.Next )
     {
@@ -695,8 +695,8 @@ void fghCalculateMenuBoxSize( void )
     }
 
     /* Store the menu's box size now: */
-    fgStructure.Menu->Height = height + 2 * FREEGLUT_MENU_BORDER;
-    fgStructure.Menu->Width  = width  + 4 * FREEGLUT_MENU_BORDER;
+    fgStructure.CurrentMenu->Height = height + 2 * FREEGLUT_MENU_BORDER;
+    fgStructure.CurrentMenu->Width  = width  + 4 * FREEGLUT_MENU_BORDER;
 }
 
 
@@ -735,8 +735,8 @@ int FGAPIENTRY glutGetMenu( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetMenu" );
 
-    if( fgStructure.Menu )
-        return fgStructure.Menu->ID;
+    if( fgStructure.CurrentMenu )
+        return fgStructure.CurrentMenu->ID;
 
     return 0;
 }
@@ -753,7 +753,7 @@ void FGAPIENTRY glutSetMenu( int menuID )
 
     freeglut_return_if_fail( menu );
 
-    fgStructure.Menu = menu;
+    fgStructure.CurrentMenu = menu;
 }
 
 /*
@@ -764,13 +764,13 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
     SFG_MenuEntry* menuEntry;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAddMenuEntry" );
     menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
-    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
 
     menuEntry->Text = strdup( label );
     menuEntry->ID   = value;
 
     /* Have the new menu entry attached to the current menu */
-    fgListAppend( &fgStructure.Menu->Entries, &menuEntry->Node );
+    fgListAppend( &fgStructure.CurrentMenu->Entries, &menuEntry->Node );
 
     fghCalculateMenuBoxSize( );
 }
@@ -787,14 +787,14 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
     menuEntry = ( SFG_MenuEntry * )calloc( sizeof( SFG_MenuEntry ), 1 );
     subMenu = fgMenuByID( subMenuID );
 
-    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
     freeglut_return_if_fail( subMenu );
 
     menuEntry->Text    = strdup( label );
     menuEntry->SubMenu = subMenu;
     menuEntry->ID      = -1;
 
-    fgListAppend( &fgStructure.Menu->Entries, &menuEntry->Node );
+    fgListAppend( &fgStructure.CurrentMenu->Entries, &menuEntry->Node );
     fghCalculateMenuBoxSize( );
 }
 
@@ -806,10 +806,10 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
     SFG_MenuEntry* menuEntry = NULL;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutChangeToMenuEntry" );
-    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
 
     /* Get n-th menu entry in the current menu, starting from one: */
-    menuEntry = fghFindMenuEntry( fgStructure.Menu, item );
+    menuEntry = fghFindMenuEntry( fgStructure.CurrentMenu, item );
 
     freeglut_return_if_fail( menuEntry );
 
@@ -836,11 +836,11 @@ void FGAPIENTRY glutChangeToSubMenu( int item, const char* label,
     subMenu = fgMenuByID( subMenuID );
     menuEntry = NULL;
 
-    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
     freeglut_return_if_fail( subMenu );
 
     /* Get n-th menu entry in the current menu, starting from one: */
-    menuEntry = fghFindMenuEntry( fgStructure.Menu, item );
+    menuEntry = fghFindMenuEntry( fgStructure.CurrentMenu, item );
 
     freeglut_return_if_fail( menuEntry );
 
@@ -862,14 +862,14 @@ void FGAPIENTRY glutRemoveMenuItem( int item )
     SFG_MenuEntry* menuEntry;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutRemoveMenuItem" );
-    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
 
     /* Get n-th menu entry in the current menu, starting from one: */
-    menuEntry = fghFindMenuEntry( fgStructure.Menu, item );
+    menuEntry = fghFindMenuEntry( fgStructure.CurrentMenu, item );
 
     freeglut_return_if_fail( menuEntry );
 
-    fgListRemove( &fgStructure.Menu->Entries, &menuEntry->Node );
+    fgListRemove( &fgStructure.CurrentMenu->Entries, &menuEntry->Node );
     if ( menuEntry->Text )
       free( menuEntry->Text );
 
@@ -884,13 +884,13 @@ void FGAPIENTRY glutAttachMenu( int button )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAttachMenu" );
 
-    freeglut_return_if_fail( fgStructure.Window );
-    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( fgStructure.CurrentWindow );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
 
     freeglut_return_if_fail( button >= 0 );
     freeglut_return_if_fail( button < FREEGLUT_MAX_MENUS );
 
-    fgStructure.Window->Menu[ button ] = fgStructure.Menu;
+    fgStructure.CurrentWindow->Menu[ button ] = fgStructure.CurrentMenu;
 }
 
 /*
@@ -900,13 +900,13 @@ void FGAPIENTRY glutDetachMenu( int button )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDetachMenu" );
 
-    freeglut_return_if_fail( fgStructure.Window );
-    freeglut_return_if_fail( fgStructure.Menu );
+    freeglut_return_if_fail( fgStructure.CurrentWindow );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
 
     freeglut_return_if_fail( button >= 0 );
     freeglut_return_if_fail( button < FREEGLUT_MAX_MENUS );
 
-    fgStructure.Window->Menu[ button ] = NULL;
+    fgStructure.CurrentWindow->Menu[ button ] = NULL;
 }
 
 /*
@@ -915,13 +915,13 @@ void FGAPIENTRY glutDetachMenu( int button )
 void* FGAPIENTRY glutGetMenuData( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetMenuData" );
-    return fgStructure.Menu->UserData;
+    return fgStructure.CurrentMenu->UserData;
 }
 
 void FGAPIENTRY glutSetMenuData(void* data)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetMenuData" );
-    fgStructure.Menu->UserData=data;
+    fgStructure.CurrentMenu->UserData=data;
 }
 
 /*** END OF FILE ***/

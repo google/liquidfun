@@ -569,8 +569,8 @@ struct tagSFG_Structure
     SFG_List        Menus;        /* The global menus list              */
     SFG_List        WindowsToDestroy;
 
-    SFG_Window*     Window;       /* The currently active win.          */
-    SFG_Menu*       Menu;         /* Same, but menu...                  */
+    SFG_Window*     CurrentWindow; /* The currently set window          */
+    SFG_Menu*       CurrentMenu;  /* Same, but menu...                  */
 
     SFG_MenuContext* MenuContext; /* OpenGL rendering context for menus */
 
@@ -693,7 +693,7 @@ extern SFG_State fgState;
  * window set, respectively:
  */
 #define  FREEGLUT_EXIT_IF_NO_WINDOW( string )                   \
-  if ( ! fgStructure.Window )                                   \
+  if ( ! fgStructure.CurrentWindow )                                   \
   {                                                             \
     fgError ( " ERROR:  Function <%s> called"                   \
               " with no current window defined.", (string) ) ;  \

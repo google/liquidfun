@@ -37,7 +37,7 @@ void FGAPIENTRY glutPostRedisplay( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPostRedisplay" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPostRedisplay" );
-    fgStructure.Window->State.Redisplay = GL_TRUE;
+    fgStructure.CurrentWindow->State.Redisplay = GL_TRUE;
 }
 
 /*
@@ -49,13 +49,13 @@ void FGAPIENTRY glutSwapBuffers( void )
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSwapBuffers" );
 
     glFlush( );
-    if( ! fgStructure.Window->Window.DoubleBuffered )
+    if( ! fgStructure.CurrentWindow->Window.DoubleBuffered )
         return;
 
 #if TARGET_HOST_UNIX_X11
-    glXSwapBuffers( fgDisplay.Display, fgStructure.Window->Window.Handle );
+    glXSwapBuffers( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
-    SwapBuffers( fgStructure.Window->Window.Device );
+    SwapBuffers( fgStructure.CurrentWindow->Window.Device );
 #endif
 
     /* GLUT_FPS env var support */

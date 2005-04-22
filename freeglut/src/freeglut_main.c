@@ -89,7 +89,7 @@ struct GXKeyList gxKeyList;
  */
 static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 {
-    SFG_Window *current_window = fgStructure.Window;
+    SFG_Window *current_window = fgStructure.CurrentWindow;
 
     freeglut_return_if_fail( window != NULL );
 
@@ -187,7 +187,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
  */
 static void fghRedrawWindow ( SFG_Window *window )
 {
-    SFG_Window *current_window = fgStructure.Window;
+    SFG_Window *current_window = fgStructure.CurrentWindow;
 
     freeglut_return_if_fail( window );
     freeglut_return_if_fail( FETCH_WCB ( *window, Display ) );
@@ -1025,7 +1025,7 @@ void FGAPIENTRY glutMainLoop( void )
     {
         if ( FETCH_WCB( *window, Visibility ) )
         {
-            SFG_Window *current_window = fgStructure.Window ;
+            SFG_Window *current_window = fgStructure.CurrentWindow ;
 
             INVOKE_WCB( *window, Visibility, ( window->State.Visible ) );
             fgSetWindow( current_window );

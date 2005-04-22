@@ -110,7 +110,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
 {
     int x = 100, y = 100, w = 100, h = 100;
-    SFG_Window *current_window = fgStructure.Window;
+    SFG_Window *current_window = fgStructure.CurrentWindow;
 
     /* Have the menu object created */
     SFG_Menu* menu = (SFG_Menu *)calloc( sizeof(SFG_Menu), 1 );
@@ -120,7 +120,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     /* Create a window for the menu to reside in. */
 
     fgCreateWindow( NULL, "freeglut menu", x, y, w, h, GL_FALSE, GL_TRUE );
-    menu->Window = fgStructure.Window;
+    menu->Window = fgStructure.CurrentWindow;
     glutDisplayFunc( fgDisplayMenu );
 
     glutHideWindow( );  /* Hide the window for now */
@@ -135,7 +135,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     fgListAppend( &fgStructure.Menus, &menu->Node );
 
     /* Newly created menus implicitly become current ones */
-    fgStructure.Menu = menu;
+    fgStructure.CurrentMenu = menu;
 
     return menu;
 }
@@ -153,8 +153,8 @@ void fgAddToWindowDestroyList( SFG_Window* window )
     fgListAppend( &fgStructure.WindowsToDestroy, &new_list_entry->node );
 
     /* Check if the window is the current one... */
-    if( fgStructure.Window == window )
-        fgStructure.Window = NULL;
+    if( fgStructure.CurrentWindow == window )
+        fgStructure.CurrentWindow = NULL;
 
     /*
      * Clear all window callbacks except Destroy, which will
@@ -199,7 +199,7 @@ void fgDestroyWindow( SFG_Window* window )
         fgDestroyWindow( ( SFG_Window * )window->Children.First );
 
     {
-        SFG_Window *activeWindow = fgStructure.Window;
+        SFG_Window *activeWindow = fgStructure.CurrentWindow;
         INVOKE_WCB( *window, Destroy, ( ) );
         fgSetWindow( activeWindow );
     }
@@ -215,8 +215,8 @@ void fgDestroyWindow( SFG_Window* window )
     fghClearCallBacks( window );
     fgCloseWindow( window );
     free( window );
-    if( fgStructure.Window == window )
-        fgStructure.Window = NULL;
+    if( fgStructure.CurrentWindow == window )
+        fgStructure.CurrentWindow = NULL;
 }
 
 /*
@@ -292,10 +292,10 @@ void fgDestroyMenu( SFG_Menu* menu )
      */
     if( menu->Destroy )
     {
-        SFG_Menu *activeMenu=fgStructure.Menu;
-        fgStructure.Menu = menu;
+        SFG_Menu *activeMenu=fgStructure.CurrentMenu;
+        fgStructure.CurrentMenu = menu;
         menu->Destroy( );
-        fgStructure.Menu = activeMenu;
+        fgStructure.CurrentMenu = activeMenu;
     }
 
     /*
@@ -315,12 +315,12 @@ void fgDestroyMenu( SFG_Menu* menu )
         free( entry );
     }
 
-    if( fgStructure.Window == menu->Window )
+    if( fgStructure.CurrentWindow == menu->Window )
         fgSetWindow( NULL );
     fgDestroyWindow( menu->Window );
     fgListRemove( &fgStructure.Menus, &menu->Node );
-    if( fgStructure.Menu == menu )
-        fgStructure.Menu = NULL;
+    if( fgStructure.CurrentMenu == menu )
+        fgStructure.CurrentMenu = NULL;
 
     free( menu );
 }

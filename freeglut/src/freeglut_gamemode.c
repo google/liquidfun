@@ -436,7 +436,7 @@ int FGAPIENTRY glutEnterGameMode( void )
 #if TARGET_HOST_UNIX_X11
 
     /* Move the window up to the topleft corner */
-    XMoveWindow( fgDisplay.Display, fgStructure.Window->Window.Handle, 0, 0 );
+    XMoveWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle, 0, 0 );
 
     /*
      * Sync needed to avoid a real race, the Xserver must have really created
@@ -502,14 +502,14 @@ int FGAPIENTRY glutEnterGameMode( void )
         /* Get the current postion of the drawable area on screen */
         XTranslateCoordinates(
             fgDisplay.Display,
-            fgStructure.Window->Window.Handle,
+            fgStructure.CurrentWindow->Window.Handle,
             fgDisplay.RootWindow,
             0, 0, &x, &y,
             &child
         );
 
         /* Move the decorataions out of the topleft corner of the display */
-        XMoveWindow( fgDisplay.Display, fgStructure.Window->Window.Handle,
+        XMoveWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle,
                      -x, -y);
     }
 

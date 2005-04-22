@@ -51,7 +51,7 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
 
   /* Make sure there is a current window, and thus a current context available */
   FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutExtensionSupported" );
-  freeglut_return_val_if_fail( fgStructure.Window != NULL, 0 );
+  freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
 
   if (strchr(extension, ' '))
     return 0;
@@ -95,7 +95,7 @@ void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutIgnoreKeyRepeat" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIgnoreKeyRepeat" );
 
-    fgStructure.Window->State.IgnoreKeyRepeat = ignore ? GL_TRUE : GL_FALSE;
+    fgStructure.CurrentWindow->State.IgnoreKeyRepeat = ignore ? GL_TRUE : GL_FALSE;
 }
 
 /*
@@ -134,9 +134,9 @@ void FGAPIENTRY glutForceJoystickFunc( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutForceJoystickFunc" );
 #if !TARGET_HOST_WINCE
-    freeglut_return_if_fail( fgStructure.Window != NULL );
-    freeglut_return_if_fail( FETCH_WCB( *( fgStructure.Window ), Joystick ) );
-    fgJoystickPollWindow( fgStructure.Window );
+    freeglut_return_if_fail( fgStructure.CurrentWindow != NULL );
+    freeglut_return_if_fail( FETCH_WCB( *( fgStructure.CurrentWindow ), Joystick ) );
+    fgJoystickPollWindow( fgStructure.CurrentWindow );
 #endif /* !TARGET_HOST_WINCE */
 }
 

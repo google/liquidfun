@@ -33,12 +33,12 @@
 /*
  * All of the callbacks setting methods can be generalized to this:
  */
-#define SET_CALLBACK(a)                                  \
-do                                                       \
-{                                                        \
-    if( fgStructure.Window == NULL )                     \
-        return;                                          \
-    SET_WCB( ( *( fgStructure.Window ) ), a, callback ); \
+#define SET_CALLBACK(a)                                         \
+do                                                              \
+{                                                               \
+    if( fgStructure.CurrentWindow == NULL )                     \
+        return;                                                 \
+    SET_WCB( ( *( fgStructure.CurrentWindow ) ), a, callback ); \
 } while( 0 )
 
 /*
@@ -132,11 +132,11 @@ static void fghVisibility( int status )
     int glut_status = GLUT_VISIBLE;
 
     FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Visibility Callback" );
-    freeglut_return_if_fail( fgStructure.Window );
+    freeglut_return_if_fail( fgStructure.CurrentWindow );
 
     if( ( GLUT_HIDDEN == status )  || ( GLUT_FULLY_COVERED == status ) )
         glut_status = GLUT_NOT_VISIBLE;
-    INVOKE_WCB( *( fgStructure.Window ), Visibility, ( glut_status ) );
+    INVOKE_WCB( *( fgStructure.CurrentWindow ), Visibility, ( glut_status ) );
 }
 
 void FGAPIENTRY glutVisibilityFunc( void (* callback)( int ) )
@@ -180,13 +180,13 @@ void FGAPIENTRY glutJoystickFunc( void (* callback)
     fgInitialiseJoysticks ();
 
     SET_CALLBACK( Joystick );
-    fgStructure.Window->State.JoystickPollRate = pollInterval;
+    fgStructure.CurrentWindow->State.JoystickPollRate = pollInterval;
 
-    fgStructure.Window->State.JoystickLastPoll =
-        fgElapsedTime() - fgStructure.Window->State.JoystickPollRate;
+    fgStructure.CurrentWindow->State.JoystickLastPoll =
+        fgElapsedTime() - fgStructure.CurrentWindow->State.JoystickPollRate;
 
-    if( fgStructure.Window->State.JoystickLastPoll < 0 )
-        fgStructure.Window->State.JoystickLastPoll = 0;
+    if( fgStructure.CurrentWindow->State.JoystickLastPoll < 0 )
+        fgStructure.CurrentWindow->State.JoystickLastPoll = 0;
 }
 
 /*
@@ -255,8 +255,8 @@ void FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) )
 void FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMenuDestroyFunc" );
-    if( fgStructure.Menu )
-        fgStructure.Menu->Destroy = callback;
+    if( fgStructure.CurrentMenu )
+        fgStructure.CurrentMenu->Destroy = callback;
 }
 
 /*
