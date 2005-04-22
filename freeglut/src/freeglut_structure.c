@@ -236,7 +236,7 @@ static void fghRemoveMenuFromWindow( SFG_Window* window, SFG_Menu* menu )
      * Check if the menu is attached to the current window,
      * if so, have it detached (by overwriting with a NULL):
      */
-    for( i = 0; i < 3; i++ )
+    for( i = 0; i < FREEGLUT_MAX_MENUS; i++ )
         if( window->Menu[ i ] == menu )
             window->Menu[ i ] = NULL;
 
@@ -342,6 +342,13 @@ void fgCreateStructure( void )
     fgListInit(&fgStructure.Windows);
     fgListInit(&fgStructure.Menus);
     fgListInit(&fgStructure.WindowsToDestroy);
+
+    fgStructure.CurrentWindow = NULL;
+    fgStructure.CurrentMenu = NULL;
+    fgStructure.MenuContext = NULL;
+    fgStructure.GameMode = NULL;
+    fgStructure.WindowID = 0;
+    fgStructure.MenuID = 0;
 }
 
 /*
