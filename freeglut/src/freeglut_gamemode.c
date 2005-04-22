@@ -291,10 +291,13 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     }
 
 #   else
+
     /*
      * XXX warning fghChangeDisplayMode: missing XFree86 video mode extensions,
      * XXX game mode will not change screen resolution when activated
      */
+    success = GL_TRUE;
+
 #   endif
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
@@ -435,23 +438,11 @@ int FGAPIENTRY glutEnterGameMode( void )
 
 #if TARGET_HOST_UNIX_X11
 
-    /* Move the window up to the topleft corner */
-    XMoveWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle, 0, 0 );
-
     /*
      * Sync needed to avoid a real race, the Xserver must have really created
      * the window before we can grab the pointer into it:
      */
     XSync( fgDisplay.Display, False );
-
-    /* Move the Pointer to the middle of the fullscreen window */
-    XWarpPointer(
-        fgDisplay.Display,
-        None,
-        fgDisplay.RootWindow,
-        0, 0, 0, 0,
-        fgState.GameModeSize.X/2, fgState.GameModeSize.Y/2
-    );
 
     /*
      * Grab the pointer to confine it into the window after the calls to
@@ -480,6 +471,15 @@ int FGAPIENTRY glutEnterGameMode( void )
         fgStructure.GameMode->Window.Handle,
         RevertToNone,
         CurrentTime
+    );
+
+    /* Move the Pointer to the middle of the fullscreen window */
+    XWarpPointer(
+        fgDisplay.Display,
+        None,
+        fgDisplay.RootWindow,
+        0, 0, 0, 0,
+        fgState.GameModeSize.X/2, fgState.GameModeSize.Y/2
     );
 
 #   ifdef X_XF86VidModeSetViewPort
