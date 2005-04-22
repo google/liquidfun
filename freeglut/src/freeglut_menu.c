@@ -134,6 +134,37 @@ static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
 }
 
 /*
+ * Private function to get the virtual maximum screen extent
+ */
+static GLvoid fghGetVMaxExtent( SFG_Window* window, int* x, int* y )
+{
+    if( fgStructure.GameMode )
+    {
+#if TARGET_HOST_UNIX_X11
+        int wx, wy;
+        Window w;
+
+        XTranslateCoordinates(
+            fgDisplay.Display,
+            window->Window.Handle,
+            fgDisplay.RootWindow,
+            0, 0, &wx, &wy, &w);
+
+        *x = fgState.GameModeSize.X + wx;
+        *y = fgState.GameModeSize.Y + wy;
+#else
+        *x = glutGet ( GLUT_SCREEN_WIDTH );
+        *y = glutGet ( GLUT_SCREEN_HEIGHT );
+#endif
+    }
+    else
+    {
+        *x = fgDisplay.ScreenWidth;
+        *y = fgDisplay.ScreenHeight;
+    }
+}
+
+/*
  * Private function to check for the current menu/sub menu activity state
  */
 static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
@@ -215,23 +246,22 @@ static GLboolean fghCheckMenuStatus( SFG_Window* window, SFG_Menu* menu )
         {
             if ( ! menuEntry->SubMenu->IsActive )
             {
+                int max_x, max_y;
                 SFG_Window *current_window = fgStructure.CurrentWindow;
 
                 /* Set up the initial menu position now... */
                 menuEntry->SubMenu->IsActive = GL_TRUE;
 
                 /* Set up the initial submenu position now: */
+                fghGetVMaxExtent(menu->ParentWindow, &max_x, &max_y);
                 menuEntry->SubMenu->X = menu->X + menu->Width;
                 menuEntry->SubMenu->Y = menu->Y +
                     menuEntry->Ordinal * FREEGLUT_MENU_HEIGHT;
 
-                if( menuEntry->SubMenu->X + menuEntry->SubMenu->Width >
-                    glutGet( GLUT_SCREEN_WIDTH ) )
-                    menuEntry->SubMenu->X = menu->X -
-                        menuEntry->SubMenu->Width;
+                if( menuEntry->SubMenu->X + menuEntry->SubMenu->Width > max_x )
+                    menuEntry->SubMenu->X = menu->X - menuEntry->SubMenu->Width;
 
-                if( menuEntry->SubMenu->Y + menuEntry->SubMenu->Height >
-                    glutGet( GLUT_SCREEN_HEIGHT ) )
+                if( menuEntry->SubMenu->Y + menuEntry->SubMenu->Height > max_y )
                     menuEntry->SubMenu->Y -= ( menuEntry->SubMenu->Height -
                                                FREEGLUT_MENU_HEIGHT -
                                                2 * FREEGLUT_MENU_BORDER );
@@ -493,6 +523,8 @@ void fgDisplayMenu( void )
  */
 static void fghActivateMenu( SFG_Window* window, int button )
 {
+    int max_x, max_y;
+
     /* We'll be referencing this menu a lot, so remember its address: */
     SFG_Menu* menu = window->Menu[ button ];
 
@@ -507,8 +539,9 @@ static void fghActivateMenu( SFG_Window* window, int button )
     fgState.ActiveMenus++;
 
     /* Set up the initial menu position now: */
-    menu->X = window->State.MouseX + glutGet( GLUT_WINDOW_X );
-    menu->Y = window->State.MouseY + glutGet( GLUT_WINDOW_Y );
+    fghGetVMaxExtent(menu->ParentWindow, &max_x, &max_y);
+    menu->X = window->State.MouseX + max_x;
+    menu->Y = window->State.MouseY + max_y;
 
     if( menu->X + menu->Width > glutGet ( GLUT_SCREEN_WIDTH ) )
         menu->X -=menu->Width;
