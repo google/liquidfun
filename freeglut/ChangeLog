@@ -920,7 +920,24 @@ mouse pointers don't work) on the way:
      the case of GLUT_CURSOR_FULL_CROSSHAIR.
 
 **************************************************************************
-* Gap in log between January 3 and April 15, 2005.
+* Changes between January 3 and April 15, 2005.
+**************************************************************************
+(237) Moved the "#include "config.h"" statement to the header file
+
+(238) Changed the "assert" checks to more dignified statements that print
+      useful error messages before exiting.  Also added initialization
+      checking to all GLUT interface functions.
+
+(239) Changed some menu code around to remove duplicate code.
+
+(240) Implemented the ability to attach a menu to multiple windows.
+
+(241) Implemented the "GLUT_AUXn" color buffers for X11 and Windows
+
+(242) Improved the cursor handling marginally
+
+**************************************************************************
+* Changes on April 15, 2005.
 **************************************************************************
 (237) Changed some comments in "freeglut_internal.h" as a test for the new
       pCVSc project.
