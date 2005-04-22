@@ -41,7 +41,7 @@
  * apart from the windowing system version.
  */
 
-/* -- INTERNAL FUNCTIONS --------------------------------------------------- */
+/* -- PRIVATE FUNCTIONS --------------------------------------------------- */
 
 #if TARGET_HOST_UNIX_X11
 /*
@@ -104,16 +104,13 @@ static cursorCacheEntry cursorCache[] = {
 };
 #endif
 
-/* -- INTERFACE FUNCTIONS -------------------------------------------------- */
+/* -- INTERNAL FUNCTIONS ---------------------------------------------------- */
 
 /*
  * Set the cursor image to be used for the current window
  */
-void FGAPIENTRY glutSetCursor( int cursorID )
+void fgSetCursor ( SFG_Window *window, int cursorID )
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetCursor" );
-    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetCursor" );
-
 #if TARGET_HOST_UNIX_X11
     {
         Cursor cursor;
@@ -154,7 +151,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
             fgError( "Failed to create cursor" );
         }
         XDefineCursor( fgDisplay.Display,
-                       fgStructure.CurrentWindow->Window.Handle, cursor );
+                       window->Window.Handle, cursor );
     }
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
@@ -163,20 +160,20 @@ void FGAPIENTRY glutSetCursor( int cursorID )
      * This is a temporary solution only...
      */
     /* Set the cursor AND change it for this window class. */
-#       define MAP_CURSOR(a,b)                                          \
-        case a:                                                         \
-            SetCursor( LoadCursor( NULL, b ) );                         \
-            SetClassLong( fgStructure.CurrentWindow->Window.Handle,     \
-                          GCL_HCURSOR,                                  \
-                          ( LONG )LoadCursor( NULL, b ) );              \
+#       define MAP_CURSOR(a,b)                                   \
+        case a:                                                  \
+            SetCursor( LoadCursor( NULL, b ) );                  \
+            SetClassLong( window->Window.Handle,                 \
+                          GCL_HCURSOR,                           \
+                          ( LONG )LoadCursor( NULL, b ) );       \
         break;
 
     /* Nuke the cursor AND change it for this window class. */
-#       define ZAP_CURSOR(a,b)                                          \
-        case a:                                                         \
-            SetCursor( NULL );                                          \
-            SetClassLong( fgStructure.CurrentWindow->Window.Handle,     \
-                          GCL_HCURSOR, ( LONG )NULL );                  \
+#       define ZAP_CURSOR(a,b)                                   \
+        case a:                                                  \
+            SetCursor( NULL );                                   \
+            SetClassLong( window->Window.Handle,                 \
+                          GCL_HCURSOR, ( LONG )NULL );           \
         break;
 
     switch( cursorID )
@@ -211,7 +208,20 @@ void FGAPIENTRY glutSetCursor( int cursorID )
     }
 #endif
 
-    fgStructure.CurrentWindow->State.Cursor = cursorID;
+    window->State.Cursor = cursorID;
+}
+
+/* -- INTERFACE FUNCTIONS -------------------------------------------------- */
+
+/*
+ * Set the cursor image to be used for the current window
+ */
+void FGAPIENTRY glutSetCursor( int cursorID )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetCursor" );
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetCursor" );
+
+    fgSetCursor ( fgStructure.CurrentWindow, cursorID );
 }
 
 /*
