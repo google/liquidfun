@@ -939,5 +939,11 @@ mouse pointers don't work) on the way:
 **************************************************************************
 * Changes on April 15, 2005.
 **************************************************************************
-(237) Changed some comments in "freeglut_internal.h" as a test for the new
+(243) Changed some comments in "freeglut_internal.h" as a test for the new
       pCVSc project.
+
+(244) Changed the names of the "fgStructure.Window" and ".Menu" variables
+      to ".CurrentWindow" and ".CurrentMenu" to make maintenance easier.
+
+(245) Tried implementing Yuri D'Elia's game mode changes.
+
