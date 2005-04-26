@@ -540,13 +540,13 @@ static void fghActivateMenu( SFG_Window* window, int button )
 
     /* Set up the initial menu position now: */
     fghGetVMaxExtent(menu->ParentWindow, &max_x, &max_y);
-    menu->X = window->State.MouseX + max_x;
-    menu->Y = window->State.MouseY + max_y;
+    menu->X = window->State.MouseX + glutGet( GLUT_WINDOW_X );
+    menu->Y = window->State.MouseY + glutGet( GLUT_WINDOW_Y );
 
-    if( menu->X + menu->Width > glutGet ( GLUT_SCREEN_WIDTH ) )
+    if( menu->X + menu->Width > max_x )
         menu->X -=menu->Width;
 
-    if( menu->Y + menu->Height > glutGet ( GLUT_SCREEN_HEIGHT ) )
+    if( menu->Y + menu->Height > max_y )
         menu->Y -=menu->Height;
 
     fgSetWindow( menu->Window );
