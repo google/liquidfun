@@ -165,7 +165,7 @@ void fgAddToWindowDestroyList( SFG_Window* window )
      * to ensure that they are no longer called after this point.
      */
     {
-        FGCBDestroy destroy = FETCH_WCB( *window, Destroy );
+        FGCBDestroy destroy = (FGCBDestroy)FETCH_WCB( *window, Destroy );
         fghClearCallBacks( window );
         SET_WCB( *window, Destroy, destroy );
     }

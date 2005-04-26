@@ -403,7 +403,7 @@ do                                                             \
  * type.
  */
 #define FETCH_WCB(window,cbname) \
-    ((FGCB ## cbname)((window).CallBacks[CB_ ## cbname]))
+    ((window).CallBacks[CB_ ## cbname])
 
 /*
  * INVOKE_WCB() is used as:
@@ -424,15 +424,28 @@ do                                                             \
  * current window.
  *
  */
+#if TARGET_HOST_WIN32
+#define INVOKE_WCB(window,cbname,arg_list)    \
+do                                            \
+{                                             \
+    if( FETCH_WCB( window, cbname ) )         \
+    {                                         \
+        FGCB ## cbname func = (FGCB ## cbname)(FETCH_WCB( window, cbname )); \
+        fgSetWindow( &window );               \
+        func arg_list;                        \
+    }                                         \
+} while( 0 )
+#else
 #define INVOKE_WCB(window,cbname,arg_list)    \
 do                                            \
 {                                             \
     if( FETCH_WCB( window, cbname ) )         \
     {                                         \
         fgSetWindow( &window );               \
-        FETCH_WCB( window, cbname ) arg_list; \
+        ((FGCB ## cbname)FETCH_WCB( window, cbname )) arg_list; \
     }                                         \
 } while( 0 )
+#endif
 
 /*
  * The window callbacks the user can supply us with. Should be kept portable.
@@ -570,7 +583,7 @@ struct tagSFG_Structure
     SFG_List        WindowsToDestroy;
 
     SFG_Window*     CurrentWindow; /* The currently set window          */
-    SFG_Menu*       CurrentMenu;  /* Same, but menu...                  */
+    SFG_Menu*       CurrentMenu;   /* Same, but menu...                 */
 
     SFG_MenuContext* MenuContext; /* OpenGL rendering context for menus */
 
@@ -693,7 +706,7 @@ extern SFG_State fgState;
  * window set, respectively:
  */
 #define  FREEGLUT_EXIT_IF_NO_WINDOW( string )                   \
-  if ( ! fgStructure.CurrentWindow )                                   \
+  if ( ! fgStructure.CurrentWindow )                            \
   {                                                             \
     fgError ( " ERROR:  Function <%s> called"                   \
               " with no current window defined.", (string) ) ;  \
