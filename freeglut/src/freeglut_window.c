@@ -350,7 +350,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
 
-    if( window->IsMenu )
+    if( window->IsMenu || ( gameMode == GL_TRUE ) )
     {
         winAttr.override_redirect = True;
         mask |= CWOverrideRedirect;
