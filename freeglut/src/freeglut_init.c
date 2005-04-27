@@ -196,6 +196,9 @@ static void fghInitialize( const char* displayName )
         ReleaseDC( desktop, context );
     }
 
+    /* Set the timer granularity to 1 ms */
+    timeBeginPeriod ( 1 );
+
 #endif
 
     fgState.Initialised = GL_TRUE;
@@ -289,7 +292,6 @@ void fgDeinitialize( void )
         fgState.ProgramName = NULL;
     }
 
-
 #if TARGET_HOST_UNIX_X11
 
     /*
@@ -303,6 +305,11 @@ void fgDeinitialize( void )
      * created so far
      */
     XCloseDisplay( fgDisplay.Display );
+
+#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+
+    /* Reset the timer granularity */
+    timeEndPeriod ( 1 );
 
 #endif
 
