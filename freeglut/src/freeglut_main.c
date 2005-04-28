@@ -1265,6 +1265,16 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          */
         return 0;
 
+    /* XXX For a future patch:  we need a mouse entry event.  Unfortunately Windows
+     * XXX doesn't give us one, so we will probably need a "MouseInWindow" flag in
+     * XXX the SFG_Window structure.  Set it to true to begin with and then have the
+     * XXX WM_MOUSELEAVE code set it to false.  Then when we get a WM_MOUSEMOVE event,
+     * XXX if the flag is false we invoke the Entry callback and set the flag to true.
+     */
+    case 0x02a2:  /* This is the message we get when the mouse is leaving the window */
+        INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
+        break ;
+
     case WM_MOUSEMOVE:
     {
 #if TARGET_HOST_WINCE
