@@ -1,0 +1,60 @@
+Windows 32 / MSVC Notes
+=======================
+
+The "freeglut" library installation package comes with MSVC 6.0 workspace and
+project files.  The workspace has two projects:  "freeglut.dsp", which creates
+a DLL file, and "freeglut_static.dsp", which creates a static library.
+
+
+Building the Libraries
+======================
+
+To build the "freeglut" libraries, open MSVC and load the "freeglut" workspace.
+This will load the two projects.  Selecting "Build" - "Batch Build" from the
+menu will build both the debug and the release versions of both libraries.
+
+The libraries will be found in the following places and will have the following
+names:
+- DLL, debug version:  freeglut\freeglut\Debug\freeglut.lib
+- DLL, release version:  freeglut\freeglut\Release\freeglut.lib
+- Static, debug version:  freeglut\freeglut\DebugStatic\freeglut_static.lib
+- Static, release version:  freeglut\freeglut\ReleaseStatic\freeglut_static.lib
+
+Unlike the *nix release, the library names are NOT automatic replacements for
+the GLUT library names.  You may rename them manually if you wish.
+
+
+Installing the Libraries
+========================
+
+To install "freeglut" on your system so that your other projects will see it,
+you will need to copy various files to various locations.
+
+    - The header files "freeglut.h", "freeglut_ext.h", "freeglut_std.h", and
+      "glut.h" (distributed in the directory "freeglut\freeglut\include\GL")
+      need to be copied to a "GL" directory under the MSVC include directory.
+      The MSVC include directory generally has a path similar to
+              "C:\Program Files\Microsoft Visual Studio\VC98\Include"
+      The "GL" subdirectory under that will probably already have the header
+      files "gl.h", "glaux.h", and "glu.h".
+    - The library file "freeglut.lib" or "freeglut_static.lib" (from the
+      corresponding debug or release directory) needs to be copied into the
+      MSVC library directory.  This usually has a path similar to
+              "C:\Program Files\Microsoft Visual Studio\VC98\Lib"
+      Note that there is no "GL" subdirectory here.  This directory should
+      already have the files "opengl32.lib", "glu32.lib", and "glaux.lib".
+    - If you are using the DLL version of "freeglut", the file "freeglut.dll"
+      needs to be copied from the Debug or the Release directory into the
+      DLL directory.  This usually has a path similar to
+              "C:\Windows\System32"
+      and will probably already have the files "opengl32.dll" and "glu32.dll".
+
+
+If you don't have MSVC
+======================
+
+The "freeglut" developers' community discussed the possibility of distributing
+binaries and decided against it.  If you need Windows library files, please
+contact John F. Fay at <john.fay@eglin.af.mil> or put a request on the
+"freeglut" developers' mailing list <freeglut-developer@lists.sourceforge.net>.
+
