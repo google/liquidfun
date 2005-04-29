@@ -41,8 +41,11 @@
  * Initial defines from "js.h" starting around line 33 with the existing "freeglut_joystick.c"
  * interspersed
  */
-#define _JS_MAX_BUTTONS 32
 
+/* XXX It might be better to poll the operating system for the numbers of buttons and
+ * XXX axes and then dynamically allocate the arrays.
+ */
+#define _JS_MAX_BUTTONS 32
 
 #if TARGET_HOST_MACINTOSH
 #    define _JS_MAX_AXES  9
