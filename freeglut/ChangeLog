@@ -934,7 +934,8 @@ mouse pointers don't work) on the way:
 
 (241) Implemented the "GLUT_AUXn" color buffers for X11 and Windows
 
-(242) Improved the cursor handling marginally
+(242) Improved the cursor handling marginally; also removed some duplicate
+      cursor code
 
 **************************************************************************
 * Changes on April 15, 2005.
@@ -946,4 +947,28 @@ mouse pointers don't work) on the way:
       to ".CurrentWindow" and ".CurrentMenu" to make maintenance easier.
 
 (245) Tried implementing Yuri D'Elia's game mode changes.
+
+**************************************************************************
+* Changes in late April 2005
+**************************************************************************
+(246) Added French version of README (called LISEZ-MOI") and a Windows-specific
+      version of README describing how to operate under MSVC
+
+(247) Changed definitions of "FETCH_WCB" and "INVOKE_WCB" to allow compilation
+      with GCC 4.0
+
+(248) Changed the Makefile path to the "include" directory to allow for
+      off-directory compilation
+
+(249) Added some initializations and changed a hard-coded number of mouse
+      buttons to a defined constant
+
+(250) Added code to the Windows timing to allow for millisecond granularity
+      in the execution time
+
+(251) Fixed a reported bug in the fullscreen mode
+
+(252) Added window exit event handling to the Windows code; also put in a note
+      about adding window entry event handling
+
 
