@@ -436,7 +436,6 @@ static CFDictionaryRef fghJoystickGetCFProperties ( SFG_Joystick* joy, io_object
 static void fghJoystickEnumerateElements ( SFG_Joystick* joy, CFTypeRef element );
 /* callback for CFArrayApply */
 static void fghJoystickElementEnumerator ( SFG_Joystick* joy, void *element, void* vjs );
-static void fghJoystickParseElement ( SFG_Joystick* joy, CFDictionaryRef element );
 
 static void fghJoystickAddAxisElement ( SFG_Joystick* joy, CFDictionaryRef axis );
 static void fghJoystickAddButtonElement ( SFG_Joystick* joy, CFDictionaryRef button );
@@ -930,66 +929,6 @@ static void fghJoystickEnumerateElements ( SFG_Joystick *joy, CFTypeRef element 
       CFRange range = {0, CFArrayGetCount ((CFArrayRef)element)};
       CFArrayApplyFunction((CFArrayRef) element, range,
             &fghJoystickElementEnumerator, joy );
-}
-
-static void fghJoystickParseElement ( SFG_Joystick *joy, CFDictionaryRef element )
-{
-    CFTypeRef refPage = CFDictionaryGetValue ((CFDictionaryRef) element, CFSTR(kIOHIDElementUsagePageKey));
-    CFTypeRef refUsage = CFDictionaryGetValue ((CFDictionaryRef) element, CFSTR(kIOHIDElementUsageKey));
-
-    long type, page, usage;
-
-    CFNumberGetValue((CFNumberRef)
-        CFDictionaryGetValue ((CFDictionaryRef) element, CFSTR(kIOHIDElementTypeKey)),
-        kCFNumberLongType, &type);
-
-    switch ( type ) {
-    case kIOHIDElementTypeInput_Misc:
-    case kIOHIDElementTypeInput_Axis:
-    case kIOHIDElementTypeInput_Button:
-        printf("got input element...");
-        CFNumberGetValue( (CFNumberRef) refUsage, kCFNumberLongType, &usage );
-        CFNumberGetValue( (CFNumberRef) refPage, kCFNumberLongType, &page );
-
-        if (page == kHIDPage_GenericDesktop) {
-            switch ( usage ) /* look at usage to determine function */
-            {
-            case kHIDUsage_GD_X:
-            case kHIDUsage_GD_Y:
-            case kHIDUsage_GD_Z:
-            case kHIDUsage_GD_Rx:
-            case kHIDUsage_GD_Ry:
-            case kHIDUsage_GD_Rz:
-            case kHIDUsage_GD_Slider: /* for throttle / trim controls */
-                printf(" axis\n");
-                fghJoystickAddAxisElement((CFDictionaryRef) element);
-                break;
-
-            case kHIDUsage_GD_Hatswitch:
-                printf(" hat\n");
-                fghJoystickAddHatElement((CFDictionaryRef) element);
-                break;
-
-            default:
-                fgWarning ( "input type element has weird usage (%x)", usage);
-                break;
-            }
-        } else if (page == kHIDPage_Button) {
-            printf(" button\n");
-            fghJoystickAddButtonElement((CFDictionaryRef) element);
-        } else
-            fgWarning ( "input type element has weird page (%x)", page);
-        break;
-
-    case kIOHIDElementTypeCollection:
-        fghJoystickEnumerateElements (
-            CFDictionaryGetValue ( element, CFSTR(kIOHIDElementKey) )
-        );
-        break;
-
-    default:
-        break;
-    }
 }
 
 static void fghJoystickAddAxisElement ( SFG_Joystick *joy, CFDictionaryRef axis )
