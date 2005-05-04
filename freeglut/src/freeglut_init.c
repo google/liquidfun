@@ -60,7 +60,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GL_FALSE,              /* UseCurrentContext */
                       GL_FALSE,              /* GLDebugSwitch */
                       GL_FALSE,              /* XSyncSwitch */
-                      GL_TRUE,               /* KeyRepeat */
+                      GLUT_KEY_REPEAT_ON,    /* KeyRepeat */
                       0xffffffff,            /* Modifiers */
                       0,                     /* FPSInterval */
                       0,                     /* SwapCount */
@@ -265,7 +265,7 @@ void fgDeinitialize( void )
     fgState.ActionOnWindowClose = GLUT_ACTION_EXIT;
     fgState.ExecState           = GLUT_EXEC_STATE_INIT;
 
-    fgState.KeyRepeat       = GL_TRUE;
+    fgState.KeyRepeat       = GLUT_KEY_REPEAT_ON;
     fgState.Modifiers       = 0xffffffff;
 
     fgState.GameModeSize.X  = 640;
@@ -685,7 +685,6 @@ void FGAPIENTRY glutInitDisplayMode( unsigned int displayMode )
 
 /* -- INIT DISPLAY STRING PARSING ------------------------------------------ */
 
-#define NUM_TOKENS             36
 static char* Tokens[] =
 {
     "alpha", "acca", "acc", "blue", "buffer", "conformant", "depth", "double",
@@ -696,6 +695,7 @@ static char* Tokens[] =
     "xstaticgrey", "xgreyscale", "xstaticcolour", "xpseudocolour",
     "xtruecolour", "xdirectcolour", "borderless", "aux"
 };
+#define NUM_TOKENS             (sizeof(Tokens) / sizeof(*Tokens))
 
 void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 {
