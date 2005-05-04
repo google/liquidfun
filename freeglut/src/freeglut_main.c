@@ -777,12 +777,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
             fgState.Modifiers = fghGetXModifiers( &event );
 
-            /*
-             * Finally execute the mouse or mouse wheel callback
-             *
-             * XXX Use a symbolic constant, *not* "4"!  ("3, sire!")
-             */
-            if( ( button < 3 ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
+            /* Finally execute the mouse or mouse wheel callback */
+            if( ( button < glutDeviceGet ( GLUT_NUM_MOUSE_BUTTONS ) ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
                 INVOKE_WCB( *window, Mouse, ( button,
                                               pressed ? GLUT_DOWN : GLUT_UP,
                                               event.xbutton.x,
@@ -802,7 +798,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                  * XXX Note that {button} has already been decremeted
                  * XXX in mapping from X button numbering to GLUT.
                  */
-                int wheel_number = (button - 3) / 2;
+                int wheel_number = (button - glutDeviceGet ( GLUT_NUM_MOUSE_BUTTONS )) / 2;
                 int direction = -1;
                 if( button % 2 )
                     direction = 1;
