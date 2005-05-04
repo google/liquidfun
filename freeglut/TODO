@@ -4,7 +4,7 @@
 
 Issues in Freeglut (so we don't forget):
 
-(D) I'd like to change the names of the Windows target directories from names like "Debug__Win32_freeglut_static" (or something like that) to names like "DebugStatic".
+*fixed*(D) I'd like to change the names of the Windows target directories from names like "Debug__Win32_freeglut_static" (or something like that) to names like "DebugStatic".
 
 Issues that can Wait until 2.2.0:
 
@@ -16,13 +16,13 @@ Issues that can Wait until 2.2.0:
 
 (4) In the Atlantis demo modified to draw a solid torus instead of a mother whale, the torus is not shaded according to the lighting.  This is true with both GLUT and freeglut.  With freeglut, when you bring up a menu the shading used to turn on but doesn't any longer; with GLUT it never did and still does not.  Interestingly, if you change to a teapot it is shaded, but other geometric shapes are not shaded.
 
-(5) The "freeglut" wire cone does not look like the GLUT wire cone.  There are several differences, one of which is that the "freeglut" cone draws the base.
+*fixed*(5) The "freeglut" wire cone does not look like the GLUT wire cone.  There are several differences, one of which is that the "freeglut" cone draws the base.
 
-(6) With the "bluepony" demo under Windows, if you reshape the window using the mouse, the scene does not redraw until you move it with a keypress (arrow key or space bar to start the animation).  Check out the "CS_VREDRAW or CS_HREDRAW" sections in MSVC help for a pointer about this.
+*fixed*(6) With the "bluepony" demo under Windows, if you reshape the window using the mouse, the scene does not redraw until you move it with a keypress (arrow key or space bar to start the animation).  Check out the "CS_VREDRAW or CS_HREDRAW" sections in MSVC help for a pointer about this.
 
 (7) If you compare the "bounce" demo with freeglut and GLUT, you see that the "freeglut" lights are larger and dimmer (and don't shine on the walls) than the GLUT lights.
 
-(8) Large submenus in "freeglut" tend to cover their parent menus, making it difficult to get past them.  This is visible in the "geoface" demo.  In GLUT the menus can extend outside the window; "freeglut" should do the same thing.
+*fixed*(8) Large submenus in "freeglut" tend to cover their parent menus, making it difficult to get past them.  This is visible in the "geoface" demo.  In GLUT the menus can extend outside the window; "freeglut" should do the same thing.
 
 (9) In the "gliq" demo, the cones forming the ends of the arrows in the "select board" are lighted differently in "freeglut" than they are in GLUT.
 
@@ -31,13 +31,13 @@ Issues that can Wait until 2.2.0:
 
 *fixed*(11) We seem to have troubles with programs that use display lists.  Check out the "walker" demo and load a new curve set.  If you have the debugger going while it is loading, you get the new curves; otherwise you don't.  This has to do with the debugger hiding the freeglut window while the display list is being changed.  <This seems to have fixed itself.>
 
-(12) The "fgCleanUpGlutsMess" function seems to duplicate the "fgDestroyStructure" or "fgDeinitialize" function and should probably be removed.
+*fixed*(12) The "fgCleanUpGlutsMess" function seems to duplicate the "fgDestroyStructure" or "fgDeinitialize" function and should probably be removed.
 
-(13) The "G_LOG_DOMAIN" defined constants are never used.  Should we start using them in warning and error messages or should we delete them?
+*fixed*(13) The "G_LOG_DOMAIN" defined constants are never used.  Should we start using them in warning and error messages or should we delete them?
 
-(14) The "freeglut_internal.h" file on lines 45ff defines or undefines "G_DISABLE_ASSERT" and "G_DISABLE_CHECKS" but these are never used.  Shall we start using them or should we delete them?
+*fixed*(14) The "freeglut_internal.h" file on lines 45ff defines or undefines "G_DISABLE_ASSERT" and "G_DISABLE_CHECKS" but these are never used.  Shall we start using them or should we delete them?
 
-(15) P-GUIDE apparently calls the get and set window size functions repeatedly.  Each time it does, the window shrinks by 2 pixels in each direction.
+*fixed*(15) P-GUIDE apparently calls the get and set window size functions repeatedly.  Each time it does, the window shrinks by 2 pixels in each direction.
 
 (16) (for Don Heyse) We need to implement the "glutLayerGet ( GLUT_NORMAL_DAMAGED )" call.
 
@@ -92,11 +92,11 @@ Issues that can Wait until 2.2.0:
 
 (41) We need to keep the "freeglut" structure current (including the GLUT action on window closure) after the last window closes.  (Aleksandar Donev e-mail, 7/4/03, 5:00 PM).
 
-(42) Menus need to display in their own subwindow with a special menu OpenGL rendering context.  This will fix a wide range of menu-related bugs.
+*fixed*(42) Menus need to display in their own subwindow with a special menu OpenGL rendering context.  This will fix a wide range of menu-related bugs.
 
-(43) We need to keep the "freeglut" structure current (including the GLUT action on window closure) after the last window closes.
+*fixed*(43) We need to keep the "freeglut" structure current (including the GLUT action on window closure) after the last window closes.
 
-(44) The "freeglut" wire cone differs from the GLUT wire cone.  As a minimum, it draws the base where GLUT does not.  I would check the solid cone as well.
+*fixed*(44) The "freeglut" wire cone differs from the GLUT wire cone.  As a minimum, it draws the base where GLUT does not.  I would check the solid cone as well.
 
 (45) The different mouse pointers (crosshair, double pointer, etc.) do not get shown.
 

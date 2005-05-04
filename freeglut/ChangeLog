@@ -971,4 +971,22 @@ mouse pointers don't work) on the way:
 (252) Added window exit event handling to the Windows code; also put in a note
       about adding window entry event handling
 
+**************************************************************************
+* Changes in early May 2005 -- in the run-up to 2.4.0
+**************************************************************************
+(253) Added handling for negative position specifications for subwindows
+
+(254) Made the display string handling in "freeglut_init.c" ever so slightly
+      more general
+
+(255) Changed the key repeat flag initialization from "GL_TRUE" to
+      "GLUT_KEY_REPEAT_ON" to make it consistent with its use elsewhere.
+
+(256) Removed the unused joystick function "fghJoystickParseElement"
+
+(257) Added a comment to "glutCreateWindow" about why "freeglut" does not
+      match GLUT when "glutInit" is not called.
+
+
+
 

@@ -678,6 +678,32 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateSubWindow" );
     parent = fgWindowByID( parentID );
     freeglut_return_val_if_fail( parent != NULL, 0 );
+    if ( x < 0 )
+    {
+        x = parent->State.Width + x ;
+        if ( w >= 0 ) x -= w ;
+    }
+
+    if ( w < 0 ) w = parent->State.Width - x + w ;
+    if ( w < 0 )
+    {
+        x += w ;
+        w = -w ;
+    }
+
+    if ( y < 0 )
+    {
+        y = parent->State.Height + y ;
+        if ( h >= 0 ) y -= h ;
+    }
+
+    if ( h < 0 ) h = parent->State.Height - y + h ;
+    if ( h < 0 )
+    {
+        y += h ;
+        h = -h ;
+    }
+
     window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
     ret = window->ID;
 
