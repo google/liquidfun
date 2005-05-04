@@ -1,6 +1,6 @@
 LIBRARY freeglutdll
 DESCRIPTION "Freeglut OpenGL Utility Toolkit"
-VERSION 2.0
+VERSION 2.4.0
 EXPORTS
 	glutInit
 	glutInitWindowPosition
