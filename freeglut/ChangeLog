@@ -987,6 +987,11 @@ mouse pointers don't work) on the way:
 (257) Added a comment to "glutCreateWindow" about why "freeglut" does not
       match GLUT when "glutInit" is not called.
 
+(258) Removed an unused "Pixmap" variable
+
+(259) Changed the "shapes" demo to the OpenGLUT "shapes" demo, which is much
+      niftier.
+
 
 
 
