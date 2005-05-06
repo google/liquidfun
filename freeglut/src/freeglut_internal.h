@@ -385,8 +385,8 @@ typedef void (*SFG_Proc)();
 #define SET_WCB(window,cbname,func)                            \
 do                                                             \
 {                                                              \
-    if( FETCH_WCB( window, cbname ) != func )                  \
-        (((window).CallBacks[CB_ ## cbname]) = (SFG_Proc) func); \
+    if( FETCH_WCB( window, cbname ) != (SFG_Proc)(func) )      \
+        (((window).CallBacks[CB_ ## cbname]) = (SFG_Proc)(func)); \
 } while( 0 )
 
 /*

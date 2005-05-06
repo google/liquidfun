@@ -12,6 +12,7 @@
    Keys:
       -    <tt>Esc &nbsp;</tt> Quit
       -    <tt>q Q &nbsp;</tt> Quit
+      -    <tt>i I &nbsp;</tt> Show info
       -    <tt>= + &nbsp;</tt> Increase \a slices
       -    <tt>- _ &nbsp;</tt> Decreate \a slices
       -    <tt>, < &nbsp;</tt> Decreate \a stacks
@@ -41,7 +42,8 @@
 #include <stdlib.h>
 
 #ifdef WIN32
-#include <crtdbg.h>  // DUMP MEMORY LEAKS
+/* DUMP MEMORY LEAKS */
+#include <crtdbg.h>
 #endif
 
 /*
@@ -61,7 +63,7 @@ static double irad = .25;
 static double orad = 1.0;
 static int depth = 4;
 static double offset[ 3 ] = { 0, 0, 0 };
-
+static GLboolean show_info = GL_TRUE;
 
 /*
  * These one-liners draw particular objects, fetching appropriate
@@ -193,7 +195,7 @@ static void shapesPrintf (int row, int col, const char *fmt, ...)
               glutBitmapWidth(font, ' ') * col,
             - glutBitmapHeight(font) * (row+2) + viewport[3]
         );
-        glutBitmapString (font, buf);
+        glutBitmapString (font, (unsigned char*)buf);
 
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
@@ -226,8 +228,6 @@ static void display(void)
 
     glEnable(GL_LIGHTING);
 
-    printf ( "Shape %d slides %d stacks %d\n", function_index, slices, stacks ) ;
-
     glColor3d(1,0,0);
 
     glPushMatrix();
@@ -247,13 +247,17 @@ static void display(void)
     glDisable(GL_LIGHTING);
     glColor3d(0.1,0.1,0.4);
 
-/*    shapesPrintf (1, 3, "Shape PgUp PgDn: %s", table [function_index].name);
-    shapesPrintf (2, 3, " Slices +-: %d   Stacks <>: %d", slices, stacks);
-    shapesPrintf (3, 3, " nSides +-: %d   nRings <>: %d", slices, stacks);
-    shapesPrintf (4, 3, " Depth  (): %d", depth);
-    shapesPrintf (5, 3, " Outer radius  Up  Down : %f", orad);
-    shapesPrintf (6, 3, " Inner radius Left Right: %f", irad);
-*/
+    if( show_info ) {
+        shapesPrintf (1, 3, "Shape PgUp PgDn: %s", table [function_index].name);
+        shapesPrintf (2, 3, "Slices +-: %d   Stacks <>: %d", slices, stacks);
+        shapesPrintf (3, 3, "nSides +-: %d   nRings <>: %d", slices, stacks);
+        shapesPrintf (4, 3, "Depth  (): %d", depth);
+        shapesPrintf (5, 3, "Outer radius  Up  Down : %f", orad);
+        shapesPrintf (6, 3, "Inner radius Left Right: %f", irad);
+    } else {
+        printf ( "Shape %d slides %d stacks %d\n", function_index, slices, stacks ) ;
+    }
+
     glutSwapBuffers();
 }
 
@@ -266,6 +270,9 @@ key(unsigned char key, int x, int y)
     case 27 :
     case 'Q':
     case 'q': glutLeaveMainLoop () ;      break;
+
+    case 'I':
+    case 'i': show_info = ( show_info == GL_TRUE ) ? GL_FALSE : GL_TRUE; break;
 
     case '=':
     case '+': slices++;                   break;
@@ -376,7 +383,8 @@ main(int argc, char *argv[])
     glutMainLoop();
 
 #ifdef WIN32
-    _CrtDumpMemoryLeaks () ;  // DUMP MEMORY LEAK INFORMATION
+    /* DUMP MEMORY LEAK INFORMATION */
+    _CrtDumpMemoryLeaks () ;
 #endif
 
     return EXIT_SUCCESS;

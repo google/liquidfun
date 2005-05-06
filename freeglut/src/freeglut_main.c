@@ -858,13 +858,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
             if( event.type == KeyPress )
             {
-                keyboard_cb = FETCH_WCB( *window, Keyboard );
-                special_cb  = FETCH_WCB( *window, Special  );
+                keyboard_cb = (FGCBKeyboard)( FETCH_WCB( *window, Keyboard ));
+                special_cb  = (FGCBSpecial) ( FETCH_WCB( *window, Special  ));
             }
             else
             {
-                keyboard_cb = FETCH_WCB( *window, KeyboardUp );
-                special_cb  = FETCH_WCB( *window, SpecialUp  );
+                keyboard_cb = (FGCBKeyboard)( FETCH_WCB( *window, KeyboardUp ));
+                special_cb  = (FGCBSpecial) ( FETCH_WCB( *window, SpecialUp  ));
             }
 
             /* Is there a keyboard/special callback hooked for this window? */

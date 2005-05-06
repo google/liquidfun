@@ -992,6 +992,5 @@ mouse pointers don't work) on the way:
 (259) Changed the "shapes" demo to the OpenGLUT "shapes" demo, which is much
       niftier.
 
-
-
-
+(260) Necessary compilation fixes for newer GCCs (e.g. 3.3.5, 4.0).
+      Side effect: The shapes demo has a new 'i' key now.
