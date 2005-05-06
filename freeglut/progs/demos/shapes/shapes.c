@@ -94,9 +94,11 @@ static void drawSolidCone(void)                { glutSolidCone(1,1,slices,stacks
 static void drawWireCone(void)                 { glutWireCone(1,1,slices,stacks);              }
 static void drawSolidCylinder(void)            { glutSolidCylinder(1,1,slices,stacks);         }
 static void drawWireCylinder(void)             { glutWireCylinder(1,1,slices,stacks);          }
+
+#define RADIUS    1.0f
+
 static void drawSolidCuboctahedron(void)
 {
-#define RADIUS    1.0f
   glBegin( GL_TRIANGLES );
     glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS, RADIUS ); glVertex3d( RADIUS, 0.0, RADIUS );
     glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS,-RADIUS );
@@ -112,15 +114,35 @@ static void drawSolidCuboctahedron(void)
     glNormal3d( 1.0, 0.0, 0.0 ); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0,-RADIUS );
     glNormal3d(-1.0, 0.0, 0.0 ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0, RADIUS );
     glNormal3d( 0.0, 1.0, 0.0 ); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS,-RADIUS ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS, RADIUS );
-    glNormal3d( 0.0,-1.0, 0.0 ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS, RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS,-RADIUS );
+    glNormal3d( 0.0,-1.0, 0.0 ); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS, RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS,-RADIUS );
     glNormal3d( 0.0, 0.0, 1.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, RADIUS ); glVertex3d(-RADIUS, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, RADIUS );
     glNormal3d( 0.0, 0.0,-1.0 ); glVertex3d( RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS,-RADIUS ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS,-RADIUS );
   glEnd();
-#undef RADIUS
 }
+
 static void drawWireCuboctahedron(void)
 {
+  glBegin( GL_LINE_LOOP );
+    glNormal3d( 1.0, 0.0, 0.0 ); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0,-RADIUS );
+  glEnd();
+  glBegin( GL_LINE_LOOP );
+    glNormal3d(-1.0, 0.0, 0.0 ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0, RADIUS );
+  glEnd();
+  glBegin( GL_LINE_LOOP );
+    glNormal3d( 0.0, 1.0, 0.0 ); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS,-RADIUS ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS, RADIUS );
+  glEnd();
+  glBegin( GL_LINE_LOOP );
+    glNormal3d( 0.0,-1.0, 0.0 ); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS, RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS,-RADIUS );
+  glEnd();
+  glBegin( GL_LINE_LOOP );
+    glNormal3d( 0.0, 0.0, 1.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, RADIUS ); glVertex3d(-RADIUS, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, RADIUS );
+  glEnd();
+  glBegin( GL_LINE_LOOP );
+    glNormal3d( 0.0, 0.0,-1.0 ); glVertex3d( RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS,-RADIUS ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS,-RADIUS );
+  glEnd();
 }
+
+#undef RADIUS
 
 /*
  * This structure defines an entry in our function-table.

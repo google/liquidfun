@@ -994,3 +994,5 @@ mouse pointers don't work) on the way:
 
 (260) Necessary compilation fixes for newer GCCs (e.g. 3.3.5, 4.0).
       Side effect: The shapes demo has a new 'i' key now.
+
+(261) Fixed a cuboctahedron vertex, implemented wire mode for that shape.
