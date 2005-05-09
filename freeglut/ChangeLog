@@ -996,3 +996,7 @@ mouse pointers don't work) on the way:
       Side effect: The shapes demo has a new 'i' key now.
 
 (261) Fixed a cuboctahedron vertex, implemented wire mode for that shape.
+
+**************************************************************************
+* 8 May 2004 -- 2.4.0 Release Candidate 1 Released
+**************************************************************************
