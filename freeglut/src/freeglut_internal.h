@@ -543,6 +543,8 @@ struct tagSFG_MenuEntry
 /*
  * A window, making part of freeglut windows hierarchy.
  * Should be kept portable.
+ *
+ * NOTE that ActiveMenu is set to menu itself if the window is a menu.
  */
 struct tagSFG_Window
 {
@@ -813,6 +815,7 @@ SFG_Menu* fgMenuByID( int menuID );
  * The menu activation and deactivation the code. This is the meat
  * of the menu user interface handling code...
  */
+void fgUpdateMenuHighlight ( SFG_Menu *menu );
 GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
                               int mouse_x, int mouse_y );
 void fgDeactivateMenu( SFG_Window *window );

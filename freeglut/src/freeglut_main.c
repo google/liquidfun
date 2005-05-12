@@ -592,6 +592,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 if( ( width != window->State.OldWidth ) ||
                     ( height != window->State.OldHeight ) )
                 {
+                    SFG_Window *current_window = fgStructure.CurrentWindow;
+
                     window->State.OldWidth = width;
                     window->State.OldHeight = height;
                     if( FETCH_WCB( *window, Reshape ) )
@@ -602,6 +604,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
                         glViewport( 0, 0, width, height );
                     }
                     glutPostRedisplay( );
+                    if( window->IsMenu )
+                        fgSetWindow( current_window );
                 }
             }
             break;
@@ -628,8 +632,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             if( event.xexpose.count == 0 )
             {
                 GETWINDOW( xexpose );
-                fgSetWindow( window );
-                glutPostRedisplay( );
+                window->State.Redisplay = GL_TRUE;
             }
             break;
 
@@ -695,6 +698,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case LeaveNotify:
             GETWINDOW( xcrossing );
             GETMOUSE( xcrossing );
+            if( ( event.type == LeaveNotify ) && window->IsMenu &&
+                window->ActiveMenu && window->ActiveMenu->IsActive )
+                fgUpdateMenuHighlight( window->ActiveMenu );
+
             INVOKE_WCB( *window, Entry, ( ( EnterNotify == event.type ) ?
                                           GLUT_ENTERED :
                                           GLUT_LEFT ) );
@@ -714,8 +721,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     window->ActiveMenu->Window->State.MouseY =
                         event.xmotion.y_root - window->ActiveMenu->Y;
                 }
-                window->ActiveMenu->Window->State.Redisplay = GL_TRUE ;
-                fgSetWindow( window->ActiveMenu->ParentWindow );
+
+                fgUpdateMenuHighlight( window->ActiveMenu );
 
                 break;
             }
@@ -1056,7 +1063,13 @@ void FGAPIENTRY glutMainLoop( void )
         else
         {
             if( fgState.IdleCallback )
+            {
+                if( fgStructure.CurrentWindow &&
+                    fgStructure.CurrentWindow->IsMenu )
+                    /* fail safe */
+                    fgSetWindow( window );
                 fgState.IdleCallback( );
+            }
 
             fghSleepForEvents( );
         }
@@ -1272,6 +1285,10 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
      * XXX if the flag is false we invoke the Entry callback and set the flag to true.
      */
     case 0x02a2:  /* This is the message we get when the mouse is leaving the window */
+        if( window->IsMenu &&
+            window->ActiveMenu && window->ActiveMenu->IsActive )
+            fgUpdateMenuHighlight( window->ActiveMenu );
+
         INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
         break ;
 
@@ -1291,8 +1308,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         if ( window->ActiveMenu )
         {
-            window->State.Redisplay = GL_TRUE;
-            fgSetWindow ( window->ActiveMenu->ParentWindow );
+            fgUpdateMenuHighlight( window->ActiveMenu );
             break;
         }
 
