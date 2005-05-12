@@ -1000,3 +1000,7 @@ mouse pointers don't work) on the way:
 **************************************************************************
 * 8 May 2004 -- 2.4.0 Release Candidate 1 Released
 **************************************************************************
+(262) Fixed the "vfprintf" for Windows so that error messages get printed
+      out again
+
+(263) Implemented Takeshi Nishimura's menu fixes.  Menus should work now.
