@@ -29,12 +29,16 @@
 #include "freeglut_internal.h"
 #include <errno.h>
 #include <stdarg.h>
-#if HAVE_VPRINTF
+#if TARGET_HOST_WIN32
 #    define VFPRINTF(s,f,a) vfprintf((s),(f),(a))
-#elif HAVE_DOPRNT
-#    define VFPRINTF(s,f,a) _doprnt((f),(a),(s))
 #else
-#    define VFPRINTF(s,f,a)
+#    if HAVE_VPRINTF
+#        define VFPRINTF(s,f,a) vfprintf((s),(f),(a))
+#    elif HAVE_DOPRNT
+#        define VFPRINTF(s,f,a) _doprnt((f),(a),(s))
+#    else
+#        define VFPRINTF(s,f,a)
+#    endif
 #endif
 
 #if TARGET_HOST_WINCE
