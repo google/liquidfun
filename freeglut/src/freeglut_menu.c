@@ -110,7 +110,6 @@ static SFG_MenuEntry *fghFindMenuEntry( SFG_Menu* menu, int index )
  */
 static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
 {
-    SFG_Window *current_window = fgStructure.CurrentWindow;
     SFG_MenuEntry *subMenuIter;
     /* Hide the present menu's window */
     fgSetWindow( menuEntry->SubMenu->Window );
@@ -675,7 +674,6 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
  */
 void fgDeactivateMenu( SFG_Window *window )
 {
-    SFG_Window *current_window = fgStructure.CurrentWindow;
     SFG_Window *parent_window = NULL;
 
     /* Check if there is an active menu attached to this window... */
