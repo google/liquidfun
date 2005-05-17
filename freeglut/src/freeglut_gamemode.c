@@ -302,72 +302,55 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
-    unsigned int    displayModes = 0, mode = 0xffffffff;
-    /* HDC      desktopDC; */
     DEVMODE  devMode;
+    char fggmstr[255]="";
 
-    /*
-     * Enumerate the available display modes
-     * Try to get a complete match
-     */
-    while( EnumDisplaySettings( NULL, displayModes, &devMode ) )
+    success = GL_FALSE;
+
+    EnumDisplaySettings( NULL, -1, &devMode ); 
+    devMode.dmFields |= DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
+
+    devMode.dmPelsWidth  = fgState.GameModeSize.X;
+    devMode.dmPelsHeight = fgState.GameModeSize.Y;
+    devMode.dmBitsPerPel = fgState.GameModeDepth;
+    devMode.dmDisplayFrequency = fgState.GameModeRefresh;
+    devMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
+
+    switch ( ChangeDisplaySettingsEx(NULL, &devMode, NULL, haveToTest ? CDS_TEST : CDS_FULLSCREEN , NULL) )
     {
-        /* Does the enumerated display mode match the user's preferences? */
-        if( fghCheckDisplayMode( devMode.dmPelsWidth,  devMode.dmPelsHeight,
-                                 devMode.dmBitsPerPel,
-                                 devMode.dmDisplayFrequency ) )
-        {
-            mode = displayModes;
-            break;
-        }
-        displayModes++;
+    case DISP_CHANGE_SUCCESSFUL:
+        success = GL_TRUE;
+
+        // update vars in case if windows switched to proper mode
+        EnumDisplaySettings( NULL, FREEGLUT_ENUM_CURRENT_SETTINGS, &devMode );
+        fgState.GameModeSize.X  = devMode.dmPelsWidth;        
+        fgState.GameModeSize.Y  = devMode.dmPelsHeight;
+        fgState.GameModeDepth   = devMode.dmBitsPerPel;
+        fgState.GameModeRefresh = devMode.dmDisplayFrequency;
+		break;
+    case DISP_CHANGE_RESTART:
+        strcpy(fggmstr,"The computer must be restarted for the graphics mode to work.");
+        break;
+    case DISP_CHANGE_BADFLAGS:
+        strcpy(fggmstr,"An invalid set of flags was passed in.");
+        break;
+    case DISP_CHANGE_BADPARAM:
+        strcpy(fggmstr,"An invalid parameter was passed in. This can include an invalid flag or combination of flags.");
+        break;
+    case DISP_CHANGE_FAILED:
+        strcpy(fggmstr,"The display driver failed the specified graphics mode.");
+        break;
+    case DISP_CHANGE_BADMODE:
+        strcpy(fggmstr,"The graphics mode is not supported.");
+        break;
+    default:
+        strcpy(fggmstr,"Unknown error in graphics mode???"); /* dunno if it is possible,MSDN does not mention any other error */
+        break;
     }
 
-    if( mode == 0xffffffff )
-    {
-        /* then try without Display Frequency */
-        displayModes = 0;
-
-        /* Enumerate the available display modes */
-        while( EnumDisplaySettings( NULL, displayModes, &devMode ) )
-        {
-            /* then try without Display Frequency */
-            if( fghCheckDisplayMode( devMode.dmPelsWidth,
-                                     devMode.dmPelsHeight,
-                                     devMode.dmBitsPerPel,
-                                     fgState.GameModeRefresh ) )
-            {
-                mode = displayModes;
-                break;
-            }
-            displayModes++;
-        }
-    }
-
-    /* Did we find a matching display mode? */
-    if( mode != 0xffffffff )
-    {
-        int retVal = DISP_CHANGE_SUCCESSFUL;
-
-        /* Mark the values we want to modify in the display change call */
-        devMode.dmFields |=
-            DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
-
-        retVal = ChangeDisplaySettings( &devMode, haveToTest ? CDS_TEST : 0 );
-
-        /* I don't know if it's really needed, but looks nice: */
-        success = (retVal == DISP_CHANGE_SUCCESSFUL) ||
-            (retVal == DISP_CHANGE_NOTUPDATED);
-
-        if( !haveToTest && success )
-        {
-            fgState.GameModeSize.X  = devMode.dmPelsWidth;
-            fgState.GameModeSize.Y  = devMode.dmPelsHeight;
-            fgState.GameModeDepth   = devMode.dmBitsPerPel;
-            fgState.GameModeRefresh = devMode.dmDisplayFrequency;
-        }
-    }
-
+    if ( !success )
+        fgWarning(fggmstr); /* I'd rather get info whats going on in my program than wonder about */
+                            /* magic happenings behind my back, its lib for devels at last ;) */
 #endif
 
     return success;
@@ -433,6 +416,9 @@ int FGAPIENTRY glutEnterGameMode( void )
         NULL, "FREEGLUT", 0, 0,
         fgState.GameModeSize.X, fgState.GameModeSize.Y, GL_TRUE, GL_FALSE
     );
+
+    fgStructure.GameMode->State.Width  = fgState.GameModeSize.X;
+    fgStructure.GameMode->State.Height = fgState.GameModeSize.Y;
 
     fgStructure.GameMode->State.IsGameMode = GL_TRUE;
 
