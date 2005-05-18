@@ -303,7 +303,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
 
     DEVMODE  devMode;
-    char fggmstr[255]="";
+    char *fggmstr = NULL;
 
     success = GL_FALSE;
 
@@ -321,7 +321,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     case DISP_CHANGE_SUCCESSFUL:
         success = GL_TRUE;
 
-        // update vars in case if windows switched to proper mode
+        /* update vars in case if windows switched to proper mode */
         EnumDisplaySettings( NULL, FREEGLUT_ENUM_CURRENT_SETTINGS, &devMode );
         fgState.GameModeSize.X  = devMode.dmPelsWidth;        
         fgState.GameModeSize.Y  = devMode.dmPelsHeight;
@@ -329,22 +329,22 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         fgState.GameModeRefresh = devMode.dmDisplayFrequency;
 		break;
     case DISP_CHANGE_RESTART:
-        strcpy(fggmstr,"The computer must be restarted for the graphics mode to work.");
+        fggmstr = "The computer must be restarted for the graphics mode to work.";
         break;
     case DISP_CHANGE_BADFLAGS:
-        strcpy(fggmstr,"An invalid set of flags was passed in.");
+        fggmstr = "An invalid set of flags was passed in.";
         break;
     case DISP_CHANGE_BADPARAM:
-        strcpy(fggmstr,"An invalid parameter was passed in. This can include an invalid flag or combination of flags.");
+        fggmstr = "An invalid parameter was passed in. This can include an invalid flag or combination of flags.";
         break;
     case DISP_CHANGE_FAILED:
-        strcpy(fggmstr,"The display driver failed the specified graphics mode.");
+        fggmstr = "The display driver failed the specified graphics mode.";
         break;
     case DISP_CHANGE_BADMODE:
-        strcpy(fggmstr,"The graphics mode is not supported.");
+        fggmstr = "The graphics mode is not supported.";
         break;
     default:
-        strcpy(fggmstr,"Unknown error in graphics mode???"); /* dunno if it is possible,MSDN does not mention any other error */
+        fggmstr = "Unknown error in graphics mode???"; /* dunno if it is possible,MSDN does not mention any other error */
         break;
     }
 
