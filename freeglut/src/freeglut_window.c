@@ -462,6 +462,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         &wmHints,
         NULL
     );
+    XFree( textProperty.value );
 
     XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
                      &fgDisplay.DeleteWindow, 1 );
