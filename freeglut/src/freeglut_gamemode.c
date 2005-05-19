@@ -210,8 +210,11 @@ static void fghRestoreState( void )
 #endif
 }
 
+#if TARGET_HOST_UNIX_X11
+#ifdef X_XF86VidModeGetAllModeLines
+
 /*
- * Checks the display mode settings against user's preferences
+ * Checks a single display mode settings against user's preferences.
  */
 static GLboolean fghCheckDisplayMode( int width, int height, int depth, int refresh )
 {
@@ -219,8 +222,34 @@ static GLboolean fghCheckDisplayMode( int width, int height, int depth, int refr
     return ( width == fgState.GameModeSize.X ) &&
            ( height == fgState.GameModeSize.Y ) &&
            ( depth == fgState.GameModeDepth ) &&
-           (refresh == fgState.GameModeRefresh );
+           ( refresh == fgState.GameModeRefresh );
 }
+
+/*
+ * Checks all display modes settings against user's preferences.
+ * Returns the mode number found or -1 if none could be found.
+ */
+static int fghCheckDisplayModes( GLboolean exactMatch, int displayModesCount, XF86VidModeModeInfo** displayModes )
+{
+    int i;
+    for( i = 0; i < displayModesCount; i++ )
+    {
+        /* Compute the displays refresh rate, dotclock comes in kHz. */
+        int refresh = ( displayModes[ i ]->dotclock * 1000 ) /
+                      ( displayModes[ i ]->htotal * displayModes[ i ]->vtotal );
+
+        if( fghCheckDisplayMode( displayModes[ i ]->hdisplay,
+                                 displayModes[ i ]->vdisplay,
+                                 fgState.GameModeDepth,
+                                 ( exactMatch ? refresh : fgState.GameModeRefresh ) ) ) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+#endif
+#endif
 
 /*
  * Changes the current display mode to match user's settings
@@ -243,7 +272,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     if( haveToTest || fgDisplay.DisplayModeValid )
     {
         XF86VidModeModeInfo** displayModes;
-        int i, ignoreRefreshRate, displayModesCount;
+        int i, displayModesCount;
 
         if( !XF86VidModeGetAllModeLines(
                  fgDisplay.Display,
@@ -260,24 +289,11 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
          * Check every of the modes looking for one that matches our demands,
          * ignoring the refresh rate if no exact match could be found.
          */
-        for( ignoreRefreshRate = 0;
-             !success && ( ignoreRefreshRate <= 1 );
-             ignoreRefreshRate++)
-        {
-            for( i = 0;
-                 !success && ( i < displayModesCount );
-                 i++ )
-            {
-                /* Compute the displays refresh rate, dotclock comes in kHz. */
-                int refresh = ( displayModes[ i ]->dotclock * 1000 ) /
-                              ( displayModes[ i ]->htotal * displayModes[ i ]->vtotal );
-
-                success = fghCheckDisplayMode( displayModes[ i ]->hdisplay,
-                                               displayModes[ i ]->vdisplay,
-                                               fgState.GameModeDepth,
-                                               ( ignoreRefreshRate ? fgState.GameModeRefresh : refresh ) );
-            }
+        i = fghCheckDisplayModes( GL_TRUE, displayModesCount, displayModes );
+        if( i < 0 ) {
+            i = fghCheckDisplayModes( GL_FALSE, displayModesCount, displayModes );
         }
+        success = ( i < 0 ) ? GL_FALSE : GL_TRUE;
 
         if( !haveToTest && success ) {
             if( !XF86VidModeSwitchToMode(
