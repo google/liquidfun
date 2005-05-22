@@ -2,9 +2,12 @@
 
 AC_INIT([freeglut library], [2.3.9], [freeglut-bugs@lists.sourceforge.net], [freeglut])
 AM_INIT_AUTOMAKE
-AC_PREREQ([2.58])
+AC_PREREQ([2.56])
 AC_CONFIG_SRCDIR([AUTHORS])
 AC_CONFIG_HEADERS([config.h])
+
+# Compatibility hack for older autoconf versions
+m4_ifdef([AS_HELP_STRING], [], [AC_DEFUN([AS_HELP_STRING], [AC_HELP_STRING($][@)])])
 
 # Checks for programs.
 AC_PROG_CC
