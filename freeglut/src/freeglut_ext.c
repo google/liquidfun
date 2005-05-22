@@ -29,168 +29,170 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-struct name_address_pair
+static GLUTproc fghGetProcAddress( const char* procName )
 {
-    const char *name;
-    GLUTproc address;
-};
+    /* optimization: quick initial check */
+    if( strncmp( procName, "glut", 4 ) != 0 )
+        return NULL;
 
-static struct name_address_pair glut_functions[] =
-{
-   { "glutInit", (GLUTproc) glutInit },
-   { "glutInitDisplayMode", (GLUTproc) glutInitDisplayMode },
-   { "glutInitDisplayString", (GLUTproc) glutInitDisplayString },
-   { "glutInitWindowPosition", (GLUTproc) glutInitWindowPosition },
-   { "glutInitWindowSize", (GLUTproc) glutInitWindowSize },
-   { "glutMainLoop", (GLUTproc) glutMainLoop },
-   { "glutCreateWindow", (GLUTproc) glutCreateWindow },
-   { "glutCreateSubWindow", (GLUTproc) glutCreateSubWindow },
-   { "glutDestroyWindow", (GLUTproc) glutDestroyWindow },
-   { "glutPostRedisplay", (GLUTproc) glutPostRedisplay },
-   { "glutPostWindowRedisplay", (GLUTproc) glutPostWindowRedisplay },
-   { "glutSwapBuffers", (GLUTproc) glutSwapBuffers },
-   { "glutGetWindow", (GLUTproc) glutGetWindow },
-   { "glutSetWindow", (GLUTproc) glutSetWindow },
-   { "glutSetWindowTitle", (GLUTproc) glutSetWindowTitle },
-   { "glutSetIconTitle", (GLUTproc) glutSetIconTitle },
-   { "glutPositionWindow", (GLUTproc) glutPositionWindow },
-   { "glutReshapeWindow", (GLUTproc) glutReshapeWindow },
-   { "glutPopWindow", (GLUTproc) glutPopWindow },
-   { "glutPushWindow", (GLUTproc) glutPushWindow },
-   { "glutIconifyWindow", (GLUTproc) glutIconifyWindow },
-   { "glutShowWindow", (GLUTproc) glutShowWindow },
-   { "glutHideWindow", (GLUTproc) glutHideWindow },
-   { "glutFullScreen", (GLUTproc) glutFullScreen },
-   { "glutSetCursor", (GLUTproc) glutSetCursor },
-   { "glutWarpPointer", (GLUTproc) glutWarpPointer },
-   { "glutEstablishOverlay", (GLUTproc) glutEstablishOverlay },
-   { "glutRemoveOverlay", (GLUTproc) glutRemoveOverlay },
-   { "glutUseLayer", (GLUTproc) glutUseLayer },
-   { "glutPostOverlayRedisplay", (GLUTproc) glutPostOverlayRedisplay },
-   { "glutPostWindowOverlayRedisplay", (GLUTproc) glutPostWindowOverlayRedisplay },
-   { "glutShowOverlay", (GLUTproc) glutShowOverlay },
-   { "glutHideOverlay", (GLUTproc) glutHideOverlay },
-   { "glutCreateMenu", (GLUTproc) glutCreateMenu },
-   { "glutDestroyMenu", (GLUTproc) glutDestroyMenu },
-   { "glutGetMenu", (GLUTproc) glutGetMenu },
-   { "glutSetMenu", (GLUTproc) glutSetMenu },
-   { "glutAddMenuEntry", (GLUTproc) glutAddMenuEntry },
-   { "glutAddSubMenu", (GLUTproc) glutAddSubMenu },
-   { "glutChangeToMenuEntry", (GLUTproc) glutChangeToMenuEntry },
-   { "glutChangeToSubMenu", (GLUTproc) glutChangeToSubMenu },
-   { "glutRemoveMenuItem", (GLUTproc) glutRemoveMenuItem },
-   { "glutAttachMenu", (GLUTproc) glutAttachMenu },
-   { "glutDetachMenu", (GLUTproc) glutDetachMenu },
-   { "glutDisplayFunc", (GLUTproc) glutDisplayFunc },
-   { "glutReshapeFunc", (GLUTproc) glutReshapeFunc },
-   { "glutKeyboardFunc", (GLUTproc) glutKeyboardFunc },
-   { "glutMouseFunc", (GLUTproc) glutMouseFunc },
-   { "glutMotionFunc", (GLUTproc) glutMotionFunc },
-   { "glutPassiveMotionFunc", (GLUTproc) glutPassiveMotionFunc },
-   { "glutEntryFunc", (GLUTproc) glutEntryFunc },
-   { "glutVisibilityFunc", (GLUTproc) glutVisibilityFunc },
-   { "glutIdleFunc", (GLUTproc) glutIdleFunc },
-   { "glutTimerFunc", (GLUTproc) glutTimerFunc },
-   { "glutMenuStateFunc", (GLUTproc) glutMenuStateFunc },
-   { "glutSpecialFunc", (GLUTproc) glutSpecialFunc },
-   { "glutSpaceballMotionFunc", (GLUTproc) glutSpaceballMotionFunc },
-   { "glutSpaceballRotateFunc", (GLUTproc) glutSpaceballRotateFunc },
-   { "glutSpaceballButtonFunc", (GLUTproc) glutSpaceballButtonFunc },
-   { "glutButtonBoxFunc", (GLUTproc) glutButtonBoxFunc },
-   { "glutDialsFunc", (GLUTproc) glutDialsFunc },
-   { "glutTabletMotionFunc", (GLUTproc) glutTabletMotionFunc },
-   { "glutTabletButtonFunc", (GLUTproc) glutTabletButtonFunc },
-   { "glutMenuStatusFunc", (GLUTproc) glutMenuStatusFunc },
-   { "glutOverlayDisplayFunc", (GLUTproc) glutOverlayDisplayFunc },
-   { "glutWindowStatusFunc", (GLUTproc) glutWindowStatusFunc },
-   { "glutKeyboardUpFunc", (GLUTproc) glutKeyboardUpFunc },
-   { "glutSpecialUpFunc", (GLUTproc) glutSpecialUpFunc },
+#define CHECK_NAME(x) if( strcmp( procName, #x ) == 0) return (GLUTproc)x;
+    CHECK_NAME(glutInit);
+    CHECK_NAME(glutInitDisplayMode);
+    CHECK_NAME(glutInitDisplayString);
+    CHECK_NAME(glutInitWindowPosition);
+    CHECK_NAME(glutInitWindowSize);
+    CHECK_NAME(glutMainLoop);
+    CHECK_NAME(glutCreateWindow);
+    CHECK_NAME(glutCreateSubWindow);
+    CHECK_NAME(glutDestroyWindow);
+    CHECK_NAME(glutPostRedisplay);
+    CHECK_NAME(glutPostWindowRedisplay);
+    CHECK_NAME(glutSwapBuffers);
+    CHECK_NAME(glutGetWindow);
+    CHECK_NAME(glutSetWindow);
+    CHECK_NAME(glutSetWindowTitle);
+    CHECK_NAME(glutSetIconTitle);
+    CHECK_NAME(glutPositionWindow);
+    CHECK_NAME(glutReshapeWindow);
+    CHECK_NAME(glutPopWindow);
+    CHECK_NAME(glutPushWindow);
+    CHECK_NAME(glutIconifyWindow);
+    CHECK_NAME(glutShowWindow);
+    CHECK_NAME(glutHideWindow);
+    CHECK_NAME(glutFullScreen);
+    CHECK_NAME(glutSetCursor);
+    CHECK_NAME(glutWarpPointer);
+    CHECK_NAME(glutEstablishOverlay);
+    CHECK_NAME(glutRemoveOverlay);
+    CHECK_NAME(glutUseLayer);
+    CHECK_NAME(glutPostOverlayRedisplay);
+    CHECK_NAME(glutPostWindowOverlayRedisplay);
+    CHECK_NAME(glutShowOverlay);
+    CHECK_NAME(glutHideOverlay);
+    CHECK_NAME(glutCreateMenu);
+    CHECK_NAME(glutDestroyMenu);
+    CHECK_NAME(glutGetMenu);
+    CHECK_NAME(glutSetMenu);
+    CHECK_NAME(glutAddMenuEntry);
+    CHECK_NAME(glutAddSubMenu);
+    CHECK_NAME(glutChangeToMenuEntry);
+    CHECK_NAME(glutChangeToSubMenu);
+    CHECK_NAME(glutRemoveMenuItem);
+    CHECK_NAME(glutAttachMenu);
+    CHECK_NAME(glutDetachMenu);
+    CHECK_NAME(glutDisplayFunc);
+    CHECK_NAME(glutReshapeFunc);
+    CHECK_NAME(glutKeyboardFunc);
+    CHECK_NAME(glutMouseFunc);
+    CHECK_NAME(glutMotionFunc);
+    CHECK_NAME(glutPassiveMotionFunc);
+    CHECK_NAME(glutEntryFunc);
+    CHECK_NAME(glutVisibilityFunc);
+    CHECK_NAME(glutIdleFunc);
+    CHECK_NAME(glutTimerFunc);
+    CHECK_NAME(glutMenuStateFunc);
+    CHECK_NAME(glutSpecialFunc);
+    CHECK_NAME(glutSpaceballMotionFunc);
+    CHECK_NAME(glutSpaceballRotateFunc);
+    CHECK_NAME(glutSpaceballButtonFunc);
+    CHECK_NAME(glutButtonBoxFunc);
+    CHECK_NAME(glutDialsFunc);
+    CHECK_NAME(glutTabletMotionFunc);
+    CHECK_NAME(glutTabletButtonFunc);
+    CHECK_NAME(glutMenuStatusFunc);
+    CHECK_NAME(glutOverlayDisplayFunc);
+    CHECK_NAME(glutWindowStatusFunc);
+    CHECK_NAME(glutKeyboardUpFunc);
+    CHECK_NAME(glutSpecialUpFunc);
 #if !TARGET_HOST_WINCE
-   { "glutJoystickFunc", (GLUTproc) glutJoystickFunc },
+    CHECK_NAME(glutJoystickFunc);
 #endif /* !TARGET_HOST_WINCE */
-   { "glutSetColor", (GLUTproc) glutSetColor },
-   { "glutGetColor", (GLUTproc) glutGetColor },
-   { "glutCopyColormap", (GLUTproc) glutCopyColormap },
-   { "glutGet", (GLUTproc) glutGet },
-   { "glutDeviceGet", (GLUTproc) glutDeviceGet },
-   { "glutExtensionSupported", (GLUTproc) glutExtensionSupported },
-   { "glutGetModifiers", (GLUTproc) glutGetModifiers },
-   { "glutLayerGet", (GLUTproc) glutLayerGet },
-   { "glutBitmapCharacter", (GLUTproc) glutBitmapCharacter },
-   { "glutBitmapWidth", (GLUTproc) glutBitmapWidth },
-   { "glutStrokeCharacter", (GLUTproc) glutStrokeCharacter },
-   { "glutStrokeWidth", (GLUTproc) glutStrokeWidth },
-   { "glutBitmapLength", (GLUTproc) glutBitmapLength },
-   { "glutStrokeLength", (GLUTproc) glutStrokeLength },
-   { "glutWireSphere", (GLUTproc) glutWireSphere },
-   { "glutSolidSphere", (GLUTproc) glutSolidSphere },
-   { "glutWireCone", (GLUTproc) glutWireCone },
-   { "glutSolidCone", (GLUTproc) glutSolidCone },
-   { "glutWireCube", (GLUTproc) glutWireCube },
-   { "glutSolidCube", (GLUTproc) glutSolidCube },
-   { "glutWireTorus", (GLUTproc) glutWireTorus },
-   { "glutSolidTorus", (GLUTproc) glutSolidTorus },
-   { "glutWireDodecahedron", (GLUTproc) glutWireDodecahedron },
-   { "glutSolidDodecahedron", (GLUTproc) glutSolidDodecahedron },
-   { "glutWireTeapot", (GLUTproc) glutWireTeapot },
-   { "glutSolidTeapot", (GLUTproc) glutSolidTeapot },
-   { "glutWireOctahedron", (GLUTproc) glutWireOctahedron },
-   { "glutSolidOctahedron", (GLUTproc) glutSolidOctahedron },
-   { "glutWireTetrahedron", (GLUTproc) glutWireTetrahedron },
-   { "glutSolidTetrahedron", (GLUTproc) glutSolidTetrahedron },
-   { "glutWireIcosahedron", (GLUTproc) glutWireIcosahedron },
-   { "glutSolidIcosahedron", (GLUTproc) glutSolidIcosahedron },
-   { "glutVideoResizeGet", (GLUTproc) glutVideoResizeGet },
-   { "glutSetupVideoResizing", (GLUTproc) glutSetupVideoResizing },
-   { "glutStopVideoResizing", (GLUTproc) glutStopVideoResizing },
-   { "glutVideoResize", (GLUTproc) glutVideoResize },
-   { "glutVideoPan", (GLUTproc) glutVideoPan },
-   { "glutReportErrors", (GLUTproc) glutReportErrors },
-   { "glutIgnoreKeyRepeat", (GLUTproc) glutIgnoreKeyRepeat },
-   { "glutSetKeyRepeat", (GLUTproc) glutSetKeyRepeat },
+    CHECK_NAME(glutSetColor);
+    CHECK_NAME(glutGetColor);
+    CHECK_NAME(glutCopyColormap);
+    CHECK_NAME(glutGet);
+    CHECK_NAME(glutDeviceGet);
+    CHECK_NAME(glutExtensionSupported);
+    CHECK_NAME(glutGetModifiers);
+    CHECK_NAME(glutLayerGet);
+    CHECK_NAME(glutBitmapCharacter);
+    CHECK_NAME(glutBitmapWidth);
+    CHECK_NAME(glutStrokeCharacter);
+    CHECK_NAME(glutStrokeWidth);
+    CHECK_NAME(glutBitmapLength);
+    CHECK_NAME(glutStrokeLength);
+    CHECK_NAME(glutWireSphere);
+    CHECK_NAME(glutSolidSphere);
+    CHECK_NAME(glutWireCone);
+    CHECK_NAME(glutSolidCone);
+    CHECK_NAME(glutWireCube);
+    CHECK_NAME(glutSolidCube);
+    CHECK_NAME(glutWireTorus);
+    CHECK_NAME(glutSolidTorus);
+    CHECK_NAME(glutWireDodecahedron);
+    CHECK_NAME(glutSolidDodecahedron);
+    CHECK_NAME(glutWireTeapot);
+    CHECK_NAME(glutSolidTeapot);
+    CHECK_NAME(glutWireOctahedron);
+    CHECK_NAME(glutSolidOctahedron);
+    CHECK_NAME(glutWireTetrahedron);
+    CHECK_NAME(glutSolidTetrahedron);
+    CHECK_NAME(glutWireIcosahedron);
+    CHECK_NAME(glutSolidIcosahedron);
+    CHECK_NAME(glutVideoResizeGet);
+    CHECK_NAME(glutSetupVideoResizing);
+    CHECK_NAME(glutStopVideoResizing);
+    CHECK_NAME(glutVideoResize);
+    CHECK_NAME(glutVideoPan);
+    CHECK_NAME(glutReportErrors);
+    CHECK_NAME(glutIgnoreKeyRepeat);
+    CHECK_NAME(glutSetKeyRepeat);
 #if !TARGET_HOST_WINCE
-   { "glutForceJoystickFunc", (GLUTproc) glutForceJoystickFunc },
-   { "glutGameModeString", (GLUTproc) glutGameModeString },
-   { "glutEnterGameMode", (GLUTproc) glutEnterGameMode },
-   { "glutLeaveGameMode", (GLUTproc) glutLeaveGameMode },
-   { "glutGameModeGet", (GLUTproc) glutGameModeGet },
+    CHECK_NAME(glutForceJoystickFunc);
+    CHECK_NAME(glutGameModeString);
+    CHECK_NAME(glutEnterGameMode);
+    CHECK_NAME(glutLeaveGameMode);
+    CHECK_NAME(glutGameModeGet);
 #endif /* !TARGET_HOST_WINCE */
-   /* freeglut extensions */
-   { "glutMainLoopEvent", (GLUTproc) glutMainLoopEvent },
-   { "glutLeaveMainLoop", (GLUTproc) glutLeaveMainLoop },
-   { "glutCloseFunc", (GLUTproc) glutCloseFunc },
-   { "glutWMCloseFunc", (GLUTproc) glutWMCloseFunc },
-   { "glutMenuDestroyFunc", (GLUTproc) glutMenuDestroyFunc },
-   { "glutSetOption", (GLUTproc) glutSetOption },
-   { "glutSetWindowData", (GLUTproc) glutSetWindowData },
-   { "glutGetWindowData", (GLUTproc) glutGetWindowData },
-   { "glutSetMenuData", (GLUTproc) glutSetMenuData },
-   { "glutGetMenuData", (GLUTproc) glutGetMenuData },
-   { "glutBitmapHeight", (GLUTproc) glutBitmapHeight },
-   { "glutStrokeHeight", (GLUTproc) glutStrokeHeight },
-   { "glutBitmapString", (GLUTproc) glutBitmapString },
-   { "glutStrokeString", (GLUTproc) glutStrokeString },
-   { "glutWireRhombicDodecahedron", (GLUTproc) glutWireRhombicDodecahedron },
-   { "glutSolidRhombicDodecahedron", (GLUTproc) glutSolidRhombicDodecahedron },
-   { "glutWireSierpinskiSponge", (GLUTproc) glutWireSierpinskiSponge },
-   { "glutSolidSierpinskiSponge", (GLUTproc) glutSolidSierpinskiSponge },
-   { "glutWireCylinder", (GLUTproc) glutWireCylinder },
-   { "glutSolidCylinder", (GLUTproc) glutSolidCylinder },
-   { "glutGetProcAddress", (GLUTproc) glutGetProcAddress },
-   { "glutMouseWheelFunc", (GLUTproc) glutMouseWheelFunc },
-   { NULL, NULL }
-};
+    /* freeglut extensions */
+    CHECK_NAME(glutMainLoopEvent);
+    CHECK_NAME(glutLeaveMainLoop);
+    CHECK_NAME(glutCloseFunc);
+    CHECK_NAME(glutWMCloseFunc);
+    CHECK_NAME(glutMenuDestroyFunc);
+    CHECK_NAME(glutSetOption);
+    CHECK_NAME(glutSetWindowData);
+    CHECK_NAME(glutGetWindowData);
+    CHECK_NAME(glutSetMenuData);
+    CHECK_NAME(glutGetMenuData);
+    CHECK_NAME(glutBitmapHeight);
+    CHECK_NAME(glutStrokeHeight);
+    CHECK_NAME(glutBitmapString);
+    CHECK_NAME(glutStrokeString);
+    CHECK_NAME(glutWireRhombicDodecahedron);
+    CHECK_NAME(glutSolidRhombicDodecahedron);
+    CHECK_NAME(glutWireSierpinskiSponge);
+    CHECK_NAME(glutSolidSierpinskiSponge);
+    CHECK_NAME(glutWireCylinder);
+    CHECK_NAME(glutSolidCylinder);
+    CHECK_NAME(glutGetProcAddress);
+    CHECK_NAME(glutMouseWheelFunc);
+#undef CHECK_NAME
+
+    return NULL;
+}
 
 
 GLUTproc FGAPIENTRY
 glutGetProcAddress( const char *procName )
 {
-    /* Try GLUT functions first */
-    int i;
+    GLUTproc p;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetProcAddress" );
-    for( i = 0; glut_functions[ i ].name; i++ )
-        if( strcmp( glut_functions[ i ].name, procName ) == 0)
-            return glut_functions[ i ].address;
+
+    /* Try GLUT functions first */
+    p = fghGetProcAddress( procName );
+    if( p != NULL )
+        return p;
 
     /* Try core GL functions */
 #if TARGET_HOST_WIN32 || TARGET_HOST_WINCE

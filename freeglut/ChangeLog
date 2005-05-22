@@ -1016,3 +1016,8 @@ mouse pointers don't work) on the way:
 **************************************************************************
 
 (265) Lowering minimum autoconf version required.
+
+(266) Guarantee consistency of names/addresses in glutGetProcAddress by
+using a macro. In addition, this avoids any non-constant initializer
+issues which might be raised when using WinDoze GCCs. The additional code
+overhead is negligible, at least for x86 (a few instructions per name).
