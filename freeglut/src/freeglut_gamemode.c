@@ -435,6 +435,7 @@ int FGAPIENTRY glutEnterGameMode( void )
 
     fgStructure.GameMode->State.Width  = fgState.GameModeSize.X;
     fgStructure.GameMode->State.Height = fgState.GameModeSize.Y;
+    fgStructure.GameMode->State.NeedToResize = GL_TRUE;
 
     fgStructure.GameMode->State.IsGameMode = GL_TRUE;
 

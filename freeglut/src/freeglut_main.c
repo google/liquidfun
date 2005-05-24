@@ -104,9 +104,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
                    width, height );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
-
-#if !TARGET_HOST_WINCE
+#elif TARGET_HOST_WIN32
     {
         RECT winRect;
         int x, y, w, h;
@@ -156,7 +154,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
                       SWP_NOZORDER
         );
     }
-#endif /* TARGET_HOST_WINCE */
+#endif
 
     /*
      * XXX Should update {window->State.OldWidth, window->State.OldHeight}
@@ -169,8 +167,6 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
         fgSetWindow( window );
         glViewport( 0, 0, width, height );
     }
-
-#endif
 
     /*
      * Force a window redraw.  In Windows at least this is only a partial

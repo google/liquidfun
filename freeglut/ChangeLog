@@ -1021,3 +1021,8 @@ mouse pointers don't work) on the way:
 using a macro. In addition, this avoids any non-constant initializer
 issues which might be raised when using WinDoze GCCs. The additional code
 overhead is negligible, at least for x86 (a few instructions per name).
+
+(267) When switching to game mode under X11, no ConfigureNotify event
+will happen and consequently no reshape callback will ever be called via
+the normal mechanism. To fix this, note that the game mode window needs
+to be resized and handle this before redraw.
