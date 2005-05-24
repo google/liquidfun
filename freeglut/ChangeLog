@@ -1026,3 +1026,8 @@ overhead is negligible, at least for x86 (a few instructions per name).
 will happen and consequently no reshape callback will ever be called via
 the normal mechanism. To fix this, note that the game mode window needs
 to be resized and handle this before redraw.
+
+(268) The original glutEnterGameMode() returns the window id of the game
+mode window, not TRUE/FALSE, we should better follow that. Note that most
+man pages claim that this function returns void, but this is definitely
+wrong.

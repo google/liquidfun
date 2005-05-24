@@ -425,7 +425,7 @@ int FGAPIENTRY glutEnterGameMode( void )
     if( ! fghChangeDisplayMode( GL_FALSE ) )
     {
         fgWarning( "failed to change screen settings" );
-        return FALSE;
+        return 0;
     }
 
     fgStructure.GameMode = fgCreateWindow(
@@ -529,7 +529,7 @@ int FGAPIENTRY glutEnterGameMode( void )
 
 #endif
 
-    return TRUE;
+    return fgStructure.GameMode->ID;
 }
 
 /*
