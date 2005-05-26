@@ -1477,11 +1477,14 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             else  /* No mouse wheel, call the mouse button callback twice */
             {
                 /*
+                 * Map wheel zero to button 3 and 4; +1 to 3, -1 to 4
+                 *  "    "   one                     +1 to 5, -1 to 6, ...
+                 *
                  * XXX The below assumes that you have no more than 3 mouse
                  * XXX buttons.  Sorry.
                  */
-                int button = wheel_number*2 + 4;
-                if( direction > 0 )
+                int button = wheel_number * 2 + 3;
+                if( direction < 0 )
                     ++button;
                 INVOKE_WCB( *window, Mouse,
                             ( button, GLUT_DOWN,
@@ -1489,7 +1492,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 );
                 INVOKE_WCB( *window, Mouse,
                             ( button, GLUT_UP,
-                              window->State.MouseX, window->State.MouseX )
+                              window->State.MouseX, window->State.MouseY )
                 );
             }
 
