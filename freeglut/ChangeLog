@@ -1031,3 +1031,10 @@ to be resized and handle this before redraw.
 mode window, not TRUE/FALSE, we should better follow that. Note that most
 man pages claim that this function returns void, but this is definitely
 wrong.
+
+(269) Dan Torop's patch to fix joystick polling times (resolves bug 1206856)
+
+**************************************************************************
+* 25 May 2004 -- 2.4.0 Release Candidate 4 Released
+**************************************************************************
+
