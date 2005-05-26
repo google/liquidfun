@@ -458,7 +458,7 @@ static void fghSleepForEvents( void )
     msec = fghNextTimer( );
     /* XXX Use GLUT timers for joysticks... */
     /* XXX Dumb; forces granularity to .01sec */
-    if( fghHaveJoystick( ) && ( msec < 10 ) )     
+    if( fghHaveJoystick( ) && ( msec > 10 ) )     
         msec = 10;
 
 #if TARGET_HOST_UNIX_X11
