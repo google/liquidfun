@@ -998,7 +998,7 @@ mouse pointers don't work) on the way:
 (261) Fixed a cuboctahedron vertex, implemented wire mode for that shape.
 
 **************************************************************************
-* 8 May 2004 -- 2.4.0 Release Candidate 1 Released
+* 8 May 2005 -- 2.4.0 Release Candidate 1 Released
 **************************************************************************
 (262) Fixed the "vfprintf" for Windows so that error messages get printed
       out again
@@ -1006,13 +1006,13 @@ mouse pointers don't work) on the way:
 (263) Implemented Takeshi Nishimura's menu fixes.  Menus should work now.
 
 **************************************************************************
-* 15 May 2004 -- 2.4.0 Release Candidate 2 Released
+* 15 May 2005 -- 2.4.0 Release Candidate 2 Released
 **************************************************************************
 
 (264) More game mode fixes
 
 **************************************************************************
-* 19 May 2004 -- 2.4.0 Release Candidate 3 Released
+* 19 May 2005 -- 2.4.0 Release Candidate 3 Released
 **************************************************************************
 
 (265) Lowering minimum autoconf version required.
@@ -1035,6 +1035,11 @@ wrong.
 (269) Dan Torop's patch to fix joystick polling times (resolves bug 1206856)
 
 **************************************************************************
-* 25 May 2004 -- 2.4.0 Release Candidate 4 Released
+* 25 May 2005 -- 2.4.0 Release Candidate 4 Released
 **************************************************************************
 
+(270) Takeshi Nishimura's changes to make the Windows mouse wheel/button mapping match that of X11; also fixing a typo in the associated mouse callback argument list.
+
+**************************************************************************
+* 2 Jun 2005 -- 2.4.0 Release Candidate 5 Released
+**************************************************************************
