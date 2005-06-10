@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([freeglut library], [2.4.0-rc5], [freeglut-bugs@lists.sourceforge.net], [freeglut])
+AC_INIT([freeglut library], [2.4.0], [freeglut-bugs@lists.sourceforge.net], [freeglut])
 AM_INIT_AUTOMAKE
 AC_PREREQ([2.56])
 AC_CONFIG_SRCDIR([AUTHORS])
