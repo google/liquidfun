@@ -1096,7 +1096,7 @@ void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], G
       glEnd () ;
     }
   }
-  else
+  else if ( num_levels > 0 )
   {
     GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
     num_levels -- ;
@@ -1135,7 +1135,7 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
 
     glEnd () ;
   }
-  else
+  else if ( num_levels > 0 )
   {
     GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
     num_levels -- ;
