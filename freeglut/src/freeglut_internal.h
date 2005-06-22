@@ -244,6 +244,7 @@ struct tagSFG_State
     fgExecutionState ExecState;           /* Used for GLUT termination       */
     char            *ProgramName;         /* Name of the invoking program    */
     GLboolean        JoysticksInitialised;  /* Only initialize if application calls for them */
+    GLboolean        InputDevsInitialised;  /* Only initialize if application calls for them */
 };
 
 /* The structure used by display initialization in freeglut_init.c */
@@ -771,6 +772,11 @@ void        fgJoystickPollWindow( SFG_Window* window );
 int  glutJoystickGetNumAxes( int ident );
 int  glutJoystickGetNumButtons( int ident );
 int  glutJoystickNotWorking( int ident );
+
+/* InputDevice Init/Fini */
+int         fgInputDeviceDetect( void );
+void        fgInitialiseInputDevices( void );
+void        fgInputDeviceClose( void );
 
 /* Setting the cursor for a given window */
 void fgSetCursor ( SFG_Window *window, int cursorID );

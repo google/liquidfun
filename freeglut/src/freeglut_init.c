@@ -82,7 +82,8 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GLUT_ACTION_EXIT,       /* ActionOnWindowClose */
                       GLUT_EXEC_STATE_INIT,   /* ExecState */
                       NULL,                   /* ProgramName */
-                      GL_FALSE                /* JoysticksInitialised */
+                      GL_FALSE,               /* JoysticksInitialised */
+                      GL_FALSE                /* InputDevsInitialised */
 };
 
 
@@ -202,6 +203,9 @@ static void fghInitialize( const char* displayName )
 #endif
 
     fgState.Initialised = GL_TRUE;
+
+    /* InputDevice uses GlutTimerFunc(), so fgState.Initialised must be TRUE */
+    fgInitialiseInputDevices();
 }
 
 /*
@@ -242,8 +246,12 @@ void fgDeinitialize( void )
 #if !TARGET_HOST_WINCE
     if ( fgState.JoysticksInitialised )
         fgJoystickClose( );
+
+    if ( fgState.InputDevsInitialised )
+        fgInputDeviceClose( );
 #endif /* !TARGET_HOST_WINCE */
     fgState.JoysticksInitialised = GL_FALSE;
+    fgState.InputDevsInitialised = GL_FALSE;
 
     fgState.Initialised = GL_FALSE;
 

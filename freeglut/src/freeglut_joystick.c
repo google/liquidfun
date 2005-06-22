@@ -1581,15 +1581,14 @@ static void fghJoystickInit( int ident )
  */
 void fgInitialiseJoysticks ( void )
 {
-  /* Initialization courtesy of OpenGLUT -- do we want it? */
-  if( !fgState.JoysticksInitialised )
-  {
-    int ident ;
-    for ( ident = 0; ident < MAX_NUM_JOYSTICKS; ident++ )
-      fghJoystickInit( ident );
+    if( !fgState.JoysticksInitialised )
+    {
+        int ident ;
+        for ( ident = 0; ident < MAX_NUM_JOYSTICKS; ident++ )
+            fghJoystickInit( ident );
 
-    fgState.JoysticksInitialised = GL_TRUE;
-  }
+        fgState.JoysticksInitialised = GL_TRUE;
+    }
 }
 
 /*
@@ -1680,21 +1679,21 @@ void fgJoystickPollWindow( SFG_Window* window )
  */
 int fgJoystickDetect( void )
 {
-  int ident;
+    int ident;
 
-  fgInitialiseJoysticks ();
+    fgInitialiseJoysticks ();
 
-  if ( !fgJoystick )
+    if ( !fgJoystick )
+        return 0;
+
+    if ( !fgState.JoysticksInitialised )
+        return 0;
+
+    for( ident=0; ident<MAX_NUM_JOYSTICKS; ident++ )
+        if( fgJoystick[ident] && !fgJoystick[ident]->error )
+            return 1;
+
     return 0;
-
-  if ( !fgState.JoysticksInitialised )
-    return 0;
-
-  for( ident=0; ident<MAX_NUM_JOYSTICKS; ident++ )
-    if( fgJoystick[ident] && !fgJoystick[ident]->error )
-      return 1;
-
-  return 0;
 }
 
 /*

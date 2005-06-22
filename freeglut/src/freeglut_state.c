@@ -540,14 +540,21 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
     case GLUT_JOYSTICK_AXES:
         return glutJoystickGetNumAxes ( 0 );
 
-    case GLUT_HAS_SPACEBALL:
     case GLUT_HAS_DIAL_AND_BUTTON_BOX:
+        return fgInputDeviceDetect ();
+
+    case GLUT_NUM_DIALS:
+        if ( fgState.InputDevsInitialised ) return 8;
+        return 0;
+ 
+    case GLUT_NUM_BUTTON_BOX_BUTTONS:
+        return 0;
+
+    case GLUT_HAS_SPACEBALL:
     case GLUT_HAS_TABLET:
         return FALSE;
 
     case GLUT_NUM_SPACEBALL_BUTTONS:
-    case GLUT_NUM_BUTTON_BOX_BUTTONS:
-    case GLUT_NUM_DIALS:
     case GLUT_NUM_TABLET_BUTTONS:
         return 0;
 
