@@ -339,11 +339,10 @@ GLUT should simply exit (the default).
 to Silicon Graphics hardware have not been implemented.&nbsp; Most or all 
 of the new callbacks are listed in the GLUT Version 4 "glut.h" header file 
 but did not make it into the documentation.&nbsp; The new callbacks consist 
-of regular and special key release callbacks, a joystick callback, a menu 
-state callback (with one argument, distinct from the menu status callback 
-which has three arguments), and a window status callback <br>
- (also with one argument).&nbsp; Unsupported callbacks are the three Spaceball 
-callbacks, the ButtonBox callback, the Dials callback, and the two Tablet 
+of regular and special key release callbacks, a joystick callback, a window 
+status callback, window closure callbacks, a menu closure callback, and a
+mouse wheel callback.&nbsp; Unsupported callbacks are the three Spaceball 
+callbacks, the ButtonBox callback, and the two Tablet 
 callbacks.&nbsp; If the user has a need for an unsupported callback he should 
 contact the <i>freeglut</i> development team.<br>
                                    
@@ -356,8 +355,8 @@ pixels for bitmapped fonts and in OpenGL units for the stroke fonts.<br>
                                    
                                   <h3>3.4.5&nbsp; Geometry Rendering<br>
                                    </h3>
- Two functions have been added to render a wireframe and a solid rhombic
-dodecahedron.                                    
+ Functions have been added to render a wireframe and a solid rhombic
+dodecahedron, a cylinder, and a Sierpinski sponge.                                    
                                   <h3> 3.4.5&nbsp; Extension Function Queries</h3>
  glutGetProcAddress is a wrapper for the glXGetProcAddressARB and wglGetProcAddress
 functions. 
