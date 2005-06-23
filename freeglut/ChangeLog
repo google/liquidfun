@@ -1049,7 +1049,14 @@ wrong.
 **************************************************************************
 
 **************************************************************************
-* Changes on 14 Jun 2005
+* Changes in late June 2005
 **************************************************************************
 
 (271) Added an RPM spec file based on the one shipped with SuSE 9.3.
+
+(272) Implemented Joe Krahn's "Input Devices" code--at the moment, a dial
+box.
+
+(273) Fixed a bug in the Sierpinski sponge code that caused the application
+to crash if it called the code with a negative number of levels
+
