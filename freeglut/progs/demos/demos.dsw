@@ -15,7 +15,31 @@ Package=<4>
 
 ###############################################################################
 
+Project: "CallbackMakerStatic"=".\CallbackMaker\CallbackMakerStatic.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "Fractals"=".\Fractals\Fractals.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "FractalsStatic"=".\Fractals\FractalsStatic.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -39,7 +63,31 @@ Package=<4>
 
 ###############################################################################
 
+Project: "Fractals_randomStatic"=".\Fractals_random\Fractals_randomStatic.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "lorenz"=".\Lorenz\lorenz.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "lorenzStatic"=".\lorenz\lorenzStatic.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -63,7 +111,31 @@ Package=<4>
 
 ###############################################################################
 
+Project: "oneStatic"=".\one\oneStatic.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "shapes"=".\shapes\shapes.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "shapesStatic"=".\shapes\shapesStatic.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
