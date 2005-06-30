@@ -1062,3 +1062,5 @@ to crash if it called the code with a negative number of levels
 
 (274) Added --enable-debug configure flag. Currently it only turns on X11
 event tracing, but in the future we could add more.
+
+(275) Cleaned up CreateNotify/ConfigureNotify handling.

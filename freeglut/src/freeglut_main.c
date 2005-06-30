@@ -1017,20 +1017,20 @@ void FGAPIENTRY glutMainLoopEvent( void )
              *
              * GLUT presumably does this because it generally tries to treat
              * sub-windows the same as windows.
-             *
-             * XXX Technically, GETWINDOW( xconfigure ) and
-             * XXX {event.xconfigure} may not be legit ways to get at
-             * XXX data for CreateNotify events.  In practice, the data
-             * XXX is in a union which is laid out much the same either
-             * XXX way.  But if you want to split hairs, this isn't legit,
-             * XXX and we should instead duplicate some code.
              */
         case CreateNotify:
         case ConfigureNotify:
-            GETWINDOW( xconfigure );
             {
-                int width = event.xconfigure.width;
-                int height = event.xconfigure.height;
+                int width, height;
+                if( event.type == CreateNotify ) {
+                    GETWINDOW( xcreatewindow );
+                    width = event.xcreatewindow.width;
+                    height = event.xcreatewindow.height;
+                } else {
+                    GETWINDOW( xconfigure );
+                    width = event.xconfigure.width;
+                    height = event.xconfigure.height;
+                }
 
                 if( ( width != window->State.OldWidth ) ||
                     ( height != window->State.OldHeight ) )
