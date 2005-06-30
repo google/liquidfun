@@ -725,31 +725,34 @@ static void fghPrintEvent( XEvent *event )
                       "%02x", e->key_vector[ i ] );
         }
         buf[ i ] = '\0';
-        fgWarning( "%s: %s", fghTypeToString( e->type ), buf );
+        fgWarning( "%s: window=0x%x, %s", fghTypeToString( e->type ), e->window,
+                   buf );
         break;
     }
 
     case Expose: {
         XExposeEvent *e = &event->xexpose;
-        fgWarning( "%s: (x,y)=(%d,%d), (width,height)=(%d,%d), count=%d",
-                   fghTypeToString( e->type ), e->x, e->y, e->width, e->height,
-                   e->count );
+        fgWarning( "%s: window=0x%x, (x,y)=(%d,%d), (width,height)=(%d,%d), "
+                   "count=%d", fghTypeToString( e->type ), e->window, e->x,
+                   e->y, e->width, e->height, e->count );
         break;
     }
 
     case GraphicsExpose: {
         XGraphicsExposeEvent *e = &event->xgraphicsexpose;
-        fgWarning( "%s: (x,y)=(%d,%d), (width,height)=(%d,%d), count=%d, "
-                   "(major_code,minor_code)=(%d,%d)",
-                   fghTypeToString( e->type ), e->x, e->y, e->width, e->height,
-                   e->count, e->major_code, e->minor_code );
+        fgWarning( "%s: drawable=0x%x, (x,y)=(%d,%d), (width,height)=(%d,%d), "
+                   "count=%d, (major_code,minor_code)=(%d,%d)",
+                   fghTypeToString( e->type ), e->drawable, e->x, e->y,
+                   e->width, e->height, e->count, e->major_code,
+                   e->minor_code );
         break;
     }
 
     case NoExpose: {
         XNoExposeEvent *e = &event->xnoexpose;
-        fgWarning( "%s: (major_code,minor_code)=(%d,%d)",
-                   fghTypeToString( e->type ), e->major_code, e->minor_code );
+        fgWarning( "%s: drawable=0x%x, (major_code,minor_code)=(%d,%d)",
+                   fghTypeToString( e->type ), e->drawable, e->major_code,
+                   e->minor_code );
         break;
     }
 
