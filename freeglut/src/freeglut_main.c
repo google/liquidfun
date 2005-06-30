@@ -513,6 +513,447 @@ static int fghGetXModifiers( XEvent *event )
 #endif
 
 
+#if TARGET_HOST_UNIX_X11 && _DEBUG
+
+static const char* fghTypeToString( int type )
+{
+    switch( type ) {
+    case KeyPress: return "KeyPress";
+    case KeyRelease: return "KeyRelease";
+    case ButtonPress: return "ButtonPress";
+    case ButtonRelease: return "ButtonRelease";
+    case MotionNotify: return "MotionNotify";
+    case EnterNotify: return "EnterNotify";
+    case LeaveNotify: return "LeaveNotify";
+    case FocusIn: return "FocusIn";
+    case FocusOut: return "FocusOut";
+    case KeymapNotify: return "KeymapNotify";
+    case Expose: return "Expose";
+    case GraphicsExpose: return "GraphicsExpose";
+    case NoExpose: return "NoExpose";
+    case VisibilityNotify: return "VisibilityNotify";
+    case CreateNotify: return "CreateNotify";
+    case DestroyNotify: return "DestroyNotify";
+    case UnmapNotify: return "UnmapNotify";
+    case MapNotify: return "MapNotify";
+    case MapRequest: return "MapRequest";
+    case ReparentNotify: return "ReparentNotify";
+    case ConfigureNotify: return "ConfigureNotify";
+    case ConfigureRequest: return "ConfigureRequest";
+    case GravityNotify: return "GravityNotify";
+    case ResizeRequest: return "ResizeRequest";
+    case CirculateNotify: return "CirculateNotify";
+    case CirculateRequest: return "CirculateRequest";
+    case PropertyNotify: return "PropertyNotify";
+    case SelectionClear: return "SelectionClear";
+    case SelectionRequest: return "SelectionRequest";
+    case SelectionNotify: return "SelectionNotify";
+    case ColormapNotify: return "ColormapNotify";
+    case ClientMessage: return "ClientMessage";
+    case MappingNotify: return "MappingNotify";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghBoolToString( Bool b )
+{
+    return b == False ? "False" : "True";
+}
+
+static const char* fghNotifyHintToString( char is_hint )
+{
+    switch( is_hint ) {
+    case NotifyNormal: return "NotifyNormal";
+    case NotifyHint: return "NotifyHint";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghNotifyModeToString( int mode )
+{
+    switch( mode ) {
+    case NotifyNormal: return "NotifyNormal";
+    case NotifyGrab: return "NotifyGrab";
+    case NotifyUngrab: return "NotifyUngrab";
+    case NotifyWhileGrabbed: return "NotifyWhileGrabbed";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghNotifyDetailToString( int detail )
+{
+    switch( detail ) {
+    case NotifyAncestor: return "NotifyAncestor";
+    case NotifyVirtual: return "NotifyVirtual";
+    case NotifyInferior: return "NotifyInferior";
+    case NotifyNonlinear: return "NotifyNonlinear";
+    case NotifyNonlinearVirtual: return "NotifyNonlinearVirtual";
+    case NotifyPointer: return "NotifyPointer";
+    case NotifyPointerRoot: return "NotifyPointerRoot";
+    case NotifyDetailNone: return "NotifyDetailNone";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghVisibilityToString( int state ) {
+    switch( state ) {
+    case VisibilityUnobscured: return "VisibilityUnobscured";
+    case VisibilityPartiallyObscured: return "VisibilityPartiallyObscured";
+    case VisibilityFullyObscured: return "VisibilityFullyObscured";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghConfigureDetailToString( int detail )
+{
+    switch( detail ) {
+    case Above: return "Above";
+    case Below: return "Below";
+    case TopIf: return "TopIf";
+    case BottomIf: return "BottomIf";
+    case Opposite: return "Opposite";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghPlaceToString( int place )
+{
+    switch( place ) {
+    case PlaceOnTop: return "PlaceOnTop";
+    case PlaceOnBottom: return "PlaceOnBottom";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghMappingRequestToString( int request )
+{
+    switch( request ) {
+    case MappingModifier: return "MappingModifier";
+    case MappingKeyboard: return "MappingKeyboard";
+    case MappingPointer: return "MappingPointer";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghPropertyStateToString( int state )
+{
+    switch( state ) {
+    case PropertyNewValue: return "PropertyNewValue";
+    case PropertyDelete: return "PropertyDelete";
+    default: return "UNKNOWN";
+    }
+}
+
+static const char* fghColormapStateToString( int state )
+{
+    switch( state ) {
+    case ColormapUninstalled: return "ColormapUninstalled";
+    case ColormapInstalled: return "ColormapInstalled";
+    default: return "UNKNOWN";
+    }
+}
+
+static void fghPrintEvent( XEvent *event )
+{
+    switch( event->type ) {
+
+    case KeyPress:
+    case KeyRelease: {
+        XKeyEvent *e = &event->xkey;
+        fgWarning( "%s: window=0x%x, root=0x%x, subwindow=0x%x, time=%lu, "
+                   "(x,y)=(%d,%d), (x_root,y_root)=(%d,%d), state=0x%x, "
+                   "keycode=%u, same_screen=%s", fghTypeToString( e->type ),
+                   e->window, e->root, e->subwindow, (unsigned long)e->time,
+                   e->x, e->y, e->x_root, e->y_root, e->state, e->keycode,
+                   fghBoolToString( e->same_screen ) );
+        break;
+    }
+
+    case ButtonPress:
+    case ButtonRelease: {
+        XButtonEvent *e = &event->xbutton;
+        fgWarning( "%s: window=0x%x, root=0x%x, subwindow=0x%x, time=%lu, "
+                   "(x,y)=(%d,%d), (x_root,y_root)=(%d,%d), state=0x%x, "
+                   "button=%u, same_screen=%d", fghTypeToString( e->type ),
+                   e->window, e->root, e->subwindow, (unsigned long)e->time,
+                   e->x, e->y, e->x_root, e->y_root, e->state, e->button,
+                   fghBoolToString( e->same_screen ) );
+        break;
+    }
+
+    case MotionNotify: {
+        XMotionEvent *e = &event->xmotion;
+        fgWarning( "%s: window=0x%x, root=0x%x, subwindow=0x%x, time=%lu, "
+                   "(x,y)=(%d,%d), (x_root,y_root)=(%d,%d), state=0x%x, "
+                   "is_hint=%s, same_screen=%d", fghTypeToString( e->type ),
+                   e->window, e->root, e->subwindow, (unsigned long)e->time,
+                   e->x, e->y, e->x_root, e->y_root, e->state,
+                   fghNotifyHintToString( e->is_hint ),
+                   fghBoolToString( e->same_screen ) );
+        break;
+    }
+
+    case EnterNotify:
+    case LeaveNotify: {
+        XCrossingEvent *e = &event->xcrossing;
+        fgWarning( "%s: window=0x%x, root=0x%x, subwindow=0x%x, time=%lu, "
+                   "(x,y)=(%d,%d), mode=%s, detail=%s, same_screen=%d, "
+                   "focus=%d, state=0x%x", fghTypeToString( e->type ),
+                   e->window, e->root, e->subwindow, (unsigned long)e->time,
+                   e->x, e->y, fghNotifyModeToString( e->mode ),
+                   fghNotifyDetailToString( e->detail ), (int)e->same_screen,
+                   (int)e->focus, e->state );
+        break;
+    }
+
+    case FocusIn:
+    case FocusOut: {
+        XFocusChangeEvent *e = &event->xfocus;
+        fgWarning( "%s: window=0x%x, mode=%s, detail=%s",
+                   fghTypeToString( e->type ), e->window,
+                   fghNotifyModeToString( e->mode ),
+                   fghNotifyDetailToString( e->detail ) );
+        break;
+    }
+
+    case KeymapNotify: {
+        XKeymapEvent *e = &event->xkeymap;
+        char buf[32 * 2 + 1];
+        int i;
+        for ( i = 0; i < 32; i++ ) {
+            snprintf( &buf[ i * 2 ], sizeof( buf ) - i * 2,
+                      "%02x", e->key_vector[ i ] );
+        }
+        buf[ i ] = '\0';
+        fgWarning( "%s: %s", fghTypeToString( e->type ), buf );
+        break;
+    }
+
+    case Expose: {
+        XExposeEvent *e = &event->xexpose;
+        fgWarning( "%s: (x,y)=(%d,%d), (width,height)=(%d,%d), count=%d",
+                   fghTypeToString( e->type ), e->x, e->y, e->width, e->height,
+                   e->count );
+        break;
+    }
+
+    case GraphicsExpose: {
+        XGraphicsExposeEvent *e = &event->xgraphicsexpose;
+        fgWarning( "%s: (x,y)=(%d,%d), (width,height)=(%d,%d), count=%d, "
+                   "(major_code,minor_code)=(%d,%d)",
+                   fghTypeToString( e->type ), e->x, e->y, e->width, e->height,
+                   e->count, e->major_code, e->minor_code );
+        break;
+    }
+
+    case NoExpose: {
+        XNoExposeEvent *e = &event->xnoexpose;
+        fgWarning( "%s: (major_code,minor_code)=(%d,%d)",
+                   fghTypeToString( e->type ), e->major_code, e->minor_code );
+        break;
+    }
+
+    case VisibilityNotify: {
+        XVisibilityEvent *e = &event->xvisibility;
+        fgWarning( "%s: window=0x%x, state=%s", fghTypeToString( e->type ),
+                   e->window, fghVisibilityToString( e->state) );
+        break;
+    }
+
+    case CreateNotify: {
+        XCreateWindowEvent *e = &event->xcreatewindow;
+        fgWarning( "%s: (x,y)=(%d,%d), (width,height)=(%d,%d), border_width=%d, "
+                   "window=0x%x, override_redirect=%s",
+                   fghTypeToString( e->type ), e->x, e->y, e->width, e->height,
+                   e->border_width, e->window,
+                   fghBoolToString( e->override_redirect ) );
+        break;
+    }
+
+    case DestroyNotify: {
+        XDestroyWindowEvent *e = &event->xdestroywindow;
+        fgWarning( "%s: event=0x%x, window=0x%x",
+                   fghTypeToString( e->type ), e->event, e->window );
+        break;
+    }
+
+    case UnmapNotify: {
+        XUnmapEvent *e = &event->xunmap;
+        fgWarning( "%s: event=0x%x, window=0x%x, from_configure=%s",
+                   fghTypeToString( e->type ), e->event, e->window,
+                   fghBoolToString( e->from_configure ) );
+        break;
+    }
+
+    case MapNotify: {
+        XMapEvent *e = &event->xmap;
+        fgWarning( "%s: event=0x%x, window=0x%x, override_redirect=%s",
+                   fghTypeToString( e->type ), e->event, e->window,
+                   fghBoolToString( e->override_redirect ) );
+        break;
+    }
+
+    case MapRequest: {
+        XMapRequestEvent *e = &event->xmaprequest;
+        fgWarning( "%s: parent=0x%x, window=0x%x",
+                   fghTypeToString( event->type ), e->parent, e->window );
+        break;
+    }
+
+    case ReparentNotify: {
+        XReparentEvent *e = &event->xreparent;
+        fgWarning( "%s: event=0x%x, window=0x%x, parent=0x%x, (x,y)=(%d,%d), "
+                   "override_redirect=%s", fghTypeToString( e->type ),
+                   e->event, e->window, e->parent, e->x, e->y,
+                   fghBoolToString( e->override_redirect ) );
+        break;
+    }
+
+    case ConfigureNotify: {
+        XConfigureEvent *e = &event->xconfigure;
+        fgWarning( "%s: event=0x%x, window=0x%x, (x,y)=(%d,%d), "
+                   "(width,height)=(%d,%d), border_width=%d, above=0x%x, "
+                   "override_redirect=%s", fghTypeToString( e->type ), e->event,
+                   e->window, e->x, e->y, e->width, e->height, e->border_width,
+                   e->above, fghBoolToString( e->override_redirect ) );
+        break;
+    }
+
+    case ConfigureRequest: {
+        XConfigureRequestEvent *e = &event->xconfigurerequest;
+        fgWarning( "%s: parent=0x%x, window=0x%x, (x,y)=(%d,%d), "
+                   "(width,height)=(%d,%d), border_width=%d, above=0x%x, "
+                   "detail=%s, value_mask=%lx", fghTypeToString( e->type ),
+                   e->parent, e->window, e->x, e->y, e->width, e->height,
+                   e->border_width, e->above,
+                   fghConfigureDetailToString( e->detail ), e->value_mask );
+        break;
+    }
+
+    case GravityNotify: {
+        XGravityEvent *e = &event->xgravity;
+        fgWarning( "%s: event=0x%x, window=0x%x, (x,y)=(%d,%d)",
+                   fghTypeToString( e->type ), e->event, e->window, e->x, e->y );
+        break;
+    }
+
+    case ResizeRequest: {
+        XResizeRequestEvent *e = &event->xresizerequest;
+        fgWarning( "%s: window=0x%x, (width,height)=(%d,%d)",
+                   fghTypeToString( e->type ), e->window, e->width, e->height );
+        break;
+    }
+
+    case CirculateNotify: {
+        XCirculateEvent *e = &event->xcirculate;
+        fgWarning( "%s: event=0x%x, window=0x%x, place=%s",
+                   fghTypeToString( e->type ), e->event, e->window,
+                   fghPlaceToString( e->place ) );
+        break;
+    }
+
+    case CirculateRequest: {
+        XCirculateRequestEvent *e = &event->xcirculaterequest;
+        fgWarning( "%s: parent=0x%x, window=0x%x, place=%s",
+                   fghTypeToString( e->type ), e->parent, e->window,
+                   fghPlaceToString( e->place ) );
+        break;
+    }
+
+    case PropertyNotify: {
+        XPropertyEvent *e = &event->xproperty;
+        fgWarning( "%s: window=0x%x, atom=%lu, time=%lu, state=%s",
+                   fghTypeToString( e->type ), e->window,
+                   (unsigned long)e->atom, (unsigned long)e->time,
+                   fghPropertyStateToString( e->state ) );
+        break;
+    }
+
+    case SelectionClear: {
+        XSelectionClearEvent *e = &event->xselectionclear;
+        fgWarning( "%s: window=0x%x, selection=%lu, time=%lu",
+                   fghTypeToString( e->type ), e->window,
+                   (unsigned long)e->selection, (unsigned long)e->time );
+        break;
+    }
+
+    case SelectionRequest: {
+        XSelectionRequestEvent *e = &event->xselectionrequest;
+        fgWarning( "%s: owner=0x%x, requestor=0x%x, selection=0x%x, "
+                   "target=0x%x, property=%lu, time=%lu",
+                   fghTypeToString( e->type ), e->owner, e->requestor,
+                   (unsigned long)e->selection, (unsigned long)e->target,
+                   (unsigned long)e->property, (unsigned long)e->time );
+        break;
+    }
+
+    case SelectionNotify: {
+        XSelectionEvent *e = &event->xselection;
+        fgWarning( "%s: requestor=0x%x, selection=0x%x, target=0x%x, "
+                   "property=%lu, time=%lu", fghTypeToString( e->type ),
+                   e->requestor, (unsigned long)e->selection,
+                   (unsigned long)e->target, (unsigned long)e->property,
+                   (unsigned long)e->time );
+        break;
+    }
+
+    case ColormapNotify: {
+        XColormapEvent *e = &event->xcolormap;
+        fgWarning( "%s: window=0x%x, colormap=%lu, new=%s, state=%s",
+                   fghTypeToString( e->type ), e->window,
+                   (unsigned long)e->colormap, fghBoolToString( e->new ),
+                   fghColormapStateToString( e->state ) );
+        break;
+    }
+
+    case ClientMessage: {
+        XClientMessageEvent *e = &event->xclient;
+        char buf[ 61 ];
+        char* p = buf;
+        char* end = buf + sizeof( buf );
+        int i;
+        switch( e->format ) {
+        case 8:
+          for ( i = 0; i < 20; i++, p += 3 ) {
+                snprintf( p, end - p, " %02x", e->data.b[ i ] );
+            }
+            break;
+        case 16:
+            for ( i = 0; i < 10; i++, p += 5 ) {
+                snprintf( p, end - p, " %04x", e->data.s[ i ] );
+            }
+            break;
+        case 32:
+            for ( i = 0; i < 5; i++, p += 9 ) {
+                snprintf( p, end - p, " %08lx", e->data.l[ i ] );
+            }
+            break;
+        }
+        *p = '\0';
+        fgWarning( "%s: window=0x%x, message_type=%lu, format=%d, data=(%s )",
+                   fghTypeToString( e->type ), e->window,
+                   (unsigned long)e->message_type, e->format, buf );
+        break;
+    }
+
+    case MappingNotify: {
+        XMappingEvent *e = &event->xmapping;
+        fgWarning( "%s: window=0x%x, request=%s, first_keycode=%d, count=%d",
+                   fghTypeToString( e->type ), e->window,
+                   fghMappingRequestToString( e->request ), e->first_keycode,
+                   e->count );
+        break;
+    }
+
+    default: {
+        fgWarning( "%s", fghTypeToString( event->type ) );
+        break;
+    }
+    }
+}
+
+#endif
+
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -539,6 +980,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
     while( XPending( fgDisplay.Display ) )
     {
         XNextEvent( fgDisplay.Display, &event );
+#if _DEBUG
+        fghPrintEvent( &event );
+#endif
 
         switch( event.type )
         {
