@@ -1085,6 +1085,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case UnmapNotify:
             /* We get this when iconifying a window. */ 
             GETWINDOW( xunmap );
+            fgSetWindow( window );
             INVOKE_WCB( *window, WindowStatus, ( GLUT_HIDDEN ) );
             window->State.Visible = GL_FALSE;
             break;
