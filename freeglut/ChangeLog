@@ -1064,3 +1064,8 @@ to crash if it called the code with a negative number of levels
 event tracing, but in the future we could add more.
 
 (275) Cleaned up CreateNotify/ConfigureNotify handling.
+
+(276) When a window is iconified, only an UnmapNotify is sent, not a
+VisibilityNotify, so we have to handle the window status callback in the
+former case, too. This fixes bug #763442 (Call the visibility callback when
+minimizing a window).

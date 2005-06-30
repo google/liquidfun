@@ -1080,11 +1080,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
             break;
 
         case MapNotify:
+            break;
+
         case UnmapNotify:
-            /*
-             * If we never do anything with this, can we just not ask to
-             * get these messages?
-             */
+            /* We get this when iconifying a window. */ 
+            GETWINDOW( xunmap );
+            INVOKE_WCB( *window, WindowStatus, ( GLUT_HIDDEN ) );
+            window->State.Visible = GL_FALSE;
             break;
 
         case MappingNotify:
@@ -1109,7 +1111,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * Sending this event, the X server can notify us that the window
              * has just acquired one of the three possible visibility states:
              * VisibilityUnobscured, VisibilityPartiallyObscured or
-             * VisibilityFullyObscured
+             * VisibilityFullyObscured. Note that we DO NOT receive a
+             * VisibilityNotify event when iconifying a window, we only get an
+             * UnmapNotify then.
              */
             switch( event.xvisibility.state )
             {
