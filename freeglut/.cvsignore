@@ -11,7 +11,10 @@ config.status
 config.sub
 configure
 configure.scan
+debugfiles.list
+debugsources.list
 freeglut-*.tar.gz
 libtool
 ltmain.sh
+man-pages
 stamp-h1
