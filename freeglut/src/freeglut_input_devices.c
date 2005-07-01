@@ -147,7 +147,7 @@ void fgInitialiseInputDevices ( void )
             DWORD type = REG_SZ;
             HKEY key;
             if (RegOpenKeyA(HKEY_LOCAL_MACHINE,"SOFTWARE\\FreeGLUT",&key)==ERROR_SUCCESS) {
-                if (RegQueryValueExA(key,"DialboxSerialPort",NULL,&type,devname,&size)==ERROR_SUCCESS){
+                if (RegQueryValueExA(key,"DialboxSerialPort",NULL,&type,(LPBYTE)devname,&size)==ERROR_SUCCESS){
                     dial_device=devname;
                 }
                 RegCloseKey(key);

@@ -1079,3 +1079,5 @@ minimizing a window).
 (278) MinGW is lacking a prototype for ChangeDisplaySettingsEx, so
 supply one in this case. Note that this should better be handled via
 autoconf than via cpp.
+
+(279) Silenced a signed/unsigned mismatched via a cast.
