@@ -1070,4 +1070,12 @@ VisibilityNotify, so we have to handle the window status callback in the
 former case, too. This fixes bug #763442 (Call the visibility callback when
 minimizing a window).
 
+**************************************************************************
+* Changes on July 1, 2005.
+**************************************************************************
+
 (277) Removed redundant files from EXTRA_DIST.
+
+(278) MinGW is lacking a prototype for ChangeDisplaySettingsEx, so
+supply one in this case. Note that this should better be handled via
+autoconf than via cpp.

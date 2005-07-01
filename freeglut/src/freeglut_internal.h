@@ -62,6 +62,17 @@
 #include <TCHAR.H>
 #endif
 
+/* TODO: MinGW is lacking a prototype, this should better be handled via autoconf! */
+#ifndef ChangeDisplaySettingsEx
+LONG WINAPI ChangeDisplaySettingsExA(LPCSTR,LPDEVMODEA,HWND,DWORD,LPVOID);
+LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
+#ifdef UNICODE
+#define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
+#else
+#define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
+#endif
+#endif
+
 #if defined(_MSC_VER)
 #define strdup   _strdup
 #endif
