@@ -42,9 +42,9 @@ lib@LIBRARY@_la_SOURCES = freeglut_callbacks.c \
 #
 # Additional linker flags
 #	 
-lib@LIBRARY@_la_LIBADD = $(LIBM) $(X_LIBS) -lGL -lGLU -lXext -lX11 $(LIBXXF86VM)
-lib@LIBRARY@_la_LDFLAGS = -version-info 11:0:8
-lib@LIBRARY@_la_CFLAGS = $(X_CFLAGS)
+lib@LIBRARY@_la_LIBADD  = $(LIBM) $(X_LIBS) $(GL_LIBS) $(LIBXXF86VM)
+lib@LIBRARY@_la_LDFLAGS = $(VERSION_INFO)
+lib@LIBRARY@_la_CFLAGS  = $(X_CFLAGS) $(EXPORT_FLAGS)
 
 INCLUDES = -I$(top_srcdir)/include
 

@@ -1081,3 +1081,6 @@ supply one in this case. Note that this should better be handled via
 autoconf than via cpp.
 
 (279) Silenced a signed/unsigned mismatched via a cast.
+
+(280) Some steps toward compilation under MinGW. Note that there are still
+linking troubles for the examples.

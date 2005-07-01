@@ -19,10 +19,24 @@ AC_SUBST([LIBTOOL_DEPS])
 
 # Checks for libraries.
 AC_PATH_XTRA
-AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode],
-	     [LIBXXF86VM=-lXxf86vm], [LIBXXF86VM=],
-             [$X_LIBS -lXext -lX11])
+
+if test x"$no_x" = xyes; then
+  GL_LIBS="-lopengl32 -lglu32 -lgdi32"
+  LIBXXF86VM=
+  VERSION_INFO=
+  EXPORT_FLAGS="-DFREEGLUT_EXPORTS"
+else
+  GL_LIBS="-lGL -lGLU -lXext -lX11"
+  AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode],
+               [LIBXXF86VM=-lXxf86vm], [LIBXXF86VM=],
+               [$X_LIBS -lXext -lX11])
+  VERSION_INFO="-version-info 11:0:8"
+  EXPORT_FLAGS=
+fi
+AC_SUBST([GL_LIBS])
 AC_SUBST([LIBXXF86VM])
+AC_SUBST([VERSION_INFO])
+AC_SUBST([EXPORT_FLAGS])
 
 # Checks for header files.
 AC_HEADER_STDC
