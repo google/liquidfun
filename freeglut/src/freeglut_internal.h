@@ -60,7 +60,6 @@
 #include <windowsx.h>
 #include <mmsystem.h>
 #include <TCHAR.H>
-#endif
 
 /* TODO: MinGW is lacking a prototype, this should better be handled via autoconf! */
 #ifndef ChangeDisplaySettingsEx
@@ -70,6 +69,7 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 #define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
 #else
 #define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
+#endif
 #endif
 #endif
 
