@@ -1069,3 +1069,5 @@ event tracing, but in the future we could add more.
 VisibilityNotify, so we have to handle the window status callback in the
 former case, too. This fixes bug #763442 (Call the visibility callback when
 minimizing a window).
+
+(277) Removed redundant files from EXTRA_DIST.
