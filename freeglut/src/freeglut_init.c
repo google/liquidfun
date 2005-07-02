@@ -61,7 +61,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GL_FALSE,              /* GLDebugSwitch */
                       GL_FALSE,              /* XSyncSwitch */
                       GLUT_KEY_REPEAT_ON,    /* KeyRepeat */
-                      0xffffffff,            /* Modifiers */
+                      INVALID_MODIFIERS,     /* Modifiers */
                       0,                     /* FPSInterval */
                       0,                     /* SwapCount */
                       0,                     /* SwapTime */
@@ -274,7 +274,7 @@ void fgDeinitialize( void )
     fgState.ExecState           = GLUT_EXEC_STATE_INIT;
 
     fgState.KeyRepeat       = GLUT_KEY_REPEAT_ON;
-    fgState.Modifiers       = 0xffffffff;
+    fgState.Modifiers       = INVALID_MODIFIERS;
 
     fgState.GameModeSize.X  = 640;
     fgState.GameModeSize.Y  = 480;

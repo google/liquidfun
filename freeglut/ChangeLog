@@ -1092,3 +1092,7 @@ linking troubles for the examples.
 fixes bug #961938 (Executable bit set on non exe files).
 
 (283) Partial fixes for bug #1218900 (freeglut-2.4.0 on FreeBSD).
+
+(284) Handle modifiers in MotionNotify events, too. This fixes bug
+#1227920 (glutGetModifiers not set/allowed in mouse callbacks). In
+addition, some related cleanup has been done.

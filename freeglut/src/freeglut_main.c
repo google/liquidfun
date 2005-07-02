@@ -495,17 +495,17 @@ static void fghSleepForEvents( void )
 
 #if TARGET_HOST_UNIX_X11
 /*
- * Returns GLUT modifier mask for an XEvent.
+ * Returns GLUT modifier mask for the state field of an X11 event.
  */
-static int fghGetXModifiers( XEvent *event )
+static int fghGetXModifiers( int state )
 {
     int ret = 0;
 
-    if( event->xkey.state & ( ShiftMask | LockMask ) )
+    if( state & ( ShiftMask | LockMask ) )
         ret |= GLUT_ACTIVE_SHIFT;
-    if( event->xkey.state & ControlMask )
+    if( state & ControlMask )
         ret |= GLUT_ACTIVE_CTRL;
-    if( event->xkey.state & Mod1Mask )
+    if( state & Mod1Mask )
         ret |= GLUT_ACTIVE_ALT;
 
     return ret;
@@ -1181,14 +1181,15 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * XXX track ButtonPress/ButtonRelease events in our own
              * XXX bit-mask?
              */
-#define BUTTON_MASK \
-  ( Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask )
-            if ( event.xmotion.state & BUTTON_MASK )
+	    fgState.Modifiers = fghGetXModifiers( event.xmotion.state );
+            if ( event.xmotion.state & ( Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask ) ) {
                 INVOKE_WCB( *window, Motion, ( event.xmotion.x,
                                                event.xmotion.y ) );
-            else
+            } else {
                 INVOKE_WCB( *window, Passive, ( event.xmotion.x,
                                                 event.xmotion.y ) );
+	    }
+	    fgState.Modifiers = INVALID_MODIFIERS;
         }
         break;
 
@@ -1234,7 +1235,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                 ! FETCH_WCB( *window, MouseWheel ) )
                 break;
 
-            fgState.Modifiers = fghGetXModifiers( &event );
+            fgState.Modifiers = fghGetXModifiers( event.xbutton.state );
 
             /* Finally execute the mouse or mouse wheel callback */
             if( ( button < glutDeviceGet ( GLUT_NUM_MOUSE_BUTTONS ) ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
@@ -1269,9 +1270,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
                                                        event.xbutton.y )
                     );
             }
-
-            /* Trash the modifiers state */
-            fgState.Modifiers = 0xffffffff;
+            fgState.Modifiers = INVALID_MODIFIERS;
         }
         break;
 
@@ -1346,11 +1345,11 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     if( keyboard_cb )
                     {
                         fgSetWindow( window );
-                        fgState.Modifiers = fghGetXModifiers( &event );
+                        fgState.Modifiers = fghGetXModifiers( event.xkey.state );
                         keyboard_cb( asciiCode[ 0 ],
                                      event.xkey.x, event.xkey.y
                         );
-                        fgState.Modifiers = 0xffffffff;
+                        fgState.Modifiers = INVALID_MODIFIERS;
                     }
                 }
                 else
@@ -1400,9 +1399,9 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     if( special_cb && (special != -1) )
                     {
                         fgSetWindow( window );
-                        fgState.Modifiers = fghGetXModifiers( &event );
+                        fgState.Modifiers = fghGetXModifiers( event.xkey.state );
                         special_cb( special, event.xkey.x, event.xkey.y );
-                        fgState.Modifiers = 0xffffffff;
+                        fgState.Modifiers = INVALID_MODIFIERS;
                     }
                 }
             }
@@ -1771,7 +1770,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             INVOKE_WCB( *window, Passive, ( window->State.MouseX,
                                             window->State.MouseY ) );
 
-        fgState.Modifiers = 0xffffffff;
+        fgState.Modifiers = INVALID_MODIFIERS;
     }
     break;
 
@@ -1881,7 +1880,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             )
         );
 
-        fgState.Modifiers = 0xffffffff;
+        fgState.Modifiers = INVALID_MODIFIERS;
     }
     break;
 
@@ -1948,7 +1947,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 );
             }
 
-        fgState.Modifiers = 0xffffffff;
+        fgState.Modifiers = INVALID_MODIFIERS;
     }
     break ;
 
@@ -2035,7 +2034,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                           window->State.MouseX, window->State.MouseY )
             );
 
-        fgState.Modifiers = 0xffffffff;
+        fgState.Modifiers = INVALID_MODIFIERS;
     }
     break;
 
@@ -2118,7 +2117,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                           window->State.MouseX, window->State.MouseY )
             );
 
-        fgState.Modifiers = 0xffffffff;
+        fgState.Modifiers = INVALID_MODIFIERS;
     }
     break;
 
@@ -2133,7 +2132,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                     ( (char)wParam,
                       window->State.MouseX, window->State.MouseY )
         );
-        fgState.Modifiers = 0xffffffff;
+        fgState.Modifiers = INVALID_MODIFIERS;
     }
     break;
 

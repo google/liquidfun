@@ -579,7 +579,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
 int FGAPIENTRY glutGetModifiers( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetModifiers" );
-    if( fgState.Modifiers == 0xffffffff )
+    if( fgState.Modifiers == INVALID_MODIFIERS )
     {
         fgWarning( "glutGetModifiers() called outside an input callback" );
         return 0;
