@@ -1087,3 +1087,6 @@ autoconf than via cpp.
 
 (281) Some steps toward compilation under MinGW. Note that there are still
 linking troubles for the examples.
+
+(282) Remove wrong "execute" bits when creating a distribution. This
+fixes bug #961938 (Executable bit set on non exe files).
