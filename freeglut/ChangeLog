@@ -1090,3 +1090,5 @@ linking troubles for the examples.
 
 (282) Remove wrong "execute" bits when creating a distribution. This
 fixes bug #961938 (Executable bit set on non exe files).
+
+(283) Partial fixes for bug #1218900 (freeglut-2.4.0 on FreeBSD).
