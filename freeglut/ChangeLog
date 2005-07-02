@@ -1060,12 +1060,15 @@ box.
 (273) Fixed a bug in the Sierpinski sponge code that caused the application
 to crash if it called the code with a negative number of levels
 
-(274) Added --enable-debug configure flag. Currently it only turns on X11
+(274) Added separate static and DLL versions of all the demonstration
+programs under Windows.
+
+(275) Added --enable-debug configure flag. Currently it only turns on X11
 event tracing, but in the future we could add more.
 
-(275) Cleaned up CreateNotify/ConfigureNotify handling.
+(276) Cleaned up CreateNotify/ConfigureNotify handling.
 
-(276) When a window is iconified, only an UnmapNotify is sent, not a
+(277) When a window is iconified, only an UnmapNotify is sent, not a
 VisibilityNotify, so we have to handle the window status callback in the
 former case, too. This fixes bug #763442 (Call the visibility callback when
 minimizing a window).
@@ -1074,13 +1077,13 @@ minimizing a window).
 * Changes on July 1, 2005.
 **************************************************************************
 
-(277) Removed redundant files from EXTRA_DIST.
+(278) Removed redundant files from EXTRA_DIST.
 
-(278) MinGW is lacking a prototype for ChangeDisplaySettingsEx, so
+(279) MinGW is lacking a prototype for ChangeDisplaySettingsEx, so
 supply one in this case. Note that this should better be handled via
 autoconf than via cpp.
 
-(279) Silenced a signed/unsigned mismatched via a cast.
+(280) Silenced a signed/unsigned mismatched via a cast.
 
-(280) Some steps toward compilation under MinGW. Note that there are still
+(281) Some steps toward compilation under MinGW. Note that there are still
 linking troubles for the examples.
