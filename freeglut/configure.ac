@@ -77,8 +77,7 @@ fi
 
 AC_ARG_ENABLE([debug],
 [AS_HELP_STRING([--enable-debug],
-                [enable debug (for developers) @<:@default=no@:>@])])
-
+                [enable debugging code (for developers) @<:@default=no@:>@])])
 if test "x$enable_debug" = xyes; then
   AC_DEFINE([_DEBUG], [1], [Define to 1 if you want to include debugging code.])
 fi
