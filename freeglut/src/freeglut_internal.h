@@ -786,7 +786,7 @@ int  glutJoystickGetNumAxes( int ident );
 int  glutJoystickGetNumButtons( int ident );
 int  glutJoystickNotWorking( int ident );
 
-/* InputDevice Init/Fini */
+/* InputDevice Initialisation and Closure */
 int         fgInputDeviceDetect( void );
 void        fgInitialiseInputDevices( void );
 void        fgInputDeviceClose( void );
