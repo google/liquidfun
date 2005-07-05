@@ -1599,13 +1599,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
             if( fgStructure.MenuContext )
                 wglMakeCurrent( window->Window.Device,
-                                fgStructure.MenuContext->Context
+                                fgStructure.MenuContext->MContext
                 );
             else
             {
                 fgStructure.MenuContext =
                     (SFG_MenuContext *)malloc( sizeof(SFG_MenuContext) );
-                fgStructure.MenuContext->Context =
+                fgStructure.MenuContext->MContext =
                     wglCreateContext( window->Window.Device );
             }
 
