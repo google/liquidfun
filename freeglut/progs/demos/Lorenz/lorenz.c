@@ -141,15 +141,15 @@ void key_cb ( unsigned char key, int x, int y )
     break ;
 
   case 'm' :  case 'M' :  /* Modify the Lorenz parameters */
-    printf ( "Please enter new value for <sigma> (default %f, currently %f): ", s0, sigma ) ;
+    printf ( "Please enter new value for <sigma> (default %lf, currently %lf): ", s0, sigma ) ;
     fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
     sscanf ( inputline, "%lf", &sigma ) ;
 
-    printf ( "Please enter new value for <b> (default %f, currently %f): ", b0, b ) ;
+    printf ( "Please enter new value for <b> (default %lf, currently %lf): ", b0, b ) ;
     fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
     sscanf ( inputline, "%lf", &b ) ;
 
-    printf ( "Please enter new value for <r> (default %f, currently %f): ", r0, r ) ;
+    printf ( "Please enter new value for <r> (default %lf, currently %lf): ", r0, r ) ;
     fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
     sscanf ( inputline, "%lf", &r ) ;
 
@@ -257,9 +257,9 @@ void display_cb ( void )
 
   /* Print the distance between the two points */
   glColor3d ( 1.0, 1.0, 1.0 ) ;  /* White */
-  sprintf ( string, "Distance: %10.6f", distance ) ;
+  sprintf ( string, "Distance: %10.6lf", distance ) ;
   glRasterPos2i ( 10, 10 ) ;
-  glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)string ) ;
+  glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char *)string ) ;
 
   glutSwapBuffers();
 }
@@ -347,7 +347,7 @@ int main ( int argc, char *argv[] )
   glutMainLoop () ;
 
 #ifdef WIN32
-  /* DUMP MEMORY LEAK INFORMATION */
+    /* DUMP MEMORY LEAK INFORMATION */
   _CrtDumpMemoryLeaks () ;
 #endif
 
