@@ -260,7 +260,15 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     /* I do not know yet if there will be a fgChooseVisual() function for Win32 */
     case GLUT_DISPLAY_MODE_POSSIBLE:
-        return( fgChooseVisual() == NULL ? 0 : 1 );
+    {
+        XVisualInfo* visualInfo = fgChooseVisual();
+        if ( visualInfo == NULL ) {
+            return 0;
+        } else {
+            XFree( visualInfo );
+            return 1;
+        }
+    }
 
     /* This is system-dependant */
     case GLUT_WINDOW_FORMAT_ID:

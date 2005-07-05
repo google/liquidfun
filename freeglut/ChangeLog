@@ -1096,3 +1096,6 @@ fixes bug #961938 (Executable bit set on non exe files).
 (284) Handle modifiers in MotionNotify events, too. This fixes bug
 #1227920 (glutGetModifiers not set/allowed in mouse callbacks). In
 addition, some related cleanup has been done.
+
+(285) X11 only: Free XVisualInfo structures when they are not needed
+anymore, fixing a space leak. Not perfect for menus yet...
