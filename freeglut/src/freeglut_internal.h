@@ -514,10 +514,10 @@ typedef struct tagSFG_MenuContext SFG_MenuContext;
 struct tagSFG_MenuContext
 {
 #if TARGET_HOST_UNIX_X11
-    XVisualInfo*        VisualInfo;       /* The window's visual information */
+    XVisualInfo*        MVisualInfo;      /* The window's visual information */
 #endif
 
-    SFG_WindowContextType Context;        /* The menu window's WGL context   */
+    SFG_WindowContextType MContext;       /* The menu window's WGL context   */
 };
 
 /* This structure describes a menu */

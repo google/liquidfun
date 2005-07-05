@@ -380,14 +380,14 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         {
             fgStructure.MenuContext =
                 (SFG_MenuContext *)malloc( sizeof(SFG_MenuContext) );
-            fgStructure.MenuContext->VisualInfo = window->Window.VisualInfo;
-            fgStructure.MenuContext->Context = glXCreateContext(
-                fgDisplay.Display, fgStructure.MenuContext->VisualInfo,
+            fgStructure.MenuContext->MVisualInfo = window->Window.VisualInfo;
+            fgStructure.MenuContext->MContext = glXCreateContext(
+                fgDisplay.Display, fgStructure.MenuContext->MVisualInfo,
                 NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
             );
         }
 
-        /* window->Window.Context = fgStructure.MenuContext->Context; */
+        /* window->Window.Context = fgStructure.MenuContext->MContext; */
         window->Window.Context = glXCreateContext(
             fgDisplay.Display, window->Window.VisualInfo,
             NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
