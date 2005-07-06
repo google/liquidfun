@@ -1085,7 +1085,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
         case UnmapNotify:
             /* We get this when iconifying a window. */ 
             GETWINDOW( xunmap );
-            fgSetWindow( window );
             INVOKE_WCB( *window, WindowStatus, ( GLUT_HIDDEN ) );
             window->State.Visible = GL_FALSE;
             break;
@@ -1100,14 +1099,6 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
         case VisibilityNotify:
         {
-            GETWINDOW( xvisibility );
-            /*
-             * XXX INVOKE_WCB() does this check for us.
-             */
-            if( ! FETCH_WCB( *window, WindowStatus ) )
-                break;
-            fgSetWindow( window );
-
             /*
              * Sending this event, the X server can notify us that the window
              * has just acquired one of the three possible visibility states:
@@ -1116,6 +1107,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * VisibilityNotify event when iconifying a window, we only get an
              * UnmapNotify then.
              */
+            GETWINDOW( xvisibility );
             switch( event.xvisibility.state )
             {
             case VisibilityUnobscured:
