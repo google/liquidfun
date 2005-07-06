@@ -413,7 +413,7 @@ static int fghHaveJoystick( void )
 }
 static void fghHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
 {
-    if( w->State.Redisplay )
+    if( w->State.Redisplay && w->State.Visible )
     {
         e->found = GL_TRUE;
         e->data = w;

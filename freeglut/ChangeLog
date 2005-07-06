@@ -1105,3 +1105,8 @@ deinitializing. The visual/context handling for menus is still rather
 obscure, though...
 
 (287) Removed redundant code.
+
+(288) We only have pending redisplay callbacks when the window wants to be
+redisplayed *and* it is visible. Otherwise we won't redraw, anyway, and
+immediately discover that there's still something to do, etc. etc., leading
+to 100% CPU load.
