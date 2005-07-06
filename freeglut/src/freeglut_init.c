@@ -225,6 +225,10 @@ void fgDeinitialize( void )
     /* If there was a menu created, destroy the rendering context */
     if( fgStructure.MenuContext )
     {
+#if TARGET_HOST_UNIX_X11
+        /* Note that the MVisualInfo is not owned by the MenuContext! */
+        glXDestroyContext( fgDisplay.Display, fgStructure.MenuContext->MContext );
+#endif
         free( fgStructure.MenuContext );
         fgStructure.MenuContext = NULL;
     }

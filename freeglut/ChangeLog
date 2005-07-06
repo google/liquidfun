@@ -1099,3 +1099,7 @@ addition, some related cleanup has been done.
 
 (285) X11 only: Free XVisualInfo structures when they are not needed
 anymore, fixing a space leak. Not perfect for menus yet...
+
+(286) X11 only: Destroy the global menu rendering context when
+deinitializing. The visual/context handling for menus is still rather
+obscure, though...
