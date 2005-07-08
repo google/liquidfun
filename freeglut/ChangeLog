@@ -1110,3 +1110,8 @@ obscure, though...
 redisplayed *and* it is visible. Otherwise we won't redraw, anyway, and
 immediately discover that there's still something to do, etc. etc., leading
 to 100% CPU load.
+
+(289) Made a few global arrays "static", avoiding namespace pollution. The
+only externally visible symbols should either be from the GLUT API
+("glutXXX") or internal freeglut entities ("fgYYY"). Reformatted things a
+bit on the way.
