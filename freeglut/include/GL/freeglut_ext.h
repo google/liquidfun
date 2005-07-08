@@ -94,7 +94,7 @@ FGAPI void    FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) );
 /*
  * State setting and retrieval functions, see freeglut_state.c
  */
-FGAPI void    FGAPIENTRY glutSetOption ( GLenum option_flag, int value ) ;
+FGAPI void    FGAPIENTRY glutSetOption ( GLenum option_flag, int value );
 /* A.Donev: User-data manipulation */
 FGAPI void*   FGAPIENTRY glutGetWindowData( void );
 FGAPI void    FGAPIENTRY glutSetWindowData(void* data);
@@ -114,8 +114,8 @@ FGAPI void    FGAPIENTRY glutStrokeString( void* font, const unsigned char *stri
  */
 FGAPI void    FGAPIENTRY glutWireRhombicDodecahedron( void );
 FGAPI void    FGAPIENTRY glutSolidRhombicDodecahedron( void );
-FGAPI void    FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale ) ;
-FGAPI void    FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale ) ;
+FGAPI void    FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale );
+FGAPI void    FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale );
 FGAPI void    FGAPIENTRY glutWireCylinder( GLdouble radius, GLdouble height, GLint slices, GLint stacks);
 FGAPI void    FGAPIENTRY glutSolidCylinder( GLdouble radius, GLdouble height, GLint slices, GLint stacks);
 
@@ -125,6 +125,22 @@ FGAPI void    FGAPIENTRY glutSolidCylinder( GLdouble radius, GLdouble height, GL
 typedef void (*GLUTproc)();
 FGAPI GLUTproc FGAPIENTRY glutGetProcAddress( const char *procName );
 
+/*
+ * Joystick functions, see freeglut_joystick.c
+ */
+FGAPI int     FGAPIENTRY glutJoystickGetNumAxes( int ident );
+FGAPI int     FGAPIENTRY glutJoystickGetNumButtons( int ident );
+FGAPI int     FGAPIENTRY glutJoystickNotWorking( int ident );
+FGAPI float   FGAPIENTRY glutJoystickGetDeadBand( int ident, int axis );
+FGAPI void    FGAPIENTRY glutJoystickSetDeadBand( int ident, int axis, float db );
+FGAPI float   FGAPIENTRY glutJoystickGetSaturation( int ident, int axis );
+FGAPI void    FGAPIENTRY glutJoystickSetSaturation( int ident, int axis, float st );
+FGAPI void    FGAPIENTRY glutJoystickSetMinRange( int ident, float *axes );
+FGAPI void    FGAPIENTRY glutJoystickSetMaxRange( int ident, float *axes );
+FGAPI void    FGAPIENTRY glutJoystickSetCenter( int ident, float *axes );
+FGAPI void    FGAPIENTRY glutJoystickGetMinRange( int ident, float *axes );
+FGAPI void    FGAPIENTRY glutJoystickGetMaxRange( int ident, float *axes );
+FGAPI void    FGAPIENTRY glutJoystickGetCenter( int ident, float *axes );
 
 #ifdef __cplusplus
     }

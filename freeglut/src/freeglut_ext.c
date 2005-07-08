@@ -177,6 +177,19 @@ static GLUTproc fghGetProcAddress( const char* procName )
     CHECK_NAME(glutSolidCylinder);
     CHECK_NAME(glutGetProcAddress);
     CHECK_NAME(glutMouseWheelFunc);
+    CHECK_NAME(glutJoystickGetNumAxes);
+    CHECK_NAME(glutJoystickGetNumButtons);
+    CHECK_NAME(glutJoystickNotWorking);
+    CHECK_NAME(glutJoystickGetDeadBand);
+    CHECK_NAME(glutJoystickSetDeadBand);
+    CHECK_NAME(glutJoystickGetSaturation);
+    CHECK_NAME(glutJoystickSetSaturation);
+    CHECK_NAME(glutJoystickSetMinRange);
+    CHECK_NAME(glutJoystickSetMaxRange);
+    CHECK_NAME(glutJoystickSetCenter);
+    CHECK_NAME(glutJoystickGetMinRange);
+    CHECK_NAME(glutJoystickGetMaxRange);
+    CHECK_NAME(glutJoystickGetCenter);
 #undef CHECK_NAME
 
     return NULL;

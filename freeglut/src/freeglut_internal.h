@@ -781,11 +781,6 @@ void        fgInitialiseJoysticks( void );
 void        fgJoystickClose( void );
 void        fgJoystickPollWindow( SFG_Window* window );
 
-/* More joystick functions.  Should these go into the API?  */
-int  glutJoystickGetNumAxes( int ident );
-int  glutJoystickGetNumButtons( int ident );
-int  glutJoystickNotWorking( int ident );
-
 /* InputDevice Initialisation and Closure */
 int         fgInputDeviceDetect( void );
 void        fgInitialiseInputDevices( void );

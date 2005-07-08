@@ -1115,3 +1115,6 @@ to 100% CPU load.
 only externally visible symbols should either be from the GLUT API
 ("glutXXX") or internal freeglut entities ("fgYYY"). Reformatted things a
 bit on the way.
+
+(290) Made all the "glutJoystickXXX" functions part of the freeglut
+extensions.
