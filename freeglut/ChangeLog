@@ -1118,3 +1118,6 @@ bit on the way.
 
 (290) Made all the "glutJoystickXXX" functions part of the freeglut
 extensions.
+
+(291) Solaris doesn't have cfmakeraw, but it is only a convenience function
+for some bit-fiddling, anyway.
