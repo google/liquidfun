@@ -1123,3 +1123,6 @@ extensions.
 for some bit-fiddling, anyway.
 
 (292) Avoid gcc warnings for some joystick code (e.g. on Solaris).
+
+(293) Improve autoconf magic: To detect headers like GL/gl.h, it might be
+necessary to temporarily use the X11 flags found by AC_PATH_XTRA.

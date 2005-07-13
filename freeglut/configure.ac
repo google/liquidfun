@@ -40,13 +40,12 @@ AC_SUBST([EXPORT_FLAGS])
 
 # Checks for header files.
 AC_HEADER_STDC
+save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $X_CFLAGS"
 AC_CHECK_HEADERS([GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
 AC_HEADER_TIME
-
-save_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS $X_CFLAGS"
 AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [], [], [#include <X11/Xlib.h>])
-CFLAGS="$save_CFLAGS"
+CPPFLAGS="$save_CPPFLAGS"
 
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
