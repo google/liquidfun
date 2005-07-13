@@ -1121,3 +1121,5 @@ extensions.
 
 (291) Solaris doesn't have cfmakeraw, but it is only a convenience function
 for some bit-fiddling, anyway.
+
+(292) Avoid gcc warnings for some joystick code (e.g. on Solaris).

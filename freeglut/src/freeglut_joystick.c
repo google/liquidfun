@@ -1066,6 +1066,9 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 #    endif
 #endif
 
+    /* Silence gcc, the correct #ifdefs would be too fragile... */
+    (void)i;
+
     /*
      * Default values (for no joystick -- each conditional will reset the
      * error flag)
