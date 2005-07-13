@@ -68,32 +68,32 @@ typedef struct {
 
 #define DIAL_NUM_VALUATORS 8
 
-	/* dial parser state machine states */
-#define DIAL_NEW		-1
+/* dial parser state machine states */
+#define DIAL_NEW                (-1)
 #define DIAL_WHICH_DEVICE       0
 #define DIAL_VALUE_HIGH         1
 #define DIAL_VALUE_LOW          2
 
-	/* dial/button box commands */
+/* dial/button box commands */
 #define DIAL_INITIALIZE                 0x20
 #define DIAL_SET_LEDS                   0x75
 #define DIAL_SET_TEXT                   0x61
 #define DIAL_SET_AUTO_DIALS             0x50
 #define DIAL_SET_AUTO_DELTA_DIALS       0x51
-#define DIAL_SET_FILTER			0x53
+#define DIAL_SET_FILTER                 0x53
 #define DIAL_SET_BUTTONS_MOM_TYPE       0x71
 #define DIAL_SET_AUTO_MOM_BUTTONS       0x73
-#define DIAL_SET_ALL_LEDS		0x4b
-#define DIAL_CLEAR_ALL_LEDS		0x4c
+#define DIAL_SET_ALL_LEDS               0x4b
+#define DIAL_CLEAR_ALL_LEDS             0x4c
 
-	/* dial/button box replies and events */
+/* dial/button box replies and events */
 #define DIAL_INITIALIZED        0x20
 #define DIAL_BASE               0x30
 #define DIAL_DELTA_BASE         0x40
 #define DIAL_PRESS_BASE         0xc0
 #define DIAL_RELEASE_BASE       0xe0
 
-	/* macros to determine reply type */
+/* macros to determine reply type */
 #define IS_DIAL_EVENT(ch)       (((ch)>=DIAL_BASE)&&((ch)<DIAL_BASE+DIAL_NUM_VALUATORS))
 #define IS_KEY_PRESS(ch)        (((ch)>=DIAL_PRESS_BASE)&&((ch)<DIAL_PRESS_BASE+DIAL_NUM_BUTTONS))
 #define IS_KEY_RELEASE(ch)      (((ch)>=DIAL_RELEASE_BASE)&&((ch)<DIAL_RELEASE_BASE+DIAL_NUM_BUTTONS))
@@ -213,8 +213,8 @@ static void poll_dials ( int id )
         {
             switch ( dial_state )
             {
-	        case DIAL_WHICH_DEVICE:
-	            dial_which = data - DIAL_BASE;
+            case DIAL_WHICH_DEVICE:
+                dial_which = data - DIAL_BASE;
                 dial_state++;
                 break;
             case DIAL_VALUE_HIGH:
