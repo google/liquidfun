@@ -271,14 +271,6 @@ static SERIALPORT *serial_open ( const char *device )
     tcgetattr(fd,&port->termio_save);
 
     memset(&termio, 0, sizeof(termio));
-
-    /* Same as "cfmakeraw(&termio)", but Solaris doesn't have this call */
-    termio.c_iflag &= ~( IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON );
-    termio.c_oflag &= ~OPOST;
-    termio.c_lflag &= ~( ECHO | ECHONL | ICANON | ISIG | IEXTEN );
-    termio.c_cflag &= ~( CSIZE | PARENB );
-    termio.c_cflag |= CS8;
-
     termio.c_cflag = CS8 | CREAD | HUPCL ;
     termio.c_iflag = IGNPAR | IGNBRK ;
     termio.c_cc[VTIME]    = 0;   /* inter-character timer */
