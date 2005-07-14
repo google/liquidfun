@@ -147,13 +147,13 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
             }
         }
 
-        if ( cursorIDToUse == GLUT_CURSOR_INHERIT )
+        if ( cursorIDToUse == GLUT_CURSOR_INHERIT ) {
             XUndefineCursor( fgDisplay.Display, window->Window.Handle );
-        if ( ( cursorIDToUse != GLUT_CURSOR_NONE ) && ( cursor == None ) )
+        } else if ( cursor != None ) {
+            XDefineCursor( fgDisplay.Display, window->Window.Handle, cursor );
+        } else if ( cursorIDToUse != GLUT_CURSOR_NONE ) {
             fgError( "Failed to create cursor" );
-        else
-            XDefineCursor( fgDisplay.Display,
-                           window->Window.Handle, cursor );
+        }
     }
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE

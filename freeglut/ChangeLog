@@ -1126,3 +1126,5 @@ for some bit-fiddling, anyway.
 
 (293) Improve autoconf magic: To detect headers like GL/gl.h, it might be
 necessary to temporarily use the X11 flags found by AC_PATH_XTRA.
+
+(294) Fixed the GLUT_CURSOR_INHERIT logic once again...
