@@ -42,7 +42,7 @@
 #   define  TARGET_HOST_UNIX_X11    0
 #   define  TARGET_HOST_WIN32       0
 #   define  TARGET_HOST_WINCE       1
-#elif defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
+#elif defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__WATCOMC__)
 #   define  TARGET_HOST_UNIX_X11    0
 #   define  TARGET_HOST_WIN32       1
 #   define  TARGET_HOST_WINCE       0
@@ -73,7 +73,7 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 #endif
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__WATCOMC__)
 #define strdup   _strdup
 #endif
 
