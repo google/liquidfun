@@ -1,31 +1,40 @@
-Windows 32 / MSVC Notes
-=======================
+Windows 32 Notes
+================
 
 The "freeglut" library installation package comes with MSVC 6.0 workspace and
-project files.  The workspace has two projects:  "freeglut.dsp", which creates
-a DLL file, and "freeglut_static.dsp", which creates a static library.
+project files.  The workspace "freeglut.dsw" has two projects:
+"freeglut.dsp", which creates a DLL file, and "freeglut_static.dsp", which
+creates a static library.
+
+The "freeglut" library also comes with an Open Watcom compiler project file
+"freeglut.wpj" and two target files "freeglut.tgt" and "freeglut_static.tgt".
+The two target files build DLL and static libraries.  The Open Watcom also
+includes "freeglut.rc", which is a resource compiler script to add a "Version"
+tab to the DLL property sheet.
 
 
-Building the Libraries
-======================
+Building the Libraries with MSVC
+================================
 
 To build the "freeglut" libraries, open MSVC and load the "freeglut" workspace.
 This will load the two projects.  Selecting "Build" - "Batch Build" from the
 menu will build both the debug and the release versions of both libraries.
 
-The libraries will be found in the following places and will have the following
-names:
-- DLL, debug version:  freeglut\freeglut\Debug\freeglut.lib
-- DLL, release version:  freeglut\freeglut\Release\freeglut.lib
-- Static, debug version:  freeglut\freeglut\DebugStatic\freeglut_static.lib
-- Static, release version:  freeglut\freeglut\ReleaseStatic\freeglut_static.lib
+The libraries will be found in the following places and will have the
+following names:
+- DLL, debug version: freeglut\freeglut\Debug\freeglut.lib
+- DLL, release version: freeglut\freeglut\Release\freeglut.lib
+- Static, debug version: freeglut\freeglut\DebugStatic\freeglut_static.lib
+- Static, release version: freeglut\freeglut\ReleaseStatic\freeglut_static.lib
 
 Unlike the *nix release, the library names are NOT automatic replacements for
-the GLUT library names.  You may rename them manually if you wish.
+the GLUT library names.  You may rename them manually if you wish, but this is
+not necessary as the header file includes a pragma telling the compiler which
+library file to look for.
 
 
-Installing the Libraries
-========================
+Installing the Libraries with MSVC
+==================================
 
 To install "freeglut" on your system so that your other projects will see it,
 you will need to copy various files to various locations.
@@ -50,8 +59,31 @@ you will need to copy various files to various locations.
       and will probably already have the files "opengl32.dll" and "glu32.dll".
 
 
-If you don't have MSVC
-======================
+Building and Installing the Libraries with Open Watcom
+======================================================
+
+To build the "freeglut" libraries, open Watcom and load the "freeglut.wpj"
+file.  This will load the two target files.  Clicking on the "Make All
+Targets" button will build both the debug and the release versions of both
+libraries.
+
+The "make" script will copy the library files to the Open Watcom library
+folder and will copy "freeglut.dll" to the correct "System32" folder.  The
+library files are named "freeglut.lib" for the DLL version and
+"freeglut_static.lib"for the static library.
+
+You will need to copy the "freeglut" include files from their installed
+location ("freeglut\freeglut\include\GL") to the Open Watcom include directory
+("%WATCOM%\h\nt\GL").
+
+Unlike the *nix release, the library names are NOT automatic replacements for
+the GLUT library names.  You may rename them manually if you wish, but this is
+not necessary as the header file includes a pragma telling the compiler which
+library file to look for.
+
+
+If you don't have MSVC or Open Watcom
+=====================================
 
 The "freeglut" developers' community discussed the possibility of distributing
 binaries and decided against it.  If you need Windows library files, please

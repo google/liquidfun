@@ -1130,3 +1130,9 @@ necessary to temporarily use the X11 flags found by AC_PATH_XTRA.
 (294) Fixed the GLUT_CURSOR_INHERIT logic once again...
 
 (295) Synched the DLL definitions with reality.
+
+**************************************************************************
+* Changes on August 31, 2005.
+**************************************************************************
+
+(296) Added support for Open Watcom
