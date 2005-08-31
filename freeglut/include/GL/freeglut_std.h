@@ -35,7 +35,7 @@
 /*
  * Under windows, we have to differentiate between static and dynamic libraries
  */
-#if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
+#if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__WATCOMC__)
 
 /* #pragma may not be supported by some compilers.
  * Discussion by FreeGLUT developers suggests that
@@ -56,7 +56,7 @@
 #    define FGAPIENTRY
 
         /* Link with Win32 static freeglut lib */
-#       if defined(_MSC_VER)
+#       if defined(_MSC_VER) || defined(__WATCOMC__)
 #           pragma comment (lib, "freeglut_static.lib")
 #       endif
 
@@ -69,7 +69,7 @@
 #                define FGAPI __declspec(dllimport)
 
             /* link with Win32 shared freeglut lib */
-#           if defined(_MSC_VER)
+#           if defined(_MSC_VER) || defined(__WATCOMC__)
 #               ifndef _WIN32_WCE
 #                   pragma comment (lib, "freeglut.lib")
 #               endif
@@ -82,7 +82,7 @@
 #   endif
 
 /* Drag in other Windows libraries as required by FreeGLUT */
-#   if defined(_MSC_VER)
+#   if defined(_MSC_VER) || defined(__WATCOMC__)
 #       ifndef _WIN32_WCE
 #           pragma comment (lib, "winmm.lib")    /* link Windows MultiMedia lib */
 #           pragma comment (lib, "user32.lib")   /* link Windows user lib       */
@@ -183,7 +183,7 @@
  *
  * Steve Baker suggested to make it binary compatible with GLUT:
  */
-#if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
+#if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__WATCOMC__)
 #   define  GLUT_STROKE_ROMAN               ((void *)0x0000)
 #   define  GLUT_STROKE_MONO_ROMAN          ((void *)0x0001)
 #   define  GLUT_BITMAP_9_BY_15             ((void *)0x0002)
