@@ -1136,3 +1136,9 @@ necessary to temporarily use the X11 flags found by AC_PATH_XTRA.
 **************************************************************************
 
 (296) Added support for Open Watcom
+
+**************************************************************************
+* Changes on September 4, 2005.
+**************************************************************************
+
+(297) Silenced autogen.sh. *nix commands are silent by default.
