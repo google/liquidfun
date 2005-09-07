@@ -1142,3 +1142,6 @@ necessary to temporarily use the X11 flags found by AC_PATH_XTRA.
 **************************************************************************
 
 (297) Silenced autogen.sh. *nix commands are silent by default.
+
+(298) Use -Wall for automake to catch some buglets, deprecated
+stuff, etc.
