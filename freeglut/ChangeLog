@@ -1145,3 +1145,5 @@ necessary to temporarily use the X11 flags found by AC_PATH_XTRA.
 
 (298) Use -Wall for automake to catch some buglets, deprecated
 stuff, etc.
+
+(299) Use target-specific *_CPPFLAGS, not the deprecated INCLUDES.

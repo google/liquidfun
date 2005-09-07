@@ -45,8 +45,7 @@ lib@LIBRARY@_la_SOURCES = freeglut_callbacks.c \
 lib@LIBRARY@_la_LIBADD  = $(LIBM) $(X_LIBS) $(GL_LIBS) $(LIBXXF86VM)
 lib@LIBRARY@_la_LDFLAGS = $(VERSION_INFO)
 lib@LIBRARY@_la_CFLAGS  = $(X_CFLAGS) $(EXPORT_FLAGS)
-
-INCLUDES = -I$(top_srcdir)/include
+lib@LIBRARY@_la_CPPFLAGS= -I$(top_srcdir)/include
 
 #
 # End of file
