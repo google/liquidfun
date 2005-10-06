@@ -128,19 +128,25 @@ FGAPI GLUTproc FGAPIENTRY glutGetProcAddress( const char *procName );
 /*
  * Joystick functions, see freeglut_joystick.c
  */
-FGAPI int     FGAPIENTRY glutJoystickGetNumAxes( int ident );
-FGAPI int     FGAPIENTRY glutJoystickGetNumButtons( int ident );
-FGAPI int     FGAPIENTRY glutJoystickNotWorking( int ident );
-FGAPI float   FGAPIENTRY glutJoystickGetDeadBand( int ident, int axis );
-FGAPI void    FGAPIENTRY glutJoystickSetDeadBand( int ident, int axis, float db );
-FGAPI float   FGAPIENTRY glutJoystickGetSaturation( int ident, int axis );
-FGAPI void    FGAPIENTRY glutJoystickSetSaturation( int ident, int axis, float st );
-FGAPI void    FGAPIENTRY glutJoystickSetMinRange( int ident, float *axes );
-FGAPI void    FGAPIENTRY glutJoystickSetMaxRange( int ident, float *axes );
-FGAPI void    FGAPIENTRY glutJoystickSetCenter( int ident, float *axes );
-FGAPI void    FGAPIENTRY glutJoystickGetMinRange( int ident, float *axes );
-FGAPI void    FGAPIENTRY glutJoystickGetMaxRange( int ident, float *axes );
-FGAPI void    FGAPIENTRY glutJoystickGetCenter( int ident, float *axes );
+/* USE OF THESE FUNCTIONS IS DEPRECATED !!!!! */
+/* If you have a serious need for these functions in your application, please either
+ * contact the "freeglut" developer community at freeglut-developer@lists.sourceforge.net,
+ * switch to the OpenGLUT library, or else port your joystick functionality over to PLIB's
+ * "js" library.
+ */
+int     glutJoystickGetNumAxes( int ident );
+int     glutJoystickGetNumButtons( int ident );
+int     glutJoystickNotWorking( int ident );
+float   glutJoystickGetDeadBand( int ident, int axis );
+void    glutJoystickSetDeadBand( int ident, int axis, float db );
+float   glutJoystickGetSaturation( int ident, int axis );
+void    glutJoystickSetSaturation( int ident, int axis, float st );
+void    glutJoystickSetMinRange( int ident, float *axes );
+void    glutJoystickSetMaxRange( int ident, float *axes );
+void    glutJoystickSetCenter( int ident, float *axes );
+void    glutJoystickGetMinRange( int ident, float *axes );
+void    glutJoystickGetMaxRange( int ident, float *axes );
+void    glutJoystickGetCenter( int ident, float *axes );
 
 #ifdef __cplusplus
     }
