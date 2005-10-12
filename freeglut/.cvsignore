@@ -1,3 +1,4 @@
+INSTALL
 Makefile
 Makefile.in
 aclocal.m4
@@ -16,6 +17,7 @@ debugfiles.list
 debugsources.list
 depcomp
 freeglut-*.tar.gz
+install-sh
 libtool
 ltmain.sh
 man-pages
