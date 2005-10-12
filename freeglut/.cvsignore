@@ -3,6 +3,7 @@ Makefile.in
 aclocal.m4
 autom4te.cache
 autoscan.log
+compile
 config.guess
 config.h
 config.h.in
@@ -13,8 +14,10 @@ configure
 configure.scan
 debugfiles.list
 debugsources.list
+depcomp
 freeglut-*.tar.gz
 libtool
 ltmain.sh
 man-pages
+missing
 stamp-h1
