@@ -56,6 +56,8 @@
 /*
  * GLUT API Extension macro definitions -- the glutGet parameters
  */
+#define  GLUT_INIT_STATE                    0x007C
+
 #define  GLUT_ACTION_ON_WINDOW_CLOSE        0x01F9
 
 #define  GLUT_WINDOW_BORDER_WIDTH           0x01FA

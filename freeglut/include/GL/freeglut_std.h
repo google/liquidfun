@@ -261,7 +261,6 @@
 #define  GLUT_INIT_DISPLAY_MODE             0x01F8
 #define  GLUT_ELAPSED_TIME                  0x02BC
 #define  GLUT_WINDOW_FORMAT_ID              0x007B
-#define  GLUT_INIT_STATE                    0x007C
 
 /*
  * GLUT API macro definitions -- the glutDeviceGet parameters
