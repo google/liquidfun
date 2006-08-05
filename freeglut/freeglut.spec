@@ -9,9 +9,9 @@
 #
 
 # norootforbuild
-# neededforbuild  gcc-c++ gcc-g77 libstdc++ libstdc++-devel mesa-devel-packages x-devel-packages
+# usedforbuild    Mesa Mesa-devel aaa_base acl attr audit-libs autoconf automake bash bind-libs bind-utils binutils bison bzip2 coreutils cpio cpp cracklib cvs cyrus-sasl db diffutils e2fsprogs expat file filesystem fillup findutils flex fontconfig fontconfig-devel gawk gcc gcc-c++ gdbm gdbm-devel gettext gettext-devel glibc glibc-devel glibc-locale gpm grep groff gzip info insserv klogd less libacl libattr libcom_err libdrm libdrm-devel libgcc libnscd libstdc++ libstdc++-devel libtool libxcrypt libzio m4 make man mktemp module-init-tools ncurses ncurses-devel net-tools netcfg openldap2-client openmotif-libs openssl pam pam-modules patch perl permissions popt procinfo procps psmisc pwdutils rcs readline rpm sed strace sysvinit tar tcpd texinfo timezone unzip util-linux vim xorg-x11-devel xorg-x11-libs zlib zlib-devel
 
-BuildRequires: aaa_base acl attr bash bind-utils bison bzip2 coreutils cpio cpp cracklib cvs cyrus-sasl db devs diffutils e2fsprogs file filesystem fillup findutils flex gawk gdbm-devel glibc glibc-devel glibc-locale gpm grep groff gzip info insserv klogd less libacl libattr libgcc libnscd libselinux libstdc++ libxcrypt libzio m4 make man mktemp module-init-tools ncurses ncurses-devel net-tools netcfg openldap2-client openssl pam pam-modules patch permissions popt procinfo procps psmisc pwdutils rcs readline sed strace syslogd sysvinit tar tcpd texinfo timezone unzip util-linux vim zlib zlib-devel autoconf automake binutils expat fontconfig fontconfig-devel gcc gcc-c++ gcc-g77 gdbm gettext libstdc++-devel libtool perl rpm xorg-x11-Mesa xorg-x11-Mesa-devel xorg-x11-devel xorg-x11-libs
+BuildRequires:  Mesa-devel gcc-c++ libdrm-devel
 
 Name:         freeglut
 Summary:      Freely Licensed Alternative to the GLUT Library
@@ -108,6 +108,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libglut.so
 
 %changelog -n freeglut
+* Set Aug 05 2006 - sven.panne@aedion.de
+- Updated build requirements for SuSE 10.1
 * Mon Jun 13 2005 - sven.panne@aedion.de
 - updated to release 2.4.0
 - use autogen.sh
