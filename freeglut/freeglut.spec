@@ -108,7 +108,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libglut.so
 
 %changelog -n freeglut
-* Set Aug 05 2006 - sven.panne@aedion.de
+* Sat Aug 05 2006 - sven.panne@aedion.de
 - Updated build requirements for SuSE 10.1
 * Mon Jun 13 2005 - sven.panne@aedion.de
 - updated to release 2.4.0
