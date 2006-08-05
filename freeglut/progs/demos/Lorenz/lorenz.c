@@ -107,6 +107,16 @@ void advance_in_time ( double time_step, double position[3], double new_position
                       ( deriv0[i] + 2.0 * ( deriv1[i] + deriv2[i] ) + deriv3[i] ) ;
 }
 
+static void
+checkedFGets ( char *s, int size, FILE *stream )
+{
+  if ( fgets ( s, size, stream ) == NULL ) {
+    fprintf ( stderr, "fgets failed\n");
+    exit ( EXIT_FAILURE );
+  }
+}
+
+
 /* GLUT callbacks */
 
 #define INPUT_LINE_LENGTH 80
@@ -142,15 +152,15 @@ void key_cb ( unsigned char key, int x, int y )
 
   case 'm' :  case 'M' :  /* Modify the Lorenz parameters */
     printf ( "Please enter new value for <sigma> (default %f, currently %f): ", s0, sigma ) ;
-    fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), stdin ) ;
     sscanf ( inputline, "%lf", &sigma ) ;
 
     printf ( "Please enter new value for <b> (default %f, currently %f): ", b0, b ) ;
-    fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), stdin ) ;
     sscanf ( inputline, "%lf", &b ) ;
 
     printf ( "Please enter new value for <r> (default %f, currently %f): ", r0, r ) ;
-    fgets ( inputline, INPUT_LINE_LENGTH-1, stdin ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), stdin ) ;
     sscanf ( inputline, "%lf", &r ) ;
 
     break ;

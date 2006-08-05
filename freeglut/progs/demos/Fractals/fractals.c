@@ -208,6 +208,16 @@ Special(int key, int x, int y)
 }
 
 
+static void
+checkedFGets ( char *s, int size, FILE *stream )
+{
+  if ( fgets ( s, size, stream ) == NULL ) {
+    fprintf ( stderr, "fgets failed\n");
+    exit ( EXIT_FAILURE );
+  }
+}
+
+
 void readConfigFile ( char *fnme )
 {
   FILE *fptr = fopen ( fnme, "rt" ) ;
@@ -217,13 +227,13 @@ void readConfigFile ( char *fnme )
   if ( fptr )
   {
     /* Read a header line */
-    fgets ( inputline, 256, fptr ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), fptr ) ;
 
     /* Read a comment line */
-    fgets ( inputline, 256, fptr ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), fptr ) ;
 
     /* Read the window title */
-    fgets ( inputline, 256, fptr ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), fptr ) ;
     /* We assume here that this line will not exceed 79 characters plus a 
        newline (window_title is 80 characters long). That'll cause a buffer 
        overflow. For a simple program like  this, though, we're letting it 
@@ -232,21 +242,21 @@ void readConfigFile ( char *fnme )
     sscanf ( inputline, "%[a-zA-Z0-9!@#$%^&*()+=/\\_-\" ]", window_title ) ; 
 
     /* Read a comment line */
-    fgets ( inputline, 256, fptr ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), fptr ) ;
 
     /* Read the number of affine transformations */
-    fgets ( inputline, 256, fptr ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), fptr ) ;
     sscanf ( inputline, "%d", &num_trans ) ;
 
     affine = (AffineTrans *)malloc ( num_trans * sizeof(AffineTrans) ) ;
 
     /* Read a comment line */
-    fgets ( inputline, 256, fptr ) ;
+    checkedFGets ( inputline, sizeof ( inputline ), fptr ) ;
 
     for ( i = 0; i < num_trans; i++ )
     {
       /* Read an affine transformation definition */
-      fgets ( inputline, 256, fptr ) ;
+      checkedFGets ( inputline, sizeof ( inputline ), fptr ) ;
       sscanf ( inputline, "%lf %lf %lf %lf %lf %lf", &affine[i].a00, &affine[i].a01,
                        &affine[i].a10, &affine[i].a11, &affine[i].b0, &affine[i].b1 ) ;
     }
