@@ -28,7 +28,7 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
 #include <aygshell.h>
 #pragma comment( lib, "Aygshell.lib" ) /* library pragmas are bad */
 
@@ -43,7 +43,7 @@ static wchar_t* fghWstrFromStr(const char* str)
 }
 
 
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -73,7 +73,7 @@ static wchar_t* fghWstrFromStr(const char* str)
 /*
  * Chooses a visual basing on the current display mode settings
  */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
 XVisualInfo* fgChooseVisual( void )
 {
@@ -169,11 +169,11 @@ XVisualInfo* fgChooseVisual( void )
 /*
  * Setup the pixel format for a Win32 window
  */
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS
 GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                               unsigned char layer_type )
 {
-#if TARGET_HOST_WINCE
+#ifdef _WIN32_WCE
     return GL_TRUE;
 #else
     PIXELFORMATDESCRIPTOR* ppfd, pfd;
@@ -244,9 +244,9 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     if( checkOnly )
         return GL_TRUE;
     return SetPixelFormat( window->Window.Device, pixelformat, ppfd );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 }
-#endif
+#endif /* TARGET_HOST_MS_WINDOWS */
 
 /*
  * Sets the OpenGL context and the fgStructure "Current Window" pointer to
@@ -254,14 +254,14 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
  */
 void fgSetWindow ( SFG_Window *window )
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     if ( window )
         glXMakeCurrent(
             fgDisplay.Display,
             window->Window.Handle,
             window->Window.Context
         );
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
     if( fgStructure.CurrentWindow )
         ReleaseDC( fgStructure.CurrentWindow->Window.Handle,
                    fgStructure.CurrentWindow->Window.Device );
@@ -287,7 +287,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                    int x, int y, int w, int h,
                    GLboolean gameMode, GLboolean isSubWindow )
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     XSetWindowAttributes winAttr;
     XTextProperty textProperty;
     XSizeHints sizeHints;
@@ -478,7 +478,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     XMapWindow( fgDisplay.Display, window->Window.Handle );
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     WNDCLASS wc;
     DWORD flags;
@@ -504,7 +504,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     }
     else
     {
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
         if ( ( ! isSubWindow ) && ( ! window->IsMenu ) )
         {
             /*
@@ -516,7 +516,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 +
                 GetSystemMetrics( SM_CYCAPTION );
         }
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 
         if( ! fgState.Position.Use )
         {
@@ -540,7 +540,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             flags |= WS_POPUP;
             exFlags |= WS_EX_TOOLWINDOW;
         }
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
         else if( window->Parent == NULL )
             flags |= WS_OVERLAPPEDWINDOW;
 #endif
@@ -548,7 +548,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             flags |= WS_CHILD;
     }
 
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
     {
         wchar_t* wstr = fghWstrFromStr(title);
 
@@ -584,17 +584,17 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         fgDisplay.Instance,
         (LPVOID) window
     );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 
     if( !( window->Window.Handle ) )
         fgError( "Failed to create a window (%s)!", title );
 
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
     ShowWindow( window->Window.Handle, SW_SHOW );
 #else
     ShowWindow( window->Window.Handle,
                 fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOW );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 
     UpdateWindow( window->Window.Handle );
     ShowCursor( TRUE );  /* XXX Old comments say "hide cursor"! */
@@ -618,14 +618,14 @@ void fgOpenWindow( SFG_Window* window, const char* title,
  */
 void fgCloseWindow( SFG_Window* window )
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     glXDestroyContext( fgDisplay.Display, window->Window.Context );
     XFree( window->Window.VisualInfo );
     XDestroyWindow( fgDisplay.Display, window->Window.Handle );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     /* Make sure we don't close a window with current context active */
     if( fgStructure.CurrentWindow == window )
@@ -779,12 +779,12 @@ void FGAPIENTRY glutShowWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutShowWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutShowWindow" );
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     XMapWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     ShowWindow( fgStructure.CurrentWindow->Window.Handle, SW_SHOW );
 
@@ -801,7 +801,7 @@ void FGAPIENTRY glutHideWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutHideWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutHideWindow" );
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     if( fgStructure.CurrentWindow->Parent == NULL )
         XWithdrawWindow( fgDisplay.Display,
@@ -812,7 +812,7 @@ void FGAPIENTRY glutHideWindow( void )
                       fgStructure.CurrentWindow->Window.Handle );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     ShowWindow( fgStructure.CurrentWindow->Window.Handle, SW_HIDE );
 
@@ -830,13 +830,13 @@ void FGAPIENTRY glutIconifyWindow( void )
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIconifyWindow" );
 
     fgStructure.CurrentWindow->State.Visible   = GL_FALSE;
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     XIconifyWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle,
                     fgDisplay.Screen );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     ShowWindow( fgStructure.CurrentWindow->Window.Handle, SW_MINIMIZE );
 
@@ -854,7 +854,7 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetWindowTitle" );
     if( ! fgStructure.CurrentWindow->Parent )
     {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
         XTextProperty text;
 
@@ -871,18 +871,17 @@ void FGAPIENTRY glutSetWindowTitle( const char* title )
 
         XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32
-
-        SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
-
-#elif TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
+#    ifdef _WIN32_WCE
         {
             wchar_t* wstr = fghWstrFromStr(title);
-
             SetWindowText( fgStructure.CurrentWindow->Window.Handle, wstr );
-
             free(wstr);
         }
+#    else
+        SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
+#    endif
+
 #endif
     }
 }
@@ -897,7 +896,7 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 
     if( ! fgStructure.CurrentWindow->Parent )
     {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
         XTextProperty text;
 
@@ -914,18 +913,17 @@ void FGAPIENTRY glutSetIconTitle( const char* title )
 
         XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32
-
-        SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
-
-#elif TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
+#    ifdef _WIN32_WCE
         {
             wchar_t* wstr = fghWstrFromStr(title);
-
             SetWindowText( fgStructure.CurrentWindow->Window.Handle, wstr );
-
             free(wstr);
         }
+#    else
+        SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
+#    endif
+
 #endif
     }
 }
@@ -951,13 +949,13 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPositionWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPositionWindow" );
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     XMoveWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle,
                  x, y );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     {
         RECT winRect;
@@ -985,11 +983,11 @@ void FGAPIENTRY glutPushWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPushWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPushWindow" );
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     XLowerWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     SetWindowPos(
         fgStructure.CurrentWindow->Window.Handle,
@@ -1009,11 +1007,11 @@ void FGAPIENTRY glutPopWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPopWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPopWindow" );
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     XRaiseWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     SetWindowPos(
         fgStructure.CurrentWindow->Window.Handle,
@@ -1034,7 +1032,7 @@ void FGAPIENTRY glutFullScreen( void )
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreen" );
 
     {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
         int x, y;
         Window w;
 
@@ -1064,7 +1062,7 @@ void FGAPIENTRY glutFullScreen( void )
             );
             XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
         }
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE) /* FIXME: what about WinCE */
         RECT rect;
 
         /* For fullscreen mode, force the top-left corner to 0,0

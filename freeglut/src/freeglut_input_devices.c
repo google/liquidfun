@@ -35,7 +35,7 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -53,7 +53,7 @@ typedef struct {
    struct termios termio, termio_save;
 } SERIALPORT;
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_MS_WINDOWS
 #include <sys/types.h>
 #include <winbase.h>
 typedef struct {
@@ -140,7 +140,7 @@ void fgInitialiseInputDevices ( void )
     if( !fgState.InputDevsInitialised )
     {
         dial_device = getenv ( "GLUT_DIALS_SERIAL" );
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS
         if (!dial_device){
             static char devname[256];
             DWORD size=sizeof(devname);
@@ -250,7 +250,7 @@ static void poll_dials ( int id )
 
 
 /******** OS Specific Serial I/O routines *******/
-#if TARGET_HOST_UNIX_X11 /* ==> Linux/BSD/UNIX POSIX serial I/O */
+#if TARGET_HOST_POSIX_X11 /* ==> Linux/BSD/UNIX POSIX serial I/O */
 static SERIALPORT *serial_open ( const char *device )
 {
     int fd;
@@ -313,7 +313,7 @@ static void serial_flush ( SERIALPORT *port )
     tcflush ( port->fd, TCIOFLUSH );
 }
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_MS_WINDOWS
 
 static SERIALPORT *serial_open(const char *device){
     HANDLE fh;

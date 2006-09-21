@@ -29,19 +29,15 @@
 #include "freeglut_internal.h"
 #include <errno.h>
 #include <stdarg.h>
-#if TARGET_HOST_WIN32
+#if  HAVE_VPRINTF
 #    define VFPRINTF(s,f,a) vfprintf((s),(f),(a))
+#elif HAVE_DOPRNT
+#    define VFPRINTF(s,f,a) _doprnt((f),(a),(s))
 #else
-#    if HAVE_VPRINTF
-#        define VFPRINTF(s,f,a) vfprintf((s),(f),(a))
-#    elif HAVE_DOPRNT
-#        define VFPRINTF(s,f,a) _doprnt((f),(a),(s))
-#    else
-#        define VFPRINTF(s,f,a)
-#    endif
+#    define VFPRINTF(s,f,a)
 #endif
 
-#if TARGET_HOST_WINCE
+#ifdef _WIN32_WCE
 
 typedef struct GXDisplayProperties GXDisplayProperties;
 typedef struct GXKeyList GXKeyList;
@@ -55,7 +51,7 @@ GXOPENINPUT GXOpenInput_ = NULL;
 
 struct GXKeyList gxKeyList;
 
-#endif
+#endif /* _WIN32_WCE */
 
 /*
  * Try to get the maximum value allowed for ints, falling back to the minimum
@@ -98,13 +94,13 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
     freeglut_return_if_fail( window != NULL );
 
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     XResizeWindow( fgDisplay.Display, window->Window.Handle,
                    width, height );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
-#elif TARGET_HOST_WIN32
+#elif TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
     {
         RECT winRect;
         int x, y, w, h;
@@ -158,7 +154,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 
     /*
      * XXX Should update {window->State.OldWidth, window->State.OldHeight}
-     * XXX to keep in lockstep with UNIX_X11 code.
+     * XXX to keep in lockstep with POSIX_X11 code.
      */
     if( FETCH_WCB( *window, Reshape ) )
         INVOKE_WCB( *window, Reshape, ( width, height ) );
@@ -225,9 +221,9 @@ static void fghcbDisplayWindow( SFG_Window *window,
     {
         window->State.Redisplay = GL_FALSE;
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
         fghRedrawWindow ( window ) ;
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
         RedrawWindow(
             window->Window.Handle, NULL, NULL,
             RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
@@ -262,9 +258,9 @@ static void fghcbCheckJoystickPolls( SFG_Window *window,
     if( window->State.JoystickLastPoll + window->State.JoystickPollRate <=
         checkTime )
     {
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
         fgJoystickPollWindow( window );
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
         window->State.JoystickLastPoll = checkTime;
     }
 
@@ -312,7 +308,7 @@ long fgElapsedTime( void )
 {
     if ( fgState.Time.Set )
     {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
         struct timeval now;
         long elapsed;
 
@@ -322,20 +318,24 @@ long fgElapsedTime( void )
         elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
 
         return elapsed;
-#elif TARGET_HOST_WIN32
-        return timeGetTime() - fgState.Time.Value;
-#elif TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
+#    if defined(_WIN32_WCE)
         return GetTickCount() - fgState.Time.Value;
+#    else
+        return timeGetTime() - fgState.Time.Value;
+#    endif
 #endif
     }
     else
     {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
         gettimeofday( &fgState.Time.Value, NULL );
-#elif TARGET_HOST_WIN32
-        fgState.Time.Value = timeGetTime ();
-#elif TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
+#    if defined(_WIN32_WCE)
         fgState.Time.Value = GetTickCount();
+#    else
+        fgState.Time.Value = timeGetTime ();
+#    endif
 #endif
         fgState.Time.Set = GL_TRUE ;
 
@@ -461,7 +461,7 @@ static void fghSleepForEvents( void )
     if( fghHaveJoystick( ) && ( msec > 10 ) )     
         msec = 10;
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     /*
      * Possibly due to aggressive use of XFlush() and friends,
      * it is possible to have our socket drained but still have
@@ -488,12 +488,12 @@ static void fghSleepForEvents( void )
         if( ( -1 == err ) && ( errno != EINTR ) )
             fgWarning ( "freeglut select() error: %d", errno );
     }
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
     MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLEVENTS );
 #endif
 }
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 /*
  * Returns GLUT modifier mask for the state field of an X11 event.
  */
@@ -513,7 +513,7 @@ static int fghGetXModifiers( int state )
 #endif
 
 
-#if TARGET_HOST_UNIX_X11 && _DEBUG
+#if TARGET_HOST_POSIX_X11 && _DEBUG
 
 static const char* fghTypeToString( int type )
 {
@@ -964,7 +964,7 @@ static void fghPrintEvent( XEvent *event )
  */
 void FGAPIENTRY glutMainLoopEvent( void )
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     SFG_Window* window;
     XEvent event;
 
@@ -1409,7 +1409,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
         }
     }
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     MSG stMsg;
 
@@ -1451,13 +1451,13 @@ void FGAPIENTRY glutMainLoop( void )
 {
     int action;
 
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
     SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
 #endif
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMainLoop" );
 
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
     /*
      * Processing before the main loop:  If there is a window which is open and
      * which has a visibility callback, call it.  I know this is an ugly hack,
@@ -1536,7 +1536,7 @@ void FGAPIENTRY glutLeaveMainLoop( void )
 }
 
 
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
 /*
  * Determine a GLUT modifer mask based on MS-WINDOWS system info.
  */
@@ -1584,7 +1584,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         {
             unsigned int current_DisplayMode = fgState.DisplayMode;
             fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
             fgSetupPixelFormat( window, GL_FALSE, PFD_MAIN_PLANE );
 #endif
             fgState.DisplayMode = current_DisplayMode;
@@ -1606,7 +1606,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
         else
         {
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
             fgSetupPixelFormat( window, GL_FALSE, PFD_MAIN_PLANE );
 #endif
 
@@ -1628,7 +1628,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         ReleaseDC( window->Window.Handle, window->Window.Device );
 
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
         /* Take over button handling */
         {
             HINSTANCE dxDllLib=LoadLibrary(_T("gx.dll"));
@@ -1644,7 +1644,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 gxKeyList = (*GXGetDefaultKeys_)(GX_LANDSCAPEKEYS);
         }
 
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
         break;
 
     case WM_SIZE:
@@ -1656,13 +1656,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         if( window->State.Visible )
         {
             window->State.NeedToResize = GL_TRUE;
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
             window->State.Width  = HIWORD(lParam);
             window->State.Height = LOWORD(lParam);
 #else
             window->State.Width  = LOWORD(lParam);
             window->State.Height = HIWORD(lParam);
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
         }
 
         break;
@@ -1733,13 +1733,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_MOUSEMOVE:
     {
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
         window->State.MouseX = 320-HIWORD( lParam );
         window->State.MouseY = LOWORD( lParam );
 #else
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
         /* Restrict to [-32768, 32767] to match X11 behaviour       */
         /* See comment in "freeglut_developer" mailing list 10/4/04 */
         if ( window->State.MouseX > 32767 ) window->State.MouseX -= 65536;
@@ -1776,13 +1776,13 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         GLboolean pressed = GL_TRUE;
         int button;
 
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
         window->State.MouseX = 320-HIWORD( lParam );
         window->State.MouseY = LOWORD( lParam );
 #else
         window->State.MouseX = LOWORD( lParam );
         window->State.MouseY = HIWORD( lParam );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 
         /* Restrict to [-32768, 32767] to match X11 behaviour       */
         /* See comment in "freeglut_developer" mailing list 10/4/04 */
@@ -1821,7 +1821,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
         }
 
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
         if( GetSystemMetrics( SM_SWAPBUTTON ) )
         {
             if( button == GLUT_LEFT_BUTTON )
@@ -1830,7 +1830,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 if( button == GLUT_RIGHT_BUTTON )
                     button = GLUT_LEFT_BUTTON;
         }
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
 
         if( button == -1 )
             return DefWindowProc( hWnd, uMsg, lParam, wParam );
@@ -1998,7 +1998,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             );
         }
 
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
         if(!(lParam & 0x40000000)) /* Prevent auto-repeat */
         {
             if(wParam==(unsigned)gxKeyList.vkRight)
@@ -2086,7 +2086,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         default:
         {
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
             BYTE state[ 256 ];
             WORD code[ 2 ];
 
@@ -2099,7 +2099,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                         ( (char)wParam,
                           window->State.MouseX, window->State.MouseY )
             );
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
         }
         }
 
@@ -2159,7 +2159,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
     case WM_SYNCPAINT:  /* 0x0088 */
         /* Another window has moved, need to update this one */
         window->State.Redisplay = GL_TRUE;
@@ -2247,7 +2247,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 break;
             }
         }
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
 
         /* We need to pass the message on to the operating system as well */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );

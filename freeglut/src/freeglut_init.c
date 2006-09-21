@@ -65,7 +65,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       0,                     /* FPSInterval */
                       0,                     /* SwapCount */
                       0,                     /* SwapTime */
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
                       { 0, GL_FALSE },       /* Time */
 #else
                       { { 0, 0 }, GL_FALSE },
@@ -94,7 +94,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
  */
 static void fghInitialize( const char* displayName )
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     fgDisplay.Display = XOpenDisplay( displayName );
 
     if( fgDisplay.Display == NULL )
@@ -137,7 +137,7 @@ static void fghInitialize( const char* displayName )
         FALSE
     );
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     WNDCLASS wc;
     ATOM atom;
@@ -165,12 +165,12 @@ static void fghInitialize( const char* displayName )
         wc.hInstance      = fgDisplay.Instance;
         wc.hIcon          = LoadIcon( fgDisplay.Instance, _T("GLUT_ICON") );
 
-#if TARGET_HOST_WIN32
+#if defined(_WIN32_WCE)
+        wc.style          = CS_HREDRAW | CS_VREDRAW;
+#else
         wc.style          = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
         if (!wc.hIcon)
           wc.hIcon        = LoadIcon( NULL, IDI_WINLOGO );
-#else /* TARGET_HOST_WINCE */
-        wc.style          = CS_HREDRAW | CS_VREDRAW;
 #endif
 
         wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
@@ -225,7 +225,7 @@ void fgDeinitialize( void )
     /* If there was a menu created, destroy the rendering context */
     if( fgStructure.MenuContext )
     {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
         /* Note that the MVisualInfo is not owned by the MenuContext! */
         glXDestroyContext( fgDisplay.Display, fgStructure.MenuContext->MContext );
 #endif
@@ -247,13 +247,13 @@ void fgDeinitialize( void )
         free( timer );
     }
 
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
     if ( fgState.JoysticksInitialised )
         fgJoystickClose( );
 
     if ( fgState.InputDevsInitialised )
         fgInputDeviceClose( );
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
     fgState.JoysticksInitialised = GL_FALSE;
     fgState.InputDevsInitialised = GL_FALSE;
 
@@ -304,7 +304,7 @@ void fgDeinitialize( void )
         fgState.ProgramName = NULL;
     }
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     /*
      * Make sure all X-client data we have created will be destroyed on
@@ -318,7 +318,7 @@ void fgDeinitialize( void )
      */
     XCloseDisplay( fgDisplay.Display );
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     /* Reset the timer granularity */
     timeEndPeriod ( 1 );
@@ -332,7 +332,7 @@ void fgDeinitialize( void )
  * Everything inside the following #ifndef is copied from the X sources.
  */
 
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
 
 /*
 
@@ -527,7 +527,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     fgElapsedTime( );
 
     /* check if GLUT_FPS env var is set */
-#if !TARGET_HOST_WINCE
+#ifndef _WIN32_WCE
     {
         const char *fps = getenv( "GLUT_FPS" );
         if( fps )
@@ -619,7 +619,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             argv[ i ] = argv[ j ];
     }
 
-#endif /* TARGET_HOST_WINCE */
+#endif /* _WIN32_WCE */
 
     /*
      * Have the display created now. If there wasn't a "-display"
@@ -826,59 +826,59 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
         case 20 :  /* "win32pdf": (incorrect spelling but was there before */
         case 21 :  /* "win32pfd":  matches the Win32 Pixel Format Descriptor by
                       number */
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS
 #endif
             break ;
 
         case 22 :  /* "xvisual":  matches the X visual ID by number */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #endif
             break ;
 
         case 23 :  /* "xstaticgray": */
         case 29 :  /* "xstaticgrey":  boolean indicating if the frame buffer
                       configuration's X visual is of type StaticGray */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #endif
             break ;
 
         case 24 :  /* "xgrayscale": */
         case 30 :  /* "xgreyscale":  boolean indicating if the frame buffer
                       configuration's X visual is of type GrayScale */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #endif
             break ;
 
         case 25 :  /* "xstaticcolor": */
         case 31 :  /* "xstaticcolour":  boolean indicating if the frame buffer
                       configuration's X visual is of type StaticColor */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #endif
             break ;
 
         case 26 :  /* "xpseudocolor": */
         case 32 :  /* "xpseudocolour":  boolean indicating if the frame buffer
                       configuration's X visual is of type PseudoColor */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #endif
             break ;
 
         case 27 :  /* "xtruecolor": */
         case 33 :  /* "xtruecolour":  boolean indicating if the frame buffer
                       configuration's X visual is of type TrueColor */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #endif
             break ;
 
         case 28 :  /* "xdirectcolor": */
         case 34 :  /* "xdirectcolour":  boolean indicating if the frame buffer
                       configuration's X visual is of type DirectColor */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #endif
             break ;
 
         case 35 :  /* "borderless":  windows should not have borders */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #endif
             break ;
 

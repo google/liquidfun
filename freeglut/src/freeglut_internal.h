@@ -37,44 +37,71 @@
 #define  VERSION_MINOR 4
 #define  VERSION_PATCH 0
 
-/* Freeglut is meant to be available under all Unix/X11 and Win32 platforms. */
-#if defined(_WIN32_WCE)
-#   define  TARGET_HOST_UNIX_X11    0
-#   define  TARGET_HOST_WIN32       0
-#   define  TARGET_HOST_WINCE       1
-#elif defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__WATCOMC__)
-#   define  TARGET_HOST_UNIX_X11    0
-#   define  TARGET_HOST_WIN32       1
-#   define  TARGET_HOST_WINCE       0
+/* Freeglut is intended to function under all Unix/X11 and Win32 platforms. */
+/* XXX: Don't all MS-Windows compilers (except Cygwin) have _WIN32 defined?
+ * XXX: If so, remove the first set of defined()'s below.
+ */
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__) \
+    || defined(_WIN32) || defined(_WIN32_WCE) \
+    || ( defined(__CYGWIN__) && defined(X_DISPLAY_MISSING) )
+#   define  TARGET_HOST_MS_WINDOWS 1
+
+#elif defined(__posix__) || defined(__unix__) || defined(__linux__)
+#   define  TARGET_HOST_POSIX_X11  1
+
+/* FIXME: no Macintosh support?
+#if ...
+#   define  TARGET_HOST_MAC_OSX    1
 #else
-#   define  TARGET_HOST_UNIX_X11    1
-#   define  TARGET_HOST_WIN32       0
-#   define  TARGET_HOST_WINCE       0
+#   error "Unrecognized target host!"
+*/
 #endif
+
+#ifndef TARGET_HOST_MS_WINDOWS
+#   define  TARGET_HOST_MS_WINDOWS 0
+#endif
+
+#ifndef  TARGET_HOST_POSIX_X11
+#   define  TARGET_HOST_POSIX_X11  0
+#endif
+
+#ifndef  TARGET_HOST_MAC_OSX
+#   define  TARGET_HOST_MAC_OSX    0
+#endif
+
+/* -- FIXED CONFIGURATION LIMITS ------------------------------------------- */
 
 #define  FREEGLUT_MAX_MENUS         3
 
-/* Somehow all Win32 include headers depend on this one: */
-#if TARGET_HOST_WIN32
-#include <windows.h>
-#include <windowsx.h>
-#include <mmsystem.h>
-#include <TCHAR.H>
+/* -- PLATFORM-SPECIFIC INCLUDES ------------------------------------------- */
 
-/* TODO: MinGW is lacking a prototype, this should better be handled via autoconf! */
-#ifndef ChangeDisplaySettingsEx
-LONG WINAPI ChangeDisplaySettingsExA(LPCSTR,LPDEVMODEA,HWND,DWORD,LPVOID);
-LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
-#ifdef UNICODE
-#define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
-#else
-#define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
-#endif
-#endif
-#endif
+/* All Win32 headers depend on the huge Windows.h recursive include.
+ * Note: Let's use proper case for MS-Win headers. Even though it's
+ * not required due to case insensitivity, it's a good habit to keep
+ * because the cross-platform includes are case sensitive.
+ */
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
+#    include <Windows.h>
+#    include <WindowsX.h>
+#    include <MMSystem.h>
+/* CYGWIN does not have tchar.h, but has TEXT(x), defined in winnt.h. */
+#    ifndef __CYGWIN__
+#      include <tchar.h>
+#    else
+#      define _TEXT(x) TEXT(x)
+#      define _T(x)    TEXT(x)
+#    endif
 
-#if defined(_MSC_VER) || defined(__WATCOMC__)
-#define strdup   _strdup
+#elif TARGET_HOST_POSIX_X11
+#    include <GL/glx.h>
+#    include <X11/Xlib.h>
+#    include <X11/Xatom.h>
+#    include <X11/keysym.h>
+#    include <X11/extensions/XInput.h>
+#    ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
+#        include <X11/extensions/xf86vmode.h>
+#    endif
+
 #endif
 
 /* These files should be available on every platform. */
@@ -95,27 +122,52 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 #if TIME_WITH_SYS_TIME
 #    include <sys/time.h>
 #    include <time.h>
+#elif HAVE_SYS_TIME_H
+#    include <sys/time.h>
 #else
-#    if HAVE_SYS_TIME_H
-#        include <sys/time.h>
-#    else
-#        include <time.h>
+#    include <time.h>
+#endif
+
+/* -- AUTOCONF HACKS --------------------------------------------------------*/
+
+/* XXX: Update autoconf to avoid these.
+ * XXX: Are non-POSIX platforms intended not to use autoconf?
+ * If so, perhaps there should be a config_guess.h for them. Alternatively,
+ * config guesses could be placed above, just after the config.h exclusion.
+ */
+#if defined(__FreeBSD__) || defined(__NetBSD__)
+#    define HAVE_USB_JS 1
+#    if defined(__NetBSD__) || ( defined(__FreeBSD__) && __FreeBSD_version >= 500000)
+#        define HAVE_USBHID_H 1
 #    endif
 #endif
 
-/* The system-dependant include files should go here: */
-#if TARGET_HOST_UNIX_X11
-    #include <GL/glx.h>
-    #include <X11/Xlib.h>
-    #include <X11/Xatom.h>
-    #include <X11/keysym.h>
-
-    #ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
-    #include <X11/extensions/xf86vmode.h>
-    #endif
+#if TARGET_HOST_MS_WINDOWS
+#    define  HAVE_VPRINTF 1
 #endif
 
-/* Microsoft VisualC++ 5.0's <math.h> does not define the PI */
+#if !defined(HAVE_VPRINTF) && !defined(HAVE_DOPRNT)
+/* XXX warning directive here? */
+#    define  HAVE_VPRINTF 1
+#endif
+
+/* MinGW may lack a prototype for ChangeDisplaySettingsEx() (depending on the version?) */
+#if TARGET_HOST_MS_WINDOWS && !defined(ChangeDisplaySettingsEx)
+LONG WINAPI ChangeDisplaySettingsExA(LPCSTR,LPDEVMODEA,HWND,DWORD,LPVOID);
+LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
+#    ifdef UNICODE
+#        define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
+#    else
+#        define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
+#    endif
+#endif
+
+#if defined(_MSC_VER) || defined(__WATCOMC__)
+/* strdup() is non-standard, for all but POSIX-2001 */
+#define strdup   _strdup
+#endif
+
+/* M_PI is non-standard (defined by BSD, not ISO-C) */
 #ifndef M_PI
 #    define  M_PI  3.14159265358979323846
 #endif
@@ -198,7 +250,7 @@ struct tagSFG_XYUse
 typedef struct tagSFG_Time SFG_Time;
 struct tagSFG_Time
 {
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
     DWORD Value;
 #else
     struct timeval  Value;
@@ -268,7 +320,7 @@ struct tagSFG_State
 typedef struct tagSFG_Display SFG_Display;
 struct tagSFG_Display
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     Display*        Display;            /* The display we are being run in.  */
     int             Screen;             /* The screen we are about to use.   */
     Window          RootWindow;         /* The screen's root window.         */
@@ -290,7 +342,7 @@ struct tagSFG_Display
 
 #endif /* X_XF86VidModeGetModeLine */
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
     HINSTANCE        Instance;          /* The application's instance        */
     DEVMODE         DisplayMode;        /* Desktop's display settings        */
 
@@ -317,12 +369,12 @@ struct tagSFG_Timer
  * Make "freeglut" window handle and context types so that we don't need so
  * much conditionally-compiled code later in the library.
  */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
 typedef Window     SFG_WindowHandleType ;
 typedef GLXContext SFG_WindowContextType ;
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
 typedef HWND    SFG_WindowHandleType ;
 typedef HGLRC   SFG_WindowContextType ;
@@ -339,9 +391,9 @@ struct tagSFG_Context
     SFG_WindowHandleType  Handle;    /* The window's handle                 */
     SFG_WindowContextType Context;   /* The window's OpenGL/WGL context     */
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     XVisualInfo*    VisualInfo;      /* The window's visual information     */
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
     HDC             Device;          /* The window's device context         */
 #endif
 
@@ -440,7 +492,7 @@ do                                                             \
  * current window.
  *
  */
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE) /* FIXME: also WinCE? */
 #define INVOKE_WCB(window,cbname,arg_list)    \
 do                                            \
 {                                             \
@@ -517,7 +569,7 @@ enum
 typedef struct tagSFG_MenuContext SFG_MenuContext;
 struct tagSFG_MenuContext
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     XVisualInfo*        MVisualInfo;      /* The window's visual information */
 #endif
 
@@ -746,12 +798,12 @@ void fgCreateStructure( void );
 void fgDestroyStructure( void );
 
 /* A helper function to check if a display mode is possible to use */
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 XVisualInfo* fgChooseVisual( void );
 #endif
 
 /* The window procedure for Win32 events handling */
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
 LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg,
                                WPARAM wParam, LPARAM lParam );
 GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,

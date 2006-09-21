@@ -45,7 +45,7 @@
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 /*
  * Queries the GL context about some attributes
  */
@@ -124,7 +124,7 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
  */
 int FGAPIENTRY glutGet( GLenum eWhat )
 {
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
     int returnValue ;
     GLboolean boolValue ;
 #endif
@@ -162,7 +162,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /* XXX Multisampling. Return what I know about multisampling. */
         return 0;
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     /*
      * The rest of GLX queries under X are general enough to use a macro to
      * check them
@@ -277,7 +277,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         return fgStructure.CurrentWindow->Window.VisualInfo->visualid;
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     /* Handle the OpenGL inquiries */
     case GLUT_WINDOW_RGBA:
@@ -369,7 +369,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         /* ...then we've got to correct the results we've just received... */
 
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
         if ( ( fgStructure.GameModeWindow != fgStructure.CurrentWindow ) && ( fgStructure.CurrentWindow->Parent == NULL ) &&
              ( ! fgStructure.CurrentWindow->IsMenu ) )
         {
@@ -378,7 +378,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
           winRect.top    += GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION );
           winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME );
         }
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
 
         switch( eWhat )
         {
@@ -391,33 +391,33 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     break;
 
     case GLUT_WINDOW_BORDER_WIDTH :
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
         return 0;
 #else
         return GetSystemMetrics( SM_CXSIZEFRAME );
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
 
     case GLUT_WINDOW_HEADER_HEIGHT :
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
         return 0;
 #else
         return GetSystemMetrics( SM_CYCAPTION );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
         return GL_FALSE;
 #else
         return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
                                     PFD_MAIN_PLANE );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 
 
     case GLUT_WINDOW_FORMAT_ID:
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
         if( fgStructure.CurrentWindow != NULL )
             return GetPixelFormat( fgStructure.CurrentWindow->Window.Device );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
         return 0;
 
 #endif
@@ -486,7 +486,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
          */
         return TRUE ;
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     case GLUT_HAS_MOUSE:
         return TRUE ;
@@ -513,7 +513,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
          */
         return 3 ;
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     case GLUT_HAS_MOUSE:
         /*
@@ -524,11 +524,11 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
 
     case GLUT_NUM_MOUSE_BUTTONS:
         /* We are much more fortunate under Win32 about this... */
-#if TARGET_HOST_WINCE
+#if defined(_WIN32_WCE)
         return 1;
 #else
         return GetSystemMetrics( SM_CMOUSEBUTTONS );
-#endif /* TARGET_HOST_WINCE */
+#endif /* defined(_WIN32_WCE) */
 
 #endif
 
@@ -612,7 +612,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
     switch( eWhat )
     {
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     case GLUT_OVERLAY_POSSIBLE:
         return FALSE;
@@ -638,7 +638,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
     case GLUT_OVERLAY_DAMAGED:
         return -1;
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     case GLUT_OVERLAY_POSSIBLE:
 /*      return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,

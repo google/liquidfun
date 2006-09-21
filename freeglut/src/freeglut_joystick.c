@@ -59,7 +59,7 @@
 #    include <IOKit/hid/IOHIDLib.h>
 #endif
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
 #    define _JS_MAX_AXES  8
 #    include <windows.h>
 #    include <mmsystem.h>
@@ -67,7 +67,7 @@
 
 #endif
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #    define _JS_MAX_AXES 16
 #    if HAVE_SYS_IOCTL_H
 #        include <sys/ioctl.h>
@@ -385,14 +385,14 @@ struct tagSFG_Joystick
          maxReport[_JS_MAX_AXES];
 #endif
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
     JOYCAPS     jsCaps;
     JOYINFOEX   js;
     UINT        js_id;
 #endif
 
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #   if defined(__FreeBSD__) || defined(__NetBSD__)
        struct os_specific_s *os;
 #   endif
@@ -455,7 +455,7 @@ static SFG_Joystick *fgJoystick [ MAX_NUM_JOYSTICKS ];
  */
 static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 {
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
     MMRESULT status;
 #else
     int status;
@@ -531,7 +531,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
     }
 #endif
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
     status = joyGetPosEx( joy->js_id, &joy->js );
 
     if ( status != JOYERR_NOERROR )
@@ -597,7 +597,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
     }
 #endif
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #    if defined(__FreeBSD__) || defined(__NetBSD__)
     if ( joy->os->is_analog )
     {
@@ -975,7 +975,7 @@ static void fghJoystickAddHatElement ( SFG_Joystick *joy, CFDictionaryRef button
 }
 #endif
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
 /* Inspired by
    http://msdn.microsoft.com/archive/en-us/dnargame/html/msdn_sidewind3d.asp
  */
@@ -1053,7 +1053,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
         CFDictionaryRef props;
     CFTypeRef topLevelElement;
 #endif
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #    if defined( __FreeBSD__ ) || defined( __NetBSD__ )
        char *cp;
 #    endif
@@ -1227,7 +1227,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     CFRelease( props );
 #endif
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
     joy->js.dwFlags = JOY_RETURNALL;
     joy->js.dwSize  = sizeof( joy->js );
 
@@ -1289,7 +1289,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     }
 #endif
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #if defined( __FreeBSD__ ) || defined( __NetBSD__ )
     for( i = 0; i < _JS_MAX_AXES; i++ )
         joy->os->cache_axes[ i ] = 0.0f;
@@ -1535,7 +1535,7 @@ static void fghJoystickInit( int ident )
     }
 #endif
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
     switch( ident )
     {
     case 0:
@@ -1553,7 +1553,7 @@ static void fghJoystickInit( int ident )
     }
 #endif
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #    if defined( __FreeBSD__ ) || defined( __NetBSD__ )
     fgJoystick[ ident ]->id = ident;
     fgJoystick[ ident ]->error = GL_FALSE;
@@ -1618,11 +1618,11 @@ void fgJoystickClose( void )
                 close( fgJoystick[ ident ]->hidDev );
 #endif
 
-#if TARGET_HOST_WIN32
+#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
             /* Do nothing special */
 #endif
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #if defined( __FreeBSD__ ) || defined( __NetBSD__ )
             if( fgJoystick[ident]->os )
             {

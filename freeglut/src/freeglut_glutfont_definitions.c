@@ -42,7 +42,7 @@
 
 #include "freeglut_internal.h"
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
 struct freeglutStrokeFont
 {

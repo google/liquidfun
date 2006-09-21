@@ -46,7 +46,7 @@
  */
 static void fghRememberState( void )
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     /*
      * This highly depends on the XFree86 extensions,
@@ -101,7 +101,7 @@ static void fghRememberState( void )
      */
 #   endif
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
 /*    DEVMODE devMode; */
 
@@ -125,7 +125,7 @@ static void fghRememberState( void )
  */
 static void fghRestoreState( void )
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
 #   ifdef X_XF86VidModeGetAllModeLines
     /* Restore the remembered pointer position: */
@@ -202,7 +202,7 @@ static void fghRestoreState( void )
      */
 #   endif
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     /* Restore the previously rememebered desktop display settings */
     ChangeDisplaySettings( &fgDisplay.DisplayMode, 0 );
@@ -210,7 +210,7 @@ static void fghRestoreState( void )
 #endif
 }
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 #ifdef X_XF86VidModeGetAllModeLines
 
 /*
@@ -257,7 +257,7 @@ static int fghCheckDisplayModes( GLboolean exactMatch, int displayModesCount, XF
 static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 {
     GLboolean success = GL_FALSE;
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     /*
      * This highly depends on the XFree86 extensions,
@@ -316,7 +316,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 
 #   endif
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     DEVMODE  devMode;
     char *fggmstr = NULL;
@@ -439,7 +439,7 @@ int FGAPIENTRY glutEnterGameMode( void )
 
     fgStructure.GameModeWindow->State.IsGameMode = GL_TRUE;
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     /*
      * Sync needed to avoid a real race, the Xserver must have really created
@@ -546,7 +546,7 @@ void FGAPIENTRY glutLeaveGameMode( void )
     fgAddToWindowDestroyList( fgStructure.GameModeWindow );
     fgStructure.GameModeWindow = NULL;
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     XUngrabPointer( fgDisplay.Display, CurrentTime );
     XUngrabKeyboard( fgDisplay.Display, CurrentTime );

@@ -1196,3 +1196,6 @@ instead of the menu's parent window
 
 (309)  Added some handy comments, spacing, fixed a typo in a comment
 
+(310)  Changed "TARGET_HOST_UNIX_X11" to "TARGET_HOST_POSIX_X11" to avoid
+trademark issues, per Joe Krahn; also rationalized the other "TARGET_HOST"
+definitions

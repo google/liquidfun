@@ -133,11 +133,11 @@ void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
 void FGAPIENTRY glutForceJoystickFunc( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutForceJoystickFunc" );
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
     freeglut_return_if_fail( fgStructure.CurrentWindow != NULL );
     freeglut_return_if_fail( FETCH_WCB( *( fgStructure.CurrentWindow ), Joystick ) );
     fgJoystickPollWindow( fgStructure.CurrentWindow );
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
 }
 
 /*

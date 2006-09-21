@@ -52,9 +52,9 @@ void FGAPIENTRY glutSwapBuffers( void )
     if( ! fgStructure.CurrentWindow->Window.DoubleBuffered )
         return;
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     glXSwapBuffers( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
     SwapBuffers( fgStructure.CurrentWindow->Window.Device );
 #endif
 

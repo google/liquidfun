@@ -28,7 +28,7 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
   #include <X11/cursorfont.h>
 #endif
 
@@ -43,7 +43,7 @@
 
 /* -- PRIVATE FUNCTIONS --------------------------------------------------- */
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 /*
  * A factory method for an empty cursor
  */
@@ -111,7 +111,7 @@ static cursorCacheEntry cursorCache[] = {
  */
 void fgSetCursor ( SFG_Window *window, int cursorID )
 {
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
     {
         Cursor cursor;
         /*
@@ -156,7 +156,7 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
         }
     }
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     /*
      * This is a temporary solution only...
@@ -234,7 +234,7 @@ void FGAPIENTRY glutWarpPointer( int x, int y )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWarpPointer" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutWarpPointer" );
 
-#if TARGET_HOST_UNIX_X11
+#if TARGET_HOST_POSIX_X11
 
     XWarpPointer(
         fgDisplay.Display,
@@ -246,7 +246,7 @@ void FGAPIENTRY glutWarpPointer( int x, int y )
     /* Make the warp visible immediately. */
     XFlush( fgDisplay.Display );
 
-#elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#elif TARGET_HOST_MS_WINDOWS
 
     {
         POINT coords;

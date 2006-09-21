@@ -104,9 +104,9 @@ static GLUTproc fghGetProcAddress( const char* procName )
     CHECK_NAME(glutWindowStatusFunc);
     CHECK_NAME(glutKeyboardUpFunc);
     CHECK_NAME(glutSpecialUpFunc);
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
     CHECK_NAME(glutJoystickFunc);
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
     CHECK_NAME(glutSetColor);
     CHECK_NAME(glutGetColor);
     CHECK_NAME(glutCopyColormap);
@@ -147,13 +147,13 @@ static GLUTproc fghGetProcAddress( const char* procName )
     CHECK_NAME(glutReportErrors);
     CHECK_NAME(glutIgnoreKeyRepeat);
     CHECK_NAME(glutSetKeyRepeat);
-#if !TARGET_HOST_WINCE
+#if !defined(_WIN32_WCE)
     CHECK_NAME(glutForceJoystickFunc);
     CHECK_NAME(glutGameModeString);
     CHECK_NAME(glutEnterGameMode);
     CHECK_NAME(glutLeaveGameMode);
     CHECK_NAME(glutGameModeGet);
-#endif /* !TARGET_HOST_WINCE */
+#endif /* !defined(_WIN32_WCE) */
     /* freeglut extensions */
     CHECK_NAME(glutMainLoopEvent);
     CHECK_NAME(glutLeaveMainLoop);
@@ -208,9 +208,9 @@ glutGetProcAddress( const char *procName )
         return p;
 
     /* Try core GL functions */
-#if TARGET_HOST_WIN32 || TARGET_HOST_WINCE
+#if TARGET_HOST_MS_WINDOWS
     return(GLUTproc)wglGetProcAddress( ( LPCSTR )procName );
-#elif TARGET_HOST_UNIX_X11 && defined( GLX_ARB_get_proc_address )
+#elif TARGET_HOST_POSIX_X11 && defined( GLX_ARB_get_proc_address )
     return(GLUTproc)glXGetProcAddressARB( ( const GLubyte * )procName );
 #else
     return NULL;
