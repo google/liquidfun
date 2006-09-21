@@ -489,7 +489,7 @@ static void fghSleepForEvents( void )
             fgWarning ( "freeglut select() error: %d", errno );
     }
 #elif TARGET_HOST_MS_WINDOWS
-    MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLEVENTS );
+    MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLINPUT );
 #endif
 }
 

@@ -1211,3 +1211,6 @@ format changes for Windows
 2006) to have the "glutInitDisplayString" ignore numerical assignments to
 tokens as a temporary fix.
 
+(314)  Fixed buy #1398196 in the bug tracker to the effect that passing the
+wrong argument in "fghSleepForEvents" can cause odd delays
+
