@@ -592,19 +592,19 @@ struct tagSFG_WindowList
 typedef struct tagSFG_Structure SFG_Structure;
 struct tagSFG_Structure
 {
-    SFG_List        Windows;      /* The global windows list            */
-    SFG_List        Menus;        /* The global menus list              */
+    SFG_List        Windows;         /* The global windows list            */
+    SFG_List        Menus;           /* The global menus list              */
     SFG_List        WindowsToDestroy;
 
-    SFG_Window*     CurrentWindow; /* The currently set window          */
-    SFG_Menu*       CurrentMenu;   /* Same, but menu...                 */
+    SFG_Window*     CurrentWindow;   /* The currently set window          */
+    SFG_Menu*       CurrentMenu;     /* Same, but menu...                 */
 
-    SFG_MenuContext* MenuContext; /* OpenGL rendering context for menus */
+    SFG_MenuContext* MenuContext;    /* OpenGL rendering context for menus */
 
-    SFG_Window*      GameMode;    /* The game mode window               */
+    SFG_Window*      GameModeWindow; /* The game mode window               */
 
-    int              WindowID;    /* The new current window ID          */
-    int              MenuID;      /* The new current menu ID            */
+    int              WindowID;       /* The new current window ID          */
+    int              MenuID;         /* The new current menu ID            */
 };
 
 /*

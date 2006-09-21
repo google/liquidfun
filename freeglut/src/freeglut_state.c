@@ -370,7 +370,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         /* ...then we've got to correct the results we've just received... */
 
 #if !TARGET_HOST_WINCE
-        if ( ( fgStructure.GameMode != fgStructure.CurrentWindow ) && ( fgStructure.CurrentWindow->Parent == NULL ) &&
+        if ( ( fgStructure.GameModeWindow != fgStructure.CurrentWindow ) && ( fgStructure.CurrentWindow->Parent == NULL ) &&
              ( ! fgStructure.CurrentWindow->IsMenu ) )
         {
           winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME );

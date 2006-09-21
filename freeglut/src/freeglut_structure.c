@@ -346,7 +346,7 @@ void fgCreateStructure( void )
     fgStructure.CurrentWindow = NULL;
     fgStructure.CurrentMenu = NULL;
     fgStructure.MenuContext = NULL;
-    fgStructure.GameMode = NULL;
+    fgStructure.GameModeWindow = NULL;
     fgStructure.WindowID = 0;
     fgStructure.MenuID = 0;
 }

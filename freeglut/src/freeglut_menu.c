@@ -140,7 +140,7 @@ static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
  */
 static GLvoid fghGetVMaxExtent( SFG_Window* window, int* x, int* y )
 {
-    if( fgStructure.GameMode )
+    if( fgStructure.GameModeWindow )
     {
 #if TARGET_HOST_UNIX_X11
         int wx, wy;

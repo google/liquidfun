@@ -1176,3 +1176,11 @@ original GLUT.
 (304) Updated build requirements for SuSE 10.1.
 
 (305) Check fgets for return value to avoid warnings.
+
+**************************************************************************
+* Changes on September 20, 2006
+**************************************************************************
+
+(306)  Changed "fgStructure.GameMode" to "fgStructure.GameModeWindow" to
+reflect better what it is
+
