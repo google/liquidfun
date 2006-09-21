@@ -433,10 +433,12 @@ void fgOpenWindow( SFG_Window* window, const char* title,
             fgState.DisplayMode &= ~GLUT_DOUBLE;
         }
 
-        /*
-         * GLUT also checks for multi-sampling, but I don't see that
-         * anywhere else in FREEGLUT so I won't bother with it for the moment.
-         */
+        if( fgState.DisplayMode & GLUT_MULTISAMPLE )
+        {
+            fgState.DisplayMode &= ~GLUT_MULTISAMPLE ;
+            window->Window.VisualInfo = fgChooseVisual( );
+            fgState.DisplayMode &= GLUT_MULTISAMPLE;
+        }
     }
 
     FREEGLUT_INTERNAL_ERROR_EXIT( window->Window.VisualInfo != NULL,

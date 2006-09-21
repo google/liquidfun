@@ -119,6 +119,16 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
     }
 }
 
+#if TARGET_HOST_MS_WINDOWS
+/* WRONG-- FIXME */
+/* The following include file is available from SGI but is not standard:
+ *   #include <GL/wglext.h>
+ * So we copy the necessary parts out of it to support the multisampling query
+ */
+#define WGL_SAMPLES_ARB                0x2042
+#endif
+
+
 /*
  * General settings query method
  */
@@ -128,6 +138,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     int returnValue ;
     GLboolean boolValue ;
 #endif
+
+    int nsamples = 0;
 
     switch (eWhat)
     {
@@ -154,15 +166,17 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_INIT_WINDOW_HEIGHT:   return fgState.Size.Y          ;
     case GLUT_INIT_DISPLAY_MODE:    return fgState.DisplayMode     ;
 
+#if TARGET_HOST_POSIX_X11
     /*
      * The window/context specific queries are handled mostly by
      * fghGetConfig().
      */
     case GLUT_WINDOW_NUM_SAMPLES:
-        /* XXX Multisampling. Return what I know about multisampling. */
-        return 0;
+#ifdef GLX_VERSION_1_3
+        glGetIntegerv(GL_SAMPLES, &nsamples);
+#endif
+        return nsamples;
 
-#if TARGET_HOST_POSIX_X11
     /*
      * The rest of GLX queries under X are general enough to use a macro to
      * check them
@@ -278,6 +292,10 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         return fgStructure.CurrentWindow->Window.VisualInfo->visualid;
 
 #elif TARGET_HOST_MS_WINDOWS
+
+    case GLUT_WINDOW_NUM_SAMPLES:
+      glGetIntegerv(WGL_SAMPLES_ARB, &nsamples);
+      return nsamples;
 
     /* Handle the OpenGL inquiries */
     case GLUT_WINDOW_RGBA:
