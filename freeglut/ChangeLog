@@ -1207,3 +1207,7 @@ and "freeglut"
 (312)  Added multisampling support for *nix and Windows; some other pixel
 format changes for Windows
 
+(313)  Added Markus Henschel's change (e-mail to developers' list, June 28,
+2006) to have the "glutInitDisplayString" ignore numerical assignments to
+tokens as a temporary fix.
+

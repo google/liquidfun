@@ -727,9 +727,16 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
     {
         /* Process this token */
         int i ;
+
+        /* Temporary fix:  Ignore any length specifications and at least
+         * process the basic token
+         * TODO:  Fix this permanently
+         */
+        size_t cleanlength = strcspn ( token, "=<>~!" );
+
         for ( i = 0; i < NUM_TOKENS; i++ )
         {
-            if ( strcmp ( token, Tokens[i] ) == 0 ) break ;
+            if ( strncmp ( token, Tokens[i], cleanlength ) == 0 ) break ;
         }
 
         switch ( i )
