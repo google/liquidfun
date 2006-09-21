@@ -1184,3 +1184,15 @@ original GLUT.
 (306)  Changed "fgStructure.GameMode" to "fgStructure.GameModeWindow" to
 reflect better what it is
 
+**************************************************************************
+* Changes on September 21, 2006
+**************************************************************************
+
+(307)  Added an end-of-line character to a warning message about an unknown
+X event type
+
+(308)  Fixing a problem in which "glutGetWindow" would return a menu's window
+instead of the menu's parent window
+
+(309)  Added some handy comments, spacing, fixed a typo in a comment
+

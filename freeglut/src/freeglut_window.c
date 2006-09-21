@@ -30,7 +30,7 @@
 
 #if TARGET_HOST_WINCE
 #include <aygshell.h>
-#pragma comment( lib, "Aygshell.lib" )
+#pragma comment( lib, "Aygshell.lib" ) /* library pragmas are bad */
 
 static wchar_t* fghWstrFromStr(const char* str)
 {
@@ -764,10 +764,11 @@ void FGAPIENTRY glutSetWindow( int ID )
  */
 int FGAPIENTRY glutGetWindow( void )
 {
+    SFG_Window *win = fgStructure.CurrentWindow;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetWindow" );
-    if( fgStructure.CurrentWindow == NULL )
-        return 0;
-    return fgStructure.CurrentWindow->ID;
+    while ( win && win->IsMenu )
+        win = win->Parent;
+    return win ? win->ID : 0;
 }
 
 /*

@@ -69,7 +69,7 @@ struct GXKeyList gxKeyList;
 #endif
 
 #ifndef MIN
-#define MIN(a,b) (((a)<(b)) ? (a) : (b))
+#    define MIN(a,b) (((a)<(b)) ? (a) : (b))
 #endif
 
 
@@ -1404,7 +1404,7 @@ void FGAPIENTRY glutMainLoopEvent( void )
             break; /* XXX Should disable this event */
 
         default:
-            fgWarning ("Unknown X event type: %d", event.type);
+            fgWarning ("Unknown X event type: %d\n", event.type);
             break;
         }
     }

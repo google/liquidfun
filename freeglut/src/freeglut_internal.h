@@ -77,13 +77,15 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 #define strdup   _strdup
 #endif
 
-/* Those files should be available on every platform. */
+/* These files should be available on every platform. */
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+
+/* These are included based on autoconf directives. */
 #if HAVE_SYS_TYPES_H
 #    include <sys/types.h>
 #endif
@@ -125,6 +127,8 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 #ifndef FALSE
 #    define  FALSE  0
 #endif
+
+/* General defines */
 
 #define INVALID_MODIFIERS 0xffffffff
 
@@ -284,7 +288,7 @@ struct tagSFG_Display
     int             DisplayPointerX;    /* saved X location of the pointer   */
     int             DisplayPointerY;    /* saved Y location of the pointer   */
 
-#endif
+#endif /* X_XF86VidModeGetModeLine */
 
 #elif TARGET_HOST_WIN32 || TARGET_HOST_WINCE
     HINSTANCE        Instance;          /* The application's instance        */
