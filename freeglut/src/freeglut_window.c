@@ -135,6 +135,8 @@ XVisualInfo* fgChooseVisual( void )
         ATTRIB_VAL( GLX_AUX_BUFFERS, 3 );
     if( fgState.DisplayMode & GLUT_AUX4 )
         ATTRIB_VAL( GLX_AUX_BUFFERS, 4 );
+    if ( fgState.DisplayMode & GLUT_MULTISAMPLE )
+        ATTRIB_VAL( GLX_SAMPLES_SGIS, 4 );
 
 
     /* Push a null at the end of the list */
@@ -170,10 +172,33 @@ XVisualInfo* fgChooseVisual( void )
  * Setup the pixel format for a Win32 window
  */
 #if TARGET_HOST_MS_WINDOWS
+/* WRONG-- FIXME */
+/* The following include file is available from SGI but is not standard:
+ *   #include <GL/wglext.h>
+ * So we copy the necessary parts out of it.
+ */
+typedef const char * (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
+
+typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
+
+#define WGL_DRAW_TO_WINDOW_ARB         0x2001
+#define WGL_ACCELERATION_ARB           0x2003
+#define WGL_SUPPORT_OPENGL_ARB         0x2010
+#define WGL_DOUBLE_BUFFER_ARB          0x2011
+#define WGL_COLOR_BITS_ARB             0x2014
+#define WGL_ALPHA_BITS_ARB             0x201B
+#define WGL_DEPTH_BITS_ARB             0x2022
+#define WGL_STENCIL_BITS_ARB           0x2023
+#define WGL_FULL_ACCELERATION_ARB      0x2027
+
+#define WGL_SAMPLE_BUFFERS_ARB         0x2041
+#define WGL_SAMPLES_ARB                0x2042
+
+
 GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                               unsigned char layer_type )
 {
-#ifdef _WIN32_WCE
+#if defined(_WIN32_WCE)
     return GL_TRUE;
 #else
     PIXELFORMATDESCRIPTOR* ppfd, pfd;
@@ -195,15 +220,31 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     pfd.nSize           = sizeof(PIXELFORMATDESCRIPTOR);
     pfd.nVersion        = 1;
     pfd.dwFlags         = flags;
-    pfd.iPixelType      = PFD_TYPE_RGBA;
+
+    if( fgState.DisplayMode & GLUT_INDEX )
+    {
+        pfd.iPixelType = PFD_TYPE_COLORINDEX;
+        pfd.cRedBits                = 0;
+        pfd.cGreenBits            = 0;
+        pfd.cBlueBits             = 0;
+        pfd.cAlphaBits            = 0;
+    }
+    else
+    {
+        pfd.iPixelType      = PFD_TYPE_RGBA;
+        pfd.cRedBits                = 8;
+        pfd.cGreenBits            = 8;
+        pfd.cBlueBits             = 8;
+        if ( fgState.DisplayMode & GLUT_ALPHA )
+            pfd.cAlphaBits            = 8;
+        else
+            pfd.cAlphaBits            = 0;
+    }
+
     pfd.cColorBits      = 24;
-    pfd.cRedBits        = 0;
     pfd.cRedShift       = 0;
-    pfd.cGreenBits      = 0;
     pfd.cGreenShift     = 0;
-    pfd.cBlueBits       = 0;
     pfd.cBlueShift      = 0;
-    pfd.cAlphaBits      = 0;
     pfd.cAlphaShift     = 0;
     pfd.cAccumBits      = 0;
     pfd.cAccumRedBits   = 0;
@@ -238,6 +279,80 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     ppfd = &pfd;
 
     pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
+
+    /* windows hack for multismapling */
+    if (fgState.DisplayMode&GLUT_MULTISAMPLE)
+    {        
+        PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetEntensionsStringARB=NULL;
+        HGLRC rc, rc_before=wglGetCurrentContext();
+        HWND hWnd;
+        HDC hDC, hDC_before=wglGetCurrentDC();
+        WNDCLASS wndCls;
+        ATOM atom;
+
+        /* create a dummy window */
+        ZeroMemory(&wndCls, sizeof(wndCls));
+                wndCls.lpfnWndProc        = DefWindowProc;
+                wndCls.hInstance            = fgDisplay.Instance;
+                wndCls.style                    = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+                wndCls.lpszClassName    = _T("FREEGLUT_dummy");
+        atom = RegisterClass( &wndCls );
+
+        hWnd=CreateWindow((LPCSTR)atom, _T(""), WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW , 0,0,0,0, 0, 0, fgDisplay.Instance, 0 );
+        hDC=GetDC(hWnd);
+        SetPixelFormat( hDC, pixelformat, ppfd );
+        
+        rc = wglCreateContext( hDC );
+        wglMakeCurrent(hDC, rc);
+        
+        wglGetEntensionsStringARB=(PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
+        if (wglGetEntensionsStringARB)
+        {
+            const char * pWglExtString=wglGetEntensionsStringARB(hDC);
+            if (pWglExtString)
+            {
+                if (strstr(pWglExtString, "WGL_ARB_multisample"))
+                {
+                    int pAttributes[100];
+                    int iCounter=0;
+                    int iPixelFormat;
+                    BOOL bValid;
+                    float fAttributes[] = {0,0};
+                    UINT numFormats;
+                    PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARBProc=NULL;
+
+                    wglChoosePixelFormatARBProc=(PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+                    if ( wglChoosePixelFormatARBProc )
+                    {
+                        pAttributes[iCounter++]=WGL_DRAW_TO_WINDOW_ARB;        pAttributes[iCounter++]=GL_TRUE;
+                        pAttributes[iCounter++]=WGL_SUPPORT_OPENGL_ARB;        pAttributes[iCounter++]=GL_TRUE;
+                        pAttributes[iCounter++]=WGL_ACCELERATION_ARB;        pAttributes[iCounter++]=WGL_FULL_ACCELERATION_ARB;
+
+                        pAttributes[iCounter++]=WGL_COLOR_BITS_ARB;            pAttributes[iCounter++]=pfd.cColorBits ;
+                        pAttributes[iCounter++]=WGL_ALPHA_BITS_ARB;            pAttributes[iCounter++]=pfd.cAlphaBits;
+                        pAttributes[iCounter++]=WGL_DEPTH_BITS_ARB;            pAttributes[iCounter++]=pfd.cDepthBits;
+                        pAttributes[iCounter++]=WGL_STENCIL_BITS_ARB;        pAttributes[iCounter++]=pfd.cStencilBits;
+
+                        pAttributes[iCounter++]=WGL_DOUBLE_BUFFER_ARB;        pAttributes[iCounter++]=(fgState.DisplayMode & GLUT_DOUBLE)!=0;
+                        pAttributes[iCounter++]=WGL_SAMPLE_BUFFERS_ARB;        pAttributes[iCounter++]=GL_TRUE;
+                        pAttributes[iCounter++]=WGL_SAMPLES_ARB;            pAttributes[iCounter++]=4;
+                        pAttributes[iCounter++]=0;                            pAttributes[iCounter++]=0;    /* terminator */
+
+                        bValid = wglChoosePixelFormatARBProc(window->Window.Device,pAttributes,fAttributes,1,&iPixelFormat,&numFormats);
+
+                        if (bValid && numFormats>0)
+                            pixelformat=iPixelFormat;
+                    }
+                }
+                wglMakeCurrent( hDC_before, rc_before);
+                wglDeleteContext(rc);
+                ReleaseDC(hWnd, hDC);
+                DestroyWindow(hWnd);
+                UnregisterClass(_T("FREEGLUT_dummy"), fgDisplay.Instance);
+            }
+        }
+    }
+
     if( pixelformat == 0 )
         return GL_FALSE;
 

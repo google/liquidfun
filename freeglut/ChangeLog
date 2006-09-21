@@ -1204,3 +1204,6 @@ definitions
 Also added a prompt for user input to highlight a difference betwen GLUT
 and "freeglut"
 
+(312)  Added multisampling support for *nix and Windows; some other pixel
+format changes for Windows
+
