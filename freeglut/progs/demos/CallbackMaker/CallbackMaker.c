@@ -13,7 +13,10 @@ static int sequence_number = 0 ;
 int reshape_called = 0, key_called = 0, special_called = 0, visibility_called = 0,
     keyup_called = 0, specialup_called = 0, joystick_called = 0, mouse_called = 0,
     mousewheel_called = 0, motion_called = 0, passivemotion_called = 0, entry_called = 0,
-    close_called = 0 ;
+    close_called = 0, overlaydisplay_called = 0, windowstatus_called = 0,
+    spacemotion_called = 0, spacerotation_called = 0, spacebutton_called = 0,
+    buttonbox_called = 0, dials_called = 0, tabletmotion_called = 0, tabletbutton_called = 0,
+    menudestroy_called = 0, menustatus_called = 0 ;
 int reshape_width = -1, reshape_height = -1, reshape_seq = -1 ;
 int key_key = -1, key_x = -1, key_y = -1, key_seq = -1 ;
 int special_key = -1, special_x = -1, special_y = -1, special_seq = -1 ;
@@ -292,12 +295,137 @@ Close(void)
             ++sequence_number, window ) ;
 }
 
+static void 
+OverlayDisplay(void)
+{
+  int window = glutGetWindow () ;
+  overlaydisplay_called = 1 ;
+  printf ( "%6d Window %d OverlayDisplay Callback\n",
+            ++sequence_number, window ) ;
+  glutPostRedisplay () ;
+}
 
+static void 
+WindowStatus(int state)
+{
+  int window = glutGetWindow () ;
+  windowstatus_called = 1 ;
+  printf ( "%6d Window %d WindowStatus Callback:  %d\n",
+            ++sequence_number, window, state ) ;
+  glutPostRedisplay () ;
+}
+
+static void 
+SpaceMotion(int x, int y, int z)
+{
+  int window = glutGetWindow () ;
+  spacemotion_called = 1 ;
+  printf ( "%6d Window %d SpaceMotion Callback:  %d %d %d\n",
+            ++sequence_number, window, x, y, z ) ;
+  glutPostRedisplay () ;
+}
+
+static void 
+SpaceRotation(int x, int y, int z)
+{
+  int window = glutGetWindow () ;
+  spacerotation_called = 1 ;
+  printf ( "%6d Window %d SpaceRotation Callback:  %d %d %d\n",
+            ++sequence_number, window, x, y, z ) ;
+  glutPostRedisplay () ;
+}
+
+static void 
+SpaceButton(int button, int updown)
+{
+  int window = glutGetWindow () ;
+  spacebutton_called = 1 ;
+  printf ( "%6d Window %d SpaceButton Callback:  %d %d\n",
+            ++sequence_number, window, button, updown ) ;
+  glutPostRedisplay () ;
+}
+
+static void 
+Dials(int x, int y)
+{
+  int window = glutGetWindow () ;
+  dials_called = 1 ;
+  printf ( "%6d Window %d Dials Callback:  %d %d\n",
+            ++sequence_number, window, x, y ) ;
+  glutPostRedisplay () ;
+}
+
+static void 
+ButtonBox(int button, int updown)
+{
+  int window = glutGetWindow () ;
+  buttonbox_called = 1 ;
+  printf ( "%6d Window %d ButtonBox Callback:  %d %d\n",
+            ++sequence_number, window, button, updown ) ;
+  glutPostRedisplay () ;
+}
+
+static void 
+TabletMotion(int x, int y)
+{
+  int window = glutGetWindow () ;
+  tabletmotion_called = 1 ;
+  printf ( "%6d Window %d TabletMotion Callback:  %d %d\n",
+            ++sequence_number, window, x, y ) ;
+  glutPostRedisplay () ;
+}
+
+static void 
+TabletButton(int button, int updown, int x, int y)
+{
+  int window = glutGetWindow () ;
+  tabletbutton_called = 1 ;
+  printf ( "%6d Window %d TabletButton Callback:  %d %d %d %d\n",
+            ++sequence_number, window, button, updown, x, y ) ;
+  glutPostRedisplay () ;
+}
+
+static void
+MenuCallback ( int menuID )
+{
+  int window = glutGetWindow () ;
+  printf( "%6d Window %d MenuCallback - menuID is %d\n",
+          ++sequence_number, window, menuID );
+}
+
+static void 
+MenuDestroy( void )
+{
+  int window = glutGetWindow () ;
+  menudestroy_called = 1 ;
+  printf ( "%6d Window %d MenuDestroy Callback\n",
+            ++sequence_number, window ) ;
+  glutPostRedisplay () ;
+}
+
+static void 
+MenuStatus( int status, int x, int y )
+{
+  int window = glutGetWindow () ;
+  menudestroy_called = 1 ;
+  printf ( "%6d Window %d MenuStatus Callback:  %d %d %d\n",
+            ++sequence_number, window, status, x, y ) ;
+  glutPostRedisplay () ;
+}
+
+static void Idle ( void )
+{
+  ++sequence_number ;
+}
 
 int 
 main(int argc, char *argv[])
 {
+#define STRING_LENGTH   10
   int freeglut_window, aux_window ;
+  char dummy_string[STRING_LENGTH];
+
+  int menuID, subMenuA, subMenuB;
 
   glutInitWindowSize(500, 250);
   glutInitWindowPosition ( 140, 140 );
@@ -323,6 +451,40 @@ main(int argc, char *argv[])
   glutPassiveMotionFunc ( PassiveMotion ) ;
   glutEntryFunc ( Entry ) ;
   glutCloseFunc ( Close ) ;
+  glutOverlayDisplayFunc ( OverlayDisplay ) ;
+  glutWindowStatusFunc ( WindowStatus ) ;
+  glutSpaceballMotionFunc ( SpaceMotion ) ;
+  glutSpaceballRotateFunc ( SpaceRotation ) ;
+  glutSpaceballButtonFunc ( SpaceButton ) ;
+  glutButtonBoxFunc ( ButtonBox ) ;
+  glutDialsFunc ( Dials ) ;
+  glutTabletMotionFunc ( TabletMotion ) ;
+  glutTabletButtonFunc ( TabletButton ) ;
+  glutMenuDestroyFunc ( MenuDestroy );
+  glutMenuStatusFunc ( MenuStatus );
+  glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF) ;
+
+  subMenuA = glutCreateMenu( MenuCallback );
+  glutAddMenuEntry( "Sub menu A1 (01)", 1 );
+  glutAddMenuEntry( "Sub menu A2 (02)", 2 );
+  glutAddMenuEntry( "Sub menu A3 (03)", 3 );
+
+  subMenuB = glutCreateMenu( MenuCallback );
+  glutAddMenuEntry( "Sub menu B1 (04)", 4 );
+  glutAddMenuEntry( "Sub menu B2 (05)", 5 );
+  glutAddMenuEntry( "Sub menu B3 (06)", 6 );
+  glutAddSubMenu( "Going to sub menu A", subMenuA );
+
+  menuID = glutCreateMenu( MenuCallback );
+  glutAddMenuEntry( "Entry one",   1 );
+  glutAddMenuEntry( "Entry two",   2 );
+  glutAddMenuEntry( "Entry three", 3 );
+  glutAddMenuEntry( "Entry four",  4 );
+  glutAddMenuEntry( "Entry five",  5 );
+  glutAddSubMenu( "Enter sub menu A", subMenuA );
+  glutAddSubMenu( "Enter sub menu B", subMenuB );
+
+  glutAttachMenu( GLUT_LEFT_BUTTON );
 
   aux_window = glutCreateWindow( "Second Window" );
   printf ( "Creating window %d as 'Second Window'\n", aux_window ) ;
@@ -343,6 +505,21 @@ main(int argc, char *argv[])
   glutPassiveMotionFunc ( PassiveMotion ) ;
   glutEntryFunc ( Entry ) ;
   glutCloseFunc ( Close ) ;
+  glutOverlayDisplayFunc ( OverlayDisplay ) ;
+  glutWindowStatusFunc ( WindowStatus ) ;
+  glutSpaceballMotionFunc ( SpaceMotion ) ;
+  glutSpaceballRotateFunc ( SpaceRotation ) ;
+  glutSpaceballButtonFunc ( SpaceButton ) ;
+  glutButtonBoxFunc ( ButtonBox ) ;
+  glutDialsFunc ( Dials ) ;
+  glutTabletMotionFunc ( TabletMotion ) ;
+  glutTabletButtonFunc ( TabletButton ) ;
+  glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF) ;
+
+  glutIdleFunc ( Idle );
+
+  printf ( "Please enter something to continue: " );
+  fgets ( dummy_string, STRING_LENGTH, stdin );
 
   glutMainLoop();
 
