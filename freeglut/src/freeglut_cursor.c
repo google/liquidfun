@@ -159,7 +159,7 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
 #elif TARGET_HOST_MS_WINDOWS
 
     /*
-     * This is a temporary solution only...
+     * Joe Krahn is re-writing the following code.
      */
     /* Set the cursor AND change it for this window class. */
 #       define MAP_CURSOR(a,b)                                   \
