@@ -422,7 +422,6 @@ struct tagSFG_WindowState
     GLboolean       IgnoreKeyRepeat;    /* Whether to ignore key repeat.     */
     GLboolean       KeyRepeating;       /* Currently in repeat mode          */
 
-    GLboolean       IsGameMode;         /* Is this the game mode window?     */
     GLboolean       NeedToResize;       /* Do we need to resize the window?  */
 };
 

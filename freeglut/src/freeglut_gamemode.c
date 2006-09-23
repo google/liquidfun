@@ -437,8 +437,6 @@ int FGAPIENTRY glutEnterGameMode( void )
     fgStructure.GameModeWindow->State.Height = fgState.GameModeSize.Y;
     fgStructure.GameModeWindow->State.NeedToResize = GL_TRUE;
 
-    fgStructure.GameModeWindow->State.IsGameMode = GL_TRUE;
-
 #if TARGET_HOST_POSIX_X11
 
     /*
@@ -540,8 +538,6 @@ void FGAPIENTRY glutLeaveGameMode( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutLeaveGameMode" );
 
     freeglut_return_if_fail( fgStructure.GameModeWindow );
-
-    fgStructure.GameModeWindow->State.IsGameMode = GL_FALSE;
 
     fgAddToWindowDestroyList( fgStructure.GameModeWindow );
     fgStructure.GameModeWindow = NULL;

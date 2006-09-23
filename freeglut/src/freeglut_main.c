@@ -120,7 +120,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 
         if ( window->Parent == NULL )
         {
-            if ( ! window->IsMenu && !window->State.IsGameMode )
+            if ( ! window->IsMenu && (window != fgStructure.GameModeWindow) )
             {
                 w += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
                 h += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
