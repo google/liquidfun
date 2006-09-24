@@ -246,18 +246,6 @@ struct tagSFG_XYUse
     GLboolean       Use;                /* ...and a single boolean.          */
 };
 
-/* A helper structure holding a timeval and a boolean */
-typedef struct tagSFG_Time SFG_Time;
-struct tagSFG_Time
-{
-#if TARGET_HOST_MS_WINDOWS
-    DWORD Value;
-#else
-    struct timeval  Value;
-#endif
-    GLboolean       Set;
-};
-
 /*
  * An enumeration containing the state of the GLUT execution:
  * initializing, running, or stopping
@@ -294,7 +282,7 @@ struct tagSFG_State
     GLuint           SwapCount;            /* Count of glutSwapBuffer calls  */
     GLuint           SwapTime;             /* Time of last SwapBuffers       */
 
-    SFG_Time         Time;                 /* Time that glutInit was called  */
+    unsigned long    Time;                 /* Time that glutInit was called  */
     SFG_List         Timers;               /* The freeglut timer hooks       */
     SFG_List         FreeTimers;           /* The unused timer hooks         */
 
@@ -898,6 +886,9 @@ void fgDisplayMenu( void );
 
 /* Elapsed time as per glutGet(GLUT_ELAPSED_TIME). */
 long fgElapsedTime( void );
+
+/* System time in milliseconds */
+long unsigned fgSystemTime(void);
 
 /* List functions */
 void fgListInit(SFG_List *list);

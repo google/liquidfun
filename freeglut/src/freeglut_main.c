@@ -301,46 +301,32 @@ static void fghCheckTimers( void )
     }
 }
 
+ 
+/* Platform-dependent time in milliseconds, as an unsigned 32-bit integer.
+ * This value wraps every 49.7 days, but integer overflows cancel
+ * when subtracting an initial start time, unless the total time exceeds
+ * 32-bit, where the GLUT API return value is also overflowed.
+ */  
+unsigned long fgSystemTime(void) {
+#if TARGET_HOST_POSIX_X11
+    struct timeval now;
+    gettimeofday( &now, NULL );
+    return now.tv_usec/1000 + now.tv_sec*1000;
+#elif TARGET_HOST_MS_WINDOWS
+#    if defined(_WIN32_WCE)
+    return GetTickCount();
+#    else
+    return timeGetTime();
+#    endif
+#endif
+}
+  
 /*
  * Elapsed Time
  */
 long fgElapsedTime( void )
 {
-    if ( fgState.Time.Set )
-    {
-#if TARGET_HOST_POSIX_X11
-        struct timeval now;
-        long elapsed;
-
-        gettimeofday( &now, NULL );
-
-        elapsed = (now.tv_usec - fgState.Time.Value.tv_usec) / 1000;
-        elapsed += (now.tv_sec - fgState.Time.Value.tv_sec) * 1000;
-
-        return elapsed;
-#elif TARGET_HOST_MS_WINDOWS
-#    if defined(_WIN32_WCE)
-        return GetTickCount() - fgState.Time.Value;
-#    else
-        return timeGetTime() - fgState.Time.Value;
-#    endif
-#endif
-    }
-    else
-    {
-#if TARGET_HOST_POSIX_X11
-        gettimeofday( &fgState.Time.Value, NULL );
-#elif TARGET_HOST_MS_WINDOWS
-#    if defined(_WIN32_WCE)
-        fgState.Time.Value = GetTickCount();
-#    else
-        fgState.Time.Value = timeGetTime ();
-#    endif
-#endif
-        fgState.Time.Set = GL_TRUE ;
-
-        return 0 ;
-    }
+    return (long) (fgSystemTime() - fgState.Time);
 }
 
 /*

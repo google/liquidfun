@@ -65,11 +65,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       0,                     /* FPSInterval */
                       0,                     /* SwapCount */
                       0,                     /* SwapTime */
-#if TARGET_HOST_MS_WINDOWS
-                      { 0, GL_FALSE },       /* Time */
-#else
-                      { { 0, 0 }, GL_FALSE },
-#endif
+                      0,                     /* Time */
                       { NULL, NULL },         /* Timers */
                       { NULL, NULL },         /* FreeTimers */
                       NULL,                   /* IdleCallback */
@@ -284,8 +280,6 @@ void fgDeinitialize( void )
     fgState.GameModeSize.Y  = 480;
     fgState.GameModeDepth   =  16;
     fgState.GameModeRefresh =  72;
-
-    fgState.Time.Set = GL_FALSE;
 
     fgListInit( &fgState.Timers );
     fgListInit( &fgState.FreeTimers );
@@ -524,7 +518,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 
     fgCreateStructure( );
 
-    fgElapsedTime( );
+    /* Get start time */
+    fgState.Time = fgSystemTime();
 
     /* check if GLUT_FPS env var is set */
 #ifndef _WIN32_WCE
