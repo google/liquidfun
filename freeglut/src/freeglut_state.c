@@ -493,7 +493,6 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
     switch( eWhat )
     {
     case GLUT_HAS_KEYBOARD:
-    case GLUT_HAS_KEYBOARD:
         /*
          * Win32 is assumed a keyboard, and this cannot be queried,
          * except for WindowsCE.
