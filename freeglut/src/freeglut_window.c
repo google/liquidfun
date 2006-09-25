@@ -437,7 +437,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         {
             fgState.DisplayMode &= ~GLUT_MULTISAMPLE ;
             window->Window.VisualInfo = fgChooseVisual( );
-            fgState.DisplayMode &= GLUT_MULTISAMPLE;
+            fgState.DisplayMode |= GLUT_MULTISAMPLE;
         }
     }
 
