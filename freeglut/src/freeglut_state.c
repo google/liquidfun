@@ -424,7 +424,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
 #if defined(_WIN32_WCE)
-        return GL_FALSE;
+        return 0;
 #else
         return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
                                     PFD_MAIN_PLANE );
@@ -493,61 +493,56 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
     switch( eWhat )
     {
     case GLUT_HAS_KEYBOARD:
+    case GLUT_HAS_KEYBOARD:
         /*
-         * We always have a keyboard present on PC machines...
+         * Win32 is assumed a keyboard, and this cannot be queried,
+         * except for WindowsCE.
          *
-         * XXX I think that some of my PCs will boot without a keyboard.
-         * XXX Also, who says that we are running on a PC?  UNIX/X11
-         * XXX is much more generic, and X11 can go over a network.
-         * XXX Though in actuality, we can probably assume BOTH a
-         * XXX mouse and keyboard for most/all of our users.
+         * X11 has a core keyboard by definition, although it can
+         * be present as a virtual/dummy keyboard. For now, there
+         * is no reliable way to tell if a real keyboard is present.
          */
-        return TRUE ;
+#if defined(_WIN32_CE)
+        return ( GetKeyboardStatus() & KBDI_KEYBOARD_PRESENT ) ? 1 : 0;
+#    pragma comment (lib,"Kbdui.lib")
+#else
+        return 1;
+#endif
 
 #if TARGET_HOST_POSIX_X11
 
+    /* X11 has a mouse by definition */
     case GLUT_HAS_MOUSE:
-        return TRUE ;
+        return 1 ;
 
     case GLUT_NUM_MOUSE_BUTTONS:
-        /*
-         * Return the number of mouse buttons available. This is a big guess.
+        /* We should be able to pass NULL when the last argument is zero,
+         * but at least one X server has a bug where this causes a segfault.
          *
-         * XXX We can probe /var/run/dmesg.boot which is world-readable.
-         * XXX This would be somewhat system-dependant, but is doable.
-         * XXX E.g., on NetBSD, my USB mouse registers:
-         * XXX   ums0 at uhidev0: 3 buttons and Z dir.
-         * XXX We can also probe /var/log/XFree86\..*\.log to get
-         * XXX lines such as:
-         * XXX   (**) Option "Buttons" "5"
-         * XXX   (**) Option "ZAxisMapping" "4 5"
-         * XXX   (**) Mouse0: ZAxisMapping: buttons 4 and 5
-         * XXX   (**) Mouse0: Buttons: 5
-         * XXX ...which tells us even more, and is a bit less
-         * XXX system-dependant.  (Other than MS-WINDOWS, all
-         * XXX target hosts with actual users are probably running
-         * XXX XFree86...)  It is at least worth taking a look at
-         * XXX this file.
+         * In XFree86/Xorg servers, a mouse wheel is seen as two buttons
+         * rather than an Axis; "freeglut_main.c" expects this when
+         * checking for a wheel event.
          */
-        return 3 ;
+        {
+            unsigned char map;
+            int nbuttons = XGetPointerMapping(fgDisplay.Display, &map,0);
+            return nbuttons;
+        }
 
 #elif TARGET_HOST_MS_WINDOWS
 
     case GLUT_HAS_MOUSE:
         /*
-         * The Windows can be booted without a mouse.
-         * It would be nice to have this reported.
+         * MS Windows can be booted without a mouse.
          */
         return GetSystemMetrics( SM_MOUSEPRESENT );
 
     case GLUT_NUM_MOUSE_BUTTONS:
-        /* We are much more fortunate under Win32 about this... */
-#if defined(_WIN32_WCE)
+#  if defined(_WIN32_WCE)
         return 1;
-#else
+#  else
         return GetSystemMetrics( SM_CMOUSEBUTTONS );
-#endif /* defined(_WIN32_WCE) */
-
+#  endif
 #endif
 
     case GLUT_HAS_JOYSTICK:
@@ -578,7 +573,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
 
     case GLUT_HAS_SPACEBALL:
     case GLUT_HAS_TABLET:
-        return FALSE;
+        return 0;
 
     case GLUT_NUM_SPACEBALL_BUTTONS:
     case GLUT_NUM_TABLET_BUTTONS:
@@ -633,13 +628,13 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
 #if TARGET_HOST_POSIX_X11
 
     case GLUT_OVERLAY_POSSIBLE:
-        return FALSE;
+        return 0;
 
     case GLUT_LAYER_IN_USE:
         return GLUT_NORMAL;
 
     case GLUT_HAS_OVERLAY:
-        return FALSE;
+        return 0;
 
     case GLUT_TRANSPARENT_INDEX:
         /*
@@ -651,7 +646,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
 
     case GLUT_NORMAL_DAMAGED:
         /* XXX Actually I do not know. Maybe. */
-        return FALSE;
+        return 0;
 
     case GLUT_OVERLAY_DAMAGED:
         return -1;
@@ -661,13 +656,13 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
     case GLUT_OVERLAY_POSSIBLE:
 /*      return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
                                    PFD_OVERLAY_PLANE ); */
-      return FALSE ;
+      return 0 ;
 
     case GLUT_LAYER_IN_USE:
         return GLUT_NORMAL;
 
     case GLUT_HAS_OVERLAY:
-        return FALSE;
+        return 0;
 
     case GLUT_TRANSPARENT_INDEX:
         /*
@@ -679,7 +674,7 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
 
     case GLUT_NORMAL_DAMAGED:
         /* XXX Actually I do not know. Maybe. */
-        return FALSE;
+        return 0;
 
     case GLUT_OVERLAY_DAMAGED:
         return -1;
