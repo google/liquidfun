@@ -503,7 +503,10 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
          */
 #if defined(_WIN32_CE)
         return ( GetKeyboardStatus() & KBDI_KEYBOARD_PRESENT ) ? 1 : 0;
-#    pragma comment (lib,"Kbdui.lib")
+#   if FREEGLUT_LIB_PRAGMAS
+#       pragma comment (lib,"Kbdui.lib")
+#   endif
+
 #else
         return 1;
 #endif

@@ -979,8 +979,8 @@ static void fghJoystickAddHatElement ( SFG_Joystick *joy, CFDictionaryRef button
 /* Inspired by
    http://msdn.microsoft.com/archive/en-us/dnargame/html/msdn_sidewind3d.asp
  */
-#    if defined(_MSC_VER)
-#        pragma comment (lib, "advapi32.lib") /* library pragmas are bad */
+#    if FREEGLUT_LIB_PRAGMAS
+#        pragma comment (lib, "advapi32.lib")
 #    endif
 
 static int fghJoystickGetOEMProductName ( SFG_Joystick* joy, char *buf, int buf_sz )

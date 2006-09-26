@@ -35,61 +35,65 @@
 /*
  * Under windows, we have to differentiate between static and dynamic libraries
  */
-#if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__WATCOMC__)
-
+#ifdef _WIN32
 /* #pragma may not be supported by some compilers.
  * Discussion by FreeGLUT developers suggests that
  * Visual C++ specific code involving pragmas may
  * need to move to a separate header.  24th Dec 2003
- */ 
+ */
+
+/* Define FREEGLUT_LIB_PRAGMAS to 1 to include library
+ * pragmas or to 1 to exclude library pragmas.
+ * The default behavior depends on the compiler/platform.
+ */
+#   ifndef FREEGLUT_LIB_PRAGMAS
+#       if ( defined(_MSC_VER) || defined(__WATCOMC__) ) && !defined(_WIN32_WCE)
+#           define FREEGLUT_LIB_PRAGMAS 1
+#       else
+#           define FREEGLUT_LIB_PRAGMAS 0
+#       endif
+#   endif
 
 #   define WIN32_LEAN_AND_MEAN
-#   define NO_MIN_MAX
-#    include <windows.h>
-#   undef min
-#   undef max
+#   define NOMINMAX
+#   include <Windows.h>
 
 /* Windows static library */
 #   ifdef FREEGLUT_STATIC
 
-#    define FGAPI
-#    define FGAPIENTRY
+#       define FGAPI
+#       define FGAPIENTRY
 
         /* Link with Win32 static freeglut lib */
-#       if defined(_MSC_VER) || defined(__WATCOMC__)
+#       if FREEGLUT_LIB_PRAGMAS
 #           pragma comment (lib, "freeglut_static.lib")
 #       endif
 
 /* Windows shared library (DLL) */
 #   else
 
-#        if defined(FREEGLUT_EXPORTS)
-#                define FGAPI __declspec(dllexport)
-#        else
-#                define FGAPI __declspec(dllimport)
+#       define FGAPIENTRY __stdcall
+#       if defined(FREEGLUT_EXPORTS)
+#           define FGAPI __declspec(dllexport)
+#       else
+#           define FGAPI __declspec(dllimport)
 
-            /* link with Win32 shared freeglut lib */
-#           if defined(_MSC_VER) || defined(__WATCOMC__)
-#               ifndef _WIN32_WCE
-#                   pragma comment (lib, "freeglut.lib")
-#               endif
-#        endif
+            /* Link with Win32 shared freeglut lib */
+#           if FREEGLUT_LIB_PRAGMAS
+#               pragma comment (lib, "freeglut.lib")
+#           endif
 
 #       endif
-
-#       define FGAPIENTRY __stdcall
 
 #   endif
 
 /* Drag in other Windows libraries as required by FreeGLUT */
-#   if defined(_MSC_VER) || defined(__WATCOMC__)
-#       ifndef _WIN32_WCE
-#           pragma comment (lib, "winmm.lib")    /* link Windows MultiMedia lib */
-#           pragma comment (lib, "user32.lib")   /* link Windows user lib       */
-#           pragma comment (lib, "gdi32.lib")    /* link Windows GDI lib        */
-#           pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
-#           pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
-#       endif /* _WIN32_WCE */
+#   if FREEGLUT_LIB_PRAGMAS
+#       pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
+#       pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */
+#       pragma comment (lib, "gdi32.lib")    /* link Windows GDI lib        */
+#       pragma comment (lib, "winmm.lib")    /* link Windows MultiMedia lib */
+#       pragma comment (lib, "user32.lib")   /* link Windows user lib       */
 #   endif
 
 #else

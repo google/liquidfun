@@ -29,8 +29,10 @@
 #include "freeglut_internal.h"
 
 #if defined(_WIN32_WCE)
-#include <aygshell.h>
-#pragma comment( lib, "Aygshell.lib" ) /* library pragmas are bad */
+#   include <Aygshell.h>
+#   ifdef FREEGLUT_LIB_PRAGMAS
+#       pragma comment( lib, "Aygshell.lib" )
+#   endif
 
 static wchar_t* fghWstrFromStr(const char* str)
 {
@@ -41,7 +43,6 @@ static wchar_t* fghWstrFromStr(const char* str)
     wstr[len] = 0;
     return wstr;
 }
-
 
 #endif /* defined(_WIN32_WCE) */
 
