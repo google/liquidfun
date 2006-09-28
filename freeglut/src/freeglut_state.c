@@ -120,7 +120,6 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
 }
 
 #if TARGET_HOST_MS_WINDOWS
-/* WRONG-- FIXME */
 /* The following include file is available from SGI but is not standard:
  *   #include <GL/wglext.h>
  * So we copy the necessary parts out of it to support the multisampling query

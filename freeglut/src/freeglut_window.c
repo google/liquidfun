@@ -173,10 +173,10 @@ XVisualInfo* fgChooseVisual( void )
  * Setup the pixel format for a Win32 window
  */
 #if TARGET_HOST_MS_WINDOWS
-/* WRONG-- FIXME */
 /* The following include file is available from SGI but is not standard:
  *   #include <GL/wglext.h>
  * So we copy the necessary parts out of it.
+ * XXX: should local definitions for extensions be put in a separate include file?
  */
 typedef const char * (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
 
