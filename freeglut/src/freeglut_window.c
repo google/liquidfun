@@ -713,7 +713,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 #else
     window->Window.Handle = CreateWindowEx(
         exFlags,
-        "FREEGLUT",
+        _T("FREEGLUT"),
         title,
         flags,
         x, y, w, h,
