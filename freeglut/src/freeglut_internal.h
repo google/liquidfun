@@ -803,12 +803,14 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
  * Defined in freeglut_structure.c, freeglut_window.c.
  */
 SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
-                            int x, int y, int w, int h,
+                            GLboolean positionUse, int x, int y,
+                            GLboolean sizeUse, int w, int h,
                             GLboolean gameMode, GLboolean isMenu );
 void        fgSetWindow ( SFG_Window *window );
 void        fgOpenWindow( SFG_Window* window, const char* title,
-                          int x, int y, int w, int h, GLboolean gameMode,
-                          GLboolean isSubWindow );
+                          GLboolean positionUse, int x, int y,
+                          GLboolean sizeUse, int w, int h,
+                          GLboolean gameMode, GLboolean isSubWindow );
 void        fgCloseWindow( SFG_Window* window );
 void        fgAddToWindowDestroyList ( SFG_Window* window );
 void        fgCloseWindows ();

@@ -400,7 +400,8 @@ void fgSetWindow ( SFG_Window *window )
  * to the freeglut structure. OpenGL context is created here.
  */
 void fgOpenWindow( SFG_Window* window, const char* title,
-                   int x, int y, int w, int h,
+                   GLboolean positionUse, int x, int y,
+                   GLboolean sizeUse, int w, int h,
                    GLboolean gameMode, GLboolean isSubWindow )
 {
 #if TARGET_HOST_POSIX_X11
@@ -477,6 +478,11 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         mask |= CWOverrideRedirect;
     }
 
+    if( ! positionUse )
+        x = y = -1; /* default window position */
+    if( ! sizeUse )
+        w = h = 300; /* default window size */
+
     window->Window.Handle = XCreateWindow(
         fgDisplay.Display,
         window->Parent == NULL ? fgDisplay.RootWindow :
@@ -549,9 +555,9 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     window->State.Visible = GL_TRUE;
 
     sizeHints.flags = 0;
-    if ( fgState.Position.Use )
+    if ( positionUse )
         sizeHints.flags |= USPosition;
-    if ( fgState.Size.Use )
+    if ( sizeUse )
         sizeHints.flags |= USSize;
 
     /*
@@ -622,6 +628,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     }
     else
     {
+        int worig = w, horig = h;
+
 #if !defined(_WIN32_WCE)
         if ( ( ! isSubWindow ) && ( ! window->IsMenu ) )
         {
@@ -636,15 +644,27 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         }
 #endif /* defined(_WIN32_WCE) */
 
-        if( ! fgState.Position.Use )
+        if( ! positionUse )
         {
             x = CW_USEDEFAULT;
             y = CW_USEDEFAULT;
         }
-        if( ! fgState.Size.Use )
+        /* setting State.Width/Height to call resize callback later */
+        if( ! sizeUse )
         {
-            w = CW_USEDEFAULT;
-            h = CW_USEDEFAULT;
+            if( ! window->IsMenu )
+            {
+                w = CW_USEDEFAULT;
+                h = CW_USEDEFAULT;
+            }
+            else /* fail safe - Windows can make a window of size (0, 0) */
+                w = h = 300; /* default window size */
+            window->State.Width = window->State.Height = -1;
+        }
+        else
+        {
+            window->State.Width = worig;
+            window->State.Height = horig;
         }
 
         /*
@@ -790,9 +810,10 @@ int FGAPIENTRY glutCreateWindow( const char* title )
      */
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateWindow" );
 
-    return fgCreateWindow( NULL, title, fgState.Position.X, fgState.Position.Y,
-                           fgState.Size.X, fgState.Size.Y, GL_FALSE,
-                           GL_FALSE )->ID;
+    return fgCreateWindow( NULL, title, fgState.Position.Use,
+                           fgState.Position.X, fgState.Position.Y,
+                           fgState.Size.Use, fgState.Size.X, fgState.Size.Y,
+                           GL_FALSE, GL_FALSE )->ID;
 }
 
 /*
@@ -833,7 +854,7 @@ int FGAPIENTRY glutCreateSubWindow( int parentID, int x, int y, int w, int h )
         h = -h ;
     }
 
-    window = fgCreateWindow( parent, "", x, y, w, h, GL_FALSE, GL_FALSE );
+    window = fgCreateWindow( parent, "", GL_TRUE, x, y, GL_TRUE, w, h, GL_FALSE, GL_FALSE );
     ret = window->ID;
 
     return ret;

@@ -1609,8 +1609,15 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
 
         window->State.NeedToResize = GL_TRUE;
-        window->State.Width  = fgState.Size.X;
-        window->State.Height = fgState.Size.Y;
+        if( ( window->State.Width < 0 ) || ( window->State.Height < 0 ) )
+        {
+            SFG_Window *current_window = fgStructure.CurrentWindow;
+
+            fgSetWindow( window );
+            window->State.Width = glutGet( GLUT_WINDOW_WIDTH );
+            window->State.Height = glutGet( GLUT_WINDOW_HEIGHT );
+            fgSetWindow( current_window );
+        }
 
         ReleaseDC( window->Window.Handle, window->Window.Device );
 

@@ -429,8 +429,9 @@ int FGAPIENTRY glutEnterGameMode( void )
     }
 
     fgStructure.GameModeWindow = fgCreateWindow(
-        NULL, "FREEGLUT", 0, 0,
-        fgState.GameModeSize.X, fgState.GameModeSize.Y, GL_TRUE, GL_FALSE
+        NULL, "FREEGLUT", GL_TRUE, 0, 0,
+        GL_TRUE, fgState.GameModeSize.X, fgState.GameModeSize.Y,
+        GL_TRUE, GL_FALSE
     );
 
     fgStructure.GameModeWindow->State.Width  = fgState.GameModeSize.X;

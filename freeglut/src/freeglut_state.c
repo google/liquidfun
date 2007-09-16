@@ -159,10 +159,14 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_SCREEN_HEIGHT:        return fgDisplay.ScreenHeight  ;
     case GLUT_SCREEN_WIDTH_MM:      return fgDisplay.ScreenWidthMM ;
     case GLUT_SCREEN_HEIGHT_MM:     return fgDisplay.ScreenHeightMM;
-    case GLUT_INIT_WINDOW_X:        return fgState.Position.X      ;
-    case GLUT_INIT_WINDOW_Y:        return fgState.Position.Y      ;
-    case GLUT_INIT_WINDOW_WIDTH:    return fgState.Size.X          ;
-    case GLUT_INIT_WINDOW_HEIGHT:   return fgState.Size.Y          ;
+    case GLUT_INIT_WINDOW_X:        return fgState.Position.Use ?
+                                           fgState.Position.X : -1 ;
+    case GLUT_INIT_WINDOW_Y:        return fgState.Position.Use ?
+                                           fgState.Position.Y : -1 ;
+    case GLUT_INIT_WINDOW_WIDTH:    return fgState.Size.Use ?
+                                           fgState.Size.X : -1     ;
+    case GLUT_INIT_WINDOW_HEIGHT:   return fgState.Size.Use ?
+                                           fgState.Size.Y : -1     ;
     case GLUT_INIT_DISPLAY_MODE:    return fgState.DisplayMode     ;
 
 #if TARGET_HOST_POSIX_X11
