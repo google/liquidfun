@@ -1,0 +1,177 @@
+# Microsoft Developer Studio Generated Dependency File, included by freeglut_static.mak
+
+.\src\freeglut_callbacks.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_cursor.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_display.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_ext.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_font.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_font_data.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_gamemode.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_geometry.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_glutfont_definitions.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_init.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_input_devices.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_joystick.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_main.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_menu.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_misc.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_overlay.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_state.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_stroke_mono_roman.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_stroke_roman.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_structure.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_teapot.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	".\src\freeglut_teapot_data.h"\
+	
+
+.\src\freeglut_videoresize.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
+
+.\src\freeglut_window.c : \
+	"..\..\..\..\..\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	".\include\GL\freeglut.h"\
+	".\include\GL\freeglut_ext.h"\
+	".\include\GL\freeglut_std.h"\
+	".\src\freeglut_internal.h"\
+	
