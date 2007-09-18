@@ -263,9 +263,13 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
                     menuEntry->SubMenu->X = menu->X - menuEntry->SubMenu->Width;
 
                 if( menuEntry->SubMenu->Y + menuEntry->SubMenu->Height > max_y )
+                {
                     menuEntry->SubMenu->Y -= ( menuEntry->SubMenu->Height -
                                                FREEGLUT_MENU_HEIGHT -
                                                2 * FREEGLUT_MENU_BORDER );
+                    if( menuEntry->SubMenu->Y < 0 )
+                        menuEntry->SubMenu->Y = 0;
+                }
 
                 fgSetWindow( menuEntry->SubMenu->Window );
                 glutPositionWindow( menuEntry->SubMenu->X,
@@ -552,7 +556,11 @@ static void fghActivateMenu( SFG_Window* window, int button )
         menu->X -=menu->Width;
 
     if( menu->Y + menu->Height > max_y )
+    {
         menu->Y -=menu->Height;
+        if( menu->Y < 0 )
+            menu->Y = 0;
+    }
 
     menu->Window->State.MouseX =
         window->State.MouseX + glutGet( GLUT_WINDOW_X ) - menu->X;
