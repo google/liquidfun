@@ -904,7 +904,14 @@ void FGAPIENTRY glutSetWindow( int ID )
 int FGAPIENTRY glutGetWindow( void )
 {
     SFG_Window *win = fgStructure.CurrentWindow;
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetWindow" );
+    /*
+     * Since GLUT did not throw an error if this function was called without a prior call to
+     * "glutInit", this function shouldn't do so here.  Instead let us return a zero.
+     * See Feature Request "[ 1307049 ] glutInit check".
+     */
+    if ( ! fgState.Initialised )
+        return 0;
+
     while ( win && win->IsMenu )
         win = win->Parent;
     return win ? win->ID : 0;
