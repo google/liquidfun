@@ -727,6 +727,14 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     if( !( window->Window.Handle ) )
         fgError( "Failed to create a window (%s)!", title );
 
+    /* Make a menu window always on top - fix Feature Request 947118 */
+    if( window->IsMenu || gameMode )
+        SetWindowPos(
+                        window->Window.Handle,
+                        HWND_TOPMOST,
+                        0, 0, 0, 0,
+                        SWP_NOMOVE | SWP_NOSIZE
+                    );
 #if defined(_WIN32_WCE)
     ShowWindow( window->Window.Handle, SW_SHOW );
 #else
