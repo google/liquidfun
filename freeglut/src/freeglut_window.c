@@ -608,6 +608,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     DWORD flags;
     DWORD exFlags = 0;
     ATOM atom;
+    int WindowStyle = 0;
 
     /* Grab the window class we have registered on glutInit(): */
     atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
@@ -735,6 +736,25 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                         0, 0, 0, 0,
                         SWP_NOMOVE | SWP_NOSIZE
                     );
+
+    /* Hack to remove the caption (title bar) and/or border
+     * and all the system menu controls.
+     */
+    WindowStyle = GetWindowLong(window->Window.Handle, GWL_STYLE);
+    if ( fgState.DisplayMode & GLUT_CAPTIONLESS )
+    {
+        SetWindowLong ( window->Window.Handle, GWL_STYLE,
+                        WindowStyle & ~(WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX));
+    }
+    else if ( fgState.DisplayMode & GLUT_BORDERLESS )
+    {
+        SetWindowLong ( window->Window.Handle, GWL_STYLE,
+                        WindowStyle & ~(WS_BORDER | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX));
+    }
+//SetWindowPos(window->Window.Handle, NULL, 0, 0, 0, 0,
+//   SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+
 #if defined(_WIN32_WCE)
     ShowWindow( window->Window.Handle, SW_SHOW );
 #else
