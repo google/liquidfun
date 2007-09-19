@@ -1688,9 +1688,6 @@ int fgJoystickDetect( void )
 
     fgInitialiseJoysticks ();
 
-    if ( !fgJoystick )
-        return 0;
-
     if ( !fgState.JoysticksInitialised )
         return 0;
 
