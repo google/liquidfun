@@ -1290,7 +1290,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
             /* Cease processing this event if it is auto repeated */
 
             if (window->State.KeyRepeating)
+            {
+                if (event.type == KeyPress) window->State.KeyRepeating = GL_FALSE;
                 break;
+            }
 
             if( event.type == KeyPress )
             {
