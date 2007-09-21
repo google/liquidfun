@@ -47,7 +47,7 @@
 int FGAPIENTRY glutExtensionSupported( const char* extension )
 {
   const char *extensions, *start;
-  const int len = strlen( extension );
+  const size_t len = strlen( extension );
 
   /* Make sure there is a current window, and thus a current context available */
   FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutExtensionSupported" );

@@ -1548,7 +1548,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 {
     SFG_Window* window;
     PAINTSTRUCT ps;
-    LONG lRet = 1;
+    LRESULT lRet = 1;
 
     FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Event Handler" ) ;
 

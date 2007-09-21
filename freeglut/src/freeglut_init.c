@@ -720,7 +720,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
      * delimited by blanks or tabs.
      */
     char *token ;
-    int len = strlen ( displayMode );
+    size_t len = strlen ( displayMode );
     char *buffer = (char *)malloc ( (len+1) * sizeof(char) );
     memcpy ( buffer, displayMode, len );
     buffer[len] = '\0';
