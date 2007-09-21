@@ -83,6 +83,7 @@
  */
 FGAPI void    FGAPIENTRY glutMainLoopEvent( void );
 FGAPI void    FGAPIENTRY glutLeaveMainLoop( void );
+FGAPI void    FGAPIENTRY glutExit         ( void );
 
 /*
  * Window-specific callback functions, see freeglut_callbacks.c

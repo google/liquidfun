@@ -653,6 +653,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 }
 
 /*
+ * Undoes all the "glutInit" stuff
+ */
+void FGAPIENTRY glutExit ( void )
+{
+  fgDeinitialize ();
+}
+
+/*
  * Sets the default initial window position for new windows
  */
 void FGAPIENTRY glutInitWindowPosition( int x, int y )
