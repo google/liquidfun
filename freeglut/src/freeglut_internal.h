@@ -380,7 +380,7 @@ struct tagSFG_Context
     SFG_WindowContextType Context;   /* The window's OpenGL/WGL context     */
 
 #if TARGET_HOST_POSIX_X11
-    XVisualInfo*    VisualInfo;      /* The window's visual information     */
+    GLXFBConfig*    FBConfig;        /* The window's FBConfig               */
 #elif TARGET_HOST_MS_WINDOWS
     HDC             Device;          /* The window's device context         */
 #endif
@@ -556,10 +556,6 @@ enum
 typedef struct tagSFG_MenuContext SFG_MenuContext;
 struct tagSFG_MenuContext
 {
-#if TARGET_HOST_POSIX_X11
-    XVisualInfo*        MVisualInfo;      /* The window's visual information */
-#endif
-
     SFG_WindowContextType MContext;       /* The menu window's WGL context   */
 };
 
@@ -786,7 +782,7 @@ void fgDestroyStructure( void );
 
 /* A helper function to check if a display mode is possible to use */
 #if TARGET_HOST_POSIX_X11
-XVisualInfo* fgChooseVisual( void );
+GLXFBConfig* fgChooseFBConfig( void );
 #endif
 
 /* The window procedure for Win32 events handling */

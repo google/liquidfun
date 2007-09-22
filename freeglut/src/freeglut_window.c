@@ -49,7 +49,7 @@ static wchar_t* fghWstrFromStr(const char* str)
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
- *  fgChooseVisual()        -- OK, but what about glutInitDisplayString()?
+ *  fgChooseFBConfig()      -- OK, but what about glutInitDisplayString()?
  *  fgSetupPixelFormat      -- ignores the display mode settings
  *  fgOpenWindow()          -- check the Win32 version, -iconic handling!
  *  fgCloseWindow()         -- check the Win32 version
@@ -76,10 +76,8 @@ static wchar_t* fghWstrFromStr(const char* str)
  */
 #if TARGET_HOST_POSIX_X11
 
-XVisualInfo* fgChooseVisual( void )
+GLXFBConfig* fgChooseFBConfig( void )
 {
-#define BUFFER_SIZES 6
-    int bufferSize[BUFFER_SIZES] = { 16, 12, 8, 4, 2, 1 };
     GLboolean wantIndexedMode = GL_FALSE;
     int attributes[ 32 ];
     int where = 0;
@@ -95,11 +93,13 @@ XVisualInfo* fgChooseVisual( void )
     if( fgState.DisplayMode & GLUT_INDEX )
     {
         ATTRIB_VAL( GLX_BUFFER_SIZE, 8 );
+        /*  Buffer size is selected later.  */
+
+        ATTRIB_VAL( GLX_RENDER_TYPE, GLX_COLOR_INDEX_BIT );
         wantIndexedMode = GL_TRUE;
     }
     else
     {
-        ATTRIB( GLX_RGBA );
         ATTRIB_VAL( GLX_RED_SIZE,   1 );
         ATTRIB_VAL( GLX_GREEN_SIZE, 1 );
         ATTRIB_VAL( GLX_BLUE_SIZE,  1 );
@@ -108,10 +108,10 @@ XVisualInfo* fgChooseVisual( void )
     }
 
     if( fgState.DisplayMode & GLUT_DOUBLE )
-        ATTRIB( GLX_DOUBLEBUFFER );
+        ATTRIB_VAL( GLX_DOUBLEBUFFER, True );
 
     if( fgState.DisplayMode & GLUT_STEREO )
-        ATTRIB( GLX_STEREO );
+        ATTRIB_VAL( GLX_STEREO, True );
 
     if( fgState.DisplayMode & GLUT_DEPTH )
         ATTRIB_VAL( GLX_DEPTH_SIZE, 1 );
@@ -137,34 +137,116 @@ XVisualInfo* fgChooseVisual( void )
     if( fgState.DisplayMode & GLUT_AUX4 )
         ATTRIB_VAL( GLX_AUX_BUFFERS, 4 );
     if ( fgState.DisplayMode & GLUT_MULTISAMPLE )
-        ATTRIB_VAL( GLX_SAMPLES_SGIS, 4 );
+    {
+        ATTRIB_VAL( GLX_SAMPLE_BUFFERS, 1 );
+    }
 
 
     /* Push a null at the end of the list */
     ATTRIB( None );
 
-    if( ! wantIndexedMode )
-        return glXChooseVisual( fgDisplay.Display, fgDisplay.Screen,
-                                attributes );
-    else
     {
-        XVisualInfo* visualInfo;
-        int i;
+        GLXFBConfig * fbconfigArray;  /*  Array of FBConfigs  */
+        GLXFBConfig * fbconfig;       /*  The FBConfig we want  */
+        int fbconfigArraySize;        /*  Number of FBConfigs in the array  */
 
-        /*
-         * In indexed mode, we need to check how many bits of depth can we
-         * achieve.  We do this by trying each possibility from the list
-         * given in the {bufferSize} array.  If we match, we return to caller.
-         */
-        for( i=0; i<BUFFER_SIZES; i++ )
+
+        /*  Get all FBConfigs that match "attributes".  */
+        fbconfigArray = glXChooseFBConfig( fgDisplay.Display,
+                                           fgDisplay.Screen,
+                                           attributes,
+                                           &fbconfigArraySize );
+
+        if (fbconfigArray != NULL)
         {
-            attributes[ 1 ] = bufferSize[ i ];
-            visualInfo = glXChooseVisual( fgDisplay.Display, fgDisplay.Screen,
-                                          attributes );
-            if( visualInfo != NULL )
-                return visualInfo;
+            int result;  /* Returned by glXGetFBConfigAttrib, not checked. */
+
+
+            if( wantIndexedMode )
+            {
+                /*
+                 * In index mode, we want the largest buffer size, i.e. visual
+                 * depth.  Here, FBConfigs are sorted by increasing buffer size
+                 * first, so FBConfigs with the largest size come last.
+                 */
+
+                int bufferSizeMin, bufferSizeMax;
+
+                /*  Get bufferSizeMin.  */
+                result =
+                  glXGetFBConfigAttrib( fgDisplay.Display,
+                                        fbconfigArray[0],
+                                        GLX_BUFFER_SIZE,
+                                        &bufferSizeMin );
+                /*  Get bufferSizeMax.  */
+                result =
+                  glXGetFBConfigAttrib( fgDisplay.Display,
+                                        fbconfigArray[fbconfigArraySize - 1],
+                                        GLX_BUFFER_SIZE,
+                                        &bufferSizeMax );
+
+                if (bufferSizeMax > bufferSizeMin)
+                {
+                    /* 
+                     * Free and reallocate fbconfigArray, keeping only FBConfigs
+                     * with the largest buffer size.
+                     */
+                    XFree(fbconfigArray);
+
+                    /*  Add buffer size token at the end of the list.  */
+                    where--;
+                    ATTRIB_VAL( GLX_BUFFER_SIZE, bufferSizeMax );
+                    ATTRIB( None );
+
+                    fbconfigArray = glXChooseFBConfig( fgDisplay.Display,
+                                                       fgDisplay.Screen,
+                                                       attributes,
+                                                       &fbconfigArraySize );
+                }
+            }
+
+            /*
+             * We now have an array of FBConfigs, the first one being the "best"
+             * one.  So we should return only this FBConfig:
+             *
+             * int fbconfigXID;
+             *
+             *  - pick the XID of the FBConfig we want
+             * result = glXGetFBConfigAttrib( fgDisplay.Display,
+             *                                fbconfigArray[0],
+             *                                GLX_FBCONFIG_ID,
+             *                                &fbconfigXID );
+             *
+             * - free the array
+             * XFree(fbconfigArray);
+             *
+             * - reset "attributes" with the XID
+             * where = 0;
+             * ATTRIB_VAL( GLX_FBCONFIG_ID, fbconfigXID );
+             * ATTRIB( None );
+             *
+             * - get our FBConfig only
+             * fbconfig = glXChooseFBConfig( fgDisplay.Display,
+             *                               fgDisplay.Screen,
+             *                               attributes,
+             *                               &fbconfigArraySize );
+             *
+             * However, for some configurations (for instance multisampling with
+             * Mesa 6.5.2 and ATI drivers), this does not work:
+             * glXChooseFBConfig returns NULL, whereas fbconfigXID is a valid
+             * XID.  Further investigation is needed.
+             *
+             * So, for now, we return the whole array of FBConfigs.  This should
+             * not produce any side effects elsewhere.
+             */
+            fbconfig = fbconfigArray;
         }
-        return NULL;
+        else
+        {
+           fbconfig = NULL;
+        }
+
+        return fbconfig;
     }
 }
 #endif
@@ -372,8 +454,9 @@ void fgSetWindow ( SFG_Window *window )
 {
 #if TARGET_HOST_POSIX_X11
     if ( window )
-        glXMakeCurrent(
+        glXMakeContextCurrent(
             fgDisplay.Display,
+            window->Window.Handle,
             window->Window.Handle,
             window->Window.Context
         );
@@ -405,46 +488,52 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                    GLboolean gameMode, GLboolean isSubWindow )
 {
 #if TARGET_HOST_POSIX_X11
+    XVisualInfo * visualInfo;
     XSetWindowAttributes winAttr;
     XTextProperty textProperty;
     XSizeHints sizeHints;
     XWMHints wmHints;
     unsigned long mask;
+    int renderType;  /*  GLX_RGBA_TYPE or GLX_COLOR_INDEX_TYPE  */
     unsigned int current_DisplayMode = fgState.DisplayMode ;
 
     /* Save the display mode if we are creating a menu window */
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB ;
 
-    window->Window.VisualInfo = fgChooseVisual( );
+    window->Window.FBConfig = fgChooseFBConfig( );
 
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = current_DisplayMode ;
 
-    if( ! window->Window.VisualInfo )
+    if( ! window->Window.FBConfig )
     {
         /*
-         * The "fgChooseVisual" returned a null meaning that the visual
+         * The "fgChooseFBConfig" returned a null meaning that the visual
          * context is not available.
          * Try a couple of variations to see if they will work.
          */
         if( !( fgState.DisplayMode & GLUT_DOUBLE ) )
         {
             fgState.DisplayMode |= GLUT_DOUBLE ;
-            window->Window.VisualInfo = fgChooseVisual( );
+            window->Window.FBConfig = fgChooseFBConfig( );
             fgState.DisplayMode &= ~GLUT_DOUBLE;
         }
 
         if( fgState.DisplayMode & GLUT_MULTISAMPLE )
         {
             fgState.DisplayMode &= ~GLUT_MULTISAMPLE ;
-            window->Window.VisualInfo = fgChooseVisual( );
+            window->Window.FBConfig = fgChooseFBConfig( );
             fgState.DisplayMode |= GLUT_MULTISAMPLE;
         }
     }
 
-    FREEGLUT_INTERNAL_ERROR_EXIT( window->Window.VisualInfo != NULL,
-                                  "Visual with necessary capabilities not found", "fgOpenWindow" );
+    FREEGLUT_INTERNAL_ERROR_EXIT( window->Window.FBConfig != NULL,
+                                  "FBConfig with necessary capabilities not found", "fgOpenWindow" );
+
+    /*  Get the X visual.  */
+    visualInfo = glXGetVisualFromFBConfig( fgDisplay.Display,
+                                           *(window->Window.FBConfig) );
 
     /*
      * XXX HINT: the masks should be updated when adding/removing callbacks.
@@ -467,7 +556,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     winAttr.colormap = XCreateColormap(
         fgDisplay.Display, fgDisplay.RootWindow,
-        window->Window.VisualInfo->visual, AllocNone
+        visualInfo->visual, AllocNone
     );
 
     mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
@@ -488,8 +577,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         window->Parent == NULL ? fgDisplay.RootWindow :
         window->Parent->Window.Handle,
         x, y, w, h, 0,
-        window->Window.VisualInfo->depth, InputOutput,
-        window->Window.VisualInfo->visual, mask,
+        visualInfo->depth, InputOutput,
+        visualInfo->visual, mask,
         &winAttr
     );
 
@@ -497,6 +586,22 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      * The GLX context creation, possibly trying the direct context rendering
      *  or else use the current context if the user has so specified
      */
+
+    /*  Set renderType.  */
+    if( window->IsMenu && ( ! fgStructure.MenuContext ) )
+    {
+        /*  Display mode has been set to GLUT_RGB.  */
+        renderType = GLX_RGBA_TYPE;
+    }
+    else if (fgState.DisplayMode & GLUT_INDEX)
+    {
+        renderType = GLX_COLOR_INDEX_TYPE;
+    }
+    else
+    {
+        renderType = GLX_RGBA_TYPE;
+    }
+
     if( window->IsMenu )
     {
         /*
@@ -507,16 +612,15 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         {
             fgStructure.MenuContext =
                 (SFG_MenuContext *)malloc( sizeof(SFG_MenuContext) );
-            fgStructure.MenuContext->MVisualInfo = window->Window.VisualInfo;
-            fgStructure.MenuContext->MContext = glXCreateContext(
-                fgDisplay.Display, fgStructure.MenuContext->MVisualInfo,
+            fgStructure.MenuContext->Context = glXCreateNewContext(
+                fgDisplay.Display, *(window->Window.FBConfig), renderType,
                 NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
             );
         }
 
         /* window->Window.Context = fgStructure.MenuContext->MContext; */
         window->Window.Context = glXCreateContext(
-            fgDisplay.Display, window->Window.VisualInfo,
+            fgDisplay.Display, window->Window.FBConfig, renderType,
             NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
         );
     }
@@ -525,14 +629,14 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         window->Window.Context = glXGetCurrentContext( );
 
         if( ! window->Window.Context )
-            window->Window.Context = glXCreateContext(
-                fgDisplay.Display, window->Window.VisualInfo,
+            window->Window.Context = glXCreateNewContext(
+                fgDisplay.Display, window->Window.FBConfig, renderType,
                 NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
             );
     }
     else
-        window->Window.Context = glXCreateContext(
-            fgDisplay.Display, window->Window.VisualInfo,
+        window->Window.Context = glXCreateNewContext(
+            fgDisplay.Display, window->Window.FBConfig, renderType,
             NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
         );
 
@@ -594,13 +698,16 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
                      &fgDisplay.DeleteWindow, 1 );
 
-    glXMakeCurrent(
+    glXMakeContextCurrent(
         fgDisplay.Display,
+        window->Window.Handle,
         window->Window.Handle,
         window->Window.Context
     );
 
     XMapWindow( fgDisplay.Display, window->Window.Handle );
+
+    XFree(visualInfo);
 
 #elif TARGET_HOST_MS_WINDOWS
 

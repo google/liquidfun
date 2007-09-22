@@ -52,10 +52,13 @@
 static int fghGetConfig( int attribute )
 {
   int returnValue = 0;
+  int result;  /*  Not checked  */
 
   if( fgStructure.CurrentWindow )
-      glXGetConfig( fgDisplay.Display, fgStructure.CurrentWindow->Window.VisualInfo,
-                    attribute, &returnValue );
+      result = glXGetFBConfigAttrib( fgDisplay.Display,
+                                     *(fgStructure.CurrentWindow->Window.FBConfig),
+                                     attribute,
+                                     &returnValue );
 
   return returnValue;
 }
@@ -213,7 +216,20 @@ int FGAPIENTRY glutGet( GLenum eWhat )
              */
             return 0;
         }
-        return fgStructure.CurrentWindow->Window.VisualInfo->visual->map_entries;
+        else
+        {
+          const GLXFBConfig * fbconfig =
+                fgStructure.CurrentWindow->Window.FBConfig;
+
+          XVisualInfo * visualInfo =
+                glXGetVisualFromFBConfig( fgDisplay.Display, *fbconfig );
+
+          const int result = visualInfo->visual->map_entries;
+
+          XFree(visualInfo);
+
+          return result;
+        }
 
     /*
      * Those calls are somewhat similiar, as they use XGetWindowAttributes()
@@ -278,13 +294,23 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     /* I do not know yet if there will be a fgChooseVisual() function for Win32 */
     case GLUT_DISPLAY_MODE_POSSIBLE:
     {
-        XVisualInfo* visualInfo = fgChooseVisual();
-        if ( visualInfo == NULL ) {
-            return 0;
-        } else {
-            XFree( visualInfo );
-            return 1;
+        /*  We should not have to call fgChooseFBConfig again here.  */
+        GLXFBConfig * fbconfig;
+        int isPossible;
+
+        fbconfig = fgChooseFBConfig();
+
+        if (fbconfig == NULL)
+        {
+            isPossible = 0;
         }
+        else
+        {
+            isPossible = 1;
+            XFree(fbconfig);
+        }
+
+        return isPossible;
     }
 
     /* This is system-dependant */
@@ -292,7 +318,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         if( fgStructure.CurrentWindow == NULL )
             return 0;
 
-        return fgStructure.CurrentWindow->Window.VisualInfo->visualid;
+        return fghGetConfig( GLX_VISUAL_ID );
 
 #elif TARGET_HOST_MS_WINDOWS
 
