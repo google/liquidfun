@@ -894,7 +894,7 @@ void fgCloseWindow( SFG_Window* window )
 #if TARGET_HOST_POSIX_X11
 
     glXDestroyContext( fgDisplay.Display, window->Window.Context );
-    XFree( window->Window.VisualInfo );
+    XFree( window->Window.FBConfig );
     XDestroyWindow( fgDisplay.Display, window->Window.Handle );
     XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
 
