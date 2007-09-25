@@ -162,6 +162,7 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
      * Joe Krahn is re-writing the following code.
      */
     /* Set the cursor AND change it for this window class. */
+#if _MSC_VER <= 1200
 #       define MAP_CURSOR(a,b)                                   \
         case a:                                                  \
             SetCursor( LoadCursor( NULL, b ) );                  \
@@ -169,7 +170,6 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
                           GCL_HCURSOR,                           \
                           ( LONG )LoadCursor( NULL, b ) );       \
         break;
-
     /* Nuke the cursor AND change it for this window class. */
 #       define ZAP_CURSOR(a,b)                                   \
         case a:                                                  \
@@ -177,6 +177,22 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
             SetClassLong( window->Window.Handle,                 \
                           GCL_HCURSOR, ( LONG )NULL );           \
         break;
+#else
+#       define MAP_CURSOR(a,b)                                   \
+        case a:                                                  \
+            SetCursor( LoadCursor( NULL, b ) );                  \
+            SetClassLongPtr( window->Window.Handle,              \
+                          GCLP_HCURSOR,                          \
+                          ( LONG )LoadCursor( NULL, b ) );       \
+        break;
+    /* Nuke the cursor AND change it for this window class. */
+#       define ZAP_CURSOR(a,b)                                   \
+        case a:                                                  \
+            SetCursor( NULL );                                   \
+            SetClassLong( window->Window.Handle,                 \
+                          GCLP_HCURSOR, ( LONG )NULL );          \
+        break;
+#endif
 
     switch( cursorID )
     {
