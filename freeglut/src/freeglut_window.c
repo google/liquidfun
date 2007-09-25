@@ -612,15 +612,15 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         {
             fgStructure.MenuContext =
                 (SFG_MenuContext *)malloc( sizeof(SFG_MenuContext) );
-            fgStructure.MenuContext->Context = glXCreateNewContext(
+            fgStructure.MenuContext->MContext = glXCreateNewContext(
                 fgDisplay.Display, *(window->Window.FBConfig), renderType,
                 NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
             );
         }
 
         /* window->Window.Context = fgStructure.MenuContext->MContext; */
-        window->Window.Context = glXCreateContext(
-            fgDisplay.Display, window->Window.FBConfig, renderType,
+        window->Window.Context = glXCreateNewContext(
+            fgDisplay.Display, *(window->Window.FBConfig), renderType,
             NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
         );
     }
@@ -630,13 +630,13 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
         if( ! window->Window.Context )
             window->Window.Context = glXCreateNewContext(
-                fgDisplay.Display, window->Window.FBConfig, renderType,
+                fgDisplay.Display, *(window->Window.FBConfig), renderType,
                 NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
             );
     }
     else
         window->Window.Context = glXCreateNewContext(
-            fgDisplay.Display, window->Window.FBConfig, renderType,
+            fgDisplay.Display, *(window->Window.FBConfig), renderType,
             NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
         );
 
@@ -858,8 +858,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         SetWindowLong ( window->Window.Handle, GWL_STYLE,
                         WindowStyle & ~(WS_BORDER | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX));
     }
-//SetWindowPos(window->Window.Handle, NULL, 0, 0, 0, 0,
-//   SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+/*  SetWindowPos(window->Window.Handle, NULL, 0, 0, 0, 0,
+     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); */
 
 
 #if defined(_WIN32_WCE)
