@@ -183,14 +183,14 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
             SetCursor( LoadCursor( NULL, b ) );                  \
             SetClassLongPtr( window->Window.Handle,              \
                           GCLP_HCURSOR,                          \
-                          ( LONG )LoadCursor( NULL, b ) );       \
+                          ( LONG )( LONG_PTR )LoadCursor( NULL, b ) );       \
         break;
     /* Nuke the cursor AND change it for this window class. */
 #       define ZAP_CURSOR(a,b)                                   \
         case a:                                                  \
             SetCursor( NULL );                                   \
-            SetClassLong( window->Window.Handle,                 \
-                          GCLP_HCURSOR, ( LONG )NULL );          \
+            SetClassLongPtr( window->Window.Handle,              \
+                          GCLP_HCURSOR, ( LONG )( LONG_PTR )NULL );          \
         break;
 #endif
 
