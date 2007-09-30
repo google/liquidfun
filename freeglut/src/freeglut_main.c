@@ -2088,7 +2088,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
             GetKeyboardState( state );
 
-            if( ToAscii( wParam, 0, state, code, 0 ) == 1 )
+            if( ToAscii( (UINT)wParam, 0, state, code, 0 ) == 1 )
                 wParam=code[ 0 ];
 
             INVOKE_WCB( *window, KeyboardUp,
