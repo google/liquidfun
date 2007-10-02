@@ -1039,7 +1039,7 @@ static int fghJoystickGetOEMProductName ( SFG_Joystick* joy, char *buf, int buf_
 
 static void fghJoystickOpen( SFG_Joystick* joy )
 {
-    int i;
+    int i = 0;
 #if TARGET_HOST_MACINTOSH
     OSStatus err;
 #endif
@@ -1061,7 +1061,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
        unsigned char u;
 #    else
 #      if defined( __linux__ )
-         int counter;
+         int counter = 0;
 #      endif
 #    endif
 #endif
