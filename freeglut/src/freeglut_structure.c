@@ -219,12 +219,6 @@ void fgDestroyWindow( SFG_Window* window )
 
     fghClearCallBacks( window );
     fgCloseWindow( window );
-#if TARGET_HOST_UNIX_X11
-    if (window->Window.FBConfig != NULL)
-    {
-        XFree( window->Window.FBConfig );
-    }
-#endif
     free( window );
     if( fgStructure.CurrentWindow == window )
         fgStructure.CurrentWindow = NULL;

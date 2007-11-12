@@ -116,6 +116,14 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
             fgStructure.CurrentWindow->State.Cursor = value;
         break;
 
+    case GLUT_AUX:
+      fgState.AuxiliaryBufferNumber = value;
+      break;
+
+    case GLUT_MULTISAMPLE:
+      fgState.SampleNumber = value;
+      break;
+
     default:
         fgWarning( "glutSetOption(): missing enum handle %d", eWhat );
         break;
@@ -718,6 +726,116 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
 
     /* And fail. That's good. Programs do love failing. */
     return -1;
+}
+
+int * FGAPIENTRY glutGetModeValues(GLenum eWhat, int * size)
+{
+  int * array;
+
+#if TARGET_HOST_POSIX_X11
+  int attributes[9];
+  GLXFBConfig * fbconfigArray;  /*  Array of FBConfigs  */
+  int fbconfigArraySize;        /*  Number of FBConfigs in the array  */
+  int attribute_name = 0;
+#endif
+
+  FREEGLUT_EXIT_IF_NOT_INITIALISED("glutGetModeValues");
+
+  array = NULL;
+  *size = 0;
+
+  switch (eWhat)
+    {
+#if TARGET_HOST_POSIX_X11
+    case GLUT_AUX:
+    case GLUT_MULTISAMPLE:
+
+      attributes[0] = GLX_BUFFER_SIZE;
+      attributes[1] = GLX_DONT_CARE;
+
+      switch (eWhat)
+        {
+        case GLUT_AUX:
+          /*
+            FBConfigs are now sorted by increasing number of auxiliary
+            buffers.  We want at least one buffer.
+          */
+          attributes[2] = GLX_AUX_BUFFERS;
+          attributes[3] = 1;
+          attributes[4] = None;
+
+          attribute_name = GLX_AUX_BUFFERS;
+
+          break;
+
+
+        case GLUT_MULTISAMPLE:
+          attributes[2] = GLX_AUX_BUFFERS;
+          attributes[3] = GLX_DONT_CARE;
+          attributes[4] = GLX_SAMPLE_BUFFERS;
+          attributes[5] = 1;
+          /*
+            FBConfigs are now sorted by increasing number of samples per
+            pixel.  We want at least one sample.
+          */
+          attributes[6] = GLX_SAMPLES;
+          attributes[7] = 1;
+          attributes[8] = None;
+
+          attribute_name = GLX_SAMPLES;
+
+          break;
+        }
+
+      fbconfigArray = glXChooseFBConfig(fgDisplay.Display,
+                                        fgDisplay.Screen,
+                                        attributes,
+                                        &fbconfigArraySize);
+
+      if (fbconfigArray != NULL)
+        {
+          int * temp_array;
+          int result;   /*  Returned by glXGetFBConfigAttrib. Not checked.  */
+          int previous_value;
+          int i;
+
+          temp_array = malloc(sizeof(int) * fbconfigArraySize);
+          previous_value = 0;
+
+          for (i = 0; i < fbconfigArraySize; i++)
+            {
+              int value;
+
+              result = glXGetFBConfigAttrib(fgDisplay.Display,
+                                            fbconfigArray[i],
+                                            attribute_name,
+                                            &value);
+              if (value > previous_value)
+                {
+                  temp_array[*size] = value;
+                  previous_value = value;
+                  (*size)++;
+                }
+            }
+
+          array = malloc(sizeof(int) * (*size));
+          for (i = 0; i < *size; i++)
+            {
+              array[i] = temp_array[i];
+            }
+
+          free(temp_array);
+          XFree(fbconfigArray);
+        }
+
+      break;
+#endif      
+
+    default:
+      break;
+    }
+
+  return array;
 }
 
 /*** END OF FILE ***/

@@ -73,10 +73,13 @@
  * Only one GLUT_AUXn bit may be used at a time.
  * Value 0x0400 is defined in OpenGLUT.
  */
+#define  GLUT_AUX                           0x1000
+
 #define  GLUT_AUX1                          0x1000
 #define  GLUT_AUX2                          0x2000
 #define  GLUT_AUX3                          0x4000
 #define  GLUT_AUX4                          0x8000
+
 
 /*
  * Process loop function, see freeglut_main.c
@@ -98,6 +101,7 @@ FGAPI void    FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) );
  * State setting and retrieval functions, see freeglut_state.c
  */
 FGAPI void    FGAPIENTRY glutSetOption ( GLenum option_flag, int value );
+FGAPI int *   FGAPIENTRY glutGetModeValues(GLenum mode, int * size);
 /* A.Donev: User-data manipulation */
 FGAPI void*   FGAPIENTRY glutGetWindowData( void );
 FGAPI void    FGAPIENTRY glutSetWindowData(void* data);

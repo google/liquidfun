@@ -128,19 +128,20 @@ GLXFBConfig* fgChooseFBConfig( void )
             ATTRIB_VAL( GLX_ACCUM_ALPHA_SIZE, 1 );
     }
 
-    if( fgState.DisplayMode & GLUT_AUX1 )
-        ATTRIB_VAL( GLX_AUX_BUFFERS, 1 );
-    if( fgState.DisplayMode & GLUT_AUX2 )
-        ATTRIB_VAL( GLX_AUX_BUFFERS, 2 );
-    if( fgState.DisplayMode & GLUT_AUX3 )
-        ATTRIB_VAL( GLX_AUX_BUFFERS, 3 );
-    if( fgState.DisplayMode & GLUT_AUX4 )
-        ATTRIB_VAL( GLX_AUX_BUFFERS, 4 );
-    if ( fgState.DisplayMode & GLUT_MULTISAMPLE )
-    {
-        ATTRIB_VAL( GLX_SAMPLE_BUFFERS, 1 );
-    }
+    if ((fgState.DisplayMode & GLUT_AUX)
+     || (fgState.DisplayMode & GLUT_AUX1)
+     || (fgState.DisplayMode & GLUT_AUX2)
+     || (fgState.DisplayMode & GLUT_AUX3)
+     || (fgState.DisplayMode & GLUT_AUX4))
+      {
+        ATTRIB_VAL(GLX_AUX_BUFFERS, fgState.AuxiliaryBufferNumber)
+      }
 
+    if (fgState.DisplayMode & GLUT_MULTISAMPLE)
+      {
+        ATTRIB_VAL(GLX_SAMPLE_BUFFERS, 1)
+        ATTRIB_VAL(GLX_SAMPLES, fgState.SampleNumber)
+      }
 
     /* Push a null at the end of the list */
     ATTRIB( None );
@@ -896,7 +897,7 @@ void fgCloseWindow( SFG_Window* window )
     glXDestroyContext( fgDisplay.Display, window->Window.Context );
     XFree( window->Window.FBConfig );
     XDestroyWindow( fgDisplay.Display, window->Window.Handle );
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    /* XFlush( fgDisplay.Display ); */ /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_MS_WINDOWS
 

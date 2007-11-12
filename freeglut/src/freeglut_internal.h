@@ -302,6 +302,9 @@ struct tagSFG_State
     char            *ProgramName;         /* Name of the invoking program    */
     GLboolean        JoysticksInitialised;  /* Only initialize if application calls for them */
     GLboolean        InputDevsInitialised;  /* Only initialize if application calls for them */
+
+    int              AuxiliaryBufferNumber;  /* Number of auxiliary buffers */
+    int              SampleNumber;         /*  Number of samples per pixel  */
 };
 
 /* The structure used by display initialization in freeglut_init.c */

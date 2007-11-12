@@ -161,6 +161,7 @@ static GLUTproc fghGetProcAddress( const char* procName )
     CHECK_NAME(glutWMCloseFunc);
     CHECK_NAME(glutMenuDestroyFunc);
     CHECK_NAME(glutSetOption);
+    CHECK_NAME(glutGetModeValues);
     CHECK_NAME(glutSetWindowData);
     CHECK_NAME(glutGetWindowData);
     CHECK_NAME(glutSetMenuData);

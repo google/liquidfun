@@ -79,7 +79,9 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GLUT_EXEC_STATE_INIT,   /* ExecState */
                       NULL,                   /* ProgramName */
                       GL_FALSE,               /* JoysticksInitialised */
-                      GL_FALSE                /* InputDevsInitialised */
+                      GL_FALSE,               /* InputDevsInitialised */
+                      0,                      /* AuxiliaryBufferNumber */
+                      0                       /* SampleNumber */
 };
 
 
@@ -893,7 +895,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
             break ;
 
         case 36 :  /* "aux":  some number of aux buffers */
-            glut_state_flag |= GLUT_AUX1;
+            glut_state_flag |= GLUT_AUX;
             break ;
 
         case 37 :  /* Unrecognized */
