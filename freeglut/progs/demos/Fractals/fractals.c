@@ -39,6 +39,9 @@ static int num_levels = 0 ;
 static int num_trans ;
 static AffineTrans *affine ;
 
+/* Flag telling us to keep executing the main loop */
+static int continue_in_main_loop = 1;
+
 /* the window title */
 char window_title [ 80 ] ;
 
@@ -125,7 +128,7 @@ Key(unsigned char key, int x, int y)
   
   switch (key) {
   case 27:  /* Escape key */
-    glutLeaveMainLoop () ;
+    continue_in_main_loop = 0 ;
     break;
 
   case '+' :
@@ -321,7 +324,11 @@ main(int argc, char *argv[])
   glutSpecialFunc(Special);
   glutDisplayFunc(Display);
 
-  glutMainLoop();
+#ifdef WIN32
+#endif
+
+  while ( continue_in_main_loop )
+    glutMainLoopEvent();
 
   printf ( "Back from the 'freeglut' main loop\n" ) ;
 
