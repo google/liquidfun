@@ -1315,35 +1315,24 @@ void FGAPIENTRY glutFullScreen( void )
 
     {
 #if TARGET_HOST_POSIX_X11
-        int x, y;
-        Window w;
 
-        XMoveResizeWindow(
-            fgDisplay.Display,
-            fgStructure.CurrentWindow->Window.Handle,
-            0, 0,
-            fgDisplay.ScreenWidth,
-            fgDisplay.ScreenHeight
-        );
+        Status status;  /* Returned by XGetWindowAttributes(), not checked. */
+        XWindowAttributes attributes;
 
-        XFlush( fgDisplay.Display ); /* This is needed */
+        status = XGetWindowAttributes(fgDisplay.Display,
+                                      fgStructure.CurrentWindow->Window.Handle,
+                                      &attributes);
+        /*
+         * The "x" and "y" members of "attributes" are the window's coordinates
+         * relative to its parent, i.e. to the decoration window.
+         */
+        XMoveResizeWindow(fgDisplay.Display,
+                          fgStructure.CurrentWindow->Window.Handle,
+                          -attributes.x,
+                          -attributes.y,
+                          fgDisplay.ScreenWidth,
+                          fgDisplay.ScreenHeight);
 
-        XTranslateCoordinates(
-            fgDisplay.Display,
-            fgStructure.CurrentWindow->Window.Handle,
-            fgDisplay.RootWindow,
-            0, 0, &x, &y, &w
-        );
-
-        if (x || y)
-        {
-            XMoveWindow(
-                fgDisplay.Display,
-                fgStructure.CurrentWindow->Window.Handle,
-                -x, -y
-            );
-            XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
-        }
 #elif TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE) /* FIXME: what about WinCE */
         RECT rect;
 
