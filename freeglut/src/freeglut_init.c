@@ -28,6 +28,10 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
+#if TARGET_HOST_POSIX_X11
+#include <limits.h>  /* LONG_MAX */
+#endif
+
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
@@ -87,6 +91,144 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
+#if TARGET_HOST_POSIX_X11
+
+/* Return the atom associated with "name". */
+static Atom fghGetAtom(const char * name)
+{
+  return XInternAtom(fgDisplay.Display, name, False);
+}
+
+/*
+ * Check if "property" is set on "window".  The property's values are returned
+ * through "data".  If the property is set and is of type "type", return the
+ * number of elements in "data".  Return zero otherwise.  In both cases, use
+ * "Xfree()" to free "data".
+ */
+static int fghGetWindowProperty(Window window,
+				Atom property,
+				Atom type,
+				unsigned char ** data)
+{
+  /*
+   * Caller always has to use "Xfree()" to free "data", since
+   * "XGetWindowProperty() always allocates one extra byte in prop_return
+   * [i.e. "data"] (even if the property is zero length) [..]".
+   */
+
+  int status;  /*  Returned by "XGetWindowProperty". */
+
+  Atom          type_returned;
+  int           temp_format;             /*  Not used. */
+  unsigned long number_of_elements;
+  unsigned long temp_bytes_after;        /*  Not used. */
+
+
+  status = XGetWindowProperty(fgDisplay.Display,
+			      window,
+			      property,
+			      0,
+			      LONG_MAX,
+			      False,
+			      type,
+			      &type_returned,
+			      &temp_format,
+			      &number_of_elements,
+			      &temp_bytes_after,
+			      data);
+
+  FREEGLUT_INTERNAL_ERROR_EXIT(status == Success,
+			       "XGetWindowProperty failled",
+			       "fghGetWindowProperty");
+
+  if (type_returned != type)
+    {
+      number_of_elements = 0;
+    }
+
+  return number_of_elements;
+}
+
+/*  Check if the window manager is NET WM compliant. */
+static int fghNetWMSupported(void)
+{
+  Atom wm_check;
+  Window ** window_ptr_1;
+
+  int number_of_windows;
+  int net_wm_supported;
+
+
+  net_wm_supported = 0;
+
+  wm_check = fghGetAtom("_NET_SUPPORTING_WM_CHECK");
+  window_ptr_1 = malloc(sizeof(Window *));
+
+  /*
+   * Check that the window manager has set this property on the root window.
+   * The property must be the ID of a child window.
+   */
+  number_of_windows = fghGetWindowProperty(fgDisplay.RootWindow,
+                                           wm_check,
+                                           XA_WINDOW,
+                                           (unsigned char **) window_ptr_1);
+  if (number_of_windows == 1)
+    {
+      Window ** window_ptr_2;
+
+      window_ptr_2 = malloc(sizeof(Window *));
+
+      /* Check that the window has the same property set to the same value. */
+      number_of_windows = fghGetWindowProperty(**window_ptr_1,
+                                               wm_check,
+                                               XA_WINDOW,
+                                               (unsigned char **) window_ptr_2);
+      if ((number_of_windows == 1) && (**window_ptr_1 == **window_ptr_2))
+      {
+        /* NET WM compliant */
+        net_wm_supported = 1;
+      }
+
+      XFree(*window_ptr_2);
+      free(window_ptr_2);
+    }
+
+        XFree(*window_ptr_1);
+        free(window_ptr_1);
+
+        return net_wm_supported;
+}
+
+/*  Check if "hint" is present in "property" for "window". */
+int fgHintPresent(Window window, Atom property, Atom hint)
+{
+  Atom ** atoms_ptr;
+  int number_of_atoms;
+  int supported;
+  int i;
+
+  supported = 0;
+
+  atoms_ptr = malloc(sizeof(Atom *));
+  number_of_atoms = fghGetWindowProperty(window,
+					 property,
+					 XA_ATOM,
+					 (unsigned char **) atoms_ptr);
+  for (i = 0; i < number_of_atoms; i++)
+    {
+      if ((*atoms_ptr)[i] == hint)
+      {
+          supported = 1;
+          break;
+      }
+    }
+
+  return supported;
+}
+
+#endif /*  TARGET_HOST_POSIX_X11  */
+
+
 /*
  * A call to this function should initialize all the display stuff...
  */
@@ -129,11 +271,32 @@ static void fghInitialize( const char* displayName )
     fgDisplay.Connection = ConnectionNumber( fgDisplay.Display );
 
     /* Create the window deletion atom */
-    fgDisplay.DeleteWindow = XInternAtom(
-        fgDisplay.Display,
-        "WM_DELETE_WINDOW",
-        FALSE
-    );
+    fgDisplay.DeleteWindow = fghGetAtom("WM_DELETE_WINDOW");
+
+    /* Create the state and full screen atoms */
+    fgDisplay.State           = None;
+    fgDisplay.StateFullScreen = None;
+
+    if (fghNetWMSupported())
+    {
+      const Atom supported = fghGetAtom("_NET_SUPPORTED");
+      const Atom state     = fghGetAtom("_NET_WM_STATE");
+      
+      /* Check if the state hint is supported. */
+      if (fgHintPresent(fgDisplay.RootWindow, supported, state))
+      {
+        const Atom full_screen = fghGetAtom("_NET_WM_STATE_FULLSCREEN");
+        
+        fgDisplay.State = state;
+        
+        /* Check if the window manager supports full screen. */
+        /**  Check "_NET_WM_ALLOWED_ACTIONS" on our window instead? **/
+        if (fgHintPresent(fgDisplay.RootWindow, supported, full_screen))
+        {
+          fgDisplay.StateFullScreen = full_screen;
+        }
+      }
+    }
 
 #elif TARGET_HOST_MS_WINDOWS
 

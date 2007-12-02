@@ -317,6 +317,8 @@ struct tagSFG_Display
     Window          RootWindow;         /* The screen's root window.         */
     int             Connection;         /* The display's connection number   */
     Atom            DeleteWindow;       /* The window deletion atom          */
+    Atom            State;              /* The state atom                    */
+    Atom            StateFullScreen;    /* The full screen atom              */
 
 #ifdef X_XF86VidModeGetModeLine
     /*
@@ -901,6 +903,13 @@ void fgListInsert(SFG_List *list, SFG_Node *next, SFG_Node *node);
 /* Error Message functions */
 void fgError( const char *fmt, ... );
 void fgWarning( const char *fmt, ... );
+
+/*
+ * Check if "hint" is present in "property" for "window".  See freeglut_init.c
+ */
+#if TARGET_HOST_POSIX_X11
+int fgHintPresent(Window window, Atom property, Atom hint);
+#endif
 
 #endif /* FREEGLUT_INTERNAL_H */
 

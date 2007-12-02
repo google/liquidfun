@@ -64,6 +64,30 @@ static int fghGetConfig( int attribute )
 }
 #endif
 
+/* Check if the window is in full screen state. */
+static int fghCheckFullScreen(void)
+{
+#if TARGET_HOST_POSIX_X11
+
+  int result;
+
+  result = 0;
+  if (fgDisplay.StateFullScreen != None)
+    {
+      result = fgHintPresent(fgStructure.CurrentWindow->Window.Handle,
+			     fgDisplay.State,
+			     fgDisplay.StateFullScreen);
+    }
+
+  return result;
+
+#else
+
+  return 0;
+
+#endif
+}
+
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -510,6 +534,10 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     case GLUT_DIRECT_RENDERING:
         return fgState.DirectContext;
+        break;
+
+    case GLUT_FULL_SCREEN:
+        return fghCheckFullScreen();
         break;
 
     default:

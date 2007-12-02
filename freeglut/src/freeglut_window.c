@@ -28,6 +28,10 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
+#if TARGET_HOST_POSIX_X11
+#include <limits.h>  /* LONG_MAX */
+#endif
+
 #if defined(_WIN32_WCE)
 #   include <Aygshell.h>
 #   ifdef FREEGLUT_LIB_PRAGMAS
@@ -250,7 +254,7 @@ GLXFBConfig* fgChooseFBConfig( void )
         return fbconfig;
     }
 }
-#endif
+#endif /* TARGET_HOST_POSIX_X11 */
 
 /*
  * Setup the pixel format for a Win32 window
@@ -1218,6 +1222,12 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutReshapeWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutReshapeWindow" );
 
+    if (glutGet(GLUT_FULL_SCREEN))
+    {
+      /*  Leave full screen state before resizing. */
+      glutFullScreenToggle();
+    }
+
     fgStructure.CurrentWindow->State.NeedToResize = GL_TRUE;
     fgStructure.CurrentWindow->State.Width  = width ;
     fgStructure.CurrentWindow->State.Height = height;
@@ -1230,6 +1240,12 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPositionWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPositionWindow" );
+
+    if (glutGet(GLUT_FULL_SCREEN))
+    {
+      /*  Leave full screen state before moving. */
+      glutFullScreenToggle();
+    }
 
 #if TARGET_HOST_POSIX_X11
 
@@ -1313,6 +1329,12 @@ void FGAPIENTRY glutFullScreen( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreen" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreen" );
 
+    if (glutGet(GLUT_FULL_SCREEN))
+    {
+      /*  Leave full screen state before resizing. */
+      glutFullScreenToggle();
+    }
+
     {
 #if TARGET_HOST_POSIX_X11
 
@@ -1366,6 +1388,61 @@ void FGAPIENTRY glutFullScreen( void )
                       SWP_NOZORDER
                     );
 #endif
+    }
+}
+
+/*
+ * Toggle the window's full screen state.
+ */
+void FGAPIENTRY glutFullScreenToggle( void )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreenToggle" );
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreenToggle" );
+
+    {
+#if TARGET_HOST_POSIX_X11
+
+      if (fgDisplay.StateFullScreen != None)
+      {
+        XEvent xevent;
+        long event_mask;
+        int status;
+
+        xevent.type = ClientMessage;
+        xevent.xclient.type = ClientMessage;
+        xevent.xclient.serial = 0;
+        xevent.xclient.send_event = True;
+        xevent.xclient.display = fgDisplay.Display;
+        xevent.xclient.window = fgStructure.CurrentWindow->Window.Handle;
+        xevent.xclient.message_type = fgDisplay.State;
+        xevent.xclient.format = 32;
+        xevent.xclient.data.l[0] = 2;  /* _NET_WM_STATE_TOGGLE */
+        xevent.xclient.data.l[1] = fgDisplay.StateFullScreen;
+        xevent.xclient.data.l[2] = 0;
+        xevent.xclient.data.l[3] = 0;
+        xevent.xclient.data.l[4] = 0;
+
+        /*** Don't really understand how event masks work... ***/
+        event_mask = SubstructureRedirectMask | SubstructureNotifyMask;
+
+        status = XSendEvent(fgDisplay.Display,
+          fgDisplay.RootWindow,
+          False,
+          event_mask,
+          &xevent);
+        FREEGLUT_INTERNAL_ERROR_EXIT(status != 0,
+          "XSendEvent failed",
+          "glutFullScreenToggle");
+      }
+      else
+#endif
+      {
+        /*
+         * If the window manager is not Net WM compliant, fall back to legacy
+         * behaviour.
+         */
+        glutFullScreen();
+      }
     }
 }
 

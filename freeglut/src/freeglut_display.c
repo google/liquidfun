@@ -48,6 +48,10 @@ void FGAPIENTRY glutSwapBuffers( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSwapBuffers" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSwapBuffers" );
 
+    /*
+     * "glXSwapBuffers" already performs an implicit call to "glFlush". What
+     * about "SwapBuffers"?
+     */
     glFlush( );
     if( ! fgStructure.CurrentWindow->Window.DoubleBuffered )
         return;

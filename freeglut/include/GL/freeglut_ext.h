@@ -68,6 +68,8 @@
 #define  GLUT_RENDERING_CONTEXT             0x01FD
 #define  GLUT_DIRECT_RENDERING              0x01FE
 
+#define  GLUT_FULL_SCREEN                   0x01FF
+
 /*
  * New tokens for glutInitDisplayMode.
  * Only one GLUT_AUXn bit may be used at a time.
@@ -87,6 +89,11 @@
 FGAPI void    FGAPIENTRY glutMainLoopEvent( void );
 FGAPI void    FGAPIENTRY glutLeaveMainLoop( void );
 FGAPI void    FGAPIENTRY glutExit         ( void );
+
+/*
+ * Window management functions, see freeglut_window.c
+ */
+FGAPI void    FGAPIENTRY glutFullScreenToggle( void );
 
 /*
  * Window-specific callback functions, see freeglut_callbacks.c
