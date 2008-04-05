@@ -2240,6 +2240,17 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             case SC_HOTKEY     :
                 break ;
 
+#if(WINVER >= 0x0400)
+            case SC_DEFAULT    :
+                break ;
+
+            case SC_MONITORPOWER    :
+                break ;
+
+            case SC_CONTEXTHELP    :
+                break ;
+#endif /* WINVER >= 0x0400 */
+
             default:
 #if _DEBUG
                 fgWarning( "Unknown wParam type 0x%x", wParam );
