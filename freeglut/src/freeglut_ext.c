@@ -42,6 +42,7 @@ static GLUTproc fghGetProcAddress( const char* procName )
     CHECK_NAME(glutInitWindowPosition);
     CHECK_NAME(glutInitWindowSize);
     CHECK_NAME(glutMainLoop);
+    CHECK_NAME(glutExit);
     CHECK_NAME(glutCreateWindow);
     CHECK_NAME(glutCreateSubWindow);
     CHECK_NAME(glutDestroyWindow);
