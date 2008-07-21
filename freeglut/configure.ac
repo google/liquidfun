@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([freeglut library], [2.4.0], [freeglut-bugs@lists.sourceforge.net], [freeglut])
+AC_INIT([freeglut library], [2.6.0], [freeglut-bugs@lists.sourceforge.net], [freeglut])
 AM_INIT_AUTOMAKE
 AC_PREREQ([2.56])
 AC_CONFIG_SRCDIR([AUTHORS])
@@ -23,6 +23,7 @@ AC_PATH_XTRA
 if test x"$no_x" = xyes; then
   GL_LIBS="-lopengl32 -lglu32 -lgdi32"
   LIBXXF86VM=
+  LIBXI=
   VERSION_INFO=
   EXPORT_FLAGS="-DFREEGLUT_EXPORTS"
 else
@@ -30,11 +31,13 @@ else
   AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode],
                [LIBXXF86VM=-lXxf86vm], [LIBXXF86VM=],
                [$X_LIBS -lXext -lX11])
+  LIBXI=-lXi
   VERSION_INFO="-version-info 11:0:8"
   EXPORT_FLAGS=
 fi
 AC_SUBST([GL_LIBS])
 AC_SUBST([LIBXXF86VM])
+AC_SUBST([LIBXI])
 AC_SUBST([VERSION_INFO])
 AC_SUBST([EXPORT_FLAGS])
 
@@ -45,6 +48,7 @@ CPPFLAGS="$CPPFLAGS $X_CFLAGS"
 AC_CHECK_HEADERS([GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
 AC_HEADER_TIME
 AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [], [], [#include <X11/Xlib.h>])
+AC_CHECK_HEADERS([X11/extensions/XI.h X11/extensions/XInput.h])
 CPPFLAGS="$save_CPPFLAGS"
 
 # Checks for library functions.
