@@ -105,8 +105,6 @@
 #endif
 
 /* These files should be available on every platform. */
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
