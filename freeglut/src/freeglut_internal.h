@@ -303,6 +303,10 @@ struct tagSFG_State
 
     int              AuxiliaryBufferNumber;  /* Number of auxiliary buffers */
     int              SampleNumber;         /*  Number of samples per pixel  */
+
+    int              MajorVersion;         /* Major OpenGL context version  */
+    int              MinorVersion;         /* Minor OpenGL context version  */
+    int              ContextFlags;         /* OpenGL context flags          */
 };
 
 /* The structure used by display initialization in freeglut_init.c */

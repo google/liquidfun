@@ -85,7 +85,10 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GL_FALSE,               /* JoysticksInitialised */
                       GL_FALSE,               /* InputDevsInitialised */
                       0,                      /* AuxiliaryBufferNumber */
-                      0                       /* SampleNumber */
+                      0,                      /* SampleNumber */
+                      1,                      /* MajorVersion */
+                      0,                      /* MajorVersion */
+                      0                       /* ContextFlags */
 };
 
 
@@ -417,6 +420,10 @@ void fgDeinitialize( void )
 #endif /* !defined(_WIN32_WCE) */
     fgState.JoysticksInitialised = GL_FALSE;
     fgState.InputDevsInitialised = GL_FALSE;
+
+    fgState.MajorVersion = 1;
+    fgState.MinorVersion = 0;
+    fgState.ContextFlags = 0;
 
     fgState.Initialised = GL_FALSE;
 
@@ -1074,6 +1081,22 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 
     /* We will make use of this value when creating a new OpenGL context... */
     fgState.DisplayMode = glut_state_flag;
+}
+
+/* -- SETTING OPENGL 3.0 CONTEXT CREATION PARAMETERS ---------------------- */
+
+void FGAPIENTRY glutInitContextVersion( int majorVersion, int minorVersion )
+{
+    /* We will make use of these valuse when creating a new OpenGL context... */
+    fgState.MajorVersion = majorVersion;
+    fgState.MinorVersion = minorVersion;
+}
+
+
+void FGAPIENTRY glutInitContextFlags( int flags )
+{
+    /* We will make use of this value when creating a new OpenGL context... */
+    fgState.ContextFlags = flags;
 }
 
 /*** END OF FILE ***/

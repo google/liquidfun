@@ -203,6 +203,9 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_INIT_WINDOW_HEIGHT:   return fgState.Size.Use ?
                                            fgState.Size.Y : -1     ;
     case GLUT_INIT_DISPLAY_MODE:    return fgState.DisplayMode     ;
+    case GLUT_INIT_MAJOR_VERSION:   return fgState.MajorVersion    ;
+    case GLUT_INIT_MINOR_VERSION:   return fgState.MinorVersion    ;
+    case GLUT_INIT_FLAGS:           return fgState.ContextFlags    ;
 
 #if TARGET_HOST_POSIX_X11
     /*

@@ -82,6 +82,18 @@
 #define  GLUT_AUX3                          0x4000
 #define  GLUT_AUX4                          0x8000
 
+/*
+ * Context-related flags, see freeglut_state.c
+ */
+#define  GLUT_INIT_MAJOR_VERSION            0x0200
+#define  GLUT_INIT_MINOR_VERSION            0x0201
+#define  GLUT_INIT_FLAGS                    0x0202
+
+/*
+ * Flags for glutInitContextFlags, see freeglut_init.c
+ */
+#define  GLUT_DEBUG                         0x0001
+#define  GLUT_FORWARD_COMPATIBLE            0x0002
 
 /*
  * Process loop function, see freeglut_main.c
@@ -161,6 +173,12 @@ void    glutJoystickSetCenter( int ident, float *axes );
 void    glutJoystickGetMinRange( int ident, float *axes );
 void    glutJoystickGetMaxRange( int ident, float *axes );
 void    glutJoystickGetCenter( int ident, float *axes );
+
+/*
+ * Initialization functions, see freeglut_init.c
+ */
+FGAPI void    FGAPIENTRY glutInitContextVersion( int majorVersion, int minorVersion );
+FGAPI void    FGAPIENTRY glutInitContextFlags( int flags );
 
 #ifdef __cplusplus
     }

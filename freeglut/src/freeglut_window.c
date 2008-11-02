@@ -485,17 +485,84 @@ void fgSetWindow ( SFG_Window *window )
 
 
 #if TARGET_HOST_POSIX_X11
+
+#ifndef GLX_CONTEXT_MAJOR_VERSION_ARB
+#define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
+#endif
+
+#ifndef GLX_CONTEXT_MINOR_VERSION_ARB
+#define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
+#endif
+
+#ifndef GLX_CONTEXT_FLAGS_ARB
+#define GLX_CONTEXT_FLAGS_ARB 0x2094
+#endif
+
+#ifndef GLX_CONTEXT_DEBUG_BIT_ARB
+#define GLX_CONTEXT_DEBUG_BIT_ARB 0x0001
+#endif
+
+#ifndef GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
+#define GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
+#endif
+
+typedef GLXContext (*CreateContextAttribsProc)(Display *dpy, GLXFBConfig config,
+					       GLXContext share_list, Bool direct,
+					       const int *attrib_list);
+
 static GLXContext fghCreateNewContext( SFG_Window* window )
 {
+  /* for color model calculation */
   int menu = ( window->IsMenu && !fgStructure.MenuContext );
   int index_mode = ( fgState.DisplayMode & GLUT_INDEX );
+
+  /* "classic" context creation */
   Display *dpy = fgDisplay.Display;
   GLXFBConfig config = *(window->Window.FBConfig);
   int render_type = ( !menu && index_mode ) ? GLX_COLOR_INDEX_TYPE : GLX_RGBA_TYPE;
   GLXContext share_list = NULL;
   Bool direct = ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT );
+  GLXContext context;
 
-  return glXCreateNewContext( dpy, config, render_type, share_list, direct );
+  /* new context creation */
+  int attribs[7];
+  CreateContextAttribsProc createContextAttribs;
+
+  /* If nothing fancy has been required, simply use the old context creation GLX API entry */
+  if ( fgState.MajorVersion == 1 && fgState.MinorVersion == 0 && fgState.ContextFlags == 0)
+  {
+    context = glXCreateNewContext( dpy, config, render_type, share_list, direct );
+    if ( context == NULL ) {
+      fgError( "could not create new OpenGL context" );
+    }
+    return context;
+  }
+
+  /* color index mode is not available anymore with OpenGL 3.0 */
+  if ( render_type == GLX_COLOR_INDEX_TYPE ) {
+    fgWarning( "color index mode is deprecated, using RGBA mode" );
+  }
+
+  attribs[0] = GLX_CONTEXT_MAJOR_VERSION_ARB;
+  attribs[1] = fgState.MajorVersion;
+  attribs[2] = GLX_CONTEXT_MINOR_VERSION_ARB;
+  attribs[3] = fgState.MinorVersion;
+  attribs[4] = GLX_CONTEXT_FLAGS_ARB;
+  attribs[5] = ((fgState.ContextFlags & GLUT_DEBUG) ? GLX_CONTEXT_DEBUG_BIT_ARB : 0) |
+    ((fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) ? GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB : 0);
+  attribs[6] = 0;
+
+  createContextAttribs = (CreateContextAttribsProc) fghGetProcAddress( "glXCreateContextAttribsARB" );
+  if ( createContextAttribs == NULL ) {
+    fgError( "glXCreateContextAttribsARB not found" );
+  }
+
+  context = createContextAttribs( dpy, config, share_list, direct, attribs );
+  if ( context == NULL ) {
+    fgError( "could not create new OpenGL %d.%d context (flags %x)",
+	     fgState.MajorVersion, fgState.MinorVersion, fgState.ContextFlags );
+  }
+  return context;
 }
 #endif
 
