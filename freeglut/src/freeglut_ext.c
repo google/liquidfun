@@ -29,7 +29,7 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-static GLUTproc fghGetProcAddress( const char* procName )
+static GLUTproc fghGetGLUTProcAddress( const char* procName )
 {
     /* optimization: quick initial check */
     if( strncmp( procName, "glut", 4 ) != 0 )
@@ -199,23 +199,25 @@ static GLUTproc fghGetProcAddress( const char* procName )
 }
 
 
+SFG_Proc fghGetProcAddress( const char *procName )
+{
+#if TARGET_HOST_MS_WINDOWS
+    return (SFG_Proc)wglGetProcAddress( ( LPCSTR )procName );
+#elif TARGET_HOST_POSIX_X11 && defined( GLX_ARB_get_proc_address )
+    return (SFG_Proc)glXGetProcAddressARB( ( const GLubyte * )procName );
+#else
+    return NULL;
+#endif
+}
+
+
 GLUTproc FGAPIENTRY
 glutGetProcAddress( const char *procName )
 {
     GLUTproc p;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetProcAddress" );
 
-    /* Try GLUT functions first */
-    p = fghGetProcAddress( procName );
-    if( p != NULL )
-        return p;
-
-    /* Try core GL functions */
-#if TARGET_HOST_MS_WINDOWS
-    return(GLUTproc)wglGetProcAddress( ( LPCSTR )procName );
-#elif TARGET_HOST_POSIX_X11 && defined( GLX_ARB_get_proc_address )
-    return(GLUTproc)glXGetProcAddressARB( ( const GLubyte * )procName );
-#else
-    return NULL;
-#endif
+    /* Try GLUT functions first, then core GL functions */
+    p = fghGetGLUTProcAddress( procName );
+    return ( p != NULL ) ? p : fghGetProcAddress( procName );
 }

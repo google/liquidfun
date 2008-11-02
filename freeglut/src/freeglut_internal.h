@@ -909,6 +909,8 @@ void fgWarning( const char *fmt, ... );
 int fgHintPresent(Window window, Atom property, Atom hint);
 #endif
 
+SFG_Proc fghGetProcAddress( const char *procName );
+
 #endif /* FREEGLUT_INTERNAL_H */
 
 /*** END OF FILE ***/
