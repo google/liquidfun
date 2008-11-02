@@ -76,7 +76,14 @@ AC_ARG_ENABLE([warnings],
 [AS_HELP_STRING([--enable-warnings],
                 [use all gcc compiler warnings @<:@default=yes@:>@])])
 if test "x$enable_warnings" != xno -a "x$GCC" = xyes; then
-  CFLAGS="$CFLAGS -Wall -pedantic -Werror"
+  CFLAGS="$CFLAGS -Wall -pedantic"
+fi
+
+AC_ARG_ENABLE([warnings-as-errors],
+[AS_HELP_STRING([--enable-warnings-as-errors],
+                [make all warnings into errors @<:@default=no@:>@])])
+if test "x$enable_warnings_as_errors" = xyes -a "x$GCC" = xyes; then
+  CFLAGS="$CFLAGS -Werror"
 fi
 
 AC_ARG_ENABLE([debug],
