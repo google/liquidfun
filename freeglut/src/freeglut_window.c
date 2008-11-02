@@ -483,6 +483,23 @@ void fgSetWindow ( SFG_Window *window )
 }
 
 
+
+#if TARGET_HOST_POSIX_X11
+static GLXContext fghCreateNewContext( SFG_Window* window )
+{
+  int menu = ( window->IsMenu && !fgStructure.MenuContext );
+  int index_mode = ( fgState.DisplayMode & GLUT_INDEX );
+  Display *dpy = fgDisplay.Display;
+  GLXFBConfig config = *(window->Window.FBConfig);
+  int render_type = ( !menu && index_mode ) ? GLX_COLOR_INDEX_TYPE : GLX_RGBA_TYPE;
+  GLXContext share_list = NULL;
+  Bool direct = ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT );
+
+  return glXCreateNewContext( dpy, config, render_type, share_list, direct );
+}
+#endif
+
+
 /*
  * Opens a window. Requires a SFG_Window object created and attached
  * to the freeglut structure. OpenGL context is created here.
@@ -499,7 +516,6 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     XSizeHints sizeHints;
     XWMHints wmHints;
     unsigned long mask;
-    int renderType;  /*  GLX_RGBA_TYPE or GLX_COLOR_INDEX_TYPE  */
     unsigned int current_DisplayMode = fgState.DisplayMode ;
 
     /* Save the display mode if we are creating a menu window */
@@ -592,21 +608,6 @@ void fgOpenWindow( SFG_Window* window, const char* title,
      *  or else use the current context if the user has so specified
      */
 
-    /*  Set renderType.  */
-    if( window->IsMenu && ( ! fgStructure.MenuContext ) )
-    {
-        /*  Display mode has been set to GLUT_RGB.  */
-        renderType = GLX_RGBA_TYPE;
-    }
-    else if (fgState.DisplayMode & GLUT_INDEX)
-    {
-        renderType = GLX_COLOR_INDEX_TYPE;
-    }
-    else
-    {
-        renderType = GLX_RGBA_TYPE;
-    }
-
     if( window->IsMenu )
     {
         /*
@@ -617,33 +618,21 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         {
             fgStructure.MenuContext =
                 (SFG_MenuContext *)malloc( sizeof(SFG_MenuContext) );
-            fgStructure.MenuContext->MContext = glXCreateNewContext(
-                fgDisplay.Display, *(window->Window.FBConfig), renderType,
-                NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
-            );
+            fgStructure.MenuContext->MContext = fghCreateNewContext( window );
         }
 
         /* window->Window.Context = fgStructure.MenuContext->MContext; */
-        window->Window.Context = glXCreateNewContext(
-            fgDisplay.Display, *(window->Window.FBConfig), renderType,
-            NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
-        );
+        window->Window.Context = fghCreateNewContext( window );
     }
     else if( fgState.UseCurrentContext )
     {
         window->Window.Context = glXGetCurrentContext( );
 
         if( ! window->Window.Context )
-            window->Window.Context = glXCreateNewContext(
-                fgDisplay.Display, *(window->Window.FBConfig), renderType,
-                NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
-            );
+            window->Window.Context = fghCreateNewContext( window );
     }
     else
-        window->Window.Context = glXCreateNewContext(
-            fgDisplay.Display, *(window->Window.FBConfig), renderType,
-            NULL, ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT )
-        );
+        window->Window.Context = fghCreateNewContext( window );
 
 #if !defined( __FreeBSD__ ) && !defined( __NetBSD__ )
     if(  !glXIsDirect( fgDisplay.Display, window->Window.Context ) )
