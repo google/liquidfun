@@ -193,6 +193,8 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutJoystickGetMinRange);
     CHECK_NAME(glutJoystickGetMaxRange);
     CHECK_NAME(glutJoystickGetCenter);
+    CHECK_NAME(glutInitContextVersion);
+    CHECK_NAME(glutInitContextFlags);
 #undef CHECK_NAME
 
     return NULL;
