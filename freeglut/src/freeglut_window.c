@@ -707,9 +707,6 @@ void fgOpenWindow( SFG_Window* window, const char* title,
       if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
         fgError( "Unable to force direct context rendering for window '%s'",
                  title );
-      else if( fgState.DirectContext == GLUT_TRY_DIRECT_CONTEXT )
-        fgWarning( "Unable to create direct context rendering for window '%s'\nThis may hurt performance.",
-                 title );
     }
 #endif
 
