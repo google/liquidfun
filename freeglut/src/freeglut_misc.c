@@ -84,6 +84,14 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
 #endif
 #endif
 
+#ifndef GL_TABLE_TOO_LARGE
+#ifdef GL_TABLE_TOO_LARGE_EXT
+#define GL_TABLE_TOO_LARGE GL_TABLE_TOO_LARGE_EXT
+#else
+#define GL_TABLE_TOO_LARGE 0x8031
+#endif
+#endif
+
 #ifndef GL_TEXTURE_TOO_LARGE
 #ifdef GL_TEXTURE_TOO_LARGE_EXT
 #define GL_TEXTURE_TOO_LARGE GL_TEXTURE_TOO_LARGE_EXT
