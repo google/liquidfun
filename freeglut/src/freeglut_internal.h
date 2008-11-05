@@ -101,6 +101,14 @@
 #    ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
 #        include <X11/extensions/xf86vmode.h>
 #    endif
+/* If GLX is too old, we will fail during runtime when multisampling
+   is requested, but at least freeglut compiles. */
+#    ifndef GLX_SAMPLE_BUFFERS
+#        define GLX_SAMPLE_BUFFERS 0x80A8
+#    endif
+#    ifndef GLX_SAMPLES
+#        define GLX_SAMPLES 0x80A9
+#    endif
 
 #endif
 
