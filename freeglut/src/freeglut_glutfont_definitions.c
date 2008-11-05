@@ -40,6 +40,7 @@
  * structure to match GLUT.
  */
 
+#include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
 #if TARGET_HOST_POSIX_X11
