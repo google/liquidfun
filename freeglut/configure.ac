@@ -22,7 +22,7 @@ AC_SUBST([LIBTOOL_DEPS])
 AC_PATH_XTRA
 
 if test x"$no_x" = xyes; then
-  GL_LIBS="-lopengl32 -lglu32 -lgdi32"
+  GL_LIBS="-lopengl32 -lglu32 -lgdi32 -lwinmm"
   LIBXXF86VM=
   LIBXI=
   VERSION_INFO=
