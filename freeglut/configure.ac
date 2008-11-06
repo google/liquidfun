@@ -57,6 +57,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_VPRINTF
 AC_CHECK_LIBM
 AC_SUBST([LIBM])
+AC_CHECK_FUNCS([gettimeofday])
 
 # Build time configuration.
 AC_ARG_ENABLE([replace-glut],
