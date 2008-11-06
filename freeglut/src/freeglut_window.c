@@ -376,17 +376,16 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
         HWND hWnd;
         HDC hDC, hDC_before=wglGetCurrentDC();
         WNDCLASS wndCls;
-        ATOM atom;
 
         /* create a dummy window */
         ZeroMemory(&wndCls, sizeof(wndCls));
-                wndCls.lpfnWndProc        = DefWindowProc;
-                wndCls.hInstance            = fgDisplay.Instance;
-                wndCls.style                    = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-                wndCls.lpszClassName    = _T("FREEGLUT_dummy");
-        atom = RegisterClass( &wndCls );
+        wndCls.lpfnWndProc = DefWindowProc;
+        wndCls.hInstance = fgDisplay.Instance;
+        wndCls.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+        wndCls.lpszClassName = _T("FREEGLUT_dummy");
+        RegisterClass( &wndCls );
 
-        hWnd=CreateWindow((LPCSTR)atom, _T(""), WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW , 0,0,0,0, 0, 0, fgDisplay.Instance, 0 );
+        hWnd=CreateWindow(_T("FREEGLUT_dummy"), _T(""), WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW , 0,0,0,0, 0, 0, fgDisplay.Instance, 0 );
         hDC=GetDC(hWnd);
         SetPixelFormat( hDC, pixelformat, ppfd );
         
