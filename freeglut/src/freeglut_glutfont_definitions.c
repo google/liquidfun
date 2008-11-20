@@ -40,7 +40,37 @@
  * structure to match GLUT.
  */
 
-#include <GL/freeglut.h>
+/*
+ * freeglut_internal.h uses some GL types, but including the GL header portably
+ * is a bit tricky, so we include freeglut_std.h here, which contains the
+ * necessary machinery. But this poses another problem, caused by the ugly
+ * original defintion of the font constants in "classic" GLUT: They are defined
+ * as void* externally, so we move them temporarily out of the way by AN EXTREME
+ * CPP HACK.
+ */
+
+#define glutStrokeRoman glutStrokeRomanIGNOREME
+#define glutStrokeMonoRoman glutStrokeMonoRomanIGNOREME
+#define glutBitmap9By15 glutBitmap9By15IGNOREME
+#define glutBitmap8By13 glutBitmap8By13IGNOREME
+#define glutBitmapTimesRoman10 glutBitmapTimesRoman10IGNOREME
+#define glutBitmapTimesRoman24 glutBitmapTimesRoman24IGNOREME
+#define glutBitmapHelvetica10 glutBitmapHelvetica10IGNOREME
+#define glutBitmapHelvetica12 glutBitmapHelvetica12IGNOREME
+#define glutBitmapHelvetica18 glutBitmapHelvetica18IGNOREME
+
+#include <GL/freeglut_std.h>
+
+#undef glutStrokeRoman
+#undef glutStrokeMonoRoman
+#undef glutBitmap9By15
+#undef glutBitmap8By13
+#undef glutBitmapTimesRoman10
+#undef glutBitmapTimesRoman24
+#undef glutBitmapHelvetica10
+#undef glutBitmapHelvetica12
+#undef glutBitmapHelvetica18
+
 #include "freeglut_internal.h"
 
 #if TARGET_HOST_POSIX_X11
@@ -53,6 +83,15 @@ struct freeglutStrokeFont
   float top ;
   float bottom ;
 };
+
+struct freeglutBitmapFont
+{
+  const char *name ;
+  const int num_chars ;
+  const int first ;
+  const void *ch ;
+};
+
 
 struct freeglutStrokeFont glutStrokeRoman ;
 struct freeglutStrokeFont glutStrokeMonoRoman ;

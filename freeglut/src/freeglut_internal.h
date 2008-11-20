@@ -687,18 +687,6 @@ struct tagSFG_Font
     float           xorig, yorig; /* Relative origin of the character */
 };
 
-#if TARGET_HOST_POSIX_X11
-
-struct freeglutBitmapFont
-{
-  const char *name ;
-  const int num_chars ;
-  const int first ;
-  const void *ch ;
-};
-
-#endif
-
 /* The stroke font structures */
 
 typedef struct tagSFG_StrokeVertex SFG_StrokeVertex;
