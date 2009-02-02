@@ -57,6 +57,11 @@
 */
 #endif
 
+/* Detect both SunPro and gcc compilers on Sun Solaris */
+#if defined (__SVR4) && defined (__sun)
+#   define TARGET_HOST_SOLARIS 1
+#endif
+
 #ifndef TARGET_HOST_MS_WINDOWS
 #   define  TARGET_HOST_MS_WINDOWS 0
 #endif
@@ -67,6 +72,10 @@
 
 #ifndef  TARGET_HOST_MAC_OSX
 #   define  TARGET_HOST_MAC_OSX    0
+#endif
+
+#ifndef  TARGET_HOST_SOLARIS
+#   define  TARGET_HOST_SOLARIS    0
 #endif
 
 /* -- FIXED CONFIGURATION LIMITS ------------------------------------------- */

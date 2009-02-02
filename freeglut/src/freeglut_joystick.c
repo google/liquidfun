@@ -1394,7 +1394,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 #    endif
 #endif
 
-#if defined( __linux__ )
+#if defined( __linux__ ) || TARGET_HOST_SOLARIS
     /* Default for older Linux systems. */
     joy->num_axes    =  2;
     joy->num_buttons = 32;
