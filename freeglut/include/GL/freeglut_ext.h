@@ -33,6 +33,13 @@
 #endif
 
 /*
+ * Additional GLUT Key definitions for the Special key function
+ */
+#define GLUT_KEY_NUM_LOCK           0x006D
+#define GLUT_KEY_BEGIN              0x006E
+#define GLUT_KEY_DELETE             0x006F
+
+/*
  * GLUT API Extension macro definitions -- behaviour when the user clicks on an "x" to close a window
  */
 #define GLUT_ACTION_EXIT                         0

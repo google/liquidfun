@@ -1159,15 +1159,15 @@ void FGAPIENTRY glutMainLoopEvent( void )
              * XXX track ButtonPress/ButtonRelease events in our own
              * XXX bit-mask?
              */
-	    fgState.Modifiers = fghGetXModifiers( event.xmotion.state );
+            fgState.Modifiers = fghGetXModifiers( event.xmotion.state );
             if ( event.xmotion.state & ( Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask ) ) {
                 INVOKE_WCB( *window, Motion, ( event.xmotion.x,
                                                event.xmotion.y ) );
             } else {
                 INVOKE_WCB( *window, Passive, ( event.xmotion.x,
                                                 event.xmotion.y ) );
-	    }
-	    fgState.Modifiers = INVALID_MODIFIERS;
+            }
+            fgState.Modifiers = INVALID_MODIFIERS;
         }
         break;
 
@@ -1356,9 +1356,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     case XK_F11:    special = GLUT_KEY_F11;    break;
                     case XK_F12:    special = GLUT_KEY_F12;    break;
 
+                    case XK_KP_Left:
                     case XK_Left:   special = GLUT_KEY_LEFT;   break;
+                    case XK_KP_Right:
                     case XK_Right:  special = GLUT_KEY_RIGHT;  break;
+                    case XK_KP_Up:
                     case XK_Up:     special = GLUT_KEY_UP;     break;
+                    case XK_KP_Down:
                     case XK_Down:   special = GLUT_KEY_DOWN;   break;
 
                     case XK_KP_Prior:
@@ -1371,6 +1375,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     case XK_End:    special = GLUT_KEY_END;    break;
                     case XK_KP_Insert:
                     case XK_Insert: special = GLUT_KEY_INSERT; break;
+
+                    case XK_Num_Lock :  special = GLUT_KEY_NUM_LOCK;  break;
+                    case XK_KP_Begin :  special = GLUT_KEY_BEGIN;     break;
+                    case XK_KP_Delete:  special = GLUT_KEY_DELETE;    break;
                     }
 
                     /*
