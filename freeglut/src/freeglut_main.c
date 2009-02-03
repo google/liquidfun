@@ -308,7 +308,7 @@ static void fghCheckTimers( void )
  * 32-bit, where the GLUT API return value is also overflowed.
  */  
 unsigned long fgSystemTime(void) {
-#if HAVE_GETTIMEOFDAY
+#if TARGET_HOST_SOLARIS || HAVE_GETTIMEOFDAY
     struct timeval now;
     gettimeofday( &now, NULL );
     return now.tv_usec/1000 + now.tv_sec*1000;

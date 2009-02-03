@@ -1060,7 +1060,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 #    ifdef JS_NEW
        unsigned char u;
 #    else
-#      if defined( __linux__ )
+#      if defined( __linux__ ) || TARGET_HOST_SOLARIS
          int counter = 0;
 #      endif
 #    endif
