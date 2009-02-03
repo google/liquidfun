@@ -3,17 +3,17 @@
     ==============
 
     This is the freeglut package.
-    
+
     Freeglut, the Free openGL Utility Toolkit, is meant to be a free alter-
     native to Mark Kilgard's GLUT library. It is distributed under an X-Consor-
     tium style license (see COPYING for details), to offer you a chance to use 
     and/or modify the source.
-    
+
     It makes use of OpenGL, GLU, and pthreads-win32 libraries. The library does
     not make use of any GLUT code and is not 100% compatible. Code recompilation
     and/or slight modifications might be required for your applications to work
     with freeglut.
-    
+
 
     PORTS
     =====
@@ -27,12 +27,23 @@
     INSTALLATION
     ============
 
-    See the INSTALL file.
-    
-    
+    Use the following commands to build from scratch on a *nix X11 platform:
+
+        autoheader
+        aclocal
+        libtoolize --copy --force
+        automake --add-missing
+        autoconf
+        ./configure
+        make
+
+    The first four of these commands are automated in a system script called
+    "autoreconf".
+
+
     CONTRIBUTING
     ============
-    
+
     Bug and missing features patches are certainly welcome. Just as comments 
     and FREEGLUT API 1 propositions are.
 
@@ -40,18 +51,18 @@
     does (tabs converted 4 white spaces). Comments are really welcome, as I 
     believe it would be nice for people fresh new to OpenGL see how the things
     are done... 
-    
-    
+
+
     WEB SITE AND CONTACTING THE AUTHOR
     ==================================
 
     Freeglut project has moved to the SourceForge:
     http://freeglut.sourceforge.net
-        
-    
+
+
     THE HOPE
     ========
-    
+
     Hope you find my work somehow useful.
     Pawel W. Olszta, <olszta@sourceforge.net>
 
