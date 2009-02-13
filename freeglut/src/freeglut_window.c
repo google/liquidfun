@@ -302,58 +302,66 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 
 GLboolean fgNewWGLCreateContext( SFG_Window* window )
 {
+    PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetEntensionsStringARB;
+
     if( (fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) &&
         (fgState.MajorVersion > 2) )
     {
-        PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetEntensionsStringARB=NULL;
+        return GL_TRUE;
+    }
 
-        wglMakeCurrent( window->Window.Device,
-                        window->Window.Context );
+    wglMakeCurrent( window->Window.Device,
+                    window->Window.Context );
 
-        wglGetEntensionsStringARB=(PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
-        if (wglGetEntensionsStringARB)
-        {
-            const char * pWglExtString=wglGetEntensionsStringARB(window->Window.Device);
-            if (pWglExtString)
-            {
-                if (strstr(pWglExtString, "WGL_ARB_create_context"))
-                {
-                    /* new context creation */
-                    HGLRC context;
-                    int attribs[7];
-                    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+    wglGetEntensionsStringARB=(PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
+    if ( wglGetEntensionsStringARB == NULL )
+    {
+        return GL_TRUE;
+    }
 
-                    attribs[0] = WGL_CONTEXT_MAJOR_VERSION_ARB;
-                    attribs[1] = fgState.MajorVersion;
-                    attribs[2] = WGL_CONTEXT_MINOR_VERSION_ARB;
-                    attribs[3] = fgState.MinorVersion;
-                    attribs[4] = WGL_CONTEXT_FLAGS_ARB;
-                    attribs[5] = ((fgState.ContextFlags & GLUT_DEBUG) ? WGL_CONTEXT_DEBUG_BIT_ARB : 0) |
-                        ((fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) ? WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB : 0);
-                    attribs[6] = 0;
+    const char * pWglExtString=wglGetEntensionsStringARB(window->Window.Device);
+    if ( pWglExtString == NULL )
+    {
+        return GL_TRUE;
+    }
 
-                    wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC) wglGetProcAddress( "wglCreateContextAttribsARB" );
-                    if ( wglCreateContextAttribsARB == NULL )
-                    {
-                        fgError( "wglCreateContextAttribsARB not found" );
-                    }
+    if ( strstr(pWglExtString, "WGL_ARB_create_context") == NULL )
+    {
+        return GL_TRUE;
+    }
 
-                    context = wglCreateContextAttribsARB( window->Window.Device, 0, attribs );
-                    if ( context == NULL )
-                    {
-                        fgError( "Unable to create OpenGL %d.%d context (flags %x)",
-                            fgState.MajorVersion, fgState.MinorVersion, fgState.ContextFlags );
-                    }
-                    else
-                    {
-                        fgWarning( "Success 3.0" );
-                        wglMakeCurrent( NULL, NULL );
-                        wglDeleteContext( window->Window.Context );
-                        window->Window.Context = context;
-                    }
-                }
-            }
-        }
+    /* new context creation */
+    HGLRC context;
+    int attribs[7];
+    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+
+    attribs[0] = WGL_CONTEXT_MAJOR_VERSION_ARB;
+    attribs[1] = fgState.MajorVersion;
+    attribs[2] = WGL_CONTEXT_MINOR_VERSION_ARB;
+    attribs[3] = fgState.MinorVersion;
+    attribs[4] = WGL_CONTEXT_FLAGS_ARB;
+    attribs[5] = ((fgState.ContextFlags & GLUT_DEBUG) ? WGL_CONTEXT_DEBUG_BIT_ARB : 0) |
+        ((fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) ? WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB : 0);
+    attribs[6] = 0;
+
+    wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC) wglGetProcAddress( "wglCreateContextAttribsARB" );
+    if ( wglCreateContextAttribsARB == NULL )
+    {
+        fgError( "wglCreateContextAttribsARB not found" );
+    }
+
+    context = wglCreateContextAttribsARB( window->Window.Device, 0, attribs );
+    if ( context == NULL )
+    {
+        fgError( "Unable to create OpenGL %d.%d context (flags %x)",
+            fgState.MajorVersion, fgState.MinorVersion, fgState.ContextFlags );
+    }
+    else
+    {
+        fgWarning( "Success 3.0" );
+        wglMakeCurrent( NULL, NULL );
+        wglDeleteContext( window->Window.Context );
+        window->Window.Context = context;
     }
 
     return GL_TRUE;
