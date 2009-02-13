@@ -29,16 +29,12 @@
 
     Use the following commands to build from scratch on a *nix X11 platform:
 
-        autoheader
-        aclocal
-        libtoolize --copy --force
-        automake --add-missing
-        autoconf
+        ./autogen.sh
         ./configure
         make
 
-    The first four of these commands are automated in a system script called
-    "autoreconf".
+    The first command is only needed after a fresh checkout, a source distribution
+    already contains all necessary files for the last two steps.
 
 
     CONTRIBUTING
