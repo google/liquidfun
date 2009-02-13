@@ -300,14 +300,17 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 #endif
 
 
-GLboolean fgNewWGLCreateContext( SFG_Window* window )
+void fgNewWGLCreateContext( SFG_Window* window )
 {
     PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetEntensionsStringARB;
+    HGLRC context;
+    int attribs[7];
+    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 
     if( (fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) &&
         (fgState.MajorVersion > 2) )
     {
-        return GL_TRUE;
+        return;
     }
 
     wglMakeCurrent( window->Window.Device,
@@ -316,25 +319,16 @@ GLboolean fgNewWGLCreateContext( SFG_Window* window )
     wglGetEntensionsStringARB=(PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
     if ( wglGetEntensionsStringARB == NULL )
     {
-        return GL_TRUE;
+        return;
     }
 
     const char * pWglExtString=wglGetEntensionsStringARB(window->Window.Device);
-    if ( pWglExtString == NULL )
+    if (( pWglExtString == NULL ) || ( strstr(pWglExtString, "WGL_ARB_create_context") == NULL ))
     {
-        return GL_TRUE;
-    }
-
-    if ( strstr(pWglExtString, "WGL_ARB_create_context") == NULL )
-    {
-        return GL_TRUE;
+        return;
     }
 
     /* new context creation */
-    HGLRC context;
-    int attribs[7];
-    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
-
     attribs[0] = WGL_CONTEXT_MAJOR_VERSION_ARB;
     attribs[1] = fgState.MajorVersion;
     attribs[2] = WGL_CONTEXT_MINOR_VERSION_ARB;
@@ -356,15 +350,10 @@ GLboolean fgNewWGLCreateContext( SFG_Window* window )
         fgError( "Unable to create OpenGL %d.%d context (flags %x)",
             fgState.MajorVersion, fgState.MinorVersion, fgState.ContextFlags );
     }
-    else
-    {
-        fgWarning( "Success 3.0" );
-        wglMakeCurrent( NULL, NULL );
-        wglDeleteContext( window->Window.Context );
-        window->Window.Context = context;
-    }
 
-    return GL_TRUE;
+    wglMakeCurrent( NULL, NULL );
+    wglDeleteContext( window->Window.Context );
+    window->Window.Context = context;
 }
 
 
