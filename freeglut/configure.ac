@@ -33,7 +33,7 @@ else
                [LIBXXF86VM=-lXxf86vm], [LIBXXF86VM=],
                [$X_LIBS -lXext -lX11])
   LIBXI=-lXi
-  VERSION_INFO="-version-info 11:0:8"
+  VERSION_INFO="-version-info 12:0:9"
   EXPORT_FLAGS=
 fi
 AC_SUBST([GL_LIBS])
