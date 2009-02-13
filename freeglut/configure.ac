@@ -95,17 +95,5 @@ if test "x$enable_debug" = xyes; then
 fi
 
 # Generate output.
-AC_CONFIG_FILES([Makefile
-                 doc/Makefile
-                 include/GL/Makefile
-                 include/Makefile
-                 progs/Makefile
-                 progs/demos/CallbackMaker/Makefile
-                 progs/demos/Fractals/Makefile
-                 progs/demos/Fractals_random/Makefile
-                 progs/demos/Lorenz/Makefile
-                 progs/demos/Makefile
-                 progs/demos/One/Makefile
-                 progs/demos/shapes/Makefile
-                 src/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile include/GL/Makefile include/Makefile progs/Makefile progs/demos/CallbackMaker/Makefile progs/demos/Fractals/Makefile progs/demos/Fractals_random/Makefile progs/demos/Lorenz/Makefile progs/demos/Makefile progs/demos/One/Makefile progs/demos/shapes/Makefile src/Makefile])
 AC_OUTPUT
