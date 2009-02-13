@@ -307,8 +307,8 @@ void fgNewWGLCreateContext( SFG_Window* window )
     int attribs[7];
     PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 
-    if( (fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) &&
-        (fgState.MajorVersion > 2) )
+    /* If nothing fancy has been required, leave the context as it is */
+    if ( fgState.MajorVersion == 1 && fgState.MinorVersion == 0 && fgState.ContextFlags == 0 )
     {
         return;
     }
