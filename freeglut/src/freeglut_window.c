@@ -283,6 +283,83 @@ typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAt
 #define WGL_SAMPLES_ARB                0x2042
 
 
+#ifndef WGL_ARB_create_context
+#define WGL_ARB_create_context 1
+#ifdef WGL_WGLEXT_PROTOTYPES
+extern HGLRC WINAPI wglCreateContextAttribsARB (HDC, HGLRC, const int *);
+#endif /* WGL_WGLEXT_PROTOTYPES */
+typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
+
+#define WGL_CONTEXT_DEBUG_BIT_ARB      0x0001
+#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
+#define WGL_CONTEXT_MAJOR_VERSION_ARB  0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB  0x2092
+#define WGL_CONTEXT_LAYER_PLANE_ARB    0x2093
+#define WGL_CONTEXT_FLAGS_ARB          0x2094
+#define ERROR_INVALID_VERSION_ARB      0x2095
+#endif
+
+
+GLboolean fgNewWGLCreateContext( SFG_Window* window )
+{
+    if( (fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) &&
+        (fgState.MajorVersion > 2) )
+    {
+        PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetEntensionsStringARB=NULL;
+
+        wglMakeCurrent( window->Window.Device,
+                        window->Window.Context );
+
+        wglGetEntensionsStringARB=(PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
+        if (wglGetEntensionsStringARB)
+        {
+            const char * pWglExtString=wglGetEntensionsStringARB(window->Window.Device);
+            if (pWglExtString)
+            {
+                if (strstr(pWglExtString, "WGL_ARB_create_context"))
+                {
+                    /* new context creation */
+                    HGLRC context;
+                    int attribs[7];
+                    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+
+                    attribs[0] = WGL_CONTEXT_MAJOR_VERSION_ARB;
+                    attribs[1] = fgState.MajorVersion;
+                    attribs[2] = WGL_CONTEXT_MINOR_VERSION_ARB;
+                    attribs[3] = fgState.MinorVersion;
+                    attribs[4] = WGL_CONTEXT_FLAGS_ARB;
+                    attribs[5] = ((fgState.ContextFlags & GLUT_DEBUG) ? WGL_CONTEXT_DEBUG_BIT_ARB : 0) |
+                        ((fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) ? WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB : 0);
+                    attribs[6] = 0;
+
+                    wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC) wglGetProcAddress( "wglCreateContextAttribsARB" );
+                    if ( wglCreateContextAttribsARB == NULL )
+                    {
+                        fgError( "wglCreateContextAttribsARB not found" );
+                    }
+
+                    context = wglCreateContextAttribsARB( window->Window.Device, 0, attribs );
+                    if ( context == NULL )
+                    {
+                        fgError( "Unable to create OpenGL %d.%d context (flags %x)",
+                            fgState.MajorVersion, fgState.MinorVersion, fgState.ContextFlags );
+                    }
+                    else
+                    {
+                        fgWarning( "Success 3.0" );
+                        wglMakeCurrent( NULL, NULL );
+                        wglDeleteContext( window->Window.Context );
+                        window->Window.Context = context;
+                    }
+                }
+            }
+        }
+    }
+
+    return GL_TRUE;
+}
+
+
 GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                               unsigned char layer_type )
 {

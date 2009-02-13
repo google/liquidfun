@@ -813,6 +813,7 @@ GLXFBConfig* fgChooseFBConfig( void );
 #if TARGET_HOST_MS_WINDOWS
 LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg,
                                WPARAM wParam, LPARAM lParam );
+GLboolean fgNewWGLCreateContext( SFG_Window* window );
 GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                               unsigned char layer_type );
 #endif

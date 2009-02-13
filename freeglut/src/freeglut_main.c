@@ -1621,6 +1621,10 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                     window->Window.Context =
                         wglCreateContext( window->Window.Device );
             }
+
+#if !defined(_WIN32_WCE)
+            fgNewWGLCreateContext( window );
+#endif
         }
 
         window->State.NeedToResize = GL_TRUE;
