@@ -46,6 +46,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* report GL errors, if any, to stderr */
 void reportErrors(const char *message)
 {
    GLenum error;
@@ -54,25 +55,75 @@ void reportErrors(const char *message)
    }
 }
 
-void init(void) 
+/* extension entries */
+void (*gl_GenBuffers) (GLsizei n, GLuint *buffers);
+void (*gl_BindBuffer) (GLenum target, GLuint buffer);
+void (*gl_BufferData) (GLenum target, GLsizeiptr size, const GLvoid *data,
+                       GLenum usage);
+
+void initExtensionEntries(void) 
 {
-   reportErrors ("at start of init");
+   gl_GenBuffers = glutGetProcAddress ("glGenBuffers");
+   gl_BindBuffer = glutGetProcAddress ("glBindBuffer");
+   gl_BufferData = glutGetProcAddress ("glBufferData");
+}
+
+/* vertex array data for a colored 2D triangle, consisting of RGB color values
+   and XY coordinates */
+const GLsizei numColorComponents = 3;
+const GLsizei numVertexComponents = 2;
+
+const GLfloat varray[] = {
+   1.0f, 0.0f, 0.0f,
+   5.0f, 5.0f,
+
+   0.0f, 1.0f, 0.0f,
+   25.0f, 5.0f,
+
+   0.0f, 0.0f, 1.0f,
+   5.0f, 25.0f
+};
+
+/* the name of the vertex buffer object */
+GLuint bufferName;
+
+void initBuffer(void)
+{
+   reportErrors ("at start of initBuffer");
+   gl_GenBuffers (1, &bufferName);
+   gl_BindBuffer (GL_ARRAY_BUFFER, bufferName);
+   gl_BufferData (GL_ARRAY_BUFFER, sizeof(varray), varray, GL_STATIC_DRAW);
+   reportErrors ("at end of initBuffer");
+}
+
+void initRendering(void)
+{
+   reportErrors ("at start of initRendering");
    glClearColor (0.0, 0.0, 0.0, 0.0);
    glShadeModel (GL_SMOOTH);
-   reportErrors ("at end of init");
+   reportErrors ("at end of initRendering");
+}
+
+void init(void) 
+{
+   initExtensionEntries();
+   initBuffer();
+   initRendering();
 }
 
 void triangle(void)
 {
+   const char *base = NULL;
+   const GLsizei stride = sizeof(GLfloat) * (numColorComponents + numVertexComponents);
+   const GLsizei numElements = sizeof(varray) / stride;
    reportErrors ("at start of triangle");
-   glBegin (GL_TRIANGLES);
-   glColor3f (1.0, 0.0, 0.0);
-   glVertex2f (5.0, 5.0);
-   glColor3f (0.0, 1.0, 0.0);
-   glVertex2f (25.0, 5.0);
-   glColor3f (0.0, 0.0, 1.0);
-   glVertex2f (5.0, 25.0);
-   glEnd();
+   gl_BindBuffer (GL_ARRAY_BUFFER, bufferName);
+   glColorPointer (numColorComponents, GL_FLOAT, stride, base);
+   glVertexPointer(numVertexComponents, GL_FLOAT, stride,
+                   base + sizeof(GLfloat) * numColorComponents);
+   glEnableClientState (GL_COLOR_ARRAY);
+   glEnableClientState (GL_VERTEX_ARRAY);
+   glDrawArrays(GL_TRIANGLES, 0, numElements);
    reportErrors ("at end of triangle");
 }
 
@@ -144,7 +195,7 @@ int main(int argc, char** argv)
    glutInit(&argc, argv);
    glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
    glutInitContextVersion(3, 0);
-   // glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
+   /* glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG); */
    glutInitWindowSize (500, 500); 
    glutInitWindowPosition (100, 100);
    glutCreateWindow (argv[0]);
