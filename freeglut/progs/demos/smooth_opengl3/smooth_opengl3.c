@@ -58,6 +58,14 @@ void checkError(const char *functionName)
 
 /* extension #defines, types and entries, avoiding a dependency on additional
    libraries like GLEW or the GL/glext.h header */
+#ifndef GL_ARRAY_BUFFER
+#define GL_ARRAY_BUFFER 0x8892
+#endif
+
+#ifndef GL_STATIC_DRAW
+#define GL_STATIC_DRAW 0x88E4
+#endif
+
 #ifndef GL_VERTEX_SHADER
 #define GL_VERTEX_SHADER 0x8B31
 #endif
@@ -92,7 +100,7 @@ typedef GLuint (*PFNGLCREATESHADERPROC) (GLenum type);
 PFNGLCREATESHADERPROC gl_CreateShader;
 
 typedef void (*PFNGLSHADERSOURCEPROC)
-  (GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
+   (GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
 PFNGLSHADERSOURCEPROC gl_ShaderSource;
 
 typedef void (*PFNGLCOMPILESHADERPROC) (GLuint shader);
@@ -114,15 +122,33 @@ typedef void (*PFNGLGETSHADERIVPROC) (GLuint shader, GLenum pname, GLint *params
 PFNGLGETSHADERIVPROC gl_GetShaderiv;
 
 typedef void (*PFNGLGETSHADERINFOLOGPROC)
-  (GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+   (GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
 PFNGLGETSHADERINFOLOGPROC gl_GetShaderInfoLog;
 
 typedef void (*PFNGLGETPROGRAMIVPROC) (GLenum target, GLenum pname, GLint *params);
 PFNGLGETPROGRAMIVPROC gl_GetProgramiv;
 
 typedef void (*PFNGLGETPROGRAMINFOLOGPROC)
-  (GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+   (GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
 PFNGLGETPROGRAMINFOLOGPROC gl_GetProgramInfoLog;
+
+typedef GLint (*PFNGLGETATTRIBLOCATIONPROC) (GLuint program, const GLchar *name);
+PFNGLGETATTRIBLOCATIONPROC gl_GetAttribLocation;
+
+typedef void (*PFNGLVERTEXATTRIBPOINTERPROC)
+   (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride,
+    const GLvoid *pointer);
+PFNGLVERTEXATTRIBPOINTERPROC gl_VertexAttribPointer;
+
+typedef void (*PFNGLENABLEVERTEXATTRIBARRAYPROC) (GLuint index);
+PFNGLENABLEVERTEXATTRIBARRAYPROC gl_EnableVertexAttribArray;
+
+typedef GLint (*PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const GLchar *name);
+PFNGLGETUNIFORMLOCATIONPROC gl_GetUniformLocation;
+
+typedef void (*PFNGLUNIFORMMATRIX4FVPROC)
+  (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+PFNGLUNIFORMMATRIX4FVPROC gl_UniformMatrix4fv;
 
 void initExtensionEntries(void) 
 {
@@ -140,6 +166,11 @@ void initExtensionEntries(void)
    gl_GetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC) glutGetProcAddress ("glGetShaderInfoLog");
    gl_GetProgramiv = (PFNGLGETPROGRAMIVPROC) glutGetProcAddress ("glGetProgramiv");
    gl_GetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC) glutGetProcAddress ("glGetProgramInfoLog");
+   gl_GetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC) glutGetProcAddress ("glGetAttribLocation");
+   gl_VertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC) glutGetProcAddress ("glVertexAttribPointer");
+   gl_EnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glEnableVertexAttribArray");
+   gl_GetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) glutGetProcAddress ("glGetUniformLocation");
+   gl_UniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC) glutGetProcAddress ("glUniformMatrix4fv");
 }
 
 /* vertex array data for a colored 2D triangle, consisting of RGB color values
@@ -171,25 +202,27 @@ void initBuffer(void)
    gl_GenBuffers (1, &vertexBufferName);
    gl_BindBuffer (GL_ARRAY_BUFFER, vertexBufferName);
    gl_BufferData (GL_ARRAY_BUFFER, sizeof(varray), varray, GL_STATIC_DRAW);
-   glEnableClientState (GL_COLOR_ARRAY);
-   glEnableClientState (GL_VERTEX_ARRAY);
    checkError ("initBuffer");
 }
 
 const GLchar *vertexShaderSource[] = {
-   "#version 120\n",
+   "#version 130\n",
+   "uniform mat4 fg_ProjectionMatrix;\n",
+   "in vec4 fg_Color;\n",
+   "in vec4 fg_Vertex;\n",
    "void main(void)\n",
    "{\n",
-   "   gl_FrontColor = gl_Color;\n",
-   "   gl_Position = ftransform();\n",
+   "   gl_FrontColor = fg_Color;\n",
+   "   gl_Position = fg_ProjectionMatrix * fg_Vertex;\n",
    "}\n"
 };
 
 const GLchar *fragmentShaderSource[] = {
-   "#version 120\n",
+   "#version 130\n",
+   "out vec4 fg_FragColor;\n",
    "void main(void)\n",
    "{\n",
-   "   gl_FragColor = gl_Color;\n",
+   "   fg_FragColor = gl_Color;\n",
    "}\n"
 };
 
@@ -237,14 +270,18 @@ GLuint createProgram(GLuint vertexShader, GLuint fragmentShader)
 {
    GLuint program = gl_CreateProgram ();
    if (vertexShader != 0) {
-     gl_AttachShader (program, vertexShader);
+      gl_AttachShader (program, vertexShader);
    }
    if (fragmentShader != 0) {
-     gl_AttachShader (program, fragmentShader);
+      gl_AttachShader (program, fragmentShader);
    }
    linkAndCheck (program);
    return program;
 }
+
+GLuint fgProjectionMatrixIndex;
+GLuint fgColorIndex;
+GLuint fgVertexIndex;
 
 void initShader(void)
 {
@@ -257,7 +294,17 @@ void initShader(void)
      compileShaderSource (GL_FRAGMENT_SHADER, fragmentShaderLines, fragmentShaderSource);
 
    GLuint program = createProgram (vertexShader, fragmentShader);
+
    gl_UseProgram (program);
+
+   fgProjectionMatrixIndex = gl_GetUniformLocation(program, "fg_ProjectionMatrix");
+
+   fgColorIndex = gl_GetAttribLocation(program, "fg_Color");
+   gl_EnableVertexAttribArray (fgColorIndex);
+
+   fgVertexIndex = gl_GetAttribLocation(program, "fg_Vertex");
+   gl_EnableVertexAttribArray (fgVertexIndex);
+
    checkError ("initShader");
 }
 
@@ -290,12 +337,17 @@ const GLvoid *bufferObjectPtr (GLsizei index)
    return (const GLvoid *) (((char *) NULL) + index);
 }
 
+GLfloat projectionMatrix[16];
+
 void triangle(void)
 {
+   gl_UniformMatrix4fv (fgProjectionMatrixIndex, 1, GL_FALSE, projectionMatrix);
+
    gl_BindBuffer (GL_ARRAY_BUFFER, vertexBufferName);
-   glColorPointer (numColorComponents, GL_FLOAT, stride, bufferObjectPtr (0));
-   glVertexPointer(numVertexComponents, GL_FLOAT, stride,
-                   bufferObjectPtr (sizeof(GLfloat) * numColorComponents));
+   gl_VertexAttribPointer (fgColorIndex, numColorComponents, GL_FLOAT, GL_FALSE,
+                           stride, bufferObjectPtr (0));
+   gl_VertexAttribPointer (fgVertexIndex, numVertexComponents, GL_FLOAT, GL_FALSE,
+                           stride, bufferObjectPtr (sizeof(GLfloat) * numColorComponents));
    glDrawArrays(GL_TRIANGLES, 0, numElements);
    checkError ("triangle");
 }
@@ -339,16 +391,12 @@ void loadOrtho2Df(GLfloat *m, GLfloat l, GLfloat r, GLfloat b, GLfloat t)
 
 void reshape (int w, int h)
 {
-   GLfloat m[16];
    glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-   glMatrixMode (GL_PROJECTION);
    if (w <= h) {
-      loadOrtho2Df (m, 0.0, 30.0, 0.0, 30.0 * (GLfloat) h/(GLfloat) w);
+      loadOrtho2Df (projectionMatrix, 0.0, 30.0, 0.0, 30.0 * (GLfloat) h/(GLfloat) w);
    } else {
-      loadOrtho2Df (m, 0.0, 30.0 * (GLfloat) w/(GLfloat) h, 0.0, 30.0);
+      loadOrtho2Df (projectionMatrix, 0.0, 30.0 * (GLfloat) w/(GLfloat) h, 0.0, 30.0);
    }
-   glLoadMatrixf (m);
-   glMatrixMode (GL_MODELVIEW);
    checkError ("reshape");
 }
 
