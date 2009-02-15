@@ -47,61 +47,72 @@
 #include <stdio.h>
 
 /* report GL errors, if any, to stderr */
-void reportErrors(const char *message)
+void checkError(const char *functionName)
 {
    GLenum error;
    while (( error = glGetError() ) != GL_NO_ERROR) {
-      fprintf (stderr, "GL error 0x%X %s\n", error, message);
+      fprintf (stderr, "GL error 0x%X detected in %s\n", error, functionName);
    }
 }
 
-/* extension entries */
-void (*gl_GenBuffers) (GLsizei n, GLuint *buffers);
-void (*gl_BindBuffer) (GLenum target, GLuint buffer);
-void (*gl_BufferData) (GLenum target, GLsizeiptr size, const GLvoid *data,
-                       GLenum usage);
+/* extension types and entries, avoiding a dependency on additional libraries
+   like GLEW or the GL/glext.h header */
+typedef void (*PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
+PFNGLGENBUFFERSPROC gl_GenBuffers;
+
+typedef void (*PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
+PFNGLBINDBUFFERPROC gl_BindBuffer;
+
+typedef void (*PFNGLBUFFERDATAPROC) (GLenum target, GLsizeiptr size,
+                                     const GLvoid *data, GLenum usage);
+PFNGLBUFFERDATAPROC gl_BufferData;
 
 void initExtensionEntries(void) 
 {
-   gl_GenBuffers = glutGetProcAddress ("glGenBuffers");
-   gl_BindBuffer = glutGetProcAddress ("glBindBuffer");
-   gl_BufferData = glutGetProcAddress ("glBufferData");
+   gl_GenBuffers = (PFNGLGENBUFFERSPROC) glutGetProcAddress ("glGenBuffers");
+   gl_BindBuffer = (PFNGLBINDBUFFERPROC) glutGetProcAddress ("glBindBuffer");
+   gl_BufferData = (PFNGLBUFFERDATAPROC) glutGetProcAddress ("glBufferData");
 }
 
 /* vertex array data for a colored 2D triangle, consisting of RGB color values
    and XY coordinates */
-const GLsizei numColorComponents = 3;
-const GLsizei numVertexComponents = 2;
-
 const GLfloat varray[] = {
-   1.0f, 0.0f, 0.0f,
-   5.0f, 5.0f,
+   1.0f, 0.0f, 0.0f, /* red */
+   5.0f, 5.0f,       /* lower left */
 
-   0.0f, 1.0f, 0.0f,
-   25.0f, 5.0f,
+   0.0f, 1.0f, 0.0f, /* green */
+   25.0f, 5.0f,      /* lower right */
 
-   0.0f, 0.0f, 1.0f,
-   5.0f, 25.0f
+   0.0f, 0.0f, 1.0f, /* blue */
+   5.0f, 25.0f       /* upper left */
+};
+
+/* ISO C somehow enforces this silly use of 'enum' for compile-time constants */
+enum {
+  numColorComponents = 3,
+  numVertexComponents = 2,
+  stride = sizeof(GLfloat) * (numColorComponents + numVertexComponents),
+  numElements = sizeof(varray) / stride
 };
 
 /* the name of the vertex buffer object */
-GLuint bufferName;
+GLuint vertexBufferName;
 
 void initBuffer(void)
 {
-   reportErrors ("at start of initBuffer");
-   gl_GenBuffers (1, &bufferName);
-   gl_BindBuffer (GL_ARRAY_BUFFER, bufferName);
+   gl_GenBuffers (1, &vertexBufferName);
+   gl_BindBuffer (GL_ARRAY_BUFFER, vertexBufferName);
    gl_BufferData (GL_ARRAY_BUFFER, sizeof(varray), varray, GL_STATIC_DRAW);
-   reportErrors ("at end of initBuffer");
+   glEnableClientState (GL_COLOR_ARRAY);
+   glEnableClientState (GL_VERTEX_ARRAY);
+   checkError ("initBuffer");
 }
 
 void initRendering(void)
 {
-   reportErrors ("at start of initRendering");
    glClearColor (0.0, 0.0, 0.0, 0.0);
    glShadeModel (GL_SMOOTH);
-   reportErrors ("at end of initRendering");
+   checkError ("initRendering");
 }
 
 void init(void) 
@@ -111,29 +122,27 @@ void init(void)
    initRendering();
 }
 
+const GLvoid *bufferObjectPtr (GLsizei index)
+{
+   return (const GLvoid *) (((char *) NULL) + index);
+}
+
 void triangle(void)
 {
-   const char *base = NULL;
-   const GLsizei stride = sizeof(GLfloat) * (numColorComponents + numVertexComponents);
-   const GLsizei numElements = sizeof(varray) / stride;
-   reportErrors ("at start of triangle");
-   gl_BindBuffer (GL_ARRAY_BUFFER, bufferName);
-   glColorPointer (numColorComponents, GL_FLOAT, stride, base);
+   gl_BindBuffer (GL_ARRAY_BUFFER, vertexBufferName);
+   glColorPointer (numColorComponents, GL_FLOAT, stride, bufferObjectPtr (0));
    glVertexPointer(numVertexComponents, GL_FLOAT, stride,
-                   base + sizeof(GLfloat) * numColorComponents);
-   glEnableClientState (GL_COLOR_ARRAY);
-   glEnableClientState (GL_VERTEX_ARRAY);
+                   bufferObjectPtr (sizeof(GLfloat) * numColorComponents));
    glDrawArrays(GL_TRIANGLES, 0, numElements);
-   reportErrors ("at end of triangle");
+   checkError ("triangle");
 }
 
 void display(void)
 {
-   reportErrors ("at start of display");
    glClear (GL_COLOR_BUFFER_BIT);
    triangle ();
    glFlush ();
-   reportErrors ("at end of display");
+   checkError ("display");
 }
 
 void loadOrthof(GLfloat *m, GLfloat l, GLfloat r, GLfloat b, GLfloat t,
@@ -168,7 +177,6 @@ void loadOrtho2Df(GLfloat *m, GLfloat l, GLfloat r, GLfloat b, GLfloat t)
 void reshape (int w, int h)
 {
    GLfloat m[16];
-   reportErrors ("at start of reshape");
    glViewport (0, 0, (GLsizei) w, (GLsizei) h);
    glMatrixMode (GL_PROJECTION);
    if (w <= h) {
@@ -178,7 +186,7 @@ void reshape (int w, int h)
    }
    glLoadMatrixf (m);
    glMatrixMode (GL_MODELVIEW);
-   reportErrors ("at end of reshape");
+   checkError ("reshape");
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -194,8 +202,11 @@ int main(int argc, char** argv)
 {
    glutInit(&argc, argv);
    glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
-   glutInitContextVersion(3, 0);
-   /* glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG); */
+   /* add command line argument "classic" for a pre-3.0 context */
+   if ((argc != 2) || (strcmp (argv[1], "classic") != 0)) {
+      glutInitContextVersion (3, 0);
+      glutInitContextFlags (GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
+   }
    glutInitWindowSize (500, 500); 
    glutInitWindowPosition (100, 100);
    glutCreateWindow (argv[0]);
