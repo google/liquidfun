@@ -306,6 +306,7 @@ void fgNewWGLCreateContext( SFG_Window* window )
     HGLRC context;
     int attribs[7];
     PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+    const char * pWglExtString;
 
     /* If nothing fancy has been required, leave the context as it is */
     if ( fgState.MajorVersion == 1 && fgState.MinorVersion == 0 && fgState.ContextFlags == 0 )
@@ -322,7 +323,7 @@ void fgNewWGLCreateContext( SFG_Window* window )
         return;
     }
 
-    const char * pWglExtString=wglGetEntensionsStringARB(window->Window.Device);
+    pWglExtString=wglGetEntensionsStringARB(window->Window.Device);
     if (( pWglExtString == NULL ) || ( strstr(pWglExtString, "WGL_ARB_create_context") == NULL ))
     {
         return;
