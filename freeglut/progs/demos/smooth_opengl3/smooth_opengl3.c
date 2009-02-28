@@ -66,6 +66,10 @@ void checkError(const char *functionName)
 #define GL_STATIC_DRAW 0x88E4
 #endif
 
+#ifndef GL_FRAGMENT_SHADER
+#define GL_FRAGMENT_SHADER 0x8B30
+#endif
+
 #ifndef GL_VERTEX_SHADER
 #define GL_VERTEX_SHADER 0x8B31
 #endif
@@ -86,13 +90,16 @@ void checkError(const char *functionName)
 #define GL_INFO_LOG_LENGTH 0x8B84
 #endif
 
+typedef ptrdiff_t ourGLsizeiptr;
+typedef char ourGLchar;
+
 typedef void (*PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
 PFNGLGENBUFFERSPROC gl_GenBuffers;
 
 typedef void (*PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
 PFNGLBINDBUFFERPROC gl_BindBuffer;
 
-typedef void (*PFNGLBUFFERDATAPROC) (GLenum target, GLsizeiptr size,
+typedef void (*PFNGLBUFFERDATAPROC) (GLenum target, ourGLsizeiptr size,
                                      const GLvoid *data, GLenum usage);
 PFNGLBUFFERDATAPROC gl_BufferData;
 
@@ -100,7 +107,7 @@ typedef GLuint (*PFNGLCREATESHADERPROC) (GLenum type);
 PFNGLCREATESHADERPROC gl_CreateShader;
 
 typedef void (*PFNGLSHADERSOURCEPROC)
-   (GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
+   (GLuint shader, GLsizei count, const ourGLchar **string, const GLint *length);
 PFNGLSHADERSOURCEPROC gl_ShaderSource;
 
 typedef void (*PFNGLCOMPILESHADERPROC) (GLuint shader);
@@ -122,17 +129,17 @@ typedef void (*PFNGLGETSHADERIVPROC) (GLuint shader, GLenum pname, GLint *params
 PFNGLGETSHADERIVPROC gl_GetShaderiv;
 
 typedef void (*PFNGLGETSHADERINFOLOGPROC)
-   (GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+   (GLuint shader, GLsizei bufSize, GLsizei *length, ourGLchar *infoLog);
 PFNGLGETSHADERINFOLOGPROC gl_GetShaderInfoLog;
 
 typedef void (*PFNGLGETPROGRAMIVPROC) (GLenum target, GLenum pname, GLint *params);
 PFNGLGETPROGRAMIVPROC gl_GetProgramiv;
 
 typedef void (*PFNGLGETPROGRAMINFOLOGPROC)
-   (GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+   (GLuint program, GLsizei bufSize, GLsizei *length, ourGLchar *infoLog);
 PFNGLGETPROGRAMINFOLOGPROC gl_GetProgramInfoLog;
 
-typedef GLint (*PFNGLGETATTRIBLOCATIONPROC) (GLuint program, const GLchar *name);
+typedef GLint (*PFNGLGETATTRIBLOCATIONPROC) (GLuint program, const ourGLchar *name);
 PFNGLGETATTRIBLOCATIONPROC gl_GetAttribLocation;
 
 typedef void (*PFNGLVERTEXATTRIBPOINTERPROC)
@@ -143,7 +150,7 @@ PFNGLVERTEXATTRIBPOINTERPROC gl_VertexAttribPointer;
 typedef void (*PFNGLENABLEVERTEXATTRIBARRAYPROC) (GLuint index);
 PFNGLENABLEVERTEXATTRIBARRAYPROC gl_EnableVertexAttribArray;
 
-typedef GLint (*PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const GLchar *name);
+typedef GLint (*PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const ourGLchar *name);
 PFNGLGETUNIFORMLOCATIONPROC gl_GetUniformLocation;
 
 typedef void (*PFNGLUNIFORMMATRIX4FVPROC)
@@ -205,7 +212,7 @@ void initBuffer(void)
    checkError ("initBuffer");
 }
 
-const GLchar *vertexShaderSource[] = {
+const ourGLchar *vertexShaderSource[] = {
    "#version 130\n",
    "uniform mat4 fg_ProjectionMatrix;\n",
    "in vec4 fg_Color;\n",
@@ -217,7 +224,7 @@ const GLchar *vertexShaderSource[] = {
    "}\n"
 };
 
-const GLchar *fragmentShaderSource[] = {
+const ourGLchar *fragmentShaderSource[] = {
    "#version 130\n",
    "out vec4 fg_FragColor;\n",
    "void main(void)\n",
@@ -233,16 +240,16 @@ void compileAndCheck(GLuint shader)
    gl_GetShaderiv (shader, GL_COMPILE_STATUS, &status);
    if (status == GL_FALSE) {
      GLint infoLogLength;
-     GLchar *infoLog;
+     ourGLchar *infoLog;
      gl_GetShaderiv (shader, GL_INFO_LOG_LENGTH, &infoLogLength);
-     infoLog = (GLchar*) malloc (infoLogLength);
+     infoLog = (ourGLchar*) malloc (infoLogLength);
      gl_GetShaderInfoLog (shader, infoLogLength, NULL, infoLog);
      fprintf (stderr, "compile log: %s\n", infoLog);
      free (infoLog);
    }
 }
 
-GLuint compileShaderSource(GLenum type, GLsizei count, const GLchar **string)
+GLuint compileShaderSource(GLenum type, GLsizei count, const ourGLchar **string)
 {
    GLuint shader = gl_CreateShader (type);
    gl_ShaderSource (shader, count, string, NULL);
@@ -257,9 +264,9 @@ void linkAndCheck(GLuint program)
    gl_GetProgramiv (program, GL_LINK_STATUS, &status);
    if (status == GL_FALSE) {
      GLint infoLogLength;
-     GLchar *infoLog;
+     ourGLchar *infoLog;
      gl_GetProgramiv (program, GL_INFO_LOG_LENGTH, &infoLogLength);
-     infoLog = (GLchar*) malloc (infoLogLength);
+     infoLog = (ourGLchar*) malloc (infoLogLength);
      gl_GetProgramInfoLog (program, infoLogLength, NULL, infoLog);
      fprintf (stderr, "link log: %s\n", infoLog);
      free (infoLog);
@@ -285,11 +292,11 @@ GLuint fgVertexIndex;
 
 void initShader(void)
 {
-   const GLsizei vertexShaderLines = sizeof(vertexShaderSource) / sizeof(GLchar*);
+   const GLsizei vertexShaderLines = sizeof(vertexShaderSource) / sizeof(ourGLchar*);
    GLuint vertexShader =
      compileShaderSource (GL_VERTEX_SHADER, vertexShaderLines, vertexShaderSource);
 
-   const GLsizei fragmentShaderLines = sizeof(fragmentShaderSource) / sizeof(GLchar*);
+   const GLsizei fragmentShaderLines = sizeof(fragmentShaderSource) / sizeof(ourGLchar*);
    GLuint fragmentShader =
      compileShaderSource (GL_FRAGMENT_SHADER, fragmentShaderLines, fragmentShaderSource);
 
