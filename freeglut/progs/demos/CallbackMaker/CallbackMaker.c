@@ -7,6 +7,7 @@
 #include <GL/freeglut.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 static int sequence_number = 0 ;
 
@@ -28,10 +29,23 @@ int mouse_button = -1, mouse_updown = -1, mouse_x = -1, mouse_y = -1, mouse_seq 
 int mousewheel_number = -1, mousewheel_direction = -1, mousewheel_x = -1, mousewheel_y = -1, mousewheel_seq = -1 ;
 int motion_x = -1, motion_y = -1, motion_seq = -1 ;
 int passivemotion_x = -1, passivemotion_y = -1, passivemotion_seq = -1 ;
+
+static void
+bitmapPrintf (const char *fmt, ...)
+{
+    static char buf[256];
+    va_list args;
+
+    va_start(args, fmt);
+    (void) vsnprintf (buf, sizeof(buf), fmt, args);
+    va_end(args);
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)buf ) ;
+}
+
+
 static void 
 Display(void)
 {
-  char line[180] ;
   int window = glutGetWindow () ;
   glClear ( GL_COLOR_BUFFER_BIT );
 
@@ -49,68 +63,57 @@ Display(void)
 
   if ( reshape_called )
   {
-    sprintf ( line, "Reshape %d:  %d %d\n", reshape_seq, reshape_width, reshape_height );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Reshape %d:  %d %d\n", reshape_seq, reshape_width, reshape_height );
   }
 
   if ( key_called )
   {
-    sprintf ( line, "Key %d:  %d(%c) %d %d\n", key_seq, key_key, key_key, key_x, key_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Key %d:  %d(%c) %d %d\n", key_seq, key_key, key_key, key_x, key_y );
   }
 
   if ( special_called )
   {
-    sprintf ( line, "Special %d:  %d(%c) %d %d\n", special_seq, special_key, special_key, special_x, special_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Special %d:  %d(%c) %d %d\n", special_seq, special_key, special_key, special_x, special_y );
   }
 
   if ( visibility_called )
   {
-    sprintf ( line, "Visibility %d:  %d\n", visibility_seq, visibility_vis );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Visibility %d:  %d\n", visibility_seq, visibility_vis );
   }
 
   if ( keyup_called )
   {
-    sprintf ( line, "Key Up %d:  %d(%c) %d %d\n", keyup_seq, keyup_key, keyup_key, keyup_x, keyup_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Key Up %d:  %d(%c) %d %d\n", keyup_seq, keyup_key, keyup_key, keyup_x, keyup_y );
   }
 
   if ( specialup_called )
   {
-    sprintf ( line, "Special Up %d:  %d(%c) %d %d\n", specialup_seq, specialup_key, specialup_key, specialup_x, specialup_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Special Up %d:  %d(%c) %d %d\n", specialup_seq, specialup_key, specialup_key, specialup_x, specialup_y );
   }
 
   if ( joystick_called )
   {
-    sprintf ( line, "Joystick %d:  %d %d %d %d\n", joystick_seq, joystick_a, joystick_b, joystick_c, joystick_d );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Joystick %d:  %d %d %d %d\n", joystick_seq, joystick_a, joystick_b, joystick_c, joystick_d );
   }
 
   if ( mouse_called )
   {
-    sprintf ( line, "Mouse %d:  %d %d %d %d\n", mouse_seq, mouse_button, mouse_updown, mouse_x, mouse_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Mouse %d:  %d %d %d %d\n", mouse_seq, mouse_button, mouse_updown, mouse_x, mouse_y );
   }
 
   if ( mousewheel_called )
   {
-    sprintf ( line, "Mouse Wheel %d:  %d %d %d %d\n", mousewheel_seq, mousewheel_number, mousewheel_direction, mousewheel_x, mousewheel_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Mouse Wheel %d:  %d %d %d %d\n", mousewheel_seq, mousewheel_number, mousewheel_direction, mousewheel_x, mousewheel_y );
   }
 
   if ( motion_called )
   {
-    sprintf ( line, "Motion %d:  %d %d\n", motion_seq, motion_x, motion_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Motion %d:  %d %d\n", motion_seq, motion_x, motion_y );
   }
 
   if ( passivemotion_called )
   {
-    sprintf ( line, "Passive Motion %d:  %d %d\n", passivemotion_seq, passivemotion_x, passivemotion_y );
-    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)line );
+    bitmapPrintf ( "Passive Motion %d:  %d %d\n", passivemotion_seq, passivemotion_x, passivemotion_y );
   }
 
   glMatrixMode ( GL_PROJECTION );

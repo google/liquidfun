@@ -29,6 +29,7 @@
 /* Include Files */
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <math.h>
 #include <GL/freeglut.h>
@@ -242,10 +243,19 @@ void draw_curve ( int index, double position [ NUM_POINTS ][3] )
   glEnd () ;
 }
 
+void bitmapPrintf (const char *fmt, ...)
+{
+    static char buf[256];
+    va_list args;
+
+    va_start(args, fmt);
+    (void) vsnprintf (buf, sizeof(buf), fmt, args);
+    va_end(args);
+    glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)buf ) ;
+}
+
 void display_cb ( void )
 {
-  char string [ 80 ] ;
-
   glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
 
   glColor3d ( 1.0, 1.0, 1.0 ) ;  /* White */
@@ -267,9 +277,8 @@ void display_cb ( void )
 
   /* Print the distance between the two points */
   glColor3d ( 1.0, 1.0, 1.0 ) ;  /* White */
-  sprintf ( string, "Distance: %10.6f", distance ) ;
   glRasterPos2i ( 1, 1 ) ;
-  glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)string ) ;
+  bitmapPrintf ( "Distance: %10.6f", distance ) ;
 
   glutSwapBuffers();
 }
