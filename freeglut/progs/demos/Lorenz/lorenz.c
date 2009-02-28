@@ -268,7 +268,7 @@ void display_cb ( void )
   /* Print the distance between the two points */
   glColor3d ( 1.0, 1.0, 1.0 ) ;  /* White */
   sprintf ( string, "Distance: %10.6f", distance ) ;
-  glRasterPos2i ( 10, 10 ) ;
+  glRasterPos2i ( 1, 1 ) ;
   glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)string ) ;
 
   glutSwapBuffers();
