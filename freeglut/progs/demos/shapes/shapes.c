@@ -41,7 +41,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef WIN32
+#ifdef _MSC_VER
 /* DUMP MEMORY LEAKS */
 #include <crtdbg.h>
 #endif
@@ -395,7 +395,7 @@ main(int argc, char *argv[])
 
     glutMainLoop();
 
-#ifdef WIN32
+#ifdef _MSC_VER
     /* DUMP MEMORY LEAK INFORMATION */
     _CrtDumpMemoryLeaks () ;
 #endif

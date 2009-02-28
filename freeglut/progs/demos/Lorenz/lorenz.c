@@ -33,7 +33,7 @@
 #include <string.h>
 #include <math.h>
 #include <GL/freeglut.h>
-#ifdef WIN32
+#ifdef _MSC_VER
 /* DUMP MEMORY LEAKS */
 #include <crtdbg.h>
 #endif
@@ -365,7 +365,7 @@ int main ( int argc, char *argv[] )
   /* Enter the GLUT main loop */
   glutMainLoop () ;
 
-#ifdef WIN32
+#ifdef _MSC_VER
   /* DUMP MEMORY LEAK INFORMATION */
   _CrtDumpMemoryLeaks () ;
 #endif
