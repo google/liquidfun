@@ -22,13 +22,13 @@ AC_SUBST([LIBTOOL_DEPS])
 AC_PATH_XTRA
 
 if test x"$no_x" = xyes; then
-  GL_LIBS="-lopengl32 -lglu32 -lgdi32 -lwinmm"
+  GL_LIBS="-lopengl32 -lgdi32 -lwinmm"
   LIBXXF86VM=
   LIBXI=
   VERSION_INFO=
   EXPORT_FLAGS="-DFREEGLUT_EXPORTS"
 else
-  GL_LIBS="-lGL -lGLU -lXext -lX11"
+  GL_LIBS="-lGL -lXext -lX11"
   AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode],
                [LIBXXF86VM=-lXxf86vm], [LIBXXF86VM=],
                [$X_LIBS -lXext -lX11])
