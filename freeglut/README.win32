@@ -82,8 +82,22 @@ not necessary as the header file includes a pragma telling the compiler which
 library file to look for.
 
 
-If you don't have MSVC or Open Watcom
-=====================================
+Building and Installing the Libraries with Cygwin
+=================================================
+
+To build "freeglut" under Cygwin, you have two choices:
+
+- You can build a normal Cygwin library, which depends on Cygwin's X11
+  libraries. To do this, you can just use the normal autotools incantation:
+      ./configure && make install
+
+- Alternatively, you can build a DLL which does not depend on X11 and links
+  against the opengl32 DLL. To do this, configure need a few more flags:
+      ./configure CPPFLAGS=-mno-cygwin LDFLAGS=-mno-cygwin --without-x && make install
+
+
+If you don't have MSVC, Open Watcom or Cygwin
+=============================================
 
 The "freeglut" developers' community discussed the possibility of distributing
 binaries and decided against it.  If you need Windows library files, please
