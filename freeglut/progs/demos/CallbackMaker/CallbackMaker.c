@@ -37,7 +37,11 @@ bitmapPrintf (const char *fmt, ...)
     va_list args;
 
     va_start(args, fmt);
+#if defined(WIN32) && !defined(__CYGWIN__)
+    (void) _vsnprintf (buf, sizeof(buf), fmt, args);
+#else
     (void) vsnprintf (buf, sizeof(buf), fmt, args);
+#endif
     va_end(args);
     glutBitmapString ( GLUT_BITMAP_HELVETICA_12, (unsigned char*)buf ) ;
 }
