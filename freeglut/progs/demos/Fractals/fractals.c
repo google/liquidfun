@@ -33,7 +33,7 @@ typedef struct
 AffineTrans ;
 
 /* Number of levels to draw the fractal */
-static int num_levels = 0 ;
+static int num_levels = 4 ;
 
 /* The definition of the fractal */
 static int num_trans ;
