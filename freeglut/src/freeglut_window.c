@@ -132,14 +132,22 @@ GLXFBConfig* fgChooseFBConfig( void )
             ATTRIB_VAL( GLX_ACCUM_ALPHA_SIZE, 1 );
     }
 
-    if ((fgState.DisplayMode & GLUT_AUX)
-     || (fgState.DisplayMode & GLUT_AUX1)
-     || (fgState.DisplayMode & GLUT_AUX2)
-     || (fgState.DisplayMode & GLUT_AUX3)
-     || (fgState.DisplayMode & GLUT_AUX4))
-      {
-        ATTRIB_VAL(GLX_AUX_BUFFERS, fgState.AuxiliaryBufferNumber)
-      }
+    if( fgState.DisplayMode & GLUT_AUX4 )
+    {
+        ATTRIB_VAL(GLX_AUX_BUFFERS, 4);
+    }
+    else if( fgState.DisplayMode & GLUT_AUX3 )
+    {
+        ATTRIB_VAL(GLX_AUX_BUFFERS, 3);
+    }
+    else if( fgState.DisplayMode & GLUT_AUX2 )
+    {
+        ATTRIB_VAL(GLX_AUX_BUFFERS, 2);
+    }
+    else if( fgState.DisplayMode & GLUT_AUX1 ) /* NOTE: Same as GLUT_AUX! */
+    {
+        ATTRIB_VAL(GLX_AUX_BUFFERS, fgState.AuxiliaryBufferNumber);
+    }
 
     if (fgState.DisplayMode & GLUT_MULTISAMPLE)
       {
@@ -427,8 +435,8 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
         pfd.cAuxBuffers = 3;
     else if( fgState.DisplayMode & GLUT_AUX2 )
         pfd.cAuxBuffers = 2;
-    else if( fgState.DisplayMode & GLUT_AUX1 )
-        pfd.cAuxBuffers = 1;
+    else if( fgState.DisplayMode & GLUT_AUX1 ) /* NOTE: Same as GLUT_AUX! */
+        pfd.cAuxBuffers = fgState.AuxiliaryBufferNumber;
     else
         pfd.cAuxBuffers = 0;
 
@@ -497,7 +505,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
 
                         pAttributes[iCounter++]=WGL_DOUBLE_BUFFER_ARB;        pAttributes[iCounter++]=(fgState.DisplayMode & GLUT_DOUBLE)!=0;
                         pAttributes[iCounter++]=WGL_SAMPLE_BUFFERS_ARB;        pAttributes[iCounter++]=GL_TRUE;
-                        pAttributes[iCounter++]=WGL_SAMPLES_ARB;            pAttributes[iCounter++]=4;
+                        pAttributes[iCounter++]=WGL_SAMPLES_ARB;            pAttributes[iCounter++]=fgState.SampleNumber;
                         pAttributes[iCounter++]=0;                            pAttributes[iCounter++]=0;    /* terminator */
 
                         bValid = wglChoosePixelFormatARBProc(window->Window.Device,pAttributes,fAttributes,1,&iPixelFormat,&numFormats);

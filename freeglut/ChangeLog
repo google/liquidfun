@@ -1,5 +1,16 @@
 2009-03-16  Sven Panne  <sven.panne@aedion.de>
 
+	* src/freeglut_init.c,src/freeglut_window.c: Set the default number of
+	  samples per pixel to 4 and actually use the value set with
+	  glutSetOption(GLUT_MULTISAMPLE,...) in Windows code. Previously the
+	  Windows code used a hardwired value of 4 and the GLX code had a
+	  default of 0, neither made much sense. Similarly, set the default
+	  number of auxiliary buffers to 1 and use that value when GLUT_AUX is
+	  used. Note: There latter token has the same value as GLUT_AUX1, and
+	  for historical reasons we seem to have 2 APIs to set the number of
+	  auxiliary buffers: Explicitly using GLUT_AUX1 ... GLUT_AUX4, and using
+	  a combination of GLUT_AUX with glutSetOption. The default of 1 ensures
+	  consistent behaviour in both cases.
 	* src/freeglut_state.c: Added GLUT_AUX and GLUT_MULTISAMPLE as possible
 	  parameters for glutGet, making things more symmetric with
 	  glutSetOption.

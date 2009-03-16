@@ -84,8 +84,8 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       NULL,                   /* ProgramName */
                       GL_FALSE,               /* JoysticksInitialised */
                       GL_FALSE,               /* InputDevsInitialised */
-                      0,                      /* AuxiliaryBufferNumber */
-                      0,                      /* SampleNumber */
+                      1,                      /* AuxiliaryBufferNumber */
+                      4,                      /* SampleNumber */
                       1,                      /* MajorVersion */
                       0,                      /* MajorVersion */
                       0                       /* ContextFlags */
