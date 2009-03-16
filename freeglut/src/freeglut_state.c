@@ -537,11 +537,15 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     case GLUT_DIRECT_RENDERING:
         return fgState.DirectContext;
-        break;
 
     case GLUT_FULL_SCREEN:
         return fghCheckFullScreen();
-        break;
+
+    case GLUT_AUX:
+      return fgState.AuxiliaryBufferNumber;
+
+    case GLUT_MULTISAMPLE:
+      return fgState.SampleNumber;
 
     default:
         fgWarning( "glutGet(): missing enum handle %d", eWhat );

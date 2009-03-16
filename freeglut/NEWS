@@ -37,7 +37,7 @@ Mar ??, 2009:
 
     * Added new API entry to de-initialize freeglut:
 
-        glutExit( void );
+        void glutExit( void );
 
     * Added more special keys: GLUT_KEY_NUM_LOCK, GLUT_KEY_BEGIN GLUT_KEY_DELETE
 
@@ -45,9 +45,11 @@ Mar ??, 2009:
       constants GLUT_CAPTIONLESS and GLUT_BORDERLESS for glutInitDisplayMode
       (currently works for Windows only).
 
-    * Added support for multisampling: glutSetOption() accepts GLUT_MULTISAMPLE
-      now. The possible number of samples per pixels can be queried via the new
-      API entry
+    * Added support for multisampling: The number of samples per pixel to use
+      when GLUT_MULTISAMPLE is specified in glutInitDisplayMode() can be set via
+      glutSetOption() with parameter GLUT_MULTISAMPLE now. glutGetOption() with
+      the same token retrieves that value. The possible number of samples per
+      pixels can be queried via the new API entry
 
         int *glutGetModeValues( GLenum mode, int *size );
 

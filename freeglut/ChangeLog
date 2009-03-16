@@ -1,5 +1,8 @@
 2009-03-16  Sven Panne  <sven.panne@aedion.de>
 
+	* src/freeglut_state.c: Added GLUT_AUX and GLUT_MULTISAMPLE as possible
+	  parameters for glutGet, making things more symmetric with
+	  glutSetOption.
 	* src/freeglutdll.def: Added missing API entries.
 
 2009-03-10  John F. Fay <john.fay.ctr@eglin.af.mil>
