@@ -1,3 +1,7 @@
+2009-03-16  Sven Panne  <sven.panne@aedion.de>
+
+	* src/freeglutdll.def: Added missing API entries.
+
 2009-03-10  John F. Fay <john.fay.ctr@eglin.af.mil>
 
 	* progs/demos/demos.dsw: Adding the "smooth_opengl3" demo

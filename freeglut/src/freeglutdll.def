@@ -1,6 +1,6 @@
 LIBRARY freeglutdll
 DESCRIPTION "Freeglut OpenGL Utility Toolkit"
-VERSION 2.4.0
+VERSION 2.6.0
 EXPORTS
 	glutInit
 	glutInitWindowPosition
@@ -151,3 +151,8 @@ EXPORTS
 	glutJoystickGetMinRange
 	glutJoystickGetMaxRange
 	glutJoystickGetCenter
+	glutExit
+	glutFullScreenToggle
+	glutGetModeValues
+	glutInitContextFlags
+	glutInitContextVersion
