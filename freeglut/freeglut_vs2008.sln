@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freeglut", "freeglut_vs2008.vcproj", "{1AE4E979-0D35-4747-BF8E-DD60358F49DB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freeglut_static", "freeglut_static_vs2008.vcproj", "{71AF75A0-52B6-4C1B-8E56-CB31C6741A18}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1AE4E979-0D35-4747-BF8E-DD60358F49DB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1AE4E979-0D35-4747-BF8E-DD60358F49DB}.Debug|Win32.Build.0 = Debug|Win32
+		{1AE4E979-0D35-4747-BF8E-DD60358F49DB}.Release|Win32.ActiveCfg = Release|Win32
+		{1AE4E979-0D35-4747-BF8E-DD60358F49DB}.Release|Win32.Build.0 = Release|Win32
+		{71AF75A0-52B6-4C1B-8E56-CB31C6741A18}.Debug|Win32.ActiveCfg = Debug|Win32
+		{71AF75A0-52B6-4C1B-8E56-CB31C6741A18}.Debug|Win32.Build.0 = Debug|Win32
+		{71AF75A0-52B6-4C1B-8E56-CB31C6741A18}.Release|Win32.ActiveCfg = Release|Win32
+		{71AF75A0-52B6-4C1B-8E56-CB31C6741A18}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
