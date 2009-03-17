@@ -677,6 +677,11 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     char* geometry = NULL;
     int i, j, argc = *pargc;
 
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    size_t sLen;
+    errno_t err;
+#endif
+
     if( fgState.Initialised )
         fgError( "illegal glutInit() reinitialization attempt" );
 
@@ -696,7 +701,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /* check if GLUT_FPS env var is set */
 #ifndef _WIN32_WCE
     {
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+        char* fps = NULL;
+        err = _dupenv_s( &fps, &sLen, "GLUT_FPS" );
+        if (err)
+            fgError("Error getting GLUT_FPS environment variable"); 
+#else
         const char *fps = getenv( "GLUT_FPS" );
+#endif
         if( fps )
         {
             int interval;
@@ -707,9 +719,18 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             else
                 fgState.FPSInterval = interval;
         }
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+        free ( fps );  fps = NULL;  /* dupenv_s allocates a string that we must free */
+#endif
     }
 
-    displayName = getenv( "DISPLAY");
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    err = _dupenv_s( &displayName, &sLen, "DISPLAY" );
+    if (err)
+        fgError("Error getting DISPLAY environment variable");
+#else
+    displayName = getenv( "DISPLAY" );
+#endif
 
     for( i = 1; i < argc; i++ )
     {
@@ -794,6 +815,9 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * variable for opening the X display (see code above):
      */
     fghInitialize( displayName );
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    free ( displayName );  displayName = NULL;  /* dupenv_s allocates a string that we must free */
+#endif
 
     /*
      * Geometry parsing deffered until here because we may need the screen
@@ -892,12 +916,19 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
      * delimited by blanks or tabs.
      */
     char *token ;
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    char *next_token = NULL;
+#endif
     size_t len = strlen ( displayMode );
     char *buffer = (char *)malloc ( (len+1) * sizeof(char) );
     memcpy ( buffer, displayMode, len );
     buffer[len] = '\0';
 
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    token = strtok_s ( buffer, " \t", &next_token );
+#else
     token = strtok ( buffer, " \t" );
+#endif
     while ( token )
     {
         /* Process this token */
@@ -1074,7 +1105,11 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
             break ;
         }
 
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+        token = strtok_s ( NULL, " \t", &next_token );
+#else
         token = strtok ( NULL, " \t" );
+#endif
     }
 
     free ( buffer );
