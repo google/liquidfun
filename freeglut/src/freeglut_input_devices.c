@@ -136,15 +136,16 @@ int fgInputDeviceDetect( void )
  */
 void fgInitialiseInputDevices ( void )
 {
-    const char *dial_device=NULL;
     if( !fgState.InputDevsInitialised )
     {
 #if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+        char *dial_device=NULL;
         size_t sLen;
         errno_t err = _dupenv_s( &dial_device, &sLen, "GLUT_DIALS_SERIAL" );
         if (err)
             fgError("Error getting GLUT_DIALS_SERIAL environment variable");
 #else
+        const char *dial_device=NULL;
         dial_device = getenv ( "GLUT_DIALS_SERIAL" );
 #endif
 #if TARGET_HOST_MS_WINDOWS
