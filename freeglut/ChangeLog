@@ -1,3 +1,37 @@
+2009-03-26  Sven Panne  <sven.panne@aedion.de>
+
+	* src/freeglut_init.c,src/freeglut_input_devices.c: Unbreak the build:
+	  C++ style comments are not allowed in ISO C90
+
+2009-03-19  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_input_devices.c: Fixing "freeglut_input_devices.c" for
+	  MSVS2005 and later per e-mail from Diederick Niehorster dated Thu
+	  3/19/2009 6:57 AM
+
+2009-03-17  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_init.c, src/freeglut_input_devices.c: Removing some build
+	  warnings from deprecated functions for VS2008 per e-mail from
+	  Diederick Niehorster dated Tue 3/10/2009
+	* freeglut_static_vs2008.vcproj, freeglut_vs2008.sln,
+	  freeglut_vs2008.vcproj,
+	  progs/demos/CallbackMaker/CallbackMakerStatic_vs2008.vcproj,
+	  progs/demos/CallbackMaker/CallbackMaker_vs2008.vcproj,
+	  progs/demos/Fractals/FractalsStatic_vs2008.vcproj,
+	  progs/demos/Fractals/Fractals_vs2008.vcproj,
+	  progs/demos/Fractals_random/Fractals_randomStatic_vs2008.vcproj,
+	  progs/demos/Fractals_random/Fractals_random_vs2008.vcproj,
+	  progs/demos/Lorenz/lorenzStatic_vs2008.vcproj,
+	  progs/demos/Lorenz/lorenz_vs2008.vcproj,
+	  progs/demos/One/oneStatic_vs2008.vcproj,
+	  progs/demos/One/one_vs2008.vcproj, progs/demos/demos_vs2008.sln,
+	  progs/demos/shapes/shapesStatic_vs2008.vcproj,
+	  progs/demos/shapes/shapes_vs2008.vcproj,
+	  progs/demos/smooth_opengl3/smooth_opengl3Static_vs2008.vcproj,
+	  progs/demos/smooth_opengl3/smooth_opengl3_vs2008.vcproj: Adding Visual
+	  Studio 2008 solution and project files
+
 2009-03-16  Sven Panne  <sven.panne@aedion.de>
 
 	* src/freeglut_init.c,src/freeglut_window.c: Set the default number of
