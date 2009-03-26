@@ -677,7 +677,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     char* geometry = NULL;
     int i, j, argc = *pargc;
 
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
     size_t sLen;
     errno_t err;
 #endif
@@ -701,7 +702,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /* check if GLUT_FPS env var is set */
 #ifndef _WIN32_WCE
     {
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
         char* fps = NULL;
         err = _dupenv_s( &fps, &sLen, "GLUT_FPS" );
         if (err)
@@ -719,12 +721,14 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             else
                 fgState.FPSInterval = interval;
         }
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
         free ( fps );  fps = NULL;  /* dupenv_s allocates a string that we must free */
 #endif
     }
 
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
     err = _dupenv_s( &displayName, &sLen, "DISPLAY" );
     if (err)
         fgError("Error getting DISPLAY environment variable");
@@ -815,7 +819,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * variable for opening the X display (see code above):
      */
     fghInitialize( displayName );
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
     free ( displayName );  displayName = NULL;  /* dupenv_s allocates a string that we must free */
 #endif
 
@@ -916,7 +921,8 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
      * delimited by blanks or tabs.
      */
     char *token ;
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
     char *next_token = NULL;
 #endif
     size_t len = strlen ( displayMode );
@@ -924,7 +930,8 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
     memcpy ( buffer, displayMode, len );
     buffer[len] = '\0';
 
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
     token = strtok_s ( buffer, " \t", &next_token );
 #else
     token = strtok ( buffer, " \t" );
@@ -1105,7 +1112,8 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
             break ;
         }
 
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+    /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
         token = strtok_s ( NULL, " \t", &next_token );
 #else
         token = strtok ( NULL, " \t" );

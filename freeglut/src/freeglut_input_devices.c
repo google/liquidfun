@@ -138,7 +138,8 @@ void fgInitialiseInputDevices ( void )
 {
     if( !fgState.InputDevsInitialised )
     {
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+      /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
         char *dial_device=NULL;
         size_t sLen;
         errno_t err = _dupenv_s( &dial_device, &sLen, "GLUT_DIALS_SERIAL" );
@@ -164,7 +165,8 @@ void fgInitialiseInputDevices ( void )
 #endif
         if ( !dial_device ) return;
         if ( !( dialbox_port = serial_open ( dial_device ) ) ) return;
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) // will return true for VC8 (VC2005) and higher
+      /* will return true for VC8 (VC2005) and higher */
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
         free ( dial_device );  dial_device = NULL;  /* dupenv_s allocates a string that we must free */
 #endif
         serial_putchar(dialbox_port,DIAL_INITIALIZE);
