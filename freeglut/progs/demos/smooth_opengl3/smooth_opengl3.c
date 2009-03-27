@@ -45,6 +45,7 @@
 #include <GL/freeglut.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <string.h>
 
 /* report GL errors, if any, to stderr */
@@ -397,9 +398,9 @@ void reshape (int w, int h)
 {
    glViewport (0, 0, (GLsizei) w, (GLsizei) h);
    if (w <= h) {
-      loadOrtho2Df (projectionMatrix, 0.0, 30.0, 0.0, 30.0 * (GLfloat) h/(GLfloat) w);
+      loadOrtho2Df (projectionMatrix, 0.0f, 30.0f, 0.0f, 30.0f * (GLfloat) h/(GLfloat) w);
    } else {
-      loadOrtho2Df (projectionMatrix, 0.0, 30.0 * (GLfloat) w/(GLfloat) h, 0.0, 30.0);
+      loadOrtho2Df (projectionMatrix, 0.0f, 30.0f * (GLfloat) w/(GLfloat) h, 0.0f, 30.0f);
    }
    checkError ("reshape");
 }

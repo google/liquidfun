@@ -1,3 +1,8 @@
+2009-03-27  Sven Panne  <sven.panne@aedion.de>
+
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Make Visual C happy by
+	  including stddef.h and explicitly marking some literals as float.
+
 2009-03-26  Sven Panne  <sven.panne@aedion.de>
 
 	* src/freeglut_init.c,src/freeglut_input_devices.c: Unbreak the build:
