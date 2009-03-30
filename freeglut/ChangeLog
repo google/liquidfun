@@ -1,3 +1,8 @@
+2009-03-30  Sven Panne  <sven.panne@aedion.de>
+
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Make the example fully
+	  OpenGL-3.1-compliant.
+
 2009-03-27  Sven Panne  <sven.panne@aedion.de>
 
 	* progs/demos/smooth_opengl3/smooth_opengl3.c: Make Visual C happy by

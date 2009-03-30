@@ -1,7 +1,7 @@
 /*
  * smooth_opengl3.c, based on smooth.c, which is (c) by SGI, see below.
  * This program demonstrates smooth shading in a way which is fully
- * OpenGL-3.0-compliant.
+ * OpenGL-3.1-compliant.
  * A smooth shaded polygon is drawn in a 2-D projection.
  */
 
@@ -211,23 +211,25 @@ void initBuffer(void)
 }
 
 const ourGLchar *vertexShaderSource[] = {
-   "#version 130\n",
+   "#version 140\n",
    "uniform mat4 fg_ProjectionMatrix;\n",
    "in vec4 fg_Color;\n",
    "in vec4 fg_Vertex;\n",
-   "void main(void)\n",
+   "smooth out vec4 fg_SmoothColor;\n",
+   "void main()\n",
    "{\n",
-   "   gl_FrontColor = fg_Color;\n",
+   "   fg_SmoothColor = fg_Color;\n",
    "   gl_Position = fg_ProjectionMatrix * fg_Vertex;\n",
    "}\n"
 };
 
 const ourGLchar *fragmentShaderSource[] = {
-   "#version 130\n",
+   "#version 140\n",
+   "smooth in vec4 fg_SmoothColor;\n",
    "out vec4 fg_FragColor;\n",
    "void main(void)\n",
    "{\n",
-   "   fg_FragColor = gl_Color;\n",
+   "   fg_FragColor = fg_SmoothColor;\n",
    "}\n"
 };
 
@@ -316,7 +318,6 @@ void initShader(void)
 void initRendering(void)
 {
    glClearColor (0.0, 0.0, 0.0, 0.0);
-   glShadeModel (GL_SMOOTH);
    checkError ("initRendering");
 }
 
@@ -418,9 +419,9 @@ int main(int argc, char** argv)
 {
    glutInit(&argc, argv);
    glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
-   /* add command line argument "classic" for a pre-3.0 context */
+   /* add command line argument "classic" for a pre-3.x context */
    if ((argc != 2) || (strcmp (argv[1], "classic") != 0)) {
-      glutInitContextVersion (3, 0);
+      glutInitContextVersion (3, 1);
       glutInitContextFlags (GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
    }
    glutInitWindowSize (500, 500); 
