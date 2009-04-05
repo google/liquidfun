@@ -1,3 +1,12 @@
+2009-04-05  Sven Panne  <sven.panne@aedion.de>
+
+	* .cvsignore,doc/.cvsignore,include/.cvsignore,include/GL/.cvsignore,
+	  progs/.cvsignore,progs/demos/.cvsignore,
+	  progs/demos/CallbackMaker/.cvsignore,progs/demos/Fractals/.cvsignore,
+	  progs/demos/Fractals_random/.cvsignore,progs/demos/Lorenz/.cvsignore,
+	  progs/demos/One/.cvsignore,progs/demos/shapes/.cvsignore,
+	  src/.cvsignore: Removed remnants of CVS.
+
 2009-03-30  Sven Panne  <sven.panne@aedion.de>
 
 	* progs/demos/smooth_opengl3/smooth_opengl3.c: Make the example fully
