@@ -1,5 +1,6 @@
 2009-04-05  Sven Panne  <sven.panne@aedion.de>
 
+	* Makefile.am: Added more project/workspace/... files to distribution.
 	* .cvsignore,doc/.cvsignore,include/.cvsignore,include/GL/.cvsignore,
 	  progs/.cvsignore,progs/demos/.cvsignore,
 	  progs/demos/CallbackMaker/.cvsignore,progs/demos/Fractals/.cvsignore,
