@@ -1,5 +1,5 @@
 #
-# spec file for package freeglut (Version 2.4.0)
+# spec file for package freeglut (Version 2.6.0)
 #
 # Copyright (c) 2005 SUSE LINUX Products GmbH, Nuernberg, Germany.
 # This file and all modifications and additions to the pristine
@@ -15,7 +15,7 @@ BuildRequires:  Mesa-devel gcc-c++ libdrm-devel
 
 Name:         freeglut
 Summary:      Freely Licensed Alternative to the GLUT Library
-Version:      2.4.0
+Version:      2.6.0
 Release:      1
 URL:          http://freeglut.sourceforge.net/
 Source0:      http://switch.dl.sourceforge.net/sourceforge/freeglut/freeglut-%{version}.tar.gz
@@ -108,6 +108,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libglut.so
 
 %changelog -n freeglut
+* Sun Apr 05 2009 - sven.panne@aedion.de
+- updated to release 2.6.0
 * Sat Aug 05 2006 - sven.panne@aedion.de
 - Updated build requirements for SuSE 10.1
 * Mon Jun 13 2005 - sven.panne@aedion.de

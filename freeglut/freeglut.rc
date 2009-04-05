@@ -2,8 +2,8 @@
 /* 0 ICON DISCARDABLE "OpenGL.ico" */
 
 1 VERSIONINFO
- FILEVERSION 2,4,0,0
- PRODUCTVERSION 2,4,0,0
+ FILEVERSION 2,6,0,0
+ PRODUCTVERSION 2,6,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -21,14 +21,14 @@ BEGIN
             /* VALUE "Comments", "\0" */
             /* VALUE "CompanyName", "\0" */
             VALUE "FileDescription", "Freeglut OpenGL Utility Toolkit\0"
-            VALUE "FileVersion", "2, 4, 0, 0\0"
+            VALUE "FileVersion", "2, 6, 0, 0\0"
             VALUE "InternalName", "freeglutdll\0"
             VALUE "LegalCopyright", "Copyright © 1999-2000 Pawel W. Olszta\0"
             /* VALUE "LegalTrademarks", "\0" */
             VALUE "OriginalFilename", "freeglut.dll\0"
             /* VALUE "PrivateBuild", "\0" */
             VALUE "ProductName", "Freeglut OpenGL Utility Toolkit\0"
-            VALUE "ProductVersion", "2, 4, 0, 0\0"
+            VALUE "ProductVersion", "2, 6, 0, 0\0"
             /* VALUE "SpecialBuild", "\0" */
         END
     END
