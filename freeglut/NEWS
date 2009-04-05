@@ -47,9 +47,9 @@ Mar ??, 2009:
 
     * Added support for multisampling: The number of samples per pixel to use
       when GLUT_MULTISAMPLE is specified in glutInitDisplayMode() can be set via
-      glutSetOption() with parameter GLUT_MULTISAMPLE now. glutGetOption() with
-      the same token retrieves that value. The possible number of samples per
-      pixels can be queried via the new API entry
+      glutSetOption() with parameter GLUT_MULTISAMPLE now. glutGet() with the
+      same token retrieves that value. The possible number of samples per pixels
+      can be queried via the new API entry
 
         int *glutGetModeValues( GLenum mode, int *size );
 
