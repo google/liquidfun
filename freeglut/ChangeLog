@@ -1,3 +1,7 @@
+2009-05-22  Sven Panne  <sven.panne@aedion.de>
+
+	* src/freeglutdll.def: Removed obsolete lines. Fixed version number.
+
 2009-04-05  Sven Panne  <sven.panne@aedion.de>
 
 	* Makefile.am: Added more project/workspace/... files to distribution.
