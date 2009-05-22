@@ -1,4 +1,7 @@
 2009-05-22  Sven Panne  <sven.panne@aedion.de>
+	* include/GL/freeglut_std.h: Avoid warnings when the ATEXIT_HACK is used
+	  with GCC, making the hack even uglier.
+
 	* include/GL/freeglut_std.h,src/freeglut_init.c,src/freeglut_internal.h,
 	  src/freeglut_menu.c,src/freeglut_window.c,src/freeglutdll.def: Added the
 	  ugly ATEXIT_HACK from GLUT 3.7, making freeglut binary compatible with the

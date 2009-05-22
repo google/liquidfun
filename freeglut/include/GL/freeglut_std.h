@@ -604,11 +604,16 @@ FGAPI void FGAPIENTRY __glutInitWithExit(int *argcp, char **argv, void (__cdecl 
 FGAPI int FGAPIENTRY __glutCreateWindowWithExit(const char *title, void (__cdecl *exitfunc)(int));
 FGAPI int FGAPIENTRY __glutCreateMenuWithExit(void (* func)(int), void (__cdecl *exitfunc)(int));
 #ifndef FREEGLUT_BUILDING_LIB
-static void FGAPIENTRY glutInit_ATEXIT_HACK(int *argcp, char **argv) { __glutInitWithExit(argcp, argv, exit); }
+#if defined(__GNUC__)
+#define FGUNUSED __attribute__((unused))
+#else
+#define FGUNUSED
+#endif
+static void FGAPIENTRY FGUNUSED glutInit_ATEXIT_HACK(int *argcp, char **argv) { __glutInitWithExit(argcp, argv, exit); }
 #define glutInit glutInit_ATEXIT_HACK
-static int FGAPIENTRY glutCreateWindow_ATEXIT_HACK(const char *title) { return __glutCreateWindowWithExit(title, exit); }
+static int FGAPIENTRY FGUNUSED glutCreateWindow_ATEXIT_HACK(const char *title) { return __glutCreateWindowWithExit(title, exit); }
 #define glutCreateWindow glutCreateWindow_ATEXIT_HACK
-static int FGAPIENTRY glutCreateMenu_ATEXIT_HACK(void (* func)(int)) { return __glutCreateMenuWithExit(func, exit); }
+static int FGAPIENTRY FGUNUSED glutCreateMenu_ATEXIT_HACK(void (* func)(int)) { return __glutCreateMenuWithExit(func, exit); }
 #define glutCreateMenu glutCreateMenu_ATEXIT_HACK
 #endif
 #endif
