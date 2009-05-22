@@ -779,11 +779,13 @@ int FGAPIENTRY glutCreateMenu( void(* callback)( int ) )
     return fgCreateMenu( callback )->ID;
 }
 
+#ifdef _WIN32
 int FGAPIENTRY __glutCreateMenuWithExit( void(* callback)( int ), void (__cdecl *exitfunc)(int) )
 {
   __glutExitFunc = exitfunc;
   return glutCreateMenu( callback );
 }
+#endif
 
 /*
  * Destroys a menu object, removing all references to it
