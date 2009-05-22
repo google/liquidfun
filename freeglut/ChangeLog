@@ -2,6 +2,10 @@
 
 	* src/freeglutdll.def: Removed obsolete lines. Fixed version number.
 
+	* freeglut_vs2008.vcproj: Use our module definition file, so we get
+	  undecorated names in the resulting DLL, just like the classic GLUT DLL
+	  from Nate Robins.
+
 2009-04-05  Sven Panne  <sven.panne@aedion.de>
 
 	* Makefile.am: Added more project/workspace/... files to distribution.
