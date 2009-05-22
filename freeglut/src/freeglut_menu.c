@@ -25,6 +25,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
@@ -776,6 +777,12 @@ int FGAPIENTRY glutCreateMenu( void(* callback)( int ) )
     /* The menu object creation code resides in freeglut_structure.c */
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateMenu" );
     return fgCreateMenu( callback )->ID;
+}
+
+int FGAPIENTRY __glutCreateMenuWithExit( void(* callback)( int ), void (__cdecl *exitfunc)(int) )
+{
+  __glutExitFunc = exitfunc;
+  return glutCreateMenu( callback );
 }
 
 /*

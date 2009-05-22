@@ -933,6 +933,10 @@ int fgHintPresent(Window window, Atom property, Atom hint);
 
 SFG_Proc fghGetProcAddress( const char *procName );
 
+#ifdef _WIN32
+extern void (__cdecl *__glutExitFunc)( int retval );
+#endif
+
 #endif /* FREEGLUT_INTERNAL_H */
 
 /*** END OF FILE ***/

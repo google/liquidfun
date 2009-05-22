@@ -25,6 +25,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
@@ -1091,6 +1092,14 @@ int FGAPIENTRY glutCreateWindow( const char* title )
                            fgState.Size.Use, fgState.Size.X, fgState.Size.Y,
                            GL_FALSE, GL_FALSE )->ID;
 }
+
+#ifdef _WIN32
+int FGAPIENTRY __glutCreateWindowWithExit( const char *title, void (__cdecl *exitfunc)(int) )
+{
+  __glutExitFunc = exitfunc;
+  return glutCreateWindow( title );
+}
+#endif
 
 /*
  * This function creates a sub window.

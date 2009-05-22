@@ -25,6 +25,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
@@ -852,6 +853,16 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             fgState.Position.Use = GL_TRUE;
     }
 }
+
+#ifdef _WIN32
+void (__cdecl *__glutExitFunc)( int retval ) = NULL;
+
+void FGAPIENTRY __glutInitWithExit( int *argcp, char **argv, void (__cdecl *exitfunc)(int) )
+{
+  __glutExitFunc = exitfunc;
+  glutInit(argcp, argv);
+}
+#endif
 
 /*
  * Undoes all the "glutInit" stuff

@@ -154,3 +154,6 @@ EXPORTS
 	glutGetModeValues
 	glutInitContextFlags
 	glutInitContextVersion
+	__glutInitWithExit
+	__glutCreateWindowWithExit
+	__glutCreateMenuWithExit

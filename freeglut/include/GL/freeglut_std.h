@@ -574,6 +574,45 @@ FGAPI void    FGAPIENTRY glutForceJoystickFunc( void );
 FGAPI int     FGAPIENTRY glutExtensionSupported( const char* extension );
 FGAPI void    FGAPIENTRY glutReportErrors( void );
 
+/* Comment from glut.h of classic GLUT:
+
+   Win32 has an annoying issue where there are multiple C run-time
+   libraries (CRTs).  If the executable is linked with a different CRT
+   from the GLUT DLL, the GLUT DLL will not share the same CRT static
+   data seen by the executable.  In particular, atexit callbacks registered
+   in the executable will not be called if GLUT calls its (different)
+   exit routine).  GLUT is typically built with the
+   "/MD" option (the CRT with multithreading DLL support), but the Visual
+   C++ linker default is "/ML" (the single threaded CRT).
+
+   One workaround to this issue is requiring users to always link with
+   the same CRT as GLUT is compiled with.  That requires users supply a
+   non-standard option.  GLUT 3.7 has its own built-in workaround where
+   the executable's "exit" function pointer is covertly passed to GLUT.
+   GLUT then calls the executable's exit function pointer to ensure that
+   any "atexit" calls registered by the application are called if GLUT
+   needs to exit.
+
+   Note that the __glut*WithExit routines should NEVER be called directly.
+   To avoid the atexit workaround, #define GLUT_DISABLE_ATEXIT_HACK. */
+
+/* to get the prototype for exit() */
+#include <stdlib.h>
+
+#if defined(_WIN32) && !defined(GLUT_DISABLE_ATEXIT_HACK)
+FGAPI void FGAPIENTRY __glutInitWithExit(int *argcp, char **argv, void (__cdecl *exitfunc)(int));
+FGAPI int FGAPIENTRY __glutCreateWindowWithExit(const char *title, void (__cdecl *exitfunc)(int));
+FGAPI int FGAPIENTRY __glutCreateMenuWithExit(void (* func)(int), void (__cdecl *exitfunc)(int));
+#ifndef FREEGLUT_BUILDING_LIB
+static void FGAPIENTRY glutInit_ATEXIT_HACK(int *argcp, char **argv) { __glutInitWithExit(argcp, argv, exit); }
+#define glutInit glutInit_ATEXIT_HACK
+static int FGAPIENTRY glutCreateWindow_ATEXIT_HACK(const char *title) { return __glutCreateWindowWithExit(title, exit); }
+#define glutCreateWindow glutCreateWindow_ATEXIT_HACK
+static int FGAPIENTRY glutCreateMenu_ATEXIT_HACK(void (* func)(int)) { return __glutCreateMenuWithExit(func, exit); }
+#define glutCreateMenu glutCreateMenu_ATEXIT_HACK
+#endif
+#endif
+
 #ifdef __cplusplus
     }
 #endif

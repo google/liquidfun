@@ -1,4 +1,8 @@
 2009-05-22  Sven Panne  <sven.panne@aedion.de>
+	* include/GL/freeglut_std.h,src/freeglut_init.c,src/freeglut_internal.h,
+	  src/freeglut_menu.c,src/freeglut_window.c,src/freeglutdll.def: Added the
+	  ugly ATEXIT_HACK from GLUT 3.7, making freeglut binary compatible with the
+	  GLUT DLLs out in the wild.
 
 	* src/freeglutdll.def: Removed obsolete lines. Fixed version number.
 
