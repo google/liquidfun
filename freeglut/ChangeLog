@@ -1,4 +1,13 @@
+2009-05-24  Sven Panne  <sven.panne@aedion.de>
+
+	* freeglut_static_vs2008.vcproj,freeglut_vs2008.vcproj,
+	  freeglut_vs2008.sln,freeglut_vs2008_static.sln: Move all files related
+	  to Visual Studio 2008 into 2 directories, one for the normal DLL
+	  build, and one for the static build. We should do this for other IDEs,
+	  too.
+
 2009-05-22  Sven Panne  <sven.panne@aedion.de>
+
 	* include/GL/freeglut_std.h: Avoid warnings when the ATEXIT_HACK is used
 	  with GCC, making the hack even uglier.
 
