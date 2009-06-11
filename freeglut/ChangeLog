@@ -1,3 +1,9 @@
+2009-06-11  Sven Panne  <sven.panne@aedion.de>
+
+	* include/GL/freeglut_std.h: Disable the ATEXIT_HACK for Watcom, their
+	"exit" function has a different calling convention, leading to
+	compilation errors.
+
 2009-05-24  Sven Panne  <sven.panne@aedion.de>
 
 	* freeglut_static_vs2008.vcproj,freeglut_vs2008.vcproj,

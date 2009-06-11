@@ -599,7 +599,7 @@ FGAPI void    FGAPIENTRY glutReportErrors( void );
 /* to get the prototype for exit() */
 #include <stdlib.h>
 
-#if defined(_WIN32) && !defined(GLUT_DISABLE_ATEXIT_HACK)
+#if defined(_WIN32) && !defined(GLUT_DISABLE_ATEXIT_HACK) && !defined(__WATCOMC__)
 FGAPI void FGAPIENTRY __glutInitWithExit(int *argcp, char **argv, void (__cdecl *exitfunc)(int));
 FGAPI int FGAPIENTRY __glutCreateWindowWithExit(const char *title, void (__cdecl *exitfunc)(int));
 FGAPI int FGAPIENTRY __glutCreateMenuWithExit(void (* func)(int), void (__cdecl *exitfunc)(int));
