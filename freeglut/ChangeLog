@@ -1,3 +1,7 @@
+2009-06-11  Paul Blew  <paul.blew@northgatearinso.com>
+
+	* replaced broken IDE based OpenWatcom build with a makefile based one
+
 2009-06-11  Sven Panne  <sven.panne@aedion.de>
 
 	* include/GL/freeglut_std.h: Disable the ATEXIT_HACK for Watcom, their

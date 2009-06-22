@@ -62,19 +62,29 @@ you will need to copy various files to various locations.
 Building and Installing the Libraries with Open Watcom
 ======================================================
 
-To build the "freeglut" libraries, open Watcom and load the "freeglut.wpj"
-file.  This will load the two target files.  Clicking on the "Make All
-Targets" button will build both the debug and the release versions of both
-libraries.
+Start a command prompt and change directory to the freeglut installation
+directory.  Type "wmake -f Makefile.wat all" to build the DLL and static
+libraries in both debug and release versions.
 
-The "make" script will copy the library files to the Open Watcom library
-folder and will copy "freeglut.dll" to the correct "System32" folder.  The
-library files are named "freeglut.lib" for the DLL version and
-"freeglut_static.lib"for the static library.
+To install "freeglut" on your system so that your other projects will see it,
+you will need to copy various files to various locations.
 
-You will need to copy the "freeglut" include files from their installed
-location ("freeglut\freeglut\include\GL") to the Open Watcom include directory
-("%WATCOM%\h\nt\GL").
+    - The header files "freeglut.h", "freeglut_ext.h", "freeglut_std.h", and
+      "glut.h" (distributed in the directory "freeglut\freeglut\include\GL")
+	  need to be copied to a "GL" directory under the Open Watcom 32-bit
+	  Windows include directory.  This usually has a path similar to
+			  "C:\WATCOM\h\nt\GL"
+    - The library file "freeglut.lib" or "freeglut_static.lib" (from the
+      corresponding debug or release directory) needs to be copied into the
+	  Open Watcom 32-bit Windows library directory.  This usually has a path
+	  similar to
+			  "C:\WATCOM\lib386\nt"
+    - If you are using the DLL version of "freeglut", the file "freeglut.dll"
+      needs to be copied from the Debug or the Release directory into the
+      DLL directory.  This usually has a path similar to
+              "C:\Windows\System32"
+      and will probably already have the files "opengl32.dll" and "glu32.dll".
+
 
 Unlike the *nix release, the library names are NOT automatic replacements for
 the GLUT library names.  You may rename them manually if you wish, but this is
