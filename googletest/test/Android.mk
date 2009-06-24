@@ -38,7 +38,7 @@ $(foreach file,$(1), \
 endef
 
 define host-test
-$(call _define-test,$(1),HOST_,-DGTEST_OS_LINUX -DGTEST_HAS_STD_STRING -O0)
+$(call _define-test,$(1),HOST_,-O0)
 endef
 
 # TODO: Figure out the right CFLAGS combination needed for bionic/astl.
