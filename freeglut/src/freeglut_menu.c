@@ -779,10 +779,10 @@ int FGAPIENTRY glutCreateMenu( void(* callback)( int ) )
     return fgCreateMenu( callback )->ID;
 }
 
-#ifdef _WIN32
-int FGAPIENTRY __glutCreateMenuWithExit( void(* callback)( int ), void (__cdecl *exitfunc)(int) )
+#ifdef TARGET_HOST_MS_WINDOWS
+int FGAPIENTRY __glutCreateMenuWithExit( void(* callback)( int ), void (__cdecl *exit_function)(int) )
 {
-  __glutExitFunc = exitfunc;
+  __glutExitFunc = exit_function;
   return glutCreateMenu( callback );
 }
 #endif

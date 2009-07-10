@@ -854,13 +854,13 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     }
 }
 
-#ifdef _WIN32
-void (__cdecl *__glutExitFunc)( int retval ) = NULL;
+#ifdef TARGET_HOST_MS_WINDOWS
+void (__cdecl *__glutExitFunc)( int return_value ) = NULL;
 
-void FGAPIENTRY __glutInitWithExit( int *argcp, char **argv, void (__cdecl *exitfunc)(int) )
+void FGAPIENTRY __glutInitWithExit( int *pargc, char **argv, void (__cdecl *exit_function)(int) )
 {
-  __glutExitFunc = exitfunc;
-  glutInit(argcp, argv);
+  __glutExitFunc = exit_function;
+  glutInit(pargc, argv);
 }
 #endif
 

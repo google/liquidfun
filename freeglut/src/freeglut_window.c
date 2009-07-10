@@ -1094,9 +1094,9 @@ int FGAPIENTRY glutCreateWindow( const char* title )
 }
 
 #ifdef _WIN32
-int FGAPIENTRY __glutCreateWindowWithExit( const char *title, void (__cdecl *exitfunc)(int) )
+int FGAPIENTRY __glutCreateWindowWithExit( const char *title, void (__cdecl *exit_function)(int) )
 {
-  __glutExitFunc = exitfunc;
+  __glutExitFunc = exit_function;
   return glutCreateWindow( title );
 }
 #endif
