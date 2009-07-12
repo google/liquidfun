@@ -1,0 +1,218 @@
+Glut alors!
+
+Par Jean-Seb le vendredi 10 juillet 2009, 00:18
+
+
+Freeglut est une évolution open-source de Glut.
+Sous Windows, on peut l'utiliser avec Cygwin.
+Facile ? Oui, si on accepte de distribuer "cygwin1.dll"
+Aidons Freeglut à conquérir son indépendance !
+m.à.j 10/7/2009 : génération d'une librairie pour linker depuis la dll.
+
+
+Récupération des sources
+
+    * Reprenez les sources de la version 2.6.0 qui intègre les changements
+      récents.
+    * Pour l'instant, il s'agit d'une RC (Release Candidate), mais la version
+      finale ne saurait tarder.
+    * L'utilisation de la 2.6 est préférable à la branche 2.4-stable, de
+      nombreux bugs étant corrigés.
+    * Vous trouverez les sources sur le site de Freeglut:
+          o http://freeglut.sourceforge.net/
+
+
+Principe
+Objectif
+
+    * Nous allons créer une dll liée à Cygwin, et une bibliothèque statique
+      indépendante
+    * Nous créerons également une librairie dynamique, permettant de linker avec
+      la dll.
+
+Liste des fichiers générés
+
+    * freeglut.dll : une dll classique pour le linkage dynamique.
+    * libfreeglut.a : la bibliothèque statique. Le programme final est autonome
+      (du moins pour OpenGL).
+    * libfreeglutdll.a : la bibliothèque dynamique. Le programme final a besoin
+      de freeglut.dll.
+
+
+Préparation
+
+    * Dépliez l'archive freeglut.
+    * Allez dans le répertoire src (situé à la racine du répertoire Freeglut),
+      et créez un sous-répertoire "Gl"
+          o Dans ce sous-répertoire, copiez les fichiers du répertoire
+            "include/Gl"
+
+    * Pourquoi faut-il créer un répertoire "Gl" pour la compilation ?
+          o C'était juste pour simplifier les choses lors de mes essais.
+          o Sinon vous pouvez créer directement les répertoires, et copier les
+            fichiers comme indiqué au point installation (lire plus loin).
+
+    * Faites un peu de ménage dans /lib :
+          o Effacez toutes les références à la glut, pour ne pas avoir de
+            conflit au linkage.
+          o Cette étape est facultative, vous pouvez également choisir de ne
+            faire le ménage qu' après une compilation réussie de Freeglut.
+          o Attention à ne pas effacer, dans un enthousiasme rédempteur, la
+            bibliothèque glu32.lib (à ne pas confondre avec glut32.lib).
+
+
+Compilation
+
+    * Oubliez le triptyque ./configure , make , make install.
+          o Ca ne marche pas du tout avec Cygwin.
+
+    * Voici un Makefile qui fera l'affaire:
+
+#Makefile pour Freeglut 2.6.0-rc et Cygwin
+#A placer dans le répertoire "src"
+
+sources=$(wildcard *.c)
+objs=$(sources:.c=.o)
+libname=freeglut
+
+
+CFLAGS=-O2 -DTARGET_HOST_MS_WINDOWS -DX_DISPLAY_MISSING -DFREEGLUT_STATIC -I./
+LDFLAGS=-lopengl32 -lgdi32 -lwinmm
+
+nocyg=-mno-cygwin -mwindows
+
+all: $(objs)
+        #construction dll liée à cygwin1.dll
+        gcc $(nocyg) $(objs) -shared $(LDFLAGS) -o $(libname).dll
+        nm $(libname).dll  | awk 'BEGIN { print "EXPORTS" } /T _glut/ {sub( /^.*T _/, "\t"); print}' > $(libname).def
+        dlltool --dllname $(libname).dll --input-def $(libname).def --output-lib lib$(libname)dll.a
+
+        #construction bibliothèque statique indépendante de cygwin
+        ar cr lib$(libname).a $(objs)
+        #pas forcément obligatoire (création d'un index pour accélérer les accès)
+        ranlib lib$(libname).a
+
+%.o: %.c
+        gcc $(nocyg) -c $(CFLAGS) $<
+
+clean:
+        rm -f *.o $(libname).dll $(libname).def lib$(libname)dll.a lib$(libname).a
+
+
+
+
+Quelques remarques sur le makefile
+
+    * Ce makefile crée une dll, une bibliothèque statique (une archive, en
+      d'autres termes) et la bibliothèque dynamique qui permettra l'utilisation
+      de la dll.
+
+    * Ne cherchez pas à stripper la bibliothèque statique! Vous ne pourriez plus
+      compiler en statique.
+          o Par contre, vous pouvez stripper l'exécutable final obtenu lors de
+            la compilation de votre application.
+
+    * J'ai choisi d'appeller la dll et les bibliothèques par leurs "vrais noms":
+      freeglut.dll libfreeglutdll.a et libfreeglut.a.
+          o Le script configure recréait (pour des raisons de compatibilité avec
+            l'ancienne bibliothèque Glut) glut.dll et libglut.a.
+          o Lors des mes essais, j'ai eu des conflits avec une authentique
+            "glut" qui trainait dans mon "/lib". J'ai décidé d'appeller les
+            choses par leur nom, afin d'éviter les confusions.
+          o Rien ne vous empêche de renommer la dll, si vous avez besoin
+            d'utiliser des programmes Glut que vous ne pouvez pas recompiler.
+
+    * La bibliothèque dynamique est générée à partir de la dll.
+          o Par souci de concision, j'ai utilisé awk. Il génère le fichier
+            d'exports utilisé par dlltool.
+          o La seule chose notable est la sélection des fonctions dont le nom
+            commence par _glut, afin d'éviter d'inclure dans la librairie
+            dynamique des fonctions sans rapport avec freeglut.
+          o ensuite, on utilise dlltool de façon très classique.
+
+nm $(libname).dll  | awk 'BEGIN { print "EXPORTS" } /T _glut/ {sub( /^.*T _/, "\t"); print}' > $(libname).def
+dlltool --dllname $(libname).dll --input-def $(libname).def --output-lib lib$(libname)dll.a
+
+
+
+
+Installation
+
+    * Copiez libfreeglut.a, libfreeglutdll.a dans le répertoire /lib de Cygwin.
+    * Copiez freglut.dll dans le system32 de Windows (ce qui est pratique, mais
+      pas propre!).
+    * Copiez les fichiers headers de Freeglut (/include/gl) dans /usr/include/Gl
+      de Cygwin.
+    * Copiez les fichiers headers (toujours /include/gl) dans
+      /usr/include/mingw/Gl : ceci sert aux compilations avec le flag
+      -mno-cygwin, qui utilise alors les includes de mingw.
+          o Vous aurez éventuellement besoin d'écraser d'anciens fichiers
+            include, correspondants à Glut, si vous l'avez installé avec Cygwin.
+
+
+Utilisation de la librairie
+
+    * Nous allons tester avec le programme shapes, présent dans
+      progs/demos/shapes
+          o -mno-cygwin sert à forcer l'utilisation de Mingw sans la grosse
+            dépendance cygwin1.dll.
+          o -mwindows sert uniquement à enlever l'horrible fenêtre shell (très
+            utile pour la mise au point, par contre).
+          o -L. (notez le point après le "L") : j'ai laissé libfreeglut.a,
+            libfreeglutdll.a et freeglut.dll dans le répertoire de test, le
+            temps des tests justement.
+
+
+Compilation en librairie statique freeglut, sans cygwin
+
+    * Toute l'astuce réside dans le define : -DFREEGLUT_STATIC
+          o Il sert à obtenir la bonne décoration des noms de fonctions dans les 
+            imports de la lib Freeglut.
+          o Vous pouvez essayer sans et prendre un éditeur hexa pour voir les
+            différences dans l'objet.
+    * attention à l'ordre des bibliothèques : -lfreeglut (statique) doit se
+      trouver avant la déclaration des bibliothèques dynamiques.
+
+    * gcc shapes.c -L. -lfreeglut -lopengl32 -lwinmm -lgdi32 -mno-cygwin
+      -mwindows -DFREEGLUT_STATIC
+
+
+Compilation avec dll freeglut, sans cygwin
+
+    * Pour le define, même remarque que ci-dessus
+    * L'ordre des bibliothèques n'a plus d'importance.
+
+    * gcc shapes.c -L. -lopengl32 -lwinmm -lgdi32 -lfreeglut -mno-cygwin
+      -DFREEGLUT_STATIC
+
+
+Compilation avec dll freeglut, avec Cygwin
+
+    * Cet exemple est donné uniquement pour référence, le thème de ce billet étant de se débarrasser de Cygwin.
+          o Disons que ça peut servir pendant la mise au point (et encore).
+
+    * gcc shapes.c -L. -lopengl32 -lwinmm -lgdi32 -lfreeglut
+
+
+
+Où sont les dooooocs ?
+
+    * Freeglut est livré avec sa documentation, plus très à jour.
+          o Il semble qu'il y ait un problème avec la doc Glut originale. Non
+            seulement elle ne correspond pas forcément au fonctionnement de
+            Freeglut, mais de plus, son auteur (Mark Kilgard) l'a copyrighté. Sa
+            distribution est donc difficile.
+
+    * Jocelyn Fréchot a entrepris une mise à niveau des docs pour la version
+      2.6.0. On peut les trouver sur son site pour l'instant:
+          o http://jocelyn.frechot.free.fr/freeglut/
+
+
+Quelque chose a survécu ...
+
+    * J'ai également testé la recompilation des démos de la lib Glut originelle
+      (paix à ses cendres).
+          o Rien de particulier à signaler.
+
+    * Merci à tous les mainteneurs courageux de Freeglut, qu'on croyait mort,
+      mais qui bouge encore.
