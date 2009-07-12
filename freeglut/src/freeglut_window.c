@@ -1093,7 +1093,7 @@ int FGAPIENTRY glutCreateWindow( const char* title )
                            GL_FALSE, GL_FALSE )->ID;
 }
 
-#ifdef _WIN32
+#ifdef TARGET_HOST_MS_WINDOWS
 int FGAPIENTRY __glutCreateWindowWithExit( const char *title, void (__cdecl *exit_function)(int) )
 {
   __glutExitFunc = exit_function;
