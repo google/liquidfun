@@ -933,7 +933,7 @@ int fgHintPresent(Window window, Atom property, Atom hint);
 
 SFG_Proc fghGetProcAddress( const char *procName );
 
-#ifdef TARGET_HOST_MS_WINDOWS
+#if TARGET_HOST_MS_WINDOWS
 extern void (__cdecl *__glutExitFunc)( int return_value );
 #endif
 

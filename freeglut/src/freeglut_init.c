@@ -854,7 +854,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     }
 }
 
-#ifdef TARGET_HOST_MS_WINDOWS
+#if TARGET_HOST_MS_WINDOWS
 void (__cdecl *__glutExitFunc)( int return_value ) = NULL;
 
 void FGAPIENTRY __glutInitWithExit( int *pargc, char **argv, void (__cdecl *exit_function)(int) )
