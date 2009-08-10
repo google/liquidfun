@@ -95,12 +95,20 @@
 #define  GLUT_INIT_MAJOR_VERSION            0x0200
 #define  GLUT_INIT_MINOR_VERSION            0x0201
 #define  GLUT_INIT_FLAGS                    0x0202
+#define  GLUT_INIT_PROFILE                  0x0203
 
 /*
  * Flags for glutInitContextFlags, see freeglut_init.c
  */
 #define  GLUT_DEBUG                         0x0001
 #define  GLUT_FORWARD_COMPATIBLE            0x0002
+
+
+/*
+ * Flags for glutInitContextProfile, see freeglut_init.c
+ */
+#define GLUT_CORE_PROFILE                   0x0001
+#define	GLUT_COMPATIBILITY_PROFILE          0x0002
 
 /*
  * Process loop function, see freeglut_main.c
@@ -186,6 +194,14 @@ void    glutJoystickGetCenter( int ident, float *axes );
  */
 FGAPI void    FGAPIENTRY glutInitContextVersion( int majorVersion, int minorVersion );
 FGAPI void    FGAPIENTRY glutInitContextFlags( int flags );
+FGAPI void    FGAPIENTRY glutInitContextProfile( int profile );
+
+/*
+ * GLUT API macro definitions -- the display mode definitions
+ */
+#define  GLUT_CAPTIONLESS                   0x0400
+#define  GLUT_BORDERLESS                    0x0800
+#define  GLUT_SRGB                          0x1000
 
 #ifdef __cplusplus
     }

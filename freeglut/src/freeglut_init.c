@@ -89,7 +89,8 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       4,                      /* SampleNumber */
                       1,                      /* MajorVersion */
                       0,                      /* MajorVersion */
-                      0                       /* ContextFlags */
+                      0,                      /* ContextFlags */
+                      0                       /* ContextProfile */
 };
 
 
@@ -425,6 +426,7 @@ void fgDeinitialize( void )
     fgState.MajorVersion = 1;
     fgState.MinorVersion = 0;
     fgState.ContextFlags = 0;
+    fgState.ContextProfile = 0;
 
     fgState.Initialised = GL_FALSE;
 
@@ -1151,6 +1153,12 @@ void FGAPIENTRY glutInitContextFlags( int flags )
 {
     /* We will make use of this value when creating a new OpenGL context... */
     fgState.ContextFlags = flags;
+}
+
+void FGAPIENTRY glutInitContextProfile( int profile )
+{
+    /* We will make use of this value when creating a new OpenGL context... */
+    fgState.ContextProfile = profile;
 }
 
 /*** END OF FILE ***/

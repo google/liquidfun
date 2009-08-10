@@ -171,8 +171,6 @@
 #define  GLUT_MULTISAMPLE                   0x0080
 #define  GLUT_STEREO                        0x0100
 #define  GLUT_LUMINANCE                     0x0200
-#define  GLUT_CAPTIONLESS                   0x0400
-#define  GLUT_BORDERLESS                    0x0800
 
 /*
  * GLUT API macro definitions -- windows and menu related definitions

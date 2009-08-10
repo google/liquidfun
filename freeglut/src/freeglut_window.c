@@ -51,6 +51,10 @@ static wchar_t* fghWstrFromStr(const char* str)
 
 #endif /* defined(_WIN32_WCE) */
 
+/* pushing attribute/value pairs into an array */
+#define ATTRIB(a) attributes[where++]=(a)
+#define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
+
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
@@ -76,88 +80,120 @@ static wchar_t* fghWstrFromStr(const char* str)
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
+static int fghIsLegacyContextVersionRequested( void )
+{
+  return fgState.MajorVersion == 1 && fgState.MinorVersion == 0;
+}
+
+static int fghIsLegacyContextRequested( void )
+{
+  return fghIsLegacyContextVersionRequested() &&
+         fgState.ContextFlags == 0 &&
+         fgState.ContextProfile == 0;
+}
+
+static int fghNumberOfAuxBuffersRequested( void )
+{
+  if ( fgState.DisplayMode & GLUT_AUX4 ) {
+    return 4;
+  }
+  if ( fgState.DisplayMode & GLUT_AUX3 ) {
+    return 3;
+  }
+  if ( fgState.DisplayMode & GLUT_AUX2 ) {
+    return 2;
+  }
+  if ( fgState.DisplayMode & GLUT_AUX1 ) { /* NOTE: Same as GLUT_AUX! */
+    return fgState.AuxiliaryBufferNumber;
+  }
+  return 0;
+}
+
+static int fghMapBit( int mask, int from, int to )
+{
+  return ( mask & from ) ? to : 0;
+
+}
+
+static void fghContextCreationError( void )
+{
+    fgError( "Unable to create OpenGL %d.%d context (flags %x, profile %x)",
+             fgState.MajorVersion, fgState.MinorVersion, fgState.ContextFlags,
+             fgState.ContextProfile );
+}
+
 /*
  * Chooses a visual basing on the current display mode settings
  */
 #if TARGET_HOST_POSIX_X11
 
+#ifndef GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB
+#define GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB 0x20B2
+#endif
+
 GLXFBConfig* fgChooseFBConfig( void )
 {
-    GLboolean wantIndexedMode = GL_FALSE;
-    int attributes[ 32 ];
-    int where = 0;
+  GLboolean wantIndexedMode = GL_FALSE;
+  int attributes[ 100 ];
+  int where = 0, numAuxBuffers;
 
-    /* First we have to process the display mode settings... */
-/*
- * XXX Why is there a semi-colon in this #define?  The code
- * XXX that uses the macro seems to always add more semicolons...
- */
-#define ATTRIB(a) attributes[where++]=a;
-#define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
+  /* First we have to process the display mode settings... */
+  if( fgState.DisplayMode & GLUT_INDEX ) {
+    ATTRIB_VAL( GLX_BUFFER_SIZE, 8 );
+    /*  Buffer size is selected later.  */
 
-    if( fgState.DisplayMode & GLUT_INDEX )
-    {
-        ATTRIB_VAL( GLX_BUFFER_SIZE, 8 );
-        /*  Buffer size is selected later.  */
-
-        ATTRIB_VAL( GLX_RENDER_TYPE, GLX_COLOR_INDEX_BIT );
-        wantIndexedMode = GL_TRUE;
+    ATTRIB_VAL( GLX_RENDER_TYPE, GLX_COLOR_INDEX_BIT );
+    wantIndexedMode = GL_TRUE;
+  } else {
+    ATTRIB_VAL( GLX_RED_SIZE,   1 );
+    ATTRIB_VAL( GLX_GREEN_SIZE, 1 );
+    ATTRIB_VAL( GLX_BLUE_SIZE,  1 );
+    if( fgState.DisplayMode & GLUT_ALPHA ) {
+      ATTRIB_VAL( GLX_ALPHA_SIZE, 1 );
     }
-    else
-    {
-        ATTRIB_VAL( GLX_RED_SIZE,   1 );
-        ATTRIB_VAL( GLX_GREEN_SIZE, 1 );
-        ATTRIB_VAL( GLX_BLUE_SIZE,  1 );
-        if( fgState.DisplayMode & GLUT_ALPHA )
-            ATTRIB_VAL( GLX_ALPHA_SIZE, 1 );
+  }
+
+  if( fgState.DisplayMode & GLUT_DOUBLE ) {
+    ATTRIB_VAL( GLX_DOUBLEBUFFER, True );
+  }
+
+  if( fgState.DisplayMode & GLUT_STEREO ) {
+    ATTRIB_VAL( GLX_STEREO, True );
+  }
+
+  if( fgState.DisplayMode & GLUT_DEPTH ) {
+    ATTRIB_VAL( GLX_DEPTH_SIZE, 1 );
+  }
+
+  if( fgState.DisplayMode & GLUT_STENCIL ) {
+    ATTRIB_VAL( GLX_STENCIL_SIZE, 1 );
+  }
+
+  if( fgState.DisplayMode & GLUT_ACCUM ) {
+    ATTRIB_VAL( GLX_ACCUM_RED_SIZE, 1 );
+    ATTRIB_VAL( GLX_ACCUM_GREEN_SIZE, 1 );
+    ATTRIB_VAL( GLX_ACCUM_BLUE_SIZE, 1 );
+    if( fgState.DisplayMode & GLUT_ALPHA ) {
+      ATTRIB_VAL( GLX_ACCUM_ALPHA_SIZE, 1 );
     }
+  }
 
-    if( fgState.DisplayMode & GLUT_DOUBLE )
-        ATTRIB_VAL( GLX_DOUBLEBUFFER, True );
+  numAuxBuffers = fghNumberOfAuxBuffersRequested();
+  if ( numAuxBuffers > 0 ) {
+    ATTRIB_VAL( GLX_AUX_BUFFERS, numAuxBuffers );
+  }
 
-    if( fgState.DisplayMode & GLUT_STEREO )
-        ATTRIB_VAL( GLX_STEREO, True );
+  if( fgState.DisplayMode & GLUT_SRGB ) {
+    ATTRIB_VAL( GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, True );
+  }
 
-    if( fgState.DisplayMode & GLUT_DEPTH )
-        ATTRIB_VAL( GLX_DEPTH_SIZE, 1 );
+  if (fgState.DisplayMode & GLUT_MULTISAMPLE) {
+    ATTRIB_VAL(GLX_SAMPLE_BUFFERS, 1);
+    ATTRIB_VAL(GLX_SAMPLES, fgState.SampleNumber);
+  }
 
-    if( fgState.DisplayMode & GLUT_STENCIL )
-        ATTRIB_VAL( GLX_STENCIL_SIZE, 1 );
-
-    if( fgState.DisplayMode & GLUT_ACCUM )
-    {
-        ATTRIB_VAL( GLX_ACCUM_RED_SIZE,   1 );
-        ATTRIB_VAL( GLX_ACCUM_GREEN_SIZE, 1 );
-        ATTRIB_VAL( GLX_ACCUM_BLUE_SIZE,  1 );
-        if( fgState.DisplayMode & GLUT_ALPHA )
-            ATTRIB_VAL( GLX_ACCUM_ALPHA_SIZE, 1 );
-    }
-
-    if( fgState.DisplayMode & GLUT_AUX4 )
-    {
-        ATTRIB_VAL(GLX_AUX_BUFFERS, 4);
-    }
-    else if( fgState.DisplayMode & GLUT_AUX3 )
-    {
-        ATTRIB_VAL(GLX_AUX_BUFFERS, 3);
-    }
-    else if( fgState.DisplayMode & GLUT_AUX2 )
-    {
-        ATTRIB_VAL(GLX_AUX_BUFFERS, 2);
-    }
-    else if( fgState.DisplayMode & GLUT_AUX1 ) /* NOTE: Same as GLUT_AUX! */
-    {
-        ATTRIB_VAL(GLX_AUX_BUFFERS, fgState.AuxiliaryBufferNumber);
-    }
-
-    if (fgState.DisplayMode & GLUT_MULTISAMPLE)
-      {
-        ATTRIB_VAL(GLX_SAMPLE_BUFFERS, 1)
-        ATTRIB_VAL(GLX_SAMPLES, fgState.SampleNumber)
-      }
-
-    /* Push a null at the end of the list */
-    ATTRIB( None );
+  /* Push a terminator at the end of the list */
+  ATTRIB( None );
 
     {
         GLXFBConfig * fbconfigArray;  /*  Array of FBConfigs  */
@@ -291,6 +327,9 @@ typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAt
 #define WGL_SAMPLE_BUFFERS_ARB         0x2041
 #define WGL_SAMPLES_ARB                0x2042
 
+#define WGL_TYPE_RGBA_FLOAT_ARB        0x21A0
+
+#define WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB 0x20A9
 
 #ifndef WGL_ARB_create_context
 #define WGL_ARB_create_context 1
@@ -299,54 +338,80 @@ extern HGLRC WINAPI wglCreateContextAttribsARB (HDC, HGLRC, const int *);
 #endif /* WGL_WGLEXT_PROTOTYPES */
 typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
 
-#define WGL_CONTEXT_DEBUG_BIT_ARB      0x0001
-#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
 #define WGL_CONTEXT_MAJOR_VERSION_ARB  0x2091
 #define WGL_CONTEXT_MINOR_VERSION_ARB  0x2092
 #define WGL_CONTEXT_LAYER_PLANE_ARB    0x2093
 #define WGL_CONTEXT_FLAGS_ARB          0x2094
+#define WGL_CONTEXT_PROFILE_MASK_ARB   0x9126
+
+#define WGL_CONTEXT_DEBUG_BIT_ARB      0x0001
+#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
+
+#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
+#define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
+
 #define ERROR_INVALID_VERSION_ARB      0x2095
+#define ERROR_INVALID_PROFILE_ARB      0x2096
 #endif
 
+static void fghFillContextAttributes( int *attributes ) {
+  int where = 0, contextFlags, contextProfile;
+
+  if ( !fghIsLegacyContextVersionRequested() ) {
+    ATTRIB_VAL( WGL_CONTEXT_MAJOR_VERSION_ARB, fgState.MajorVersion );
+    ATTRIB_VAL( WGL_CONTEXT_MINOR_VERSION_ARB, fgState.MinorVersion );
+  }
+
+  contextFlags =
+    fghMapBit( fgState.ContextFlags, GLUT_DEBUG, WGL_CONTEXT_DEBUG_BIT_ARB ) |
+    fghMapBit( fgState.ContextFlags, GLUT_FORWARD_COMPATIBLE, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB );
+  if ( contextFlags != 0 ) {
+    ATTRIB_VAL( WGL_CONTEXT_FLAGS_ARB, contextFlags );
+  }
+
+  contextProfile =
+    fghMapBit( fgState.ContextProfile, GLUT_CORE_PROFILE, WGL_CONTEXT_CORE_PROFILE_BIT_ARB ) |
+    fghMapBit( fgState.ContextProfile, GLUT_COMPATIBILITY_PROFILE, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB );
+  if ( contextProfile != 0 ) {
+    ATTRIB_VAL( WGL_CONTEXT_PROFILE_MASK_ARB, contextProfile );
+  }
+
+  ATTRIB( 0 );
+}
+
+static int fghIsExtensionSupported( HDC hdc, const char *extension ) {
+    const char *pWglExtString;
+    PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetEntensionsStringARB =
+      (PFNWGLGETEXTENSIONSSTRINGARBPROC) wglGetProcAddress("wglGetExtensionsStringARB");
+    if ( wglGetEntensionsStringARB == NULL )
+    {
+      return FALSE;
+    }
+    pWglExtString = wglGetEntensionsStringARB( hdc );
+    return ( pWglExtString != NULL ) && ( strstr(pWglExtString, extension) != NULL );
+}
 
 void fgNewWGLCreateContext( SFG_Window* window )
 {
-    PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetEntensionsStringARB;
     HGLRC context;
-    int attribs[7];
+    int attributes[9];
     PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
-    const char * pWglExtString;
 
     /* If nothing fancy has been required, leave the context as it is */
-    if ( fgState.MajorVersion == 1 && fgState.MinorVersion == 0 && fgState.ContextFlags == 0 )
+    if ( fghIsLegacyContextRequested() )
     {
         return;
     }
 
-    wglMakeCurrent( window->Window.Device,
-                    window->Window.Context );
+    wglMakeCurrent( window->Window.Device, window->Window.Context );
 
-    wglGetEntensionsStringARB=(PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
-    if ( wglGetEntensionsStringARB == NULL )
-    {
-        return;
-    }
-
-    pWglExtString=wglGetEntensionsStringARB(window->Window.Device);
-    if (( pWglExtString == NULL ) || ( strstr(pWglExtString, "WGL_ARB_create_context") == NULL ))
+    if ( !fghIsExtensionSupported( window->Window.Device, "WGL_ARB_create_context" ) )
     {
         return;
     }
 
     /* new context creation */
-    attribs[0] = WGL_CONTEXT_MAJOR_VERSION_ARB;
-    attribs[1] = fgState.MajorVersion;
-    attribs[2] = WGL_CONTEXT_MINOR_VERSION_ARB;
-    attribs[3] = fgState.MinorVersion;
-    attribs[4] = WGL_CONTEXT_FLAGS_ARB;
-    attribs[5] = ((fgState.ContextFlags & GLUT_DEBUG) ? WGL_CONTEXT_DEBUG_BIT_ARB : 0) |
-        ((fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) ? WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB : 0);
-    attribs[6] = 0;
+    fghFillContextAttributes( attributes );
 
     wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC) wglGetProcAddress( "wglCreateContextAttribsARB" );
     if ( wglCreateContextAttribsARB == NULL )
@@ -354,11 +419,10 @@ void fgNewWGLCreateContext( SFG_Window* window )
         fgError( "wglCreateContextAttribsARB not found" );
     }
 
-    context = wglCreateContextAttribsARB( window->Window.Device, 0, attribs );
+    context = wglCreateContextAttribsARB( window->Window.Device, 0, attributes );
     if ( context == NULL )
     {
-        fgError( "Unable to create OpenGL %d.%d context (flags %x)",
-            fgState.MajorVersion, fgState.MinorVersion, fgState.ContextFlags );
+        fghContextCreationError();
     }
 
     wglMakeCurrent( NULL, NULL );
@@ -366,6 +430,90 @@ void fgNewWGLCreateContext( SFG_Window* window )
     window->Window.Context = context;
 }
 
+#if !defined(_WIN32_WCE)
+
+static void fghFillPFD( PIXELFORMATDESCRIPTOR *ppfd, HDC hdc, unsigned char layer_type )
+{
+  int flags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL;
+  if ( fgState.DisplayMode & GLUT_DOUBLE ) {
+        flags |= PFD_DOUBLEBUFFER;
+  }
+  if ( fgState.DisplayMode & GLUT_STEREO ) {
+    flags |= PFD_STEREO;
+  }
+
+#if defined(_MSC_VER)
+#pragma message( "fgSetupPixelFormat(): there is still some work to do here!" )
+#endif
+
+  /* Specify which pixel format do we opt for... */
+  ppfd->nSize = sizeof(PIXELFORMATDESCRIPTOR);
+  ppfd->nVersion = 1;
+  ppfd->dwFlags = flags;
+
+  if( fgState.DisplayMode & GLUT_INDEX ) {
+    ppfd->iPixelType = PFD_TYPE_COLORINDEX;
+    ppfd->cRedBits = 0;
+    ppfd->cGreenBits = 0;
+    ppfd->cBlueBits = 0;
+    ppfd->cAlphaBits = 0;
+  } else {
+    ppfd->iPixelType = PFD_TYPE_RGBA;
+    ppfd->cRedBits = 8;
+    ppfd->cGreenBits = 8;
+    ppfd->cBlueBits = 8;
+    ppfd->cAlphaBits = ( fgState.DisplayMode & GLUT_ALPHA ) ? 8 : 0;
+  }
+
+  ppfd->cColorBits = 24;
+  ppfd->cRedShift = 0;
+  ppfd->cGreenShift = 0;
+  ppfd->cBlueShift = 0;
+  ppfd->cAlphaShift = 0;
+  ppfd->cAccumBits = 0;
+  ppfd->cAccumRedBits = 0;
+  ppfd->cAccumGreenBits = 0;
+  ppfd->cAccumBlueBits = 0;
+  ppfd->cAccumAlphaBits = 0;
+
+  /* Hmmm, or 32/0 instead of 24/8? */
+  ppfd->cDepthBits = 24;
+  ppfd->cStencilBits = 8;
+
+  ppfd->cAuxBuffers = fghNumberOfAuxBuffersRequested();
+  ppfd->iLayerType = layer_type;
+  ppfd->bReserved = 0;
+  ppfd->dwLayerMask = 0;
+  ppfd->dwVisibleMask = 0;
+  ppfd->dwDamageMask = 0;
+  
+  ppfd->cColorBits = (BYTE) GetDeviceCaps( hdc, BITSPIXEL );
+}
+
+static void fghFillPixelFormatAttributes( int *attributes, const PIXELFORMATDESCRIPTOR *ppfd )
+{
+  int where = 0;
+
+  ATTRIB_VAL( WGL_DRAW_TO_WINDOW_ARB, GL_TRUE );
+  ATTRIB_VAL( WGL_SUPPORT_OPENGL_ARB, GL_TRUE );
+  ATTRIB_VAL( WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB );
+
+  ATTRIB_VAL( WGL_COLOR_BITS_ARB, ppfd->cColorBits );
+  ATTRIB_VAL( WGL_ALPHA_BITS_ARB, ppfd->cAlphaBits );
+  ATTRIB_VAL( WGL_DEPTH_BITS_ARB, ppfd->cDepthBits );
+  ATTRIB_VAL( WGL_STENCIL_BITS_ARB, ppfd->cStencilBits );
+
+  ATTRIB_VAL( WGL_DOUBLE_BUFFER_ARB, ( fgState.DisplayMode & GLUT_DOUBLE ) != 0 );
+
+  if ( fgState.DisplayMode & GLUT_SRGB ) {
+    ATTRIB_VAL( WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB, TRUE );
+  }
+
+  ATTRIB_VAL( WGL_SAMPLE_BUFFERS_ARB, GL_TRUE );
+  ATTRIB_VAL( WGL_SAMPLES_ARB, fgState.SampleNumber );
+  ATTRIB( 0 );
+}
+#endif
 
 GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                               unsigned char layer_type )
@@ -373,89 +521,17 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
 #if defined(_WIN32_WCE)
     return GL_TRUE;
 #else
-    PIXELFORMATDESCRIPTOR* ppfd, pfd;
-    int flags, pixelformat;
+    PIXELFORMATDESCRIPTOR pfd;
+    PIXELFORMATDESCRIPTOR* ppfd = &pfd;
+    int pixelformat;
 
-    freeglut_return_val_if_fail( window != NULL, 0 );
-    flags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL;
-    if( fgState.DisplayMode & GLUT_DOUBLE )
-        flags |= PFD_DOUBLEBUFFER;
-
-    if( fgState.DisplayMode & GLUT_STEREO )
-        flags |= PFD_STEREO;
-
-#if defined(_MSC_VER)
-#pragma message( "fgSetupPixelFormat(): there is still some work to do here!" )
-#endif
-
-    /* Specify which pixel format do we opt for... */
-    pfd.nSize           = sizeof(PIXELFORMATDESCRIPTOR);
-    pfd.nVersion        = 1;
-    pfd.dwFlags         = flags;
-
-    if( fgState.DisplayMode & GLUT_INDEX )
-    {
-        pfd.iPixelType = PFD_TYPE_COLORINDEX;
-        pfd.cRedBits                = 0;
-        pfd.cGreenBits            = 0;
-        pfd.cBlueBits             = 0;
-        pfd.cAlphaBits            = 0;
-    }
-    else
-    {
-        pfd.iPixelType      = PFD_TYPE_RGBA;
-        pfd.cRedBits                = 8;
-        pfd.cGreenBits            = 8;
-        pfd.cBlueBits             = 8;
-        if ( fgState.DisplayMode & GLUT_ALPHA )
-            pfd.cAlphaBits            = 8;
-        else
-            pfd.cAlphaBits            = 0;
-    }
-
-    pfd.cColorBits      = 24;
-    pfd.cRedShift       = 0;
-    pfd.cGreenShift     = 0;
-    pfd.cBlueShift      = 0;
-    pfd.cAlphaShift     = 0;
-    pfd.cAccumBits      = 0;
-    pfd.cAccumRedBits   = 0;
-    pfd.cAccumGreenBits = 0;
-    pfd.cAccumBlueBits  = 0;
-    pfd.cAccumAlphaBits = 0;
-#if 0
-    pfd.cDepthBits      = 32;
-    pfd.cStencilBits    = 0;
-#else
-    pfd.cDepthBits      = 24;
-    pfd.cStencilBits    = 8;
-#endif
-    if( fgState.DisplayMode & GLUT_AUX4 )
-        pfd.cAuxBuffers = 4;
-    else if( fgState.DisplayMode & GLUT_AUX3 )
-        pfd.cAuxBuffers = 3;
-    else if( fgState.DisplayMode & GLUT_AUX2 )
-        pfd.cAuxBuffers = 2;
-    else if( fgState.DisplayMode & GLUT_AUX1 ) /* NOTE: Same as GLUT_AUX! */
-        pfd.cAuxBuffers = fgState.AuxiliaryBufferNumber;
-    else
-        pfd.cAuxBuffers = 0;
-
-    pfd.iLayerType      = layer_type;
-    pfd.bReserved       = 0;
-    pfd.dwLayerMask     = 0;
-    pfd.dwVisibleMask   = 0;
-    pfd.dwDamageMask    = 0;
-
-    pfd.cColorBits = (BYTE) GetDeviceCaps( window->Window.Device, BITSPIXEL );
-    ppfd = &pfd;
-
+    fghFillPFD( ppfd, window->Window.Device, layer_type );
     pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
 
-    /* windows hack for multismapling */
-    if (fgState.DisplayMode&GLUT_MULTISAMPLE)
+    /* windows hack for multismapling/sRGB */
+    if ( ( fgState.DisplayMode & GLUT_MULTISAMPLE ) ||
+         ( fgState.DisplayMode & GLUT_SRGB ) )
     {        
-        PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetEntensionsStringARB=NULL;
         HGLRC rc, rc_before=wglGetCurrentContext();
         HWND hWnd;
         HDC hDC, hDC_before=wglGetCurrentDC();
@@ -476,60 +552,35 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
         rc = wglCreateContext( hDC );
         wglMakeCurrent(hDC, rc);
         
-        wglGetEntensionsStringARB=(PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
-        if (wglGetEntensionsStringARB)
+        if ( fghIsExtensionSupported( hDC, "WGL_ARB_multisample" ) )
         {
-            const char * pWglExtString=wglGetEntensionsStringARB(hDC);
-            if (pWglExtString)
+            PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARBProc =
+              (PFNWGLCHOOSEPIXELFORMATARBPROC) wglGetProcAddress("wglChoosePixelFormatARB");
+            if ( wglChoosePixelFormatARBProc )
             {
-                if (strstr(pWglExtString, "WGL_ARB_multisample"))
+                int attributes[100];
+                int iPixelFormat;
+                BOOL bValid;
+                float fAttributes[] = { 0, 0 };
+                UINT numFormats;
+                fghFillPixelFormatAttributes( attributes, ppfd );
+                bValid = wglChoosePixelFormatARBProc(window->Window.Device, attributes, fAttributes, 1, &iPixelFormat, &numFormats);
+
+                if ( bValid && numFormats > 0 )
                 {
-                    int pAttributes[100];
-                    int iCounter=0;
-                    int iPixelFormat;
-                    BOOL bValid;
-                    float fAttributes[] = {0,0};
-                    UINT numFormats;
-                    PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARBProc=NULL;
-
-                    wglChoosePixelFormatARBProc=(PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
-                    if ( wglChoosePixelFormatARBProc )
-                    {
-                        pAttributes[iCounter++]=WGL_DRAW_TO_WINDOW_ARB;        pAttributes[iCounter++]=GL_TRUE;
-                        pAttributes[iCounter++]=WGL_SUPPORT_OPENGL_ARB;        pAttributes[iCounter++]=GL_TRUE;
-                        pAttributes[iCounter++]=WGL_ACCELERATION_ARB;        pAttributes[iCounter++]=WGL_FULL_ACCELERATION_ARB;
-
-                        pAttributes[iCounter++]=WGL_COLOR_BITS_ARB;            pAttributes[iCounter++]=pfd.cColorBits ;
-                        pAttributes[iCounter++]=WGL_ALPHA_BITS_ARB;            pAttributes[iCounter++]=pfd.cAlphaBits;
-                        pAttributes[iCounter++]=WGL_DEPTH_BITS_ARB;            pAttributes[iCounter++]=pfd.cDepthBits;
-                        pAttributes[iCounter++]=WGL_STENCIL_BITS_ARB;        pAttributes[iCounter++]=pfd.cStencilBits;
-
-                        pAttributes[iCounter++]=WGL_DOUBLE_BUFFER_ARB;        pAttributes[iCounter++]=(fgState.DisplayMode & GLUT_DOUBLE)!=0;
-                        pAttributes[iCounter++]=WGL_SAMPLE_BUFFERS_ARB;        pAttributes[iCounter++]=GL_TRUE;
-                        pAttributes[iCounter++]=WGL_SAMPLES_ARB;            pAttributes[iCounter++]=fgState.SampleNumber;
-                        pAttributes[iCounter++]=0;                            pAttributes[iCounter++]=0;    /* terminator */
-
-                        bValid = wglChoosePixelFormatARBProc(window->Window.Device,pAttributes,fAttributes,1,&iPixelFormat,&numFormats);
-
-                        if (bValid && numFormats>0)
-                            pixelformat=iPixelFormat;
-                    }
+                    pixelformat = iPixelFormat;
                 }
-                wglMakeCurrent( hDC_before, rc_before);
-                wglDeleteContext(rc);
-                ReleaseDC(hWnd, hDC);
-                DestroyWindow(hWnd);
-                UnregisterClass(_T("FREEGLUT_dummy"), fgDisplay.Instance);
             }
         }
+
+        wglMakeCurrent( hDC_before, rc_before);
+        wglDeleteContext(rc);
+        ReleaseDC(hWnd, hDC);
+        DestroyWindow(hWnd);
+        UnregisterClass(_T("FREEGLUT_dummy"), fgDisplay.Instance);
     }
 
-    if( pixelformat == 0 )
-        return GL_FALSE;
-
-    if( checkOnly )
-        return GL_TRUE;
-    return SetPixelFormat( window->Window.Device, pixelformat, ppfd );
+    return ( pixelformat != 0 ) && ( checkOnly || SetPixelFormat( window->Window.Device, pixelformat, ppfd ) );
 #endif /* defined(_WIN32_WCE) */
 }
 #endif /* TARGET_HOST_MS_WINDOWS */
@@ -581,6 +632,10 @@ void fgSetWindow ( SFG_Window *window )
 #define GLX_CONTEXT_FLAGS_ARB 0x2094
 #endif
 
+#ifndef GLX_CONTEXT_PROFILE_MASK_ARB
+#define GLX_CONTEXT_PROFILE_MASK_ARB 0x9126
+#endif
+
 #ifndef GLX_CONTEXT_DEBUG_BIT_ARB
 #define GLX_CONTEXT_DEBUG_BIT_ARB 0x0001
 #endif
@@ -588,6 +643,47 @@ void fgSetWindow ( SFG_Window *window )
 #ifndef GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
 #define GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
 #endif
+
+#ifndef GLX_CONTEXT_CORE_PROFILE_BIT_ARB
+#define GLX_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
+#endif
+
+#ifndef GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
+#define GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
+#endif
+
+#ifndef GLX_RGBA_FLOAT_TYPE
+#define GLX_RGBA_FLOAT_TYPE 0x20B9
+#endif
+
+#ifndef GLX_RGBA_FLOAT_BIT
+#define GLX_RGBA_FLOAT_BIT 0x00000004
+#endif
+
+static void fghFillContextAttributes( int *attributes ) {
+  int where = 0, contextFlags, contextProfile;
+
+  if ( !fghIsLegacyContextVersionRequested() ) {
+    ATTRIB_VAL( GLX_CONTEXT_MAJOR_VERSION_ARB, fgState.MajorVersion );
+    ATTRIB_VAL( GLX_CONTEXT_MINOR_VERSION_ARB, fgState.MinorVersion );
+  }
+
+  contextFlags =
+    fghMapBit( fgState.ContextFlags, GLUT_DEBUG, GLX_CONTEXT_DEBUG_BIT_ARB ) |
+    fghMapBit( fgState.ContextFlags, GLUT_FORWARD_COMPATIBLE, GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB );
+  if ( contextFlags != 0 ) {
+    ATTRIB_VAL( GLX_CONTEXT_FLAGS_ARB, contextFlags );
+  }
+
+  contextProfile =
+    fghMapBit( fgState.ContextProfile, GLUT_CORE_PROFILE, GLX_CONTEXT_CORE_PROFILE_BIT_ARB ) |
+    fghMapBit( fgState.ContextProfile, GLUT_COMPATIBILITY_PROFILE, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB );
+  if ( contextProfile != 0 ) {
+    ATTRIB_VAL( GLX_CONTEXT_PROFILE_MASK_ARB, contextProfile );
+  }
+
+  ATTRIB( 0 );
+}
 
 typedef GLXContext (*CreateContextAttribsProc)(Display *dpy, GLXFBConfig config,
 					       GLXContext share_list, Bool direct,
@@ -608,15 +704,15 @@ static GLXContext fghCreateNewContext( SFG_Window* window )
   GLXContext context;
 
   /* new context creation */
-  int attribs[7];
+  int attributes[9];
   CreateContextAttribsProc createContextAttribs;
 
   /* If nothing fancy has been required, simply use the old context creation GLX API entry */
-  if ( fgState.MajorVersion == 1 && fgState.MinorVersion == 0 && fgState.ContextFlags == 0)
+  if ( fghIsLegacyContextRequested() )
   {
     context = glXCreateNewContext( dpy, config, render_type, share_list, direct );
     if ( context == NULL ) {
-      fgError( "could not create new OpenGL context" );
+      fghContextCreationError();
     }
     return context;
   }
@@ -626,24 +722,16 @@ static GLXContext fghCreateNewContext( SFG_Window* window )
     fgWarning( "color index mode is deprecated, using RGBA mode" );
   }
 
-  attribs[0] = GLX_CONTEXT_MAJOR_VERSION_ARB;
-  attribs[1] = fgState.MajorVersion;
-  attribs[2] = GLX_CONTEXT_MINOR_VERSION_ARB;
-  attribs[3] = fgState.MinorVersion;
-  attribs[4] = GLX_CONTEXT_FLAGS_ARB;
-  attribs[5] = ((fgState.ContextFlags & GLUT_DEBUG) ? GLX_CONTEXT_DEBUG_BIT_ARB : 0) |
-    ((fgState.ContextFlags & GLUT_FORWARD_COMPATIBLE) ? GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB : 0);
-  attribs[6] = 0;
+  fghFillContextAttributes( attributes );
 
   createContextAttribs = (CreateContextAttribsProc) fghGetProcAddress( "glXCreateContextAttribsARB" );
   if ( createContextAttribs == NULL ) {
     fgError( "glXCreateContextAttribsARB not found" );
   }
 
-  context = createContextAttribs( dpy, config, share_list, direct, attribs );
+  context = createContextAttribs( dpy, config, share_list, direct, attributes );
   if ( context == NULL ) {
-    fgError( "could not create new OpenGL %d.%d context (flags %x)",
-	     fgState.MajorVersion, fgState.MinorVersion, fgState.ContextFlags );
+    fghContextCreationError();
   }
   return context;
 }

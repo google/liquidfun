@@ -1,3 +1,12 @@
+2009-08-10  Sven Panne  <sven.panne@aedion.de>
+
+	* include/GL/freeglut_ext.h,include/GL/freeglut_std.h,src/freeglut_ext.c,
+	src/freeglut_init.c,src/freeglut_internal.h,src/freeglut_state.c,
+	src/freeglut_window.c,src/freeglutdll.def: Added support for sRGB
+	framebuffers via the GLX_ARB_framebuffer_sRGB / WGL_ARB_framebuffer_sRGB
+	extensions. Added support for context profiles via the new parts of the
+	GLX_ARB_create_context / WGL_ARB_create_context extensions.
+
 2009-06-11  Paul Blew  <paul.blew@northgatearinso.com>
 
 	* replaced broken IDE based OpenWatcom build with a makefile based one

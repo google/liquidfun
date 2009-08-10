@@ -206,6 +206,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_INIT_MAJOR_VERSION:   return fgState.MajorVersion    ;
     case GLUT_INIT_MINOR_VERSION:   return fgState.MinorVersion    ;
     case GLUT_INIT_FLAGS:           return fgState.ContextFlags    ;
+    case GLUT_INIT_PROFILE:         return fgState.ContextProfile  ;
 
 #if TARGET_HOST_POSIX_X11
     /*
