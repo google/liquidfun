@@ -364,16 +364,28 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     /* Handle the OpenGL inquiries */
     case GLUT_WINDOW_RGBA:
+#if defined(_WIN32_WCE)
+      boolValue = (GLboolean)0;  /* WinCE doesn't support this feature */
+#else
       glGetBooleanv ( GL_RGBA_MODE, &boolValue );
       returnValue = boolValue ? 1 : 0;
+#endif
       return returnValue;
     case GLUT_WINDOW_DOUBLEBUFFER:
+#if defined(_WIN32_WCE)
+      boolValue = (GLboolean)0;  /* WinCE doesn't support this feature */
+#else
       glGetBooleanv ( GL_DOUBLEBUFFER, &boolValue );
       returnValue = boolValue ? 1 : 0;
+#endif
       return returnValue;
     case GLUT_WINDOW_STEREO:
+#if defined(_WIN32_WCE)
+      boolValue = (GLboolean)0;  /* WinCE doesn't support this feature */
+#else
       glGetBooleanv ( GL_STEREO, &boolValue );
       returnValue = boolValue ? 1 : 0;
+#endif
       return returnValue;
 
     case GLUT_WINDOW_RED_SIZE:
@@ -389,16 +401,32 @@ int FGAPIENTRY glutGet( GLenum eWhat )
       glGetIntegerv ( GL_ALPHA_BITS, &returnValue );
       return returnValue;
     case GLUT_WINDOW_ACCUM_RED_SIZE:
+#if defined(_WIN32_WCE)
+      returnValue = 0;  /* WinCE doesn't support this feature */
+#else
       glGetIntegerv ( GL_ACCUM_RED_BITS, &returnValue );
+#endif
       return returnValue;
     case GLUT_WINDOW_ACCUM_GREEN_SIZE:
+#if defined(_WIN32_WCE)
+      returnValue = 0;  /* WinCE doesn't support this feature */
+#else
       glGetIntegerv ( GL_ACCUM_GREEN_BITS, &returnValue );
+#endif
       return returnValue;
     case GLUT_WINDOW_ACCUM_BLUE_SIZE:
+#if defined(_WIN32_WCE)
+      returnValue = 0;  /* WinCE doesn't support this feature */
+#else
       glGetIntegerv ( GL_ACCUM_BLUE_BITS, &returnValue );
+#endif
       return returnValue;
     case GLUT_WINDOW_ACCUM_ALPHA_SIZE:
+#if defined(_WIN32_WCE)
+      returnValue = 0;  /* WinCE doesn't support this feature */
+#else
       glGetIntegerv ( GL_ACCUM_ALPHA_BITS, &returnValue );
+#endif
       return returnValue;
     case GLUT_WINDOW_DEPTH_SIZE:
       glGetIntegerv ( GL_DEPTH_BITS, &returnValue );

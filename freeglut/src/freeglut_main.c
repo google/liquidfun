@@ -1735,7 +1735,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
      * XXX WM_MOUSELEAVE code set it to false.  Then when we get a WM_MOUSEMOVE event,
      * XXX if the flag is false we invoke the Entry callback and set the flag to true.
      */
-    case 0x02a2:  /* This is the message we get when the mouse is leaving the window */
+    case 0x02a3:  /* This is the message we get when the mouse is leaving the window */
         if( window->IsMenu &&
             window->ActiveMenu && window->ActiveMenu->IsActive )
             fgUpdateMenuHighlight( window->ActiveMenu );
