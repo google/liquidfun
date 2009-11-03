@@ -683,7 +683,9 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /* will return true for VC8 (VC2005) and higher */
 #if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
     size_t sLen;
+#if HAVE_ERRNO
     errno_t err;
+#endif
 #endif
 
     if( fgState.Initialised )
@@ -706,7 +708,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 #ifndef _WIN32_WCE
     {
     /* will return true for VC8 (VC2005) and higher */
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) && HAVE_ERRNO
         char* fps = NULL;
         err = _dupenv_s( &fps, &sLen, "GLUT_FPS" );
         if (err)
@@ -725,13 +727,13 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
                 fgState.FPSInterval = interval;
         }
     /* will return true for VC8 (VC2005) and higher */
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) && HAVE_ERRNO
         free ( fps );  fps = NULL;  /* dupenv_s allocates a string that we must free */
 #endif
     }
 
     /* will return true for VC8 (VC2005) and higher */
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) && HAVE_ERRNO
     err = _dupenv_s( &displayName, &sLen, "DISPLAY" );
     if (err)
         fgError("Error getting DISPLAY environment variable");
@@ -823,7 +825,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      */
     fghInitialize( displayName );
     /* will return true for VC8 (VC2005) and higher */
-#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 )
+#if TARGET_HOST_MS_WINDOWS && ( _MSC_VER >= 1400 ) && HAVE_ERRNO
     free ( displayName );  displayName = NULL;  /* dupenv_s allocates a string that we must free */
 #endif
 

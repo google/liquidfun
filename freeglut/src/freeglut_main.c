@@ -27,7 +27,9 @@
 
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
-#include <errno.h>
+#if HAVE_ERRNO
+#    include <errno.h>
+#endif
 #include <stdarg.h>
 #if  HAVE_VPRINTF
 #    define VFPRINTF(s,f,a) vfprintf((s),(f),(a))
@@ -471,8 +473,10 @@ static void fghSleepForEvents( void )
         wait.tv_usec = (msec % 1000) * 1000;
         err = select( socket+1, &fdset, NULL, NULL, &wait );
 
+#if HAVE_ERRNO
         if( ( -1 == err ) && ( errno != EINTR ) )
             fgWarning ( "freeglut select() error: %d", errno );
+#endif
     }
 #elif TARGET_HOST_MS_WINDOWS
     MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLINPUT );
