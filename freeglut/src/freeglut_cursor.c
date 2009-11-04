@@ -162,7 +162,7 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
      * Joe Krahn is re-writing the following code.
      */
     /* Set the cursor AND change it for this window class. */
-#if _MSC_VER <= 1200
+#if !defined(__MINGW64__) && _MSC_VER <= 1200
 #       define MAP_CURSOR(a,b)                                   \
         case a:                                                  \
             SetCursor( LoadCursor( NULL, b ) );                  \
