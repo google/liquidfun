@@ -1682,12 +1682,25 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
 
         break;
-#if 0
+
     case WM_SETFOCUS:
 /*        printf("WM_SETFOCUS: %p\n", window ); */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
         break;
 
+    case WM_KILLFOCUS:
+/*        printf("WM_KILLFOCUS: %p\n", window ); */
+        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
+
+        if( window->IsMenu &&
+            window->ActiveMenu && window->ActiveMenu->IsActive )
+            fgUpdateMenuHighlight( window->ActiveMenu );
+
+        break;
+
+#if 0
     case WM_ACTIVATE:
         if (LOWORD(wParam) != WA_INACTIVE)
         {
@@ -1732,20 +1745,6 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * The window already got destroyed, so don't bother with it.
          */
         return 0;
-
-    /* XXX For a future patch:  we need a mouse entry event.  Unfortunately Windows
-     * XXX doesn't give us one, so we will probably need a "MouseInWindow" flag in
-     * XXX the SFG_Window structure.  Set it to true to begin with and then have the
-     * XXX WM_MOUSELEAVE code set it to false.  Then when we get a WM_MOUSEMOVE event,
-     * XXX if the flag is false we invoke the Entry callback and set the flag to true.
-     */
-    case 0x02a3:  /* This is the message we get when the mouse is leaving the window */
-        if( window->IsMenu &&
-            window->ActiveMenu && window->ActiveMenu->IsActive )
-            fgUpdateMenuHighlight( window->ActiveMenu );
-
-        INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
-        break ;
 
     case WM_MOUSEMOVE:
     {
