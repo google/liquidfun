@@ -593,12 +593,17 @@ void fgSetWindow ( SFG_Window *window )
 {
 #if TARGET_HOST_POSIX_X11
     if ( window )
+    {
         glXMakeContextCurrent(
             fgDisplay.Display,
             window->Window.Handle,
             window->Window.Handle,
             window->Window.Context
         );
+
+        /* also register this window to receive spaceball events */
+        fgSpaceballSetWindow(window);
+    }
 #elif TARGET_HOST_MS_WINDOWS
     if( fgStructure.CurrentWindow )
         ReleaseDC( fgStructure.CurrentWindow->Window.Handle,

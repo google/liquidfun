@@ -675,10 +675,14 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return 0;
 
     case GLUT_HAS_SPACEBALL:
+        return fgHasSpaceball();
+
     case GLUT_HAS_TABLET:
         return 0;
 
     case GLUT_NUM_SPACEBALL_BUTTONS:
+        return fgSpaceballNumButtons();
+
     case GLUT_NUM_TABLET_BUTTONS:
         return 0;
 

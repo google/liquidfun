@@ -28,6 +28,7 @@ lib@LIBRARY@_la_SOURCES = freeglut_callbacks.c \
 			 freeglut_geometry.c \
 			 freeglut_init.c \
 			 freeglut_input_devices.c \
+			 freeglut_spaceball.c \
 			 freeglut_joystick.c \
 			 freeglut_main.c \
 			 freeglut_menu.c \

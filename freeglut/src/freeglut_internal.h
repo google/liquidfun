@@ -564,9 +564,9 @@ enum
     /* Presently ignored */
     CB_Select,
     CB_OverlayDisplay,
-    CB_SpaceMotion,
-    CB_SpaceRotation,
-    CB_SpaceButton,
+    CB_SpaceMotion,     /* presently implemented only on UNIX/X11 */
+    CB_SpaceRotation,   /* presently implemented only on UNIX/X11 */
+    CB_SpaceButton,     /* presently implemented only on UNIX/X11 */
     CB_Dials,
     CB_ButtonBox,
     CB_TabletMotion,
@@ -852,6 +852,19 @@ void        fgJoystickPollWindow( SFG_Window* window );
 int         fgInputDeviceDetect( void );
 void        fgInitialiseInputDevices( void );
 void        fgInputDeviceClose( void );
+
+/* spaceball device functions, defined in freeglut_spaceball.c */
+void        fgInitialiseSpaceball( void );
+void        fgSpaceballClose( void );
+void        fgSpaceballSetWindow( SFG_Window *window );
+
+int         fgHasSpaceball( void );
+int         fgSpaceballNumButtons( void );
+
+#if TARGET_HOST_POSIX_X11
+int         fgIsSpaceballXEvent( const XEvent *ev );
+void        fgSpaceballHandleXEvent( const XEvent *ev );
+#endif
 
 /* Setting the cursor for a given window */
 void fgSetCursor ( SFG_Window *window, int cursorID );
