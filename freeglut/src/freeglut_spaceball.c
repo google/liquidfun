@@ -63,10 +63,8 @@ void fgInitialiseSpaceball(void)
     {
         Window w;
 		
-        if(!fgStructure.CurrentWindow) {
-            fgWarning("fgInitialiseSpaceball: no current window!\n");
+        if(!fgStructure.CurrentWindow)
             return;
-        }
 
         w = fgStructure.CurrentWindow->Window.Handle;
         if(spnav_x11_open(fgDisplay.Display, w) == -1) {
