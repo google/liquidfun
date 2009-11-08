@@ -21,11 +21,11 @@ quat_t quat_rotate(quat_t q, float angle, float x, float y, float z);
 
 /* matrix functions */
 static inline void m4_cons(mat4_t m,
-		float m11, float m12, float m13, float m14,
-		float m21, float m22, float m23, float m24,
-		float m31, float m32, float m33, float m34,
-		float m41, float m42, float m43, float m44);
+    float m11, float m12, float m13, float m14,
+    float m21, float m22, float m23, float m24,
+    float m31, float m32, float m33, float m34,
+    float m41, float m42, float m43, float m44);
 
 #include "vmath.inl"
 
-#endif	/* VMATH_H_ */
+#endif  /* VMATH_H_ */
