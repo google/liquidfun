@@ -59,6 +59,7 @@ OBJ_FILES = &
 	freeglut_menu.obj &
 	freeglut_misc.obj &
 	freeglut_overlay.obj &
+	freeglut_spaceball.obj &
 	freeglut_state.obj &
 	freeglut_stroke_mono_roman.obj &
 	freeglut_stroke_roman.obj &
@@ -140,10 +141,13 @@ freeglut_misc.obj : $(SRC_DIR)\freeglut_misc.c
 freeglut_overlay.obj : $(SRC_DIR)\freeglut_overlay.c
 	$(COMPILER) $(SRC_DIR)\$[. $(COMPILE_OPTIONS)
 
-freeglut_state.obj : $(SRC_DIR)\freeglut_state.c
+freeglut_spaceball.obj : $(SRC_DIR)\freeglut_spaceball.c
 	$(COMPILER) $(SRC_DIR)\$[. $(COMPILE_OPTIONS)
 
-freeglut_stroke_mono_roman.obj : $(SRC_DIR)\freeglut_stroke_mono_roman.c
+ffreeglut_state.obj : $(SRC_DIR)\freeglut_state.c
+	$(COMPILER) $(SRC_DIR)\$[. $(COMPILE_OPTIONS)
+
+reeglut_stroke_mono_roman.obj : $(SRC_DIR)\freeglut_stroke_mono_roman.c
 	$(COMPILER) $(SRC_DIR)\$[. $(COMPILE_OPTIONS)
 
 freeglut_stroke_roman.obj : $(SRC_DIR)\freeglut_stroke_roman.c
