@@ -533,6 +533,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\src\freeglut_spaceball.c"
+				>
+			</File>
+			<File
 				RelativePath="..\src\freeglut_state.c"
 				>
 				<FileConfiguration
