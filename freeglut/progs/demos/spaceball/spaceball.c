@@ -15,6 +15,10 @@
 #include <GL/freeglut.h>
 #include "vmath.h"
 
+#ifndef M_PI
+#define M_PI    3.14159265358979323846264338327950
+#endif
+
 void draw_cube(void);
 
 /* callbacks */
@@ -58,7 +62,15 @@ void disp(void)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslatef(pos.x, pos.y, pos.z);
+#if defined(WIN32)
+  /* This is STRICTLY a place-holder until we get this working properly for windows.
+   * I do not pretend that this is equivalent to the non-Windows equivalent.  I just
+   * want the thing to build without errors.
+   */
+  glMultMatrixf((float*)xform);
+#else
   glMultTransposeMatrixf((float*)xform);
+#endif
 
   draw_cube();
 
@@ -119,7 +131,7 @@ void draw_cube(void)
 void reshape(int x, int y)
 {
   float aspect = (float)x / (float)y;
-  float halfy = tan(FOV / 2.0);
+  float halfy = (float)tan(FOV / 2.0);
   float halfx = halfy * aspect;
 
   glViewport(0, 0, x, y);
@@ -150,16 +162,16 @@ void keyb(unsigned char key, int x, int y)
 
 void sbmot(int x, int y, int z)
 {
-  pos.x += x * 0.001;
-  pos.y += y * 0.001;
-  pos.z -= z * 0.001;
+  pos.x += x * 0.001f;
+  pos.y += y * 0.001f;
+  pos.z -= z * 0.001f;
   glutPostRedisplay();
 }
 
 void sbrot(int x, int y, int z)
 {
-  float axis_len = sqrt(x * x + y * y + z * z);
-  rot = quat_rotate(rot, axis_len * 0.001, -x / axis_len, -y / axis_len, z / axis_len);
+  float axis_len = (float)sqrt(x * x + y * y + z * z);
+  rot = quat_rotate(rot, axis_len * 0.001f, -x / axis_len, -y / axis_len, z / axis_len);
   glutPostRedisplay();
 }
 
