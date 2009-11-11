@@ -149,6 +149,10 @@ SOURCE=.\src\freeglut_overlay.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\freeglut_spaceball.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\freeglut_state.c
 # End Source File
 # Begin Source File
