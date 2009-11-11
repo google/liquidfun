@@ -62,15 +62,7 @@ void disp(void)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslatef(pos.x, pos.y, pos.z);
-#if defined(WIN32)
-  /* This is STRICTLY a place-holder until we get this working properly for windows.
-   * I do not pretend that this is equivalent to the non-Windows equivalent.  I just
-   * want the thing to build without errors.
-   */
   glMultMatrixf((float*)xform);
-#else
-  glMultTransposeMatrixf((float*)xform);
-#endif
 
   draw_cube();
 
