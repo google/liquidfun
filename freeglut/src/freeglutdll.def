@@ -136,19 +136,6 @@ EXPORTS
 	glutExtensionSupported
 	glutReportErrors
 	glutGetProcAddress
-	glutJoystickGetNumAxes
-	glutJoystickGetNumButtons
-	glutJoystickNotWorking
-	glutJoystickGetDeadBand
-	glutJoystickSetDeadBand
-	glutJoystickGetSaturation
-	glutJoystickSetSaturation
-	glutJoystickSetMinRange
-	glutJoystickSetMaxRange
-	glutJoystickSetCenter
-	glutJoystickGetMinRange
-	glutJoystickGetMaxRange
-	glutJoystickGetCenter
 	glutExit
 	glutFullScreenToggle
 	glutGetModeValues
