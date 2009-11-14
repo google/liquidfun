@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="freeglut"
 	ProjectGUID="{1AE4E979-0D35-4747-BF8E-DD60358F49DB}"
+	RootNamespace="freeglut"
 	TargetFrameworkVersion="0"
 	>
 	<Platforms>
@@ -690,6 +691,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\src\freeglutdll.def"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -724,6 +729,10 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath="..\freeglut.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

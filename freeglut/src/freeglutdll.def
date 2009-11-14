@@ -1,3 +1,4 @@
+LIBRARY freeglut
 VERSION 2.6
 EXPORTS
 	glutInit
