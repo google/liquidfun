@@ -1346,7 +1346,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
         if( joy->error )
             return;
 
-        snprintf( joyfname, sizeof(buffer), "%s/.joy%drc", getenv( "HOME" ), joy->id );
+        snprintf( joyfname, sizeof(joyfname), "%s/.joy%drc", getenv( "HOME" ), joy->id );
 
         joyfile = fopen( joyfname, "r" );
         joy->error =( joyfile == NULL );
