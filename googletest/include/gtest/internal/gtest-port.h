@@ -65,6 +65,7 @@
 //
 // Macros indicating the current platform (defined to 1 if compiled on
 // the given platform; otherwise undefined):
+//   GTEST_OS_ANDROID  - Android
 //   GTEST_OS_CYGWIN   - Cygwin
 //   GTEST_OS_LINUX    - Linux
 //   GTEST_OS_MAC      - Mac OS X
@@ -177,6 +178,8 @@
 #define GTEST_OS_WINDOWS 1
 #elif defined __APPLE__
 #define GTEST_OS_MAC 1
+#elif defined ANDROID
+#define GTEST_OS_ANDROID 1
 #elif defined __linux__
 #define GTEST_OS_LINUX 1
 #elif defined __MVS__
@@ -250,10 +253,11 @@
 // TODO(wan@google.com): uses autoconf to detect whether ::std::wstring
 //   is available.
 
-#if GTEST_OS_CYGWIN || GTEST_OS_SOLARIS
+#if GTEST_OS_CYGWIN || GTEST_OS_SOLARIS || GTEST_OS_ANDROID
 // Cygwin 1.5 and below doesn't support ::std::wstring.
 // Cygwin 1.7 might add wstring support; this should be updated when clear.
 // Solaris' libc++ doesn't support it either.
+// Android does not support wstring and never will.
 #define GTEST_HAS_STD_WSTRING 0
 #else
 #define GTEST_HAS_STD_WSTRING GTEST_HAS_STD_STRING
@@ -379,7 +383,7 @@
 #if GTEST_HAS_STD_STRING && (GTEST_OS_LINUX || \
                              GTEST_OS_MAC || \
                              GTEST_OS_CYGWIN || \
-                             (GTEST_OS_WINDOWS && _MSC_VER >= 1400))
+                             (GTEST_OS_WINDOWS && _MSC_VER >= 1400)) && !GTEST_OS_ANDROID
 #define GTEST_HAS_DEATH_TEST 1
 #include <vector>
 #endif
