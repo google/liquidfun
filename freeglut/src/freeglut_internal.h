@@ -49,9 +49,11 @@
 #elif defined(__posix__) || defined(__unix__) || defined(__linux__)
 #   define  TARGET_HOST_POSIX_X11  1
 
-/* FIXME: no Macintosh support?
-#if ...
-#   define  TARGET_HOST_MAC_OSX    1
+#elif defined(__APPLE__)
+/* This is a placeholder until we get native OSX support ironed out -- JFF 11/18/09 */
+#   define  TARGET_HOST_POSIX_X11  1
+/* #   define  TARGET_HOST_MAC_OSX    1 */
+
 #else
 #   error "Unrecognized target host!"
 */
