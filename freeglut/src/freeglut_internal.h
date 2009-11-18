@@ -436,6 +436,8 @@ struct tagSFG_WindowState
     GLboolean       KeyRepeating;       /* Currently in repeat mode          */
 
     GLboolean       NeedToResize;       /* Do we need to resize the window?  */
+
+    GLboolean       IsFullscreen;       /* is the window fullscreen? */
 };
 
 

@@ -68,23 +68,9 @@ static int fghGetConfig( int attribute )
 static int fghCheckFullScreen(void)
 {
 #if TARGET_HOST_POSIX_X11
-
-  int result;
-
-  result = 0;
-  if (fgDisplay.StateFullScreen != None)
-    {
-      result = fgHintPresent(fgStructure.CurrentWindow->Window.Handle,
-			     fgDisplay.State,
-			     fgDisplay.StateFullScreen);
-    }
-
-  return result;
-
+    return fgStructure.CurrentWindow->State.IsFullscreen;
 #else
-
-  return 0;
-
+    return 0;
 #endif
 }
 

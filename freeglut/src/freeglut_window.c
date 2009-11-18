@@ -1559,41 +1559,111 @@ void FGAPIENTRY glutPopWindow( void )
 #endif
 }
 
-/*
- * Resize the current window so that it fits the whole screen
- */
-void FGAPIENTRY glutFullScreen( void )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreen" );
-    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreen" );
+#if TARGET_HOST_POSIX_X11
+static int ewmh_fullscr_toggle(void);
+static int resize_fullscr_toogle(void);
 
-    if (glutGet(GLUT_FULL_SCREEN))
-    {
-      /*  Leave full screen state before resizing. */
-      glutFullScreenToggle();
+static int toggle_fullscreen(void)
+{
+    /* first try the EWMH (_NET_WM_STATE) method ... */
+    if(ewmh_fullscr_toggle() != -1) {
+        return 0;
     }
 
-    {
-#if TARGET_HOST_POSIX_X11
+    /* fall back to resizing the window */
+    if(resize_fullscr_toogle() != -1) {
+        return 0;
+    }
+    return -1;
+}
 
-        Status status;  /* Returned by XGetWindowAttributes(), not checked. */
-        XWindowAttributes attributes;
+#define _NET_WM_STATE_TOGGLE    2
+static int ewmh_fullscr_toggle(void)
+{
+    XEvent xev;
+    long evmask = SubstructureRedirectMask | SubstructureNotifyMask;
 
-        status = XGetWindowAttributes(fgDisplay.Display,
-                                      fgStructure.CurrentWindow->Window.Handle,
-                                      &attributes);
+    if(!fgDisplay.State || !fgDisplay.StateFullScreen) {
+        return -1;
+    }
+
+    xev.type = ClientMessage;
+    xev.xclient.window = fgStructure.CurrentWindow->Window.Handle;
+    xev.xclient.message_type = fgDisplay.State;
+    xev.xclient.format = 32;
+    xev.xclient.data.l[0] = _NET_WM_STATE_TOGGLE;
+    xev.xclient.data.l[1] = fgDisplay.StateFullScreen;
+    xev.xclient.data.l[2] = 0;	/* no second property to toggle */
+    xev.xclient.data.l[3] = 1;	/* source indication: application */
+    xev.xclient.data.l[4] = 0;	/* unused */
+
+    if(!XSendEvent(fgDisplay.Display, fgDisplay.RootWindow, 0, evmask, &xev)) {
+        return -1;
+    }
+    return 0;
+}
+
+static int resize_fullscr_toogle(void)
+{
+    XWindowAttributes attributes;
+
+    if(glutGet(GLUT_FULL_SCREEN)) {
+        /* restore original window size */
+        SFG_Window *win = fgStructure.CurrentWindow;
+        fgStructure.CurrentWindow->State.NeedToResize = GL_TRUE;
+        fgStructure.CurrentWindow->State.Width  = win->State.OldWidth;
+        fgStructure.CurrentWindow->State.Height = win->State.OldHeight;
+
+    } else {
+        /* resize the window to cover the entire screen */
+        XGetWindowAttributes(fgDisplay.Display,
+                fgStructure.CurrentWindow->Window.Handle,
+                &attributes);
+        
         /*
          * The "x" and "y" members of "attributes" are the window's coordinates
          * relative to its parent, i.e. to the decoration window.
          */
         XMoveResizeWindow(fgDisplay.Display,
-                          fgStructure.CurrentWindow->Window.Handle,
-                          -attributes.x,
-                          -attributes.y,
-                          fgDisplay.ScreenWidth,
-                          fgDisplay.ScreenHeight);
+                fgStructure.CurrentWindow->Window.Handle,
+                -attributes.x,
+                -attributes.y,
+                fgDisplay.ScreenWidth,
+                fgDisplay.ScreenHeight);
+    }
+    return 0;
+}
+#endif	/* TARGET_HOST_POSIX_X11 */
+
+
+/*
+ * Resize the current window so that it fits the whole screen
+ */
+void FGAPIENTRY glutFullScreen( void )
+{
+    SFG_Window *win;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreen" );
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreen" );
+
+    win = fgStructure.CurrentWindow;
+
+#if TARGET_HOST_POSIX_X11
+    if(!glutGet(GLUT_FULL_SCREEN)) {
+        if(toggle_fullscreen() != -1) {
+            win->State.IsFullscreen = GL_TRUE;
+        }
+    }
 
 #elif TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE) /* FIXME: what about WinCE */
+
+    if (glutGet(GLUT_FULL_SCREEN))
+    {
+        /*  Leave full screen state before resizing. */
+        glutFullScreenToggle();
+    }
+
+    {
         RECT rect;
 
         /* For fullscreen mode, force the top-left corner to 0,0
@@ -1625,8 +1695,10 @@ void FGAPIENTRY glutFullScreen( void )
                       SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
                       SWP_NOZORDER
                     );
-#endif
+        
+        win->State.IsFullscreen = GL_TRUE;
     }
+#endif
 }
 
 /*
@@ -1634,54 +1706,21 @@ void FGAPIENTRY glutFullScreen( void )
  */
 void FGAPIENTRY glutFullScreenToggle( void )
 {
+    SFG_Window *win;
+
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreenToggle" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreenToggle" );
 
-    {
+    win = fgStructure.CurrentWindow;
+
 #if TARGET_HOST_POSIX_X11
-
-      if (fgDisplay.StateFullScreen != None)
-      {
-        XEvent xevent;
-        long event_mask;
-        int status;
-
-        xevent.type = ClientMessage;
-        xevent.xclient.type = ClientMessage;
-        xevent.xclient.serial = 0;
-        xevent.xclient.send_event = True;
-        xevent.xclient.display = fgDisplay.Display;
-        xevent.xclient.window = fgStructure.CurrentWindow->Window.Handle;
-        xevent.xclient.message_type = fgDisplay.State;
-        xevent.xclient.format = 32;
-        xevent.xclient.data.l[0] = 2;  /* _NET_WM_STATE_TOGGLE */
-        xevent.xclient.data.l[1] = fgDisplay.StateFullScreen;
-        xevent.xclient.data.l[2] = 0;
-        xevent.xclient.data.l[3] = 0;
-        xevent.xclient.data.l[4] = 0;
-
-        /*** Don't really understand how event masks work... ***/
-        event_mask = SubstructureRedirectMask | SubstructureNotifyMask;
-
-        status = XSendEvent(fgDisplay.Display,
-          fgDisplay.RootWindow,
-          False,
-          event_mask,
-          &xevent);
-        FREEGLUT_INTERNAL_ERROR_EXIT(status != 0,
-          "XSendEvent failed",
-          "glutFullScreenToggle");
-      }
-      else
-#endif
-      {
-        /*
-         * If the window manager is not Net WM compliant, fall back to legacy
-         * behaviour.
-         */
-        glutFullScreen();
-      }
+    if(toggle_fullscreen() != -1) {
+        win->State.IsFullscreen = !win->State.IsFullscreen;
     }
+#elif TARGET_HOST_MS_WINDOWS
+    glutFullScreen();
+    win->State.IsFullscreen = !win->State.IsFullscreen;
+#endif
 }
 
 /*
