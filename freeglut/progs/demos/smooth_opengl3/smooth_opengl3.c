@@ -94,65 +94,50 @@ void checkError(const char *functionName)
 typedef ptrdiff_t ourGLsizeiptr;
 typedef char ourGLchar;
 
+#if defined(WIN32)
 #ifndef APIENTRY
 #define APIENTRY
 #endif
 
 typedef void (APIENTRY *PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
-PFNGLGENBUFFERSPROC gl_GenBuffers;
-
 typedef void (APIENTRY *PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
-PFNGLBINDBUFFERPROC gl_BindBuffer;
-
 typedef void (APIENTRY *PFNGLBUFFERDATAPROC) (GLenum target, ourGLsizeiptr size, const GLvoid *data, GLenum usage);
-PFNGLBUFFERDATAPROC gl_BufferData;
-
 typedef GLuint (APIENTRY *PFNGLCREATESHADERPROC) (GLenum type);
-PFNGLCREATESHADERPROC gl_CreateShader;
-
 typedef void (APIENTRY *PFNGLSHADERSOURCEPROC) (GLuint shader, GLsizei count, const ourGLchar **string, const GLint *length);
-PFNGLSHADERSOURCEPROC gl_ShaderSource;
-
 typedef void (APIENTRY *PFNGLCOMPILESHADERPROC) (GLuint shader);
-PFNGLCOMPILESHADERPROC gl_CompileShader;
-
 typedef GLuint (APIENTRY *PFNGLCREATEPROGRAMPROC) (void);
-PFNGLCREATEPROGRAMPROC gl_CreateProgram;
-
 typedef void (APIENTRY *PFNGLATTACHSHADERPROC) (GLuint program, GLuint shader);
-PFNGLATTACHSHADERPROC gl_AttachShader;
-
 typedef void (APIENTRY *PFNGLLINKPROGRAMPROC) (GLuint program);
-PFNGLLINKPROGRAMPROC gl_LinkProgram;
-
 typedef void (APIENTRY *PFNGLUSEPROGRAMPROC) (GLuint program);
-PFNGLUSEPROGRAMPROC gl_UseProgram;
-
 typedef void (APIENTRY *PFNGLGETSHADERIVPROC) (GLuint shader, GLenum pname, GLint *params);
-PFNGLGETSHADERIVPROC gl_GetShaderiv;
-
 typedef void (APIENTRY *PFNGLGETSHADERINFOLOGPROC) (GLuint shader, GLsizei bufSize, GLsizei *length, ourGLchar *infoLog);
-PFNGLGETSHADERINFOLOGPROC gl_GetShaderInfoLog;
-
 typedef void (APIENTRY *PFNGLGETPROGRAMIVPROC) (GLenum target, GLenum pname, GLint *params);
-PFNGLGETPROGRAMIVPROC gl_GetProgramiv;
-
 typedef void (APIENTRY *PFNGLGETPROGRAMINFOLOGPROC) (GLuint program, GLsizei bufSize, GLsizei *length, ourGLchar *infoLog);
-PFNGLGETPROGRAMINFOLOGPROC gl_GetProgramInfoLog;
-
 typedef GLint (APIENTRY *PFNGLGETATTRIBLOCATIONPROC) (GLuint program, const ourGLchar *name);
-PFNGLGETATTRIBLOCATIONPROC gl_GetAttribLocation;
-
 typedef void (APIENTRY *PFNGLVERTEXATTRIBPOINTERPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
-PFNGLVERTEXATTRIBPOINTERPROC gl_VertexAttribPointer;
-
 typedef void (APIENTRY *PFNGLENABLEVERTEXATTRIBARRAYPROC) (GLuint index);
-PFNGLENABLEVERTEXATTRIBARRAYPROC gl_EnableVertexAttribArray;
-
 typedef GLint (APIENTRY *PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const ourGLchar *name);
-PFNGLGETUNIFORMLOCATIONPROC gl_GetUniformLocation;
-
 typedef void (APIENTRY *PFNGLUNIFORMMATRIX4FVPROC) (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+#endif  /* defined(WIN32) */
+
+PFNGLGENBUFFERSPROC gl_GenBuffers;
+PFNGLBINDBUFFERPROC gl_BindBuffer;
+PFNGLBUFFERDATAPROC gl_BufferData;
+PFNGLCREATESHADERPROC gl_CreateShader;
+PFNGLSHADERSOURCEPROC gl_ShaderSource;
+PFNGLCOMPILESHADERPROC gl_CompileShader;
+PFNGLCREATEPROGRAMPROC gl_CreateProgram;
+PFNGLATTACHSHADERPROC gl_AttachShader;
+PFNGLLINKPROGRAMPROC gl_LinkProgram;
+PFNGLUSEPROGRAMPROC gl_UseProgram;
+PFNGLGETSHADERIVPROC gl_GetShaderiv;
+PFNGLGETSHADERINFOLOGPROC gl_GetShaderInfoLog;
+PFNGLGETPROGRAMIVPROC gl_GetProgramiv;
+PFNGLGETPROGRAMINFOLOGPROC gl_GetProgramInfoLog;
+PFNGLGETATTRIBLOCATIONPROC gl_GetAttribLocation;
+PFNGLVERTEXATTRIBPOINTERPROC gl_VertexAttribPointer;
+PFNGLENABLEVERTEXATTRIBARRAYPROC gl_EnableVertexAttribArray;
+PFNGLGETUNIFORMLOCATIONPROC gl_GetUniformLocation;
 PFNGLUNIFORMMATRIX4FVPROC gl_UniformMatrix4fv;
 
 void initExtensionEntries(void) 
