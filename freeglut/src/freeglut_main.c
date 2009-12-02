@@ -27,7 +27,7 @@
 
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
-#if HAVE_ERRNO
+#if HAVE_ERRNO_H
 #    include <errno.h>
 #endif
 #include <stdarg.h>
@@ -473,7 +473,7 @@ static void fghSleepForEvents( void )
         wait.tv_usec = (msec % 1000) * 1000;
         err = select( socket+1, &fdset, NULL, NULL, &wait );
 
-#if HAVE_ERRNO
+#if HAVE_ERRNO_H
         if( ( -1 == err ) && ( errno != EINTR ) )
             fgWarning ( "freeglut select() error: %d", errno );
 #endif

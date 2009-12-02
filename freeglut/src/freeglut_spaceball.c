@@ -215,7 +215,10 @@ OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if HAVE_ERRNO_H
 #include <errno.h>
+#endif
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
