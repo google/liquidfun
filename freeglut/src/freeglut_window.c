@@ -600,9 +600,6 @@ void fgSetWindow ( SFG_Window *window )
             window->Window.Handle,
             window->Window.Context
         );
-
-        /* also register this window to receive spaceball events */
-        fgSpaceballSetWindow(window);
     }
 #elif TARGET_HOST_MS_WINDOWS
     if( fgStructure.CurrentWindow )

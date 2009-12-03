@@ -143,11 +143,13 @@ int fgIsSpaceballXEvent(const XEvent *xev)
 {
     spnav_event sev;
 
+    if(spnav_win != fgStructure.CurrentWindow) {
+        /* this will also initialize spaceball if needed (first call) */
+        fgSpaceballSetWindow(fgStructure.CurrentWindow);
+    }
+
     if(!sball_initialized) {
-        fgInitialiseSpaceball();
-        if(!sball_initialized) {
-            return 0;
-        }
+        return 0;
     }
 
     return spnav_x11_event(xev, &sev);
