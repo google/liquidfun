@@ -28,10 +28,6 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-#if TARGET_HOST_POSIX_X11
-  #include <X11/cursorfont.h>
-#endif
-
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *  glutSetCursor()     -- Win32 mappings are incomplete.
@@ -44,6 +40,8 @@
 /* -- PRIVATE FUNCTIONS --------------------------------------------------- */
 
 #if TARGET_HOST_POSIX_X11
+  #include <X11/cursorfont.h>
+
 /*
  * A factory method for an empty cursor
  */
@@ -102,62 +100,71 @@ static cursorCacheEntry cursorCache[] = {
     { XC_bottom_right_corner, None }, /* GLUT_CURSOR_BOTTOM_RIGHT_CORNER */
     { XC_bottom_left_corner,  None }  /* GLUT_CURSOR_BOTTOM_LEFT_CORNER */
 };
-#endif
 
-/* -- INTERNAL FUNCTIONS ---------------------------------------------------- */
-
-/*
- * Set the cursor image to be used for the current window
- */
-void fgSetCursor ( SFG_Window *window, int cursorID )
+static void fghSetCursor ( SFG_Window *window, int cursorID )
 {
-#if TARGET_HOST_POSIX_X11
-    {
-        Cursor cursor;
-        /*
-         * XXX FULL_CROSSHAIR demotes to plain CROSSHAIR. Old GLUT allows
-         * for this, but if there is a system that easily supports a full-
-         * window (or full-screen) crosshair, we might consider it.
-         */
-        int cursorIDToUse =
-            ( cursorID == GLUT_CURSOR_FULL_CROSSHAIR ) ? GLUT_CURSOR_CROSSHAIR : cursorID;
+    Cursor cursor;
+    /*
+     * XXX FULL_CROSSHAIR demotes to plain CROSSHAIR. Old GLUT allows
+     * for this, but if there is a system that easily supports a full-
+     * window (or full-screen) crosshair, we might consider it.
+     */
+    int cursorIDToUse =
+        ( cursorID == GLUT_CURSOR_FULL_CROSSHAIR ) ? GLUT_CURSOR_CROSSHAIR : cursorID;
 
-        if( ( cursorIDToUse >= 0 ) &&
-            ( cursorIDToUse < sizeof( cursorCache ) / sizeof( cursorCache[0] ) ) ) {
-            cursorCacheEntry *entry = &cursorCache[ cursorIDToUse ];
-            if( entry->cachedCursor == None ) {
-                entry->cachedCursor =
-                    XCreateFontCursor( fgDisplay.Display, entry->cursorShape );
-            }
-            cursor = entry->cachedCursor;
-        } else {
-            switch( cursorIDToUse )
-            {
-            case GLUT_CURSOR_NONE:
-                cursor = getEmptyCursor( );
-                break;
-
-            case GLUT_CURSOR_INHERIT:
-                cursor = None;
-                break;
-
-            default:
-                fgError( "Unknown cursor type: %d", cursorIDToUse );
-                return;
-            }
+    if( ( cursorIDToUse >= 0 ) &&
+        ( cursorIDToUse < sizeof( cursorCache ) / sizeof( cursorCache[0] ) ) ) {
+        cursorCacheEntry *entry = &cursorCache[ cursorIDToUse ];
+        if( entry->cachedCursor == None ) {
+            entry->cachedCursor =
+                XCreateFontCursor( fgDisplay.Display, entry->cursorShape );
         }
+        cursor = entry->cachedCursor;
+    } else {
+        switch( cursorIDToUse )
+        {
+        case GLUT_CURSOR_NONE:
+            cursor = getEmptyCursor( );
+            break;
 
-        if ( cursorIDToUse == GLUT_CURSOR_INHERIT ) {
-            XUndefineCursor( fgDisplay.Display, window->Window.Handle );
-        } else if ( cursor != None ) {
-            XDefineCursor( fgDisplay.Display, window->Window.Handle, cursor );
-        } else if ( cursorIDToUse != GLUT_CURSOR_NONE ) {
-            fgError( "Failed to create cursor" );
+        case GLUT_CURSOR_INHERIT:
+            cursor = None;
+            break;
+
+        default:
+            fgError( "Unknown cursor type: %d", cursorIDToUse );
+            return;
         }
     }
 
-#elif TARGET_HOST_MS_WINDOWS
+    if ( cursorIDToUse == GLUT_CURSOR_INHERIT ) {
+        XUndefineCursor( fgDisplay.Display, window->Window.Handle );
+    } else if ( cursor != None ) {
+        XDefineCursor( fgDisplay.Display, window->Window.Handle, cursor );
+    } else if ( cursorIDToUse != GLUT_CURSOR_NONE ) {
+        fgError( "Failed to create cursor" );
+    }
+}
 
+
+static void fghWarpPointer ( int x, int y )
+{
+    XWarpPointer(
+        fgDisplay.Display,
+        None,
+        fgStructure.CurrentWindow->Window.Handle,
+        0, 0, 0, 0,
+        x, y
+    );
+    /* Make the warp visible immediately. */
+    XFlush( fgDisplay.Display );
+}
+#endif
+
+
+#if TARGET_HOST_MS_WINDOWS
+static void fghSetCursor ( SFG_Window *window, int cursorID )
+{
     /*
      * Joe Krahn is re-writing the following code.
      */
@@ -224,10 +231,24 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
         fgError( "Unknown cursor type: %d", cursorID );
         break;
     }
+}
+
+
+static void fghWarpPointer ( int x, int y )
+{
+    POINT coords;
+    coords.x = x;
+    coords.y = y;
+
+    /* ClientToScreen() translates {coords} for us. */
+    ClientToScreen( fgStructure.CurrentWindow->Window.Handle, &coords );
+    SetCursorPos( coords.x, coords.y );
+}
 #endif
 
-    window->State.Cursor = cursorID;
-}
+
+/* -- INTERNAL FUNCTIONS ---------------------------------------------------- */
+
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
@@ -239,7 +260,8 @@ void FGAPIENTRY glutSetCursor( int cursorID )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetCursor" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetCursor" );
 
-    fgSetCursor ( fgStructure.CurrentWindow, cursorID );
+    fghSetCursor ( fgStructure.CurrentWindow, cursorID );
+    fgStructure.CurrentWindow->State.Cursor = cursorID;
 }
 
 /*
@@ -250,31 +272,7 @@ void FGAPIENTRY glutWarpPointer( int x, int y )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWarpPointer" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutWarpPointer" );
 
-#if TARGET_HOST_POSIX_X11
-
-    XWarpPointer(
-        fgDisplay.Display,
-        None,
-        fgStructure.CurrentWindow->Window.Handle,
-        0, 0, 0, 0,
-        x, y
-    );
-    /* Make the warp visible immediately. */
-    XFlush( fgDisplay.Display );
-
-#elif TARGET_HOST_MS_WINDOWS
-
-    {
-        POINT coords;
-        coords.x = x;
-        coords.y = y;
-
-        /* ClientToScreen() translates {coords} for us. */
-        ClientToScreen( fgStructure.CurrentWindow->Window.Handle, &coords );
-        SetCursorPos( coords.x, coords.y );
-    }
-
-#endif
+    fghWarpPointer ( x, y );
 }
 
 /*** END OF FILE ***/
