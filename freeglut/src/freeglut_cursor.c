@@ -248,6 +248,10 @@ static void fghWarpPointer ( int x, int y )
 
 
 /* -- INTERNAL FUNCTIONS ---------------------------------------------------- */
+void fgSetCursor ( SFG_Window *window, int cursorID )
+{
+    fghSetCursor ( window, cursorID );
+}
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
