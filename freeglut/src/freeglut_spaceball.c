@@ -218,7 +218,7 @@ OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
 
