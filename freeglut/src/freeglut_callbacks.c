@@ -179,6 +179,15 @@ void FGAPIENTRY glutJoystickFunc( void (* callback)
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickFunc" );
     fgInitialiseJoysticks ();
 
+    if ( ( ( fgStructure.CurrentWindow->State.JoystickPollRate < 0 ) ||
+           !FETCH_WCB(*fgStructure.CurrentWindow,Joystick) ) &&  /* Joystick callback was disabled */
+         ( callback && ( pollInterval >= 0 ) ) )               /* but is now enabled */
+        ++fgState.NumActiveJoysticks;
+    else if ( ( ( fgStructure.CurrentWindow->State.JoystickPollRate >= 0 ) &&
+                FETCH_WCB(*fgStructure.CurrentWindow,Joystick) ) &&  /* Joystick callback was enabled */
+              ( !callback || ( pollInterval < 0 ) ) )              /* but is now disabled */
+        --fgState.NumActiveJoysticks;
+
     SET_CALLBACK( Joystick );
     fgStructure.CurrentWindow->State.JoystickPollRate = pollInterval;
 

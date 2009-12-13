@@ -57,7 +57,7 @@
 
 #else
 #   error "Unrecognized target host!"
-*/
+
 #endif
 #endif
 
@@ -320,6 +320,7 @@ struct tagSFG_State
     fgExecutionState ExecState;           /* Used for GLUT termination       */
     char            *ProgramName;         /* Name of the invoking program    */
     GLboolean        JoysticksInitialised;  /* Only initialize if application calls for them */
+    int              NumActiveJoysticks;    /* Number of active joysticks -- if zero, don't poll joysticks */
     GLboolean        InputDevsInitialised;  /* Only initialize if application calls for them */
 
     int              AuxiliaryBufferNumber;  /* Number of auxiliary buffers */

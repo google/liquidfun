@@ -84,6 +84,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GLUT_EXEC_STATE_INIT,   /* ExecState */
                       NULL,                   /* ProgramName */
                       GL_FALSE,               /* JoysticksInitialised */
+                      0,                      /* NumActiveJoysticks */
                       GL_FALSE,               /* InputDevsInitialised */
                       1,                      /* AuxiliaryBufferNumber */
                       4,                      /* SampleNumber */
