@@ -36,19 +36,15 @@
 #include "freeglut_internal.h"
 
 #if TARGET_HOST_POSIX_X11
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
 #include <sys/ioctl.h>
-#include <sys/time.h>
-#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <termios.h>
 #include <fcntl.h>
-#include <sys/types.h>
 
 typedef struct {
    int fd;

@@ -33,7 +33,7 @@
 
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
-#if HAVE_SYS_PARAM_H
+#ifdef HAVE_SYS_PARAM_H
 #    include <sys/param.h>
 #endif
 
@@ -69,14 +69,15 @@
 
 #if TARGET_HOST_POSIX_X11
 #    define _JS_MAX_AXES 16
-#    if HAVE_SYS_IOCTL_H
+#    ifdef HAVE_SYS_IOCTL_H
 #        include <sys/ioctl.h>
 #    endif
-#    if HAVE_FCNTL_H
+#    ifdef HAVE_FCNTL_H
 #        include <fcntl.h>
 #    endif
-#    if HAVE_ERRNO_H
+#    ifdef HAVE_ERRNO_H
 #        include <errno.h>
+#        include <string.h>
 #    endif
 #    if defined(__FreeBSD__) || defined(__NetBSD__)
 /* XXX The below hack is done until freeglut's autoconf is updated. */
@@ -240,7 +241,7 @@ static int fghJoystickFindUSBdev(char *name, char *out, int outlen)
       if (cp)
         return 1;
     }
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
     else if (errno == EACCES) {
       if (!protection_warned) {
         fgWarning ( "Can't open %s for read!", buf );
@@ -265,7 +266,7 @@ static int fghJoystickInitializeHID(struct os_specific_s *os,
 
     if ( ( rd = hid_get_report_desc( os->fd ) ) == 0 )
     {
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
         fgWarning ( "error: %s: %s", os->fname, strerror( errno ) );
 #else
         fgWarning ( "error: %s", os->fname );
@@ -279,7 +280,7 @@ static int fghJoystickInitializeHID(struct os_specific_s *os,
         if( ioctl( os->fd, USB_GET_REPORT_ID, &report_id ) < 0)
         {
             /*** XXX {report_id} may not be the right variable? ***/
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
             fgWarning ( "error: %s%d: %s", UHIDDEV, report_id, strerror( errno ) );
 #else
             fgWarning ( "error: %s%d", UHIDDEV, report_id );
@@ -676,7 +677,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
             }
         }
     }
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
     if ( len < 0 && errno != EAGAIN )
 #else
     if ( len < 0 )
@@ -699,7 +700,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 
         if ( status != sizeof( struct js_event ) )
         {
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
             if ( errno == EAGAIN )
             {
                 /* Use the old values */
@@ -1317,7 +1318,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 
     joy->os->fd = open( joy->os->fname, O_RDONLY | O_NONBLOCK);
 
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
     if( joy->os->fd < 0 && errno == EACCES )
         fgWarning ( "%s exists but is not readable by you", joy->os->fname );
 #endif

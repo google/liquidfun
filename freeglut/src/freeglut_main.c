@@ -27,13 +27,13 @@
 
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
 #    include <errno.h>
 #endif
 #include <stdarg.h>
-#if  HAVE_VPRINTF
+#ifdef  HAVE_VFPRINTF
 #    define VFPRINTF(s,f,a) vfprintf((s),(f),(a))
-#elif HAVE_DOPRNT
+#elif defined(HAVE__DOPRNT)
 #    define VFPRINTF(s,f,a) _doprnt((f),(a),(s))
 #else
 #    define VFPRINTF(s,f,a)
@@ -59,7 +59,7 @@ struct GXKeyList gxKeyList;
  * Try to get the maximum value allowed for ints, falling back to the minimum
  * guaranteed by ISO C99 if there is no suitable header.
  */
-#if HAVE_LIMITS_H
+#ifdef HAVE_LIMITS_H
 #    include <limits.h>
 #endif
 #ifndef INT_MAX
@@ -473,7 +473,7 @@ static void fghSleepForEvents( void )
         wait.tv_usec = (msec % 1000) * 1000;
         err = select( socket+1, &fdset, NULL, NULL, &wait );
 
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
         if( ( -1 == err ) && ( errno != EINTR ) )
             fgWarning ( "freeglut select() error: %d", errno );
 #endif

@@ -28,7 +28,7 @@
 #ifndef  FREEGLUT_INTERNAL_H
 #define  FREEGLUT_INTERNAL_H
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #    include "config.h"
 #endif
 
@@ -41,6 +41,7 @@
 /* XXX: Don't all MS-Windows compilers (except Cygwin) have _WIN32 defined?
  * XXX: If so, remove the first set of defined()'s below.
  */
+#if !defined(TARGET_HOST_POSIX_X11) && !defined(TARGET_HOST_MS_WINDOWS) && !defined(TARGET_HOST_MAC_OSX)
 #if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__) \
     || defined(_WIN32) || defined(_WIN32_WCE) \
     || ( defined(__CYGWIN__) && defined(X_DISPLAY_MISSING) )
@@ -57,6 +58,7 @@
 #else
 #   error "Unrecognized target host!"
 */
+#endif
 #endif
 
 /* Detect both SunPro and gcc compilers on Sun Solaris */
@@ -109,7 +111,7 @@
 #    include <X11/Xatom.h>
 #    include <X11/keysym.h>
 #    include <X11/extensions/XInput.h>
-#    ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
+#    ifdef HAVE_XXF86VM
 #        include <X11/extensions/xf86vmode.h>
 #    endif
 /* If GLX is too old, we will fail during runtime when multisampling
@@ -130,16 +132,16 @@
 #include <stdlib.h>
 
 /* These are included based on autoconf directives. */
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 #    include <sys/types.h>
 #endif
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #endif
-#if TIME_WITH_SYS_TIME
+#ifdef TIME_WITH_SYS_TIME
 #    include <sys/time.h>
 #    include <time.h>
-#elif HAVE_SYS_TIME_H
+#elif defined(HAVE_SYS_TIME_H)
 #    include <sys/time.h>
 #else
 #    include <time.h>
@@ -157,15 +159,6 @@
 #    if defined(__NetBSD__) || ( defined(__FreeBSD__) && __FreeBSD_version >= 500000)
 #        define HAVE_USBHID_H 1
 #    endif
-#endif
-
-#if TARGET_HOST_MS_WINDOWS
-#    define  HAVE_VPRINTF 1
-#endif
-
-#if !defined(HAVE_VPRINTF) && !defined(HAVE_DOPRNT)
-/* XXX warning directive here? */
-#    define  HAVE_VPRINTF 1
 #endif
 
 /* MinGW may lack a prototype for ChangeDisplaySettingsEx() (depending on the version?) */
@@ -189,12 +182,21 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 #    define  M_PI  3.14159265358979323846
 #endif
 
-#ifndef TRUE
-#    define  TRUE  1
-#endif
-
-#ifndef FALSE
-#    define  FALSE  0
+#ifdef HAVE_STDBOOL_H
+#    include <stdbool.h>
+#    ifndef TRUE
+#        define TRUE true
+#    endif
+#    ifndef FALSE
+#        define FALSE false
+#    endif
+#else
+#    ifndef TRUE
+#        define  TRUE  1
+#    endif
+#    ifndef FALSE
+#        define  FALSE  0
+#    endif
 #endif
 
 /* General defines */
