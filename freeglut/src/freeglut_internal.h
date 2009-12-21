@@ -41,7 +41,7 @@
 /* XXX: Don't all MS-Windows compilers (except Cygwin) have _WIN32 defined?
  * XXX: If so, remove the first set of defined()'s below.
  */
-#if !defined(TARGET_HOST_POSIX_X11) && !defined(TARGET_HOST_MS_WINDOWS) && !defined(TARGET_HOST_MAC_OSX)
+#if !defined(TARGET_HOST_POSIX_X11) && !defined(TARGET_HOST_MS_WINDOWS) && !defined(TARGET_HOST_MAC_OSX) && !defined(TARGET_HOST_SOLARIS)
 #if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__) \
     || defined(_WIN32) || defined(_WIN32_WCE) \
     || ( defined(__CYGWIN__) && defined(X_DISPLAY_MISSING) )
