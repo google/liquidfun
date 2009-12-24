@@ -39,7 +39,7 @@
 
 /* -- PRIVATE FUNCTIONS --------------------------------------------------- */
 
-#if TARGET_HOST_POSIX_X11
+#if TARGET_HOST_POSIX_X11 || TARGET_HOST_MAC_OSX || TARGET_HOST_SOLARIS
   #include <X11/cursorfont.h>
 
 /*

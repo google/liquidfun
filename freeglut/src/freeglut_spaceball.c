@@ -10,6 +10,8 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
+/* -- PRIVATE FUNCTIONS --------------------------------------------------- */
+
 #if TARGET_HOST_POSIX_X11
 #include <X11/Xlib.h>
 
