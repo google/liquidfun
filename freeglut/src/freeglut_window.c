@@ -38,18 +38,108 @@
 #   ifdef FREEGLUT_LIB_PRAGMAS
 #       pragma comment( lib, "Aygshell.lib" )
 #   endif
-
-static wchar_t* fghWstrFromStr(const char* str)
-{
-    int i,len=strlen(str);
-    wchar_t* wstr = (wchar_t*)malloc(2*len+2);
-    for(i=0; i<len; i++)
-        wstr[i] = str[i];
-    wstr[len] = 0;
-    return wstr;
-}
-
 #endif /* defined(_WIN32_WCE) */
+
+
+#if TARGET_HOST_POSIX_X11
+#ifndef GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB
+#define GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB 0x20B2
+#endif
+
+#ifndef GLX_CONTEXT_MAJOR_VERSION_ARB
+#define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
+#endif
+
+#ifndef GLX_CONTEXT_MINOR_VERSION_ARB
+#define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
+#endif
+
+#ifndef GLX_CONTEXT_FLAGS_ARB
+#define GLX_CONTEXT_FLAGS_ARB 0x2094
+#endif
+
+#ifndef GLX_CONTEXT_PROFILE_MASK_ARB
+#define GLX_CONTEXT_PROFILE_MASK_ARB 0x9126
+#endif
+
+#ifndef GLX_CONTEXT_DEBUG_BIT_ARB
+#define GLX_CONTEXT_DEBUG_BIT_ARB 0x0001
+#endif
+
+#ifndef GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
+#define GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
+#endif
+
+#ifndef GLX_CONTEXT_CORE_PROFILE_BIT_ARB
+#define GLX_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
+#endif
+
+#ifndef GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
+#define GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
+#endif
+
+#ifndef GLX_RGBA_FLOAT_TYPE
+#define GLX_RGBA_FLOAT_TYPE 0x20B9
+#endif
+
+#ifndef GLX_RGBA_FLOAT_BIT
+#define GLX_RGBA_FLOAT_BIT 0x00000004
+#endif
+#endif  /* TARGET_HOST_POSIX_X11 */
+
+
+#if TARGET_HOST_MS_WINDOWS
+/* The following include file is available from SGI but is not standard:
+ *   #include <GL/wglext.h>
+ * So we copy the necessary parts out of it.
+ * XXX: should local definitions for extensions be put in a separate include file?
+ */
+typedef const char * (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
+
+typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
+
+#define WGL_DRAW_TO_WINDOW_ARB         0x2001
+#define WGL_ACCELERATION_ARB           0x2003
+#define WGL_SUPPORT_OPENGL_ARB         0x2010
+#define WGL_DOUBLE_BUFFER_ARB          0x2011
+#define WGL_COLOR_BITS_ARB             0x2014
+#define WGL_ALPHA_BITS_ARB             0x201B
+#define WGL_DEPTH_BITS_ARB             0x2022
+#define WGL_STENCIL_BITS_ARB           0x2023
+#define WGL_FULL_ACCELERATION_ARB      0x2027
+
+#define WGL_SAMPLE_BUFFERS_ARB         0x2041
+#define WGL_SAMPLES_ARB                0x2042
+
+#define WGL_TYPE_RGBA_FLOAT_ARB        0x21A0
+
+#define WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB 0x20A9
+
+#ifndef WGL_ARB_create_context
+#define WGL_ARB_create_context 1
+#ifdef WGL_WGLEXT_PROTOTYPES
+extern HGLRC WINAPI wglCreateContextAttribsARB (HDC, HGLRC, const int *);
+#endif /* WGL_WGLEXT_PROTOTYPES */
+typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
+
+#define WGL_CONTEXT_MAJOR_VERSION_ARB  0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB  0x2092
+#define WGL_CONTEXT_LAYER_PLANE_ARB    0x2093
+#define WGL_CONTEXT_FLAGS_ARB          0x2094
+#define WGL_CONTEXT_PROFILE_MASK_ARB   0x9126
+
+#define WGL_CONTEXT_DEBUG_BIT_ARB      0x0001
+#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
+
+#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
+#define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
+
+#define ERROR_INVALID_VERSION_ARB      0x2095
+#define ERROR_INVALID_PROFILE_ARB      0x2096
+#endif
+
+#endif  /* TARGET_HOST_MS_WINDOWS */
+
 
 /* pushing attribute/value pairs into an array */
 #define ATTRIB(a) attributes[where++]=(a)
@@ -122,14 +212,13 @@ static void fghContextCreationError( void )
              fgState.ContextProfile );
 }
 
+
+/* -- SYSTEM-DEPENDENT PRIVATE FUNCTIONS ------------------------------------ */
+
+#if TARGET_HOST_POSIX_X11
 /*
  * Chooses a visual basing on the current display mode settings
  */
-#if TARGET_HOST_POSIX_X11
-
-#ifndef GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB
-#define GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB 0x20B2
-#endif
 
 GLXFBConfig* fgChooseFBConfig( void )
 {
@@ -299,60 +388,177 @@ GLXFBConfig* fgChooseFBConfig( void )
         return fbconfig;
     }
 }
-#endif /* TARGET_HOST_POSIX_X11 */
 
+
+static void fghFillContextAttributes( int *attributes ) {
+  int where = 0, contextFlags, contextProfile;
+
+  if ( !fghIsLegacyContextVersionRequested() ) {
+    ATTRIB_VAL( GLX_CONTEXT_MAJOR_VERSION_ARB, fgState.MajorVersion );
+    ATTRIB_VAL( GLX_CONTEXT_MINOR_VERSION_ARB, fgState.MinorVersion );
+  }
+
+  contextFlags =
+    fghMapBit( fgState.ContextFlags, GLUT_DEBUG, GLX_CONTEXT_DEBUG_BIT_ARB ) |
+    fghMapBit( fgState.ContextFlags, GLUT_FORWARD_COMPATIBLE, GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB );
+  if ( contextFlags != 0 ) {
+    ATTRIB_VAL( GLX_CONTEXT_FLAGS_ARB, contextFlags );
+  }
+
+  contextProfile =
+    fghMapBit( fgState.ContextProfile, GLUT_CORE_PROFILE, GLX_CONTEXT_CORE_PROFILE_BIT_ARB ) |
+    fghMapBit( fgState.ContextProfile, GLUT_COMPATIBILITY_PROFILE, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB );
+  if ( contextProfile != 0 ) {
+    ATTRIB_VAL( GLX_CONTEXT_PROFILE_MASK_ARB, contextProfile );
+  }
+
+  ATTRIB( 0 );
+}
+
+typedef GLXContext (*CreateContextAttribsProc)(Display *dpy, GLXFBConfig config,
+					       GLXContext share_list, Bool direct,
+					       const int *attrib_list);
+
+static GLXContext fghCreateNewContext( SFG_Window* window )
+{
+  /* for color model calculation */
+  int menu = ( window->IsMenu && !fgStructure.MenuContext );
+  int index_mode = ( fgState.DisplayMode & GLUT_INDEX );
+
+  /* "classic" context creation */
+  Display *dpy = fgDisplay.Display;
+  GLXFBConfig config = *(window->Window.FBConfig);
+  int render_type = ( !menu && index_mode ) ? GLX_COLOR_INDEX_TYPE : GLX_RGBA_TYPE;
+  GLXContext share_list = NULL;
+  Bool direct = ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT );
+  GLXContext context;
+
+  /* new context creation */
+  int attributes[9];
+  CreateContextAttribsProc createContextAttribs;
+
+  /* If nothing fancy has been required, simply use the old context creation GLX API entry */
+  if ( fghIsLegacyContextRequested() )
+  {
+    context = glXCreateNewContext( dpy, config, render_type, share_list, direct );
+    if ( context == NULL ) {
+      fghContextCreationError();
+    }
+    return context;
+  }
+
+  /* color index mode is not available anymore with OpenGL 3.0 */
+  if ( render_type == GLX_COLOR_INDEX_TYPE ) {
+    fgWarning( "color index mode is deprecated, using RGBA mode" );
+  }
+
+  fghFillContextAttributes( attributes );
+
+  createContextAttribs = (CreateContextAttribsProc) fghGetProcAddress( "glXCreateContextAttribsARB" );
+  if ( createContextAttribs == NULL ) {
+    fgError( "glXCreateContextAttribsARB not found" );
+  }
+
+  context = createContextAttribs( dpy, config, share_list, direct, attributes );
+  if ( context == NULL ) {
+    fghContextCreationError();
+  }
+  return context;
+}
+
+
+#define _NET_WM_STATE_TOGGLE    2
+static int fghResizeFullscrToggle(void)
+{
+    XWindowAttributes attributes;
+
+    if(glutGet(GLUT_FULL_SCREEN)) {
+        /* restore original window size */
+        SFG_Window *win = fgStructure.CurrentWindow;
+        fgStructure.CurrentWindow->State.NeedToResize = GL_TRUE;
+        fgStructure.CurrentWindow->State.Width  = win->State.OldWidth;
+        fgStructure.CurrentWindow->State.Height = win->State.OldHeight;
+
+    } else {
+        /* resize the window to cover the entire screen */
+        XGetWindowAttributes(fgDisplay.Display,
+                fgStructure.CurrentWindow->Window.Handle,
+                &attributes);
+        
+        /*
+         * The "x" and "y" members of "attributes" are the window's coordinates
+         * relative to its parent, i.e. to the decoration window.
+         */
+        XMoveResizeWindow(fgDisplay.Display,
+                fgStructure.CurrentWindow->Window.Handle,
+                -attributes.x,
+                -attributes.y,
+                fgDisplay.ScreenWidth,
+                fgDisplay.ScreenHeight);
+    }
+    return 0;
+}
+
+static int fghEwmhFullscrToggle(void)
+{
+    XEvent xev;
+    long evmask = SubstructureRedirectMask | SubstructureNotifyMask;
+
+    if(!fgDisplay.State || !fgDisplay.StateFullScreen) {
+        return -1;
+    }
+
+    xev.type = ClientMessage;
+    xev.xclient.window = fgStructure.CurrentWindow->Window.Handle;
+    xev.xclient.message_type = fgDisplay.State;
+    xev.xclient.format = 32;
+    xev.xclient.data.l[0] = _NET_WM_STATE_TOGGLE;
+    xev.xclient.data.l[1] = fgDisplay.StateFullScreen;
+    xev.xclient.data.l[2] = 0;	/* no second property to toggle */
+    xev.xclient.data.l[3] = 1;	/* source indication: application */
+    xev.xclient.data.l[4] = 0;	/* unused */
+
+    if(!XSendEvent(fgDisplay.Display, fgDisplay.RootWindow, 0, evmask, &xev)) {
+        return -1;
+    }
+    return 0;
+}
+
+static int fghToggleFullscreen(void)
+{
+    /* first try the EWMH (_NET_WM_STATE) method ... */
+    if(fghEwmhFullscrToggle() != -1) {
+        return 0;
+    }
+
+    /* fall back to resizing the window */
+    if(fghResizeFullscrToggle() != -1) {
+        return 0;
+    }
+    return -1;
+}
+
+
+#endif  /* TARGET_HOST_POSIX_X11 */
+
+
+#if TARGET_HOST_MS_WINDOWS
 /*
  * Setup the pixel format for a Win32 window
  */
-#if TARGET_HOST_MS_WINDOWS
-/* The following include file is available from SGI but is not standard:
- *   #include <GL/wglext.h>
- * So we copy the necessary parts out of it.
- * XXX: should local definitions for extensions be put in a separate include file?
- */
-typedef const char * (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
 
-typedef BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats);
+#if defined(_WIN32_WCE)
+static wchar_t* fghWstrFromStr(const char* str)
+{
+    int i,len=strlen(str);
+    wchar_t* wstr = (wchar_t*)malloc(2*len+2);
+    for(i=0; i<len; i++)
+        wstr[i] = str[i];
+    wstr[len] = 0;
+    return wstr;
+}
+#endif /* defined(_WIN32_WCE) */
 
-#define WGL_DRAW_TO_WINDOW_ARB         0x2001
-#define WGL_ACCELERATION_ARB           0x2003
-#define WGL_SUPPORT_OPENGL_ARB         0x2010
-#define WGL_DOUBLE_BUFFER_ARB          0x2011
-#define WGL_COLOR_BITS_ARB             0x2014
-#define WGL_ALPHA_BITS_ARB             0x201B
-#define WGL_DEPTH_BITS_ARB             0x2022
-#define WGL_STENCIL_BITS_ARB           0x2023
-#define WGL_FULL_ACCELERATION_ARB      0x2027
-
-#define WGL_SAMPLE_BUFFERS_ARB         0x2041
-#define WGL_SAMPLES_ARB                0x2042
-
-#define WGL_TYPE_RGBA_FLOAT_ARB        0x21A0
-
-#define WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB 0x20A9
-
-#ifndef WGL_ARB_create_context
-#define WGL_ARB_create_context 1
-#ifdef WGL_WGLEXT_PROTOTYPES
-extern HGLRC WINAPI wglCreateContextAttribsARB (HDC, HGLRC, const int *);
-#endif /* WGL_WGLEXT_PROTOTYPES */
-typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
-
-#define WGL_CONTEXT_MAJOR_VERSION_ARB  0x2091
-#define WGL_CONTEXT_MINOR_VERSION_ARB  0x2092
-#define WGL_CONTEXT_LAYER_PLANE_ARB    0x2093
-#define WGL_CONTEXT_FLAGS_ARB          0x2094
-#define WGL_CONTEXT_PROFILE_MASK_ARB   0x9126
-
-#define WGL_CONTEXT_DEBUG_BIT_ARB      0x0001
-#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
-
-#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
-#define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
-
-#define ERROR_INVALID_VERSION_ARB      0x2095
-#define ERROR_INVALID_PROFILE_ARB      0x2096
-#endif
 
 static void fghFillContextAttributes( int *attributes ) {
   int where = 0, contextFlags, contextProfile;
@@ -583,7 +789,8 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     return ( pixelformat != 0 ) && ( checkOnly || SetPixelFormat( window->Window.Device, pixelformat, ppfd ) );
 #endif /* defined(_WIN32_WCE) */
 }
-#endif /* TARGET_HOST_MS_WINDOWS */
+
+#endif  /* TARGET_HOST_MS_WINDOWS */
 
 /*
  * Sets the OpenGL context and the fgStructure "Current Window" pointer to
@@ -618,126 +825,6 @@ void fgSetWindow ( SFG_Window *window )
     fgStructure.CurrentWindow = window;
 }
 
-
-
-#if TARGET_HOST_POSIX_X11
-
-#ifndef GLX_CONTEXT_MAJOR_VERSION_ARB
-#define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
-#endif
-
-#ifndef GLX_CONTEXT_MINOR_VERSION_ARB
-#define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
-#endif
-
-#ifndef GLX_CONTEXT_FLAGS_ARB
-#define GLX_CONTEXT_FLAGS_ARB 0x2094
-#endif
-
-#ifndef GLX_CONTEXT_PROFILE_MASK_ARB
-#define GLX_CONTEXT_PROFILE_MASK_ARB 0x9126
-#endif
-
-#ifndef GLX_CONTEXT_DEBUG_BIT_ARB
-#define GLX_CONTEXT_DEBUG_BIT_ARB 0x0001
-#endif
-
-#ifndef GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
-#define GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
-#endif
-
-#ifndef GLX_CONTEXT_CORE_PROFILE_BIT_ARB
-#define GLX_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
-#endif
-
-#ifndef GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
-#define GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
-#endif
-
-#ifndef GLX_RGBA_FLOAT_TYPE
-#define GLX_RGBA_FLOAT_TYPE 0x20B9
-#endif
-
-#ifndef GLX_RGBA_FLOAT_BIT
-#define GLX_RGBA_FLOAT_BIT 0x00000004
-#endif
-
-static void fghFillContextAttributes( int *attributes ) {
-  int where = 0, contextFlags, contextProfile;
-
-  if ( !fghIsLegacyContextVersionRequested() ) {
-    ATTRIB_VAL( GLX_CONTEXT_MAJOR_VERSION_ARB, fgState.MajorVersion );
-    ATTRIB_VAL( GLX_CONTEXT_MINOR_VERSION_ARB, fgState.MinorVersion );
-  }
-
-  contextFlags =
-    fghMapBit( fgState.ContextFlags, GLUT_DEBUG, GLX_CONTEXT_DEBUG_BIT_ARB ) |
-    fghMapBit( fgState.ContextFlags, GLUT_FORWARD_COMPATIBLE, GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB );
-  if ( contextFlags != 0 ) {
-    ATTRIB_VAL( GLX_CONTEXT_FLAGS_ARB, contextFlags );
-  }
-
-  contextProfile =
-    fghMapBit( fgState.ContextProfile, GLUT_CORE_PROFILE, GLX_CONTEXT_CORE_PROFILE_BIT_ARB ) |
-    fghMapBit( fgState.ContextProfile, GLUT_COMPATIBILITY_PROFILE, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB );
-  if ( contextProfile != 0 ) {
-    ATTRIB_VAL( GLX_CONTEXT_PROFILE_MASK_ARB, contextProfile );
-  }
-
-  ATTRIB( 0 );
-}
-
-typedef GLXContext (*CreateContextAttribsProc)(Display *dpy, GLXFBConfig config,
-					       GLXContext share_list, Bool direct,
-					       const int *attrib_list);
-
-static GLXContext fghCreateNewContext( SFG_Window* window )
-{
-  /* for color model calculation */
-  int menu = ( window->IsMenu && !fgStructure.MenuContext );
-  int index_mode = ( fgState.DisplayMode & GLUT_INDEX );
-
-  /* "classic" context creation */
-  Display *dpy = fgDisplay.Display;
-  GLXFBConfig config = *(window->Window.FBConfig);
-  int render_type = ( !menu && index_mode ) ? GLX_COLOR_INDEX_TYPE : GLX_RGBA_TYPE;
-  GLXContext share_list = NULL;
-  Bool direct = ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT );
-  GLXContext context;
-
-  /* new context creation */
-  int attributes[9];
-  CreateContextAttribsProc createContextAttribs;
-
-  /* If nothing fancy has been required, simply use the old context creation GLX API entry */
-  if ( fghIsLegacyContextRequested() )
-  {
-    context = glXCreateNewContext( dpy, config, render_type, share_list, direct );
-    if ( context == NULL ) {
-      fghContextCreationError();
-    }
-    return context;
-  }
-
-  /* color index mode is not available anymore with OpenGL 3.0 */
-  if ( render_type == GLX_COLOR_INDEX_TYPE ) {
-    fgWarning( "color index mode is deprecated, using RGBA mode" );
-  }
-
-  fghFillContextAttributes( attributes );
-
-  createContextAttribs = (CreateContextAttribsProc) fghGetProcAddress( "glXCreateContextAttribsARB" );
-  if ( createContextAttribs == NULL ) {
-    fgError( "glXCreateContextAttribsARB not found" );
-  }
-
-  context = createContextAttribs( dpy, config, share_list, direct, attributes );
-  if ( context == NULL ) {
-    fghContextCreationError();
-  }
-  return context;
-}
-#endif
 
 
 /*
@@ -1556,83 +1643,6 @@ void FGAPIENTRY glutPopWindow( void )
 #endif
 }
 
-#if TARGET_HOST_POSIX_X11
-static int ewmh_fullscr_toggle(void);
-static int resize_fullscr_toogle(void);
-
-static int toggle_fullscreen(void)
-{
-    /* first try the EWMH (_NET_WM_STATE) method ... */
-    if(ewmh_fullscr_toggle() != -1) {
-        return 0;
-    }
-
-    /* fall back to resizing the window */
-    if(resize_fullscr_toogle() != -1) {
-        return 0;
-    }
-    return -1;
-}
-
-#define _NET_WM_STATE_TOGGLE    2
-static int ewmh_fullscr_toggle(void)
-{
-    XEvent xev;
-    long evmask = SubstructureRedirectMask | SubstructureNotifyMask;
-
-    if(!fgDisplay.State || !fgDisplay.StateFullScreen) {
-        return -1;
-    }
-
-    xev.type = ClientMessage;
-    xev.xclient.window = fgStructure.CurrentWindow->Window.Handle;
-    xev.xclient.message_type = fgDisplay.State;
-    xev.xclient.format = 32;
-    xev.xclient.data.l[0] = _NET_WM_STATE_TOGGLE;
-    xev.xclient.data.l[1] = fgDisplay.StateFullScreen;
-    xev.xclient.data.l[2] = 0;	/* no second property to toggle */
-    xev.xclient.data.l[3] = 1;	/* source indication: application */
-    xev.xclient.data.l[4] = 0;	/* unused */
-
-    if(!XSendEvent(fgDisplay.Display, fgDisplay.RootWindow, 0, evmask, &xev)) {
-        return -1;
-    }
-    return 0;
-}
-
-static int resize_fullscr_toogle(void)
-{
-    XWindowAttributes attributes;
-
-    if(glutGet(GLUT_FULL_SCREEN)) {
-        /* restore original window size */
-        SFG_Window *win = fgStructure.CurrentWindow;
-        fgStructure.CurrentWindow->State.NeedToResize = GL_TRUE;
-        fgStructure.CurrentWindow->State.Width  = win->State.OldWidth;
-        fgStructure.CurrentWindow->State.Height = win->State.OldHeight;
-
-    } else {
-        /* resize the window to cover the entire screen */
-        XGetWindowAttributes(fgDisplay.Display,
-                fgStructure.CurrentWindow->Window.Handle,
-                &attributes);
-        
-        /*
-         * The "x" and "y" members of "attributes" are the window's coordinates
-         * relative to its parent, i.e. to the decoration window.
-         */
-        XMoveResizeWindow(fgDisplay.Display,
-                fgStructure.CurrentWindow->Window.Handle,
-                -attributes.x,
-                -attributes.y,
-                fgDisplay.ScreenWidth,
-                fgDisplay.ScreenHeight);
-    }
-    return 0;
-}
-#endif	/* TARGET_HOST_POSIX_X11 */
-
-
 /*
  * Resize the current window so that it fits the whole screen
  */
@@ -1647,7 +1657,7 @@ void FGAPIENTRY glutFullScreen( void )
 
 #if TARGET_HOST_POSIX_X11
     if(!glutGet(GLUT_FULL_SCREEN)) {
-        if(toggle_fullscreen() != -1) {
+        if(fghToggleFullscreen() != -1) {
             win->State.IsFullscreen = GL_TRUE;
         }
     }
@@ -1711,7 +1721,7 @@ void FGAPIENTRY glutFullScreenToggle( void )
     win = fgStructure.CurrentWindow;
 
 #if TARGET_HOST_POSIX_X11
-    if(toggle_fullscreen() != -1) {
+    if(fghToggleFullscreen() != -1) {
         win->State.IsFullscreen = !win->State.IsFullscreen;
     }
 #elif TARGET_HOST_MS_WINDOWS
