@@ -43,7 +43,7 @@
  */
 
 /* Define FREEGLUT_LIB_PRAGMAS to 1 to include library
- * pragmas or to 1 to exclude library pragmas.
+ * pragmas or to 0 to exclude library pragmas.
  * The default behavior depends on the compiler/platform.
  */
 #   ifndef FREEGLUT_LIB_PRAGMAS
