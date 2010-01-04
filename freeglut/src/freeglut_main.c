@@ -1387,6 +1387,13 @@ void FGAPIENTRY glutMainLoopEvent( void )
                     case XK_Num_Lock :  special = GLUT_KEY_NUM_LOCK;  break;
                     case XK_KP_Begin :  special = GLUT_KEY_BEGIN;     break;
                     case XK_KP_Delete:  special = GLUT_KEY_DELETE;    break;
+
+                    case XK_Shift_L:   special = GLUT_KEY_SHIFT_L;    break;
+                    case XK_Shift_R:   special = GLUT_KEY_SHIFT_R;    break;
+                    case XK_Control_L: special = GLUT_KEY_CTRL_L;     break;
+                    case XK_Control_R: special = GLUT_KEY_CTRL_R;     break;
+                    case XK_Alt_L:     special = GLUT_KEY_ALT_L;      break;
+                    case XK_Alt_R:     special = GLUT_KEY_ALT_R;      break;
                     }
 
                     /*
