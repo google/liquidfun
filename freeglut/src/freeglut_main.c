@@ -1573,6 +1573,9 @@ static int fghGetWin32Modifiers (void)
 LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                                LPARAM lParam )
 {
+    static unsigned char lControl = 0, rControl = 0, lShift = 0,
+                         rShift = 0, lAlt = 0, rAlt = 0;
+
     SFG_Window* window;
     PAINTSTRUCT ps;
     LRESULT lRet = 1;
@@ -1586,6 +1589,118 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     /* printf ( "Window %3d message <%04x> %12d %12d\n", window?window->ID:0,
              uMsg, wParam, lParam ); */
+
+    /* Checking for CTRL, ALT, and SHIFT key positions:  Key Down! */
+    if ( !lControl && GetAsyncKeyState ( VK_LCONTROL ) )
+    {
+        INVOKE_WCB	( *window, Special,
+                      ( GLUT_KEY_CTRL_L, window->State.MouseX, window->State.MouseY )
+                    );
+
+        lControl = 1;
+    }
+
+    if ( !rControl && GetAsyncKeyState ( VK_RCONTROL ) )
+    {
+        INVOKE_WCB ( *window, Special,
+                     ( GLUT_KEY_CTRL_R, window->State.MouseX, window->State.MouseY )
+                   );
+
+        rControl = 1;
+    }
+
+    if ( !lShift && GetAsyncKeyState ( VK_LSHIFT ) )
+    {
+        INVOKE_WCB ( *window, Special,
+                     ( GLUT_KEY_SHIFT_L, window->State.MouseX, window->State.MouseY )
+                   );
+
+        lShift = 1;
+    }
+
+    if ( !rShift && GetAsyncKeyState ( VK_RSHIFT ) )
+    {
+        INVOKE_WCB ( *window, Special,
+                     ( GLUT_KEY_SHIFT_R, window->State.MouseX, window->State.MouseY )
+                   );
+
+        rShift = 1;
+    }
+
+    if ( !lAlt && GetAsyncKeyState ( VK_LMENU ) )
+    {
+        INVOKE_WCB ( *window, Special,
+                     ( GLUT_KEY_ALT_L, window->State.MouseX, window->State.MouseY )
+                   );
+
+        lAlt = 1;
+    }
+
+    if ( !rAlt && GetAsyncKeyState ( VK_RMENU ) )
+    {
+        INVOKE_WCB ( *window, Special,
+                     ( GLUT_KEY_ALT_R, window->State.MouseX, window->State.MouseY )
+                   );
+
+        rAlt = 1;
+    }
+
+    /* Checking for CTRL, ALT, and SHIFT key positions:  Key Up! */
+    if ( lControl && !GetAsyncKeyState ( VK_LCONTROL ) )
+    {
+        INVOKE_WCB ( *window, SpecialUp,
+                     ( GLUT_KEY_CTRL_L, window->State.MouseX, window->State.MouseY )
+        );
+
+        lControl = 0;
+    }
+
+    if ( rControl && !GetAsyncKeyState ( VK_RCONTROL ) )
+    {
+        INVOKE_WCB ( *window, SpecialUp,
+                     ( GLUT_KEY_CTRL_R, window->State.MouseX, window->State.MouseY )
+                   );
+
+        rControl = 0;
+    }
+
+    if ( lShift && !GetAsyncKeyState ( VK_LSHIFT ) )
+    {
+        INVOKE_WCB ( *window, SpecialUp,
+                     ( GLUT_KEY_SHIFT_L, window->State.MouseX, window->State.MouseY )
+                   );
+
+        lShift = 0;
+    }
+
+    if ( rShift && !GetAsyncKeyState ( VK_RSHIFT ) )
+    {
+        INVOKE_WCB ( *window, SpecialUp,
+                     ( GLUT_KEY_SHIFT_R, window->State.MouseX, window->State.MouseY )
+        );
+
+        rShift = 0;
+    }
+
+    if ( lAlt && !GetAsyncKeyState ( VK_LMENU ) )
+    {
+        INVOKE_WCB ( *window, SpecialUp,
+                     ( GLUT_KEY_ALT_L, window->State.MouseX, window->State.MouseY )
+                   );
+
+        lAlt = 0;
+    }
+
+    if ( rAlt && !GetAsyncKeyState ( VK_RMENU ) )
+    {
+        INVOKE_WCB ( *window, SpecialUp,
+                     ( GLUT_KEY_ALT_R, window->State.MouseX, window->State.MouseY )
+                   );
+
+        rAlt = 0;
+    }
+
+
     switch( uMsg )
     {
     case WM_CREATE:
@@ -2016,6 +2131,12 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_RIGHT,  GLUT_KEY_RIGHT     );
             KEY( VK_DOWN,   GLUT_KEY_DOWN      );
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
+            KEY( VK_LCONTROL, GLUT_KEY_CTRL_L  );
+            KEY( VK_RCONTROL, GLUT_KEY_CTRL_R  );
+            KEY( VK_LSHIFT, GLUT_KEY_SHIFT_L   );
+            KEY( VK_RSHIFT, GLUT_KEY_SHIFT_R   );
+            KEY( VK_LMENU,  GLUT_KEY_ALT_L     );
+            KEY( VK_RMENU,  GLUT_KEY_ALT_R     );
 
         case VK_DELETE:
             /* The delete key should be treated as an ASCII keypress: */
@@ -2102,6 +2223,12 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_RIGHT,  GLUT_KEY_RIGHT     );
             KEY( VK_DOWN,   GLUT_KEY_DOWN      );
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
+            KEY( VK_LCONTROL, GLUT_KEY_CTRL_L  );
+            KEY( VK_RCONTROL, GLUT_KEY_CTRL_R  );
+            KEY( VK_LSHIFT, GLUT_KEY_SHIFT_L   );
+            KEY( VK_RSHIFT, GLUT_KEY_SHIFT_R   );
+            KEY( VK_LMENU,  GLUT_KEY_ALT_L     );
+            KEY( VK_RMENU,  GLUT_KEY_ALT_R     );
 
           case VK_DELETE:
               /* The delete key should be treated as an ASCII keypress: */
