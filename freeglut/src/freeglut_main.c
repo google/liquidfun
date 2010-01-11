@@ -1590,116 +1590,118 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     /* printf ( "Window %3d message <%04x> %12d %12d\n", window?window->ID:0,
              uMsg, wParam, lParam ); */
 
-    /* Checking for CTRL, ALT, and SHIFT key positions:  Key Down! */
-    if ( !lControl && GetAsyncKeyState ( VK_LCONTROL ) )
+    if ( window )
     {
-        INVOKE_WCB	( *window, Special,
-                      ( GLUT_KEY_CTRL_L, window->State.MouseX, window->State.MouseY )
-                    );
+      /* Checking for CTRL, ALT, and SHIFT key positions:  Key Down! */
+      if ( !lControl && GetAsyncKeyState ( VK_LCONTROL ) )
+      {
+          INVOKE_WCB	( *window, Special,
+                        ( GLUT_KEY_CTRL_L, window->State.MouseX, window->State.MouseY )
+                      );
 
-        lControl = 1;
+          lControl = 1;
+      }
+
+      if ( !rControl && GetAsyncKeyState ( VK_RCONTROL ) )
+      {
+          INVOKE_WCB ( *window, Special,
+                       ( GLUT_KEY_CTRL_R, window->State.MouseX, window->State.MouseY )
+                     );
+
+          rControl = 1;
+      }
+
+      if ( !lShift && GetAsyncKeyState ( VK_LSHIFT ) )
+      {
+          INVOKE_WCB ( *window, Special,
+                       ( GLUT_KEY_SHIFT_L, window->State.MouseX, window->State.MouseY )
+                     );
+
+          lShift = 1;
+      }
+
+      if ( !rShift && GetAsyncKeyState ( VK_RSHIFT ) )
+      {
+          INVOKE_WCB ( *window, Special,
+                       ( GLUT_KEY_SHIFT_R, window->State.MouseX, window->State.MouseY )
+                     );
+
+          rShift = 1;
+      }
+
+      if ( !lAlt && GetAsyncKeyState ( VK_LMENU ) )
+      {
+          INVOKE_WCB ( *window, Special,
+                       ( GLUT_KEY_ALT_L, window->State.MouseX, window->State.MouseY )
+                     );
+
+          lAlt = 1;
+      }
+
+      if ( !rAlt && GetAsyncKeyState ( VK_RMENU ) )
+      {
+          INVOKE_WCB ( *window, Special,
+                       ( GLUT_KEY_ALT_R, window->State.MouseX, window->State.MouseY )
+                     );
+
+          rAlt = 1;
+      }
+
+      /* Checking for CTRL, ALT, and SHIFT key positions:  Key Up! */
+      if ( lControl && !GetAsyncKeyState ( VK_LCONTROL ) )
+      {
+          INVOKE_WCB ( *window, SpecialUp,
+                       ( GLUT_KEY_CTRL_L, window->State.MouseX, window->State.MouseY )
+                     );
+
+          lControl = 0;
+      }
+
+      if ( rControl && !GetAsyncKeyState ( VK_RCONTROL ) )
+      {
+          INVOKE_WCB ( *window, SpecialUp,
+                       ( GLUT_KEY_CTRL_R, window->State.MouseX, window->State.MouseY )
+                     );
+
+          rControl = 0;
+      }
+
+      if ( lShift && !GetAsyncKeyState ( VK_LSHIFT ) )
+      {
+          INVOKE_WCB ( *window, SpecialUp,
+                       ( GLUT_KEY_SHIFT_L, window->State.MouseX, window->State.MouseY )
+                     );
+
+          lShift = 0;
+      }
+
+      if ( rShift && !GetAsyncKeyState ( VK_RSHIFT ) )
+      {
+          INVOKE_WCB ( *window, SpecialUp,
+                       ( GLUT_KEY_SHIFT_R, window->State.MouseX, window->State.MouseY )
+                     );
+
+          rShift = 0;
+      }
+
+      if ( lAlt && !GetAsyncKeyState ( VK_LMENU ) )
+      {
+          INVOKE_WCB ( *window, SpecialUp,
+                       ( GLUT_KEY_ALT_L, window->State.MouseX, window->State.MouseY )
+                     );
+
+          lAlt = 0;
+      }
+
+      if ( rAlt && !GetAsyncKeyState ( VK_RMENU ) )
+      {
+          INVOKE_WCB ( *window, SpecialUp,
+                       ( GLUT_KEY_ALT_R, window->State.MouseX, window->State.MouseY )
+                     );
+
+          rAlt = 0;
+      }
     }
-
-    if ( !rControl && GetAsyncKeyState ( VK_RCONTROL ) )
-    {
-        INVOKE_WCB ( *window, Special,
-                     ( GLUT_KEY_CTRL_R, window->State.MouseX, window->State.MouseY )
-                   );
-
-        rControl = 1;
-    }
-
-    if ( !lShift && GetAsyncKeyState ( VK_LSHIFT ) )
-    {
-        INVOKE_WCB ( *window, Special,
-                     ( GLUT_KEY_SHIFT_L, window->State.MouseX, window->State.MouseY )
-                   );
-
-        lShift = 1;
-    }
-
-    if ( !rShift && GetAsyncKeyState ( VK_RSHIFT ) )
-    {
-        INVOKE_WCB ( *window, Special,
-                     ( GLUT_KEY_SHIFT_R, window->State.MouseX, window->State.MouseY )
-                   );
-
-        rShift = 1;
-    }
-
-    if ( !lAlt && GetAsyncKeyState ( VK_LMENU ) )
-    {
-        INVOKE_WCB ( *window, Special,
-                     ( GLUT_KEY_ALT_L, window->State.MouseX, window->State.MouseY )
-                   );
-
-        lAlt = 1;
-    }
-
-    if ( !rAlt && GetAsyncKeyState ( VK_RMENU ) )
-    {
-        INVOKE_WCB ( *window, Special,
-                     ( GLUT_KEY_ALT_R, window->State.MouseX, window->State.MouseY )
-                   );
-
-        rAlt = 1;
-    }
-
-    /* Checking for CTRL, ALT, and SHIFT key positions:  Key Up! */
-    if ( lControl && !GetAsyncKeyState ( VK_LCONTROL ) )
-    {
-        INVOKE_WCB ( *window, SpecialUp,
-                     ( GLUT_KEY_CTRL_L, window->State.MouseX, window->State.MouseY )
-        );
-
-        lControl = 0;
-    }
-
-    if ( rControl && !GetAsyncKeyState ( VK_RCONTROL ) )
-    {
-        INVOKE_WCB ( *window, SpecialUp,
-                     ( GLUT_KEY_CTRL_R, window->State.MouseX, window->State.MouseY )
-                   );
-
-        rControl = 0;
-    }
-
-    if ( lShift && !GetAsyncKeyState ( VK_LSHIFT ) )
-    {
-        INVOKE_WCB ( *window, SpecialUp,
-                     ( GLUT_KEY_SHIFT_L, window->State.MouseX, window->State.MouseY )
-                   );
-
-        lShift = 0;
-    }
-
-    if ( rShift && !GetAsyncKeyState ( VK_RSHIFT ) )
-    {
-        INVOKE_WCB ( *window, SpecialUp,
-                     ( GLUT_KEY_SHIFT_R, window->State.MouseX, window->State.MouseY )
-        );
-
-        rShift = 0;
-    }
-
-    if ( lAlt && !GetAsyncKeyState ( VK_LMENU ) )
-    {
-        INVOKE_WCB ( *window, SpecialUp,
-                     ( GLUT_KEY_ALT_L, window->State.MouseX, window->State.MouseY )
-                   );
-
-        lAlt = 0;
-    }
-
-    if ( rAlt && !GetAsyncKeyState ( VK_RMENU ) )
-    {
-        INVOKE_WCB ( *window, SpecialUp,
-                     ( GLUT_KEY_ALT_R, window->State.MouseX, window->State.MouseY )
-                   );
-
-        rAlt = 0;
-    }
-
 
     switch( uMsg )
     {
