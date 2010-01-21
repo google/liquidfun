@@ -47,7 +47,7 @@
 
 #if GTEST_HAS_TYPED_TEST || GTEST_HAS_TYPED_TEST_P
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !GTEST_OS_ANDROID
 #include <cxxabi.h>
 #endif  // __GNUC__
 
