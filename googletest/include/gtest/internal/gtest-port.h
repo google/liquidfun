@@ -335,7 +335,7 @@
 // The user didn't tell us, so we need to figure it out.
 
 // GCC provides <tr1/tuple> since 4.0.0.
-#if defined(__GNUC__) && (GTEST_GCC_VER_ >= 40000)
+#if defined(__GNUC__) && (GTEST_GCC_VER_ >= 40000) && !GTEST_OS_ANDROID
 #define GTEST_HAS_TR1_TUPLE 1
 #else
 #define GTEST_HAS_TR1_TUPLE 0
