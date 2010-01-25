@@ -88,15 +88,14 @@
 
 /* -- PLATFORM-SPECIFIC INCLUDES ------------------------------------------- */
 
-/* All Win32 headers depend on the huge Windows.h recursive include.
- * Note: Let's use proper case for MS-Win headers. Even though it's
- * not required due to case insensitivity, it's a good habit to keep
- * because the cross-platform includes are case sensitive.
+/* All Win32 headers depend on the huge windows.h recursive include.
+ * Note: Lower-case header names are used, for best cross-platform
+ * compatibility.
  */
 #if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
-#    include <Windows.h>
-#    include <WindowsX.h>
-#    include <MMSystem.h>
+#    include <windows.h>
+#    include <windowsx.h>
+#    include <mmsystem.h>
 /* CYGWIN does not have tchar.h, but has TEXT(x), defined in winnt.h. */
 #    ifndef __CYGWIN__
 #      include <tchar.h>

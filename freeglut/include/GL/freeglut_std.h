@@ -58,7 +58,7 @@
 #    define WIN32_LEAN_AND_MEAN 1
 #  endif
 #   define NOMINMAX
-#   include <Windows.h>
+#   include <windows.h>
 
 /* Windows static library */
 #   ifdef FREEGLUT_STATIC
