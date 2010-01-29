@@ -110,7 +110,7 @@ static void fghRememberState( void )
 /* hack to get around my stupid cross-gcc headers */
 #define FREEGLUT_ENUM_CURRENT_SETTINGS -1
 
-    EnumDisplaySettings( NULL, FREEGLUT_ENUM_CURRENT_SETTINGS,
+    EnumDisplaySettings( fgDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS,
                          &fgDisplay.DisplayMode );
 
     /* Make sure we will be restoring all settings needed */
@@ -205,7 +205,7 @@ static void fghRestoreState( void )
 #elif TARGET_HOST_MS_WINDOWS
 
     /* Restore the previously rememebered desktop display settings */
-    ChangeDisplaySettings( &fgDisplay.DisplayMode, 0 );
+    ChangeDisplaySettingsEx( fgDisplay.DisplayName,&fgDisplay.DisplayMode, 0,0,0 );
 
 #endif
 }
@@ -323,7 +323,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 
     success = GL_FALSE;
 
-    EnumDisplaySettings( NULL, -1, &devMode ); 
+    EnumDisplaySettings( fgDisplay.DisplayName, -1, &devMode ); 
     devMode.dmFields |= DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
 
     devMode.dmPelsWidth  = fgState.GameModeSize.X;
@@ -332,13 +332,13 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     devMode.dmDisplayFrequency = fgState.GameModeRefresh;
     devMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
 
-    switch ( ChangeDisplaySettingsEx(NULL, &devMode, NULL, haveToTest ? CDS_TEST : CDS_FULLSCREEN , NULL) )
+    switch ( ChangeDisplaySettingsEx(fgDisplay.DisplayName, &devMode, NULL, haveToTest ? CDS_TEST : CDS_FULLSCREEN , NULL) )
     {
     case DISP_CHANGE_SUCCESSFUL:
         success = GL_TRUE;
 
         /* update vars in case if windows switched to proper mode */
-        EnumDisplaySettings( NULL, FREEGLUT_ENUM_CURRENT_SETTINGS, &devMode );
+        EnumDisplaySettings( fgDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS, &devMode );
         fgState.GameModeSize.X  = devMode.dmPelsWidth;        
         fgState.GameModeSize.Y  = devMode.dmPelsHeight;
         fgState.GameModeDepth   = devMode.dmBitsPerPel;
@@ -409,6 +409,8 @@ void FGAPIENTRY glutGameModeString( const char* string )
     fgState.GameModeDepth   = depth;
     fgState.GameModeRefresh = refresh;
 }
+
+
 
 /*
  * Enters the game mode

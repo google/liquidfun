@@ -362,6 +362,7 @@ struct tagSFG_Display
 #elif TARGET_HOST_MS_WINDOWS
     HINSTANCE        Instance;          /* The application's instance        */
     DEVMODE         DisplayMode;        /* Desktop's display settings        */
+    char           *DisplayName;        /* Display name for multi display support*/ 
 
 #endif
 

@@ -825,6 +825,55 @@ void fgSetWindow ( SFG_Window *window )
     fgStructure.CurrentWindow = window;
 }
 
+#if TARGET_HOST_MS_WINDOWS
+
+typedef struct {
+      int *x;
+      int *y;
+      const char *name;
+}m_proc_t ;
+
+static BOOL CALLBACK m_proc(HMONITOR mon,
+			    HDC hdc,
+			    LPRECT rect,
+			    LPARAM data)
+{
+      m_proc_t *dp=(m_proc_t *)data;
+      MONITORINFOEX info;
+      BOOL res;
+      info.cbSize=sizeof(info);
+      res=GetMonitorInfo(mon,(LPMONITORINFO)&info);
+      if( res )
+      {
+          if( !strcmp(dp->name,info.szDevice) )
+          {
+              *(dp->x)=info.rcMonitor.left;
+              *(dp->y)=info.rcMonitor.top;
+              return FALSE;
+          }
+      }
+      return TRUE;
+}
+
+/* 
+ * this function is only used in fgOpenWindow. Currently it only sets 
+ * its output parameters, if the DisplayName is set in fgDisplay 
+ * (and if it is able to recognize the display)
+*/
+
+static void get_display_origin(int *xp,int *yp)
+{
+    if( fgDisplay.DisplayName )
+    {
+        m_proc_t st;
+        st.x=xp;
+        st.y=yp;
+        st.name=fgDisplay.DisplayName;
+        EnumDisplayMonitors(0,0,m_proc,(LPARAM)&st);
+     }
+}
+#endif
+
 
 
 /*
@@ -1137,17 +1186,24 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         UpdateWindow(window->Window.Handle);
     }
 #else
-    window->Window.Handle = CreateWindowEx(
-        exFlags,
-        _T("FREEGLUT"),
-        title,
-        flags,
-        x, y, w, h,
-        (HWND) window->Parent == NULL ? NULL : window->Parent->Window.Handle,
-        (HMENU) NULL,
-        fgDisplay.Instance,
-        (LPVOID) window
-    );
+    {
+      /* xoff and yoff are used to place window relative to current display */
+      /* The operation of gamemode also depends on this */
+        int xoff=0,yoff=0;
+        get_display_origin(&xoff,&yoff);
+
+        window->Window.Handle = CreateWindowEx(
+            exFlags,
+            _T("FREEGLUT"),
+            title,
+            flags,
+            x+xoff, y+yoff, w, h,
+            (HWND) window->Parent == NULL ? NULL : window->Parent->Window.Handle,
+            (HMENU) NULL,
+            fgDisplay.Instance,
+            (LPVOID) window
+        );
+    }
 #endif /* defined(_WIN32_WCE) */
 
     if( !( window->Window.Handle ) )
@@ -1680,8 +1736,9 @@ void FGAPIENTRY glutFullScreen( void )
 
         rect.left   = 0;
         rect.top    = 0;
-        rect.right  = fgDisplay.ScreenWidth;
-        rect.bottom = fgDisplay.ScreenHeight;
+	get_display_origin(&rect.left,&rect.top);
+        rect.right  = fgDisplay.ScreenWidth+rect.left;
+        rect.bottom = fgDisplay.ScreenHeight+rect.top;
 
         AdjustWindowRect ( &rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS |
                                   WS_CLIPCHILDREN, FALSE );

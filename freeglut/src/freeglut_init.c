@@ -311,7 +311,7 @@ static void fghInitialize( const char* displayName )
 
     /* What we need to do is to initialize the fgDisplay global structure here. */
     fgDisplay.Instance = GetModuleHandle( NULL );
-
+    fgDisplay.DisplayName=strdup(displayName);
     atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
 
     if( atom == 0 )
@@ -363,7 +363,23 @@ static void fghInitialize( const char* displayName )
 
         ReleaseDC( desktop, context );
     }
-
+    /* If we have a DisplayName try to use it for metrics */
+    if( fgDisplay.DisplayName )
+    {
+        HDC context = CreateDC(fgDisplay.DisplayName,0,0,0);
+        if( context )
+        {
+	    fgDisplay.ScreenWidth  = GetDeviceCaps( context, HORZRES );
+	    fgDisplay.ScreenHeight = GetDeviceCaps( context, VERTRES );
+	    fgDisplay.ScreenWidthMM  = GetDeviceCaps( context, HORZSIZE );
+	    fgDisplay.ScreenHeightMM = GetDeviceCaps( context, VERTSIZE );
+	    DeleteDC(context);
+        }
+        else
+	    fgWarning("fghInitialize: "
+		      "CreateDC failed, Screen size info may be incorrect");
+      
+    }
     /* Set the timer granularity to 1 ms */
     timeBeginPeriod ( 1 );
 
@@ -489,6 +505,11 @@ void fgDeinitialize( void )
     XCloseDisplay( fgDisplay.Display );
 
 #elif TARGET_HOST_MS_WINDOWS
+    if( fgDisplay.DisplayName )
+    {
+        free( fgDisplay.DisplayName );
+        fgDisplay.DisplayName = NULL;
+    }
 
     /* Reset the timer granularity */
     timeEndPeriod ( 1 );
