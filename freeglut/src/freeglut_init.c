@@ -377,7 +377,8 @@ static void fghInitialize( const char* displayName )
         }
         else
 	    fgWarning("fghInitialize: "
-		      "CreateDC failed, Screen size info may be incorrect");
+		      "CreateDC failed, Screen size info may be incorrect\n"
+          "This is quite likely caused by a bad '-display' parameter");
       
     }
     /* Set the timer granularity to 1 ms */
