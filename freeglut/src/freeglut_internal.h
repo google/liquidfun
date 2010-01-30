@@ -160,6 +160,10 @@
 #    endif
 #endif
 
+#if TARGET_HOST_MS_WINDOWS
+#    define  HAVE_VFPRINTF 1
+#endif
+
 /* MinGW may lack a prototype for ChangeDisplaySettingsEx() (depending on the version?) */
 #if TARGET_HOST_MS_WINDOWS && !defined(ChangeDisplaySettingsEx)
 LONG WINAPI ChangeDisplaySettingsExA(LPCSTR,LPDEVMODEA,HWND,DWORD,LPVOID);
