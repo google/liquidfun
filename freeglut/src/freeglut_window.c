@@ -827,6 +827,7 @@ void fgSetWindow ( SFG_Window *window )
 
 #if TARGET_HOST_MS_WINDOWS
 
+#if(WINVER >= 0x500)
 typedef struct {
       int *x;
       int *y;
@@ -859,7 +860,7 @@ static BOOL CALLBACK m_proc(HMONITOR mon,
  * this function is only used in fgOpenWindow. Currently it only sets 
  * its output parameters, if the DisplayName is set in fgDisplay 
  * (and if it is able to recognize the display)
-*/
+ */
 
 static void get_display_origin(int *xp,int *yp)
 {
@@ -872,6 +873,17 @@ static void get_display_origin(int *xp,int *yp)
         EnumDisplayMonitors(0,0,m_proc,(LPARAM)&st);
      }
 }
+#else
+#pragma message( "-display parameter only works if compiled with WINVER >= 0x0500")
+
+static void get_display_origin(int *xp,int *yp)
+{
+    if( fgDisplay.DisplayName )
+    {
+        fgWarning( "for working -display support FreeGLUT must be compiled with WINVER >= 0x0500");
+    }
+}
+#endif
 #endif
 
 
