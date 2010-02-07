@@ -183,11 +183,13 @@ TEST(GetTestTypeIdTest, ReturnsTheSameValueInsideOrOutsideOfGoogleTest) {
 
 // Tests FormatTimeInMillisAsSeconds().
 
-TEST(FormatTimeInMillisAsSecondsTest, FormatsZero) {
+// DISABLED see bug 2398288
+TEST(FormatTimeInMillisAsSecondsTest, DISABLED_FormatsZero) {
   EXPECT_STREQ("0", FormatTimeInMillisAsSeconds(0));
 }
 
-TEST(FormatTimeInMillisAsSecondsTest, FormatsPositiveNumber) {
+// DISABLED see bug 2398288
+TEST(FormatTimeInMillisAsSecondsTest, DISABLED_FormatsPositiveNumber) {
   EXPECT_STREQ("0.003", FormatTimeInMillisAsSeconds(3));
   EXPECT_STREQ("0.01", FormatTimeInMillisAsSeconds(10));
   EXPECT_STREQ("0.2", FormatTimeInMillisAsSeconds(200));
@@ -195,7 +197,8 @@ TEST(FormatTimeInMillisAsSecondsTest, FormatsPositiveNumber) {
   EXPECT_STREQ("3", FormatTimeInMillisAsSeconds(3000));
 }
 
-TEST(FormatTimeInMillisAsSecondsTest, FormatsNegativeNumber) {
+// DISABLED see bug 2398288
+TEST(FormatTimeInMillisAsSecondsTest, DISABLED_FormatsNegativeNumber) {
   EXPECT_STREQ("-0.003", FormatTimeInMillisAsSeconds(-3));
   EXPECT_STREQ("-0.01", FormatTimeInMillisAsSeconds(-10));
   EXPECT_STREQ("-0.2", FormatTimeInMillisAsSeconds(-200));
@@ -304,6 +307,7 @@ TEST(WideStringToUtf8Test, CanEncodeNul) {
   EXPECT_STREQ("", WideStringToUtf8(L"", -1).c_str());
 }
 
+#if GTEST_HAS_STD_WSTRING
 // Tests that ASCII strings are encoded correctly.
 TEST(WideStringToUtf8Test, CanEncodeAscii) {
   EXPECT_STREQ("a", WideStringToUtf8(L"a", 1).c_str());
@@ -311,6 +315,7 @@ TEST(WideStringToUtf8Test, CanEncodeAscii) {
   EXPECT_STREQ("a", WideStringToUtf8(L"a", -1).c_str());
   EXPECT_STREQ("ab", WideStringToUtf8(L"ab", -1).c_str());
 }
+#endif  // GTEST_HAS_STD_WSTRING
 
 // Tests that Unicode code-points that have 8 to 11 bits are encoded
 // as 110xxxxx 10xxxxxx.
@@ -388,6 +393,7 @@ TEST(WideStringToUtf8Test, CanEncodeInvalidUtf16SurrogatePair) {
 #endif  // !GTEST_WIDE_STRING_USES_UTF16_
 
 // Tests that codepoint concatenation works correctly.
+#if GTEST_HAS_STD_WSTRING
 #if !GTEST_WIDE_STRING_USES_UTF16_
 TEST(WideStringToUtf8Test, ConcatenatesCodepointsCorrectly) {
   EXPECT_STREQ(
@@ -406,6 +412,7 @@ TEST(WideStringToUtf8Test, ConcatenatesCodepointsCorrectly) {
       WideStringToUtf8(L"\xC74D\n\x576\x8D3", -1).c_str());
 }
 #endif  // !GTEST_WIDE_STRING_USES_UTF16_
+#endif  // GTEST_HAS_STD_WSTRING
 
 // Tests the List template class.
 
@@ -1920,6 +1927,7 @@ TEST(StringAssertionTest, ASSERT_STRCASENE) {
                        "(ignoring case)");
 }
 
+#if GTEST_HAS_STD_WSTRING
 // Tests *_STREQ on wide strings.
 TEST(StringAssertionTest, STREQ_Wide) {
   // NULL strings.
@@ -1943,6 +1951,7 @@ TEST(StringAssertionTest, STREQ_Wide) {
   EXPECT_NONFATAL_FAILURE(EXPECT_STREQ(L"abc\x8119", L"abc\x8120"),
                           "abc");
 }
+#endif  // GTEST_HAS_STD_WSTRING
 
 // Tests *_STRNE on wide strings.
 TEST(StringAssertionTest, STRNE_Wide) {
@@ -1983,6 +1992,7 @@ TEST(IsSubstringTest, ReturnsCorrectResultForCString) {
   EXPECT_TRUE(IsSubstring("", "", "needle", "two needles"));
 }
 
+#if GTEST_HAS_STD_WSTRING
 // Tests that IsSubstring() returns the correct result when the input
 // argument type is const wchar_t*.
 TEST(IsSubstringTest, ReturnsCorrectResultForWideCString) {
@@ -1993,6 +2003,7 @@ TEST(IsSubstringTest, ReturnsCorrectResultForWideCString) {
   EXPECT_TRUE(IsSubstring("", "", static_cast<const wchar_t*>(NULL), NULL));
   EXPECT_TRUE(IsSubstring("", "", L"needle", L"two needles"));
 }
+#endif  // GTEST_HAS_STD_WSTRING
 
 // Tests that IsSubstring() generates the correct message when the input
 // argument type is const char*.
@@ -2015,6 +2026,7 @@ TEST(IsSubstringTest, ReturnsCorrectResultsForStdString) {
 }
 
 #endif  // GTEST_HAS_STD_STRING
+
 
 #if GTEST_HAS_STD_WSTRING
 // Tests that IsSubstring returns the correct result when the input
@@ -2047,6 +2059,7 @@ TEST(IsNotSubstringTest, ReturnsCorrectResultForCString) {
   EXPECT_FALSE(IsNotSubstring("", "", "needle", "two needles"));
 }
 
+#if GTEST_HAS_STD_WSTRING
 // Tests that IsNotSubstring() returns the correct result when the input
 // argument type is const wchar_t*.
 TEST(IsNotSubstringTest, ReturnsCorrectResultForWideCString) {
@@ -2065,6 +2078,7 @@ TEST(IsNotSubstringTest, GeneratesCorrectMessageForWideCString) {
                    "needle_expr", "haystack_expr",
                    L"needle", L"two needles").failure_message());
 }
+#endif  // GTEST_HAS_STD_WSTRING
 
 #if GTEST_HAS_STD_STRING
 
@@ -2293,8 +2307,9 @@ TEST_F(FloatTest, Commutative) {
                           "1.0");
 }
 
+// DISABLED see bug 2398288
 // Tests EXPECT_NEAR.
-TEST_F(FloatTest, EXPECT_NEAR) {
+TEST_F(FloatTest, DISABLED_EXPECT_NEAR) {
   EXPECT_NEAR(-1.0f, -1.1f, 0.2f);
   EXPECT_NEAR(2.0f, 3.0f, 1.0f);
   EXPECT_NONFATAL_FAILURE(EXPECT_NEAR(1.0f,1.2f, 0.1f),  // NOLINT
@@ -2304,8 +2319,9 @@ TEST_F(FloatTest, EXPECT_NEAR) {
   // space after the first comma in the previous line.
 }
 
+// DISABLED see bug 2398288
 // Tests ASSERT_NEAR.
-TEST_F(FloatTest, ASSERT_NEAR) {
+TEST_F(FloatTest, DISABLED_ASSERT_NEAR) {
   ASSERT_NEAR(-1.0f, -1.1f, 0.2f);
   ASSERT_NEAR(2.0f, 3.0f, 1.0f);
   EXPECT_FATAL_FAILURE(ASSERT_NEAR(1.0f,1.2f, 0.1f),  // NOLINT
@@ -2446,8 +2462,9 @@ TEST_F(DoubleTest, Commutative) {
   EXPECT_NONFATAL_FAILURE(EXPECT_DOUBLE_EQ(further_from_one_, 1.0), "1.0");
 }
 
+// DISABLED see bug 2398288
 // Tests EXPECT_NEAR.
-TEST_F(DoubleTest, EXPECT_NEAR) {
+TEST_F(DoubleTest, DISABLED_EXPECT_NEAR) {
   EXPECT_NEAR(-1.0, -1.1, 0.2);
   EXPECT_NEAR(2.0, 3.0, 1.0);
   EXPECT_NONFATAL_FAILURE(EXPECT_NEAR(1.0, 1.2, 0.1),  // NOLINT
@@ -2457,8 +2474,9 @@ TEST_F(DoubleTest, EXPECT_NEAR) {
   // space after the first comma in the previous statement.
 }
 
+// DISABLED see bug 2398288
 // Tests ASSERT_NEAR.
-TEST_F(DoubleTest, ASSERT_NEAR) {
+TEST_F(DoubleTest, DISABLED_ASSERT_NEAR) {
   ASSERT_NEAR(-1.0, -1.1, 0.2);
   ASSERT_NEAR(2.0, 3.0, 1.0);
   EXPECT_FATAL_FAILURE(ASSERT_NEAR(1.0, 1.2, 0.1),  // NOLINT
@@ -3787,6 +3805,7 @@ TEST(EqAssertionTest, Char) {
                           "ch");
 }
 
+#if GTEST_HAS_STD_WSTRING
 // Tests using wchar_t values in {EXPECT|ASSERT}_EQ.
 TEST(EqAssertionTest, WideChar) {
   EXPECT_EQ(L'b', L'b');
@@ -3805,6 +3824,7 @@ TEST(EqAssertionTest, WideChar) {
   EXPECT_FATAL_FAILURE(ASSERT_EQ(L'\x8120', wchar),
                        "Value of: wchar");
 }
+#endif  // GTEST_HAS_STD_WSTRING
 
 #if GTEST_HAS_STD_STRING
 // Tests using ::std::string values in {EXPECT|ASSERT}_EQ.
@@ -4187,6 +4207,7 @@ TEST(MessageTest, NullPointers) {
                msg.GetString().c_str());
 }
 
+#if GTEST_HAS_STD_WSTRING
 // Tests streaming wide strings to testing::Message.
 TEST(MessageTest, WideStrings) {
   // Streams a NULL of type const wchar_t*.
@@ -4209,7 +4230,7 @@ TEST(MessageTest, WideStrings) {
   EXPECT_STREQ("abc\xe8\x84\x99",
                (Message() << wstr).GetString().c_str());
 }
-
+#endif  // GTEST_HAS_STD_WSTRING
 
 // This line tests that we can define tests in the testing namespace.
 namespace testing {

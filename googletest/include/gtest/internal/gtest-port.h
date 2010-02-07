@@ -299,6 +299,10 @@
 
 #elif defined(__GNUC__)
 
+// Android uses GCC but does not support RTTI
+#if GTEST_OS_ANDROID
+#define GTEST_HAS_RTTI 0
+#else
 // Starting with version 4.3.2, gcc defines __GXX_RTTI iff RTTI is enabled.
 #if GTEST_GCC_VER_ >= 40302
 #ifdef __GXX_RTTI
@@ -310,6 +314,7 @@
 // For gcc versions smaller than 4.3.2, we assume RTTI is enabled.
 #define GTEST_HAS_RTTI 1
 #endif  // GTEST_GCC_VER >= 40302
+#endif  // GTEST_OS_ANDROID
 
 #else
 
@@ -383,7 +388,7 @@
 #if GTEST_HAS_STD_STRING && (GTEST_OS_LINUX || \
                              GTEST_OS_MAC || \
                              GTEST_OS_CYGWIN || \
-                             (GTEST_OS_WINDOWS && _MSC_VER >= 1400)) && !GTEST_OS_ANDROID
+                             (GTEST_OS_WINDOWS && _MSC_VER >= 1400))
 #define GTEST_HAS_DEATH_TEST 1
 #include <vector>
 #endif
@@ -400,10 +405,12 @@
 
 // Typed tests need <typeinfo> and variadic macros, which gcc and VC
 // 8.0+ support.
-#if defined(__GNUC__) || (_MSC_VER >= 1400)
+// TODO: We should be able to support these on Android but we don't
+// have cxxabi.h when building for the target but we have it for the host.
+#if ( defined(__GNUC__) || (_MSC_VER >= 1400) ) && !defined(GTEST_OS_ANDROID)
 #define GTEST_HAS_TYPED_TEST 1
 #define GTEST_HAS_TYPED_TEST_P 1
-#endif  // defined(__GNUC__) || (_MSC_VER >= 1400)
+#endif  // defined(__GNUC__) || (_MSC_VER >= 1400) && !defined(GTEST_OS_ANDROID)
 
 // Determines whether to support Combine(). This only makes sense when
 // value-parameterized tests are enabled.
