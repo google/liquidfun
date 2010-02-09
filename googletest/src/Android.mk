@@ -14,9 +14,33 @@
 #
 #
 
-ifeq ($(HOST_OS),linux)
+# Gtest builds 2 libraries: libgtest and libgtest_main. libgtest
+# contains most of the code (assertions...) and libgtest_main just
+# provide a common main to run the test (ie if you link against
+# libgtest_main you won't/should not provide a main() entry point.
+#
+# We build these 2 libraries for the target device and for the host if
+# it is running linux. The linux build and tests are run under
+# valgrind by 'runtest'.
+#
+# Includes:
+# * For a host build we need to specify bionic/libstdc++/include
+#   otherwise gcc will pick the system's STL. For targets build this
+#   is automatically done by the toolchain but we add it for the
+#   simulator builds..
+# * libjingle's include directives start at the 'talk' level which is
+#   2 directories up. We use $(LOCAL_PATH) to get an absolute include
+#   path just in case talk has been symlinked.
 
 LOCAL_PATH := $(call my-dir)
+
+libgtest_includes:= \
+    bionic/libstdc++/include \
+    external/astl/include \
+    $(LOCAL_PATH)/.. \
+    $(LOCAL_PATH)/../include
+
+ifeq ($(HOST_OS),linux)
 
 #######################################################################
 # gtest lib host
@@ -24,27 +48,15 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_CPP_EXTENSION := .cc
-# TODO: may need to drag these in a shared variable when we start to
-# support target builds.
-LOCAL_SRC_FILES := \
-    gtest.cc \
-    gtest-death-test.cc \
-    gtest-filepath.cc \
-    src/gtest-internal-inl.h \
-    gtest-port.cc \
-    gtest-test-part.cc \
-    gtest-typed-test.cc
 
+LOCAL_SRC_FILES := gtest-all.cc
 
-LOCAL_C_INCLUDES := \
-    $(LOCAL_PATH)/.. \
-    $(LOCAL_PATH)/../include
-
+LOCAL_C_INCLUDES := $(libgtest_includes)
 
 LOCAL_CFLAGS += -O0
 
 LOCAL_MODULE := libgtest
-LOCAL_MODULE_TAGS := tests
+LOCAL_MODULE_TAGS := eng
 
 include $(BUILD_HOST_STATIC_LIBRARY)
 
@@ -54,14 +66,10 @@ include $(BUILD_HOST_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPP_EXTENSION := .cc
-# TODO: may need to drag these in a shared variable when we start to
-# support target builds.
-LOCAL_SRC_FILES := \
-    gtest_main.cc
 
-LOCAL_C_INCLUDES := \
-    $(LOCAL_PATH)/.. \
-    $(LOCAL_PATH)/../include
+LOCAL_SRC_FILES := gtest_main.cc
+
+LOCAL_C_INCLUDES := $(libgtest_includes)
 
 LOCAL_CFLAGS += -O0
 
@@ -73,3 +81,37 @@ LOCAL_MODULE_TAGS := eng
 include $(BUILD_HOST_STATIC_LIBRARY)
 
 endif # HOST_OS == linux
+
+#######################################################################
+# gtest lib target
+
+include $(CLEAR_VARS)
+
+LOCAL_CPP_EXTENSION := .cc
+
+LOCAL_SRC_FILES := gtest-all.cc
+
+LOCAL_C_INCLUDES := $(libgtest_includes)
+
+LOCAL_MODULE := libgtest
+LOCAL_MODULE_TAGS := eng
+
+include $(BUILD_STATIC_LIBRARY)
+
+#######################################################################
+# gtest_main lib target
+
+include $(CLEAR_VARS)
+
+LOCAL_CPP_EXTENSION := .cc
+
+LOCAL_SRC_FILES := gtest_main.cc
+
+LOCAL_C_INCLUDES := $(libgtest_includes)
+
+LOCAL_STATIC_LIBRARIES := libgtest
+
+LOCAL_MODULE := libgtest_main
+LOCAL_MODULE_TAGS := eng
+
+include $(BUILD_STATIC_LIBRARY)

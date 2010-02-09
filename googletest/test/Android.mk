@@ -14,11 +14,20 @@
 #
 #
 
-ifeq ($(HOST_OS),linux)
+# define the GTEST_TESTS environment variable to build the test programs
+ifdef GTEST_TESTS
+
 LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
 
 # TODO: Refactor these as 1st class build templates as suggested in
 # review of the orginal import.
+
+libgtest_test_includes:= \
+	bionic/libstdc++/include \
+	external/astl/include \
+	$(LOCAL_PATH)/../include \
+	$(LOCAL_PATH)/..
 
 # $(1): source list
 # $(2): "HOST_" or empty
@@ -28,11 +37,11 @@ $(foreach file,$(1), \
   $(eval include $(CLEAR_VARS)) \
   $(eval LOCAL_CPP_EXTENSION := .cc) \
   $(eval LOCAL_SRC_FILES := $(file)) \
-  $(eval LOCAL_C_INCLUDES := $(LOCAL_PATH)/../include $(LOCAL_PATH)/..) \
+  $(eval LOCAL_C_INCLUDES := $(libgtest_test_includes)) \
   $(eval LOCAL_MODULE := $(notdir $(file:%.cc=%))) \
   $(eval LOCAL_CFLAGS += $(3)) \
-  $(eval LOCAL_STATIC_LIBRARIES := libgtest_main libgtest) \
-  $(eval LOCAL_MODULE_TAGS := tests) \
+  $(eval LOCAL_STATIC_LIBRARIES := libgtest_main libgtest libastl) \
+  $(eval LOCAL_MODULE_TAGS := eng) \
   $(eval include $(BUILD_$(2)EXECUTABLE)) \
 )
 endef
@@ -41,30 +50,34 @@ define host-test
 $(call _define-test,$(1),HOST_,-O0)
 endef
 
-# TODO: Figure out the right CFLAGS combination needed for bionic/astl.
 define target-test
 $(call _define-test,$(1))
 endef
 
-
-# We use the single file option to build all the tests.
 sources := \
+  gtest-death-test_test.cc \
   gtest-filepath_test.cc \
   gtest-linked_ptr_test.cc \
   gtest-message_test.cc \
   gtest-options_test.cc \
   gtest-port_test.cc \
+  gtest_environment_test.cc \
+  gtest_no_test_unittest.cc \
   gtest_pred_impl_unittest.cc \
+  gtest_repeat_test.cc \
   gtest-test-part_test.cc \
   gtest-typed-test_test.cc \
   gtest-typed-test2_test.cc \
+  gtest_stress_test.cc \
   gtest_unittest.cc \
   gtest_prod_test.cc
 
+ifeq ($(HOST_OS),linux)
 $(call host-test, $(sources))
+endif
+
+$(call target-test, $(sources))
+
+endif  # GTEST_TESTS
 
 
-# TODO: Target is not working yet.
-# $(call target-test, $(sources))
-
-endif # HOST_OS == linux
