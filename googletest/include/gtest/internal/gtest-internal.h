@@ -39,7 +39,7 @@
 
 #include <gtest/internal/gtest-port.h>
 
-#if GTEST_OS_LINUX
+#if GTEST_OS_LINUX || GTEST_OS_ANDROID
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
