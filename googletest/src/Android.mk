@@ -20,27 +20,32 @@
 # libgtest_main you won't/should not provide a main() entry point.
 #
 # We build these 2 libraries for the target device and for the host if
-# it is running linux. The linux build and tests are run under
-# valgrind by 'runtest'.
+# it is running linux and using ASTL.
 #
-# Includes:
-# * For a host build we need to specify bionic/libstdc++/include
-#   otherwise gcc will pick the system's STL. For targets build this
-#   is automatically done by the toolchain but we add it for the
-#   simulator builds..
-# * libjingle's include directives start at the 'talk' level which is
-#   2 directories up. We use $(LOCAL_PATH) to get an absolute include
-#   path just in case talk has been symlinked.
+
+# TODO: The targets below have some redundancy. Check if we cannot
+# condense them using function(s) for the common code.
 
 LOCAL_PATH := $(call my-dir)
 
+ifeq ($(BUILD_WITH_ASTL),true)
 libgtest_includes:= \
     bionic/libstdc++/include \
     external/astl/include \
     $(LOCAL_PATH)/.. \
     $(LOCAL_PATH)/../include
+else
+# BUILD_WITH_ASTL could be undefined, force it to false.
+BUILD_WITH_ASTL := false
+libgtest_includes := \
+    bionic \
+    external/stlport/stlport \
+    $(LOCAL_PATH)/.. \
+    $(LOCAL_PATH)/../include
+endif
 
-ifeq ($(HOST_OS),linux)
+# Gtest depends on STLPort which does not build on host/simulator.
+ifeq ($(HOST_OS)-$(BUILD_WITH_ASTL),linux-true)
 
 #######################################################################
 # gtest lib host
@@ -55,7 +60,7 @@ LOCAL_C_INCLUDES := $(libgtest_includes)
 
 LOCAL_CFLAGS += -O0
 
-LOCAL_MODULE := libgtest
+LOCAL_MODULE := libgtest_host
 LOCAL_MODULE_TAGS := eng
 
 include $(BUILD_HOST_STATIC_LIBRARY)
@@ -75,7 +80,7 @@ LOCAL_CFLAGS += -O0
 
 LOCAL_STATIC_LIBRARIES := libgtest
 
-LOCAL_MODULE := libgtest_main
+LOCAL_MODULE := libgtest_main_host
 LOCAL_MODULE_TAGS := eng
 
 include $(BUILD_HOST_STATIC_LIBRARY)
