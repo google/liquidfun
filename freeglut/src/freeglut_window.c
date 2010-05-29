@@ -1282,7 +1282,10 @@ void fgCloseWindow( SFG_Window* window )
     if( window->Window.Context )
         glXDestroyContext( fgDisplay.Display, window->Window.Context );
     XFree( window->Window.FBConfig );
-    XDestroyWindow( fgDisplay.Display, window->Window.Handle );
+
+    if( window->Window.Handle ) {
+        XDestroyWindow( fgDisplay.Display, window->Window.Handle );
+    }
     /* XFlush( fgDisplay.Display ); */ /* XXX Shouldn't need this */
 
 #elif TARGET_HOST_MS_WINDOWS
