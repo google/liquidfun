@@ -38,14 +38,9 @@ else
 # BUILD_WITH_ASTL could be undefined, force it to false.
 BUILD_WITH_ASTL := false
 libgtest_includes := \
-    bionic \
-    external/stlport/stlport \
     $(LOCAL_PATH)/.. \
     $(LOCAL_PATH)/../include
 endif
-
-# Gtest depends on STLPort which does not build on host/simulator.
-ifeq ($(HOST_OS)-$(BUILD_WITH_ASTL),linux-true)
 
 #######################################################################
 # gtest lib host
@@ -85,8 +80,6 @@ LOCAL_MODULE_TAGS := eng
 
 include $(BUILD_HOST_STATIC_LIBRARY)
 
-endif # HOST_OS == linux
-
 #######################################################################
 # gtest lib target
 
@@ -97,6 +90,12 @@ LOCAL_CPP_EXTENSION := .cc
 LOCAL_SRC_FILES := gtest-all.cc
 
 LOCAL_C_INCLUDES := $(libgtest_includes)
+
+ifneq ($(BUILD_WITH_ASTL),true)
+ifneq ($(TARGET_SIMULATOR),true)
+include external/stlport/libstlport.mk
+endif
+endif
 
 LOCAL_MODULE := libgtest
 LOCAL_MODULE_TAGS := eng
@@ -113,6 +112,12 @@ LOCAL_CPP_EXTENSION := .cc
 LOCAL_SRC_FILES := gtest_main.cc
 
 LOCAL_C_INCLUDES := $(libgtest_includes)
+
+ifneq ($(BUILD_WITH_ASTL),true)
+ifneq ($(TARGET_SIMULATOR),true)
+include external/stlport/libstlport.mk
+endif
+endif
 
 LOCAL_STATIC_LIBRARIES := libgtest
 
