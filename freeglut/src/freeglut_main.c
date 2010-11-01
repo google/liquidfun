@@ -338,36 +338,61 @@ void fgError( const char *fmt, ... )
 {
     va_list ap;
 
-    va_start( ap, fmt );
+    if (fgState.ErrorFunc) {
 
-    fprintf( stderr, "freeglut ");
-    if( fgState.ProgramName )
-        fprintf( stderr, "(%s): ", fgState.ProgramName );
-    VFPRINTF( stderr, fmt, ap );
-    fprintf( stderr, "\n" );
+        va_start( ap, fmt );
 
-    va_end( ap );
+        /* call user set error handler here */
+        fgState.ErrorFunc(fmt, ap);
 
-    if ( fgState.Initialised )
-        fgDeinitialize ();
+        va_end( ap );
 
-    exit( 1 );
+    } else {
+
+        va_start( ap, fmt );
+
+        fprintf( stderr, "freeglut ");
+        if( fgState.ProgramName )
+            fprintf( stderr, "(%s): ", fgState.ProgramName );
+        VFPRINTF( stderr, fmt, ap );
+        fprintf( stderr, "\n" );
+
+        va_end( ap );
+
+        if ( fgState.Initialised )
+            fgDeinitialize ();
+
+        exit( 1 );
+    }
 }
 
 void fgWarning( const char *fmt, ... )
 {
     va_list ap;
 
-    va_start( ap, fmt );
+    if (fgState.WarningFunc) {
 
-    fprintf( stderr, "freeglut ");
-    if( fgState.ProgramName )
-        fprintf( stderr, "(%s): ", fgState.ProgramName );
-    VFPRINTF( stderr, fmt, ap );
-    fprintf( stderr, "\n" );
+        va_start( ap, fmt );
 
-    va_end( ap );
+        /* call user set warning handler here */
+        fgState.WarningFunc(fmt, ap);
+
+        va_end( ap );
+
+    } else {
+
+        va_start( ap, fmt );
+
+        fprintf( stderr, "freeglut ");
+        if( fgState.ProgramName )
+            fprintf( stderr, "(%s): ", fgState.ProgramName );
+        VFPRINTF( stderr, fmt, ap );
+        fprintf( stderr, "\n" );
+
+        va_end( ap );
+    }
 }
+
 
 /*
  * Indicates whether Joystick events are being used by ANY window.

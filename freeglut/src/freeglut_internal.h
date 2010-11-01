@@ -129,6 +129,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 /* These are included based on autoconf directives. */
 #ifdef HAVE_SYS_TYPES_H
@@ -243,6 +244,10 @@ typedef void (* FGCBMenuStatus    )( int, int, int );
 /* The callback used when creating/using menus */
 typedef void (* FGCBMenu          )( int );
 
+/* The FreeGLUT error/warning handler type definition */
+typedef void (* FGError           ) ( const char *fmt, va_list ap);
+typedef void (* FGWarning         ) ( const char *fmt, va_list ap);
+
 
 /* A list structure */
 typedef struct tagSFG_List SFG_List;
@@ -333,6 +338,8 @@ struct tagSFG_State
     int              MinorVersion;         /* Minor OpenGL context version  */
     int              ContextFlags;         /* OpenGL context flags          */
     int              ContextProfile;       /* OpenGL context profile        */
+    FGError          ErrorFunc;            /* User defined error handler    */
+    FGWarning        WarningFunc;          /* User defined warning handler  */
 };
 
 /* The structure used by display initialization in freeglut_init.c */

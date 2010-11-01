@@ -202,6 +202,12 @@ FGAPI void    FGAPIENTRY glutInitContextVersion( int majorVersion, int minorVers
 FGAPI void    FGAPIENTRY glutInitContextFlags( int flags );
 FGAPI void    FGAPIENTRY glutInitContextProfile( int profile );
 
+/* to get the typedef for va_list */
+#include <stdarg.h>
+
+FGAPI void    FGAPIENTRY glutInitErrorFunc( void (* vError)( const char *fmt, va_list ap ) );
+FGAPI void    FGAPIENTRY glutInitWarningFunc( void (* vWarning)( const char *fmt, va_list ap ) );
+
 /*
  * GLUT API macro definitions -- the display mode definitions
  */

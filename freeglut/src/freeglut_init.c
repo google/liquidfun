@@ -91,7 +91,9 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       1,                      /* MajorVersion */
                       0,                      /* MajorVersion */
                       0,                      /* ContextFlags */
-                      0                       /* ContextProfile */
+                      0,                      /* ContextProfile */
+                      NULL,                   /* ErrorFunc */
+                      NULL                    /* WarningFunc */
 };
 
 
@@ -1141,6 +1143,26 @@ void FGAPIENTRY glutInitContextProfile( int profile )
 {
     /* We will make use of this value when creating a new OpenGL context... */
     fgState.ContextProfile = profile;
+}
+
+/* -------------- User Defined Error/Warning Handler Support -------------- */
+
+/*
+ * Sets the user error handler (note the use of va_list for the args to the fmt)
+ */
+void FGAPIENTRY glutInitErrorFunc( void (* vfgError) ( const char *fmt, va_list ap ) )
+{
+    /* This allows user programs to handle freeglut errors */
+    fgState.ErrorFunc = vfgError;
+}
+
+/*
+ * Sets the user warning handler (note the use of va_list for the args to the fmt)
+ */
+void FGAPIENTRY glutInitWarningFunc( void (* vfgWarning) ( const char *fmt, va_list ap ) )
+{
+    /* This allows user programs to handle freeglut warnings */
+    fgState.ErrorFunc = vfgWarning;
 }
 
 /*** END OF FILE ***/
