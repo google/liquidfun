@@ -89,7 +89,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       1,                      /* AuxiliaryBufferNumber */
                       4,                      /* SampleNumber */
                       1,                      /* MajorVersion */
-                      0,                      /* MajorVersion */
+                      0,                      /* MinorVersion */
                       0,                      /* ContextFlags */
                       0,                      /* ContextProfile */
                       NULL,                   /* ErrorFunc */
