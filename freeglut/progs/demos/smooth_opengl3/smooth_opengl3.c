@@ -94,7 +94,6 @@ void checkError(const char *functionName)
 typedef ptrdiff_t ourGLsizeiptr;
 typedef char ourGLchar;
 
-#if defined(WIN32)
 #ifndef APIENTRY
 #define APIENTRY
 #endif
@@ -118,7 +117,6 @@ typedef void (APIENTRY *PFNGLVERTEXATTRIBPOINTERPROC) (GLuint index, GLint size,
 typedef void (APIENTRY *PFNGLENABLEVERTEXATTRIBARRAYPROC) (GLuint index);
 typedef GLint (APIENTRY *PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const ourGLchar *name);
 typedef void (APIENTRY *PFNGLUNIFORMMATRIX4FVPROC) (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-#endif  /* defined(WIN32) */
 
 PFNGLGENBUFFERSPROC gl_GenBuffers;
 PFNGLBINDBUFFERPROC gl_BindBuffer;
