@@ -144,10 +144,10 @@ freeglut_overlay.obj : $(SRC_DIR)\freeglut_overlay.c
 freeglut_spaceball.obj : $(SRC_DIR)\freeglut_spaceball.c
 	$(COMPILER) $(SRC_DIR)\$[. $(COMPILE_OPTIONS)
 
-ffreeglut_state.obj : $(SRC_DIR)\freeglut_state.c
+freeglut_state.obj : $(SRC_DIR)\freeglut_state.c
 	$(COMPILER) $(SRC_DIR)\$[. $(COMPILE_OPTIONS)
 
-reeglut_stroke_mono_roman.obj : $(SRC_DIR)\freeglut_stroke_mono_roman.c
+freeglut_stroke_mono_roman.obj : $(SRC_DIR)\freeglut_stroke_mono_roman.c
 	$(COMPILER) $(SRC_DIR)\$[. $(COMPILE_OPTIONS)
 
 freeglut_stroke_roman.obj : $(SRC_DIR)\freeglut_stroke_roman.c
