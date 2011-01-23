@@ -47,7 +47,7 @@
     || ( defined(__CYGWIN__) && defined(X_DISPLAY_MISSING) )
 #   define  TARGET_HOST_MS_WINDOWS 1
 
-#elif defined(__posix__) || defined(__unix__) || defined(__linux__)
+#elif defined(__posix__) || defined(__unix__) || defined(__linux__) || defined(__sun)
 #   define  TARGET_HOST_POSIX_X11  1
 
 #elif defined(__APPLE__)
