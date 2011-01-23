@@ -320,7 +320,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         GLXFBConfig * fbconfig;
         int isPossible;
 
-        fbconfig = fgChooseFBConfig();
+        fbconfig = fgChooseFBConfig(NULL);
 
         if (fbconfig == NULL)
         {

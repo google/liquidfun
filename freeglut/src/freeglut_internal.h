@@ -825,7 +825,7 @@ void fgDestroyStructure( void );
 
 /* A helper function to check if a display mode is possible to use */
 #if TARGET_HOST_POSIX_X11
-GLXFBConfig* fgChooseFBConfig( void );
+GLXFBConfig* fgChooseFBConfig( int* numcfgs );
 #endif
 
 /* The window procedure for Win32 events handling */

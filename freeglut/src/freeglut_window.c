@@ -220,7 +220,7 @@ static void fghContextCreationError( void )
  * Chooses a visual basing on the current display mode settings
  */
 
-GLXFBConfig* fgChooseFBConfig( void )
+GLXFBConfig* fgChooseFBConfig( int *numcfgs )
 {
   GLboolean wantIndexedMode = GL_FALSE;
   int attributes[ 100 ];
@@ -384,6 +384,9 @@ GLXFBConfig* fgChooseFBConfig( void )
         {
            fbconfig = NULL;
         }
+
+	if (numcfgs)
+		*numcfgs = fbconfigArraySize;
 
         return fbconfig;
     }
@@ -904,13 +907,14 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     XSizeHints sizeHints;
     XWMHints wmHints;
     unsigned long mask;
+    int num_FBConfigs, i;
     unsigned int current_DisplayMode = fgState.DisplayMode ;
 
     /* Save the display mode if we are creating a menu window */
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB ;
 
-    window->Window.FBConfig = fgChooseFBConfig( );
+    window->Window.FBConfig = fgChooseFBConfig( &num_FBConfigs );
 
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = current_DisplayMode ;
@@ -925,14 +929,14 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         if( !( fgState.DisplayMode & GLUT_DOUBLE ) )
         {
             fgState.DisplayMode |= GLUT_DOUBLE ;
-            window->Window.FBConfig = fgChooseFBConfig( );
+            window->Window.FBConfig = fgChooseFBConfig( &num_FBConfigs );
             fgState.DisplayMode &= ~GLUT_DOUBLE;
         }
 
         if( fgState.DisplayMode & GLUT_MULTISAMPLE )
         {
             fgState.DisplayMode &= ~GLUT_MULTISAMPLE ;
-            window->Window.FBConfig = fgChooseFBConfig( );
+            window->Window.FBConfig = fgChooseFBConfig( &num_FBConfigs );
             fgState.DisplayMode |= GLUT_MULTISAMPLE;
         }
     }
@@ -941,8 +945,15 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                                   "FBConfig with necessary capabilities not found", "fgOpenWindow" );
 
     /*  Get the X visual.  */
-    visualInfo = glXGetVisualFromFBConfig( fgDisplay.Display,
-                                           *(window->Window.FBConfig) );
+    for (i = 0; i < num_FBConfigs; i++) {
+	    visualInfo = glXGetVisualFromFBConfig( fgDisplay.Display,
+						   window->Window.FBConfig[i] );
+	    if (visualInfo)
+		break;
+    }
+
+    FREEGLUT_INTERNAL_ERROR_EXIT( visualInfo != NULL,
+                                  "visualInfo could not be retrieved from FBConfig", "fgOpenWindow" );
 
     /*
      * XXX HINT: the masks should be updated when adding/removing callbacks.
