@@ -801,11 +801,12 @@ extern SFG_State fgState;
  * A call to those macros assures us that there is a current
  * window set, respectively:
  */
-#define  FREEGLUT_EXIT_IF_NO_WINDOW( string )                   \
-  if ( ! fgStructure.CurrentWindow )                            \
-  {                                                             \
-    fgError ( " ERROR:  Function <%s> called"                   \
-              " with no current window defined.", (string) ) ;  \
+#define  FREEGLUT_EXIT_IF_NO_WINDOW( string )                               \
+  if ( ! fgStructure.CurrentWindow &&                                       \
+       ( fgState.ActionOnWindowClose != GLUT_ACTION_CONTINUE_EXECUTION ) )  \
+  {                                                                         \
+    fgError ( " ERROR:  Function <%s> called"                               \
+              " with no current window defined.", (string) ) ;              \
   }
 
 /*
