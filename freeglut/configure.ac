@@ -21,7 +21,7 @@ AC_SUBST([LIBTOOL_DEPS])
 # Checks for libraries.
 AC_PATH_XTRA
 
-if test x"$no_x" = xyes; then
+if test "x$no_x" = xyes; then
   GL_LIBS="-lopengl32 -lgdi32 -lwinmm"
   LIBXXF86VM=
   LIBXI=
