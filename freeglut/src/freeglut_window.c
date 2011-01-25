@@ -679,7 +679,7 @@ static void fghFillPFD( PIXELFORMATDESCRIPTOR *ppfd, HDC hdc, unsigned char laye
   ppfd->cGreenShift = 0;
   ppfd->cBlueShift = 0;
   ppfd->cAlphaShift = 0;
-  ppfd->cAccumBits = 0;
+  ppfd->cAccumBits = ( fgState.DisplayMode & GLUT_ACCUM ) ? 1 : 0;
   ppfd->cAccumRedBits = 0;
   ppfd->cAccumGreenBits = 0;
   ppfd->cAccumBlueBits = 0;
