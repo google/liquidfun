@@ -733,9 +733,16 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     PIXELFORMATDESCRIPTOR pfd;
     PIXELFORMATDESCRIPTOR* ppfd = &pfd;
     int pixelformat;
+    HDC current_hDC;
+    GLboolean success;
 
-    fghFillPFD( ppfd, window->Window.Device, layer_type );
-    pixelformat = ChoosePixelFormat( window->Window.Device, ppfd );
+    if (checkOnly)
+      current_hDC = CreateDC(TEXT("DISPLAY"), NULL ,NULL ,NULL);
+    else
+      current_hDC = window->Window.Device;
+
+    fghFillPFD( ppfd, current_hDC, layer_type );
+    pixelformat = ChoosePixelFormat( current_hDC, ppfd );
 
     /* windows hack for multismapling/sRGB */
     if ( ( fgState.DisplayMode & GLUT_MULTISAMPLE ) ||
@@ -757,10 +764,10 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
         hWnd=CreateWindow(_T("FREEGLUT_dummy"), _T(""), WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW , 0,0,0,0, 0, 0, fgDisplay.Instance, 0 );
         hDC=GetDC(hWnd);
         SetPixelFormat( hDC, pixelformat, ppfd );
-        
+
         rc = wglCreateContext( hDC );
         wglMakeCurrent(hDC, rc);
-        
+
         if ( fghIsExtensionSupported( hDC, "WGL_ARB_multisample" ) )
         {
             PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARBProc =
@@ -773,7 +780,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                 float fAttributes[] = { 0, 0 };
                 UINT numFormats;
                 fghFillPixelFormatAttributes( attributes, ppfd );
-                bValid = wglChoosePixelFormatARBProc(window->Window.Device, attributes, fAttributes, 1, &iPixelFormat, &numFormats);
+                bValid = wglChoosePixelFormatARBProc(hDC, attributes, fAttributes, 1, &iPixelFormat, &numFormats);
 
                 if ( bValid && numFormats > 0 )
                 {
@@ -789,7 +796,12 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
         UnregisterClass(_T("FREEGLUT_dummy"), fgDisplay.Instance);
     }
 
-    return ( pixelformat != 0 ) && ( checkOnly || SetPixelFormat( window->Window.Device, pixelformat, ppfd ) );
+    success = ( pixelformat != 0 ) && ( checkOnly || SetPixelFormat( current_hDC, pixelformat, ppfd ) );
+
+    if (checkOnly)
+        DeleteDC(current_hDC);
+
+    return success;
 #endif /* defined(_WIN32_WCE) */
 }
 
