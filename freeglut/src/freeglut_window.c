@@ -31,6 +31,7 @@
 
 #if TARGET_HOST_POSIX_X11
 #include <limits.h>  /* LONG_MAX */
+#include <unistd.h>  /* usleep */
 #endif
 
 #if defined(_WIN32_WCE)
@@ -905,6 +906,14 @@ static void get_display_origin(int *xp,int *yp)
 #endif
 
 
+#if TARGET_HOST_POSIX_X11
+static Bool fghWindowIsVisible( Display *display, XEvent *event, XPointer arg)
+{
+    Window window = arg;
+    return (event->type == MapNotify) && (event->xmap.window == window);
+}
+#endif
+
 
 /*
  * Opens a window. Requires a SFG_Window object created and attached
@@ -921,6 +930,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     XTextProperty textProperty;
     XSizeHints sizeHints;
     XWMHints wmHints;
+    XEvent eventReturnBuffer; /* return buffer required for a call */
     unsigned long mask;
     int num_FBConfigs, i;
     unsigned int current_DisplayMode = fgState.DisplayMode ;
@@ -1113,6 +1123,9 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     XMapWindow( fgDisplay.Display, window->Window.Handle );
 
     XFree(visualInfo);
+
+    if( !isSubWindow)
+        XPeekIfEvent( fgDisplay.Display, &eventReturnBuffer, &fghWindowIsVisible, window->Window.Handle );
 
 #elif TARGET_HOST_MS_WINDOWS
 
