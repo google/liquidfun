@@ -812,17 +812,20 @@ void fgSetWindow ( SFG_Window *window )
         );
     }
 #elif TARGET_HOST_MS_WINDOWS
-    if( fgStructure.CurrentWindow )
-        ReleaseDC( fgStructure.CurrentWindow->Window.Handle,
-                   fgStructure.CurrentWindow->Window.Device );
-
-    if ( window )
+    if ( window != fgStructure.CurrentWindow )
     {
-        window->Window.Device = GetDC( window->Window.Handle );
-        wglMakeCurrent(
-            window->Window.Device,
-            window->Window.Context
-        );
+        if( fgStructure.CurrentWindow )
+            ReleaseDC( fgStructure.CurrentWindow->Window.Handle,
+                       fgStructure.CurrentWindow->Window.Device );
+
+        if ( window )
+        {
+            window->Window.Device = GetDC( window->Window.Handle );
+            wglMakeCurrent(
+                window->Window.Device,
+                window->Window.Context
+            );
+        }
     }
 #endif
     fgStructure.CurrentWindow = window;
