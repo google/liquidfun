@@ -324,13 +324,28 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     success = GL_FALSE;
 
     EnumDisplaySettings( fgDisplay.DisplayName, -1, &devMode ); 
-    devMode.dmFields |= DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
+    devMode.dmFields = 0;
 
-    devMode.dmPelsWidth  = fgState.GameModeSize.X;
-    devMode.dmPelsHeight = fgState.GameModeSize.Y;
-    devMode.dmBitsPerPel = fgState.GameModeDepth;
-    devMode.dmDisplayFrequency = fgState.GameModeRefresh;
-    devMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
+    if (fgState.GameModeSize.X!=-1)
+    {
+        devMode.dmPelsWidth  = fgState.GameModeSize.X;
+        devMode.dmFields |= DM_PELSWIDTH;
+    }
+    if (fgState.GameModeSize.Y!=-1)
+    {
+        devMode.dmPelsHeight  = fgState.GameModeSize.Y;
+        devMode.dmFields |= DM_PELSHEIGHT;
+    }
+    if (fgState.GameModeDepth!=-1)
+    {
+        devMode.dmBitsPerPel  = fgState.GameModeDepth;
+        devMode.dmFields |= DM_BITSPERPEL;
+    }
+    if (fgState.GameModeRefresh!=-1)
+    {
+        devMode.dmDisplayFrequency  = fgState.GameModeRefresh;
+        devMode.dmFields |= DM_DISPLAYFREQUENCY;
+    }
 
     switch ( ChangeDisplaySettingsEx(fgDisplay.DisplayName, &devMode, NULL, haveToTest ? CDS_TEST : CDS_FULLSCREEN , NULL) )
     {
@@ -380,7 +395,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
  */
 void FGAPIENTRY glutGameModeString( const char* string )
 {
-    int width = 640, height = 480, depth = 16, refresh = 72;
+    int width = -1, height = -1, depth = -1, refresh = -1;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGameModeString" );
 
