@@ -419,10 +419,10 @@ void FGAPIENTRY glutGameModeString( const char* string )
                                 );
 
     /* Hopefully it worked, and if not, we still have the default values */
-    fgState.GameModeSize.X  = width;
-    fgState.GameModeSize.Y  = height;
-    fgState.GameModeDepth   = depth;
-    fgState.GameModeRefresh = refresh;
+    if ( width   > 0 ) fgState.GameModeSize.X  = width;
+    if ( height  > 0 ) fgState.GameModeSize.Y  = height;
+    if ( depth   > 0 ) fgState.GameModeDepth   = depth;
+    if ( refresh > 0 ) fgState.GameModeRefresh = refresh;
 }
 
 
