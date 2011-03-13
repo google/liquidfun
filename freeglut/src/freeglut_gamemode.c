@@ -204,7 +204,7 @@ static void fghRestoreState( void )
 
 #elif TARGET_HOST_MS_WINDOWS
 
-    /* Restore the previously rememebered desktop display settings */
+    /* Restore the previously remembered desktop display settings */
     ChangeDisplaySettingsEx( fgDisplay.DisplayName,&fgDisplay.DisplayMode, 0,0,0 );
 
 #endif
@@ -242,6 +242,15 @@ static int fghCheckDisplayModes( GLboolean exactMatch, int displayModesCount, XF
                                  displayModes[ i ]->vdisplay,
                                  fgState.GameModeDepth,
                                  ( exactMatch ? refresh : fgState.GameModeRefresh ) ) ) {
+            if (!exactMatch)
+            {
+                /* Update the chosen refresh rate, otherwise a
+                 * glutGameModeGet(GLUT_GAME_MODE_REFRESH_RATE) would not
+                 * return the right values
+                 */
+                fgState.GameModeRefresh = refresh;
+            }
+
             return i;
         }
     }
