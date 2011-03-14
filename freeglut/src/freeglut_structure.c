@@ -114,7 +114,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
  */
 SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
 {
-    int x = 100, y = 100, w = 100, h = 100;
+    int x = 100, y = 100, w = 1, h = 1;
     SFG_Window *current_window = fgStructure.CurrentWindow;
 
     /* Have the menu object created */
