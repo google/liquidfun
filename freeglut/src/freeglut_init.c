@@ -1162,7 +1162,7 @@ void FGAPIENTRY glutInitErrorFunc( void (* vfgError) ( const char *fmt, va_list 
 void FGAPIENTRY glutInitWarningFunc( void (* vfgWarning) ( const char *fmt, va_list ap ) )
 {
     /* This allows user programs to handle freeglut warnings */
-    fgState.ErrorFunc = vfgWarning;
+    fgState.WarningFunc = vfgWarning;
 }
 
 /*** END OF FILE ***/
