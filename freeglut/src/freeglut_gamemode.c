@@ -40,6 +40,65 @@
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
+static int xrandr_resize(int xsz, int ysz, int just_checking)
+{
+    int res = -1;
+
+#ifdef HAVE_X11_EXTENSIONS_XRANDR_H
+    int event_base, error_base;
+    Status st;
+    XRRScreenConfiguration *xrr_config;
+    XRRScreenSize *ssizes;
+    Rotation rot;
+    int i, ssizes_count, curr;
+    Time timestamp, cfg_timestamp;
+
+    /* must check at runtime for the availability of the extension */
+    if(!XRRQueryExtension(fgDisplay.Display, &event_base, &error_base)) {
+        return -1;
+    }
+
+    if(!(xrr_config = XRRGetScreenInfo(fgDisplay.Display, fgDisplay.RootWindow))) {
+        fgWarning("XRRGetScreenInfo failed");
+        return -1;
+    }
+    ssizes = XRRConfigSizes(xrr_config, &ssizes_count);
+    curr = XRRConfigCurrentConfiguration(xrr_config, &rot);
+    timestamp = XRRConfigTimes(xrr_config, &cfg_timestamp);
+
+    if(xsz == ssizes[curr].width && ysz == ssizes[curr].height) {
+        /* no need to switch, we're already in the requested mode */
+        res = 0;
+        goto done;
+    }
+
+    for(i=0; i<ssizes_count; i++) {
+        if(ssizes[i].width == xsz && ssizes[i].height == ysz) {
+            break;  /* found it */
+        }
+    }
+    if(i == ssizes_count)
+        goto done;
+
+    if(just_checking) {
+        res = 0;
+        goto done;
+    }
+
+    if((st = XRRSetScreenConfig(fgDisplay.Display, xrr_config, fgDisplay.RootWindow,
+                    i, rot, timestamp)) != 0) {
+        fgWarning("XRRSetScreenConfig failed");
+        goto done;
+    }
+    res = 0;
+
+done:
+    XRRFreeScreenConfigInfo(xrr_config);
+#endif
+    return res;
+}
+
+
 /*
  * Remembers the current visual settings, so that
  * we can change them and restore later...
@@ -47,13 +106,36 @@
 static void fghRememberState( void )
 {
 #if TARGET_HOST_POSIX_X11
+    int event_base, error_base;
+
+#   ifdef HAVE_X11_EXTENSIONS_XRANDR_H
+    if(XRRQueryExtension(fgDisplay.Display, &event_base, &error_base)) {
+        XRRScreenConfiguration *xrr_config;
+        XRRScreenSize *ssizes;
+        Rotation rot;
+        int ssize_count, curr;
+
+        if((xrr_config = XRRGetScreenInfo(fgDisplay.Display, fgDisplay.RootWindow))) {
+            ssizes = XRRConfigSizes(xrr_config, &ssize_count);
+            curr = XRRConfigCurrentConfiguration(xrr_config, &rot);
+
+            fgDisplay.prev_xsz = ssizes[curr].width;
+            fgDisplay.prev_ysz = ssizes[curr].height;
+            fgDisplay.prev_size_valid = 1;
+            XRRFreeScreenConfigInfo(xrr_config);
+            return;
+        }
+    }
+#   endif
 
     /*
      * This highly depends on the XFree86 extensions,
      * not approved as X Consortium standards
      */
-#   ifdef X_XF86VidModeGetModeLine
-
+#   ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
+    if(!XF86VidModeQueryExtension(fgDisplay.Display, &event_base, &error_base)) {
+        return;
+    }
 
     /*
      * Remember the current ViewPort location of the screen to be able to
@@ -93,12 +175,6 @@ static void fghRememberState( void )
 
     if( !fgDisplay.DisplayModeValid )
             fgWarning( "XF86VidModeGetModeLine failed" );
-
-#   else
-    /*
-     * XXX warning fghRememberState: missing XFree86 video mode extensions,
-     * XXX game mode will not change screen resolution when activated
-     */
 #   endif
 
 #elif TARGET_HOST_MS_WINDOWS
@@ -127,7 +203,17 @@ static void fghRestoreState( void )
 {
 #if TARGET_HOST_POSIX_X11
 
-#   ifdef X_XF86VidModeGetAllModeLines
+#   ifdef HAVE_X11_EXTENSIONS_XRANDR_H
+    if(fgDisplay.prev_size_valid) {
+        if(xrandr_resize(fgDisplay.prev_xsz, fgDisplay.prev_ysz, 0) != -1) {
+            fgDisplay.prev_size_valid = 0;
+            return;
+        }
+    }
+#   endif
+
+
+#   ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
     /* Restore the remembered pointer position: */
     XWarpPointer(
         fgDisplay.Display, None, fgDisplay.RootWindow, 0, 0, 0, 0,
@@ -179,7 +265,7 @@ static void fghRestoreState( void )
                          fgDisplay.Screen,
                          fgDisplay.DisplayViewPortX,
                          fgDisplay.DisplayViewPortY ) )
-                    fgWarning( "XF86VidModeSetViewPort failed" );
+                    fgWarning( "HAVE_X11_EXTENSIONS_XF86VMODE_H failed" );
 
 
                 /*
@@ -195,11 +281,6 @@ static void fghRestoreState( void )
         XFree( displayModes );
     }
 
-#   else
-    /*
-     * XXX warning fghRestoreState: missing XFree86 video mode extensions,
-     * XXX game mode will not change screen resolution when activated
-     */
 #   endif
 
 #elif TARGET_HOST_MS_WINDOWS
@@ -211,7 +292,7 @@ static void fghRestoreState( void )
 }
 
 #if TARGET_HOST_POSIX_X11
-#ifdef X_XF86VidModeGetAllModeLines
+#ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
 
 /*
  * Checks a single display mode settings against user's preferences.
@@ -268,11 +349,19 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     GLboolean success = GL_FALSE;
 #if TARGET_HOST_POSIX_X11
 
+    /* first try to use XRandR, then fallback to XF86VidMode */
+#   ifdef HAVE_X11_EXTENSIONS_XRANDR_H
+    if(xrandr_resize(fgState.GameModeSize.X, fgState.GameModeSize.Y, haveToTest) != -1) {
+        return GL_TRUE;
+    }
+#   endif
+
+
     /*
      * This highly depends on the XFree86 extensions,
      * not approved as X Consortium standards
      */
-#   ifdef X_XF86VidModeGetAllModeLines
+#   ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
 
     /*
      * This is also used by applcations which check modes by calling
@@ -510,7 +599,7 @@ int FGAPIENTRY glutEnterGameMode( void )
         fgState.GameModeSize.X/2, fgState.GameModeSize.Y/2
     );
 
-#   ifdef X_XF86VidModeSetViewPort
+#   ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
 
     if( fgDisplay.DisplayModeValid )
     {

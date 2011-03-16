@@ -1316,6 +1316,12 @@ void fgOpenWindow( SFG_Window* window, const char* title,
  */
 void fgCloseWindow( SFG_Window* window )
 {
+    /* if we're in gamemode, call glutLeaveGameMode first to make sure the
+     * gamemode is properly closed before closing the window
+     */
+    if (fgStructure.GameModeWindow != NULL)
+        glutLeaveGameMode();
+
 #if TARGET_HOST_POSIX_X11
 
     if( window->Window.Context )

@@ -29,9 +29,8 @@ if test "x$no_x" = xyes; then
   EXPORT_FLAGS="-DFREEGLUT_EXPORTS"
 else
   GL_LIBS="-lGL -lXext -lX11"
-  AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode],
-               [LIBXXF86VM=-lXxf86vm], [LIBXXF86VM=],
-               [$X_LIBS -lXext -lX11])
+  AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode])
+  AC_CHECK_LIB([Xrandr], [XRRQueryExtension])
   LIBXI=-lXi
   VERSION_INFO="-version-info 12:0:9"
   EXPORT_FLAGS=
@@ -49,6 +48,7 @@ CPPFLAGS="$CPPFLAGS $X_CFLAGS"
 AC_CHECK_HEADERS([usbhid.h errno.h GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
 AC_HEADER_TIME
 AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [], [], [#include <X11/Xlib.h>])
+AC_CHECK_HEADERS([X11/extensions/Xrandr.h])
 AC_CHECK_HEADERS([X11/extensions/XI.h X11/extensions/XInput.h])
 CPPFLAGS="$save_CPPFLAGS"
 

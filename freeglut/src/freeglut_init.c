@@ -389,6 +389,7 @@ static void fghInitialize( const char* displayName )
 #endif
 
     fgState.Initialised = GL_TRUE;
+    atexit(fgDeinitialize);
 
     /* InputDevice uses GlutTimerFunc(), so fgState.Initialised must be TRUE */
     fgInitialiseInputDevices();
@@ -403,8 +404,6 @@ void fgDeinitialize( void )
 
     if( !fgState.Initialised )
     {
-        fgWarning( "fgDeinitialize(): "
-                   "no valid initialization has been performed" );
         return;
     }
 

@@ -110,8 +110,11 @@
 #    include <X11/Xatom.h>
 #    include <X11/keysym.h>
 #    include <X11/extensions/XInput.h>
-#    ifdef HAVE_XXF86VM
+#    ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
 #        include <X11/extensions/xf86vmode.h>
+#    endif
+#    ifdef HAVE_X11_EXTENSIONS_XRANDR_H
+#        include <X11/extensions/Xrandr.h>
 #    endif
 /* If GLX is too old, we will fail during runtime when multisampling
    is requested, but at least freeglut compiles. */
@@ -355,7 +358,12 @@ struct tagSFG_Display
     Atom            State;              /* The state atom                    */
     Atom            StateFullScreen;    /* The full screen atom              */
 
-#ifdef X_XF86VidModeGetModeLine
+#ifdef HAVE_X11_EXTENSIONS_XRANDR_H
+    int prev_xsz, prev_ysz;
+    int prev_size_valid;
+#endif	/* HAVE_X11_EXTENSIONS_XRANDR_H */
+
+#ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
     /*
      * XF86VidMode may be compilable even if it fails at runtime.  Therefore,
      * the validity of the VidMode has to be tracked
@@ -368,7 +376,7 @@ struct tagSFG_Display
     int             DisplayPointerX;    /* saved X location of the pointer   */
     int             DisplayPointerY;    /* saved Y location of the pointer   */
 
-#endif /* X_XF86VidModeGetModeLine */
+#endif /* HAVE_X11_EXTENSIONS_XF86VMODE_H */
 
 #elif TARGET_HOST_MS_WINDOWS
     HINSTANCE        Instance;          /* The application's instance        */
