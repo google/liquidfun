@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build;CopyFiles" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug_Static|Win32">
       <Configuration>Debug_Static</Configuration>
@@ -100,6 +100,9 @@
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>for %%I in ($(TargetDir)\$(TargetName)$(TargetExt) $(TargetDir)\$(TargetName).lib $(TargetDir)\$(TargetName).exp) do xcopy /F /Y %%I ..\..\lib\Debug\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Static|Win32'">
     <ClCompile>
@@ -121,6 +124,9 @@
       <OutputFile>$(OutDir)$(TargetName).lib</OutputFile>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
+    <PostBuildEvent>
+      <Command>xcopy /F /Y $(TargetDir)\$(TargetName)$(TargetExt) ..\..\lib\Debug\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -145,6 +151,9 @@
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>for %%I in ($(TargetDir)\$(TargetName)$(TargetExt) $(TargetDir)\$(TargetName).lib $(TargetDir)\$(TargetName).exp) do xcopy /F /Y %%I ..\..\lib\Release\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Static|Win32'">
     <ClCompile>
@@ -166,6 +175,9 @@
       <OutputFile>$(OutDir)$(TargetName).lib</OutputFile>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
+    <PostBuildEvent>
+      <Command>xcopy /F /Y $(TargetDir)\$(TargetName)$(TargetExt) ..\..\lib\Release\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\freeglut_callbacks.c" />
@@ -210,32 +222,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <Target Name="CopyFiles">
-    <Message Text="Copying Files..." />
-    <Copy
-      SourceFiles="$(TargetDir)\$(TargetName)$(TargetExt)"
-      DestinationFolder="..\..\lib\Debug\"
-      SkipUnchangedFiles="true"
-      Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' Or '$(Configuration)|$(Platform)'=='Debug_Static|Win32'"
-    />
-    <Copy
-      SourceFiles="$(TargetDir)\$(TargetName).lib;$(TargetDir)\$(TargetName).exp"
-      DestinationFolder="..\..\lib\Debug\"
-      SkipUnchangedFiles="true"
-      Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"
-    />
-
-    <Copy
-      SourceFiles="$(TargetDir)\$(TargetName)$(TargetExt)"
-      DestinationFolder="..\..\lib\Release\"
-      SkipUnchangedFiles="true"
-      Condition="'$(Configuration)|$(Platform)'=='Release|Win32' Or '$(Configuration)|$(Platform)'=='Release_Static|Win32'"
-    />
-    <Copy
-      SourceFiles="$(TargetDir)\$(TargetName).lib;$(TargetDir)\$(TargetName).exp"
-      DestinationFolder="..\..\lib\Release\"
-      SkipUnchangedFiles="true"
-      Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"
-    />
-  </Target>
 </Project>
