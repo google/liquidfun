@@ -22,7 +22,7 @@
 #include <GL/freeglut.h>
 
 int g_LeaveGameMode = 0;
-int g_InGameMode = 1;
+int g_InGameMode = 0;
 
 /*
  * Call this function to have some text drawn at given coordinates
@@ -301,18 +301,24 @@ int main( int argc, char** argv )
     glutGameModeString( "1024x768" );
     glutGameModeString( ":32@120" );
     glutGameModeString( "Toudi glupcze, Danwin bedzie moj!" );
-    glutGameModeString( "640x480:16@72" );
-
+    
+    glutGameModeString( "640x480:37@300" );    /* this one should fail */
     glutEnterGameMode();
+
+    glutGameModeString( "800x600" );    /* this one is likely to succeed */
+    glutEnterGameMode();
+
+    if (glutGameModeGet(GLUT_GAME_MODE_ACTIVE))
+        g_InGameMode = 1;
     glutDisplayFunc( SampleDisplay );
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleGameModeKeyboard );
     glutIdleFunc( SampleIdle );
     glutAttachMenu( GLUT_LEFT_BUTTON );
 
-    printf( "current window is %ix%i+%i+%i",
-            glutGet( GLUT_WINDOW_X ), glutGet( GLUT_WINDOW_Y ),
-            glutGet( GLUT_WINDOW_WIDTH ), glutGet( GLUT_WINDOW_HEIGHT )
+    printf( "current window is %ix%i at (%i,%i)",
+        glutGet( GLUT_WINDOW_WIDTH ), glutGet( GLUT_WINDOW_HEIGHT ),
+        glutGet( GLUT_WINDOW_X ), glutGet( GLUT_WINDOW_Y )
     );
 
     /*
