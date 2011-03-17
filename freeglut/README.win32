@@ -22,10 +22,18 @@ menu will build both the debug and the release versions of both libraries.
 
 The libraries will be found in the following places and will have the
 following names:
-- DLL, debug version: freeglut\freeglut\Debug\freeglut.lib
-- DLL, release version: freeglut\freeglut\Release\freeglut.lib
-- Static, debug version: freeglut\freeglut\DebugStatic\freeglut_static.lib
-- Static, release version: freeglut\freeglut\ReleaseStatic\freeglut_static.lib
+- DLL, debug version:       freeglut\freeglut\Debug\freeglut.lib
+- DLL, release version:     freeglut\freeglut\Release\freeglut.lib
+- Static, debug version:    freeglut\freeglut\DebugStatic\freeglut_static.lib
+- Static, release version:  freeglut\freeglut\ReleaseStatic\freeglut_static.lib
+
+Starting with VS2008, these libraries can instead be found at:
+- DLL, debug version:       freeglut\freeglut\lib\Debug\freeglut.lib
+                            freeglut\freeglut\lib\Debug\freeglut.dll
+- DLL, release version:     freeglut\freeglut\lib\Release\freeglut.lib
+                            freeglut\freeglut\lib\Release\freeglut.dll
+- Static, debug version:    freeglut\freeglut\lib\Debug\freeglut_static.lib
+- Static, release version:  freeglut\freeglut\lib\Release\freeglut_static.lib
 
 Unlike the *nix release, the library names are NOT automatic replacements for
 the GLUT library names.  You may rename them manually if you wish, but this is
