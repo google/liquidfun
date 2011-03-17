@@ -445,6 +445,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 
     DEVMODE  devMode;
     char *fggmstr = NULL;
+    char displayMode[300];
 
     success = GL_FALSE;
 
@@ -508,8 +509,14 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
     }
 
     if ( !success )
-        fgWarning(fggmstr); /* I'd rather get info whats going on in my program than wonder about */
-                            /* magic happenings behind my back, its lib for devels at last ;) */
+    {
+        /* I'd rather get info whats going on in my program than wonder about */
+        /* magic happenings behind my back, its lib for devels at last ;) */
+        
+        /* append display mode to error to make things more informative */
+        sprintf(displayMode,"%s Problem with requested mode: %ix%i:%i@%i", fggmstr, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmBitsPerPel, devMode.dmDisplayFrequency);
+        fgWarning(displayMode);
+    }
 #endif
 
     return success;
