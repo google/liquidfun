@@ -364,7 +364,7 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 #   ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
 
     /*
-     * This is also used by applcations which check modes by calling
+     * This is also used by applications which check modes by calling
      * glutGameModeGet(GLUT_GAME_MODE_POSSIBLE), so allow the check:
      */
     if( haveToTest || fgDisplay.DisplayModeValid )
@@ -372,6 +372,33 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
         XF86VidModeModeInfo** displayModes;
         int i, displayModesCount;
 
+        /* current display mode was queried in fghRememberState
+         * set defaulted values to the current display mode's
+         */
+        if (fgState.GameModeSize.X == -1)
+        {
+            fgState.GameModeSize.X = fgDisplay.DisplayMode.hdisplay;
+        }
+        if (fgState.GameModeSize.Y == -1)
+        {
+            fgState.GameModeSize.Y = fgDisplay.DisplayMode.vdisplay;
+        }
+        if (fgState.GameModeDepth == -1)
+        {
+            /* can't get color depth from this, nor can we change it, do nothing
+             * TODO: get with XGetVisualInfo()? but then how to set?
+             */
+        }
+        if (fgState.GameModeRefresh != -1)
+        {
+            /* Compute the displays refresh rate, dotclock comes in kHz. */
+            int refresh = ( fgDisplay.DisplayModeClock * 1000 ) /
+                ( fgDisplay.DisplayMode.htotal * fgDisplay.DisplayMode.vtotal );
+
+            fgState.GameModeRefresh = refresh;
+        }
+
+        /* query all possible display modes */
         if( !XF86VidModeGetAllModeLines(
                  fgDisplay.Display,
                  fgDisplay.Screen,
@@ -516,11 +543,14 @@ void FGAPIENTRY glutGameModeString( const char* string )
                                     string
                                 );
 
-    /* Hopefully it worked, and if not, we still have the default values */
-    if ( width   > 0 ) fgState.GameModeSize.X  = width;
-    if ( height  > 0 ) fgState.GameModeSize.Y  = height;
-    if ( depth   > 0 ) fgState.GameModeDepth   = depth;
-    if ( refresh > 0 ) fgState.GameModeRefresh = refresh;
+    /* All values not specified are now set to -1, which means those
+     * aspects of the current display mode are not changed in
+     * fghChangeDisplayMode() above.
+     */
+    fgState.GameModeSize.X  = width;
+    fgState.GameModeSize.Y  = height;
+    fgState.GameModeDepth   = depth;
+    fgState.GameModeRefresh = refresh;
 }
 
 
