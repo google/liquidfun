@@ -373,4 +373,40 @@ void FGAPIENTRY glutTabletButtonFunc( void (* callback)( int, int, int, int ) )
     SET_CALLBACK( TabletButton );
 }
 
+/*
+ * Sets the multi-pointer entry callback for the current window
+ */
+void FGAPIENTRY glutMultiEntryFunc( void (* callback)(int, int ) )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMultiEntryFunc" );
+    SET_CALLBACK( MultiEntry );
+}
+
+/*
+ * Sets the multi-pointer button callback for the current window
+ */
+void FGAPIENTRY glutMultiButtonFunc( void (* callback)(int, int, int, int, int ) )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMultiButtonFunc" );
+    SET_CALLBACK( MultiButton );
+}
+
+/*
+ * Sets the multi-pointer motion callback for the current window
+ */
+void FGAPIENTRY glutMultiMotionFunc( void (* callback)(int, int, int ) )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMultiMotionFunc" );
+    SET_CALLBACK( MultiMotion );
+}
+
+/*
+ * Sets the multi-pointer passive motion callback for the current window
+ */
+void FGAPIENTRY glutMultiPassiveFunc( void (* callback)(int, int, int ) )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMultiPassiveFunc" );
+    SET_CALLBACK( MultiPassive );
+}
+
 /*** END OF FILE ***/

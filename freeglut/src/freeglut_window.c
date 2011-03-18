@@ -1120,6 +1120,11 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         window->Window.Context
     );
 
+    /* register extension events _before_ window is mapped */
+    #ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
+       fgRegisterDevices( fgDisplay.Display, &(window->Window.Handle) );
+    #endif
+
     XMapWindow( fgDisplay.Display, window->Window.Handle );
 
     XFree(visualInfo);
@@ -1286,6 +1291,10 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 /*  SetWindowPos(window->Window.Handle, NULL, 0, 0, 0, 0,
      SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); */
 
+    /* Enable multitouch: additional flag TWF_FINETOUCH, TWF_WANTPALM */
+    #ifdef WM_TOUCH
+       RegisterTouchWindow( window->Window.Handle, TWF_FINETOUCH | TWF_WANTPALM );
+    #endif
 
 #if defined(_WIN32_WCE)
     ShowWindow( window->Window.Handle, SW_SHOW );

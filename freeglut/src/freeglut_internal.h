@@ -238,6 +238,11 @@ typedef void (* FGCBTabletMotion  )( int, int );
 typedef void (* FGCBTabletButton  )( int, int, int, int );
 typedef void (* FGCBDestroy       )( void );
 
+typedef void (* FGCBMultiEntry   )( int, int );
+typedef void (* FGCBMultiButton  )( int, int, int, int, int );
+typedef void (* FGCBMultiMotion  )( int, int, int );
+typedef void (* FGCBMultiPassive )( int, int, int );
+
 /* The global callbacks type definitions */
 typedef void (* FGCBIdle          )( void );
 typedef void (* FGCBTimer         )( int );
@@ -586,6 +591,12 @@ enum
     CB_WindowStatus,
     CB_Joystick,
     CB_Destroy,
+
+    /* MPX-related */
+    CB_MultiEntry,
+    CB_MultiButton,
+    CB_MultiMotion,
+    CB_MultiPassive,
 
     /* Presently ignored */
     CB_Select,
@@ -970,6 +981,13 @@ void fgWarning( const char *fmt, ... );
  */
 #if TARGET_HOST_POSIX_X11
 int fgHintPresent(Window window, Atom property, Atom hint);
+
+/* Handler for X extension Events */
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
+  void fgHandleExtensionEvents( XEvent * ev );
+  void fgRegisterDevices( Display* dpy, Window* win );
+#endif
+
 #endif
 
 SFG_Proc fghGetProcAddress( const char *procName );

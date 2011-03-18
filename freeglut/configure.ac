@@ -31,6 +31,7 @@ else
   GL_LIBS="-lGL -lXext -lX11"
   AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode])
   AC_CHECK_LIB([Xrandr], [XRRQueryExtension])
+  AC_CHECK_LIB([Xi], [XISelectEvents])
   LIBXI=-lXi
   VERSION_INFO="-version-info 12:0:9"
   EXPORT_FLAGS=
@@ -50,6 +51,7 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [], [], [#include <X11/Xlib.h>])
 AC_CHECK_HEADERS([X11/extensions/Xrandr.h])
 AC_CHECK_HEADERS([X11/extensions/XI.h X11/extensions/XInput.h])
+AC_CHECK_HEADERS([X11/extensions/XInput2.h])
 CPPFLAGS="$save_CPPFLAGS"
 
 # Checks for library functions.

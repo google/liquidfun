@@ -512,7 +512,7 @@ static void fghSleepForEvents( void )
 /*
  * Returns GLUT modifier mask for the state field of an X11 event.
  */
-static int fghGetXModifiers( int state )
+int fghGetXModifiers( int state )
 {
     int ret = 0;
 
@@ -1445,7 +1445,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
             break;
 
         default:
-            fgWarning ("Unknown X event type: %d\n", event.type);
+            /* enter handling of Extension Events here */
+            #ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
+                fgHandleExtensionEvents( &event );
+            #endif
             break;
         }
     }
@@ -2444,6 +2447,41 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 
+#ifdef WM_TOUCH
+	/* handle multi-touch messages */
+	case WM_TOUCH:
+	{
+		unsigned int numInputs = (unsigned int)wParam;
+		unsigned int i = 0;
+		TOUCHINPUT* ti = (TOUCHINPUT*)malloc( sizeof(TOUCHINPUT)*numInputs);
+		if (GetTouchInputInfo( (HTOUCHINPUT)lParam, numInputs, ti, sizeof(TOUCHINPUT) )) {
+			/* Handle each contact point */
+			for (i = 0; i < numInputs; ++i ) {
+
+				POINT tp;
+				tp.x = TOUCH_COORD_TO_PIXEL(ti[i].x);
+				tp.y = TOUCH_COORD_TO_PIXEL(ti[i].y);
+				ScreenToClient( hWnd, &tp );
+
+				ti[i].dwID = ti[i].dwID * 2;
+
+				if (ti[i].dwFlags & TOUCHEVENTF_DOWN) {
+					INVOKE_WCB( *window, MultiEntry,  ( ti[i].dwID, GLUT_ENTERED ) );
+					INVOKE_WCB( *window, MultiButton, ( ti[i].dwID, tp.x, tp.y, 0, GLUT_DOWN ) );
+				} else if (ti[i].dwFlags & TOUCHEVENTF_MOVE) {
+					INVOKE_WCB( *window, MultiMotion, ( ti[i].dwID, tp.x, tp.y ) );
+				} else if (ti[i].dwFlags & TOUCHEVENTF_UP)   { 
+					INVOKE_WCB( *window, MultiButton, ( ti[i].dwID, tp.x, tp.y, 0, GLUT_UP ) );
+					INVOKE_WCB( *window, MultiEntry,  ( ti[i].dwID, GLUT_LEFT ) );
+				}
+			}
+		}
+		CloseTouchInputHandle((HTOUCHINPUT)lParam);
+		free( (void*)ti );
+		lRet = 0; /*DefWindowProc( hWnd, uMsg, wParam, lParam );*/
+		break;
+	}
+#endif
     default:
         /* Handle unhandled messages */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );

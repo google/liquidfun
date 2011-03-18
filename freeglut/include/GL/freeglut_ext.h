@@ -173,6 +173,17 @@ typedef void (*GLUTproc)();
 FGAPI GLUTproc FGAPIENTRY glutGetProcAddress( const char *procName );
 
 /*
+ * Multi-touch/multi-pointer extensions
+ */
+
+#define GLUT_HAS_MULTI 1
+
+FGAPI void FGAPIENTRY glutMultiEntryFunc( void (* callback)( int, int ) );
+FGAPI void FGAPIENTRY glutMultiButtonFunc( void (* callback)( int, int, int, int, int ) );
+FGAPI void FGAPIENTRY glutMultiMotionFunc( void (* callback)( int, int, int ) );
+FGAPI void FGAPIENTRY glutMultiPassiveFunc( void (* callback)( int, int, int ) );
+
+/*
  * Joystick functions, see freeglut_joystick.c
  */
 /* USE OF THESE FUNCTIONS IS DEPRECATED !!!!! */

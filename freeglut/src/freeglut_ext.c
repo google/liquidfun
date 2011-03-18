@@ -85,6 +85,10 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutReshapeFunc);
     CHECK_NAME(glutKeyboardFunc);
     CHECK_NAME(glutMouseFunc);
+    CHECK_NAME(glutMultiEntryFunc);
+    CHECK_NAME(glutMultiMotionFunc);
+    CHECK_NAME(glutMultiButtonFunc);
+    CHECK_NAME(glutMultiPassiveFunc);
     CHECK_NAME(glutMotionFunc);
     CHECK_NAME(glutPassiveMotionFunc);
     CHECK_NAME(glutEntryFunc);
