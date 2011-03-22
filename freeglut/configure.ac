@@ -60,6 +60,7 @@ AC_FUNC_VPRINTF
 AC_CHECK_LIBM
 AC_SUBST([LIBM])
 AC_CHECK_FUNCS([gettimeofday])
+AC_CHECK_FUNCS([vfprintf])
 
 # Build time configuration.
 AC_ARG_ENABLE([replace-glut],
@@ -97,5 +98,5 @@ if test "x$enable_debug" = xyes; then
 fi
 
 # Generate output.
-AC_CONFIG_FILES([Makefile doc/Makefile include/GL/Makefile include/Makefile progs/Makefile progs/demos/CallbackMaker/Makefile progs/demos/Error/Makefile progs/demos/Fractals/Makefile progs/demos/Fractals_random/Makefile progs/demos/Lorenz/Makefile progs/demos/Makefile progs/demos/One/Makefile progs/demos/shapes/Makefile progs/demos/smooth_opengl3/Makefile progs/demos/spaceball/Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile include/GL/Makefile include/Makefile progs/Makefile progs/demos/CallbackMaker/Makefile progs/demos/Fractals/Makefile progs/demos/Fractals_random/Makefile progs/demos/Lorenz/Makefile progs/demos/Makefile progs/demos/One/Makefile progs/demos/shapes/Makefile progs/demos/smooth_opengl3/Makefile progs/demos/spaceball/Makefile src/Makefile])
 AC_OUTPUT
