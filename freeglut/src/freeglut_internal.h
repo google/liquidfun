@@ -365,6 +365,7 @@ struct tagSFG_Display
 
 #ifdef HAVE_X11_EXTENSIONS_XRANDR_H
     int prev_xsz, prev_ysz;
+    int prev_refresh;
     int prev_size_valid;
 #endif	/* HAVE_X11_EXTENSIONS_XRANDR_H */
 
