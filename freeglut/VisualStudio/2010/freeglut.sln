@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
+﻿Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freeglut", "freeglut.vcxproj", "{1AE4E979-0D35-4747-BF8E-DD60358F49DB}"
 EndProject
@@ -98,7 +97,8 @@ Global
 		{CD3C35E0-FED3-4425-8CF9-A772667D464B}.Release_Static|Win32.ActiveCfg = Release_Static|Win32
 		{CD3C35E0-FED3-4425-8CF9-A772667D464B}.Release_Static|Win32.Build.0 = Release_Static|Win32
 		{CD3C35E0-FED3-4425-8CF9-A772667D464B}.Release|Win32.ActiveCfg = Release|Win32
-		{CD3C35E0-FED3-4425-8CF9-A772667D464B}.Release|Win32.Build.0 = Release|Win32	EndGlobalSection
+		{CD3C35E0-FED3-4425-8CF9-A772667D464B}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
