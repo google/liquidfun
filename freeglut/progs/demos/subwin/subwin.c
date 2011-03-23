@@ -191,7 +191,7 @@ main(int argc, char *argv[])
     glutKeyboardFunc(key);
     glutSpecialFunc(special);
     glutEntryFunc(entry);
-    glClearColor(0.7,0.7,0.7,1);
+    glClearColor(0.7f,0.7f,0.7f,1);
 	winmax = sw1 > winmax ? sw1 : winmax;
 
 	sw2=glutCreateSubWindow(mainwin,328,240,314,236);
@@ -200,7 +200,7 @@ main(int argc, char *argv[])
     glutKeyboardFunc(key);
     glutSpecialFunc(special);
     glutEntryFunc(entry);
-    glClearColor(0.7,0.7,0.7,1);
+    glClearColor(0.7f,0.7f,0.7f,1);
 	winmax = sw2 > winmax ? sw2 : winmax;
 
 	strings = malloc(sizeof(char *)*(winmax+1));
