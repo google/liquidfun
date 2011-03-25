@@ -85,7 +85,7 @@ resize(int width, int height)
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-	//gluOrtho2D(0, width, 0, height);
+	/*gluOrtho2D(0, width, 0, height);*/
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity() ;
