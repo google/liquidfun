@@ -1273,8 +1273,10 @@ void FGAPIENTRY glutMainLoopEvent( void )
                  * XXX See XFree86 configuration docs (even back in the
                  * XXX 3.x days, and especially with 4.x).
                  *
-                 * XXX Note that {button} has already been decremeted
+                 * XXX Note that {button} has already been decremented
                  * XXX in mapping from X button numbering to GLUT.
+				 *
+				 * XXX Should add support for partial wheel turns as Windows does -- 5/27/11
                  */
                 int wheel_number = (button - glutDeviceGet ( GLUT_NUM_MOUSE_BUTTONS )) / 2;
                 int direction = -1;
@@ -2058,67 +2060,67 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case 0x020a:
         /* Should be WM_MOUSEWHEEL but my compiler doesn't recognize it */
     {
+        int wheel_number = LOWORD( wParam );
+        short ticks = ( short )HIWORD( wParam );
+		fgState.MouseWheelTicks += ticks;
+
         /*
-         * XXX THIS IS SPECULATIVE -- John Fay, 10/2/03
          * XXX Should use WHEEL_DELTA instead of 120
          */
-        int wheel_number = LOWORD( wParam );
-        short ticks = ( short )HIWORD( wParam ) / 120;
-        int direction = 1;
+		if ( abs ( fgState.MouseWheelTicks ) > 120 )
+		{
+			int direction = ( fgState.MouseWheelTicks > 0 ) ? 1 : -1;
 
-        if( ticks < 0 )
-        {
-            direction = -1;
-            ticks = -ticks;
-        }
+            if( ! FETCH_WCB( *window, MouseWheel ) &&
+                ! FETCH_WCB( *window, Mouse ) )
+                break;
 
-        /*
-         * The mouse cursor has moved. Remember the new mouse cursor's position
-         */
-        /*        window->State.MouseX = LOWORD( lParam ); */
-        /* Need to adjust by window position, */
-        /*        window->State.MouseY = HIWORD( lParam ); */
-        /* change "lParam" to other parameter */
+            fgSetWindow( window );
+            fgState.Modifiers = fghGetWin32Modifiers( );
 
-        if( ! FETCH_WCB( *window, MouseWheel ) &&
-            ! FETCH_WCB( *window, Mouse ) )
-            break;
+            /*
+             * XXX Should use WHEEL_DELTA instead of 120
+             */
+            while( abs ( fgState.MouseWheelTicks ) > 120 )
+			{
+                if( FETCH_WCB( *window, MouseWheel ) )
+                    INVOKE_WCB( *window, MouseWheel,
+                                ( wheel_number,
+                                  direction,
+                                  window->State.MouseX,
+                                  window->State.MouseY
+                                )
+                    );
+                else  /* No mouse wheel, call the mouse button callback twice */
+				{
+                    /*
+                     * Map wheel zero to button 3 and 4; +1 to 3, -1 to 4
+                     *  "    "   one                     +1 to 5, -1 to 6, ...
+                     *
+                     * XXX The below assumes that you have no more than 3 mouse
+                     * XXX buttons.  Sorry.
+                     */
+                    int button = wheel_number * 2 + 3;
+                    if( direction < 0 )
+                        ++button;
+                    INVOKE_WCB( *window, Mouse,
+                                ( button, GLUT_DOWN,
+                                  window->State.MouseX, window->State.MouseY )
+                    );
+                    INVOKE_WCB( *window, Mouse,
+                                ( button, GLUT_UP,
+                                  window->State.MouseX, window->State.MouseY )
+                    );
+				}
 
-        fgSetWindow( window );
-        fgState.Modifiers = fghGetWin32Modifiers( );
-
-        while( ticks-- )
-            if( FETCH_WCB( *window, MouseWheel ) )
-                INVOKE_WCB( *window, MouseWheel,
-                            ( wheel_number,
-                              direction,
-                              window->State.MouseX,
-                              window->State.MouseY
-                            )
-                );
-            else  /* No mouse wheel, call the mouse button callback twice */
-            {
                 /*
-                 * Map wheel zero to button 3 and 4; +1 to 3, -1 to 4
-                 *  "    "   one                     +1 to 5, -1 to 6, ...
-                 *
-                 * XXX The below assumes that you have no more than 3 mouse
-                 * XXX buttons.  Sorry.
+                 * XXX Should use WHEEL_DELTA instead of 120
                  */
-                int button = wheel_number * 2 + 3;
-                if( direction < 0 )
-                    ++button;
-                INVOKE_WCB( *window, Mouse,
-                            ( button, GLUT_DOWN,
-                              window->State.MouseX, window->State.MouseY )
-                );
-                INVOKE_WCB( *window, Mouse,
-                            ( button, GLUT_UP,
-                              window->State.MouseX, window->State.MouseY )
-                );
-            }
+				fgState.MouseWheelTicks -= 120 * direction;
+			}
 
-        fgState.Modifiers = INVALID_MODIFIERS;
+            fgState.Modifiers = INVALID_MODIFIERS;
+		}
     }
     break ;
 
