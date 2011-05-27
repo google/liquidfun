@@ -141,6 +141,10 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 
 #endif  /* TARGET_HOST_MS_WINDOWS */
 
+#ifdef WM_TOUCH
+	typedef BOOL (*pRegisterTouchWindow)(HWND,ULONG);
+   static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
+#endif
 
 /* pushing attribute/value pairs into an array */
 #define ATTRIB(a) attributes[where++]=(a)
@@ -1293,7 +1297,10 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     /* Enable multitouch: additional flag TWF_FINETOUCH, TWF_WANTPALM */
     #ifdef WM_TOUCH
-       RegisterTouchWindow( window->Window.Handle, TWF_FINETOUCH | TWF_WANTPALM );
+        if (fghRegisterTouchWindow == (pRegisterTouchWindow)0xDEADBEEF) 
+			fghRegisterTouchWindow = (pRegisterTouchWindow)GetProcAddress(GetModuleHandle("user32"),"RegisterTouchWindow");
+		if (fghRegisterTouchWindow)
+             fghRegisterTouchWindow( window->Window.Handle, TWF_FINETOUCH | TWF_WANTPALM );
     #endif
 
 #if defined(_WIN32_WCE)

@@ -70,6 +70,12 @@ struct GXKeyList gxKeyList;
 #    define MIN(a,b) (((a)<(b)) ? (a) : (b))
 #endif
 
+#ifdef WM_TOUCH
+    typedef BOOL (*pGetTouchInputInfo)(HTOUCHINPUT,UINT,PTOUCHINPUT,int);
+    typedef BOOL (*pCloseTouchInputHandle)(HTOUCHINPUT);
+	static pGetTouchInputInfo fghGetTouchInputInfo = (pGetTouchInputInfo)0xDEADBEEF;
+	static pCloseTouchInputHandle fghCloseTouchInputHandle = (pCloseTouchInputHandle)0xDEADBEEF;
+#endif
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -2456,7 +2462,18 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 		unsigned int numInputs = (unsigned int)wParam;
 		unsigned int i = 0;
 		TOUCHINPUT* ti = (TOUCHINPUT*)malloc( sizeof(TOUCHINPUT)*numInputs);
-		if (GetTouchInputInfo( (HTOUCHINPUT)lParam, numInputs, ti, sizeof(TOUCHINPUT) )) {
+
+		if (fghGetTouchInputInfo == (pGetTouchInputInfo)0xDEADBEEF) {
+		    fghGetTouchInputInfo = (pGetTouchInputInfo)GetProcAddress(GetModuleHandle("user32"),"GetTouchInputInfo");
+		    fghCloseTouchInputHandle = (pCloseTouchInputHandle)GetProcAddress(GetModuleHandle("user32"),"CloseTouchInputHandle");
+		}
+
+		if (!fghGetTouchInputInfo) { 
+			free( (void*)ti );
+			break;
+		}
+
+		if (fghGetTouchInputInfo( (HTOUCHINPUT)lParam, numInputs, ti, sizeof(TOUCHINPUT) )) {
 			/* Handle each contact point */
 			for (i = 0; i < numInputs; ++i ) {
 
@@ -2478,7 +2495,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 				}
 			}
 		}
-		CloseTouchInputHandle((HTOUCHINPUT)lParam);
+		fghCloseTouchInputHandle((HTOUCHINPUT)lParam);
 		free( (void*)ti );
 		lRet = 0; /*DefWindowProc( hWnd, uMsg, wParam, lParam );*/
 		break;
