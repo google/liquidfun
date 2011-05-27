@@ -468,7 +468,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
 #if !defined(_WIN32_WCE)
         if ( ( fgStructure.GameModeWindow != fgStructure.CurrentWindow ) && ( fgStructure.CurrentWindow->Parent == NULL ) &&
-             ( ! fgStructure.CurrentWindow->IsMenu ) )
+             ( ! fgStructure.CurrentWindow->IsMenu ) &&
+	     !( fgState.DisplayMode & GLUT_BORDERLESS ))
         {
           winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME );
           winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME );
@@ -491,6 +492,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 #if defined(_WIN32_WCE)
         return 0;
 #else
+	if ( fgState.DisplayMode & GLUT_BORDERLESS )
+	  return 0;
         return GetSystemMetrics( SM_CXSIZEFRAME );
 #endif /* !defined(_WIN32_WCE) */
 
@@ -498,6 +501,8 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 #if defined(_WIN32_WCE)
         return 0;
 #else
+	if ( fgState.DisplayMode & GLUT_BORDERLESS )
+	  return 0;
         return GetSystemMetrics( SM_CYCAPTION );
 #endif /* defined(_WIN32_WCE) */
 
