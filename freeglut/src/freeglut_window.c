@@ -1286,7 +1286,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     else if ( fgState.DisplayMode & GLUT_BORDERLESS )
     {
         SetWindowLong ( window->Window.Handle, GWL_STYLE,
-                        WindowStyle & ~(WS_BORDER | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX));
+                        WindowStyle & ~(WS_BORDER | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_DLGFRAME | WS_SIZEBOX));
     }
 /*  SetWindowPos(window->Window.Handle, NULL, 0, 0, 0, 0,
      SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); */
