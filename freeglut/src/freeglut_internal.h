@@ -339,6 +339,8 @@ struct tagSFG_State
     int              NumActiveJoysticks;    /* Number of active joysticks -- if zero, don't poll joysticks */
     GLboolean        InputDevsInitialised;  /* Only initialize if application calls for them */
 
+	int              MouseWheelTicks;      /* Number of ticks the mouse wheel has turned */
+
     int              AuxiliaryBufferNumber;  /* Number of auxiliary buffers */
     int              SampleNumber;         /*  Number of samples per pixel  */
 

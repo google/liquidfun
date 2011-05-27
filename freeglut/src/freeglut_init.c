@@ -86,6 +86,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       GL_FALSE,               /* JoysticksInitialised */
                       0,                      /* NumActiveJoysticks */
                       GL_FALSE,               /* InputDevsInitialised */
+                      0,                      /* MouseWheelTicks */
                       1,                      /* AuxiliaryBufferNumber */
                       4,                      /* SampleNumber */
                       1,                      /* MajorVersion */
@@ -441,6 +442,8 @@ void fgDeinitialize( void )
 #endif /* !defined(_WIN32_WCE) */
     fgState.JoysticksInitialised = GL_FALSE;
     fgState.InputDevsInitialised = GL_FALSE;
+
+	fgState.MouseWheelTicks = 0;
 
     fgState.MajorVersion = 1;
     fgState.MinorVersion = 0;
