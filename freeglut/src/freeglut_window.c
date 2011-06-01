@@ -1332,10 +1332,11 @@ void fgOpenWindow( SFG_Window* window, const char* title,
  */
 void fgCloseWindow( SFG_Window* window )
 {
-    /* if we're in gamemode, call glutLeaveGameMode first to make sure the
-     * gamemode is properly closed before closing the window
+    /* if we're in gamemode and we're closing the gamemode window,
+     * call glutLeaveGameMode first to make sure the gamemode is
+     * properly closed before closing the window
      */
-    if (fgStructure.GameModeWindow != NULL)
+    if (fgStructure.GameModeWindow != NULL && fgStructure.GameModeWindow->ID==window->ID)
         glutLeaveGameMode();
 
 #if TARGET_HOST_POSIX_X11
