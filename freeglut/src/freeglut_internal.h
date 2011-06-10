@@ -387,7 +387,7 @@ struct tagSFG_Display
 #endif /* HAVE_X11_EXTENSIONS_XF86VMODE_H */
 
 #elif TARGET_HOST_MS_WINDOWS
-    HINSTANCE        Instance;          /* The application's instance        */
+    HINSTANCE       Instance;           /* The application's instance        */
     DEVMODE         DisplayMode;        /* Desktop's display settings        */
     char           *DisplayName;        /* Display name for multi display support*/ 
 

@@ -101,7 +101,6 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 
     freeglut_return_if_fail( window != NULL );
 
-
 #if TARGET_HOST_POSIX_X11
 
     XResizeWindow( fgDisplay.Display, window->Window.Handle,
@@ -233,6 +232,7 @@ static void fghcbDisplayWindow( SFG_Window *window,
 #if TARGET_HOST_POSIX_X11
         fghRedrawWindow ( window ) ;
 #elif TARGET_HOST_MS_WINDOWS
+
         RedrawWindow(
             window->Window.Handle, NULL, NULL,
             RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
@@ -1743,7 +1743,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     switch( uMsg )
     {
     case WM_CREATE:
-        /* The window structure is passed as the creation structure paramter... */
+        /* The window structure is passed as the creation structure parameter... */
         window = (SFG_Window *) (((LPCREATESTRUCT) lParam)->lpCreateParams);
         FREEGLUT_INTERNAL_ERROR_EXIT ( ( window != NULL ), "Cannot create window",
                                        "fgWindowProc" );
@@ -1797,6 +1797,10 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
 
         window->State.NeedToResize = GL_TRUE;
+        /* if we used CW_USEDEFAULT (thats a negative value) for the size
+         * of the window, query the window now for the size at which it
+         * was created.
+         */
         if( ( window->State.Width < 0 ) || ( window->State.Height < 0 ) )
         {
             SFG_Window *current_window = fgStructure.CurrentWindow;

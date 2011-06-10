@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Fractals_random"
 	ProjectGUID="{0D61E7A8-BF10-4C13-B5F4-971851C89E23}"
 	RootNamespace="Fractals_random"
@@ -49,6 +49,8 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,7 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
-                AdditionalLibraryDirectories="..\..\..\lib\Debug"
+				AdditionalLibraryDirectories="..\..\..\lib\Debug"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -89,7 +91,7 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
-        <Configuration
+		<Configuration
 			Name="Debug_Static|Win32"
 			OutputDirectory="$(SolutionDir)build\$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -122,6 +124,8 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -135,7 +139,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
-                AdditionalLibraryDirectories="..\..\..\lib\Debug"
+				AdditionalLibraryDirectories="..\..\..\lib\Debug"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -196,6 +200,8 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -209,7 +215,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-                AdditionalLibraryDirectories="..\..\..\lib\Release"
+				AdditionalLibraryDirectories="..\..\..\lib\Release"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -238,7 +244,7 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
-        <Configuration
+		<Configuration
 			Name="Release_Static|Win32"
 			OutputDirectory="$(SolutionDir)build\$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -272,6 +278,8 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -285,7 +293,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-                AdditionalLibraryDirectories="..\..\..\lib\Release"
+				AdditionalLibraryDirectories="..\..\..\lib\Release"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
