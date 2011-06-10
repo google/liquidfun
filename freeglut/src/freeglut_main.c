@@ -71,8 +71,8 @@ struct GXKeyList gxKeyList;
 #endif
 
 #ifdef WM_TOUCH
-    typedef BOOL (*pGetTouchInputInfo)(HTOUCHINPUT,UINT,PTOUCHINPUT,int);
-    typedef BOOL (*pCloseTouchInputHandle)(HTOUCHINPUT);
+    typedef BOOL (WINAPI *pGetTouchInputInfo)(HTOUCHINPUT,UINT,PTOUCHINPUT,int);
+    typedef BOOL (WINAPI *pCloseTouchInputHandle)(HTOUCHINPUT);
 	static pGetTouchInputInfo fghGetTouchInputInfo = (pGetTouchInputInfo)0xDEADBEEF;
 	static pCloseTouchInputHandle fghCloseTouchInputHandle = (pCloseTouchInputHandle)0xDEADBEEF;
 #endif

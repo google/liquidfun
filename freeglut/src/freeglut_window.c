@@ -142,7 +142,7 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 #endif  /* TARGET_HOST_MS_WINDOWS */
 
 #ifdef WM_TOUCH
-	typedef BOOL (*pRegisterTouchWindow)(HWND,ULONG);
+	typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
    static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
 #endif
 
