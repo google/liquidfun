@@ -314,7 +314,7 @@ static void fghInitialize( const char* displayName )
 
     /* What we need to do is to initialize the fgDisplay global structure here. */
     fgDisplay.Instance = GetModuleHandle( NULL );
-    fgDisplay.DisplayName=strdup(displayName);
+    fgDisplay.DisplayName= displayName ? strdup(displayName) : 0 ;
     atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
 
     if( atom == 0 )
