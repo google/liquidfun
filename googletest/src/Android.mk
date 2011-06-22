@@ -28,19 +28,15 @@
 
 LOCAL_PATH := $(call my-dir)
 
-ifeq ($(BUILD_WITH_ASTL),true)
-libgtest_includes:= \
+libgtest_target_includes := \
     bionic/libstdc++/include \
-    external/astl/include \
+    external/stlport/stlport \
     $(LOCAL_PATH)/.. \
     $(LOCAL_PATH)/../include
-else
-# BUILD_WITH_ASTL could be undefined, force it to false.
-BUILD_WITH_ASTL := false
-libgtest_includes := \
-    $(LOCAL_PATH)/.. \
-    $(LOCAL_PATH)/../include
-endif
+
+libgtest_host_includes := \
+  $(LOCAL_PATH)/.. \
+  $(LOCAL_PATH)/../include
 
 #######################################################################
 # gtest lib host
@@ -51,7 +47,7 @@ LOCAL_CPP_EXTENSION := .cc
 
 LOCAL_SRC_FILES := gtest-all.cc
 
-LOCAL_C_INCLUDES := $(libgtest_includes)
+LOCAL_C_INCLUDES := $(libgtest_host_includes)
 
 LOCAL_CFLAGS += -O0
 
@@ -69,7 +65,7 @@ LOCAL_CPP_EXTENSION := .cc
 
 LOCAL_SRC_FILES := gtest_main.cc
 
-LOCAL_C_INCLUDES := $(libgtest_includes)
+LOCAL_C_INCLUDES := $(libgtest_host_includes)
 
 LOCAL_CFLAGS += -O0
 
@@ -89,7 +85,7 @@ LOCAL_CPP_EXTENSION := .cc
 
 LOCAL_SRC_FILES := gtest-all.cc
 
-LOCAL_C_INCLUDES := $(libgtest_includes)
+LOCAL_C_INCLUDES := $(libgtest_target_includes)
 
 ifneq ($(BUILD_WITH_ASTL),true)
 ifneq ($(TARGET_SIMULATOR),true)
@@ -111,7 +107,7 @@ LOCAL_CPP_EXTENSION := .cc
 
 LOCAL_SRC_FILES := gtest_main.cc
 
-LOCAL_C_INCLUDES := $(libgtest_includes)
+LOCAL_C_INCLUDES := $(libgtest_target_includes)
 
 ifneq ($(BUILD_WITH_ASTL),true)
 ifneq ($(TARGET_SIMULATOR),true)
