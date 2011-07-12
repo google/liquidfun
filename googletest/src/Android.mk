@@ -88,9 +88,7 @@ LOCAL_SRC_FILES := gtest-all.cc
 LOCAL_C_INCLUDES := $(libgtest_target_includes)
 
 ifneq ($(BUILD_WITH_ASTL),true)
-ifneq ($(TARGET_SIMULATOR),true)
 include external/stlport/libstlport.mk
-endif
 endif
 
 LOCAL_MODULE := libgtest
@@ -110,9 +108,7 @@ LOCAL_SRC_FILES := gtest_main.cc
 LOCAL_C_INCLUDES := $(libgtest_target_includes)
 
 ifneq ($(BUILD_WITH_ASTL),true)
-ifneq ($(TARGET_SIMULATOR),true)
 include external/stlport/libstlport.mk
-endif
 endif
 
 LOCAL_STATIC_LIBRARIES := libgtest

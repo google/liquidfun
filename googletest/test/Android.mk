@@ -82,13 +82,9 @@ $(call _define-test,$(1),HOST_,-O0,_host)
 endef
 endif
 
-
-# Cannot build simulator with STLport.
-ifneq ($(TARGET_SIMULATOR)-$(BUILD_WITH_ASTL),true-false)
 define target-test
 $(call _define-test,$(1))
 endef
-endif
 
 sources := \
   gtest-death-test_test.cc \
@@ -112,9 +108,4 @@ ifeq ($(HOST_OS)-$(BUILD_WITH_ASTL),linux-true)
 $(call host-test, $(sources))
 endif
 
-# Cannot build simulator with STLport.
-ifneq ($(TARGET_SIMULATOR)-$(BUILD_WITH_ASTL),true-false)
 $(call target-test, $(sources))
-endif
-
-
