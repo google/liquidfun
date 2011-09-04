@@ -64,16 +64,6 @@ static int fghGetConfig( int attribute )
 }
 #endif
 
-/* Check if the window is in full screen state. */
-static int fghCheckFullScreen(void)
-{
-#if TARGET_HOST_POSIX_X11
-    return fgStructure.CurrentWindow->State.IsFullscreen;
-#else
-    return 0;
-#endif
-}
-
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -458,25 +448,11 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
 
-        /*
-         * We need to call GetWindowRect() first...
-         *  (this returns the pixel coordinates of the outside of the window)
-         */
+#if defined(_WIN32_WCE)
         GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect );
-
-        /* ...then we've got to correct the results we've just received... */
-
-#if !defined(_WIN32_WCE)
-        if ( ( fgStructure.GameModeWindow != fgStructure.CurrentWindow ) && ( fgStructure.CurrentWindow->Parent == NULL ) &&
-             ( ! fgStructure.CurrentWindow->IsMenu ) &&
-	     !( fgState.DisplayMode & GLUT_BORDERLESS ))
-        {
-          winRect.left   += GetSystemMetrics( SM_CXSIZEFRAME );
-          winRect.right  -= GetSystemMetrics( SM_CXSIZEFRAME );
-          winRect.top    += GetSystemMetrics( SM_CYSIZEFRAME ) + GetSystemMetrics( SM_CYCAPTION );
-          winRect.bottom -= GetSystemMetrics( SM_CYSIZEFRAME );
-        }
-#endif /* !defined(_WIN32_WCE) */
+#else
+        winRect = fghGetClientArea(fgStructure.CurrentWindow, FALSE);
+#endif /* defined(_WIN32_WCE) */
 
         switch( eWhat )
         {
@@ -489,21 +465,32 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     break;
 
     case GLUT_WINDOW_BORDER_WIDTH :
-#if defined(_WIN32_WCE)
-        return 0;
-#else
-	if ( fgState.DisplayMode & GLUT_BORDERLESS )
-	  return 0;
-        return GetSystemMetrics( SM_CXSIZEFRAME );
-#endif /* !defined(_WIN32_WCE) */
-
     case GLUT_WINDOW_HEADER_HEIGHT :
 #if defined(_WIN32_WCE)
         return 0;
 #else
-	if ( fgState.DisplayMode & GLUT_BORDERLESS )
-	  return 0;
-        return GetSystemMetrics( SM_CYCAPTION );
+        {
+            DWORD windowStyle;
+
+            if (fgStructure.CurrentWindow && fgStructure.CurrentWindow->Window.Handle)
+                windowStyle = GetWindowLong(fgStructure.CurrentWindow->Window.Handle, GWL_STYLE);
+            else
+                /* If no window, return sizes for a default window with title bar and border */
+                windowStyle = WS_OVERLAPPEDWINDOW;
+            
+            switch( eWhat )
+            {
+            case GLUT_WINDOW_BORDER_WIDTH:
+                {
+                    int xBorderWidth, yBorderWidth;
+                    fghGetBorderWidth(windowStyle, &xBorderWidth, &yBorderWidth);
+                    return xBorderWidth;
+                }
+            case GLUT_WINDOW_HEADER_HEIGHT:
+                /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
+                return (windowStyle & WS_MAXIMIZEBOX)? GetSystemMetrics( SM_CYCAPTION ) : 0;
+            }
+        }
 #endif /* defined(_WIN32_WCE) */
 
     case GLUT_DISPLAY_MODE_POSSIBLE:
@@ -559,7 +546,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         return fgState.DirectContext;
 
     case GLUT_FULL_SCREEN:
-        return fghCheckFullScreen();
+        return fgStructure.CurrentWindow->State.IsFullscreen;
 
     case GLUT_AUX:
       return fgState.AuxiliaryBufferNumber;

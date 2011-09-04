@@ -166,6 +166,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutWMCloseFunc);
     CHECK_NAME(glutMenuDestroyFunc);
     CHECK_NAME(glutFullScreenToggle);
+    CHECK_NAME(glutLeaveFullScreen);
     CHECK_NAME(glutSetOption);
     CHECK_NAME(glutGetModeValues);
     CHECK_NAME(glutSetWindowData);

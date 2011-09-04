@@ -127,6 +127,7 @@ FGAPI void    FGAPIENTRY glutExit         ( void );
  * Window management functions, see freeglut_window.c
  */
 FGAPI void    FGAPIENTRY glutFullScreenToggle( void );
+FGAPI void    FGAPIENTRY glutLeaveFullScreen( void );
 
 /*
  * Window-specific callback functions, see freeglut_callbacks.c

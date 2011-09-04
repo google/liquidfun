@@ -79,7 +79,9 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 
     /* Initialize the object properties */
     window->ID = ++fgStructure.WindowID;
+#if TARGET_HOST_POSIX_X11
     window->State.OldHeight = window->State.OldWidth = -1;
+#endif
 
     fgListInit( &window->Children );
     if( parent )

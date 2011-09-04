@@ -109,8 +109,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 
 #elif TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
     {
-        RECT winRect;
-        int x, y, w, h;
+        RECT windowRect;
 
         /*
          * For windowed mode, get the current position of the
@@ -119,51 +118,43 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
          */
 
         /* "GetWindowRect" returns the pixel coordinates of the outside of the window */
-        GetWindowRect( window->Window.Handle, &winRect );
-        x = winRect.left;
-        y = winRect.top;
-        w = width;
-        h = height;
+        GetWindowRect( window->Window.Handle, &windowRect );
 
-        if ( window->Parent == NULL )
-        {
-	   if ( ! window->IsMenu && (window != fgStructure.GameModeWindow) &&
-	       !( fgState.DisplayMode & GLUT_BORDERLESS ))
-            {
-                w += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-                h += GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
-                     GetSystemMetrics( SM_CYCAPTION );
-            }
-        }
+        /* Create rect in FreeGLUT format, (X,Y) topleft outside window, WxH of client area */
+        windowRect.right    = windowRect.left+width;
+        windowRect.bottom   = windowRect.top+height;
+
+        if (window->Parent == NULL)
+            /* get the window rect from this to feed to SetWindowPos, correct for window decorations */
+            fghComputeWindowRectFromClientArea_QueryWindow(window,&windowRect,TRUE);
         else
         {
+            /* correct rect for position client area of parent window
+             * (SetWindowPos input for child windows is in coordinates
+             * relative to the parent's client area).
+             * Child windows don't have decoration, so no need to correct
+             * for them.
+             */
             RECT parentRect;
-            GetWindowRect( window->Parent->Window.Handle, &parentRect );
-            x -= parentRect.left + GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-            y -= parentRect.top  + GetSystemMetrics( SM_CYSIZEFRAME ) * 2 +
-                                   GetSystemMetrics( SM_CYCAPTION );
+            parentRect = fghGetClientArea( window->Parent, FALSE );
+            windowRect.left   -= parentRect.left;
+            windowRect.right  -= parentRect.left;
+            windowRect.top    -= parentRect.top;
+            windowRect.bottom -= parentRect.top;
         }
-
-        /*
-         * SWP_NOACTIVATE      Do not activate the window
-         * SWP_NOOWNERZORDER   Do not change position in z-order
-         * SWP_NOSENDCHANGING  Supress WM_WINDOWPOSCHANGING message
-         * SWP_NOZORDER        Retains the current Z order (ignore 2nd param)
-         */
-
+        
+        /* Do the actual resizing */
         SetWindowPos( window->Window.Handle,
                       HWND_TOP,
-                      x, y, w, h,
+                      windowRect.left, windowRect.top,
+                      windowRect.right - windowRect.left,
+                      windowRect.bottom- windowRect.top,
                       SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
                       SWP_NOZORDER
         );
     }
 #endif
 
-    /*
-     * XXX Should update {window->State.OldWidth, window->State.OldHeight}
-     * XXX to keep in lockstep with POSIX_X11 code.
-     */
     if( FETCH_WCB( *window, Reshape ) )
         INVOKE_WCB( *window, Reshape, ( width, height ) );
     else

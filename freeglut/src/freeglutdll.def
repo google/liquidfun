@@ -139,6 +139,7 @@ EXPORTS
 	glutGetProcAddress
 	glutExit
 	glutFullScreenToggle
+	glutLeaveFullScreen
 	glutGetModeValues
 	glutInitContextFlags
 	glutInitContextVersion

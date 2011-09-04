@@ -449,10 +449,16 @@ struct tagSFG_Context
 typedef struct tagSFG_WindowState SFG_WindowState;
 struct tagSFG_WindowState
 {
+    /* Note that on Windows, sizes always refer to the client area, thus without the window decorations */
     int             Width;              /* Window's width in pixels          */
     int             Height;             /* The same about the height         */
+#if TARGET_HOST_POSIX_X11
     int             OldWidth;           /* Window width from before a resize */
     int             OldHeight;          /*   "    height  "    "    "   "    */
+#elif TARGET_HOST_MS_WINDOWS
+    RECT            OldRect;            /* window rect - stored before the window is made fullscreen */
+    DWORD           OldStyle;           /* window style - stored before the window is made fullscreen */
+#endif
 
     GLboolean       Redisplay;          /* Do we have to redisplay?          */
     GLboolean       Visible;            /* Is the window visible now         */
@@ -925,6 +931,17 @@ void fgSetCursor ( SFG_Window *window, int cursorID );
 void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator );
 void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback,
                        SFG_Enumerator* enumerator );
+
+/* 
+ * Helper functions for getting client area from the window rect
+ * and the window rect from the client area given the style of the window
+ * (or a valid window pointer from which the style can be queried).
+ */
+void fghComputeWindowRectFromClientArea_UseStyle   ( const DWORD windowStyle , RECT *clientRect, BOOL posIsOutside );
+void fghComputeWindowRectFromClientArea_QueryWindow( const SFG_Window *window, RECT *clientRect, BOOL posIsOutside );
+void fghComputeClientAreaFromWindowRect            ( const SFG_Window *window, RECT *windowRect, BOOL wantPosOutside );
+RECT fghGetClientArea                              ( const SFG_Window *window,                   BOOL wantPosOutside );
+void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth);
 
 /*
  * fgWindowByHandle returns a (SFG_Window *) value pointing to the

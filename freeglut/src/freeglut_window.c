@@ -850,12 +850,167 @@ void fgSetWindow ( SFG_Window *window )
 
 #if TARGET_HOST_MS_WINDOWS
 
+/* Computes position of corners of window Rect (outer position including
+ * decorations) based on the provided client rect and based on the style
+ * of the window in question.
+ * If posIsOutside is set to true, the input client Rect is taken to follow
+ * freeGLUT's window specification convention in which the top-left corner
+ * is at the outside of the window, while the size
+ * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
+ * area.
+ */
+void fghComputeWindowRectFromClientArea_UseStyle( const DWORD windowStyle, RECT *clientRect, BOOL posIsOutside )
+{
+    int xBorderWidth = 0, yBorderWidth = 0;
+
+    /* If window has title bar, correct rect for it */
+    if (windowStyle & WS_MAXIMIZEBOX) /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
+        if (posIsOutside)
+            clientRect->bottom += GetSystemMetrics( SM_CYCAPTION );
+        else
+            clientRect->top -= GetSystemMetrics( SM_CYCAPTION );
+
+    /* get width of window's borders (frame), correct rect for it.
+     * Note, borders can be of zero width if style does not specify borders
+     */
+    fghGetBorderWidth(windowStyle, &xBorderWidth, &yBorderWidth);
+    if (posIsOutside)
+    {
+        clientRect->right  += xBorderWidth * 2;
+        clientRect->bottom += yBorderWidth * 2;
+    }
+    else
+    {
+        clientRect->left   -= xBorderWidth;
+        clientRect->right  += xBorderWidth;
+        clientRect->top    -= yBorderWidth;
+        clientRect->bottom += yBorderWidth;
+    }
+}
+
+/* Computes position of corners of window Rect (outer position including
+ * decorations) based on the provided client rect and based on the style
+ * of the window in question. If the window pointer or the window handle
+ * is NULL, a fully decorated window (caption and border) is assumed.
+ * Furthermore, if posIsOutside is set to true, the input client Rect is
+ * taken to follow freeGLUT's window specification convention in which the
+ * top-left corner is at the outside of the window, while the size
+ * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
+ * area.
+*/
+void fghComputeWindowRectFromClientArea_QueryWindow( const SFG_Window *window, RECT *clientRect, BOOL posIsOutside )
+{
+    DWORD windowStyle = 0;
+
+    if (window && window->Window.Handle)
+        windowStyle = GetWindowLong(window->Window.Handle, GWL_STYLE);
+    else
+        windowStyle = WS_OVERLAPPEDWINDOW;
+
+    fghComputeWindowRectFromClientArea_UseStyle(windowStyle, clientRect, posIsOutside);
+}
+
+/* Computes position of corners of client area (drawable area) of a window
+ * based on the provided window Rect (outer position including decorations)
+ * and based on the style of the window in question. If the window pointer
+ * or the window handle is NULL, a fully decorated window (caption and
+ * border) is assumed.
+ * Furthermore, if wantPosOutside is set to true, the output client Rect
+ * will follow freeGLUT's window specification convention in which the
+ * top-left corner is at the outside of the window, the size
+ * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
+ * area.
+ */
+void fghComputeClientAreaFromWindowRect( const SFG_Window *window, RECT *windowRect, BOOL wantPosOutside )
+{
+    DWORD windowStyle = 0;
+    int xBorderWidth = 0, yBorderWidth = 0;
+
+    if (window && window->Window.Handle)
+        windowStyle = GetWindowLong(window->Window.Handle, GWL_STYLE);
+    else
+        windowStyle = WS_OVERLAPPEDWINDOW;
+
+    /* If window has title bar, correct rect for it */
+    if (windowStyle & WS_MAXIMIZEBOX) /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
+        if (wantPosOutside)
+            windowRect->bottom -= GetSystemMetrics( SM_CYCAPTION );
+        else
+            windowRect->top    += GetSystemMetrics( SM_CYCAPTION );
+
+    /* get width of window's borders (frame), correct rect for it.
+     * Note, borders can be of zero width if style does not specify borders
+     */
+    fghGetBorderWidth(windowStyle, &xBorderWidth, &yBorderWidth);
+    if (wantPosOutside)
+    {
+        windowRect->right  -= xBorderWidth * 2;
+        windowRect->bottom -= yBorderWidth * 2;
+    }
+    else
+    {
+        windowRect->left   += xBorderWidth;
+        windowRect->right  -= xBorderWidth;
+        windowRect->top    += yBorderWidth;
+        windowRect->bottom -= yBorderWidth;
+    }
+}
+
+/* Gets the rect describing the client area (drawable area) of the
+ * specified window.
+ * Returns an empty rect if window pointer or window handle is NULL.
+ * If wantPosOutside is set to true, the output client Rect
+ * will follow freeGLUT's window specification convention in which the
+ * top-left corner is at the outside of the window, while the size
+ * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
+ * area.
+ */
+RECT fghGetClientArea( const SFG_Window *window, BOOL wantPosOutside )
+{
+    RECT windowRect = {0,0,0,0};
+
+    freeglut_return_val_if_fail((window && window->Window.Handle),windowRect);
+    
+    /*
+     * call GetWindowRect()
+     * (this returns the pixel coordinates of the outside of the window)
+     */
+    GetWindowRect( window->Window.Handle, &windowRect );
+
+    /* Then correct the results */
+    fghComputeClientAreaFromWindowRect(window, &windowRect, wantPosOutside);
+
+    return windowRect;
+}
+
+/* Returns the width of the window borders based on the window's style.
+ */
+void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth)
+{
+    if (windowStyle & WS_THICKFRAME)
+    {
+        *xBorderWidth = GetSystemMetrics(SM_CXSIZEFRAME);
+        *yBorderWidth = GetSystemMetrics(SM_CYSIZEFRAME);
+    }
+    else if (windowStyle & WS_DLGFRAME)
+    {
+        *xBorderWidth = GetSystemMetrics(SM_CXFIXEDFRAME);
+        *yBorderWidth = GetSystemMetrics(SM_CYFIXEDFRAME);
+    }
+    else
+    {
+        *xBorderWidth = 0;
+        *yBorderWidth = 0;
+    }
+}
+
 #if(WINVER >= 0x500)
-typedef struct {
+typedef struct
+{
       int *x;
       int *y;
       const char *name;
-}m_proc_t ;
+} m_proc_t;
 
 static BOOL CALLBACK m_proc(HMONITOR mon,
 			    HDC hdc,
@@ -869,7 +1024,7 @@ static BOOL CALLBACK m_proc(HMONITOR mon,
       res=GetMonitorInfo(mon,(LPMONITORINFO)&info);
       if( res )
       {
-          if( !strcmp(dp->name,info.szDevice) )
+          if( strcmp(dp->name,info.szDevice)==0 )
           {
               *(dp->x)=info.rcMonitor.left;
               *(dp->y)=info.rcMonitor.top;
@@ -880,13 +1035,18 @@ static BOOL CALLBACK m_proc(HMONITOR mon,
 }
 
 /* 
- * this function is only used in fgOpenWindow. Currently it only sets 
- * its output parameters, if the DisplayName is set in fgDisplay 
- * (and if it is able to recognize the display)
+ * this function returns the origin of the screen identified by
+ * fgDisplay.DisplayName, and 0 otherwise.
+ * This is used in fgOpenWindow to open the gamemode window on the screen
+ * identified by the -display command line argument. The function should
+ * not be called otherwise.
  */
 
 static void get_display_origin(int *xp,int *yp)
 {
+    *xp = 0;
+    *yp = 0;
+
     if( fgDisplay.DisplayName )
     {
         m_proc_t st;
@@ -894,13 +1054,16 @@ static void get_display_origin(int *xp,int *yp)
         st.y=yp;
         st.name=fgDisplay.DisplayName;
         EnumDisplayMonitors(0,0,m_proc,(LPARAM)&st);
-     }
+    }
 }
 #else
 #pragma message( "-display parameter only works if compiled with WINVER >= 0x0500")
 
 static void get_display_origin(int *xp,int *yp)
 {
+    *xp = 0;
+    *yp = 0;
+
     if( fgDisplay.DisplayName )
     {
         fgWarning( "for working -display support FreeGLUT must be compiled with WINVER >= 0x0500");
@@ -1139,16 +1302,16 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 #elif TARGET_HOST_MS_WINDOWS
 
     WNDCLASS wc;
-    DWORD flags;
+    DWORD flags   = 0;
     DWORD exFlags = 0;
     ATOM atom;
-    int WindowStyle = 0;
 
     /* Grab the window class we have registered on glutInit(): */
     atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
     FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Info Not Found",
                                    "fgOpenWindow" );
 
+    /* Determine window style flags*/
     if( gameMode )
     {
         FREEGLUT_INTERNAL_ERROR_EXIT ( window->Parent == NULL,
@@ -1163,63 +1326,99 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     }
     else
     {
-        int worig = w, horig = h;
-
-#if !defined(_WIN32_WCE)
-        if ( ( ! isSubWindow ) && ( ! window->IsMenu ) )
-        {
-            /*
-             * Update the window dimensions, taking account of window
-             * decorations.  "freeglut" is to create the window with the
-             * outside of its border at (x,y) and with dimensions (w,h).
-             */
-            w += (GetSystemMetrics( SM_CXSIZEFRAME ) )*2;
-            h += (GetSystemMetrics( SM_CYSIZEFRAME ) )*2 +
-                GetSystemMetrics( SM_CYCAPTION );
-        }
-#endif /* defined(_WIN32_WCE) */
-
-        if( ! positionUse )
-        {
-            x = CW_USEDEFAULT;
-            y = CW_USEDEFAULT;
-        }
-        /* setting State.Width/Height to call resize callback later */
-        if( ! sizeUse )
-        {
-            if( ! window->IsMenu )
-            {
-                w = CW_USEDEFAULT;
-                h = CW_USEDEFAULT;
-            }
-            else /* fail safe - Windows can make a window of size (0, 0) */
-                w = h = 300; /* default window size */
-            window->State.Width = window->State.Height = -1;
-        }
-        else
-        {
-            window->State.Width = worig;
-            window->State.Height = horig;
-        }
+        flags = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
         /*
          * There's a small difference between creating the top, child and
-         * game mode windows
+         * menu windows
          */
-        flags = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_VISIBLE;
-
         if ( window->IsMenu )
         {
             flags |= WS_POPUP;
             exFlags |= WS_EX_TOOLWINDOW;
         }
-#if !defined(_WIN32_WCE)
+#if defined(_WIN32_WCE)
+        /* no decorations for windows CE */
+#else
+        /* if this is not a subwindow (child), set its style based on the requested display mode */
         else if( window->Parent == NULL )
-            flags |= WS_OVERLAPPEDWINDOW;
+            if ( fgState.DisplayMode & GLUT_BORDERLESS )
+            {
+                /* no window decorations needed */
+            }
+            else if ( fgState.DisplayMode & GLUT_CAPTIONLESS )
+                /* only window decoration is a border, no title bar or buttons */
+                flags |= WS_DLGFRAME;
+            else
+                /* window decoration are a border, title bar and buttons.
+                 * NB: we later query whether the window has a title bar or
+                 * not by testing for the maximize button, as the test for
+                 * WS_CAPTION can be true without the window having a title
+                 * bar. This style WS_OVERLAPPEDWINDOW gives you a maximize
+                 * button. */
+                flags |= WS_OVERLAPPEDWINDOW;
 #endif
         else
+            /* subwindows always have no decoration, but are marked as a child window to the OS */
             flags |= WS_CHILD;
     }
+
+    /* determine window size and position */
+    if( gameMode )
+    {
+        /* if in gamemode, query the origin of specified by the -display
+         * parameter command line (if any) and offset the upper-left corner
+         * of the window so we create the window on that screen.
+         * The -display argument doesn't do anything if not trying to enter
+         * gamemode.
+         */
+        int xoff=0, yoff=0;
+        get_display_origin(&xoff,&yoff);
+        x += xoff;
+        y += yoff;
+    }
+    if( !positionUse )
+    {
+        x = CW_USEDEFAULT;
+        y = CW_USEDEFAULT;
+    }
+    if( !sizeUse )
+    {
+        if( ! window->IsMenu )
+        {
+            w = CW_USEDEFAULT;
+            h = CW_USEDEFAULT;
+        }
+        else /* fail safe - Windows can make a window of size (0, 0) */
+            w = h = 300; /* default window size */
+    }
+    /* store requested client area width and height */
+    window->State.Width = w;
+    window->State.Height = h;
+
+#if !defined(_WIN32_WCE)    /* no decorations for windows CE */
+    if( sizeUse )
+    {
+        RECT windowRect;
+        /*
+         * Update the window dimensions, taking the window decorations
+         * into account.  FreeGLUT is to create the window with the
+         * topleft outside corner at (x,y) and with client area
+         * dimensions (w,h).
+         * note: don't need to do this when w=h=CW_USEDEFAULT, so in the
+         * if( sizeUse ) here is convenient.
+         */
+        windowRect.left     = x;
+        windowRect.top      = y;
+        windowRect.right    = x+w;
+        windowRect.bottom   = y+h;
+
+        fghComputeWindowRectFromClientArea_UseStyle(flags,&windowRect,TRUE);
+
+        w = windowRect.right - windowRect.left;
+        h = windowRect.bottom- windowRect.top;
+    }
+#endif /* !defined(_WIN32_WCE) */
 
 #if defined(_WIN32_WCE)
     {
@@ -1246,28 +1445,27 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         UpdateWindow(window->Window.Handle);
     }
 #else
-    {
-      /* xoff and yoff are used to place window relative to current display */
-      /* The operation of gamemode also depends on this */
-        int xoff=0,yoff=0;
-        get_display_origin(&xoff,&yoff);
-
-        window->Window.Handle = CreateWindowEx(
-            exFlags,
-            _T("FREEGLUT"),
-            title,
-            flags,
-            x+xoff, y+yoff, w, h,
-            (HWND) window->Parent == NULL ? NULL : window->Parent->Window.Handle,
-            (HMENU) NULL,
-            fgDisplay.Instance,
-            (LPVOID) window
-        );
-    }
+    window->Window.Handle = CreateWindowEx(
+        exFlags,
+        _T("FREEGLUT"),
+        title,
+        flags,
+        x, y, w, h,
+        (HWND) window->Parent == NULL ? NULL : window->Parent->Window.Handle,
+        (HMENU) NULL,
+        fgDisplay.Instance,
+        (LPVOID) window
+    );
 #endif /* defined(_WIN32_WCE) */
 
     if( !( window->Window.Handle ) )
         fgError( "Failed to create a window (%s)!", title );
+
+#if !defined(_WIN32_WCE)
+    /* Need to set requested style again, apparently Windows doesn't listen when requesting windows without title bar or borders */
+    SetWindowLong(window->Window.Handle, GWL_STYLE, flags);
+    SetWindowPos(window->Window.Handle, HWND_TOP, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+#endif /* defined(_WIN32_WCE) */
 
     /* Make a menu window always on top - fix Feature Request 947118 */
     if( window->IsMenu || gameMode )
@@ -1277,23 +1475,6 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                         0, 0, 0, 0,
                         SWP_NOMOVE | SWP_NOSIZE
                     );
-
-    /* Hack to remove the caption (title bar) and/or border
-     * and all the system menu controls.
-     */
-    WindowStyle = GetWindowLong(window->Window.Handle, GWL_STYLE);
-    if ( fgState.DisplayMode & GLUT_CAPTIONLESS )
-    {
-        SetWindowLong ( window->Window.Handle, GWL_STYLE,
-                        WindowStyle & ~(WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX));
-    }
-    else if ( fgState.DisplayMode & GLUT_BORDERLESS )
-    {
-        SetWindowLong ( window->Window.Handle, GWL_STYLE,
-                        WindowStyle & ~(WS_BORDER | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_DLGFRAME | WS_SIZEBOX));
-    }
-/*  SetWindowPos(window->Window.Handle, NULL, 0, 0, 0, 0,
-     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); */
 
     /* Enable multitouch: additional flag TWF_FINETOUCH, TWF_WANTPALM */
     #ifdef WM_TOUCH
@@ -1680,7 +1861,7 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
     if (glutGet(GLUT_FULL_SCREEN))
     {
       /*  Leave full screen state before resizing. */
-      glutFullScreenToggle();
+      glutLeaveFullScreen();
     }
 
     fgStructure.CurrentWindow->State.NeedToResize = GL_TRUE;
@@ -1699,7 +1880,7 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
     if (glutGet(GLUT_FULL_SCREEN))
     {
       /*  Leave full screen state before moving. */
-      glutFullScreenToggle();
+      glutLeaveFullScreen();
     }
 
 #if TARGET_HOST_POSIX_X11
@@ -1788,6 +1969,21 @@ void FGAPIENTRY glutFullScreen( void )
 
     win = fgStructure.CurrentWindow;
 
+    if (win->Parent)
+    {
+        /* Child windows cannot be made fullscreen, consistent with GLUT's behavior
+         * Also, what would it mean for a child window to be fullscreen, given that it
+         * is confined to its parent?
+         */
+        fgWarning("glutFullScreen called on a child window, ignoring...");
+        return;
+    }
+    else if (fgStructure.GameModeWindow != NULL && fgStructure.GameModeWindow->ID==win->ID)
+    {
+        /* Ignore fullscreen call on GameMode window, those are always fullscreen already */
+        return;
+    }
+
 #if TARGET_HOST_POSIX_X11
     if(!glutGet(GLUT_FULL_SCREEN)) {
         if(fghToggleFullscreen() != -1) {
@@ -1799,34 +1995,50 @@ void FGAPIENTRY glutFullScreen( void )
 
     if (glutGet(GLUT_FULL_SCREEN))
     {
-        /*  Leave full screen state before resizing. */
-        glutFullScreenToggle();
+        /*  Leave full screen state before entering fullscreen again (resizing?) */
+        glutLeaveFullScreen();
     }
 
     {
+        DWORD s;
         RECT rect;
+        HMONITOR hMonitor;
+        MONITORINFO mi;
 
-        /* For fullscreen mode, force the top-left corner to 0,0
-         * and adjust the window rectangle so that the client area
-         * covers the whole screen.
+        /* For fullscreen mode, first remove all window decoration
+         * and set style to popup so it will overlap the taskbar
+         * then force to maximize on the screen on which it has the most
+         * overlap.
          */
 
-        rect.left   = 0;
-        rect.top    = 0;
-	get_display_origin(&rect.left,&rect.top);
-        rect.right  = fgDisplay.ScreenWidth+rect.left;
-        rect.bottom = fgDisplay.ScreenHeight+rect.top;
+        
+        /* store current window rect */
+        GetWindowRect( win->Window.Handle, &win->State.OldRect );
 
-        AdjustWindowRect ( &rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS |
-                                  WS_CLIPCHILDREN, FALSE );
+        /* store current window style */
+        win->State.OldStyle = s = GetWindowLong(win->Window.Handle, GWL_STYLE);
+
+        /* remove decorations from style and add popup style*/
+        s &= ~WS_OVERLAPPEDWINDOW;
+        s |= WS_POPUP;
+        SetWindowLong(win->Window.Handle, GWL_STYLE, s);
+        SetWindowPos(win->Window.Handle, HWND_TOP, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+        /* For fullscreen mode, find the monitor that is covered the most
+         * by the window and get its rect as the resize target.
+	     */
+        hMonitor= MonitorFromRect(&win->State.OldRect, MONITOR_DEFAULTTONEAREST);
+        mi.cbSize = sizeof(mi);
+        GetMonitorInfo(hMonitor, &mi);
+        rect = mi.rcMonitor;
 
         /*
+         * then resize window
          * SWP_NOACTIVATE     Do not activate the window
          * SWP_NOOWNERZORDER  Do not change position in z-order
-         * SWP_NOSENDCHANGING Supress WM_WINDOWPOSCHANGING message
+         * SWP_NOSENDCHANGING Suppress WM_WINDOWPOSCHANGING message
          * SWP_NOZORDER       Retains the current Z order (ignore 2nd param)
          */
-
         SetWindowPos( fgStructure.CurrentWindow->Window.Handle,
                       HWND_TOP,
                       rect.left,
@@ -1839,6 +2051,51 @@ void FGAPIENTRY glutFullScreen( void )
         
         win->State.IsFullscreen = GL_TRUE;
     }
+#endif
+}
+
+/*
+ * If we are fullscreen, resize the current window back to its original size
+ */
+void FGAPIENTRY glutLeaveFullScreen( void )
+{
+    SFG_Window *win;
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreen" );
+    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreen" );
+
+    win = fgStructure.CurrentWindow;
+
+#if TARGET_HOST_POSIX_X11
+    if(glutGet(GLUT_FULL_SCREEN)) {
+        if(fghToggleFullscreen() != -1) {
+            win->State.IsFullscreen = GL_FALSE;
+        }
+    }
+
+#elif TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE) /* FIXME: what about WinCE */
+    if (!glutGet(GLUT_FULL_SCREEN))
+    {
+        /* nothing to do */
+        return;
+    }
+
+    /* restore style of window before making it fullscreen */
+    SetWindowLong(win->Window.Handle, GWL_STYLE, win->State.OldStyle);
+    SetWindowPos(win->Window.Handle, HWND_TOP, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+    /* Then resize */
+    SetWindowPos(win->Window.Handle,
+        HWND_TOP,
+        win->State.OldRect.left,
+        win->State.OldRect.top,
+        win->State.OldRect.right  - win->State.OldRect.left,
+        win->State.OldRect.bottom - win->State.OldRect.top,
+        SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
+        SWP_NOZORDER
+        );
+
+    win->State.IsFullscreen = GL_FALSE;
 #endif
 }
 
@@ -1859,8 +2116,10 @@ void FGAPIENTRY glutFullScreenToggle( void )
         win->State.IsFullscreen = !win->State.IsFullscreen;
     }
 #elif TARGET_HOST_MS_WINDOWS
-    glutFullScreen();
-    win->State.IsFullscreen = !win->State.IsFullscreen;
+    if (!win->State.IsFullscreen)
+        glutFullScreen();
+    else
+        glutLeaveFullScreen();
 #endif
 }
 
