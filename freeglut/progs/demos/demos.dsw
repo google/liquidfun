@@ -75,6 +75,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "Resizer"=.\Resizer\Resizer.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "lorenz"=.\Lorenz\lorenz.dsp - Package Owner=<4>
 
 Package=<5>

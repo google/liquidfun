@@ -43,6 +43,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "subwin", "subwin\subwin.vcp
 		{1AE4E979-0D35-4747-BF8E-DD60358F49DB} = {1AE4E979-0D35-4747-BF8E-DD60358F49DB}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Resizer", "Resizer\Resizer.vcproj", "{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1AE4E979-0D35-4747-BF8E-DD60358F49DB} = {1AE4E979-0D35-4747-BF8E-DD60358F49DB}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Static|Win32 = Debug_Static|Win32
@@ -123,6 +128,14 @@ Global
 		{CD3C35E0-FED3-4425-8CF9-A772667D464B}.Release_Static|Win32.Build.0 = Release_Static|Win32
 		{CD3C35E0-FED3-4425-8CF9-A772667D464B}.Release|Win32.ActiveCfg = Release|Win32
 		{CD3C35E0-FED3-4425-8CF9-A772667D464B}.Release|Win32.Build.0 = Release|Win32
+		{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}.Debug_Static|Win32.ActiveCfg = Debug_Static|Win32
+		{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}.Debug_Static|Win32.Build.0 = Debug_Static|Win32
+		{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}.Debug|Win32.Build.0 = Debug|Win32
+		{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}.Release_Static|Win32.ActiveCfg = Release_Static|Win32
+		{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}.Release_Static|Win32.Build.0 = Release_Static|Win32
+		{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}.Release|Win32.ActiveCfg = Release|Win32
+		{8034DA32-26FB-46FC-A47B-2E3EAD39B34E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

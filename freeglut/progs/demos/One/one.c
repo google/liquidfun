@@ -258,6 +258,8 @@ int main( int argc, char** argv )
 
     glutInit( &argc, argv );
 
+    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+
     subMenuA = glutCreateMenu( SampleMenu );
     glutAddMenuEntry( "Sub menu A1 (01)", 1 );
     glutAddMenuEntry( "Sub menu A2 (02)", 2 );
@@ -316,7 +318,7 @@ int main( int argc, char** argv )
     glutIdleFunc( SampleIdle );
     glutAttachMenu( GLUT_LEFT_BUTTON );
 
-    printf( "current window is %ix%i at (%i,%i)",
+    printf( "current window is %ix%i at (%i,%i)\n",
         glutGet( GLUT_WINDOW_WIDTH ), glutGet( GLUT_WINDOW_HEIGHT ),
         glutGet( GLUT_WINDOW_X ), glutGet( GLUT_WINDOW_Y )
     );

@@ -104,8 +104,8 @@ static void display(void)
     glColor3d(0.1,0.1,0.4);
 
 	if (win == mainwin) {
-	    shapesPrintf (2, 3, "Move The mounse into different windows");
-	    shapesPrintf (3, 3, "pressing keys will add to the string");		
+	    shapesPrintf (2, 3, "Move The mouse into different windows");
+	    shapesPrintf (3, 3, "pressing keys will add to the string");
     }
     shapesPrintf (5, 3, "Window: %d", win);
     shapesPrintf (6, 3, "String: %s", strings[win]);
@@ -170,7 +170,7 @@ main(int argc, char *argv[])
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
 
-    glutCreateWindow("OpenGLUT Sub Windows");
+    glutCreateWindow("FreeGLUT Sub Windows");
 
     glutReshapeFunc(resize);
     glutDisplayFunc(display);
@@ -194,7 +194,7 @@ main(int argc, char *argv[])
     glClearColor(0.7f,0.7f,0.7f,1);
 	winmax = sw1 > winmax ? sw1 : winmax;
 
-	sw2=glutCreateSubWindow(mainwin,328,240,314,236);
+	sw2=glutCreateSubWindow(mainwin,322,240,314,236);
     glutReshapeFunc(resize);
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
