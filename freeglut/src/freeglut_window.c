@@ -2000,6 +2000,7 @@ void FGAPIENTRY glutFullScreen( void )
     }
 
     {
+#if(WINVER >= 0x0500)
         DWORD s;
         RECT rect;
         HMONITOR hMonitor;
@@ -2031,6 +2032,23 @@ void FGAPIENTRY glutFullScreen( void )
         mi.cbSize = sizeof(mi);
         GetMonitorInfo(hMonitor, &mi);
         rect = mi.rcMonitor;
+#else   /* if (WINVER >= 0x0500) */
+        RECT rect;
+
+        /* For fullscreen mode, force the top-left corner to 0,0
+         * and adjust the window rectangle so that the client area
+         * covers the whole screen.
+         */
+
+        rect.left   = 0;
+        rect.top    = 0;
+        get_display_origin(&rect.left,&rect.top);
+        rect.right  = fgDisplay.ScreenWidth+rect.left;
+        rect.bottom = fgDisplay.ScreenHeight+rect.top;
+
+        AdjustWindowRect ( &rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS |
+                                  WS_CLIPCHILDREN, FALSE );
+#endif  /* (WINVER >= 0x0500) */
 
         /*
          * then resize window
@@ -2048,7 +2066,7 @@ void FGAPIENTRY glutFullScreen( void )
                       SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
                       SWP_NOZORDER
                     );
-        
+
         win->State.IsFullscreen = GL_TRUE;
     }
 #endif
