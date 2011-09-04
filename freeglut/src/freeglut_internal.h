@@ -381,10 +381,10 @@ struct tagSFG_Display
     int             DisplayModeClock;   /* The display mode's refresh rate   */
     int             DisplayViewPortX;   /* saved X location of the viewport  */
     int             DisplayViewPortY;   /* saved Y location of the viewport  */
+#endif /* HAVE_X11_EXTENSIONS_XF86VMODE_H */
+
     int             DisplayPointerX;    /* saved X location of the pointer   */
     int             DisplayPointerY;    /* saved Y location of the pointer   */
-
-#endif /* HAVE_X11_EXTENSIONS_XF86VMODE_H */
 
 #elif TARGET_HOST_MS_WINDOWS
     HINSTANCE       Instance;           /* The application's instance        */
