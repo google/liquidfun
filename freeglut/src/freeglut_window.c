@@ -1367,7 +1367,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     if( gameMode )
     {
         /* if in gamemode, query the origin of specified by the -display
-         * parameter command line (if any) and offset the upper-left corner
+         * command line parameter (if any) and offset the upper-left corner
          * of the window so we create the window on that screen.
          * The -display argument doesn't do anything if not trying to enter
          * gamemode.
@@ -2000,7 +2000,7 @@ void FGAPIENTRY glutFullScreen( void )
     }
 
     {
-#if(WINVER >= 0x0500)
+#if(WINVER >= 0x0500) /* Windows 2000 or later */
         DWORD s;
         RECT rect;
         HMONITOR hMonitor;
@@ -2042,9 +2042,8 @@ void FGAPIENTRY glutFullScreen( void )
 
         rect.left   = 0;
         rect.top    = 0;
-        get_display_origin(&rect.left,&rect.top);
-        rect.right  = fgDisplay.ScreenWidth+rect.left;
-        rect.bottom = fgDisplay.ScreenHeight+rect.top;
+        rect.right  = fgDisplay.ScreenWidth;
+        rect.bottom = fgDisplay.ScreenHeight;
 
         AdjustWindowRect ( &rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS |
                                   WS_CLIPCHILDREN, FALSE );
