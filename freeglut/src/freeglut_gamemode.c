@@ -58,7 +58,8 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
     /* we only heed the rate if we CAN actually use it (Xrandr >= 1.1) and
      * the user actually cares about it (rate > 0)
      */
-    use_rate = rate > 0 && ver_major >= 1 && ver_minor >= 1;
+    use_rate = ( rate > 0 ) && ( ( ver_major >= 1 ) ||
+		                         ( ver_major == 1 ) && ( ver_minor >= 1 ) );
 
     /* this loop is only so that the whole thing will be repeated if someone
      * else changes video mode between our query the current information and
@@ -104,7 +105,7 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
         if(res_idx == -1)
             break;  /* no matching resolution */
 
-#if RANDR_MAJOR >= 1 && RANDR_MINOR >= 1
+#if ( RANDR_MAJOR >= 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
         if(rate <= 0) {
             fgState.GameModeRefresh = XRRConfigCurrentRate(xrr_config);
         }
@@ -133,7 +134,7 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
             break;
         }
 
-#if RANDR_MAJOR >= 1 && RANDR_MINOR >= 1
+#if ( RANDR_MAJOR >= 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
         if(use_rate)
             result = XRRSetScreenConfigAndRate(fgDisplay.Display, xrr_config,
                     fgDisplay.RootWindow, res_idx, rot, rate, timestamp);
@@ -193,7 +194,7 @@ static void fghRememberState( void )
             fgDisplay.prev_ysz = ssizes[curr].height;
             fgDisplay.prev_refresh = -1;
 
-#       if RANDR_MAJOR >= 1 && RANDR_MINOR >= 1
+#       if ( RANDR_MAJOR >= 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
             if(fgState.GameModeRefresh != -1) {
                 fgDisplay.prev_refresh = XRRConfigCurrentRate(xrr_config);
             }
