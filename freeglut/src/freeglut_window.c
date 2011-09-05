@@ -1076,7 +1076,7 @@ static void get_display_origin(int *xp,int *yp)
 #if TARGET_HOST_POSIX_X11
 static Bool fghWindowIsVisible( Display *display, XEvent *event, XPointer arg)
 {
-    Window window = arg;
+    Window window = (Window)arg;
     return (event->type == MapNotify) && (event->xmap.window == window);
 }
 #endif
@@ -1092,7 +1092,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                    GLboolean gameMode, GLboolean isSubWindow )
 {
 #if TARGET_HOST_POSIX_X11
-    XVisualInfo * visualInfo;
+    XVisualInfo * visualInfo = NULL;
     XSetWindowAttributes winAttr;
     XTextProperty textProperty;
     XSizeHints sizeHints;
@@ -1297,7 +1297,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     XFree(visualInfo);
 
     if( !isSubWindow)
-        XPeekIfEvent( fgDisplay.Display, &eventReturnBuffer, &fghWindowIsVisible, window->Window.Handle );
+        XPeekIfEvent( fgDisplay.Display, &eventReturnBuffer, &fghWindowIsVisible, (XPointer)(window->Window.Handle) );
 
 #elif TARGET_HOST_MS_WINDOWS
 
