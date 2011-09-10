@@ -932,6 +932,7 @@ void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator );
 void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback,
                        SFG_Enumerator* enumerator );
 
+#if TARGET_HOST_MS_WINDOWS
 /* 
  * Helper functions for getting client area from the window rect
  * and the window rect from the client area given the style of the window
@@ -942,6 +943,7 @@ void fghComputeWindowRectFromClientArea_QueryWindow( const SFG_Window *window, R
 void fghComputeClientAreaFromWindowRect            ( const SFG_Window *window, RECT *windowRect, BOOL wantPosOutside );
 RECT fghGetClientArea                              ( const SFG_Window *window,                   BOOL wantPosOutside );
 void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth);
+#endif
 
 /*
  * fgWindowByHandle returns a (SFG_Window *) value pointing to the
