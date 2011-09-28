@@ -79,11 +79,11 @@
 #        include <errno.h>
 #        include <string.h>
 #    endif
-#    if defined(__FreeBSD__) || defined(__NetBSD__)
+#    if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
 /* XXX The below hack is done until freeglut's autoconf is updated. */
 #        define HAVE_USB_JS    1
 
-#        if defined(__FreeBSD__)
+#        if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
 #            include <sys/joystick.h>
 #        else
 /*
@@ -134,7 +134,7 @@
 
 /* BSD defines from "jsBSD.cxx" around lines 42-270 */
 
-#if defined(__NetBSD__) || defined(__FreeBSD__)
+#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
 
 #    ifdef HAVE_USB_JS
 #        if defined(__NetBSD__)
@@ -145,16 +145,14 @@
 #            else
 #                include <usb.h>
 #            endif
-#        elif defined(__FreeBSD__)
-#            if __FreeBSD_version < 500000
-#                include <libusbhid.h>
-#            else
-/* XXX The below hack is done until freeglut's autoconf is updated. */
-#                define HAVE_USBHID_H 1
+#        elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#            ifdef HAVE_USBHID_H
 #                include <usbhid.h>
+#            else
+#                include <libusbhid.h>
 #            endif
 #        endif
-#        include <dev/usb/usb.h>
+#        include <legacy/dev/usb/usb.h>
 #        include <dev/usb/usbhid.h>
 
 /* Compatibility with older usb.h revisions */
@@ -407,7 +405,7 @@ struct tagSFG_Joystick
 
 
 #if TARGET_HOST_POSIX_X11
-#   if defined(__FreeBSD__) || defined(__NetBSD__)
+#   if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
        struct os_specific_s *os;
 #   endif
 
@@ -475,7 +473,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
     int status;
 #endif
 
-#if defined(__FreeBSD__) || defined(__NetBSD__)
+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
     int len;
 #endif
 
@@ -612,7 +610,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 #endif
 
 #if TARGET_HOST_POSIX_X11
-#    if defined(__FreeBSD__) || defined(__NetBSD__)
+#    if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
     if ( joy->os->is_analog )
     {
         int status = read ( joy->os->fd, &joy->os->ajs, sizeof(joy->os->ajs) );
@@ -764,7 +762,7 @@ static void fghJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
     }
 
     if ( buttons )
-#        if defined( __FreeBSD__ ) || defined( __NetBSD__ )
+#        if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
         *buttons = ( joy->js.b1 ? 1 : 0 ) | ( joy->js.b2 ? 2 : 0 );  /* XXX Should not be here -- BSD is handled earlier */
 #        else
         *buttons = joy->js.buttons;
@@ -1074,7 +1072,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     CFTypeRef topLevelElement;
 #endif
 #if TARGET_HOST_POSIX_X11
-#    if defined( __FreeBSD__ ) || defined( __NetBSD__ )
+#    if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
        char *cp;
 #    endif
 #    ifdef JS_NEW
@@ -1310,7 +1308,7 @@ static void fghJoystickOpen( SFG_Joystick* joy )
 #endif
 
 #if TARGET_HOST_POSIX_X11
-#if defined( __FreeBSD__ ) || defined( __NetBSD__ )
+#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
     for( i = 0; i < _JS_MAX_AXES; i++ )
         joy->os->cache_axes[ i ] = 0.0f;
 
@@ -1576,7 +1574,7 @@ static void fghJoystickInit( int ident )
 #endif
 
 #if TARGET_HOST_POSIX_X11
-#    if defined( __FreeBSD__ ) || defined( __NetBSD__ )
+#    if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
     fgJoystick[ ident ]->id = ident;
     fgJoystick[ ident ]->error = GL_FALSE;
 
@@ -1645,7 +1643,7 @@ void fgJoystickClose( void )
 #endif
 
 #if TARGET_HOST_POSIX_X11
-#if defined( __FreeBSD__ ) || defined( __NetBSD__ )
+#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
             if( fgJoystick[ident]->os )
             {
                 if( ! fgJoystick[ ident ]->error )

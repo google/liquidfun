@@ -42,11 +42,15 @@ AC_SUBST([LIBXI])
 AC_SUBST([VERSION_INFO])
 AC_SUBST([EXPORT_FLAGS])
 
+AC_CHECK_LIB([usbhid], [hid_init],
+             [LIBUSBHID=-lusbhid], [LIBUSBHID=])
+AC_SUBST(LIBUSBHID)
+
 # Checks for header files.
 AC_HEADER_STDC
 save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-AC_CHECK_HEADERS([usbhid.h errno.h GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
+AC_CHECK_HEADERS([usbhid.h libusbhid.h errno.h GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
 AC_HEADER_TIME
 AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [], [], [#include <X11/Xlib.h>])
 AC_CHECK_HEADERS([X11/extensions/Xrandr.h])
