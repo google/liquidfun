@@ -27,13 +27,23 @@ following names:
 - Static, debug version:    freeglut\freeglut\DebugStatic\freeglut_static.lib
 - Static, release version:  freeglut\freeglut\ReleaseStatic\freeglut_static.lib
 
-Starting with VS2008, these libraries can instead be found at:
-- DLL, debug version:       freeglut\freeglut\lib\Debug\freeglut.lib
-                            freeglut\freeglut\lib\Debug\freeglut.dll
-- DLL, release version:     freeglut\freeglut\lib\Release\freeglut.lib
-                            freeglut\freeglut\lib\Release\freeglut.dll
-- Static, debug version:    freeglut\freeglut\lib\Debug\freeglut_static.lib
-- Static, release version:  freeglut\freeglut\lib\Release\freeglut_static.lib
+Starting with VS2008, both 32bit and 64bit builds are available.
+These libraries can instead be found at:
+32bit:
+- DLL, debug version:       freeglut\freeglut\lib\x86\Debug\freeglut.lib
+                            freeglut\freeglut\lib\x86\Debug\freeglut.dll
+- Static, debug version:    freeglut\freeglut\lib\x86\Debug\freeglut_static.lib
+- DLL, release version:     freeglut\freeglut\lib\x86\freeglut.lib
+                            freeglut\freeglut\lib\x86\freeglut.dll
+- Static, release version:  freeglut\freeglut\lib\x86\freeglut_static.lib
+
+64bit:
+- DLL, debug version:       freeglut\freeglut\lib\x64\Debug\freeglut.lib
+                            freeglut\freeglut\lib\x64\Debug\freeglut.dll
+- Static, debug version:    freeglut\freeglut\lib\x64\Debug\freeglut_static.lib
+- DLL, release version:     freeglut\freeglut\lib\x64\freeglut.lib
+                            freeglut\freeglut\lib\x64\freeglut.dll
+- Static, release version:  freeglut\freeglut\lib\x64\freeglut_static.lib
 
 Unlike the *nix release, the library names are NOT automatic replacements for
 the GLUT library names.  You may rename them manually if you wish, but this is
@@ -65,10 +75,6 @@ you will need to copy various files to various locations.
       DLL directory.  This usually has a path similar to
               "C:\Windows\System32"
       and will probably already have the files "opengl32.dll" and "glu32.dll".
-
-The "VisualStudio2008" and "VisualStudio2008Static" directories are DEPRECATED
-as of January 22, 2011.  Users are directed to the "VisualStudio\2008" directory
-instead.
 
 
 Building and Installing the Libraries with Open Watcom
