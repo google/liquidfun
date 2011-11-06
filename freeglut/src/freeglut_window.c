@@ -177,7 +177,7 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 
 static int fghIsLegacyContextVersionRequested( void )
 {
-  return fgState.MajorVersion == 1 && fgState.MinorVersion == 0;
+  return fgState.MajorVersion < 2 || (fgState.MajorVersion == 2 && fgState.MinorVersion <= 1);
 }
 
 static int fghIsLegacyContextRequested( void )
@@ -443,10 +443,17 @@ static GLXContext fghCreateNewContext( SFG_Window* window )
 
   /* new context creation */
   int attributes[9];
-  CreateContextAttribsProc createContextAttribs;
+  CreateContextAttribsProc createContextAttribs = (CreateContextAttribsProc) fghGetProcAddress( "glXCreateContextAttribsARB" );
+ 
+  /* glXCreateContextAttribsARB not found, yet the user has requested the new context creation */
+  if ( !createContextAttribs && !fghIsLegacyContextRequested() ) {
+    fgWarning( "OpenGL >2.1 context requested but glXCreateContextAttribsARB is not available! Falling back to legacy context creation" );
+	fgState.MajorVersion = 2;
+	fgState.MinorVersion = 1;
+  }
 
   /* If nothing fancy has been required, simply use the old context creation GLX API entry */
-  if ( fghIsLegacyContextRequested() )
+  if ( fghIsLegacyContextRequested() || !createContextAttribs )
   {
     context = glXCreateNewContext( dpy, config, render_type, share_list, direct );
     if ( context == NULL ) {
@@ -461,11 +468,6 @@ static GLXContext fghCreateNewContext( SFG_Window* window )
   }
 
   fghFillContextAttributes( attributes );
-
-  createContextAttribs = (CreateContextAttribsProc) fghGetProcAddress( "glXCreateContextAttribsARB" );
-  if ( createContextAttribs == NULL ) {
-    fgError( "glXCreateContextAttribsARB not found" );
-  }
 
   context = createContextAttribs( dpy, config, share_list, direct, attributes );
   if ( context == NULL ) {
