@@ -69,8 +69,6 @@ LOCAL_C_INCLUDES := $(libgtest_host_includes)
 
 LOCAL_CFLAGS += -O0
 
-LOCAL_STATIC_LIBRARIES := libgtest
-
 LOCAL_MODULE := libgtest_main_host
 LOCAL_MODULE_TAGS := eng
 
@@ -110,8 +108,6 @@ LOCAL_C_INCLUDES := $(libgtest_target_includes)
 ifneq ($(BUILD_WITH_ASTL),true)
 include external/stlport/libstlport.mk
 endif
-
-LOCAL_STATIC_LIBRARIES := libgtest
 
 LOCAL_MODULE := libgtest_main
 LOCAL_MODULE_TAGS := eng
