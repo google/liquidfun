@@ -34,6 +34,7 @@
 #ifndef GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_H_
 #define GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_H_
 
+#include <cstddef>
 #include <iterator>
 #include <utility>
 #include <vector>
