@@ -33,26 +33,16 @@
 
 __author__ = 'wan@google.com (Zhanyong Wan)'
 
-import gtest_test_utils
 import os
-import sys
-import unittest
+import gtest_test_utils
+
 
 IS_WINDOWS = os.name == 'nt'
-IS_LINUX = os.name == 'posix'
+IS_LINUX = os.name == 'posix' and os.uname()[0] == 'Linux'
 
-if IS_WINDOWS:
-  BUILD_DIRS = [
-      'build.dbg\\',
-      'build.opt\\',
-      'build.dbg8\\',
-      'build.opt8\\',
-      ]
-  COMMAND = 'gtest_env_var_test_.exe'
+COMMAND = gtest_test_utils.GetTestExecutablePath('gtest_env_var_test_')
 
-if IS_LINUX:
-  COMMAND = os.path.join(gtest_test_utils.GetBuildDir(),
-                         'gtest_env_var_test_')
+environ = os.environ.copy()
 
 
 def AssertEq(expected, actual):
@@ -66,72 +56,48 @@ def SetEnvVar(env_var, value):
   """Sets the env variable to 'value'; unsets it when 'value' is None."""
 
   if value is not None:
-    os.environ[env_var] = value
-  elif env_var in os.environ:
-    del os.environ[env_var]
+    environ[env_var] = value
+  elif env_var in environ:
+    del environ[env_var]
 
 
-def GetFlag(command, flag):
+def GetFlag(flag):
   """Runs gtest_env_var_test_ and returns its output."""
 
-  cmd = command
+  args = [COMMAND]
   if flag is not None:
-    cmd += ' %s' % (flag,)
-  stdin, stdout = os.popen2(cmd, 'b')
-  stdin.close()
-  line = stdout.readline()
-  stdout.close()
-  return line
+    args += [flag]
+  return gtest_test_utils.Subprocess(args, env=environ).output
 
 
-def TestFlag(command, flag, test_val, default_val):
+def TestFlag(flag, test_val, default_val):
   """Verifies that the given flag is affected by the corresponding env var."""
 
   env_var = 'GTEST_' + flag.upper()
   SetEnvVar(env_var, test_val)
-  AssertEq(test_val, GetFlag(command, flag))
+  AssertEq(test_val, GetFlag(flag))
   SetEnvVar(env_var, None)
-  AssertEq(default_val, GetFlag(command, flag))
+  AssertEq(default_val, GetFlag(flag))
 
 
-def TestEnvVarAffectsFlag(command):
-  """An environment variable should affect the corresponding flag."""
+class GTestEnvVarTest(gtest_test_utils.TestCase):
+  def testEnvVarAffectsFlag(self):
+    """Tests that environment variable should affect the corresponding flag."""
 
-  TestFlag(command, 'break_on_failure', '1', '0')
-  TestFlag(command, 'color', 'yes', 'auto')
-  TestFlag(command, 'filter', 'FooTest.Bar', '*')
-  TestFlag(command, 'output', 'tmp/foo.xml', '')
-  TestFlag(command, 'print_time', '1', '0')
-  TestFlag(command, 'repeat', '999', '1')
-  TestFlag(command, 'throw_on_failure', '1', '0')
+    TestFlag('break_on_failure', '1', '0')
+    TestFlag('color', 'yes', 'auto')
+    TestFlag('filter', 'FooTest.Bar', '*')
+    TestFlag('output', 'xml:tmp/foo.xml', '')
+    TestFlag('print_time', '0', '1')
+    TestFlag('repeat', '999', '1')
+    TestFlag('throw_on_failure', '1', '0')
+    TestFlag('death_test_style', 'threadsafe', 'fast')
+    TestFlag('catch_exceptions', '0', '1')
 
-  if IS_WINDOWS:
-    TestFlag(command, 'catch_exceptions', '1', '0')
-  if IS_LINUX:
-    TestFlag(command, 'stack_trace_depth', '0', '100')
-    TestFlag(command, 'death_test_style', 'thread-safe', 'fast')
-    TestFlag(command, 'death_test_use_fork', '1', '0')
-
-
-if IS_WINDOWS:
-
-  def main():
-    for build_dir in BUILD_DIRS:
-      command = build_dir + COMMAND
-      print 'Testing with %s . . .' % (command,)
-      TestEnvVarAffectsFlag(command)
-    return 0
-
-  if __name__ == '__main__':
-    main()
+    if IS_LINUX:
+      TestFlag('death_test_use_fork', '1', '0')
+      TestFlag('stack_trace_depth', '0', '100')
 
 
-if IS_LINUX:
-
-  class GTestEnvVarTest(unittest.TestCase):
-    def testEnvVarAffectsFlag(self):
-      TestEnvVarAffectsFlag(COMMAND)
-
-
-  if __name__ == '__main__':
-    gtest_test_utils.Main()
+if __name__ == '__main__':
+  gtest_test_utils.Main()

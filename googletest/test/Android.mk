@@ -71,7 +71,7 @@ $(foreach file,$(1), \
   $(eval LOCAL_STATIC_LIBRARIES := $(libgtest_test$(4)_static_lib)) \
   $(eval LOCAL_SHARED_LIBRARIES := $(libgtest_test$(4)_shared_lib)) \
   $(eval LOCAL_MODULE_TAGS := tests) \
-  $(eval LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)) \
+  $(eval LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_NATIVE_TESTS)) \
   $(eval include $(BUILD_$(2)EXECUTABLE)) \
 )
 endef

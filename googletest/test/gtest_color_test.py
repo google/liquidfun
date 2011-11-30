@@ -33,16 +33,15 @@
 
 __author__ = 'wan@google.com (Zhanyong Wan)'
 
-import gtest_test_utils
 import os
-import sys
-import unittest
+import gtest_test_utils
 
+
+IS_WINDOWS = os.name = 'nt'
 
 COLOR_ENV_VAR = 'GTEST_COLOR'
 COLOR_FLAG = 'gtest_color'
-COMMAND = os.path.join(gtest_test_utils.GetBuildDir(),
-                       'gtest_color_test_')
+COMMAND = gtest_test_utils.GetTestExecutablePath('gtest_color_test_')
 
 
 def SetEnvVar(env_var, value):
@@ -59,31 +58,38 @@ def UsesColor(term, color_env_var, color_flag):
 
   SetEnvVar('TERM', term)
   SetEnvVar(COLOR_ENV_VAR, color_env_var)
-  cmd = COMMAND
-  if color_flag is not None:
-    cmd += ' --%s=%s' % (COLOR_FLAG, color_flag)
-  return gtest_test_utils.GetExitStatus(os.system(cmd))
+
+  if color_flag is None:
+    args = []
+  else:
+    args = ['--%s=%s' % (COLOR_FLAG, color_flag)]
+  p = gtest_test_utils.Subprocess([COMMAND] + args)
+  return not p.exited or p.exit_code
 
 
-class GTestColorTest(unittest.TestCase):
+class GTestColorTest(gtest_test_utils.TestCase):
   def testNoEnvVarNoFlag(self):
     """Tests the case when there's neither GTEST_COLOR nor --gtest_color."""
 
-    self.assert_(not UsesColor('dumb', None, None))
-    self.assert_(not UsesColor('emacs', None, None))
-    self.assert_(not UsesColor('xterm-mono', None, None))
-    self.assert_(not UsesColor('unknown', None, None))
-    self.assert_(not UsesColor(None, None, None))
+    if not IS_WINDOWS:
+      self.assert_(not UsesColor('dumb', None, None))
+      self.assert_(not UsesColor('emacs', None, None))
+      self.assert_(not UsesColor('xterm-mono', None, None))
+      self.assert_(not UsesColor('unknown', None, None))
+      self.assert_(not UsesColor(None, None, None))
+    self.assert_(UsesColor('linux', None, None))
     self.assert_(UsesColor('cygwin', None, None))
     self.assert_(UsesColor('xterm', None, None))
     self.assert_(UsesColor('xterm-color', None, None))
+    self.assert_(UsesColor('xterm-256color', None, None))
 
   def testFlagOnly(self):
     """Tests the case when there's --gtest_color but not GTEST_COLOR."""
 
     self.assert_(not UsesColor('dumb', None, 'no'))
     self.assert_(not UsesColor('xterm-color', None, 'no'))
-    self.assert_(not UsesColor('emacs', None, 'auto'))
+    if not IS_WINDOWS:
+      self.assert_(not UsesColor('emacs', None, 'auto'))
     self.assert_(UsesColor('xterm', None, 'auto'))
     self.assert_(UsesColor('dumb', None, 'yes'))
     self.assert_(UsesColor('xterm', None, 'yes'))
@@ -93,7 +99,8 @@ class GTestColorTest(unittest.TestCase):
 
     self.assert_(not UsesColor('dumb', 'no', None))
     self.assert_(not UsesColor('xterm-color', 'no', None))
-    self.assert_(not UsesColor('dumb', 'auto', None))
+    if not IS_WINDOWS:
+      self.assert_(not UsesColor('dumb', 'auto', None))
     self.assert_(UsesColor('xterm-color', 'auto', None))
     self.assert_(UsesColor('dumb', 'yes', None))
     self.assert_(UsesColor('xterm-color', 'yes', None))

@@ -33,7 +33,7 @@
 
 #include <stdlib.h>
 #include <iostream>
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 // Indicates that this translation unit is part of Google Test's
 // implementation.  It must come before gtest-internal-inl.h is
@@ -64,14 +64,14 @@ namespace {
   do {\
     const int expected_val = (expected);\
     const int actual_val = (actual);\
-    if (expected_val != actual_val) {\
+    if (::testing::internal::IsTrue(expected_val != actual_val)) {\
       ::std::cout << "Value of: " #actual "\n"\
                   << "  Actual: " << actual_val << "\n"\
                   << "Expected: " #expected "\n"\
                   << "Which is: " << expected_val << "\n";\
-      abort();\
+      ::testing::internal::posix::Abort();\
     }\
-  } while(false)
+  } while(::testing::internal::AlwaysFalse())
 
 
 // Used for verifying that global environment set-up and tear-down are
@@ -112,13 +112,11 @@ int g_death_test_count = 0;
 TEST(BarDeathTest, ThreadSafeAndFast) {
   g_death_test_count++;
 
-#if GTEST_HAS_DEATH_TEST
   GTEST_FLAG(death_test_style) = "threadsafe";
-  EXPECT_DEATH(abort(), "");
+  EXPECT_DEATH_IF_SUPPORTED(::testing::internal::posix::Abort(), "");
 
   GTEST_FLAG(death_test_style) = "fast";
-  EXPECT_DEATH(abort(), "");
-#endif  // GTEST_HAS_DEATH_TEST
+  EXPECT_DEATH_IF_SUPPORTED(::testing::internal::posix::Abort(), "");
 }
 
 #if GTEST_HAS_PARAM_TEST

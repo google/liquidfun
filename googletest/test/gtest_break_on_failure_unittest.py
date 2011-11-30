@@ -43,10 +43,11 @@ __author__ = 'wan@google.com (Zhanyong Wan)'
 import gtest_test_utils
 import os
 import sys
-import unittest
 
 
 # Constants.
+
+IS_WINDOWS = os.name == 'nt'
 
 # The environment variable for enabling/disabling the break-on-failure mode.
 BREAK_ON_FAILURE_ENV_VAR = 'GTEST_BREAK_ON_FAILURE'
@@ -57,12 +58,18 @@ BREAK_ON_FAILURE_FLAG = 'gtest_break_on_failure'
 # The environment variable for enabling/disabling the throw-on-failure mode.
 THROW_ON_FAILURE_ENV_VAR = 'GTEST_THROW_ON_FAILURE'
 
+# The environment variable for enabling/disabling the catch-exceptions mode.
+CATCH_EXCEPTIONS_ENV_VAR = 'GTEST_CATCH_EXCEPTIONS'
+
 # Path to the gtest_break_on_failure_unittest_ program.
-EXE_PATH = os.path.join(gtest_test_utils.GetBuildDir(),
-                        'gtest_break_on_failure_unittest_')
+EXE_PATH = gtest_test_utils.GetTestExecutablePath(
+    'gtest_break_on_failure_unittest_')
 
 
 # Utilities.
+
+
+environ = os.environ.copy()
 
 
 def SetEnvVar(env_var, value):
@@ -71,15 +78,15 @@ def SetEnvVar(env_var, value):
   """
 
   if value is not None:
-    os.environ[env_var] = value
-  elif env_var in os.environ:
-    del os.environ[env_var]
+    environ[env_var] = value
+  elif env_var in environ:
+    del environ[env_var]
 
 
 def Run(command):
   """Runs a command; returns 1 if it was killed by a signal, or 0 otherwise."""
 
-  p = gtest_test_utils.Subprocess(command)
+  p = gtest_test_utils.Subprocess(command, env=environ)
   if p.terminated_by_signal:
     return 1
   else:
@@ -89,7 +96,7 @@ def Run(command):
 # The tests.
 
 
-class GTestBreakOnFailureUnitTest(unittest.TestCase):
+class GTestBreakOnFailureUnitTest(gtest_test_utils.TestCase):
   """Tests using the GTEST_BREAK_ON_FAILURE environment variable or
   the --gtest_break_on_failure flag to turn assertion failures into
   segmentation faults.
@@ -193,6 +200,19 @@ class GTestBreakOnFailureUnitTest(unittest.TestCase):
                         expect_seg_fault=1)
     finally:
       SetEnvVar(THROW_ON_FAILURE_ENV_VAR, None)
+
+  if IS_WINDOWS:
+    def testCatchExceptionsDoesNotInterfere(self):
+      """Tests that gtest_catch_exceptions doesn't interfere."""
+
+      SetEnvVar(CATCH_EXCEPTIONS_ENV_VAR, '1')
+      try:
+        self.RunAndVerify(env_var_value='1',
+                          flag_value='1',
+                          expect_seg_fault=1)
+      finally:
+        SetEnvVar(CATCH_EXCEPTIONS_ENV_VAR, None)
+
 
 if __name__ == '__main__':
   gtest_test_utils.Main()

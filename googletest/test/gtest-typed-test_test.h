@@ -32,7 +32,7 @@
 #ifndef GTEST_TEST_GTEST_TYPED_TEST_TEST_H_
 #define GTEST_TEST_GTEST_TYPED_TEST_TEST_H_
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #if GTEST_HAS_TYPED_TEST_P
 
@@ -55,7 +55,7 @@ TYPED_TEST_P(ContainerTest, CanBeDefaultConstructed) {
 
 TYPED_TEST_P(ContainerTest, InitialSizeIsZero) {
   TypeParam container;
-  EXPECT_EQ(0, container.size());
+  EXPECT_EQ(0U, container.size());
 }
 
 REGISTER_TYPED_TEST_CASE_P(ContainerTest,

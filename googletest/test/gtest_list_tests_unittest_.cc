@@ -38,8 +38,7 @@
 // This program will be invoked from a Python unit test.
 // Don't run it directly.
 
-#include <gtest/gtest.h>
-
+#include "gtest/gtest.h"
 
 namespace {
 
@@ -50,7 +49,7 @@ TEST(Foo, Bar1) {
 TEST(Foo, Bar2) {
 }
 
-TEST(Foo, Bar3) {
+TEST(Foo, DISABLED_Bar3) {
 }
 
 TEST(Abc, Xyz) {
@@ -68,7 +67,7 @@ class FooTest : public testing::Test {
 TEST_F(FooTest, Test1) {
 }
 
-TEST_F(FooTest, Test2) {
+TEST_F(FooTest, DISABLED_Test2) {
 }
 
 TEST_F(FooTest, Test3) {
@@ -79,9 +78,8 @@ TEST(FooDeathTest, Test1) {
 
 }  // namespace
 
-
 int main(int argc, char **argv) {
-  testing::InitGoogleTest(&argc, argv);
+  ::testing::InitGoogleTest(&argc, argv);
 
   return RUN_ALL_TESTS();
 }

@@ -31,14 +31,13 @@
 //
 // Tests for the Message class.
 
-#include <gtest/gtest-message.h>
+#include "gtest/gtest-message.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace {
 
 using ::testing::Message;
-using ::testing::internal::StrStream;
 
 // A helper function that turns a Message into a C string.
 const char* ToCString(const Message& msg) {
@@ -68,6 +67,23 @@ TEST(MessageTest, ConstructsFromCString) {
   EXPECT_STREQ("Hello", ToCString(msg));
 }
 
+// Tests streaming a float.
+TEST(MessageTest, StreamsFloat) {
+  const char* const s = ToCString(Message() << 1.23456F << " " << 2.34567F);
+  // Both numbers should be printed with enough precision.
+  EXPECT_PRED_FORMAT2(testing::IsSubstring, "1.234560", s);
+  EXPECT_PRED_FORMAT2(testing::IsSubstring, " 2.345669", s);
+}
+
+// Tests streaming a double.
+TEST(MessageTest, StreamsDouble) {
+  const char* const s = ToCString(Message() << 1260570880.4555497 << " "
+                                  << 1260572265.1954534);
+  // Both numbers should be printed with enough precision.
+  EXPECT_PRED_FORMAT2(testing::IsSubstring, "1260570880.45", s);
+  EXPECT_PRED_FORMAT2(testing::IsSubstring, " 1260572265.19", s);
+}
+
 // Tests streaming a non-char pointer.
 TEST(MessageTest, StreamsPointer) {
   int n = 0;
@@ -92,12 +108,7 @@ TEST(MessageTest, StreamsNullCString) {
   EXPECT_STREQ("(null)", ToCString(Message() << p));
 }
 
-#if GTEST_HAS_STD_STRING
-
 // Tests streaming std::string.
-//
-// As std::string has problem in MSVC when exception is disabled, we only
-// test this where std::string can be used.
 TEST(MessageTest, StreamsString) {
   const ::std::string str("Hello");
   EXPECT_STREQ("Hello", ToCString(Message() << str));
@@ -112,8 +123,6 @@ TEST(MessageTest, StreamsStringWithEmbeddedNUL) {
   EXPECT_STREQ("Here's a NUL\\0 and some more string",
                ToCString(Message() << string_with_nul));
 }
-
-#endif  // GTEST_HAS_STD_STRING
 
 // Tests streaming a NUL char.
 TEST(MessageTest, StreamsNULChar) {
@@ -144,9 +153,9 @@ TEST(MessageTest, GetString) {
 // Tests streaming a Message object to an ostream.
 TEST(MessageTest, StreamsToOStream) {
   Message msg("Hello");
-  StrStream ss;
+  ::std::stringstream ss;
   ss << msg;
-  EXPECT_STREQ("Hello", testing::internal::StrStreamToString(&ss).c_str());
+  EXPECT_STREQ("Hello", testing::internal::StringStreamToString(&ss).c_str());
 }
 
 // Tests that a Message object doesn't take up too much stack space.

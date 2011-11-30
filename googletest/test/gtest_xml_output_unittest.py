@@ -34,21 +34,27 @@
 __author__ = 'eefacm@gmail.com (Sean Mcafee)'
 
 import errno
-import gtest_test_utils
 import os
 import sys
-import tempfile
-import unittest
-
 from xml.dom import minidom, Node
 
+import gtest_test_utils
 import gtest_xml_test_utils
+
 
 GTEST_OUTPUT_FLAG         = "--gtest_output"
 GTEST_DEFAULT_OUTPUT_FILE = "test_detail.xml"
+GTEST_PROGRAM_NAME = "gtest_xml_output_unittest_"
+
+SUPPORTS_STACK_TRACES = False
+
+if SUPPORTS_STACK_TRACES:
+  STACK_TRACE_TEMPLATE = "\nStack trace:\n*"
+else:
+  STACK_TRACE_TEMPLATE = ""
 
 EXPECTED_NON_EMPTY_XML = """<?xml version="1.0" encoding="UTF-8"?>
-<testsuite tests="13" failures="2" disabled="2" errors="0" time="*" name="AllTests">
+<testsuites tests="23" failures="4" disabled="2" errors="0" time="*" name="AllTests">
   <testsuite name="SuccessfulTest" tests="1" failures="0" disabled="0" errors="0" time="*">
     <testcase name="Succeeds" status="run" time="*" classname="SuccessfulTest"/>
   </testsuite>
@@ -56,7 +62,7 @@ EXPECTED_NON_EMPTY_XML = """<?xml version="1.0" encoding="UTF-8"?>
     <testcase name="Fails" status="run" time="*" classname="FailedTest">
       <failure message="Value of: 2&#x0A;Expected: 1" type=""><![CDATA[gtest_xml_output_unittest_.cc:*
 Value of: 2
-Expected: 1]]></failure>
+Expected: 1%(stack)s]]></failure>
     </testcase>
   </testsuite>
   <testsuite name="MixedResultTest" tests="3" failures="1" disabled="1" errors="0" time="*">
@@ -64,12 +70,26 @@ Expected: 1]]></failure>
     <testcase name="Fails" status="run" time="*" classname="MixedResultTest">
       <failure message="Value of: 2&#x0A;Expected: 1" type=""><![CDATA[gtest_xml_output_unittest_.cc:*
 Value of: 2
-Expected: 1]]></failure>
+Expected: 1%(stack)s]]></failure>
       <failure message="Value of: 3&#x0A;Expected: 2" type=""><![CDATA[gtest_xml_output_unittest_.cc:*
 Value of: 3
-Expected: 2]]></failure>
+Expected: 2%(stack)s]]></failure>
     </testcase>
     <testcase name="DISABLED_test" status="notrun" time="*" classname="MixedResultTest"/>
+  </testsuite>
+  <testsuite name="XmlQuotingTest" tests="1" failures="1" disabled="0" errors="0" time="*">
+    <testcase name="OutputsCData" status="run" time="*" classname="XmlQuotingTest">
+      <failure message="Failed&#x0A;XML output: &lt;?xml encoding=&quot;utf-8&quot;&gt;&lt;top&gt;&lt;![CDATA[cdata text]]&gt;&lt;/top&gt;" type=""><![CDATA[gtest_xml_output_unittest_.cc:*
+Failed
+XML output: <?xml encoding="utf-8"><top><![CDATA[cdata text]]>]]&gt;<![CDATA[</top>%(stack)s]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="InvalidCharactersTest" tests="1" failures="1" disabled="0" errors="0" time="*">
+    <testcase name="InvalidCharactersInMessage" status="run" time="*" classname="InvalidCharactersTest">
+      <failure message="Failed&#x0A;Invalid characters in brackets []" type=""><![CDATA[gtest_xml_output_unittest_.cc:*
+Failed
+Invalid characters in brackets []%(stack)s]]></failure>
+    </testcase>
   </testsuite>
   <testsuite name="DisabledTest" tests="1" failures="0" disabled="1" errors="0" time="*">
     <testcase name="DISABLED_test_not_run" status="notrun" time="*" classname="DisabledTest"/>
@@ -85,12 +105,30 @@ Expected: 2]]></failure>
      <testcase name="ExternalUtilityThatCallsRecordIntValuedProperty" status="run" time="*" classname="NoFixtureTest" key_for_utility_int="1"/>
      <testcase name="ExternalUtilityThatCallsRecordStringValuedProperty" status="run" time="*" classname="NoFixtureTest" key_for_utility_string="1"/>
   </testsuite>
-</testsuite>"""
+  <testsuite name="Single/ValueParamTest" tests="4" failures="0" disabled="0" errors="0" time="*">
+    <testcase name="HasValueParamAttribute/0" value_param="33" status="run" time="*" classname="Single/ValueParamTest" />
+    <testcase name="HasValueParamAttribute/1" value_param="42" status="run" time="*" classname="Single/ValueParamTest" />
+    <testcase name="AnotherTestThatHasValueParamAttribute/0" value_param="33" status="run" time="*" classname="Single/ValueParamTest" />
+    <testcase name="AnotherTestThatHasValueParamAttribute/1" value_param="42" status="run" time="*" classname="Single/ValueParamTest" />
+  </testsuite>
+  <testsuite name="TypedTest/0" tests="1" failures="0" disabled="0" errors="0" time="*">
+    <testcase name="HasTypeParamAttribute" type_param="*" status="run" time="*" classname="TypedTest/0" />
+  </testsuite>
+  <testsuite name="TypedTest/1" tests="1" failures="0" disabled="0" errors="0" time="*">
+    <testcase name="HasTypeParamAttribute" type_param="*" status="run" time="*" classname="TypedTest/1" />
+  </testsuite>
+  <testsuite name="Single/TypeParameterizedTestCase/0" tests="1" failures="0" disabled="0" errors="0" time="*">
+    <testcase name="HasTypeParamAttribute" type_param="*" status="run" time="*" classname="Single/TypeParameterizedTestCase/0" />
+  </testsuite>
+  <testsuite name="Single/TypeParameterizedTestCase/1" tests="1" failures="0" disabled="0" errors="0" time="*">
+    <testcase name="HasTypeParamAttribute" type_param="*" status="run" time="*" classname="Single/TypeParameterizedTestCase/1" />
+  </testsuite>
+</testsuites>""" % {'stack': STACK_TRACE_TEMPLATE}
 
 
 EXPECTED_EMPTY_XML = """<?xml version="1.0" encoding="UTF-8"?>
-<testsuite tests="0" failures="0" disabled="0" errors="0" time="*" name="AllTests">
-</testsuite>"""
+<testsuites tests="0" failures="0" disabled="0" errors="0" time="*" name="AllTests">
+</testsuites>"""
 
 
 class GTestXMLOutputUnitTest(gtest_xml_test_utils.GTestXMLTestCase):
@@ -103,8 +141,7 @@ class GTestXMLOutputUnitTest(gtest_xml_test_utils.GTestXMLTestCase):
     Runs a test program that generates a non-empty XML output, and
     tests that the XML output is expected.
     """
-    self._TestXmlOutput("gtest_xml_output_unittest_",
-                        EXPECTED_NON_EMPTY_XML, 1)
+    self._TestXmlOutput(GTEST_PROGRAM_NAME, EXPECTED_NON_EMPTY_XML, 1)
 
   def testEmptyXmlOutput(self):
     """
@@ -120,11 +157,10 @@ class GTestXMLOutputUnitTest(gtest_xml_test_utils.GTestXMLTestCase):
     Confirms that Google Test produces an XML output file with the expected
     default name if no name is explicitly specified.
     """
-    temp_dir = tempfile.mkdtemp()
-    output_file     = os.path.join(temp_dir,
-                                   GTEST_DEFAULT_OUTPUT_FILE)
-    gtest_prog_path = os.path.join(gtest_test_utils.GetBuildDir(),
-                                   "gtest_no_test_unittest")
+    output_file = os.path.join(gtest_test_utils.GetTempDir(),
+                               GTEST_DEFAULT_OUTPUT_FILE)
+    gtest_prog_path = gtest_test_utils.GetTestExecutablePath(
+        "gtest_no_test_unittest")
     try:
       os.remove(output_file)
     except OSError, e:
@@ -133,10 +169,39 @@ class GTestXMLOutputUnitTest(gtest_xml_test_utils.GTestXMLTestCase):
 
     p = gtest_test_utils.Subprocess(
         [gtest_prog_path, "%s=xml" % GTEST_OUTPUT_FLAG],
-        working_dir=temp_dir)
+        working_dir=gtest_test_utils.GetTempDir())
     self.assert_(p.exited)
     self.assertEquals(0, p.exit_code)
     self.assert_(os.path.isfile(output_file))
+
+  def testSuppressedXmlOutput(self):
+    """
+    Tests that no XML file is generated if the default XML listener is
+    shut down before RUN_ALL_TESTS is invoked.
+    """
+
+    xml_path = os.path.join(gtest_test_utils.GetTempDir(),
+                            GTEST_PROGRAM_NAME + "out.xml")
+    if os.path.isfile(xml_path):
+      os.remove(xml_path)
+
+    gtest_prog_path = gtest_test_utils.GetTestExecutablePath(GTEST_PROGRAM_NAME)
+
+    command = [gtest_prog_path,
+               "%s=xml:%s" % (GTEST_OUTPUT_FLAG, xml_path),
+               "--shut_down_xml"]
+    p = gtest_test_utils.Subprocess(command)
+    if p.terminated_by_signal:
+      self.assert_(False,
+                   "%s was killed by signal %d" % (gtest_prog_name, p.signal))
+    else:
+      self.assert_(p.exited)
+      self.assertEquals(1, p.exit_code,
+                        "'%s' exited with code %s, which doesn't match "
+                        "the expected exit code %s."
+                        % (command, p.exit_code, 1))
+
+    self.assert_(not os.path.isfile(xml_path))
 
 
   def _TestXmlOutput(self, gtest_prog_name, expected_xml, expected_exit_code):
@@ -146,10 +211,9 @@ class GTestXMLOutputUnitTest(gtest_xml_test_utils.GTestXMLTestCase):
     XML document.  Furthermore, the program's exit code must be
     expected_exit_code.
     """
-
-    xml_path = os.path.join(tempfile.mkdtemp(), gtest_prog_name + "out.xml")
-    gtest_prog_path = os.path.join(gtest_test_utils.GetBuildDir(),
-                                   gtest_prog_name)
+    xml_path = os.path.join(gtest_test_utils.GetTempDir(),
+                            gtest_prog_name + "out.xml")
+    gtest_prog_path = gtest_test_utils.GetTestExecutablePath(gtest_prog_name)
 
     command = [gtest_prog_path, "%s=xml:%s" % (GTEST_OUTPUT_FLAG, xml_path)]
     p = gtest_test_utils.Subprocess(command)

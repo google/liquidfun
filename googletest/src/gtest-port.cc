@@ -29,30 +29,32 @@
 //
 // Author: wan@google.com (Zhanyong Wan)
 
-#include <gtest/internal/gtest-port.h>
+#include "gtest/internal/gtest-port.h"
 
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#if GTEST_OS_WINDOWS
-#include <io.h>
-#include <sys/stat.h>
-#else
-#include <unistd.h>
-#endif  // GTEST_OS_WINDOWS
-
-#if GTEST_USES_SIMPLE_RE
 #include <string.h>
-#endif
 
-#ifdef _WIN32_WCE
-#include <windows.h>  // For TerminateProcess()
-#endif  // _WIN32_WCE
+#if GTEST_OS_WINDOWS_MOBILE
+# include <windows.h>  // For TerminateProcess()
+#elif GTEST_OS_WINDOWS
+# include <io.h>
+# include <sys/stat.h>
+#else
+# include <unistd.h>
+#endif  // GTEST_OS_WINDOWS_MOBILE
 
-#include <gtest/gtest-spi.h>
-#include <gtest/gtest-message.h>
-#include <gtest/internal/gtest-string.h>
+#if GTEST_OS_MAC
+# include <mach/mach_init.h>
+# include <mach/task.h>
+# include <mach/vm_map.h>
+#endif  // GTEST_OS_MAC
+
+#include "gtest/gtest-spi.h"
+#include "gtest/gtest-message.h"
+#include "gtest/internal/gtest-internal.h"
+#include "gtest/internal/gtest-string.h"
 
 // Indicates that this translation unit is part of Google Test's
 // implementation.  It must come before gtest-internal-inl.h is
@@ -66,20 +68,59 @@
 namespace testing {
 namespace internal {
 
-#if GTEST_OS_WINDOWS
-// Microsoft does not provide a definition of STDERR_FILENO.
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+// MSVC and C++Builder do not provide a definition of STDERR_FILENO.
+const int kStdOutFileno = 1;
 const int kStdErrFileno = 2;
 #else
+const int kStdOutFileno = STDOUT_FILENO;
 const int kStdErrFileno = STDERR_FILENO;
-#endif  // GTEST_OS_WINDOWS
+#endif  // _MSC_VER
+
+#if GTEST_OS_MAC
+
+// Returns the number of threads running in the process, or 0 to indicate that
+// we cannot detect it.
+size_t GetThreadCount() {
+  const task_t task = mach_task_self();
+  mach_msg_type_number_t thread_count;
+  thread_act_array_t thread_list;
+  const kern_return_t status = task_threads(task, &thread_list, &thread_count);
+  if (status == KERN_SUCCESS) {
+    // task_threads allocates resources in thread_list and we need to free them
+    // to avoid leaks.
+    vm_deallocate(task,
+                  reinterpret_cast<vm_address_t>(thread_list),
+                  sizeof(thread_t) * thread_count);
+    return static_cast<size_t>(thread_count);
+  } else {
+    return 0;
+  }
+}
+
+#else
+
+size_t GetThreadCount() {
+  // There's no portable way to detect the number of threads, so we just
+  // return 0 to indicate that we cannot detect it.
+  return 0;
+}
+
+#endif  // GTEST_OS_MAC
 
 #if GTEST_USES_POSIX_RE
 
 // Implements RE.  Currently only needed for death tests.
 
 RE::~RE() {
-  regfree(&partial_regex_);
-  regfree(&full_regex_);
+  if (is_valid_) {
+    // regfree'ing an invalid regex might crash because the content
+    // of the regex is undefined. Since the regex's are essentially
+    // the same, one cannot be valid (or invalid) without the other
+    // being so too.
+    regfree(&partial_regex_);
+    regfree(&full_regex_);
+  }
   free(const_cast<char*>(pattern_));
 }
 
@@ -102,7 +143,7 @@ bool RE::PartialMatch(const char* str, const RE& re) {
 
 // Initializes an RE from its string representation.
 void RE::Init(const char* regex) {
-  pattern_ = strdup(regex);
+  pattern_ = posix::StrDup(regex);
 
   // Reserves enough bytes to hold the regular expression used for a
   // full match.
@@ -119,9 +160,10 @@ void RE::Init(const char* regex) {
   // Some implementation of POSIX regex (e.g. on at least some
   // versions of Cygwin) doesn't accept the empty string as a valid
   // regex.  We change it to an equivalent form "()" to be safe.
-  const char* const partial_regex = (*regex == '\0') ? "()" : regex;
-  is_valid_ = (regcomp(&partial_regex_, partial_regex, REG_EXTENDED) == 0)
-      && is_valid_;
+  if (is_valid_) {
+    const char* const partial_regex = (*regex == '\0') ? "()" : regex;
+    is_valid_ = regcomp(&partial_regex_, partial_regex, REG_EXTENDED) == 0;
+  }
   EXPECT_TRUE(is_valid_)
       << "Regular expression \"" << regex
       << "\" is not a valid POSIX Extended regular expression.";
@@ -140,20 +182,20 @@ bool IsInSet(char ch, const char* str) {
 // Returns true iff ch belongs to the given classification.  Unlike
 // similar functions in <ctype.h>, these aren't affected by the
 // current locale.
-bool IsDigit(char ch) { return '0' <= ch && ch <= '9'; }
-bool IsPunct(char ch) {
+bool IsAsciiDigit(char ch) { return '0' <= ch && ch <= '9'; }
+bool IsAsciiPunct(char ch) {
   return IsInSet(ch, "^-!\"#$%&'()*+,./:;<=>?@[\\]_`{|}~");
 }
 bool IsRepeat(char ch) { return IsInSet(ch, "?*+"); }
-bool IsWhiteSpace(char ch) { return IsInSet(ch, " \f\n\r\t\v"); }
-bool IsWordChar(char ch) {
+bool IsAsciiWhiteSpace(char ch) { return IsInSet(ch, " \f\n\r\t\v"); }
+bool IsAsciiWordChar(char ch) {
   return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') ||
       ('0' <= ch && ch <= '9') || ch == '_';
 }
 
 // Returns true iff "\\c" is a supported escape sequence.
 bool IsValidEscape(char c) {
-  return (IsPunct(c) || IsInSet(c, "dDfnrsStvwW"));
+  return (IsAsciiPunct(c) || IsInSet(c, "dDfnrsStvwW"));
 }
 
 // Returns true iff the given atom (specified by escaped and pattern)
@@ -161,19 +203,19 @@ bool IsValidEscape(char c) {
 bool AtomMatchesChar(bool escaped, char pattern_char, char ch) {
   if (escaped) {  // "\\p" where p is pattern_char.
     switch (pattern_char) {
-      case 'd': return IsDigit(ch);
-      case 'D': return !IsDigit(ch);
+      case 'd': return IsAsciiDigit(ch);
+      case 'D': return !IsAsciiDigit(ch);
       case 'f': return ch == '\f';
       case 'n': return ch == '\n';
       case 'r': return ch == '\r';
-      case 's': return IsWhiteSpace(ch);
-      case 'S': return !IsWhiteSpace(ch);
+      case 's': return IsAsciiWhiteSpace(ch);
+      case 'S': return !IsAsciiWhiteSpace(ch);
       case 't': return ch == '\t';
       case 'v': return ch == '\v';
-      case 'w': return IsWordChar(ch);
-      case 'W': return !IsWordChar(ch);
+      case 'w': return IsAsciiWordChar(ch);
+      case 'W': return !IsAsciiWordChar(ch);
     }
-    return IsPunct(pattern_char) && pattern_char == ch;
+    return IsAsciiPunct(pattern_char) && pattern_char == ch;
   }
 
   return (pattern_char == '.' && ch != '\n') || pattern_char == ch;
@@ -350,11 +392,7 @@ bool RE::PartialMatch(const char* str, const RE& re) {
 void RE::Init(const char* regex) {
   pattern_ = full_pattern_ = NULL;
   if (regex != NULL) {
-#if GTEST_OS_WINDOWS
-    pattern_ = _strdup(regex);
-#else
-    pattern_ = strdup(regex);
-#endif
+    pattern_ = posix::StrDup(regex);
   }
 
   is_valid_ = ValidateRegex(regex);
@@ -386,99 +424,148 @@ void RE::Init(const char* regex) {
 
 #endif  // GTEST_USES_POSIX_RE
 
-// Logs a message at the given severity level.
-void GTestLog(GTestLogSeverity severity, const char* file,
-              int line, const char* msg) {
+const char kUnknownFile[] = "unknown file";
+
+// Formats a source file path and a line number as they would appear
+// in an error message from the compiler used to compile this code.
+GTEST_API_ ::std::string FormatFileLocation(const char* file, int line) {
+  const char* const file_name = file == NULL ? kUnknownFile : file;
+
+  if (line < 0) {
+    return String::Format("%s:", file_name).c_str();
+  }
+#ifdef _MSC_VER
+  return String::Format("%s(%d):", file_name, line).c_str();
+#else
+  return String::Format("%s:%d:", file_name, line).c_str();
+#endif  // _MSC_VER
+}
+
+// Formats a file location for compiler-independent XML output.
+// Although this function is not platform dependent, we put it next to
+// FormatFileLocation in order to contrast the two functions.
+// Note that FormatCompilerIndependentFileLocation() does NOT append colon
+// to the file location it produces, unlike FormatFileLocation().
+GTEST_API_ ::std::string FormatCompilerIndependentFileLocation(
+    const char* file, int line) {
+  const char* const file_name = file == NULL ? kUnknownFile : file;
+
+  if (line < 0)
+    return file_name;
+  else
+    return String::Format("%s:%d", file_name, line).c_str();
+}
+
+
+GTestLog::GTestLog(GTestLogSeverity severity, const char* file, int line)
+    : severity_(severity) {
   const char* const marker =
       severity == GTEST_INFO ?    "[  INFO ]" :
       severity == GTEST_WARNING ? "[WARNING]" :
       severity == GTEST_ERROR ?   "[ ERROR ]" : "[ FATAL ]";
-  fprintf(stderr, "\n%s %s:%d: %s\n", marker, file, line, msg);
-  if (severity == GTEST_FATAL) {
-    fflush(NULL);  // abort() is not guaranteed to flush open file streams.
-    abort();
-  }
+  GetStream() << ::std::endl << marker << " "
+              << FormatFileLocation(file, line).c_str() << ": ";
 }
 
-#if GTEST_HAS_STD_STRING
-
+// Flushes the buffers and, if severity is GTEST_FATAL, aborts the program.
+GTestLog::~GTestLog() {
+  GetStream() << ::std::endl;
+  if (severity_ == GTEST_FATAL) {
+    fflush(stderr);
+    posix::Abort();
+  }
+}
 // Disable Microsoft deprecation warnings for POSIX functions called from
 // this class (creat, dup, dup2, and close)
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4996)
+# pragma warning(push)
+# pragma warning(disable: 4996)
 #endif  // _MSC_VER
 
-// Defines the stderr capturer.
+#if GTEST_HAS_STREAM_REDIRECTION
 
-class CapturedStderr {
+// Object that captures an output stream (stdout/stderr).
+class CapturedStream {
  public:
-  // The ctor redirects stderr to a temporary file.
-  CapturedStderr() {
-    uncaptured_fd_ = dup(kStdErrFileno);
+  // The ctor redirects the stream to a temporary file.
+  CapturedStream(int fd) : fd_(fd), uncaptured_fd_(dup(fd)) {
 
-#if GTEST_OS_WINDOWS
+# if GTEST_OS_WINDOWS
     char temp_dir_path[MAX_PATH + 1] = { '\0' };  // NOLINT
     char temp_file_path[MAX_PATH + 1] = { '\0' };  // NOLINT
 
     ::GetTempPathA(sizeof(temp_dir_path), temp_dir_path);
-    ::GetTempFileNameA(temp_dir_path, "gtest_redir", 0, temp_file_path);
+    const UINT success = ::GetTempFileNameA(temp_dir_path,
+                                            "gtest_redir",
+                                            0,  // Generate unique file name.
+                                            temp_file_path);
+    GTEST_CHECK_(success != 0)
+        << "Unable to create a temporary file in " << temp_dir_path;
     const int captured_fd = creat(temp_file_path, _S_IREAD | _S_IWRITE);
+    GTEST_CHECK_(captured_fd != -1) << "Unable to open temporary file "
+                                    << temp_file_path;
     filename_ = temp_file_path;
-#elif GTEST_OS_ANDROID
+// ANDROID
+#elif GTEST_OS_LINUX_ANDROID
     char name_template[] = "/sdcard/captured_stderr.XXXXXX";
     const int captured_fd = mkstemp(name_template);
     filename_ = name_template;
-#else
+// END ANDROID
+# else
     // There's no guarantee that a test has write access to the
     // current directory, so we create the temporary file in the /tmp
     // directory instead.
-    char name_template[] = "/tmp/captured_stderr.XXXXXX";
+    char name_template[] = "/tmp/captured_stream.XXXXXX";
     const int captured_fd = mkstemp(name_template);
     filename_ = name_template;
-#endif  // GTEST_OS_WINDOWS
+# endif  // GTEST_OS_WINDOWS
     fflush(NULL);
-    dup2(captured_fd, kStdErrFileno);
+    dup2(captured_fd, fd_);
     close(captured_fd);
   }
 
-  ~CapturedStderr() {
+  ~CapturedStream() {
     remove(filename_.c_str());
   }
 
-  // Stops redirecting stderr.
-  void StopCapture() {
-    // Restores the original stream.
-    fflush(NULL);
-    dup2(uncaptured_fd_, kStdErrFileno);
-    close(uncaptured_fd_);
-    uncaptured_fd_ = -1;
+  String GetCapturedString() {
+    if (uncaptured_fd_ != -1) {
+      // Restores the original stream.
+      fflush(NULL);
+      dup2(uncaptured_fd_, fd_);
+      close(uncaptured_fd_);
+      uncaptured_fd_ = -1;
+    }
+
+    FILE* const file = posix::FOpen(filename_.c_str(), "r");
+    const String content = ReadEntireFile(file);
+    posix::FClose(file);
+    return content;
   }
 
-  // Returns the name of the temporary file holding the stderr output.
-  // GTEST_HAS_DEATH_TEST implies that we have ::std::string, so we
-  // can use it here.
-  ::std::string filename() const { return filename_; }
-
  private:
+  // Reads the entire content of a file as a String.
+  static String ReadEntireFile(FILE* file);
+
+  // Returns the size (in bytes) of a file.
+  static size_t GetFileSize(FILE* file);
+
+  const int fd_;  // A stream to capture.
   int uncaptured_fd_;
+  // Name of the temporary file holding the stderr output.
   ::std::string filename_;
+
+  GTEST_DISALLOW_COPY_AND_ASSIGN_(CapturedStream);
 };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
-
-static CapturedStderr* g_captured_stderr = NULL;
-
 // Returns the size (in bytes) of a file.
-static size_t GetFileSize(FILE * file) {
+size_t CapturedStream::GetFileSize(FILE* file) {
   fseek(file, 0, SEEK_END);
   return static_cast<size_t>(ftell(file));
 }
 
 // Reads the entire content of a file as a string.
-static ::std::string ReadEntireFile(FILE * file) {
+String CapturedStream::ReadEntireFile(FILE* file) {
   const size_t file_size = GetFileSize(file);
   char* const buffer = new char[file_size];
 
@@ -494,45 +581,55 @@ static ::std::string ReadEntireFile(FILE * file) {
     bytes_read += bytes_last_read;
   } while (bytes_last_read > 0 && bytes_read < file_size);
 
-  const ::std::string content(buffer, buffer+bytes_read);
+  const String content(buffer, bytes_read);
   delete[] buffer;
 
   return content;
 }
 
-// Starts capturing stderr.
-void CaptureStderr() {
-  if (g_captured_stderr != NULL) {
-    GTEST_LOG_(FATAL, "Only one stderr capturer can exist at one time.");
+# ifdef _MSC_VER
+#  pragma warning(pop)
+# endif  // _MSC_VER
+
+static CapturedStream* g_captured_stderr = NULL;
+static CapturedStream* g_captured_stdout = NULL;
+
+// Starts capturing an output stream (stdout/stderr).
+void CaptureStream(int fd, const char* stream_name, CapturedStream** stream) {
+  if (*stream != NULL) {
+    GTEST_LOG_(FATAL) << "Only one " << stream_name
+                      << " capturer can exist at a time.";
   }
-  g_captured_stderr = new CapturedStderr;
+  *stream = new CapturedStream(fd);
 }
 
-// Stops capturing stderr and returns the captured string.
-// GTEST_HAS_DEATH_TEST implies that we have ::std::string, so we can
-// use it here.
-::std::string GetCapturedStderr() {
-  g_captured_stderr->StopCapture();
+// Stops capturing the output stream and returns the captured string.
+String GetCapturedStream(CapturedStream** captured_stream) {
+  const String content = (*captured_stream)->GetCapturedString();
 
-// Disables Microsoft deprecation warning for fopen and fclose.
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif  // _MSC_VER
-  FILE* const file = fopen(g_captured_stderr->filename().c_str(), "r");
-  const ::std::string content = ReadEntireFile(file);
-  fclose(file);
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
-
-  delete g_captured_stderr;
-  g_captured_stderr = NULL;
+  delete *captured_stream;
+  *captured_stream = NULL;
 
   return content;
 }
 
-#endif  // GTEST_HAS_STD_STRING
+// Starts capturing stdout.
+void CaptureStdout() {
+  CaptureStream(kStdOutFileno, "stdout", &g_captured_stdout);
+}
+
+// Starts capturing stderr.
+void CaptureStderr() {
+  CaptureStream(kStdErrFileno, "stderr", &g_captured_stderr);
+}
+
+// Stops capturing stdout and returns the captured string.
+String GetCapturedStdout() { return GetCapturedStream(&g_captured_stdout); }
+
+// Stops capturing stderr and returns the captured string.
+String GetCapturedStderr() { return GetCapturedStream(&g_captured_stderr); }
+
+#endif  // GTEST_HAS_STREAM_REDIRECTION
 
 #if GTEST_HAS_DEATH_TEST
 
@@ -544,12 +641,14 @@ const ::std::vector<String>& GetArgvs() { return g_argvs; }
 
 #endif  // GTEST_HAS_DEATH_TEST
 
-#ifdef _WIN32_WCE
-void abort() {
+#if GTEST_OS_WINDOWS_MOBILE
+namespace posix {
+void Abort() {
   DebugBreak();
   TerminateProcess(GetCurrentProcess(), 1);
 }
-#endif  // _WIN32_WCE
+}  // namespace posix
+#endif  // GTEST_OS_WINDOWS_MOBILE
 
 // Returns the name of the environment variable corresponding to the
 // given flag.  For example, FlagToEnvVar("foo") will return
@@ -559,8 +658,8 @@ static String FlagToEnvVar(const char* flag) {
       (Message() << GTEST_FLAG_PREFIX_ << flag).GetString();
 
   Message env_var;
-  for (int i = 0; i != full_flag.GetLength(); i++) {
-    env_var << static_cast<char>(toupper(full_flag.c_str()[i]));
+  for (size_t i = 0; i != full_flag.length(); i++) {
+    env_var << ToUpper(full_flag.c_str()[i]);
   }
 
   return env_var.GetString();
@@ -613,7 +712,7 @@ bool ParseInt32(const Message& src_text, const char* str, Int32* value) {
 // The value is considered true iff it's not "0".
 bool BoolFromGTestEnv(const char* flag, bool default_value) {
   const String env_var = FlagToEnvVar(flag);
-  const char* const string_value = GetEnv(env_var.c_str());
+  const char* const string_value = posix::GetEnv(env_var.c_str());
   return string_value == NULL ?
       default_value : strcmp(string_value, "0") != 0;
 }
@@ -623,7 +722,7 @@ bool BoolFromGTestEnv(const char* flag, bool default_value) {
 // doesn't represent a valid 32-bit integer, returns default_value.
 Int32 Int32FromGTestEnv(const char* flag, Int32 default_value) {
   const String env_var = FlagToEnvVar(flag);
-  const char* const string_value = GetEnv(env_var.c_str());
+  const char* const string_value = posix::GetEnv(env_var.c_str());
   if (string_value == NULL) {
     // The environment variable is not set.
     return default_value;
@@ -645,7 +744,7 @@ Int32 Int32FromGTestEnv(const char* flag, Int32 default_value) {
 // the given flag; if it's not set, returns default_value.
 const char* StringFromGTestEnv(const char* flag, const char* default_value) {
   const String env_var = FlagToEnvVar(flag);
-  const char* const value = GetEnv(env_var.c_str());
+  const char* const value = posix::GetEnv(env_var.c_str());
   return value == NULL ? default_value : value;
 }
 

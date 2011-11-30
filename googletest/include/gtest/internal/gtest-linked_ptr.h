@@ -71,13 +71,13 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <gtest/internal/gtest-port.h>
+#include "gtest/internal/gtest-port.h"
 
 namespace testing {
 namespace internal {
 
 // Protects copying of all linked_ptr objects.
-extern Mutex g_linked_ptr_mutex;
+GTEST_API_ GTEST_DECLARE_STATIC_MUTEX_(g_linked_ptr_mutex);
 
 // This is used internally by all instances of linked_ptr<>.  It needs to be
 // a non-template class because different types of linked_ptr<> can refer to
@@ -172,15 +172,6 @@ class linked_ptr {
   T* get() const { return value_; }
   T* operator->() const { return value_; }
   T& operator*() const { return *value_; }
-  // Release ownership of the pointed object and returns it.
-  // Sole ownership by this linked_ptr object is required.
-  T* release() {
-    bool last = link_.depart();
-    assert(last);
-    T* v = value_;
-    value_ = NULL;
-    return v;
-  }
 
   bool operator==(T* p) const { return value_ == p; }
   bool operator!=(T* p) const { return value_ != p; }

@@ -31,12 +31,14 @@
 //
 // Unit test for include/gtest/gtest_prod.h.
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "test/production.h"
 
+// ANDROID
 #ifdef ANDROID
 #include "test/production.cc"
 #endif
+// END ANDROID
 
 // Tests that private members can be accessed from a TEST declared as
 // a friend of the class.

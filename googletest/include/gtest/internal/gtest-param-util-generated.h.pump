@@ -45,13 +45,30 @@ $var maxtuple = 10  $$ Maximum number of Combine arguments we want to support.
 #ifndef GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_GENERATED_H_
 #define GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_GENERATED_H_
 
-#include <gtest/internal/gtest-port.h>
+// scripts/fuse_gtest.py depends on gtest's own header being #included
+// *unconditionally*.  Therefore these #includes cannot be moved
+// inside #if GTEST_HAS_PARAM_TEST.
+#include "gtest/internal/gtest-param-util.h"
+#include "gtest/internal/gtest-port.h"
 
 #if GTEST_HAS_PARAM_TEST
 
-#include <gtest/internal/gtest-param-util.h>
-
 namespace testing {
+
+// Forward declarations of ValuesIn(), which is implemented in
+// include/gtest/gtest-param-test.h.
+template <typename ForwardIterator>
+internal::ParamGenerator<
+  typename ::testing::internal::IteratorTraits<ForwardIterator>::value_type>
+ValuesIn(ForwardIterator begin, ForwardIterator end);
+
+template <typename T, size_t N>
+internal::ParamGenerator<T> ValuesIn(const T (&array)[N]);
+
+template <class Container>
+internal::ParamGenerator<typename Container::value_type> ValuesIn(
+    const Container& container);
+
 namespace internal {
 
 // Used in the Values() function to provide polymorphic capabilities.
@@ -64,6 +81,9 @@ class ValueArray1 {
   operator ParamGenerator<T>() const { return ValuesIn(&v1_, &v1_ + 1); }
 
  private:
+  // No implementation - assignment is unsupported.
+  void operator=(const ValueArray1& other);
+
   const T1 v1_;
 };
 
@@ -83,6 +103,9 @@ class ValueArray$i {
   }
 
  private:
+  // No implementation - assignment is unsupported.
+  void operator=(const ValueArray$i& other);
+
 $for j [[
 
   const T$j v$(j)_;
@@ -92,7 +115,7 @@ $for j [[
 
 ]]
 
-#if GTEST_HAS_COMBINE
+# if GTEST_HAS_COMBINE
 // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
 //
 // Generates values from the Cartesian product of values produced
@@ -201,6 +224,9 @@ $for j  || [[
 ]];
     }
 
+    // No implementation - assignment is unsupported.
+    void operator=(const Iterator& other);
+
     const ParamGeneratorInterface<ParamType>* const base_;
     // begin[i]_ and end[i]_ define the i-th range that Iterator traverses.
     // current[i]_ is the actual traversing iterator.
@@ -212,14 +238,17 @@ $for j [[
 ]]
 
     ParamType current_value_;
-  };
+  };  // class CartesianProductGenerator$i::Iterator
+
+  // No implementation - assignment is unsupported.
+  void operator=(const CartesianProductGenerator$i& other);
 
 
 $for j [[
   const ParamGenerator<T$j> g$(j)_;
 
 ]]
-};
+};  // class CartesianProductGenerator$i
 
 
 ]]
@@ -250,16 +279,19 @@ $for j,[[
   }
 
  private:
+  // No implementation - assignment is unsupported.
+  void operator=(const CartesianProductHolder$i& other);
+
 
 $for j [[
   const Generator$j g$(j)_;
 
 ]]
-};
+};  // class CartesianProductHolder$i
 
 ]]
 
-#endif  // GTEST_HAS_COMBINE
+# endif  // GTEST_HAS_COMBINE
 
 }  // namespace internal
 }  // namespace testing

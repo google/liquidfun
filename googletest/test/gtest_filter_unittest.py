@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2005, Google Inc.
-# All rights reserved.
+# Copyright 2005 Google Inc. All Rights Reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -46,11 +45,42 @@ __author__ = 'wan@google.com (Zhanyong Wan)'
 import os
 import re
 import sets
-import tempfile
-import unittest
+import sys
+
 import gtest_test_utils
 
 # Constants.
+
+# Checks if this platform can pass empty environment variables to child
+# processes.  We set an env variable to an empty string and invoke a python
+# script in a subprocess to print whether the variable is STILL in
+# os.environ.  We then use 'eval' to parse the child's output so that an
+# exception is thrown if the input is anything other than 'True' nor 'False'.
+os.environ['EMPTY_VAR'] = ''
+child = gtest_test_utils.Subprocess(
+    [sys.executable, '-c', 'import os; print \'EMPTY_VAR\' in os.environ'])
+CAN_PASS_EMPTY_ENV = eval(child.output)
+
+
+# Check if this platform can unset environment variables in child processes.
+# We set an env variable to a non-empty string, unset it, and invoke
+# a python script in a subprocess to print whether the variable
+# is NO LONGER in os.environ.
+# We use 'eval' to parse the child's output so that an exception
+# is thrown if the input is neither 'True' nor 'False'.
+os.environ['UNSET_VAR'] = 'X'
+del os.environ['UNSET_VAR']
+child = gtest_test_utils.Subprocess(
+    [sys.executable, '-c', 'import os; print \'UNSET_VAR\' not in os.environ'])
+CAN_UNSET_ENV = eval(child.output)
+
+
+# Checks if we should test with an empty filter. This doesn't
+# make sense on platforms that cannot pass empty env variables (Win32)
+# and on platforms that cannot unset variables (since we cannot tell
+# the difference between "" and NULL -- Borland and Solaris < 5.10)
+CAN_TEST_EMPTY_FILTER = (CAN_PASS_EMPTY_ENV and CAN_UNSET_ENV)
+
 
 # The environment variable for specifying the test filters.
 FILTER_ENV_VAR = 'GTEST_FILTER'
@@ -67,8 +97,7 @@ FILTER_FLAG = 'gtest_filter'
 ALSO_RUN_DISABED_TESTS_FLAG = 'gtest_also_run_disabled_tests'
 
 # Command to run the gtest_filter_unittest_ program.
-COMMAND = os.path.join(gtest_test_utils.GetBuildDir(),
-                       'gtest_filter_unittest_')
+COMMAND = gtest_test_utils.GetTestExecutablePath('gtest_filter_unittest_')
 
 # Regex for determining whether parameterized tests are enabled in the binary.
 PARAM_TEST_REGEX = re.compile(r'/ParamTest')
@@ -78,6 +107,14 @@ TEST_CASE_REGEX = re.compile(r'^\[\-+\] \d+ tests? from (\w+(/\w+)?)')
 
 # Regex for parsing test names from Google Test's output.
 TEST_REGEX = re.compile(r'^\[\s*RUN\s*\].*\.(\w+(/\w+)?)')
+
+# The command line flag to tell Google Test to output the list of tests it
+# will run.
+LIST_TESTS_FLAG = '--gtest_list_tests'
+
+# Indicates whether Google Test supports death tests.
+SUPPORTS_DEATH_TESTS = 'HasDeathTest' in gtest_test_utils.Subprocess(
+    [COMMAND, LIST_TESTS_FLAG]).output
 
 # Full names of all tests in gtest_filter_unittests_.
 PARAM_TESTS = [
@@ -100,6 +137,14 @@ DISABLED_TESTS = [
     'DISABLED_FoobarbazTest.TestA',
     ]
 
+if SUPPORTS_DEATH_TESTS:
+  DEATH_TESTS = [
+    'HasDeathTest.Test1',
+    'HasDeathTest.Test2',
+    ]
+else:
+  DEATH_TESTS = []
+
 # All the non-disabled tests.
 ACTIVE_TESTS = [
     'FooTest.Abc',
@@ -112,35 +157,39 @@ ACTIVE_TESTS = [
     'BazTest.TestOne',
     'BazTest.TestA',
     'BazTest.TestB',
-
-    'HasDeathTest.Test1',
-    'HasDeathTest.Test2',
-    ] + PARAM_TESTS
+    ] + DEATH_TESTS + PARAM_TESTS
 
 param_tests_present = None
 
 # Utilities.
+
+environ = os.environ.copy()
 
 
 def SetEnvVar(env_var, value):
   """Sets the env variable to 'value'; unsets it when 'value' is None."""
 
   if value is not None:
-    os.environ[env_var] = value
-  elif env_var in os.environ:
-    del os.environ[env_var]
+    environ[env_var] = value
+  elif env_var in environ:
+    del environ[env_var]
 
 
-def Run(command):
-  """Runs a Google Test program and returns a list of full names of the
-  tests that were run along with the test exit code.
-  """
+def RunAndReturnOutput(args = None):
+  """Runs the test program and returns its output."""
 
-  stdout_file = os.popen(command, 'r')
+  return gtest_test_utils.Subprocess([COMMAND] + (args or []),
+                                     env=environ).output
+
+
+def RunAndExtractTestList(args = None):
+  """Runs the test program and returns its exit code and a list of tests run."""
+
+  p = gtest_test_utils.Subprocess([COMMAND] + (args or []), env=environ)
   tests_run = []
   test_case = ''
   test = ''
-  for line in stdout_file:
+  for line in p.output.split('\n'):
     match = TEST_CASE_REGEX.match(line)
     if match is not None:
       test_case = match.group(1)
@@ -148,41 +197,33 @@ def Run(command):
       match = TEST_REGEX.match(line)
       if match is not None:
         test = match.group(1)
-        tests_run += [test_case + '.' + test]
-  exit_code = stdout_file.close()
-  return (tests_run, exit_code)
+        tests_run.append(test_case + '.' + test)
+  return (tests_run, p.exit_code)
 
 
 def InvokeWithModifiedEnv(extra_env, function, *args, **kwargs):
   """Runs the given function and arguments in a modified environment."""
   try:
-    original_env = os.environ.copy()
-    os.environ.update(extra_env)
+    original_env = environ.copy()
+    environ.update(extra_env)
     return function(*args, **kwargs)
   finally:
-    for key in extra_env.iterkeys():
-      if key in original_env:
-        os.environ[key] = original_env[key]
-      else:
-        del os.environ[key]
+    environ.clear()
+    environ.update(original_env)
 
 
 def RunWithSharding(total_shards, shard_index, command):
-  """Runs the Google Test program shard and returns a list of full names of the
-  tests that were run along with the exit code.
-  """
+  """Runs a test program shard and returns exit code and a list of tests run."""
 
   extra_env = {SHARD_INDEX_ENV_VAR: str(shard_index),
                TOTAL_SHARDS_ENV_VAR: str(total_shards)}
-  return InvokeWithModifiedEnv(extra_env, Run, command)
+  return InvokeWithModifiedEnv(extra_env, RunAndExtractTestList, command)
 
 # The unit test.
 
 
-class GTestFilterUnitTest(unittest.TestCase):
-  """Tests using the GTEST_FILTER environment variable or the
-  --gtest_filter flag to filter tests.
-  """
+class GTestFilterUnitTest(gtest_test_utils.TestCase):
+  """Tests the env variable or the command line flag to filter tests."""
 
   # Utilities.
 
@@ -204,72 +245,115 @@ class GTestFilterUnitTest(unittest.TestCase):
     self.assertEqual(len(set_var), len(full_partition))
     self.assertEqual(sets.Set(set_var), sets.Set(full_partition))
 
-  def RunAndVerify(self, gtest_filter, tests_to_run):
-    """Runs gtest_flag_unittest_ with the given filter, and verifies
-    that the right set of tests were run.
-    """
-    # Adjust tests_to_run in case value parameterized tests are disabled
-    # in the binary.
+  def AdjustForParameterizedTests(self, tests_to_run):
+    """Adjust tests_to_run in case value parameterized tests are disabled."""
+
     global param_tests_present
     if not param_tests_present:
-      tests_to_run = list(sets.Set(tests_to_run) - sets.Set(PARAM_TESTS))
+      return list(sets.Set(tests_to_run) - sets.Set(PARAM_TESTS))
+    else:
+      return tests_to_run
 
-    # First, tests using GTEST_FILTER.
+  def RunAndVerify(self, gtest_filter, tests_to_run):
+    """Checks that the binary runs correct set of tests for a given filter."""
 
-    SetEnvVar(FILTER_ENV_VAR, gtest_filter)
-    tests_run = Run(COMMAND)[0]
-    SetEnvVar(FILTER_ENV_VAR, None)
+    tests_to_run = self.AdjustForParameterizedTests(tests_to_run)
 
-    self.AssertSetEqual(tests_run, tests_to_run)
+    # First, tests using the environment variable.
 
-    # Next, tests using --gtest_filter.
+    # Windows removes empty variables from the environment when passing it
+    # to a new process.  This means it is impossible to pass an empty filter
+    # into a process using the environment variable.  However, we can still
+    # test the case when the variable is not supplied (i.e., gtest_filter is
+    # None).
+    # pylint: disable-msg=C6403
+    if CAN_TEST_EMPTY_FILTER or gtest_filter != '':
+      SetEnvVar(FILTER_ENV_VAR, gtest_filter)
+      tests_run = RunAndExtractTestList()[0]
+      SetEnvVar(FILTER_ENV_VAR, None)
+      self.AssertSetEqual(tests_run, tests_to_run)
+    # pylint: enable-msg=C6403
+
+    # Next, tests using the command line flag.
 
     if gtest_filter is None:
-      command = COMMAND
+      args = []
     else:
-      command = '%s --%s=%s' % (COMMAND, FILTER_FLAG, gtest_filter)
+      args = ['--%s=%s' % (FILTER_FLAG, gtest_filter)]
 
-    tests_run = Run(command)[0]
+    tests_run = RunAndExtractTestList(args)[0]
     self.AssertSetEqual(tests_run, tests_to_run)
 
   def RunAndVerifyWithSharding(self, gtest_filter, total_shards, tests_to_run,
-                               command=COMMAND, check_exit_0=False):
-    """Runs all shards of gtest_flag_unittest_ with the given filter, and
+                               args=None, check_exit_0=False):
+    """Checks that binary runs correct tests for the given filter and shard.
+
+    Runs all shards of gtest_filter_unittest_ with the given filter, and
     verifies that the right set of tests were run. The union of tests run
     on each shard should be identical to tests_to_run, without duplicates.
-    If check_exit_0, make sure that all shards returned 0.
-    """
-    SetEnvVar(FILTER_ENV_VAR, gtest_filter)
-    partition = []
-    for i in range(0, total_shards):
-      (tests_run, exit_code) = RunWithSharding(total_shards, i, command)
-      if check_exit_0:
-        self.assert_(exit_code is None)
-      partition.append(tests_run)
 
-    self.AssertPartitionIsValid(tests_to_run, partition)
-    SetEnvVar(FILTER_ENV_VAR, None)
+    Args:
+      gtest_filter: A filter to apply to the tests.
+      total_shards: A total number of shards to split test run into.
+      tests_to_run: A set of tests expected to run.
+      args   :      Arguments to pass to the to the test binary.
+      check_exit_0: When set to a true value, make sure that all shards
+                    return 0.
+    """
+
+    tests_to_run = self.AdjustForParameterizedTests(tests_to_run)
+
+    # Windows removes empty variables from the environment when passing it
+    # to a new process.  This means it is impossible to pass an empty filter
+    # into a process using the environment variable.  However, we can still
+    # test the case when the variable is not supplied (i.e., gtest_filter is
+    # None).
+    # pylint: disable-msg=C6403
+    if CAN_TEST_EMPTY_FILTER or gtest_filter != '':
+      SetEnvVar(FILTER_ENV_VAR, gtest_filter)
+      partition = []
+      for i in range(0, total_shards):
+        (tests_run, exit_code) = RunWithSharding(total_shards, i, args)
+        if check_exit_0:
+          self.assertEqual(0, exit_code)
+        partition.append(tests_run)
+
+      self.AssertPartitionIsValid(tests_to_run, partition)
+      SetEnvVar(FILTER_ENV_VAR, None)
+    # pylint: enable-msg=C6403
 
   def RunAndVerifyAllowingDisabled(self, gtest_filter, tests_to_run):
-    """Runs gtest_flag_unittest_ with the given filter, and enables
-    disabled tests. Verifies that the right set of tests were run.
-    """
-    # Construct the command line.
-    command = '%s --%s' % (COMMAND, ALSO_RUN_DISABED_TESTS_FLAG)
-    if gtest_filter is not None:
-      command = '%s --%s=%s' % (command, FILTER_FLAG, gtest_filter)
+    """Checks that the binary runs correct set of tests for the given filter.
 
-    tests_run = Run(command)[0]
+    Runs gtest_filter_unittest_ with the given filter, and enables
+    disabled tests. Verifies that the right set of tests were run.
+
+    Args:
+      gtest_filter: A filter to apply to the tests.
+      tests_to_run: A set of tests expected to run.
+    """
+
+    tests_to_run = self.AdjustForParameterizedTests(tests_to_run)
+
+    # Construct the command line.
+    args = ['--%s' % ALSO_RUN_DISABED_TESTS_FLAG]
+    if gtest_filter is not None:
+      args.append('--%s=%s' % (FILTER_FLAG, gtest_filter))
+
+    tests_run = RunAndExtractTestList(args)[0]
     self.AssertSetEqual(tests_run, tests_to_run)
 
   def setUp(self):
-    """Sets up test case. Determines whether value-parameterized tests are
-    enabled in the binary and sets flags accordingly.
+    """Sets up test case.
+
+    Determines whether value-parameterized tests are enabled in the binary and
+    sets the flags accordingly.
     """
+
     global param_tests_present
     if param_tests_present is None:
       param_tests_present = PARAM_TEST_REGEX.search(
-          '\n'.join(os.popen(COMMAND, 'r').readlines())) is not None
+          RunAndReturnOutput()) is not None
 
   def testDefaultBehavior(self):
     """Tests the behavior of not specifying the filter."""
@@ -277,9 +361,8 @@ class GTestFilterUnitTest(unittest.TestCase):
     self.RunAndVerify(None, ACTIVE_TESTS)
 
   def testDefaultBehaviorWithShards(self):
-    """Tests the behavior of not specifying the filter, with sharding
-    enabled.
-    """
+    """Tests the behavior without the filter, with sharding enabled."""
+
     self.RunAndVerifyWithSharding(None, 1, ACTIVE_TESTS)
     self.RunAndVerifyWithSharding(None, 2, ACTIVE_TESTS)
     self.RunAndVerifyWithSharding(None, len(ACTIVE_TESTS) - 1, ACTIVE_TESTS)
@@ -365,10 +448,7 @@ class GTestFilterUnitTest(unittest.TestCase):
 
         'BazTest.TestOne',
         'BazTest.TestA',
-        'BazTest.TestB',
-
-        'HasDeathTest.Test1',
-        'HasDeathTest.Test2', ] + PARAM_TESTS)
+        'BazTest.TestB', ] + DEATH_TESTS + PARAM_TESTS)
 
   def testWildcardInTestName(self):
     """Tests using wildcard in the test name."""
@@ -429,7 +509,7 @@ class GTestFilterUnitTest(unittest.TestCase):
         ])
 
   def testNegativeFilters(self):
-    self.RunAndVerify('*-HasDeathTest.Test1', [
+    self.RunAndVerify('*-BazTest.TestOne', [
         'FooTest.Abc',
         'FooTest.Xyz',
 
@@ -437,24 +517,17 @@ class GTestFilterUnitTest(unittest.TestCase):
         'BarTest.TestTwo',
         'BarTest.TestThree',
 
-        'BazTest.TestOne',
         'BazTest.TestA',
         'BazTest.TestB',
+        ] + DEATH_TESTS + PARAM_TESTS)
 
-        'HasDeathTest.Test2',
-        ] + PARAM_TESTS)
-
-    self.RunAndVerify('*-FooTest.Abc:HasDeathTest.*', [
+    self.RunAndVerify('*-FooTest.Abc:BazTest.*', [
         'FooTest.Xyz',
 
         'BarTest.TestOne',
         'BarTest.TestTwo',
         'BarTest.TestThree',
-
-        'BazTest.TestOne',
-        'BazTest.TestA',
-        'BazTest.TestB',
-        ] + PARAM_TESTS)
+        ] + DEATH_TESTS + PARAM_TESTS)
 
     self.RunAndVerify('BarTest.*-BarTest.TestOne', [
         'BarTest.TestTwo',
@@ -462,15 +535,11 @@ class GTestFilterUnitTest(unittest.TestCase):
         ])
 
     # Tests without leading '*'.
-    self.RunAndVerify('-FooTest.Abc:FooTest.Xyz:HasDeathTest.*', [
+    self.RunAndVerify('-FooTest.Abc:FooTest.Xyz:BazTest.*', [
         'BarTest.TestOne',
         'BarTest.TestTwo',
         'BarTest.TestThree',
-
-        'BazTest.TestOne',
-        'BazTest.TestA',
-        'BazTest.TestB',
-        ] + PARAM_TESTS)
+        ] + DEATH_TESTS + PARAM_TESTS)
 
     # Value parameterized tests.
     self.RunAndVerify('*/*', PARAM_TESTS)
@@ -492,13 +561,11 @@ class GTestFilterUnitTest(unittest.TestCase):
         ])
 
   def testFlagOverridesEnvVar(self):
-    """Tests that the --gtest_filter flag overrides the GTEST_FILTER
-    environment variable.
-    """
+    """Tests that the filter flag overrides the filtering env. variable."""
 
     SetEnvVar(FILTER_ENV_VAR, 'Foo*')
-    command = '%s --%s=%s' % (COMMAND, FILTER_FLAG, '*One')
-    tests_run = Run(command)[0]
+    args = ['--%s=%s' % (FILTER_FLAG, '*One')]
+    tests_run = RunAndExtractTestList(args)[0]
     SetEnvVar(FILTER_ENV_VAR, None)
 
     self.AssertSetEqual(tests_run, ['BarTest.TestOne', 'BazTest.TestOne'])
@@ -506,57 +573,61 @@ class GTestFilterUnitTest(unittest.TestCase):
   def testShardStatusFileIsCreated(self):
     """Tests that the shard file is created if specified in the environment."""
 
-    test_tmpdir = tempfile.mkdtemp()
-    shard_status_file = os.path.join(test_tmpdir, 'shard_status_file')
+    shard_status_file = os.path.join(gtest_test_utils.GetTempDir(),
+                                     'shard_status_file')
     self.assert_(not os.path.exists(shard_status_file))
 
     extra_env = {SHARD_STATUS_FILE_ENV_VAR: shard_status_file}
-    stdout_file = InvokeWithModifiedEnv(extra_env, os.popen, COMMAND, 'r')
     try:
-      stdout_file.readlines()
+      InvokeWithModifiedEnv(extra_env, RunAndReturnOutput)
     finally:
-      stdout_file.close()
       self.assert_(os.path.exists(shard_status_file))
       os.remove(shard_status_file)
-      os.removedirs(test_tmpdir)
 
   def testShardStatusFileIsCreatedWithListTests(self):
-    """Tests that the shard file is created with --gtest_list_tests."""
+    """Tests that the shard file is created with the "list_tests" flag."""
 
-    test_tmpdir = tempfile.mkdtemp()
-    shard_status_file = os.path.join(test_tmpdir, 'shard_status_file2')
+    shard_status_file = os.path.join(gtest_test_utils.GetTempDir(),
+                                     'shard_status_file2')
     self.assert_(not os.path.exists(shard_status_file))
 
     extra_env = {SHARD_STATUS_FILE_ENV_VAR: shard_status_file}
-    stdout_file = InvokeWithModifiedEnv(extra_env, os.popen,
-                                        '%s --gtest_list_tests' % COMMAND, 'r')
     try:
-      stdout_file.readlines()
+      output = InvokeWithModifiedEnv(extra_env,
+                                     RunAndReturnOutput,
+                                     [LIST_TESTS_FLAG])
     finally:
-      stdout_file.close()
+      # This assertion ensures that Google Test enumerated the tests as
+      # opposed to running them.
+      self.assert_('[==========]' not in output,
+                   'Unexpected output during test enumeration.\n'
+                   'Please ensure that LIST_TESTS_FLAG is assigned the\n'
+                   'correct flag value for listing Google Test tests.')
+
       self.assert_(os.path.exists(shard_status_file))
       os.remove(shard_status_file)
-      os.removedirs(test_tmpdir)
 
-  def testShardingWorksWithDeathTests(self):
-    """Tests integration with death tests and sharding."""
-    gtest_filter = 'HasDeathTest.*:SeqP/*'
-    expected_tests = [
-        'HasDeathTest.Test1',
-        'HasDeathTest.Test2',
+  if SUPPORTS_DEATH_TESTS:
+    def testShardingWorksWithDeathTests(self):
+      """Tests integration with death tests and sharding."""
 
-        'SeqP/ParamTest.TestX/0',
-        'SeqP/ParamTest.TestX/1',
-        'SeqP/ParamTest.TestY/0',
-        'SeqP/ParamTest.TestY/1',
-        ]
+      gtest_filter = 'HasDeathTest.*:SeqP/*'
+      expected_tests = [
+          'HasDeathTest.Test1',
+          'HasDeathTest.Test2',
 
-    for command in (COMMAND + ' --gtest_death_test_style=threadsafe',
-                    COMMAND + ' --gtest_death_test_style=fast'):
-      self.RunAndVerifyWithSharding(gtest_filter, 3, expected_tests,
-                                    check_exit_0=True, command=command)
-      self.RunAndVerifyWithSharding(gtest_filter, 5, expected_tests,
-                                    check_exit_0=True, command=command)
+          'SeqP/ParamTest.TestX/0',
+          'SeqP/ParamTest.TestX/1',
+          'SeqP/ParamTest.TestY/0',
+          'SeqP/ParamTest.TestY/1',
+          ]
+
+      for flag in ['--gtest_death_test_style=threadsafe',
+                   '--gtest_death_test_style=fast']:
+        self.RunAndVerifyWithSharding(gtest_filter, 3, expected_tests,
+                                      check_exit_0=True, args=[flag])
+        self.RunAndVerifyWithSharding(gtest_filter, 5, expected_tests,
+                                      check_exit_0=True, args=[flag])
 
 if __name__ == '__main__':
   gtest_test_utils.Main()

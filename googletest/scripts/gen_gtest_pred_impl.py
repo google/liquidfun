@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#!/usr/bin/env python
 #
 # Copyright 2006, Google Inc.
 # All rights reserved.
@@ -238,21 +238,19 @@ AssertionResult AssertPred%(n)sHelper(const char* pred_text""" % DEFS
   impl += """) {
   if (pred(%(vs)s)) return AssertionSuccess();
 
-  Message msg;
 """ % DEFS
 
-  impl += '  msg << pred_text << "("'
+  impl += '  return AssertionFailure() << pred_text << "("'
 
   impl += Iter(n, """
-      << e%s""", sep=' << ", "')
+                            << e%s""", sep=' << ", "')
 
   impl += ' << ") evaluates to false, where"'
 
   impl += Iter(n, """
-      << "\\n" << e%s << " evaluates to " << v%s""")
+                            << "\\n" << e%s << " evaluates to " << v%s""")
 
   impl += """;
-  return AssertionFailure(msg);
 }
 
 // Internal macro for implementing {EXPECT|ASSERT}_PRED_FORMAT%(n)s.
@@ -386,8 +384,8 @@ def UnitTestPreamble():
 
 #include <iostream>
 
-#include <gtest/gtest.h>
-#include <gtest/gtest-spi.h>
+#include "gtest/gtest.h"
+#include "gtest/gtest-spi.h"
 
 // A user-defined data type.
 struct Bool {
@@ -478,15 +476,14 @@ testing::AssertionResult PredFormatFunction%(n)s(""" % DEFS
   if (PredFunction%(n)s(%(vs)s))
     return testing::AssertionSuccess();
 
-  testing::Message msg;
-  msg << """ % DEFS
+  return testing::AssertionFailure()
+      << """ % DEFS
 
   tests += Iter(n, 'e%s', sep=' << " + " << ')
 
   tests += """
       << " is expected to be positive, but evaluates to "
       << %(v_sum)s << ".";
-  return testing::AssertionFailure(msg);
 }
 """ % DEFS
 
