@@ -149,3 +149,7 @@ EXPORTS
 	__glutInitWithExit
 	__glutCreateWindowWithExit
 	__glutCreateMenuWithExit
+	glutMultiButtonFunc
+	glutMultiEntryFunc
+	glutMultiMotionFunc
+	glutMultiPassiveFunc
