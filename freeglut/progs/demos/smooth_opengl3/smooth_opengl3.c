@@ -53,7 +53,8 @@ void checkError(const char *functionName)
 {
    GLenum error;
    while (( error = glGetError() ) != GL_NO_ERROR) {
-      fprintf (stderr, "GL error 0x%X detected in %s\n", error, functionName);
+      const GLubyte* sError = gluErrorString(error);
+      fprintf (stderr, "GL error 0x%X, %s, detected in %s\n", error, sError, functionName);
    }
 }
 
