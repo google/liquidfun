@@ -211,27 +211,27 @@ static int fghNetWMSupported(void)
 /*  Check if "hint" is present in "property" for "window". */
 int fgHintPresent(Window window, Atom property, Atom hint)
 {
-  Atom ** atoms_ptr;
+  Atom *atoms;
   int number_of_atoms;
   int supported;
   int i;
 
   supported = 0;
 
-  atoms_ptr = malloc(sizeof(Atom *));
   number_of_atoms = fghGetWindowProperty(window,
 					 property,
 					 XA_ATOM,
-					 (unsigned char **) atoms_ptr);
+					 (unsigned char **) &atoms);
   for (i = 0; i < number_of_atoms; i++)
-    {
-      if ((*atoms_ptr)[i] == hint)
+  {
+      if (atoms[i] == hint)
       {
           supported = 1;
           break;
       }
-    }
+  }
 
+  XFree(atoms);
   return supported;
 }
 
