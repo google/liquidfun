@@ -36,7 +36,12 @@
 void FGAPIENTRY glutPostRedisplay( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPostRedisplay" );
-    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPostRedisplay" );
+    if ( ! fgStructure.CurrentWindow )
+	{
+      fgError ( " ERROR:  Function <%s> called"
+                " with no current window defined.", "glutPostRedisplay" ) ;
+	}
+
     fgStructure.CurrentWindow->State.Redisplay = GL_TRUE;
 }
 
