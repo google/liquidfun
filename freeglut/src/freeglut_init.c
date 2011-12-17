@@ -390,7 +390,12 @@ static void fghInitialize( const char* displayName )
 #endif
 
     fgState.Initialised = GL_TRUE;
+
+    /* Avoid registering atexit callback on Win32 as it results in an access
+     * violation due to calling into a module which has been unloaded. */
+#ifndef TARGET_HOST_MS_WINDOWS
     atexit(fgDeinitialize);
+#endif
 
     /* InputDevice uses GlutTimerFunc(), so fgState.Initialised must be TRUE */
     fgInitialiseInputDevices();
