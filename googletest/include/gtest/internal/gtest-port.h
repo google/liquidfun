@@ -400,6 +400,15 @@
 #   define GTEST_HAS_RTTI 0
 #  endif
 
+# elif defined(__clang__)
+
+// Android does not support RTTI
+#if GTEST_OS_LINUX_ANDROID
+#define GTEST_HAS_RTTI 0
+#else
+#define GTEST_HAS_RTTI 1
+#endif //ANDROID
+
 # else
 
 // For all other compilers, we assume RTTI is enabled.
@@ -546,7 +555,7 @@
 // pops up a dialog window that cannot be suppressed programmatically.
 #if (GTEST_OS_LINUX || GTEST_OS_MAC || GTEST_OS_CYGWIN || GTEST_OS_SOLARIS || \
      (GTEST_OS_WINDOWS_DESKTOP && _MSC_VER >= 1400) || \
-     GTEST_OS_WINDOWS_MINGW || GTEST_OS_AIX || GTEST_OS_HPUX)
+     GTEST_OS_WINDOWS_MINGW || GTEST_OS_AIX || GTEST_OS_HPUX || GTEST_OS_LINUX_ANDROID)
 # define GTEST_HAS_DEATH_TEST 1
 # include <vector>  // NOLINT
 #endif
