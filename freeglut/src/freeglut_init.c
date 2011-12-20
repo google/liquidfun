@@ -393,7 +393,7 @@ static void fghInitialize( const char* displayName )
 
     /* Avoid registering atexit callback on Win32 as it results in an access
      * violation due to calling into a module which has been unloaded. */
-#ifndef TARGET_HOST_MS_WINDOWS
+#if ( TARGET_HOST_MS_WINDOWS == 0 )
     atexit(fgDeinitialize);
 #endif
 
