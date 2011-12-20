@@ -413,6 +413,11 @@ void fgDeinitialize( void )
         return;
     }
 
+	/* If we're in game mode, we want to leave game mode */
+    if( fgStructure.GameModeWindow ) {
+        glutLeaveGameMode();
+    }
+
     /* If there was a menu created, destroy the rendering context */
     if( fgStructure.MenuContext )
     {
