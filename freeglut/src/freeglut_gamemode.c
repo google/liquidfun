@@ -106,10 +106,6 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
             break;  /* no matching resolution */
 
 #if ( RANDR_MAJOR >= 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
-        if(rate <= 0) {
-            fgState.GameModeRefresh = XRRConfigCurrentRate(xrr_config);
-        }
-
         if(use_rate) {
             rate = fgState.GameModeRefresh;
 
