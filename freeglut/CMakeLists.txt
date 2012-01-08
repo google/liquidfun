@@ -29,11 +29,11 @@ SET(FREEGLUT_SRCS
 	src/freeglut_xinput.c
 )
 
-IF(WIN32)
-	LIST(APPEND FREEGLUT_SRCS src/freeglut_windows.c)
-ELSE()
-	LIST(APPEND FREEGLUT_SRCS src/freeglut_x11.c)
-ENDIF()
+#IF(WIN32)
+#	LIST(APPEND FREEGLUT_SRCS src/freeglut_windows.c)
+#ELSE()
+#	LIST(APPEND FREEGLUT_SRCS src/freeglut_x11.c)
+#ENDIF()
 
 # Neatly organize all of the output files in the build directory
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
@@ -100,11 +100,11 @@ MACRO(ADD_DEMO name)
 ENDMACRO()
 
 ADD_DEMO(CallbackMaker   progs/demos/CallbackMaker/CallbackMaker.c)
-ADD_DEMO(Fractals        progs/demos/Fractals/Fractals.c)
-ADD_DEMO(Fractals_random progs/demos/Fractals_random/Fractals_random.c)
-ADD_DEMO(Lorenz          progs/demos/Lorenz/Lorenz.c)
-ADD_DEMO(One             progs/demos/One/One.c)
-ADD_DEMO(Resizer         progs/demos/Resizer/Resizer.c)
+ADD_DEMO(Fractals        progs/demos/Fractals/fractals.c)
+ADD_DEMO(Fractals_random progs/demos/Fractals_random/fractals_random.c)
+ADD_DEMO(Lorenz          progs/demos/Lorenz/lorenz.c)
+ADD_DEMO(One             progs/demos/One/one.c)
+ADD_DEMO(Resizer         progs/demos/Resizer/Resizer.cpp)
 ADD_DEMO(shapes          progs/demos/shapes/shapes.c)
 ADD_DEMO(smooth_opengl3  progs/demos/smooth_opengl3/smooth_opengl3.c)
 ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c)
