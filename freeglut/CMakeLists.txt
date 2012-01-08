@@ -107,7 +107,9 @@ ADD_DEMO(One             progs/demos/One/one.c)
 ADD_DEMO(Resizer         progs/demos/Resizer/Resizer.cpp)
 ADD_DEMO(shapes          progs/demos/shapes/shapes.c)
 ADD_DEMO(smooth_opengl3  progs/demos/smooth_opengl3/smooth_opengl3.c)
-ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c)
+ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c
+                         progs/demos/spaceball/vmath.c
+                         progs/demos/spaceball/vmath.h)
 ADD_DEMO(subwin          progs/demos/subwin/subwin.c)
 
 
