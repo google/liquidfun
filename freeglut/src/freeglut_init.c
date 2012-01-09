@@ -392,7 +392,10 @@ static void fghInitialize( const char* displayName )
     fgState.Initialised = GL_TRUE;
 
     /* Avoid registering atexit callback on Win32 as it results in an access
-     * violation due to calling into a module which has been unloaded. */
+     * violation due to calling into a module which has been unloaded.
+     * Any cleanup isn't needed on Windows anyway, the OS takes care of it.c
+     * see: http://blogs.msdn.com/b/oldnewthing/archive/2012/01/05/10253268.aspx
+     */
 #if ( TARGET_HOST_MS_WINDOWS == 0 )
     atexit(fgDeinitialize);
 #endif
