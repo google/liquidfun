@@ -93,10 +93,15 @@ INSTALL(TARGETS freeglut DESTINATION lib)
 INSTALL(DIRECTORY "${CMAKE_SOURCE_DIR}/include/GL" DESTINATION include
 		FILES_MATCHING PATTERN "*.h")
 
+# Optionally build demos, on by default.
+option( FREEGLUT_BUILD_DEMOS "Build FreeGLUT demos." ON )
+
 MACRO(ADD_DEMO name)
-	ADD_EXECUTABLE(${name} ${ARGN})
-	TARGET_LINK_LIBRARIES(${name} freeglut)
-	INSTALL(TARGETS ${name} DESTINATION bin)
+	if( FREEGLUT_BUILD_DEMOS )
+		ADD_EXECUTABLE(${name} ${ARGN})
+		TARGET_LINK_LIBRARIES(${name} freeglut)
+		INSTALL(TARGETS ${name} DESTINATION bin)
+	endif()
 ENDMACRO()
 
 ADD_DEMO(CallbackMaker   progs/demos/CallbackMaker/CallbackMaker.c)
