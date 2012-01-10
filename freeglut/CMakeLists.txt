@@ -1,7 +1,14 @@
 PROJECT(freeglut)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+SET(FREEGLUT_HEADERS
+	include/GL/freeglut.h
+	include/GL/freeglut_ext.h
+	include/GL/freeglut_std.h
+	include/GL/glut.h
+)
 SET(FREEGLUT_SRCS
+	${FREEGLUT_HEADERS}
 	src/freeglut_callbacks.c
 	src/freeglut_cursor.c
 	src/freeglut_display.c
@@ -90,8 +97,7 @@ IF(NOT BUILD_SHARED_LIBS)
 ENDIF()
 
 INSTALL(TARGETS freeglut DESTINATION lib)
-INSTALL(DIRECTORY "${CMAKE_SOURCE_DIR}/include/GL" DESTINATION include
-		FILES_MATCHING PATTERN "*.h")
+INSTALL(FILES ${FREEGLUT_HEADERS} DESTINATION include/GL)
 
 # Optionally build demos, on by default.
 option( FREEGLUT_BUILD_DEMOS "Build FreeGLUT demos." ON )
