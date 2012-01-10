@@ -12,10 +12,10 @@
   </general>
   <kdevautoproject>
     <general>
-      <activetarget>src/freeglut</activetarget>
+      <activetarget>src/Common/freeglut</activetarget>
     </general>
     <run>
-      <mainprogram>src/freeglut</mainprogram>
+      <mainprogram>src/Common/freeglut</mainprogram>
     </run>
     <make>
       <envvars>

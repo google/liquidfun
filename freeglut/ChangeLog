@@ -1,3 +1,10 @@
+2012-01-09  John F. Fay <johnffay@cybertron.com>
+	* Released freeglut 2.8.0 a few days ago and am restarting the ChangeLog
+	* Added 'cmake' support
+	* Moved source files from 'src' directory to 'src/Common' directory with
+	an eye to moving platform-specific code to separate files in separate
+	directories
+ 
 2009-08-10  Sven Panne  <sven.panne@aedion.de>
 
 	* include/GL/freeglut_ext.h,include/GL/freeglut_std.h,src/freeglut_ext.c,

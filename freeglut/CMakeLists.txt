@@ -9,37 +9,37 @@ SET(FREEGLUT_HEADERS
 )
 SET(FREEGLUT_SRCS
 	${FREEGLUT_HEADERS}
-	src/freeglut_callbacks.c
-	src/freeglut_cursor.c
-	src/freeglut_display.c
-	src/freeglut_ext.c
-	src/freeglut_font.c
-	src/freeglut_font_data.c
-	src/freeglut_gamemode.c
-	src/freeglut_geometry.c
-	src/freeglut_glutfont_definitions.c
-	src/freeglut_init.c
-	src/freeglut_input_devices.c
-	src/freeglut_joystick.c
-	src/freeglut_main.c
-	src/freeglut_menu.c
-	src/freeglut_misc.c
-	src/freeglut_overlay.c
-	src/freeglut_spaceball.c
-	src/freeglut_state.c
-	src/freeglut_stroke_mono_roman.c
-	src/freeglut_stroke_roman.c
-	src/freeglut_structure.c
-	src/freeglut_teapot.c
-	src/freeglut_videoresize.c
-	src/freeglut_window.c
-	src/freeglut_xinput.c
+	src/Common/freeglut_callbacks.c
+	src/Common/freeglut_cursor.c
+	src/Common/freeglut_display.c
+	src/Common/freeglut_ext.c
+	src/Common/freeglut_font.c
+	src/Common/freeglut_font_data.c
+	src/Common/freeglut_gamemode.c
+	src/Common/freeglut_geometry.c
+	src/Common/freeglut_glutfont_definitions.c
+	src/Common/freeglut_init.c
+	src/Common/freeglut_input_devices.c
+	src/Common/freeglut_joystick.c
+	src/Common/freeglut_main.c
+	src/Common/freeglut_menu.c
+	src/Common/freeglut_misc.c
+	src/Common/freeglut_overlay.c
+	src/Common/freeglut_spaceball.c
+	src/Common/freeglut_state.c
+	src/Common/freeglut_stroke_mono_roman.c
+	src/Common/freeglut_stroke_roman.c
+	src/Common/freeglut_structure.c
+	src/Common/freeglut_teapot.c
+	src/Common/freeglut_videoresize.c
+	src/Common/freeglut_window.c
+	src/Common/freeglut_xinput.c
 )
 
 #IF(WIN32)
-#	LIST(APPEND FREEGLUT_SRCS src/freeglut_windows.c)
+#	LIST(APPEND FREEGLUT_SRCS src/Windows/freeglut_cursor_windows.c)
 #ELSE()
-#	LIST(APPEND FREEGLUT_SRCS src/freeglut_x11.c)
+#	LIST(APPEND FREEGLUT_SRCS src/X11/freeglut_cursor_x11.c)
 #ENDIF()
 
 # Neatly organize all of the output files in the build directory
@@ -82,7 +82,7 @@ ADD_DEFINITIONS(-DHAVE_CONFIG_H)
 
 IF(BUILD_SHARED_LIBS)
 	IF(WIN32)
-		LIST(APPEND FREEGLUT_SRCS src/freeglutdll.def freeglut.rc)
+		LIST(APPEND FREEGLUT_SRCS src/Common/freeglutdll.def freeglut.rc)
 	ENDIF()
 	ADD_DEFINITIONS(-DFREEGLUT_EXPORTS)
 ELSE()

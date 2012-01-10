@@ -22,7 +22,7 @@ DEBUG_STATIC_DIR = debug-static
 DEBUG_DYNAMIC_DIR = debug-dynamic
 
 INCLUDE_DIR = ..\include
-SRC_DIR = ..\src
+SRC_DIR = ..\src\Common
 COMPILER = wcc386
 COMPILE_COMMON_OPTIONS = -i$(INCLUDE_DIR);$(%WATCOM)\h;$(%WATCOM)\h\nt -fp6 -w4 -e25 -wcd202 -bt=nt -mf -zq
 COMPILE_DEBUG_OPTIONS = -d3 -od -DDEBUG -D_DEBUG

@@ -15,81 +15,81 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\freeglut_callbacks.c">
+    <ClCompile Include="..\..\src\Common\freeglut_callbacks.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_cursor.c">
+    <ClCompile Include="..\..\src\Common\freeglut_cursor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_display.c">
+    <ClCompile Include="..\..\src\Common\freeglut_display.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_ext.c">
+    <ClCompile Include="..\..\src\Common\freeglut_ext.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_font.c">
+    <ClCompile Include="..\..\src\Common\freeglut_font.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_font_data.c">
+    <ClCompile Include="..\..\src\Common\freeglut_font_data.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_gamemode.c">
+    <ClCompile Include="..\..\src\Common\freeglut_gamemode.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_geometry.c">
+    <ClCompile Include="..\..\src\Common\freeglut_geometry.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_glutfont_definitions.c">
+    <ClCompile Include="..\..\src\Common\freeglut_glutfont_definitions.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_init.c">
+    <ClCompile Include="..\..\src\Common\freeglut_init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_input_devices.c">
+    <ClCompile Include="..\..\src\Common\freeglut_input_devices.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_joystick.c">
+    <ClCompile Include="..\..\src\Common\freeglut_joystick.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_main.c">
+    <ClCompile Include="..\..\src\Common\freeglut_main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_menu.c">
+    <ClCompile Include="..\..\src\Common\freeglut_menu.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_misc.c">
+    <ClCompile Include="..\..\src\Common\freeglut_misc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_overlay.c">
+    <ClCompile Include="..\..\src\Common\freeglut_overlay.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_spaceball.c">
+    <ClCompile Include="..\..\src\Common\freeglut_spaceball.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_state.c">
+    <ClCompile Include="..\..\src\Common\freeglut_state.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_stroke_mono_roman.c">
+    <ClCompile Include="..\..\src\Common\freeglut_stroke_mono_roman.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_stroke_roman.c">
+    <ClCompile Include="..\..\src\Common\freeglut_stroke_roman.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_structure.c">
+    <ClCompile Include="..\..\src\Common\freeglut_structure.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_teapot.c">
+    <ClCompile Include="..\..\src\Common\freeglut_teapot.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_videoresize.c">
+    <ClCompile Include="..\..\src\Common\freeglut_videoresize.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\freeglut_window.c">
+    <ClCompile Include="..\..\src\Common\freeglut_window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\freeglutdll.def">
+    <None Include="..\..\src\Common\freeglutdll.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
@@ -100,13 +100,13 @@
     <ClInclude Include="..\..\include\GL\freeglut_ext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\freeglut_internal.h">
+    <ClInclude Include="..\..\src\Common\freeglut_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\GL\freeglut_std.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\freeglut_teapot_data.h">
+    <ClInclude Include="..\..\src\Common\freeglut_teapot_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\GL\glut.h">

@@ -69,7 +69,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="2"
-				ModuleDefinitionFile="..\..\src\freeglutdll.def"
+				ModuleDefinitionFile="..\..\src\Common\freeglutdll.def"
 				GenerateDebugInformation="true"
 				RandomizedBaseAddress="1"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
@@ -361,7 +361,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
-				ModuleDefinitionFile="..\..\src\freeglutdll.def"
+				ModuleDefinitionFile="..\..\src\Common\freeglutdll.def"
 				RandomizedBaseAddress="1"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
@@ -610,103 +610,103 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\src\freeglut_callbacks.c"
+				RelativePath="..\..\src\Common\freeglut_callbacks.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_cursor.c"
+				RelativePath="..\..\src\Common\freeglut_cursor.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_display.c"
+				RelativePath="..\..\src\Common\freeglut_display.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_ext.c"
+				RelativePath="..\..\src\Common\freeglut_ext.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_font.c"
+				RelativePath="..\..\src\Common\freeglut_font.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_font_data.c"
+				RelativePath="..\..\src\Common\freeglut_font_data.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_gamemode.c"
+				RelativePath="..\..\src\Common\freeglut_gamemode.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_geometry.c"
+				RelativePath="..\..\src\Common\freeglut_geometry.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_glutfont_definitions.c"
+				RelativePath="..\..\src\Common\freeglut_glutfont_definitions.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_init.c"
+				RelativePath="..\..\src\Common\freeglut_init.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_input_devices.c"
+				RelativePath="..\..\src\Common\freeglut_input_devices.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_joystick.c"
+				RelativePath="..\..\src\Common\freeglut_joystick.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_main.c"
+				RelativePath="..\..\src\Common\freeglut_main.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_menu.c"
+				RelativePath="..\..\src\Common\freeglut_menu.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_misc.c"
+				RelativePath="..\..\src\Common\freeglut_misc.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_overlay.c"
+				RelativePath="..\..\src\Common\freeglut_overlay.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_spaceball.c"
+				RelativePath="..\..\src\Common\freeglut_spaceball.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_state.c"
+				RelativePath="..\..\src\Common\freeglut_state.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_stroke_mono_roman.c"
+				RelativePath="..\..\src\Common\freeglut_stroke_mono_roman.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_stroke_roman.c"
+				RelativePath="..\..\src\Common\freeglut_stroke_roman.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_structure.c"
+				RelativePath="..\..\src\Common\freeglut_structure.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_teapot.c"
+				RelativePath="..\..\src\Common\freeglut_teapot.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_videoresize.c"
+				RelativePath="..\..\src\Common\freeglut_videoresize.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_window.c"
+				RelativePath="..\..\src\Common\freeglut_window.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglutdll.def"
+				RelativePath="..\..\src\Common\freeglutdll.def"
 				>
 			</File>
 		</Filter>
@@ -723,7 +723,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_internal.h"
+				RelativePath="..\..\src\Common\freeglut_internal.h"
 				>
 			</File>
 			<File
@@ -731,7 +731,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\freeglut_teapot_data.h"
+				RelativePath="..\..\src\Common\freeglut_teapot_data.h"
 				>
 			</File>
 			<File

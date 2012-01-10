@@ -67,7 +67,7 @@ Compilation
     * Here Makefile which will make the deal:
 
 #Makefile for Freeglut 2.6.0-rc and Cygwin
-#To place in the directory “src”
+#To place in the directory “src/Common”
 
 sources=$ (wildcard *.c)
 objs=$ (sources: .c=.o)

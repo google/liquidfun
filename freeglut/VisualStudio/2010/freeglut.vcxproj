@@ -161,7 +161,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>..\..\src\freeglutdll.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\..\src\Common\freeglutdll.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -251,7 +251,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>..\..\src\freeglutdll.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\..\src\Common\freeglutdll.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -321,40 +321,40 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\freeglut_callbacks.c" />
-    <ClCompile Include="..\..\src\freeglut_cursor.c" />
-    <ClCompile Include="..\..\src\freeglut_display.c" />
-    <ClCompile Include="..\..\src\freeglut_ext.c" />
-    <ClCompile Include="..\..\src\freeglut_font.c" />
-    <ClCompile Include="..\..\src\freeglut_font_data.c" />
-    <ClCompile Include="..\..\src\freeglut_gamemode.c" />
-    <ClCompile Include="..\..\src\freeglut_geometry.c" />
-    <ClCompile Include="..\..\src\freeglut_glutfont_definitions.c" />
-    <ClCompile Include="..\..\src\freeglut_init.c" />
-    <ClCompile Include="..\..\src\freeglut_input_devices.c" />
-    <ClCompile Include="..\..\src\freeglut_joystick.c" />
-    <ClCompile Include="..\..\src\freeglut_main.c" />
-    <ClCompile Include="..\..\src\freeglut_menu.c" />
-    <ClCompile Include="..\..\src\freeglut_misc.c" />
-    <ClCompile Include="..\..\src\freeglut_overlay.c" />
-    <ClCompile Include="..\..\src\freeglut_spaceball.c" />
-    <ClCompile Include="..\..\src\freeglut_state.c" />
-    <ClCompile Include="..\..\src\freeglut_stroke_mono_roman.c" />
-    <ClCompile Include="..\..\src\freeglut_stroke_roman.c" />
-    <ClCompile Include="..\..\src\freeglut_structure.c" />
-    <ClCompile Include="..\..\src\freeglut_teapot.c" />
-    <ClCompile Include="..\..\src\freeglut_videoresize.c" />
-    <ClCompile Include="..\..\src\freeglut_window.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_callbacks.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_cursor.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_display.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_ext.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_font.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_font_data.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_gamemode.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_geometry.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_glutfont_definitions.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_init.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_input_devices.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_joystick.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_main.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_menu.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_misc.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_overlay.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_spaceball.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_state.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_stroke_mono_roman.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_stroke_roman.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_structure.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_teapot.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_videoresize.c" />
+    <ClCompile Include="..\..\src\Common\freeglut_window.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\freeglutdll.def" />
+    <None Include="..\..\src\Common\freeglutdll.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\GL\freeglut.h" />
     <ClInclude Include="..\..\include\GL\freeglut_ext.h" />
-    <ClInclude Include="..\..\src\freeglut_internal.h" />
+    <ClInclude Include="..\..\src\Common\freeglut_internal.h" />
     <ClInclude Include="..\..\include\GL\freeglut_std.h" />
-    <ClInclude Include="..\..\src\freeglut_teapot_data.h" />
+    <ClInclude Include="..\..\src\Common\freeglut_teapot_data.h" />
     <ClInclude Include="..\..\include\GL\glut.h" />
   </ItemGroup>
   <ItemGroup>

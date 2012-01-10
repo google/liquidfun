@@ -69,7 +69,7 @@ Compilation
     * Voici un Makefile qui fera l'affaire:
 
 #Makefile pour Freeglut 2.6.0-rc et Cygwin
-#A placer dans le répertoire "src"
+#A placer dans le répertoire "src/Common"
 
 sources=$(wildcard *.c)
 objs=$(sources:.c=.o)

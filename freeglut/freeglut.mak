@@ -323,7 +323,7 @@ LINK32_OBJS= \
 
 
 !IF "$(CFG)" == "freeglut - Win32 Release" || "$(CFG)" == "freeglut - Win32 Debug"
-SOURCE=.\src\freeglut_callbacks.c
+SOURCE=.\src\Common\freeglut_callbacks.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -341,7 +341,7 @@ SOURCE=.\src\freeglut_callbacks.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_cursor.c
+SOURCE=.\src\Common\freeglut_cursor.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -359,7 +359,7 @@ SOURCE=.\src\freeglut_cursor.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_display.c
+SOURCE=.\src\Common\freeglut_display.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -377,7 +377,7 @@ SOURCE=.\src\freeglut_display.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_ext.c
+SOURCE=.\src\Common\freeglut_ext.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -395,7 +395,7 @@ SOURCE=.\src\freeglut_ext.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_font.c
+SOURCE=.\src\Common\freeglut_font.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -413,7 +413,7 @@ SOURCE=.\src\freeglut_font.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_font_data.c
+SOURCE=.\src\Common\freeglut_font_data.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -431,7 +431,7 @@ SOURCE=.\src\freeglut_font_data.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_gamemode.c
+SOURCE=.\src\Common\freeglut_gamemode.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -449,7 +449,7 @@ SOURCE=.\src\freeglut_gamemode.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_geometry.c
+SOURCE=.\src\Common\freeglut_geometry.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -467,7 +467,7 @@ SOURCE=.\src\freeglut_geometry.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_glutfont_definitions.c
+SOURCE=.\src\Common\freeglut_glutfont_definitions.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -485,7 +485,7 @@ SOURCE=.\src\freeglut_glutfont_definitions.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_init.c
+SOURCE=.\src\Common\freeglut_init.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -503,7 +503,7 @@ SOURCE=.\src\freeglut_init.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_input_devices.c
+SOURCE=.\src\Common\freeglut_input_devices.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -521,7 +521,7 @@ SOURCE=.\src\freeglut_input_devices.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_joystick.c
+SOURCE=.\src\Common\freeglut_joystick.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -539,7 +539,7 @@ SOURCE=.\src\freeglut_joystick.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_main.c
+SOURCE=.\src\Common\freeglut_main.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -557,7 +557,7 @@ SOURCE=.\src\freeglut_main.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_menu.c
+SOURCE=.\src\Common\freeglut_menu.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -575,7 +575,7 @@ SOURCE=.\src\freeglut_menu.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_misc.c
+SOURCE=.\src\Common\freeglut_misc.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -593,7 +593,7 @@ SOURCE=.\src\freeglut_misc.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_overlay.c
+SOURCE=.\src\Common\freeglut_overlay.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -611,7 +611,7 @@ SOURCE=.\src\freeglut_overlay.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_state.c
+SOURCE=.\src\Common\freeglut_state.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -629,7 +629,7 @@ SOURCE=.\src\freeglut_state.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_stroke_mono_roman.c
+SOURCE=.\src\Common\freeglut_stroke_mono_roman.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -647,7 +647,7 @@ SOURCE=.\src\freeglut_stroke_mono_roman.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_stroke_roman.c
+SOURCE=.\src\Common\freeglut_stroke_roman.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -665,7 +665,7 @@ SOURCE=.\src\freeglut_stroke_roman.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_structure.c
+SOURCE=.\src\Common\freeglut_structure.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -683,7 +683,7 @@ SOURCE=.\src\freeglut_structure.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_teapot.c
+SOURCE=.\src\Common\freeglut_teapot.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -701,7 +701,7 @@ SOURCE=.\src\freeglut_teapot.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_videoresize.c
+SOURCE=.\src\Common\freeglut_videoresize.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 
@@ -719,7 +719,7 @@ SOURCE=.\src\freeglut_videoresize.c
 
 !ENDIF 
 
-SOURCE=.\src\freeglut_window.c
+SOURCE=.\src\Common\freeglut_window.c
 
 !IF  "$(CFG)" == "freeglut - Win32 Release"
 

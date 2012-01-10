@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = src include progs doc
+SUBDIRS = src Common include progs doc
 AUTOMAKE_OPTIONS = gnu
 
 EXTRA_DIST = \

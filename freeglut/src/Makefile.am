@@ -15,31 +15,31 @@ EXTRA_DIST = freeglutdll.def
 #
 # Those source files build the freeglut library
 #
-lib@LIBRARY@_la_SOURCES = freeglut_callbacks.c \
-			 freeglut_cursor.c \
-			 freeglut_display.c \
-			 freeglut_ext.c \
-			 freeglut_font.c \
-			 freeglut_glutfont_definitions.c \
-			 freeglut_font_data.c \
-			 freeglut_stroke_roman.c \
-			 freeglut_stroke_mono_roman.c \
-			 freeglut_gamemode.c \
-			 freeglut_geometry.c \
-			 freeglut_init.c \
-			 freeglut_input_devices.c \
-			 freeglut_spaceball.c \
-			 freeglut_joystick.c \
-			 freeglut_main.c \
-			 freeglut_menu.c \
-			 freeglut_misc.c \
-			 freeglut_overlay.c \
-			 freeglut_state.c \
-			 freeglut_structure.c \
-			 freeglut_teapot.c \
-			 freeglut_videoresize.c \
-			 freeglut_window.c \
-			 freeglut_xinput.c
+lib@LIBRARY@_la_SOURCES = Common/freeglut_callbacks.c \
+			 Common/freeglut_cursor.c \
+			 Common/freeglut_display.c \
+			 Common/freeglut_ext.c \
+			 Common/freeglut_font.c \
+			 Common/freeglut_glutfont_definitions.c \
+			 Common/freeglut_font_data.c \
+			 Common/freeglut_stroke_roman.c \
+			 Common/freeglut_stroke_mono_roman.c \
+			 Common/freeglut_gamemode.c \
+			 Common/freeglut_geometry.c \
+			 Common/freeglut_init.c \
+			 Common/freeglut_input_devices.c \
+			 Common/freeglut_spaceball.c \
+			 Common/freeglut_joystick.c \
+			 Common/freeglut_main.c \
+			 Common/freeglut_menu.c \
+			 Common/freeglut_misc.c \
+			 Common/freeglut_overlay.c \
+			 Common/freeglut_state.c \
+			 Common/freeglut_structure.c \
+			 Common/freeglut_teapot.c \
+			 Common/freeglut_videoresize.c \
+			 Common/freeglut_window.c \
+			 Common/freeglut_xinput.c
 
 #
 # Additional linker flags
