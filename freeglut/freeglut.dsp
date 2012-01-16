@@ -89,6 +89,62 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Group "mswin"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_cursor_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_display_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_ext_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_gamemode_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_init_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_input_devices_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_joystick_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_main_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_menu_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_spaceball_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_state_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_structure_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_window_mswin.c
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\src\Common\freeglut_callbacks.c

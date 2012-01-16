@@ -83,6 +83,67 @@ LIB32=link.exe -lib
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Group "mswin"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_cursor_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_display_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_ext_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_gamemode_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_init_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_input_devices_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_joystick_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_main_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_menu_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_spaceball_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_state_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_structure_mswin.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_window_mswin.c
+# End Source File
+# End Group
+# End Group
+# Begin Source File
+
+SOURCE=.\include\GL\freeglut.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\src\Common\freeglut_callbacks.c
@@ -98,6 +159,10 @@ SOURCE=.\src\Common\freeglut_display.c
 # Begin Source File
 
 SOURCE=.\src\Common\freeglut_ext.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\GL\freeglut_ext.h
 # End Source File
 # Begin Source File
 
@@ -129,6 +194,10 @@ SOURCE=.\src\Common\freeglut_input_devices.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\Common\freeglut_internal.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Common\freeglut_joystick.c
 # End Source File
 # Begin Source File
@@ -157,6 +226,10 @@ SOURCE=.\src\Common\freeglut_state.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\GL\freeglut_std.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Common\freeglut_stroke_mono_roman.c
 # End Source File
 # Begin Source File
@@ -173,40 +246,23 @@ SOURCE=.\src\Common\freeglut_teapot.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\Common\freeglut_teapot_data.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Common\freeglut_videoresize.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\Common\freeglut_window.c
 # End Source File
-# End Group
-# Begin Group "Header Files"
-
-# PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE=.\include\GL\freeglut.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\GL\freeglut_ext.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\Common\freeglut_internal.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\GL\freeglut_std.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\Common\freeglut_teapot_data.h
-# End Source File
 # Begin Source File
 
 SOURCE=.\include\GL\glut.h
 # End Source File
-# End Group
 # End Target
+# Begin Group "Header Files"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# End Group
 # End Project
