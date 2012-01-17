@@ -19,6 +19,7 @@ SET(FREEGLUT_SRCS
 	src/Common/freeglut_geometry.c
 	src/Common/freeglut_glutfont_definitions.c
 	src/Common/freeglut_init.c
+	src/Common/freeglut_internal.h
 	src/Common/freeglut_input_devices.c
 	src/Common/freeglut_joystick.c
 	src/Common/freeglut_main.c
@@ -36,18 +37,51 @@ SET(FREEGLUT_SRCS
 	src/Common/freeglut_xinput.c
 )
 
-#IF(WIN32)
-#	LIST(APPEND FREEGLUT_SRCS src/Windows/freeglut_cursor_windows.c)
-#ELSE()
-#	LIST(APPEND FREEGLUT_SRCS src/X11/freeglut_cursor_x11.c)
-#ENDIF()
+IF(WIN32)
+	LIST(APPEND FREEGLUT_SRCS
+		src/mswin/freeglut_cursor_mswin.c
+		src/mswin/freeglut_display_mswin.c
+		src/mswin/freeglut_ext_mswin.c
+		src/mswin/freeglut_gamemode_mswin.c
+		src/mswin/freeglut_init_mswin.c
+		src/mswin/freeglut_internal_mswin.h
+		src/mswin/freeglut_input_devices_mswin.c
+		src/mswin/freeglut_joystick_mswin.c
+		src/mswin/freeglut_main_mswin.c
+		src/mswin/freeglut_menu_mswin.c
+		src/mswin/freeglut_spaceball_mswin.c
+		src/mswin/freeglut_state_mswin.c
+		src/mswin/freeglut_structure_mswin.c
+		src/mswin/freeglut_window_mswin.c
+)
+ELSE()
+	LIST(APPEND FREEGLUT_SRCS
+		src/x11/freeglut_cursor_x11.c
+		src/x11/freeglut_display_x11.c
+		src/x11/freeglut_ext_x11.c
+		src/x11/freeglut_gamemode_x11.c
+		src/x11/freeglut_glutfont_definitions_x11.c
+		src/x11/freeglut_init_x11.c
+		src/x11/freeglut_internal_x11.h
+		src/x11/freeglut_input_devices_x11.c
+		src/x11/freeglut_joystick_x11.c
+		src/x11/freeglut_main_x11.c
+		src/x11/freeglut_menu_x11.c
+		src/x11/freeglut_spaceball_x11.c
+		src/x11/freeglut_state_x11.c
+		src/x11/freeglut_structure_x11.c
+		src/x11/freeglut_window_x11.c
+)
+
+
+ENDIF()
 
 # Neatly organize all of the output files in the build directory
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 # BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
-# re-delcare it here so it will show up in the GUI.
+# re-declare it here so it will show up in the GUI.
 OPTION(BUILD_SHARED_LIBS "Build FreeGLUT as a shared library." ON)
 
 FIND_PACKAGE(OpenGL REQUIRED)
