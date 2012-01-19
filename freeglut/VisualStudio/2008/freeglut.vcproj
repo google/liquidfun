@@ -609,6 +609,62 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
+            <Filter
+                Name="mswin"
+                >
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_cursor_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_display_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_ext_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_gamemode_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_init_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_input_devices_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_joystick_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_main_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_menu_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_spaceball_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_state_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_structure_mswin.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\mswin\freeglut_window_mswin.c"
+                    >
+                </File>
+            </Filter>
 			<File
 				RelativePath="..\..\src\Common\freeglut_callbacks.c"
 				>
@@ -724,6 +780,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Common\freeglut_internal.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\mswin\freeglut_internal_mswin.h"
 				>
 			</File>
 			<File

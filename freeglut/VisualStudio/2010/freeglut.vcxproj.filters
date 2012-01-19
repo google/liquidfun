@@ -13,6 +13,9 @@
       <UniqueIdentifier>{6d047688-5630-43f9-885d-d6aa0aba3773}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="Source Files\mswin">
+      <UniqueIdentifier>{0c3de8b2-619b-4004-b9f4-3b1133120b3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Common\freeglut_callbacks.c">
@@ -87,6 +90,45 @@
     <ClCompile Include="..\..\src\Common\freeglut_window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_cursor_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_display_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_ext_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_gamemode_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_init_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_input_devices_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_joystick_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_main_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_menu_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_spaceball_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_state_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_structure_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mswin\freeglut_window_mswin.c">
+      <Filter>Source Files\mswin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\Common\freeglutdll.def">
@@ -110,6 +152,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\GL\glut.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mswin\freeglut_internal_mswin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
