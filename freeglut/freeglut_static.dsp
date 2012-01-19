@@ -139,6 +139,10 @@ SOURCE=.\src\mswin\freeglut_structure_mswin.c
 SOURCE=.\src\mswin\freeglut_window_mswin.c
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\src\mswin\freeglut_internal_mswin.h
+# End Source File
 # End Group
 # Begin Source File
 

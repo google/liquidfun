@@ -259,6 +259,10 @@ SOURCE=.\src\Common\freeglut_internal.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\mswin\freeglut_internal_mswin.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\GL\freeglut_std.h
 # End Source File
 # Begin Source File
