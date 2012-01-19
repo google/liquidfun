@@ -39,6 +39,9 @@
 
 /* -- PRIVATE FUNCTIONS --------------------------------------------------- */
 
+extern void fghSetCursor ( SFG_Window *window, int cursorID );
+extern void fghWarpPointer ( int x, int y );
+
 #if TARGET_HOST_POSIX_X11 || TARGET_HOST_MAC_OSX || TARGET_HOST_SOLARIS
   #include <X11/cursorfont.h>
 
@@ -158,91 +161,6 @@ static void fghWarpPointer ( int x, int y )
     );
     /* Make the warp visible immediately. */
     XFlush( fgDisplay.Display );
-}
-#endif
-
-
-#if TARGET_HOST_MS_WINDOWS
-static void fghSetCursor ( SFG_Window *window, int cursorID )
-{
-    /*
-     * Joe Krahn is re-writing the following code.
-     */
-    /* Set the cursor AND change it for this window class. */
-#if !defined(__MINGW64__) && _MSC_VER <= 1200
-#       define MAP_CURSOR(a,b)                                   \
-        case a:                                                  \
-            SetCursor( LoadCursor( NULL, b ) );                  \
-            SetClassLong( window->Window.Handle,                 \
-                          GCL_HCURSOR,                           \
-                          ( LONG )LoadCursor( NULL, b ) );       \
-        break;
-    /* Nuke the cursor AND change it for this window class. */
-#       define ZAP_CURSOR(a,b)                                   \
-        case a:                                                  \
-            SetCursor( NULL );                                   \
-            SetClassLong( window->Window.Handle,                 \
-                          GCL_HCURSOR, ( LONG )NULL );           \
-        break;
-#else
-#       define MAP_CURSOR(a,b)                                   \
-        case a:                                                  \
-            SetCursor( LoadCursor( NULL, b ) );                  \
-            SetClassLongPtr( window->Window.Handle,              \
-                          GCLP_HCURSOR,                          \
-                          ( LONG )( LONG_PTR )LoadCursor( NULL, b ) );       \
-        break;
-    /* Nuke the cursor AND change it for this window class. */
-#       define ZAP_CURSOR(a,b)                                   \
-        case a:                                                  \
-            SetCursor( NULL );                                   \
-            SetClassLongPtr( window->Window.Handle,              \
-                          GCLP_HCURSOR, ( LONG )( LONG_PTR )NULL );          \
-        break;
-#endif
-
-    switch( cursorID )
-    {
-        MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW,         IDC_ARROW     );
-        MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,          IDC_ARROW     );
-        MAP_CURSOR( GLUT_CURSOR_INFO,                IDC_HELP      );
-        MAP_CURSOR( GLUT_CURSOR_DESTROY,             IDC_CROSS     );
-        MAP_CURSOR( GLUT_CURSOR_HELP,                IDC_HELP      );
-        MAP_CURSOR( GLUT_CURSOR_CYCLE,               IDC_SIZEALL   );
-        MAP_CURSOR( GLUT_CURSOR_SPRAY,               IDC_CROSS     );
-        MAP_CURSOR( GLUT_CURSOR_WAIT,                IDC_WAIT      );
-        MAP_CURSOR( GLUT_CURSOR_TEXT,                IDC_IBEAM     );
-        MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,           IDC_CROSS     );
-        MAP_CURSOR( GLUT_CURSOR_UP_DOWN,             IDC_SIZENS    );
-        MAP_CURSOR( GLUT_CURSOR_LEFT_RIGHT,          IDC_SIZEWE    );
-        MAP_CURSOR( GLUT_CURSOR_TOP_SIDE,            IDC_ARROW     ); /* XXX ToDo */
-        MAP_CURSOR( GLUT_CURSOR_BOTTOM_SIDE,         IDC_ARROW     ); /* XXX ToDo */
-        MAP_CURSOR( GLUT_CURSOR_LEFT_SIDE,           IDC_ARROW     ); /* XXX ToDo */
-        MAP_CURSOR( GLUT_CURSOR_RIGHT_SIDE,          IDC_ARROW     ); /* XXX ToDo */
-        MAP_CURSOR( GLUT_CURSOR_TOP_LEFT_CORNER,     IDC_SIZENWSE  );
-        MAP_CURSOR( GLUT_CURSOR_TOP_RIGHT_CORNER,    IDC_SIZENESW  );
-        MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, IDC_SIZENWSE  );
-        MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER,  IDC_SIZENESW  );
-        MAP_CURSOR( GLUT_CURSOR_INHERIT,             IDC_ARROW     ); /* XXX ToDo */
-        ZAP_CURSOR( GLUT_CURSOR_NONE,                NULL          );
-        MAP_CURSOR( GLUT_CURSOR_FULL_CROSSHAIR,      IDC_CROSS     ); /* XXX ToDo */
-
-    default:
-        fgError( "Unknown cursor type: %d", cursorID );
-        break;
-    }
-}
-
-
-static void fghWarpPointer ( int x, int y )
-{
-    POINT coords;
-    coords.x = x;
-    coords.y = y;
-
-    /* ClientToScreen() translates {coords} for us. */
-    ClientToScreen( fgStructure.CurrentWindow->Window.Handle, &coords );
-    SetCursorPos( coords.x, coords.y );
 }
 #endif
 
