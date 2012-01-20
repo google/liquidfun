@@ -39,6 +39,10 @@
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
+extern void fghRememberState( void );
+extern void fghRestoreState( void );
+extern GLboolean fghChangeDisplayMode( GLboolean haveToTest );
+
 
 #if TARGET_HOST_POSIX_X11
 static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
@@ -154,13 +158,13 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
 }
 #endif  /* TARGET_HOST_POSIX_X11 */
 
+#if TARGET_HOST_POSIX_X11
 /*
  * Remembers the current visual settings, so that
  * we can change them and restore later...
  */
 static void fghRememberState( void )
 {
-#if TARGET_HOST_POSIX_X11
     int event_base, error_base;
 
     /*
@@ -237,31 +241,15 @@ static void fghRememberState( void )
         fgWarning( "XF86VidModeGetModeLine failed" );
 #   endif
 
-#elif TARGET_HOST_MS_WINDOWS
-
-/*    DEVMODE devMode; */
-
-    /* Grab the current desktop settings... */
-
-/* hack to get around my stupid cross-gcc headers */
-#define FREEGLUT_ENUM_CURRENT_SETTINGS -1
-
-    EnumDisplaySettings( fgDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS,
-                         &fgDisplay.DisplayMode );
-
-    /* Make sure we will be restoring all settings needed */
-    fgDisplay.DisplayMode.dmFields |=
-        DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
-
-#endif
 }
+#endif
 
+#if TARGET_HOST_POSIX_X11
 /*
  * Restores the previously remembered visual settings
  */
 static void fghRestoreState( void )
 {
-#if TARGET_HOST_POSIX_X11
     /* Restore the remembered pointer position: */
     XWarpPointer(
         fgDisplay.Display, None, fgDisplay.RootWindow, 0, 0, 0, 0,
@@ -352,13 +340,8 @@ static void fghRestoreState( void )
 
 #   endif
 
-#elif TARGET_HOST_MS_WINDOWS
-
-    /* Restore the previously remembered desktop display settings */
-    ChangeDisplaySettingsEx( fgDisplay.DisplayName,&fgDisplay.DisplayMode, 0,0,0 );
-
-#endif
 }
+#endif
 
 #if TARGET_HOST_POSIX_X11
 #ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
@@ -410,14 +393,14 @@ static int fghCheckDisplayModes( GLboolean exactMatch, int displayModesCount, XF
 #endif
 #endif
 
+#if TARGET_HOST_POSIX_X11
+
 /*
  * Changes the current display mode to match user's settings
  */
 static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 {
     GLboolean success = GL_FALSE;
-#if TARGET_HOST_POSIX_X11
-
     /* first try to use XRandR, then fallback to XF86VidMode */
 #   ifdef HAVE_X11_EXTENSIONS_XRANDR_H
     if(xrandr_resize(fgState.GameModeSize.X, fgState.GameModeSize.Y,
@@ -512,88 +495,10 @@ static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
 
 #   endif
 
-
-#elif TARGET_HOST_MS_WINDOWS
-
-    DEVMODE  devMode;
-    char *fggmstr = NULL;
-    char displayMode[300];
-
-    success = GL_FALSE;
-
-    EnumDisplaySettings( fgDisplay.DisplayName, -1, &devMode ); 
-    devMode.dmFields = 0;
-
-    if (fgState.GameModeSize.X!=-1)
-    {
-        devMode.dmPelsWidth  = fgState.GameModeSize.X;
-        devMode.dmFields |= DM_PELSWIDTH;
-    }
-    if (fgState.GameModeSize.Y!=-1)
-    {
-        devMode.dmPelsHeight  = fgState.GameModeSize.Y;
-        devMode.dmFields |= DM_PELSHEIGHT;
-    }
-    if (fgState.GameModeDepth!=-1)
-    {
-        devMode.dmBitsPerPel  = fgState.GameModeDepth;
-        devMode.dmFields |= DM_BITSPERPEL;
-    }
-    if (fgState.GameModeRefresh!=-1)
-    {
-        devMode.dmDisplayFrequency  = fgState.GameModeRefresh;
-        devMode.dmFields |= DM_DISPLAYFREQUENCY;
-    }
-
-    switch ( ChangeDisplaySettingsEx(fgDisplay.DisplayName, &devMode, NULL, haveToTest ? CDS_TEST : CDS_FULLSCREEN , NULL) )
-    {
-    case DISP_CHANGE_SUCCESSFUL:
-        success = GL_TRUE;
-
-        if (!haveToTest)
-        {
-            /* update vars in case if windows switched to proper mode */
-            EnumDisplaySettings( fgDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS, &devMode );
-            fgState.GameModeSize.X  = devMode.dmPelsWidth;        
-            fgState.GameModeSize.Y  = devMode.dmPelsHeight;
-            fgState.GameModeDepth   = devMode.dmBitsPerPel;
-            fgState.GameModeRefresh = devMode.dmDisplayFrequency;
-        }
-		break;
-    case DISP_CHANGE_RESTART:
-        fggmstr = "The computer must be restarted for the graphics mode to work.";
-        break;
-    case DISP_CHANGE_BADFLAGS:
-        fggmstr = "An invalid set of flags was passed in.";
-        break;
-    case DISP_CHANGE_BADPARAM:
-        fggmstr = "An invalid parameter was passed in. This can include an invalid flag or combination of flags.";
-        break;
-    case DISP_CHANGE_FAILED:
-        fggmstr = "The display driver failed the specified graphics mode.";
-        break;
-    case DISP_CHANGE_BADMODE:
-        fggmstr = "The graphics mode is not supported.";
-        break;
-    default:
-        fggmstr = "Unknown error in graphics mode???"; /* dunno if it is possible,MSDN does not mention any other error */
-        break;
-    }
-
-    if ( !success )
-    {
-        /* I'd rather get info whats going on in my program than wonder about */
-        /* magic happenings behind my back, its lib for devels at last ;) */
-        
-        /* append display mode to error to make things more informative */
-        sprintf(displayMode,"%s Problem with requested mode: %ix%i:%i@%i", fggmstr, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmBitsPerPel, devMode.dmDisplayFrequency);
-        fgWarning(displayMode);
-    }
-#endif
-
     return success;
 }
 
+#endif
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
