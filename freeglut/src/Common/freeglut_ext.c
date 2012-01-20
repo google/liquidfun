@@ -30,6 +30,7 @@
 #include "freeglut_internal.h"
 
 extern SFG_Proc fghGetProcAddress( const char *procName );
+extern GLUTproc fghGetPlatformSpecificGLUTProcAddress( const char *procName );
 
 static GLUTproc fghGetGLUTProcAddress( const char* procName )
 {
@@ -111,9 +112,6 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutWindowStatusFunc);
     CHECK_NAME(glutKeyboardUpFunc);
     CHECK_NAME(glutSpecialUpFunc);
-#if !defined(_WIN32_WCE)
-    CHECK_NAME(glutJoystickFunc);
-#endif /* !defined(_WIN32_WCE) */
     CHECK_NAME(glutSetColor);
     CHECK_NAME(glutGetColor);
     CHECK_NAME(glutCopyColormap);
@@ -154,13 +152,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutReportErrors);
     CHECK_NAME(glutIgnoreKeyRepeat);
     CHECK_NAME(glutSetKeyRepeat);
-#if !defined(_WIN32_WCE)
-    CHECK_NAME(glutForceJoystickFunc);
-    CHECK_NAME(glutGameModeString);
-    CHECK_NAME(glutEnterGameMode);
-    CHECK_NAME(glutLeaveGameMode);
-    CHECK_NAME(glutGameModeGet);
-#endif /* !defined(_WIN32_WCE) */
+
     /* freeglut extensions */
     CHECK_NAME(glutMainLoopEvent);
     CHECK_NAME(glutLeaveMainLoop);
@@ -212,6 +204,25 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
 
 
 #if TARGET_HOST_POSIX_X11
+static GLUTproc fghGetGLUTProcAddress( const char* procName )
+{
+    /* optimization: quick initial check */
+    if( strncmp( procName, "glut", 4 ) != 0 )
+        return NULL;
+
+#define CHECK_NAME(x) if( strcmp( procName, #x ) == 0) return (GLUTproc)x;
+    CHECK_NAME(glutJoystickFunc);
+    CHECK_NAME(glutForceJoystickFunc);
+    CHECK_NAME(glutGameModeString);
+    CHECK_NAME(glutEnterGameMode);
+    CHECK_NAME(glutLeaveGameMode);
+    CHECK_NAME(glutGameModeGet);
+#undef CHECK_NAME
+
+    return NULL;
+}
+
+
 SFG_Proc fghGetProcAddress( const char *procName )
 {
 #if defined( GLX_ARB_get_proc_address )
@@ -231,5 +242,10 @@ glutGetProcAddress( const char *procName )
 
     /* Try GLUT functions first, then core GL functions */
     p = fghGetGLUTProcAddress( procName );
+
+	/* Some GLUT functions are platform-specific: */
+	if ( !p )
+      p = fghGetPlatformSpecificGLUTProcAddress( procName );
+
     return ( p != NULL ) ? p : fghGetProcAddress( procName );
 }

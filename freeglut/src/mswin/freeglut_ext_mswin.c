@@ -28,6 +28,26 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal_mswin.h"
 
+GLUTproc fghGetPlatformSpecificGLUTProcAddress( const char* procName )
+{
+#if !defined(_WIN32_WCE)
+    /* optimization: quick initial check */
+    if( strncmp( procName, "glut", 4 ) != 0 )
+        return NULL;
+
+#define CHECK_NAME(x) if( strcmp( procName, #x ) == 0) return (GLUTproc)x;
+    CHECK_NAME(glutJoystickFunc);
+    CHECK_NAME(glutForceJoystickFunc);
+    CHECK_NAME(glutGameModeString);
+    CHECK_NAME(glutEnterGameMode);
+    CHECK_NAME(glutLeaveGameMode);
+    CHECK_NAME(glutGameModeGet);
+#undef CHECK_NAME
+#endif /* !defined(_WIN32_WCE) */
+
+    return NULL;
+}
+
 
 
 SFG_Proc fghGetProcAddress( const char *procName )
