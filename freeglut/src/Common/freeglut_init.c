@@ -100,6 +100,10 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
+extern void fghInitialize( const char* displayName );
+extern void fghDeinitialiseInputDevices ( void );
+extern void fghCloseDisplay ( void );
+
 #if TARGET_HOST_POSIX_X11
 
 /* Return the atom associated with "name". */
@@ -238,12 +242,12 @@ int fgHintPresent(Window window, Atom property, Atom hint)
 #endif /*  TARGET_HOST_POSIX_X11  */
 
 
+#if TARGET_HOST_POSIX_X11
 /*
  * A call to this function should initialize all the display stuff...
  */
 static void fghInitialize( const char* displayName )
 {
-#if TARGET_HOST_POSIX_X11
     fgDisplay.Display = XOpenDisplay( displayName );
 
     if( fgDisplay.Display == NULL )
@@ -307,102 +311,48 @@ static void fghInitialize( const char* displayName )
       }
     }
 
-#elif TARGET_HOST_MS_WINDOWS
-
-    WNDCLASS wc;
-    ATOM atom;
-
-    /* What we need to do is to initialize the fgDisplay global structure here. */
-    fgDisplay.Instance = GetModuleHandle( NULL );
-    fgDisplay.DisplayName= displayName ? strdup(displayName) : 0 ;
-    atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
-
-    if( atom == 0 )
-    {
-        ZeroMemory( &wc, sizeof(WNDCLASS) );
-
-        /*
-         * Each of the windows should have its own device context, and we
-         * want redraw events during Vertical and Horizontal Resizes by
-         * the user.
-         *
-         * XXX Old code had "| CS_DBCLCKS" commented out.  Plans for the
-         * XXX future?  Dead-end idea?
-         */
-        wc.lpfnWndProc    = fgWindowProc;
-        wc.cbClsExtra     = 0;
-        wc.cbWndExtra     = 0;
-        wc.hInstance      = fgDisplay.Instance;
-        wc.hIcon          = LoadIcon( fgDisplay.Instance, _T("GLUT_ICON") );
-
-#if defined(_WIN32_WCE)
-        wc.style          = CS_HREDRAW | CS_VREDRAW;
-#else
-        wc.style          = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-        if (!wc.hIcon)
-          wc.hIcon        = LoadIcon( NULL, IDI_WINLOGO );
-#endif
-
-        wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
-        wc.hbrBackground  = NULL;
-        wc.lpszMenuName   = NULL;
-        wc.lpszClassName  = _T("FREEGLUT");
-
-        /* Register the window class */
-        atom = RegisterClass( &wc );
-        FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Not Registered", "fghInitialize" );
-    }
-
-    /* The screen dimensions can be obtained via GetSystemMetrics() calls */
-    fgDisplay.ScreenWidth  = GetSystemMetrics( SM_CXSCREEN );
-    fgDisplay.ScreenHeight = GetSystemMetrics( SM_CYSCREEN );
-
-    {
-        HWND desktop = GetDesktopWindow( );
-        HDC  context = GetDC( desktop );
-
-        fgDisplay.ScreenWidthMM  = GetDeviceCaps( context, HORZSIZE );
-        fgDisplay.ScreenHeightMM = GetDeviceCaps( context, VERTSIZE );
-
-        ReleaseDC( desktop, context );
-    }
-    /* If we have a DisplayName try to use it for metrics */
-    if( fgDisplay.DisplayName )
-    {
-        HDC context = CreateDC(fgDisplay.DisplayName,0,0,0);
-        if( context )
-        {
-	    fgDisplay.ScreenWidth  = GetDeviceCaps( context, HORZRES );
-	    fgDisplay.ScreenHeight = GetDeviceCaps( context, VERTRES );
-	    fgDisplay.ScreenWidthMM  = GetDeviceCaps( context, HORZSIZE );
-	    fgDisplay.ScreenHeightMM = GetDeviceCaps( context, VERTSIZE );
-	    DeleteDC(context);
-        }
-        else
-	    fgWarning("fghInitialize: "
-		      "CreateDC failed, Screen size info may be incorrect\n"
-          "This is quite likely caused by a bad '-display' parameter");
-      
-    }
-    /* Set the timer granularity to 1 ms */
-    timeBeginPeriod ( 1 );
-
-#endif
 
     fgState.Initialised = GL_TRUE;
 
-    /* Avoid registering atexit callback on Win32 as it results in an access
-     * violation due to calling into a module which has been unloaded.
-     * Any cleanup isn't needed on Windows anyway, the OS takes care of it.c
-     * see: http://blogs.msdn.com/b/oldnewthing/archive/2012/01/05/10253268.aspx
-     */
-#if ( TARGET_HOST_MS_WINDOWS == 0 )
     atexit(fgDeinitialize);
-#endif
 
     /* InputDevice uses GlutTimerFunc(), so fgState.Initialised must be TRUE */
     fgInitialiseInputDevices();
 }
+
+#endif
+
+#if TARGET_HOST_POSIX_X11
+static void fghDeinitialiseInputDevices ( void )
+{
+    if ( fgState.JoysticksInitialised )
+        fgJoystickClose( );
+
+    if ( fgState.InputDevsInitialised )
+        fgInputDeviceClose( );
+
+    fgState.JoysticksInitialised = GL_FALSE;
+    fgState.InputDevsInitialised = GL_FALSE;
+}
+
+
+static void fghCloseDisplay ( void )
+{
+    /*
+     * Make sure all X-client data we have created will be destroyed on
+     * display closing
+     */
+    XSetCloseDownMode( fgDisplay.Display, DestroyAll );
+
+    /*
+     * Close the display connection, destroying all windows we have
+     * created so far
+     */
+    XCloseDisplay( fgDisplay.Display );
+}
+
+#endif
+
 
 /*
  * Perform the freeglut deinitialization...
@@ -446,15 +396,7 @@ void fgDeinitialize( void )
         free( timer );
     }
 
-#if !defined(_WIN32_WCE)
-    if ( fgState.JoysticksInitialised )
-        fgJoystickClose( );
-
-    if ( fgState.InputDevsInitialised )
-        fgInputDeviceClose( );
-#endif /* !defined(_WIN32_WCE) */
-    fgState.JoysticksInitialised = GL_FALSE;
-    fgState.InputDevsInitialised = GL_FALSE;
+	fghDeinitialiseInputDevices ();
 
 	fgState.MouseWheelTicks = 0;
 
@@ -508,31 +450,7 @@ void fgDeinitialize( void )
         fgState.ProgramName = NULL;
     }
 
-#if TARGET_HOST_POSIX_X11
-
-    /*
-     * Make sure all X-client data we have created will be destroyed on
-     * display closing
-     */
-    XSetCloseDownMode( fgDisplay.Display, DestroyAll );
-
-    /*
-     * Close the display connection, destroying all windows we have
-     * created so far
-     */
-    XCloseDisplay( fgDisplay.Display );
-
-#elif TARGET_HOST_MS_WINDOWS
-    if( fgDisplay.DisplayName )
-    {
-        free( fgDisplay.DisplayName );
-        fgDisplay.DisplayName = NULL;
-    }
-
-    /* Reset the timer granularity */
-    timeEndPeriod ( 1 );
-
-#endif
+	fghCloseDisplay ();
 
     fgState.Initialised = GL_FALSE;
 }
