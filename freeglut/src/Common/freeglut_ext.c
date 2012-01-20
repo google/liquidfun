@@ -29,6 +29,8 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
+extern SFG_Proc fghGetProcAddress( const char *procName );
+
 static GLUTproc fghGetGLUTProcAddress( const char* procName )
 {
     /* optimization: quick initial check */
@@ -209,16 +211,16 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
 }
 
 
+#if TARGET_HOST_POSIX_X11
 SFG_Proc fghGetProcAddress( const char *procName )
 {
-#if TARGET_HOST_MS_WINDOWS
-    return (SFG_Proc)wglGetProcAddress( ( LPCSTR )procName );
-#elif TARGET_HOST_POSIX_X11 && defined( GLX_ARB_get_proc_address )
+#if defined( GLX_ARB_get_proc_address )
     return (SFG_Proc)glXGetProcAddressARB( ( const GLubyte * )procName );
 #else
     return NULL;
 #endif
 }
+#endif
 
 
 GLUTproc FGAPIENTRY
