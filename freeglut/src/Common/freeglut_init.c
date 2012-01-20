@@ -322,6 +322,110 @@ static void fghInitialize( const char* displayName )
 
 #endif
 
+
+void fghParseCommandLineArguments ( int* pargc, char** argv, char **pDisplayName, char **pGeometry )
+{
+#ifndef _WIN32_WCE
+    int i, j, argc = *pargc;
+
+    {
+	    /* check if GLUT_FPS env var is set */
+        const char *fps = getenv( "GLUT_FPS" );
+
+        if( fps )
+        {
+            int interval;
+            sscanf( fps, "%d", &interval );
+
+            if( interval <= 0 )
+                fgState.FPSInterval = 5000;  /* 5000 millisecond default */
+            else
+                fgState.FPSInterval = interval;
+        }
+    }
+
+    *pDisplayName = getenv( "DISPLAY" );
+
+    for( i = 1; i < argc; i++ )
+    {
+        if( strcmp( argv[ i ], "-display" ) == 0 )
+        {
+            if( ++i >= argc )
+                fgError( "-display parameter must be followed by display name" );
+
+            *pDisplayName = argv[ i ];
+
+            argv[ i - 1 ] = NULL;
+            argv[ i     ] = NULL;
+            ( *pargc ) -= 2;
+        }
+        else if( strcmp( argv[ i ], "-geometry" ) == 0 )
+        {
+            if( ++i >= argc )
+                fgError( "-geometry parameter must be followed by window "
+                         "geometry settings" );
+
+            *pGeometry = argv[ i ];
+
+            argv[ i - 1 ] = NULL;
+            argv[ i     ] = NULL;
+            ( *pargc ) -= 2;
+        }
+        else if( strcmp( argv[ i ], "-direct" ) == 0)
+        {
+            if( fgState.DirectContext == GLUT_FORCE_INDIRECT_CONTEXT )
+                fgError( "parameters ambiguity, -direct and -indirect "
+                    "cannot be both specified" );
+
+            fgState.DirectContext = GLUT_FORCE_DIRECT_CONTEXT;
+            argv[ i ] = NULL;
+            ( *pargc )--;
+        }
+        else if( strcmp( argv[ i ], "-indirect" ) == 0 )
+        {
+            if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
+                fgError( "parameters ambiguity, -direct and -indirect "
+                    "cannot be both specified" );
+
+            fgState.DirectContext = GLUT_FORCE_INDIRECT_CONTEXT;
+            argv[ i ] = NULL;
+            (*pargc)--;
+        }
+        else if( strcmp( argv[ i ], "-iconic" ) == 0 )
+        {
+            fgState.ForceIconic = GL_TRUE;
+            argv[ i ] = NULL;
+            ( *pargc )--;
+        }
+        else if( strcmp( argv[ i ], "-gldebug" ) == 0 )
+        {
+            fgState.GLDebugSwitch = GL_TRUE;
+            argv[ i ] = NULL;
+            ( *pargc )--;
+        }
+        else if( strcmp( argv[ i ], "-sync" ) == 0 )
+        {
+            fgState.XSyncSwitch = GL_TRUE;
+            argv[ i ] = NULL;
+            ( *pargc )--;
+        }
+    }
+
+    /* Compact {argv}. */
+    for( i = j = 1; i < *pargc; i++, j++ )
+    {
+        /* Guaranteed to end because there are "*pargc" arguments left */
+        while ( argv[ j ] == NULL )
+            j++;
+        if ( i != j )
+            argv[ i ] = argv[ j ];
+    }
+
+#endif /* _WIN32_WCE */
+
+}
+
+
 void fghCloseInputDevices ( void )
 {
     if ( fgState.JoysticksInitialised )
@@ -642,8 +746,6 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 {
     char* displayName = NULL;
     char* geometry = NULL;
-    int i, j, argc = *pargc;
-
     if( fgState.Initialised )
         fgError( "illegal glutInit() reinitialization attempt" );
 
@@ -660,101 +762,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /* Get start time */
     fgState.Time = fgSystemTime();
 
-    /* check if GLUT_FPS env var is set */
-#ifndef _WIN32_WCE
-    {
-        const char *fps = getenv( "GLUT_FPS" );
-
-        if( fps )
-        {
-            int interval;
-            sscanf( fps, "%d", &interval );
-
-            if( interval <= 0 )
-                fgState.FPSInterval = 5000;  /* 5000 millisecond default */
-            else
-                fgState.FPSInterval = interval;
-        }
-    }
-
-    displayName = getenv( "DISPLAY" );
-
-    for( i = 1; i < argc; i++ )
-    {
-        if( strcmp( argv[ i ], "-display" ) == 0 )
-        {
-            if( ++i >= argc )
-                fgError( "-display parameter must be followed by display name" );
-
-            displayName = argv[ i ];
-
-            argv[ i - 1 ] = NULL;
-            argv[ i     ] = NULL;
-            ( *pargc ) -= 2;
-        }
-        else if( strcmp( argv[ i ], "-geometry" ) == 0 )
-        {
-            if( ++i >= argc )
-                fgError( "-geometry parameter must be followed by window "
-                         "geometry settings" );
-
-            geometry = argv[ i ];
-
-            argv[ i - 1 ] = NULL;
-            argv[ i     ] = NULL;
-            ( *pargc ) -= 2;
-        }
-        else if( strcmp( argv[ i ], "-direct" ) == 0)
-        {
-            if( fgState.DirectContext == GLUT_FORCE_INDIRECT_CONTEXT )
-                fgError( "parameters ambiguity, -direct and -indirect "
-                    "cannot be both specified" );
-
-            fgState.DirectContext = GLUT_FORCE_DIRECT_CONTEXT;
-            argv[ i ] = NULL;
-            ( *pargc )--;
-        }
-        else if( strcmp( argv[ i ], "-indirect" ) == 0 )
-        {
-            if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
-                fgError( "parameters ambiguity, -direct and -indirect "
-                    "cannot be both specified" );
-
-            fgState.DirectContext = GLUT_FORCE_INDIRECT_CONTEXT;
-            argv[ i ] = NULL;
-            (*pargc)--;
-        }
-        else if( strcmp( argv[ i ], "-iconic" ) == 0 )
-        {
-            fgState.ForceIconic = GL_TRUE;
-            argv[ i ] = NULL;
-            ( *pargc )--;
-        }
-        else if( strcmp( argv[ i ], "-gldebug" ) == 0 )
-        {
-            fgState.GLDebugSwitch = GL_TRUE;
-            argv[ i ] = NULL;
-            ( *pargc )--;
-        }
-        else if( strcmp( argv[ i ], "-sync" ) == 0 )
-        {
-            fgState.XSyncSwitch = GL_TRUE;
-            argv[ i ] = NULL;
-            ( *pargc )--;
-        }
-    }
-
-    /* Compact {argv}. */
-    for( i = j = 1; i < *pargc; i++, j++ )
-    {
-        /* Guaranteed to end because there are "*pargc" arguments left */
-        while ( argv[ j ] == NULL )
-            j++;
-        if ( i != j )
-            argv[ i ] = argv[ j ];
-    }
-
-#endif /* _WIN32_WCE */
+	fghParseCommandLineArguments ( pargc, argv, &displayName, &geometry );
 
     /*
      * Have the display created now. If there wasn't a "-display"
