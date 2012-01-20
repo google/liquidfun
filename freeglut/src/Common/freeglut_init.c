@@ -329,9 +329,6 @@ void fghCloseInputDevices ( void )
 
     if ( fgState.InputDevsInitialised )
         fgInputDeviceClose( );
-
-    fgState.JoysticksInitialised = GL_FALSE;
-    fgState.InputDevsInitialised = GL_FALSE;
 }
 
 
