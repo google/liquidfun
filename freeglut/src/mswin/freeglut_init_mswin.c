@@ -129,14 +129,12 @@ void fghInitialize( const char* displayName )
 
 
 /* Platform-Specific Deinitialization Functions: */
+extern void fghCloseInputDevices ( void );
+
 void fghDeinitialiseInputDevices ( void )
 {
 #if !defined(_WIN32_WCE)
-    if ( fgState.JoysticksInitialised )
-        fgJoystickClose( );
-
-    if ( fgState.InputDevsInitialised )
-        fgInputDeviceClose( );
+	fghCloseInputDevices ();
 #endif /* !defined(_WIN32_WCE) */
     fgState.JoysticksInitialised = GL_FALSE;
     fgState.InputDevsInitialised = GL_FALSE;

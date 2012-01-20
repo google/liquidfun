@@ -322,14 +322,23 @@ static void fghInitialize( const char* displayName )
 
 #endif
 
-#if TARGET_HOST_POSIX_X11
-static void fghDeinitialiseInputDevices ( void )
+void fghCloseInputDevices ( void )
 {
     if ( fgState.JoysticksInitialised )
         fgJoystickClose( );
 
     if ( fgState.InputDevsInitialised )
         fgInputDeviceClose( );
+
+    fgState.JoysticksInitialised = GL_FALSE;
+    fgState.InputDevsInitialised = GL_FALSE;
+}
+
+
+#if TARGET_HOST_POSIX_X11
+static void fghDeinitialiseInputDevices ( void )
+{
+	fghCloseInputDevices ();
 
     fgState.JoysticksInitialised = GL_FALSE;
     fgState.InputDevsInitialised = GL_FALSE;
