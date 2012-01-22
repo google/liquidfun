@@ -14,7 +14,7 @@
 #include <X11/extensions/XInput2.h>
 
 /* import function from freeglut_main.c */
-int fghGetXModifiers( int state );
+int fghGetModifiers( int state );
 
 /* extension opcode for XInput */
 int xi_opcode = -1;
@@ -160,7 +160,7 @@ void fgHandleExtensionEvents( XEvent* base_ev ) {
 
 			case XI_Enter:
 			case XI_Leave:
-				fgState.Modifiers = fghGetXModifiers( ((XIEnterEvent*)event)->mods.base );
+				fgState.Modifiers = fghGetModifiers( ((XIEnterEvent*)event)->mods.base );
 				INVOKE_WCB( *window, MultiEntry, (
 					event->deviceid, 
 					(event->evtype == XI_Enter ? GLUT_ENTERED : GLUT_LEFT)
@@ -172,7 +172,7 @@ void fgHandleExtensionEvents( XEvent* base_ev ) {
 
 			case XI_ButtonPress:
 			case XI_ButtonRelease:
-				fgState.Modifiers = fghGetXModifiers( event->mods.base );
+				fgState.Modifiers = fghGetModifiers( event->mods.base );
 				INVOKE_WCB( *window, MultiButton, (
 					event->deviceid, 
 					event->event_x,
@@ -189,7 +189,7 @@ void fgHandleExtensionEvents( XEvent* base_ev ) {
 				break;
 
 			case XI_Motion:
-				fgState.Modifiers = fghGetXModifiers( event->mods.base );
+				fgState.Modifiers = fghGetModifiers( event->mods.base );
 				for (i = 0; i < event->buttons.mask_len; i++) if (event->buttons.mask[i]) button = 1;
 				if (button) {
 					INVOKE_WCB( *window, MultiMotion,  ( event->deviceid, event->event_x, event->event_y ) );
