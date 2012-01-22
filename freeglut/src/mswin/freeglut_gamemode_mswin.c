@@ -1,5 +1,5 @@
 /*
- * freeglut_cursor_mswin.c
+ * freeglut_gamemode_mswin.c
  *
  * The Windows-specific mouse cursor related stuff.
  *
