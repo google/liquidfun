@@ -46,21 +46,15 @@
 #include <termios.h>
 #include <fcntl.h>
 
-typedef struct {
+struct {
    int fd;
    struct termios termio, termio_save;
-} SERIALPORT;
-
-#elif TARGET_HOST_MS_WINDOWS
-#include <sys/types.h>
-#include <winbase.h>
-typedef struct {
-   HANDLE fh;
-   COMMTIMEOUTS timeouts_save;
-   DCB dcb_save;
-} SERIALPORT;
+} _serialport;
 
 #endif
+
+typedef struct _serialport SERIALPORT;
+
 
 /********************* Dialbox definitions ***********************/
 
@@ -99,12 +93,13 @@ typedef struct {
 
 /*****************************************************************/
 
-static SERIALPORT *serial_open ( const char *device );
-static void serial_close ( SERIALPORT *port );
-static int serial_getchar ( SERIALPORT *port );
-static int serial_putchar ( SERIALPORT *port, unsigned char ch );
-static void serial_flush ( SERIALPORT *port );
+extern SERIALPORT *serial_open ( const char *device );
+extern void serial_close ( SERIALPORT *port );
+extern int serial_getchar ( SERIALPORT *port );
+extern int serial_putchar ( SERIALPORT *port, unsigned char ch );
+extern void serial_flush ( SERIALPORT *port );
 
+extern void fghRegisterDialDevice ( const char *dial_device );
 static void send_dial_event(int dial, int value);
 static void poll_dials(int id);
 
@@ -132,26 +127,20 @@ int fgInputDeviceDetect( void )
 /*
  * Try initializing the input device(s)
  */
+#if TARGET_HOST_POSIX_X11
+static void fghRegisterDialDevice ( const char *dial_device )
+{
+}
+#endif
+
 void fgInitialiseInputDevices ( void )
 {
     if( !fgState.InputDevsInitialised )
     {
         const char *dial_device=NULL;
         dial_device = getenv ( "GLUT_DIALS_SERIAL" );
-#if TARGET_HOST_MS_WINDOWS
-        if (!dial_device){
-            static char devname[256];
-            DWORD size=sizeof(devname);
-            DWORD type = REG_SZ;
-            HKEY key;
-            if (RegOpenKeyA(HKEY_LOCAL_MACHINE,"SOFTWARE\\FreeGLUT",&key)==ERROR_SUCCESS) {
-                if (RegQueryValueExA(key,"DialboxSerialPort",NULL,&type,(LPBYTE)devname,&size)==ERROR_SUCCESS){
-                    dial_device=devname;
-                }
-                RegCloseKey(key);
-            }
-        }
-#endif
+		fghRegisterDialDevice ( dial_device );
+
         if ( !dial_device ) return;
         if ( !( dialbox_port = serial_open ( dial_device ) ) ) return;
         serial_putchar(dialbox_port,DIAL_INITIALIZE);
@@ -309,70 +298,6 @@ static int serial_putchar(SERIALPORT *port, unsigned char ch){
 static void serial_flush ( SERIALPORT *port )
 {
     tcflush ( port->fd, TCIOFLUSH );
-}
-
-#elif TARGET_HOST_MS_WINDOWS
-
-static SERIALPORT *serial_open(const char *device){
-    HANDLE fh;
-    DCB dcb={sizeof(DCB)};
-    COMMTIMEOUTS timeouts;
-    SERIALPORT *port;
-
-    fh = CreateFile(device,GENERIC_READ|GENERIC_WRITE,0,NULL,
-      OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-    if (!fh) return NULL;
-
-    port = malloc(sizeof(SERIALPORT));
-    ZeroMemory(port, sizeof(SERIALPORT));
-    port->fh = fh;
-
-    /* save current port settings */
-    GetCommState(fh,&port->dcb_save);
-    GetCommTimeouts(fh,&port->timeouts_save);
-
-    dcb.DCBlength=sizeof(DCB);
-    BuildCommDCB("96,n,8,1",&dcb);
-    SetCommState(fh,&dcb);
-
-    ZeroMemory(&timeouts,sizeof(timeouts));
-    timeouts.ReadTotalTimeoutConstant=1;
-    timeouts.WriteTotalTimeoutConstant=1;
-    SetCommTimeouts(fh,&timeouts);
-
-    serial_flush(port);
-
-    return port;
-}
-
-static void serial_close(SERIALPORT *port){
-    if (port){
-        /* restore old port settings */
-        SetCommState(port->fh,&port->dcb_save);
-        SetCommTimeouts(port->fh,&port->timeouts_save);
-        CloseHandle(port->fh);
-        free(port);
-    }
-}
-
-static int serial_getchar(SERIALPORT *port){
-    DWORD n;
-    unsigned char ch;
-    if (!port) return EOF;
-    if (!ReadFile(port->fh,&ch,1,&n,NULL)) return EOF;
-    if (n==1) return ch;
-    return EOF;
-}
-
-static int serial_putchar(SERIALPORT *port, unsigned char ch){
-    DWORD n;
-    if (!port) return 0;
-    return WriteFile(port->fh,&ch,1,&n,NULL);
-}
-
-static void serial_flush ( SERIALPORT *port )
-{
-    FlushFileBuffers(port->fh);
 }
 
 #endif
