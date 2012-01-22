@@ -77,6 +77,12 @@ struct GXKeyList gxKeyList;
 	static pCloseTouchInputHandle fghCloseTouchInputHandle = (pCloseTouchInputHandle)0xDEADBEEF;
 #endif
 
+extern void fghPlatformReshapeWindow ( SFG_Window *window, int width, int height );
+extern void fghcbPlatformDisplayWindow ( SFG_Window *window );
+extern void fghPlatformSleepForEvents( long msec );
+extern void fghProcessSingleEvent ( void );
+
+
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
@@ -95,65 +101,22 @@ struct GXKeyList gxKeyList;
  * callback is hooked, the viewport size is updated to
  * match the new window size.
  */
+#if TARGET_HOST_POSIX_X11
+static void fghPlatformReshapeWindow ( SFG_Window *window, int width, int height )
+{
+    XResizeWindow( fgDisplay.Display, window->Window.Handle,
+                   width, height );
+    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+}
+#endif
+
 static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 {
     SFG_Window *current_window = fgStructure.CurrentWindow;
 
     freeglut_return_if_fail( window != NULL );
 
-#if TARGET_HOST_POSIX_X11
-
-    XResizeWindow( fgDisplay.Display, window->Window.Handle,
-                   width, height );
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
-
-#elif TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
-    {
-        RECT windowRect;
-
-        /*
-         * For windowed mode, get the current position of the
-         * window and resize taking the size of the frame
-         * decorations into account.
-         */
-
-        /* "GetWindowRect" returns the pixel coordinates of the outside of the window */
-        GetWindowRect( window->Window.Handle, &windowRect );
-
-        /* Create rect in FreeGLUT format, (X,Y) topleft outside window, WxH of client area */
-        windowRect.right    = windowRect.left+width;
-        windowRect.bottom   = windowRect.top+height;
-
-        if (window->Parent == NULL)
-            /* get the window rect from this to feed to SetWindowPos, correct for window decorations */
-            fghComputeWindowRectFromClientArea_QueryWindow(window,&windowRect,TRUE);
-        else
-        {
-            /* correct rect for position client area of parent window
-             * (SetWindowPos input for child windows is in coordinates
-             * relative to the parent's client area).
-             * Child windows don't have decoration, so no need to correct
-             * for them.
-             */
-            RECT parentRect;
-            parentRect = fghGetClientArea( window->Parent, FALSE );
-            windowRect.left   -= parentRect.left;
-            windowRect.right  -= parentRect.left;
-            windowRect.top    -= parentRect.top;
-            windowRect.bottom -= parentRect.top;
-        }
-        
-        /* Do the actual resizing */
-        SetWindowPos( window->Window.Handle,
-                      HWND_TOP,
-                      windowRect.left, windowRect.top,
-                      windowRect.right - windowRect.left,
-                      windowRect.bottom- windowRect.top,
-                      SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
-                      SWP_NOZORDER
-        );
-    }
-#endif
+	fghPlatformReshapeWindow ( window, width, height );
 
     if( FETCH_WCB( *window, Reshape ) )
         INVOKE_WCB( *window, Reshape, ( width, height ) );
@@ -212,6 +175,13 @@ static void fghRedrawWindow ( SFG_Window *window )
 /*
  * A static helper function to execute display callback for a window
  */
+#if TARGET_HOST_POSIX_X11
+static void fghcbPlatformDisplayWindow ( SFG_Window *window )
+{
+        fghRedrawWindow ( window ) ;
+}
+#endif
+
 static void fghcbDisplayWindow( SFG_Window *window,
                                 SFG_Enumerator *enumerator )
 {
@@ -219,16 +189,7 @@ static void fghcbDisplayWindow( SFG_Window *window,
         window->State.Visible )
     {
         window->State.Redisplay = GL_FALSE;
-
-#if TARGET_HOST_POSIX_X11
-        fghRedrawWindow ( window ) ;
-#elif TARGET_HOST_MS_WINDOWS
-
-        RedrawWindow(
-            window->Window.Handle, NULL, NULL,
-            RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
-        );
-#endif
+		fghcbPlatformDisplayWindow ( window );
     }
 
     fgEnumSubWindows( window, fghcbDisplayWindow, enumerator );
@@ -459,20 +420,10 @@ static long fghNextTimer( void )
  * Does the magic required to relinquish the CPU until something interesting
  * happens.
  */
-static void fghSleepForEvents( void )
-{
-    long msec;
-
-    if( fgState.IdleCallback || fghHavePendingRedisplays( ) )
-        return;
-
-    msec = fghNextTimer( );
-    /* XXX Use GLUT timers for joysticks... */
-    /* XXX Dumb; forces granularity to .01sec */
-    if( fghHaveJoystick( ) && ( msec > 10 ) )     
-        msec = 10;
 
 #if TARGET_HOST_POSIX_X11
+static void fghPlatformSleepForEvents( long msec )
+{
     /*
      * Possibly due to aggressive use of XFlush() and friends,
      * it is possible to have our socket drained but still have
@@ -501,9 +452,23 @@ static void fghSleepForEvents( void )
             fgWarning ( "freeglut select() error: %d", errno );
 #endif
     }
-#elif TARGET_HOST_MS_WINDOWS
-    MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLINPUT );
+}
 #endif
+
+static void fghSleepForEvents( void )
+{
+    long msec;
+
+    if( fgState.IdleCallback || fghHavePendingRedisplays( ) )
+        return;
+
+    msec = fghNextTimer( );
+    /* XXX Use GLUT timers for joysticks... */
+    /* XXX Dumb; forces granularity to .01sec */
+    if( fghHaveJoystick( ) && ( msec > 10 ) )     
+        msec = 10;
+
+	fghPlatformSleepForEvents ( msec );
 }
 
 #if TARGET_HOST_POSIX_X11
@@ -523,10 +488,8 @@ int fghGetXModifiers( int state )
 
     return ret;
 }
-#endif
 
 
-#if TARGET_HOST_POSIX_X11 && _DEBUG
 
 static const char* fghTypeToString( int type )
 {
@@ -968,16 +931,9 @@ static void fghPrintEvent( XEvent *event )
     }
 }
 
-#endif
 
-/* -- INTERFACE FUNCTIONS -------------------------------------------------- */
-
-/*
- * Executes a single iteration in the freeglut processing loop.
- */
-void FGAPIENTRY glutMainLoopEvent( void )
+void fghProcessSingleEvent ( void )
 {
-#if TARGET_HOST_POSIX_X11
     SFG_Window* window;
     XEvent event;
 
@@ -1452,32 +1408,17 @@ void FGAPIENTRY glutMainLoopEvent( void )
             break;
         }
     }
-
-#elif TARGET_HOST_MS_WINDOWS
-
-    MSG stMsg;
-
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMainLoopEvent" );
-
-    while( PeekMessage( &stMsg, NULL, 0, 0, PM_NOREMOVE ) )
-    {
-        if( GetMessage( &stMsg, NULL, 0, 0 ) == 0 )
-        {
-            if( fgState.ActionOnWindowClose == GLUT_ACTION_EXIT )
-            {
-                fgDeinitialize( );
-                exit( 0 );
-            }
-            else if( fgState.ActionOnWindowClose == GLUT_ACTION_GLUTMAINLOOP_RETURNS )
-                fgState.ExecState = GLUT_EXEC_STATE_STOP;
-
-            return;
-        }
-
-        TranslateMessage( &stMsg );
-        DispatchMessage( &stMsg );
-    }
+}
 #endif
+
+/* -- INTERFACE FUNCTIONS -------------------------------------------------- */
+
+/*
+ * Executes a single iteration in the freeglut processing loop.
+ */
+void FGAPIENTRY glutMainLoopEvent( void )
+{
+	fghProcessSingleEvent ();
 
     if( fgState.Timers.First )
         fghCheckTimers( );
