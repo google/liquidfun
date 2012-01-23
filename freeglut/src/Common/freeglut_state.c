@@ -41,6 +41,8 @@
  * The fail-on-call policy will help adding the most needed things imho.
  */
 
+extern int fgPlatformGlutGet ( GLenum eWhat );
+
 /* -- LOCAL DEFINITIONS ---------------------------------------------------- */
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -62,129 +64,13 @@ static int fghGetConfig( int attribute )
 
   return returnValue;
 }
-#endif
 
-/* -- INTERFACE FUNCTIONS -------------------------------------------------- */
-
-/*
- * General settings assignment method
- */
-void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
+static int fgPlatformGlutGet ( GLenum eWhat )
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetOption" );
-
-    /*
-     * XXX In chronological code add order.  (WHY in that order?)
-     */
-    switch( eWhat )
-    {
-    case GLUT_INIT_WINDOW_X:
-        fgState.Position.X = (GLint)value;
-        break;
-
-    case GLUT_INIT_WINDOW_Y:
-        fgState.Position.Y = (GLint)value;
-        break;
-
-    case GLUT_INIT_WINDOW_WIDTH:
-        fgState.Size.X = (GLint)value;
-        break;
-
-    case GLUT_INIT_WINDOW_HEIGHT:
-        fgState.Size.Y = (GLint)value;
-        break;
-
-    case GLUT_INIT_DISPLAY_MODE:
-        fgState.DisplayMode = (unsigned int)value;
-        break;
-
-    case GLUT_ACTION_ON_WINDOW_CLOSE:
-        fgState.ActionOnWindowClose = value;
-        break;
-
-    case GLUT_RENDERING_CONTEXT:
-        fgState.UseCurrentContext =
-            ( value == GLUT_USE_CURRENT_CONTEXT ) ? GL_TRUE : GL_FALSE;
-        break;
-
-    case GLUT_DIRECT_RENDERING:
-        fgState.DirectContext = value;
-        break;
-
-    case GLUT_WINDOW_CURSOR:
-        if( fgStructure.CurrentWindow != NULL )
-            fgStructure.CurrentWindow->State.Cursor = value;
-        break;
-
-    case GLUT_AUX:
-      fgState.AuxiliaryBufferNumber = value;
-      break;
-
-    case GLUT_MULTISAMPLE:
-      fgState.SampleNumber = value;
-      break;
-
-    default:
-        fgWarning( "glutSetOption(): missing enum handle %d", eWhat );
-        break;
-    }
-}
-
-#if TARGET_HOST_MS_WINDOWS
-/* The following include file is available from SGI but is not standard:
- *   #include <GL/wglext.h>
- * So we copy the necessary parts out of it to support the multisampling query
- */
-#define WGL_SAMPLES_ARB                0x2042
-#endif
-
-
-/*
- * General settings query method
- */
-int FGAPIENTRY glutGet( GLenum eWhat )
-{
-#if TARGET_HOST_MS_WINDOWS
-    int returnValue ;
-    GLboolean boolValue ;
-#endif
-
     int nsamples = 0;
 
-    switch (eWhat)
-    {
-    case GLUT_INIT_STATE:
-        return fgState.Initialised;
-
-    case GLUT_ELAPSED_TIME:
-        return fgElapsedTime();
-    }
-
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGet" );
-
-    /* XXX In chronological code add order.  (WHY in that order?) */
     switch( eWhat )
     {
-    /* Following values are stored in fgState and fgDisplay global structures */
-    case GLUT_SCREEN_WIDTH:         return fgDisplay.ScreenWidth   ;
-    case GLUT_SCREEN_HEIGHT:        return fgDisplay.ScreenHeight  ;
-    case GLUT_SCREEN_WIDTH_MM:      return fgDisplay.ScreenWidthMM ;
-    case GLUT_SCREEN_HEIGHT_MM:     return fgDisplay.ScreenHeightMM;
-    case GLUT_INIT_WINDOW_X:        return fgState.Position.Use ?
-                                           fgState.Position.X : -1 ;
-    case GLUT_INIT_WINDOW_Y:        return fgState.Position.Use ?
-                                           fgState.Position.Y : -1 ;
-    case GLUT_INIT_WINDOW_WIDTH:    return fgState.Size.Use ?
-                                           fgState.Size.X : -1     ;
-    case GLUT_INIT_WINDOW_HEIGHT:   return fgState.Size.Use ?
-                                           fgState.Size.Y : -1     ;
-    case GLUT_INIT_DISPLAY_MODE:    return fgState.DisplayMode     ;
-    case GLUT_INIT_MAJOR_VERSION:   return fgState.MajorVersion    ;
-    case GLUT_INIT_MINOR_VERSION:   return fgState.MinorVersion    ;
-    case GLUT_INIT_FLAGS:           return fgState.ContextFlags    ;
-    case GLUT_INIT_PROFILE:         return fgState.ContextProfile  ;
-
-#if TARGET_HOST_POSIX_X11
     /*
      * The window/context specific queries are handled mostly by
      * fghGetConfig().
@@ -332,184 +218,116 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
         return fghGetConfig( GLX_VISUAL_ID );
 
-#elif TARGET_HOST_MS_WINDOWS
-
-    case GLUT_WINDOW_NUM_SAMPLES:
-      glGetIntegerv(WGL_SAMPLES_ARB, &nsamples);
-      return nsamples;
-
-    /* Handle the OpenGL inquiries */
-    case GLUT_WINDOW_RGBA:
-#if defined(_WIN32_WCE)
-      boolValue = (GLboolean)0;  /* WinCE doesn't support this feature */
-#else
-      glGetBooleanv ( GL_RGBA_MODE, &boolValue );
-      returnValue = boolValue ? 1 : 0;
-#endif
-      return returnValue;
-    case GLUT_WINDOW_DOUBLEBUFFER:
-#if defined(_WIN32_WCE)
-      boolValue = (GLboolean)0;  /* WinCE doesn't support this feature */
-#else
-      glGetBooleanv ( GL_DOUBLEBUFFER, &boolValue );
-      returnValue = boolValue ? 1 : 0;
-#endif
-      return returnValue;
-    case GLUT_WINDOW_STEREO:
-#if defined(_WIN32_WCE)
-      boolValue = (GLboolean)0;  /* WinCE doesn't support this feature */
-#else
-      glGetBooleanv ( GL_STEREO, &boolValue );
-      returnValue = boolValue ? 1 : 0;
-#endif
-      return returnValue;
-
-    case GLUT_WINDOW_RED_SIZE:
-      glGetIntegerv ( GL_RED_BITS, &returnValue );
-      return returnValue;
-    case GLUT_WINDOW_GREEN_SIZE:
-      glGetIntegerv ( GL_GREEN_BITS, &returnValue );
-      return returnValue;
-    case GLUT_WINDOW_BLUE_SIZE:
-      glGetIntegerv ( GL_BLUE_BITS, &returnValue );
-      return returnValue;
-    case GLUT_WINDOW_ALPHA_SIZE:
-      glGetIntegerv ( GL_ALPHA_BITS, &returnValue );
-      return returnValue;
-    case GLUT_WINDOW_ACCUM_RED_SIZE:
-#if defined(_WIN32_WCE)
-      returnValue = 0;  /* WinCE doesn't support this feature */
-#else
-      glGetIntegerv ( GL_ACCUM_RED_BITS, &returnValue );
-#endif
-      return returnValue;
-    case GLUT_WINDOW_ACCUM_GREEN_SIZE:
-#if defined(_WIN32_WCE)
-      returnValue = 0;  /* WinCE doesn't support this feature */
-#else
-      glGetIntegerv ( GL_ACCUM_GREEN_BITS, &returnValue );
-#endif
-      return returnValue;
-    case GLUT_WINDOW_ACCUM_BLUE_SIZE:
-#if defined(_WIN32_WCE)
-      returnValue = 0;  /* WinCE doesn't support this feature */
-#else
-      glGetIntegerv ( GL_ACCUM_BLUE_BITS, &returnValue );
-#endif
-      return returnValue;
-    case GLUT_WINDOW_ACCUM_ALPHA_SIZE:
-#if defined(_WIN32_WCE)
-      returnValue = 0;  /* WinCE doesn't support this feature */
-#else
-      glGetIntegerv ( GL_ACCUM_ALPHA_BITS, &returnValue );
-#endif
-      return returnValue;
-    case GLUT_WINDOW_DEPTH_SIZE:
-      glGetIntegerv ( GL_DEPTH_BITS, &returnValue );
-      return returnValue;
-
-    case GLUT_WINDOW_BUFFER_SIZE:
-      returnValue = 1 ;                                      /* ????? */
-      return returnValue;
-    case GLUT_WINDOW_STENCIL_SIZE:
-      returnValue = 0 ;                                      /* ????? */
-      return returnValue;
-
-    case GLUT_WINDOW_X:
-    case GLUT_WINDOW_Y:
-    case GLUT_WINDOW_WIDTH:
-    case GLUT_WINDOW_HEIGHT:
-    {
-        /*
-         *  There is considerable confusion about the "right thing to
-         *  do" concerning window  size and position.  GLUT itself is
-         *  not consistent between Windows and UNIX/X11; since
-         *  platform independence is a virtue for "freeglut", we
-         *  decided to break with GLUT's behaviour.
-         *
-         *  Under UNIX/X11, it is apparently not possible to get the
-         *  window border sizes in order to subtract them off the
-         *  window's initial position until some time after the window
-         *  has been created.  Therefore we decided on the following
-         *  behaviour, both under Windows and under UNIX/X11:
-         *  - When you create a window with position (x,y) and size
-         *    (w,h), the upper left hand corner of the outside of the
-         *    window is at (x,y) and the size of the drawable area  is
-         *    (w,h).
-         *  - When you query the size and position of the window--as
-         *    is happening here for Windows--"freeglut" will return
-         *    the size of the drawable area--the (w,h) that you
-         *    specified when you created the window--and the coordinates
-         *    of the upper left hand corner of the drawable
-         *    area--which is NOT the (x,y) you specified.
-         */
-
-        RECT winRect;
-
-        freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
-
-#if defined(_WIN32_WCE)
-        GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect );
-#else
-        winRect = fghGetClientArea(fgStructure.CurrentWindow, FALSE);
-#endif /* defined(_WIN32_WCE) */
-
-        switch( eWhat )
-        {
-        case GLUT_WINDOW_X:      return winRect.left                ;
-        case GLUT_WINDOW_Y:      return winRect.top                 ;
-        case GLUT_WINDOW_WIDTH:  return winRect.right - winRect.left;
-        case GLUT_WINDOW_HEIGHT: return winRect.bottom - winRect.top;
-        }
+    default:
+        fgWarning( "glutGet(): missing enum handle %d", eWhat );
+        break;
     }
-    break;
-
-    case GLUT_WINDOW_BORDER_WIDTH :
-    case GLUT_WINDOW_HEADER_HEIGHT :
-#if defined(_WIN32_WCE)
-        return 0;
-#else
-        {
-            DWORD windowStyle;
-
-            if (fgStructure.CurrentWindow && fgStructure.CurrentWindow->Window.Handle)
-                windowStyle = GetWindowLong(fgStructure.CurrentWindow->Window.Handle, GWL_STYLE);
-            else
-                /* If no window, return sizes for a default window with title bar and border */
-                windowStyle = WS_OVERLAPPEDWINDOW;
-            
-            switch( eWhat )
-            {
-            case GLUT_WINDOW_BORDER_WIDTH:
-                {
-                    int xBorderWidth, yBorderWidth;
-                    fghGetBorderWidth(windowStyle, &xBorderWidth, &yBorderWidth);
-                    return xBorderWidth;
-                }
-            case GLUT_WINDOW_HEADER_HEIGHT:
-                /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
-                return (windowStyle & WS_MAXIMIZEBOX)? GetSystemMetrics( SM_CYCAPTION ) : 0;
-            }
-        }
-#endif /* defined(_WIN32_WCE) */
-
-    case GLUT_DISPLAY_MODE_POSSIBLE:
-#if defined(_WIN32_WCE)
-        return 0;
-#else
-        return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
-                                    PFD_MAIN_PLANE );
-#endif /* defined(_WIN32_WCE) */
-
-
-    case GLUT_WINDOW_FORMAT_ID:
-#if !defined(_WIN32_WCE)
-        if( fgStructure.CurrentWindow != NULL )
-            return GetPixelFormat( fgStructure.CurrentWindow->Window.Device );
-#endif /* defined(_WIN32_WCE) */
-        return 0;
-
+}
 #endif
+
+/* -- INTERFACE FUNCTIONS -------------------------------------------------- */
+
+/*
+ * General settings assignment method
+ */
+void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetOption" );
+
+    /*
+     * XXX In chronological code add order.  (WHY in that order?)
+     */
+    switch( eWhat )
+    {
+    case GLUT_INIT_WINDOW_X:
+        fgState.Position.X = (GLint)value;
+        break;
+
+    case GLUT_INIT_WINDOW_Y:
+        fgState.Position.Y = (GLint)value;
+        break;
+
+    case GLUT_INIT_WINDOW_WIDTH:
+        fgState.Size.X = (GLint)value;
+        break;
+
+    case GLUT_INIT_WINDOW_HEIGHT:
+        fgState.Size.Y = (GLint)value;
+        break;
+
+    case GLUT_INIT_DISPLAY_MODE:
+        fgState.DisplayMode = (unsigned int)value;
+        break;
+
+    case GLUT_ACTION_ON_WINDOW_CLOSE:
+        fgState.ActionOnWindowClose = value;
+        break;
+
+    case GLUT_RENDERING_CONTEXT:
+        fgState.UseCurrentContext =
+            ( value == GLUT_USE_CURRENT_CONTEXT ) ? GL_TRUE : GL_FALSE;
+        break;
+
+    case GLUT_DIRECT_RENDERING:
+        fgState.DirectContext = value;
+        break;
+
+    case GLUT_WINDOW_CURSOR:
+        if( fgStructure.CurrentWindow != NULL )
+            fgStructure.CurrentWindow->State.Cursor = value;
+        break;
+
+    case GLUT_AUX:
+      fgState.AuxiliaryBufferNumber = value;
+      break;
+
+    case GLUT_MULTISAMPLE:
+      fgState.SampleNumber = value;
+      break;
+
+    default:
+        fgWarning( "glutSetOption(): missing enum handle %d", eWhat );
+        break;
+    }
+}
+
+/*
+ * General settings query method
+ */
+int FGAPIENTRY glutGet( GLenum eWhat )
+{
+    switch (eWhat)
+    {
+    case GLUT_INIT_STATE:
+        return fgState.Initialised;
+
+    case GLUT_ELAPSED_TIME:
+        return fgElapsedTime();
+    }
+
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGet" );
+
+    /* XXX In chronological code add order.  (WHY in that order?) */
+    switch( eWhat )
+    {
+    /* Following values are stored in fgState and fgDisplay global structures */
+    case GLUT_SCREEN_WIDTH:         return fgDisplay.ScreenWidth   ;
+    case GLUT_SCREEN_HEIGHT:        return fgDisplay.ScreenHeight  ;
+    case GLUT_SCREEN_WIDTH_MM:      return fgDisplay.ScreenWidthMM ;
+    case GLUT_SCREEN_HEIGHT_MM:     return fgDisplay.ScreenHeightMM;
+    case GLUT_INIT_WINDOW_X:        return fgState.Position.Use ?
+                                           fgState.Position.X : -1 ;
+    case GLUT_INIT_WINDOW_Y:        return fgState.Position.Use ?
+                                           fgState.Position.Y : -1 ;
+    case GLUT_INIT_WINDOW_WIDTH:    return fgState.Size.Use ?
+                                           fgState.Size.X : -1     ;
+    case GLUT_INIT_WINDOW_HEIGHT:   return fgState.Size.Use ?
+                                           fgState.Size.Y : -1     ;
+    case GLUT_INIT_DISPLAY_MODE:    return fgState.DisplayMode     ;
+    case GLUT_INIT_MAJOR_VERSION:   return fgState.MajorVersion    ;
+    case GLUT_INIT_MINOR_VERSION:   return fgState.MinorVersion    ;
+    case GLUT_INIT_FLAGS:           return fgState.ContextFlags    ;
+    case GLUT_INIT_PROFILE:         return fgState.ContextProfile  ;
 
     /* The window structure queries */
     case GLUT_WINDOW_PARENT:
@@ -555,7 +373,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
       return fgState.SampleNumber;
 
     default:
-        fgWarning( "glutGet(): missing enum handle %d", eWhat );
+        return fgPlatformGlutGet ( eWhat );
         break;
     }
     return -1;
