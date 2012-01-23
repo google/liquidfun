@@ -229,3 +229,99 @@ int fgPlatformGlutGet ( GLenum eWhat )
 
 	return -1;
 }
+
+
+int fgPlatformGlutDeviceGet ( GLenum eWhat )
+{
+    switch( eWhat )
+    {
+    case GLUT_HAS_KEYBOARD:
+        /*
+         * Win32 is assumed a keyboard, and this cannot be queried,
+         * except for WindowsCE.
+         *
+         * X11 has a core keyboard by definition, although it can
+         * be present as a virtual/dummy keyboard. For now, there
+         * is no reliable way to tell if a real keyboard is present.
+         */
+#if defined(_WIN32_CE)
+        return ( GetKeyboardStatus() & KBDI_KEYBOARD_PRESENT ) ? 1 : 0;
+#   if FREEGLUT_LIB_PRAGMAS
+#       pragma comment (lib,"Kbdui.lib")
+#   endif
+
+#else
+        return 1;
+#endif
+
+    case GLUT_HAS_MOUSE:
+        /*
+         * MS Windows can be booted without a mouse.
+         */
+        return GetSystemMetrics( SM_MOUSEPRESENT );
+
+    case GLUT_NUM_MOUSE_BUTTONS:
+#  if defined(_WIN32_WCE)
+        return 1;
+#  else
+        return GetSystemMetrics( SM_CMOUSEBUTTONS );
+#  endif
+
+    default:
+        fgWarning( "glutDeviceGet(): missing enum handle %d", eWhat );
+        break;
+    }
+
+    /* And now -- the failure. */
+    return -1;
+}
+
+
+int fgPlatformGlutLayerGet( GLenum eWhat )
+{
+    /*
+     * This is easy as layers are not implemented ;-)
+     *
+     * XXX Can we merge the UNIX/X11 and WIN32 sections?  Or
+     * XXX is overlay support planned?
+     */
+    switch( eWhat )
+    {
+
+    case GLUT_OVERLAY_POSSIBLE:
+/*      return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
+                                   PFD_OVERLAY_PLANE ); */
+      return 0 ;
+
+    case GLUT_LAYER_IN_USE:
+        return GLUT_NORMAL;
+
+    case GLUT_HAS_OVERLAY:
+        return 0;
+
+    case GLUT_TRANSPARENT_INDEX:
+        /*
+         * Return just anything, which is always defined as zero
+         *
+         * XXX HUH?
+         */
+        return 0;
+
+    case GLUT_NORMAL_DAMAGED:
+        /* XXX Actually I do not know. Maybe. */
+        return 0;
+
+    case GLUT_OVERLAY_DAMAGED:
+        return -1;
+
+    default:
+        fgWarning( "glutLayerGet(): missing enum handle %d", eWhat );
+        break;
+    }
+
+    /* And fail. That's good. Programs do love failing. */
+    return -1;
+}
+
+
+

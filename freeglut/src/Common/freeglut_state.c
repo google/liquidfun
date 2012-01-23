@@ -42,6 +42,8 @@
  */
 
 extern int fgPlatformGlutGet ( GLenum eWhat );
+extern int fgPlatformGlutDeviceGet ( GLenum eWhat );
+extern int fgPlatformGlutLayerGet ( GLenum eWhat );
 
 /* -- LOCAL DEFINITIONS ---------------------------------------------------- */
 
@@ -223,6 +225,92 @@ static int fgPlatformGlutGet ( GLenum eWhat )
         break;
     }
 }
+
+
+static int fgPlatformGlutDeviceGet ( GLenum eWhat )
+{
+    switch( eWhat )
+    {
+    case GLUT_HAS_KEYBOARD:
+        /*
+         * X11 has a core keyboard by definition, although it can
+         * be present as a virtual/dummy keyboard. For now, there
+         * is no reliable way to tell if a real keyboard is present.
+         */
+        return 1;
+
+    /* X11 has a mouse by definition */
+    case GLUT_HAS_MOUSE:
+        return 1 ;
+
+    case GLUT_NUM_MOUSE_BUTTONS:
+        /* We should be able to pass NULL when the last argument is zero,
+         * but at least one X server has a bug where this causes a segfault.
+         *
+         * In XFree86/Xorg servers, a mouse wheel is seen as two buttons
+         * rather than an Axis; "freeglut_main.c" expects this when
+         * checking for a wheel event.
+         */
+        {
+            unsigned char map;
+            int nbuttons = XGetPointerMapping(fgDisplay.Display, &map,0);
+            return nbuttons;
+        }
+
+    default:
+        fgWarning( "glutDeviceGet(): missing enum handle %d", eWhat );
+        break;
+    }
+
+    /* And now -- the failure. */
+    return -1;
+}
+
+int fgPlatformGlutLayerGet( GLenum eWhat )
+{
+    /*
+     * This is easy as layers are not implemented ;-)
+     *
+     * XXX Can we merge the UNIX/X11 and WIN32 sections?  Or
+     * XXX is overlay support planned?
+     */
+    switch( eWhat )
+    {
+    case GLUT_OVERLAY_POSSIBLE:
+        return 0;
+
+    case GLUT_LAYER_IN_USE:
+        return GLUT_NORMAL;
+
+    case GLUT_HAS_OVERLAY:
+        return 0;
+
+    case GLUT_TRANSPARENT_INDEX:
+        /*
+         * Return just anything, which is always defined as zero
+         *
+         * XXX HUH?
+         */
+        return 0;
+
+    case GLUT_NORMAL_DAMAGED:
+        /* XXX Actually I do not know. Maybe. */
+        return 0;
+
+    case GLUT_OVERLAY_DAMAGED:
+        return -1;
+
+    default:
+        fgWarning( "glutLayerGet(): missing enum handle %d", eWhat );
+        break;
+    }
+
+    /* And fail. That's good. Programs do love failing. */
+    return -1;
+}
+
+
+
 #endif
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
@@ -389,61 +477,6 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
     /* XXX WARNING: we are mostly lying in this function. */
     switch( eWhat )
     {
-    case GLUT_HAS_KEYBOARD:
-        /*
-         * Win32 is assumed a keyboard, and this cannot be queried,
-         * except for WindowsCE.
-         *
-         * X11 has a core keyboard by definition, although it can
-         * be present as a virtual/dummy keyboard. For now, there
-         * is no reliable way to tell if a real keyboard is present.
-         */
-#if defined(_WIN32_CE)
-        return ( GetKeyboardStatus() & KBDI_KEYBOARD_PRESENT ) ? 1 : 0;
-#   if FREEGLUT_LIB_PRAGMAS
-#       pragma comment (lib,"Kbdui.lib")
-#   endif
-
-#else
-        return 1;
-#endif
-
-#if TARGET_HOST_POSIX_X11
-
-    /* X11 has a mouse by definition */
-    case GLUT_HAS_MOUSE:
-        return 1 ;
-
-    case GLUT_NUM_MOUSE_BUTTONS:
-        /* We should be able to pass NULL when the last argument is zero,
-         * but at least one X server has a bug where this causes a segfault.
-         *
-         * In XFree86/Xorg servers, a mouse wheel is seen as two buttons
-         * rather than an Axis; "freeglut_main.c" expects this when
-         * checking for a wheel event.
-         */
-        {
-            unsigned char map;
-            int nbuttons = XGetPointerMapping(fgDisplay.Display, &map,0);
-            return nbuttons;
-        }
-
-#elif TARGET_HOST_MS_WINDOWS
-
-    case GLUT_HAS_MOUSE:
-        /*
-         * MS Windows can be booted without a mouse.
-         */
-        return GetSystemMetrics( SM_MOUSEPRESENT );
-
-    case GLUT_NUM_MOUSE_BUTTONS:
-#  if defined(_WIN32_WCE)
-        return 1;
-#  else
-        return GetSystemMetrics( SM_CMOUSEBUTTONS );
-#  endif
-#endif
-
     case GLUT_HAS_JOYSTICK:
         return fgJoystickDetect ();
 
@@ -489,8 +522,7 @@ int FGAPIENTRY glutDeviceGet( GLenum eWhat )
         return fgState.KeyRepeat;
 
     default:
-        fgWarning( "glutDeviceGet(): missing enum handle %d", eWhat );
-        break;
+		return fgPlatformGlutDeviceGet ( eWhat );
     }
 
     /* And now -- the failure. */
@@ -528,64 +560,8 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
     switch( eWhat )
     {
 
-#if TARGET_HOST_POSIX_X11
-
-    case GLUT_OVERLAY_POSSIBLE:
-        return 0;
-
-    case GLUT_LAYER_IN_USE:
-        return GLUT_NORMAL;
-
-    case GLUT_HAS_OVERLAY:
-        return 0;
-
-    case GLUT_TRANSPARENT_INDEX:
-        /*
-         * Return just anything, which is always defined as zero
-         *
-         * XXX HUH?
-         */
-        return 0;
-
-    case GLUT_NORMAL_DAMAGED:
-        /* XXX Actually I do not know. Maybe. */
-        return 0;
-
-    case GLUT_OVERLAY_DAMAGED:
-        return -1;
-
-#elif TARGET_HOST_MS_WINDOWS
-
-    case GLUT_OVERLAY_POSSIBLE:
-/*      return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
-                                   PFD_OVERLAY_PLANE ); */
-      return 0 ;
-
-    case GLUT_LAYER_IN_USE:
-        return GLUT_NORMAL;
-
-    case GLUT_HAS_OVERLAY:
-        return 0;
-
-    case GLUT_TRANSPARENT_INDEX:
-        /*
-         * Return just anything, which is always defined as zero
-         *
-         * XXX HUH?
-         */
-        return 0;
-
-    case GLUT_NORMAL_DAMAGED:
-        /* XXX Actually I do not know. Maybe. */
-        return 0;
-
-    case GLUT_OVERLAY_DAMAGED:
-        return -1;
-#endif
-
     default:
-        fgWarning( "glutLayerGet(): missing enum handle %d", eWhat );
-        break;
+        return fgPlatformGlutLayerGet( eWhat );
     }
 
     /* And fail. That's good. Programs do love failing. */
