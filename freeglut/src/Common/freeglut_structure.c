@@ -48,6 +48,8 @@ SFG_Structure fgStructure = { { NULL, NULL },  /* The list of windows       */
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
+extern void fgPlatformCreateWindow ( SFG_Window *window );
+
 static void fghClearCallBacks( SFG_Window *window )
 {
     if( window )
@@ -57,6 +59,15 @@ static void fghClearCallBacks( SFG_Window *window )
             window->CallBacks[ i ] = NULL;
     }
 }
+
+#if TARGET_HOST_POSIX_X11
+void fgPlatformCreateWindow ( SFG_Window *window )
+{
+    window->Window.FBConfig = NULL;
+
+    window->State.OldHeight = window->State.OldWidth = -1;
+}
+#endif
 
 /*
  * This private function creates, opens and adds to the hierarchy
@@ -72,16 +83,12 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
     /* Have the window object created */
     SFG_Window *window = (SFG_Window *)calloc( sizeof(SFG_Window), 1 );
 
-#if TARGET_HOST_UNIX_X11
-    window->Window.FBConfig = NULL;
-#endif
+	fgPlatformCreateWindow ( window );
+
     fghClearCallBacks( window );
 
     /* Initialize the object properties */
     window->ID = ++fgStructure.WindowID;
-#if TARGET_HOST_POSIX_X11
-    window->State.OldHeight = window->State.OldWidth = -1;
-#endif
 
     fgListInit( &window->Children );
     if( parent )
