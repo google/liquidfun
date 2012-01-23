@@ -852,20 +852,6 @@ void fgDeinitialize( void );
 void fgCreateStructure( void );
 void fgDestroyStructure( void );
 
-/* A helper function to check if a display mode is possible to use */
-#if TARGET_HOST_POSIX_X11
-GLXFBConfig* fgChooseFBConfig( int* numcfgs );
-#endif
-
-/* The window procedure for Win32 events handling */
-#if TARGET_HOST_MS_WINDOWS
-LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg,
-                               WPARAM wParam, LPARAM lParam );
-void fgNewWGLCreateContext( SFG_Window* window );
-GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
-                              unsigned char layer_type );
-#endif
-
 /*
  * Window creation, opening, closing and destruction.
  * Also CallBack clearing/initialization.

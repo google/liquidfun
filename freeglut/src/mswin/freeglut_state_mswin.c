@@ -29,6 +29,9 @@
 #include "freeglut_internal_mswin.h"
 
 
+extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
+                                     unsigned char layer_type );
+
 
 /* The following include file is available from SGI but is not standard:
  *   #include <GL/wglext.h>

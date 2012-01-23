@@ -29,6 +29,11 @@
 #include "freeglut_internal_mswin.h"
 
 
+
+extern LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg,
+                               WPARAM wParam, LPARAM lParam );
+
+
 /*
  * A call to this function should initialize all the display stuff...
  */

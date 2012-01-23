@@ -45,6 +45,12 @@ extern int fgPlatformGlutGet ( GLenum eWhat );
 extern int fgPlatformGlutDeviceGet ( GLenum eWhat );
 extern int fgPlatformGlutLayerGet ( GLenum eWhat );
 
+/* A helper function to check if a display mode is possible to use */
+#if TARGET_HOST_POSIX_X11
+GLXFBConfig* fgChooseFBConfig( int* numcfgs );
+#endif
+
+
 /* -- LOCAL DEFINITIONS ---------------------------------------------------- */
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */

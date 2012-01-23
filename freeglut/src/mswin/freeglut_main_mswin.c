@@ -31,6 +31,11 @@
 
 extern void fghRedrawWindow ( SFG_Window *window );
 
+extern void fgNewWGLCreateContext( SFG_Window* window );
+extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
+                                     unsigned char layer_type );
+
+
 
 void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 {
