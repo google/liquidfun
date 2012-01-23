@@ -84,6 +84,9 @@ static float menu_pen_hfore [4] = {0.0f,  0.0f,  0.0f,  1.0f};
 static float menu_pen_hback [4] = {1.0f,  1.0f,  1.0f,  1.0f};
 #endif
 
+
+extern GLvoid fghGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y );
+
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
 /*
@@ -139,27 +142,28 @@ static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
 /*
  * Private function to get the virtual maximum screen extent
  */
+#if TARGET_HOST_POSIX_X11
+static GLvoid fghGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
+{
+    int wx, wy;
+    Window w;
+
+    XTranslateCoordinates(
+        fgDisplay.Display,
+        window->Window.Handle,
+        fgDisplay.RootWindow,
+        0, 0, &wx, &wy, &w);
+
+    *x = fgState.GameModeSize.X + wx;
+    *y = fgState.GameModeSize.Y + wy;
+}
+#endif
+
+
 static GLvoid fghGetVMaxExtent( SFG_Window* window, int* x, int* y )
 {
     if( fgStructure.GameModeWindow )
-    {
-#if TARGET_HOST_POSIX_X11
-        int wx, wy;
-        Window w;
-
-        XTranslateCoordinates(
-            fgDisplay.Display,
-            window->Window.Handle,
-            fgDisplay.RootWindow,
-            0, 0, &wx, &wy, &w);
-
-        *x = fgState.GameModeSize.X + wx;
-        *y = fgState.GameModeSize.Y + wy;
-#else
-        *x = glutGet ( GLUT_SCREEN_WIDTH );
-        *y = glutGet ( GLUT_SCREEN_HEIGHT );
-#endif
-    }
+		fghGetGameModeVMaxExtent ( window, x, y );
     else
     {
         *x = fgDisplay.ScreenWidth;
