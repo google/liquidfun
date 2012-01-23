@@ -45,7 +45,7 @@ int serial_putchar ( SERIALPORT *port, unsigned char ch );
 void serial_flush ( SERIALPORT *port );
 
 
-void fghRegisterDialDevice ( const char *dial_device )
+void fgPlatformRegisterDialDevice ( const char *dial_device )
 {
         if (!dial_device){
             static char devname[256];

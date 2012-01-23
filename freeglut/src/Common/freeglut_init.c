@@ -100,9 +100,9 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
-extern void fghInitialize( const char* displayName );
-extern void fghDeinitialiseInputDevices ( void );
-extern void fghCloseDisplay ( void );
+extern void fgPlatformInitialize( const char* displayName );
+extern void fgPlatformDeinitialiseInputDevices ( void );
+extern void fgPlatformCloseDisplay ( void );
 
 #if TARGET_HOST_POSIX_X11
 
@@ -246,7 +246,7 @@ int fgHintPresent(Window window, Atom property, Atom hint)
 /*
  * A call to this function should initialize all the display stuff...
  */
-static void fghInitialize( const char* displayName )
+static void fgPlatformInitialize( const char* displayName )
 {
     fgDisplay.Display = XOpenDisplay( displayName );
 
@@ -437,7 +437,7 @@ void fghCloseInputDevices ( void )
 
 
 #if TARGET_HOST_POSIX_X11
-static void fghDeinitialiseInputDevices ( void )
+static void fgPlatformDeinitialiseInputDevices ( void )
 {
 	fghCloseInputDevices ();
 
@@ -446,7 +446,7 @@ static void fghDeinitialiseInputDevices ( void )
 }
 
 
-static void fghCloseDisplay ( void )
+static void fgPlatformCloseDisplay ( void )
 {
     /*
      * Make sure all X-client data we have created will be destroyed on
@@ -506,7 +506,7 @@ void fgDeinitialize( void )
         free( timer );
     }
 
-	fghDeinitialiseInputDevices ();
+	fgPlatformDeinitialiseInputDevices ();
 
 	fgState.MouseWheelTicks = 0;
 
@@ -560,7 +560,7 @@ void fgDeinitialize( void )
         fgState.ProgramName = NULL;
     }
 
-	fghCloseDisplay ();
+	fgPlatformCloseDisplay ();
 
     fgState.Initialised = GL_FALSE;
 }
@@ -617,7 +617,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * in the program arguments, we will use the DISPLAY environment
      * variable for opening the X display (see code above):
      */
-    fghInitialize( displayName );
+    fgPlatformInitialize( displayName );
 
     /*
      * Geometry parsing deffered until here because we may need the screen

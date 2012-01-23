@@ -85,7 +85,7 @@ static float menu_pen_hback [4] = {1.0f,  1.0f,  1.0f,  1.0f};
 #endif
 
 
-extern GLvoid fghGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y );
+extern GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y );
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
@@ -143,7 +143,7 @@ static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
  * Private function to get the virtual maximum screen extent
  */
 #if TARGET_HOST_POSIX_X11
-static GLvoid fghGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
+static GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
 {
     int wx, wy;
     Window w;
@@ -163,7 +163,7 @@ static GLvoid fghGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
 static GLvoid fghGetVMaxExtent( SFG_Window* window, int* x, int* y )
 {
     if( fgStructure.GameModeWindow )
-		fghGetGameModeVMaxExtent ( window, x, y );
+		fgPlatformGetGameModeVMaxExtent ( window, x, y );
     else
     {
         *x = fgDisplay.ScreenWidth;

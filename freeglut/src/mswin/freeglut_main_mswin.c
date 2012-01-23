@@ -32,7 +32,7 @@
 extern void fghRedrawWindow ( SFG_Window *window );
 
 
-void fghPlatformReshapeWindow ( SFG_Window *window, int width, int height )
+void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 {
     RECT windowRect;
 
@@ -80,7 +80,7 @@ void fghPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 }
 
 
-void fghcbPlatformDisplayWindow ( SFG_Window *window )
+void fgPlatformDisplayWindow ( SFG_Window *window )
 {
     RedrawWindow(
         window->Window.Handle, NULL, NULL,
@@ -89,13 +89,13 @@ void fghcbPlatformDisplayWindow ( SFG_Window *window )
 }
 
 
-void fghPlatformSleepForEvents( long msec )
+void fgPlatformSleepForEvents( long msec )
 {
     MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLINPUT );
 }
 
 
-void fghProcessSingleEvent ( void )
+void fgPlatformProcessSingleEvent ( void )
 {
     MSG stMsg;
 
@@ -123,7 +123,7 @@ void fghProcessSingleEvent ( void )
 
 
 
-void fghMainLoopPreliminaryWork ( void )
+void fgPlatformMainLoopPreliminaryWork ( void )
 {
     SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
 
@@ -154,7 +154,7 @@ void fghMainLoopPreliminaryWork ( void )
 /*
  * Determine a GLUT modifer mask based on MS-WINDOWS system info.
  */
-static int fghGetModifiers (void)
+static int fgPlatformGetModifiers (void)
 {
     return
         ( ( ( GetKeyState( VK_LSHIFT   ) < 0 ) ||
@@ -168,8 +168,8 @@ static int fghGetModifiers (void)
 /*
  * The window procedure for handling Win32 events
  */
-LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
-                               LPARAM lParam )
+LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
+                                       LPARAM lParam )
 {
     static unsigned char lControl = 0, rControl = 0, lShift = 0,
                          rShift = 0, lAlt = 0, rAlt = 0;
@@ -307,7 +307,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         /* The window structure is passed as the creation structure parameter... */
         window = (SFG_Window *) (((LPCREATESTRUCT) lParam)->lpCreateParams);
         FREEGLUT_INTERNAL_ERROR_EXIT ( ( window != NULL ), "Cannot create window",
-                                       "fgWindowProc" );
+                                       "fgPlatformWindowProc" );
 
         window->Window.Handle = hWnd;
         window->Window.Device = GetDC( hWnd );
@@ -497,7 +497,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
         SetFocus(window->Window.Handle);
 
-        fgState.Modifiers = fghGetModifiers( );
+        fgState.Modifiers = fgPlatformGetModifiers( );
 
         if( ( wParam & MK_LBUTTON ) ||
             ( wParam & MK_MBUTTON ) ||
@@ -607,7 +607,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             break;
 
         fgSetWindow( window );
-        fgState.Modifiers = fghGetModifiers( );
+        fgState.Modifiers = fgPlatformGetModifiers( );
 
         INVOKE_WCB(
             *window, Mouse,
@@ -641,7 +641,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 break;
 
             fgSetWindow( window );
-            fgState.Modifiers = fghGetModifiers( );
+            fgState.Modifiers = fgPlatformGetModifiers( );
 
             /*
              * XXX Should use WHEEL_DELTA instead of 120
@@ -702,7 +702,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Remember the current modifiers state. This is done here in order
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
-        fgState.Modifiers = fghGetModifiers( );
+        fgState.Modifiers = fgPlatformGetModifiers( );
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
@@ -792,7 +792,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          * Remember the current modifiers state. This is done here in order
          * to make sure the VK_DELETE keyboard callback is executed properly.
          */
-        fgState.Modifiers = fghGetModifiers( );
+        fgState.Modifiers = fgPlatformGetModifiers( );
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
@@ -877,7 +877,7 @@ LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
       if( (fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE) && (HIWORD(lParam) & KF_REPEAT) )
             break;
 
-        fgState.Modifiers = fghGetModifiers( );
+        fgState.Modifiers = fgPlatformGetModifiers( );
         INVOKE_WCB( *window, Keyboard,
                     ( (char)wParam,
                       window->State.MouseX, window->State.MouseY )

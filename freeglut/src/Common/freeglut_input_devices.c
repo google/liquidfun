@@ -99,7 +99,7 @@ extern int serial_getchar ( SERIALPORT *port );
 extern int serial_putchar ( SERIALPORT *port, unsigned char ch );
 extern void serial_flush ( SERIALPORT *port );
 
-extern void fghRegisterDialDevice ( const char *dial_device );
+extern void fgPlatformRegisterDialDevice ( const char *dial_device );
 static void send_dial_event(int dial, int value);
 static void poll_dials(int id);
 
@@ -128,7 +128,7 @@ int fgInputDeviceDetect( void )
  * Try initializing the input device(s)
  */
 #if TARGET_HOST_POSIX_X11
-static void fghRegisterDialDevice ( const char *dial_device )
+static void fgPlatformRegisterDialDevice ( const char *dial_device )
 {
 }
 #endif
@@ -139,7 +139,7 @@ void fgInitialiseInputDevices ( void )
     {
         const char *dial_device=NULL;
         dial_device = getenv ( "GLUT_DIALS_SERIAL" );
-		fghRegisterDialDevice ( dial_device );
+		fgPlatformRegisterDialDevice ( dial_device );
 
         if ( !dial_device ) return;
         if ( !( dialbox_port = serial_open ( dial_device ) ) ) return;

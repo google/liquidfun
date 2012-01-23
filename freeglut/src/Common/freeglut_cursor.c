@@ -39,8 +39,8 @@
 
 /* -- PRIVATE FUNCTIONS --------------------------------------------------- */
 
-extern void fghSetCursor ( SFG_Window *window, int cursorID );
-extern void fghWarpPointer ( int x, int y );
+extern void fgPlatformSetCursor ( SFG_Window *window, int cursorID );
+extern void fgPlatformWarpPointer ( int x, int y );
 
 #if TARGET_HOST_POSIX_X11 || TARGET_HOST_MAC_OSX || TARGET_HOST_SOLARIS
   #include <X11/cursorfont.h>
@@ -104,7 +104,7 @@ static cursorCacheEntry cursorCache[] = {
     { XC_bottom_left_corner,  None }  /* GLUT_CURSOR_BOTTOM_LEFT_CORNER */
 };
 
-static void fghSetCursor ( SFG_Window *window, int cursorID )
+static void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
 {
     Cursor cursor;
     /*
@@ -150,7 +150,7 @@ static void fghSetCursor ( SFG_Window *window, int cursorID )
 }
 
 
-static void fghWarpPointer ( int x, int y )
+static void fgPlatformWarpPointer ( int x, int y )
 {
     XWarpPointer(
         fgDisplay.Display,
@@ -168,7 +168,7 @@ static void fghWarpPointer ( int x, int y )
 /* -- INTERNAL FUNCTIONS ---------------------------------------------------- */
 void fgSetCursor ( SFG_Window *window, int cursorID )
 {
-    fghSetCursor ( window, cursorID );
+    fgPlatformSetCursor ( window, cursorID );
 }
 
 
@@ -182,7 +182,7 @@ void FGAPIENTRY glutSetCursor( int cursorID )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetCursor" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetCursor" );
 
-    fghSetCursor ( fgStructure.CurrentWindow, cursorID );
+    fgPlatformSetCursor ( fgStructure.CurrentWindow, cursorID );
     fgStructure.CurrentWindow->State.Cursor = cursorID;
 }
 
@@ -194,7 +194,7 @@ void FGAPIENTRY glutWarpPointer( int x, int y )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWarpPointer" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutWarpPointer" );
 
-    fghWarpPointer ( x, y );
+    fgPlatformWarpPointer ( x, y );
 }
 
 /*** END OF FILE ***/

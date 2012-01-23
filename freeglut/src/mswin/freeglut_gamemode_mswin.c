@@ -32,7 +32,7 @@
  * Remembers the current visual settings, so that
  * we can change them and restore later...
  */
-void fghRememberState( void )
+void fgPlatformRememberState( void )
 {
 /*    DEVMODE devMode; */
 
@@ -53,7 +53,7 @@ void fghRememberState( void )
 /*
  * Restores the previously remembered visual settings
  */
-void fghRestoreState( void )
+void fgPlatformRestoreState( void )
 {
     /* Restore the previously remembered desktop display settings */
     ChangeDisplaySettingsEx( fgDisplay.DisplayName,&fgDisplay.DisplayMode, 0,0,0 );
@@ -66,7 +66,7 @@ void fghRestoreState( void )
 /*
  * Changes the current display mode to match user's settings
  */
-GLboolean fghChangeDisplayMode( GLboolean haveToTest )
+GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
 {
     GLboolean success = GL_FALSE;
     DEVMODE  devMode;

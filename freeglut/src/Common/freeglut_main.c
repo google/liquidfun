@@ -77,11 +77,11 @@ struct GXKeyList gxKeyList;
 	static pCloseTouchInputHandle fghCloseTouchInputHandle = (pCloseTouchInputHandle)0xDEADBEEF;
 #endif
 
-extern void fghPlatformReshapeWindow ( SFG_Window *window, int width, int height );
-extern void fghcbPlatformDisplayWindow ( SFG_Window *window );
-extern void fghPlatformSleepForEvents( long msec );
-extern void fghProcessSingleEvent ( void );
-extern void fghMainLoopPreliminaryWork ( void );
+extern void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height );
+extern void fgPlatformDisplayWindow ( SFG_Window *window );
+extern void fgPlatformSleepForEvents( long msec );
+extern void fgPlatformProcessSingleEvent ( void );
+extern void fgPlatformMainLoopPreliminaryWork ( void );
 
 
 /*
@@ -103,7 +103,7 @@ extern void fghMainLoopPreliminaryWork ( void );
  * match the new window size.
  */
 #if TARGET_HOST_POSIX_X11
-static void fghPlatformReshapeWindow ( SFG_Window *window, int width, int height )
+static void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 {
     XResizeWindow( fgDisplay.Display, window->Window.Handle,
                    width, height );
@@ -117,7 +117,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 
     freeglut_return_if_fail( window != NULL );
 
-	fghPlatformReshapeWindow ( window, width, height );
+	fgPlatformReshapeWindow ( window, width, height );
 
     if( FETCH_WCB( *window, Reshape ) )
         INVOKE_WCB( *window, Reshape, ( width, height ) );
@@ -177,7 +177,7 @@ void fghRedrawWindow ( SFG_Window *window )
  * A static helper function to execute display callback for a window
  */
 #if TARGET_HOST_POSIX_X11
-static void fghcbPlatformDisplayWindow ( SFG_Window *window )
+static void fgPlatformDisplayWindow ( SFG_Window *window )
 {
         fghRedrawWindow ( window ) ;
 }
@@ -190,7 +190,7 @@ static void fghcbDisplayWindow( SFG_Window *window,
         window->State.Visible )
     {
         window->State.Redisplay = GL_FALSE;
-		fghcbPlatformDisplayWindow ( window );
+		fgPlatformDisplayWindow ( window );
     }
 
     fgEnumSubWindows( window, fghcbDisplayWindow, enumerator );
@@ -423,7 +423,7 @@ static long fghNextTimer( void )
  */
 
 #if TARGET_HOST_POSIX_X11
-static void fghPlatformSleepForEvents( long msec )
+static void fgPlatformSleepForEvents( long msec )
 {
     /*
      * Possibly due to aggressive use of XFlush() and friends,
@@ -469,14 +469,14 @@ static void fghSleepForEvents( void )
     if( fghHaveJoystick( ) && ( msec > 10 ) )     
         msec = 10;
 
-	fghPlatformSleepForEvents ( msec );
+	fgPlatformSleepForEvents ( msec );
 }
 
 #if TARGET_HOST_POSIX_X11
 /*
  * Returns GLUT modifier mask for the state field of an X11 event.
  */
-int fghGetModifiers( int state )
+int fgPlatformGetModifiers( int state )
 {
     int ret = 0;
 
@@ -933,7 +933,7 @@ static void fghPrintEvent( XEvent *event )
 }
 
 
-void fghProcessSingleEvent ( void )
+void fgPlatformProcessSingleEvent ( void )
 {
     SFG_Window* window;
     XEvent event;
@@ -1147,7 +1147,7 @@ void fghProcessSingleEvent ( void )
              * XXX track ButtonPress/ButtonRelease events in our own
              * XXX bit-mask?
              */
-            fgState.Modifiers = fghGetModifiers( event.xmotion.state );
+            fgState.Modifiers = fgPlatformGetModifiers( event.xmotion.state );
             if ( event.xmotion.state & ( Button1Mask | Button2Mask | Button3Mask | Button4Mask | Button5Mask ) ) {
                 INVOKE_WCB( *window, Motion, ( event.xmotion.x,
                                                event.xmotion.y ) );
@@ -1201,7 +1201,7 @@ void fghProcessSingleEvent ( void )
                 ! FETCH_WCB( *window, MouseWheel ) )
                 break;
 
-            fgState.Modifiers = fghGetModifiers( event.xbutton.state );
+            fgState.Modifiers = fgPlatformGetModifiers( event.xbutton.state );
 
             /* Finally execute the mouse or mouse wheel callback */
             if( ( button < glutDeviceGet ( GLUT_NUM_MOUSE_BUTTONS ) ) || ( ! FETCH_WCB( *window, MouseWheel ) ) )
@@ -1316,7 +1316,7 @@ void fghProcessSingleEvent ( void )
                     if( keyboard_cb )
                     {
                         fgSetWindow( window );
-                        fgState.Modifiers = fghGetModifiers( event.xkey.state );
+                        fgState.Modifiers = fgPlatformGetModifiers( event.xkey.state );
                         keyboard_cb( asciiCode[ 0 ],
                                      event.xkey.x, event.xkey.y
                         );
@@ -1385,7 +1385,7 @@ void fghProcessSingleEvent ( void )
                     if( special_cb && (special != -1) )
                     {
                         fgSetWindow( window );
-                        fgState.Modifiers = fghGetModifiers( event.xkey.state );
+                        fgState.Modifiers = fgPlatformGetModifiers( event.xkey.state );
                         special_cb( special, event.xkey.x, event.xkey.y );
                         fgState.Modifiers = INVALID_MODIFIERS;
                     }
@@ -1412,7 +1412,7 @@ void fghProcessSingleEvent ( void )
 }
 
 
-static void fghMainLoopPreliminaryWork ( void )
+static void fgPlatformMainLoopPreliminaryWork ( void )
 {
 }
 #endif
@@ -1424,7 +1424,7 @@ static void fghMainLoopPreliminaryWork ( void )
  */
 void FGAPIENTRY glutMainLoopEvent( void )
 {
-	fghProcessSingleEvent ();
+	fgPlatformProcessSingleEvent ();
 
     if( fgState.Timers.First )
         fghCheckTimers( );
@@ -1444,7 +1444,7 @@ void FGAPIENTRY glutMainLoop( void )
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMainLoop" );
 
-	fghMainLoopPreliminaryWork ();
+	fgPlatformMainLoopPreliminaryWork ();
 
     fgState.ExecState = GLUT_EXEC_STATE_RUNNING ;
     while( fgState.ExecState == GLUT_EXEC_STATE_RUNNING )

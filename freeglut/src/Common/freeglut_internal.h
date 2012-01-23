@@ -859,7 +859,7 @@ GLXFBConfig* fgChooseFBConfig( int* numcfgs );
 
 /* The window procedure for Win32 events handling */
 #if TARGET_HOST_MS_WINDOWS
-LRESULT CALLBACK fgWindowProc( HWND hWnd, UINT uMsg,
+LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg,
                                WPARAM wParam, LPARAM lParam );
 void fgNewWGLCreateContext( SFG_Window* window );
 GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,

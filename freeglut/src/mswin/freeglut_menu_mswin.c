@@ -29,7 +29,7 @@
 #include "freeglut_internal_mswin.h"
 
 
-GLvoid fghGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
+GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
 {
     *x = glutGet ( GLUT_SCREEN_WIDTH );
     *y = glutGet ( GLUT_SCREEN_HEIGHT );

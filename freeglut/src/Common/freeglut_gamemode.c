@@ -39,9 +39,9 @@
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
-extern void fghRememberState( void );
-extern void fghRestoreState( void );
-extern GLboolean fghChangeDisplayMode( GLboolean haveToTest );
+extern void fgPlatformRememberState( void );
+extern void fgPlatformRestoreState( void );
+extern GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest );
 
 
 #if TARGET_HOST_POSIX_X11
@@ -163,7 +163,7 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
  * Remembers the current visual settings, so that
  * we can change them and restore later...
  */
-static void fghRememberState( void )
+static void fgPlatformRememberState( void )
 {
     int event_base, error_base;
 
@@ -248,7 +248,7 @@ static void fghRememberState( void )
 /*
  * Restores the previously remembered visual settings
  */
-static void fghRestoreState( void )
+static void fgPlatformRestoreState( void )
 {
     /* Restore the remembered pointer position: */
     XWarpPointer(
@@ -398,7 +398,7 @@ static int fghCheckDisplayModes( GLboolean exactMatch, int displayModesCount, XF
 /*
  * Changes the current display mode to match user's settings
  */
-static GLboolean fghChangeDisplayMode( GLboolean haveToTest )
+static GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
 {
     GLboolean success = GL_FALSE;
     /* first try to use XRandR, then fallback to XF86VidMode */
@@ -532,7 +532,7 @@ void FGAPIENTRY glutGameModeString( const char* string )
 
     /* All values not specified are now set to -1, which means those
      * aspects of the current display mode are not changed in
-     * fghChangeDisplayMode() above.
+     * fgPlatformChangeDisplayMode() above.
      */
     fgState.GameModeSize.X  = width;
     fgState.GameModeSize.Y  = height;
@@ -552,9 +552,9 @@ int FGAPIENTRY glutEnterGameMode( void )
     if( fgStructure.GameModeWindow )
         fgAddToWindowDestroyList( fgStructure.GameModeWindow );
     else
-        fghRememberState( );
+        fgPlatformRememberState( );
 
-    if( ! fghChangeDisplayMode( GL_FALSE ) )
+    if( ! fgPlatformChangeDisplayMode( GL_FALSE ) )
     {
         fgWarning( "failed to change screen settings" );
         return 0;
@@ -680,7 +680,7 @@ void FGAPIENTRY glutLeaveGameMode( void )
 
 #endif
 
-    fghRestoreState();
+    fgPlatformRestoreState();
 }
 
 /*
@@ -696,7 +696,7 @@ int FGAPIENTRY glutGameModeGet( GLenum eWhat )
         return !!fgStructure.GameModeWindow;
 
     case GLUT_GAME_MODE_POSSIBLE:
-        return fghChangeDisplayMode( GL_TRUE );
+        return fgPlatformChangeDisplayMode( GL_TRUE );
 
     case GLUT_GAME_MODE_WIDTH:
         return fgState.GameModeSize.X;

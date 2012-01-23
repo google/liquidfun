@@ -30,7 +30,7 @@
 #include "freeglut_internal.h"
 
 extern SFG_Proc fghGetProcAddress( const char *procName );
-extern GLUTproc fghGetPlatformSpecificGLUTProcAddress( const char *procName );
+extern GLUTproc fgPlatformGlutGetProcAddress( const char *procName );
 
 static GLUTproc fghGetGLUTProcAddress( const char* procName )
 {
@@ -223,6 +223,12 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
 }
 
 
+static GLUTproc fgPlatformGlutGetProcAddress( const char* procName )
+{
+    return NULL;
+}
+
+
 SFG_Proc fghGetProcAddress( const char *procName )
 {
 #if defined( GLX_ARB_get_proc_address )
@@ -245,7 +251,7 @@ glutGetProcAddress( const char *procName )
 
 	/* Some GLUT functions are platform-specific: */
 	if ( !p )
-      p = fghGetPlatformSpecificGLUTProcAddress( procName );
+      p = fgPlatformGlutGetProcAddress( procName );
 
     return ( p != NULL ) ? p : fghGetProcAddress( procName );
 }

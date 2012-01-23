@@ -30,7 +30,7 @@
 
 
 
-void fghSetCursor ( SFG_Window *window, int cursorID )
+void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
 {
     /*
      * Joe Krahn is re-writing the following code.
@@ -101,7 +101,7 @@ void fghSetCursor ( SFG_Window *window, int cursorID )
 }
 
 
-void fghWarpPointer ( int x, int y )
+void fgPlatformWarpPointer ( int x, int y )
 {
     POINT coords;
     coords.x = x;

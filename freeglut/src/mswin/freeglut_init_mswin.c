@@ -32,7 +32,7 @@
 /*
  * A call to this function should initialize all the display stuff...
  */
-void fghInitialize( const char* displayName )
+void fgPlatformInitialize( const char* displayName )
 {
     WNDCLASS wc;
     ATOM atom;
@@ -54,7 +54,7 @@ void fghInitialize( const char* displayName )
          * XXX Old code had "| CS_DBCLCKS" commented out.  Plans for the
          * XXX future?  Dead-end idea?
          */
-        wc.lpfnWndProc    = fgWindowProc;
+        wc.lpfnWndProc    = fgPlatformWindowProc;
         wc.cbClsExtra     = 0;
         wc.cbWndExtra     = 0;
         wc.hInstance      = fgDisplay.Instance;
@@ -75,7 +75,7 @@ void fghInitialize( const char* displayName )
 
         /* Register the window class */
         atom = RegisterClass( &wc );
-        FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Not Registered", "fghInitialize" );
+        FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Not Registered", "fgPlatformInitialize" );
     }
 
     /* The screen dimensions can be obtained via GetSystemMetrics() calls */
@@ -104,7 +104,7 @@ void fghInitialize( const char* displayName )
 	    DeleteDC(context);
         }
         else
-	    fgWarning("fghInitialize: "
+	    fgWarning("fgPlatformInitialize: "
 		      "CreateDC failed, Screen size info may be incorrect\n"
           "This is quite likely caused by a bad '-display' parameter");
       
@@ -131,7 +131,7 @@ void fghInitialize( const char* displayName )
 /* Platform-Specific Deinitialization Functions: */
 extern void fghCloseInputDevices ( void );
 
-void fghDeinitialiseInputDevices ( void )
+void fgPlatformDeinitialiseInputDevices ( void )
 {
 #if !defined(_WIN32_WCE)
 	fghCloseInputDevices ();
@@ -140,7 +140,7 @@ void fghDeinitialiseInputDevices ( void )
     fgState.InputDevsInitialised = GL_FALSE;
 }
 
-void fghCloseDisplay ( void )
+void fgPlatformCloseDisplay ( void )
 {
     if( fgDisplay.DisplayName )
     {

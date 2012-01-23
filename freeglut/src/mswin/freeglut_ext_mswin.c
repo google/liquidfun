@@ -28,7 +28,7 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal_mswin.h"
 
-GLUTproc fghGetPlatformSpecificGLUTProcAddress( const char* procName )
+GLUTproc fgPlatformGlutGetProcAddress( const char* procName )
 {
 #if !defined(_WIN32_WCE)
     /* optimization: quick initial check */
