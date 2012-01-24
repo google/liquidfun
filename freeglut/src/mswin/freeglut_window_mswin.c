@@ -95,6 +95,13 @@ typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
 static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
 #endif
 
+/* 
+ * Helper functions for getting client area from the window rect
+ * and the window rect from the client area given the style of the window
+ * (or a valid window pointer from which the style can be queried).
+ */
+extern void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth);
+
 
 /*
  * Setup the pixel format for a Win32 window

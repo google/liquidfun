@@ -42,6 +42,13 @@ static pGetTouchInputInfo fghGetTouchInputInfo = (pGetTouchInputInfo)0xDEADBEEF;
 static pCloseTouchInputHandle fghCloseTouchInputHandle = (pCloseTouchInputHandle)0xDEADBEEF;
 #endif
 
+/* 
+ * Helper functions for getting client area from the window rect
+ * and the window rect from the client area given the style of the window
+ * (or a valid window pointer from which the style can be queried).
+ */
+extern void fghComputeWindowRectFromClientArea_QueryWindow( const SFG_Window *window, RECT *clientRect, BOOL posIsOutside );
+extern RECT fghGetClientArea                              ( const SFG_Window *window,                   BOOL wantPosOutside );
 
 
 void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )

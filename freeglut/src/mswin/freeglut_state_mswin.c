@@ -32,6 +32,14 @@
 extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                                      unsigned char layer_type );
 
+/* 
+ * Helper functions for getting client area from the window rect
+ * and the window rect from the client area given the style of the window
+ * (or a valid window pointer from which the style can be queried).
+ */
+extern RECT fghGetClientArea( const SFG_Window *window, BOOL wantPosOutside );
+extern void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth);
+
 
 /* The following include file is available from SGI but is not standard:
  *   #include <GL/wglext.h>
