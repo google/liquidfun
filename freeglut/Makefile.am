@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = src Common include progs doc
+SUBDIRS = src src/Common src/x11 include progs doc
 AUTOMAKE_OPTIONS = gnu
 
 EXTRA_DIST = \
@@ -52,7 +52,7 @@ EXTRA_DIST = \
 	progs/demos/smooth_opengl3/smooth_opengl3_vs2008.vcproj
 
 # Thanks to WinDoze, some files in CVS have the "execute" bit set when they
-# shoudn't. We could fix this if we had direct access to the CVS repository,
+# shouldn't. We could fix this if we had direct access to the CVS repository,
 # but we are not that lucky. Instead we fix this at distribution creation time.
 dist-hook:
 	find $(distdir) -type f \( \
