@@ -246,7 +246,7 @@ int fgHintPresent(Window window, Atom property, Atom hint)
 /*
  * A call to this function should initialize all the display stuff...
  */
-static void fgPlatformInitialize( const char* displayName )
+void fgPlatformInitialize( const char* displayName )
 {
     fgDisplay.Display = XOpenDisplay( displayName );
 
@@ -437,7 +437,7 @@ void fghCloseInputDevices ( void )
 
 
 #if TARGET_HOST_POSIX_X11
-static void fgPlatformDeinitialiseInputDevices ( void )
+void fgPlatformDeinitialiseInputDevices ( void )
 {
 	fghCloseInputDevices ();
 
@@ -446,7 +446,7 @@ static void fgPlatformDeinitialiseInputDevices ( void )
 }
 
 
-static void fgPlatformCloseDisplay ( void )
+void fgPlatformCloseDisplay ( void )
 {
     /*
      * Make sure all X-client data we have created will be destroyed on

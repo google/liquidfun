@@ -104,7 +104,7 @@ static cursorCacheEntry cursorCache[] = {
     { XC_bottom_left_corner,  None }  /* GLUT_CURSOR_BOTTOM_LEFT_CORNER */
 };
 
-static void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
+void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
 {
     Cursor cursor;
     /*
@@ -150,7 +150,7 @@ static void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
 }
 
 
-static void fgPlatformWarpPointer ( int x, int y )
+void fgPlatformWarpPointer ( int x, int y )
 {
     XWarpPointer(
         fgDisplay.Display,

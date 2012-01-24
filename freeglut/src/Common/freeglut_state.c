@@ -73,7 +73,7 @@ static int fghGetConfig( int attribute )
   return returnValue;
 }
 
-static int fgPlatformGlutGet ( GLenum eWhat )
+int fgPlatformGlutGet ( GLenum eWhat )
 {
     int nsamples = 0;
 
@@ -233,7 +233,7 @@ static int fgPlatformGlutGet ( GLenum eWhat )
 }
 
 
-static int fgPlatformGlutDeviceGet ( GLenum eWhat )
+int fgPlatformGlutDeviceGet ( GLenum eWhat )
 {
     switch( eWhat )
     {

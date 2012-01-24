@@ -96,7 +96,7 @@ extern void fgPlatformMainLoopPreliminaryWork ( void );
  * match the new window size.
  */
 #if TARGET_HOST_POSIX_X11
-static void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
+void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 {
     XResizeWindow( fgDisplay.Display, window->Window.Handle,
                    width, height );
@@ -170,7 +170,7 @@ void fghRedrawWindow ( SFG_Window *window )
  * A static helper function to execute display callback for a window
  */
 #if TARGET_HOST_POSIX_X11
-static void fgPlatformDisplayWindow ( SFG_Window *window )
+void fgPlatformDisplayWindow ( SFG_Window *window )
 {
         fghRedrawWindow ( window ) ;
 }
@@ -416,7 +416,7 @@ static long fghNextTimer( void )
  */
 
 #if TARGET_HOST_POSIX_X11
-static void fgPlatformSleepForEvents( long msec )
+void fgPlatformSleepForEvents( long msec )
 {
     /*
      * Possibly due to aggressive use of XFlush() and friends,
@@ -1405,7 +1405,7 @@ void fgPlatformProcessSingleEvent ( void )
 }
 
 
-static void fgPlatformMainLoopPreliminaryWork ( void )
+void fgPlatformMainLoopPreliminaryWork ( void )
 {
 }
 #endif

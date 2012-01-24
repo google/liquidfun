@@ -163,7 +163,7 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
  * Remembers the current visual settings, so that
  * we can change them and restore later...
  */
-static void fgPlatformRememberState( void )
+void fgPlatformRememberState( void )
 {
     int event_base, error_base;
 
@@ -248,7 +248,7 @@ static void fgPlatformRememberState( void )
 /*
  * Restores the previously remembered visual settings
  */
-static void fgPlatformRestoreState( void )
+void fgPlatformRestoreState( void )
 {
     /* Restore the remembered pointer position: */
     XWarpPointer(
@@ -398,7 +398,7 @@ static int fghCheckDisplayModes( GLboolean exactMatch, int displayModesCount, XF
 /*
  * Changes the current display mode to match user's settings
  */
-static GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
+GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
 {
     GLboolean success = GL_FALSE;
     /* first try to use XRandR, then fallback to XF86VidMode */

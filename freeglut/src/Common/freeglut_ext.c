@@ -223,7 +223,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
 }
 
 
-static GLUTproc fgPlatformGlutGetProcAddress( const char* procName )
+GLUTproc fgPlatformGlutGetProcAddress( const char* procName )
 {
     return NULL;
 }

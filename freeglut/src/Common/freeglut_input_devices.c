@@ -128,7 +128,7 @@ int fgInputDeviceDetect( void )
  * Try initializing the input device(s)
  */
 #if TARGET_HOST_POSIX_X11
-static void fgPlatformRegisterDialDevice ( const char *dial_device )
+void fgPlatformRegisterDialDevice ( const char *dial_device )
 {
 }
 #endif

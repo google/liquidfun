@@ -143,7 +143,7 @@ static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
  * Private function to get the virtual maximum screen extent
  */
 #if TARGET_HOST_POSIX_X11
-static GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
+GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
 {
     int wx, wy;
     Window w;
