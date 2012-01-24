@@ -90,6 +90,11 @@ extern int fghIsLegacyContextRequested( void );
 extern void fghContextCreationError( void );
 extern int fghNumberOfAuxBuffersRequested( void );
 
+#ifdef WM_TOUCH
+typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
+static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
+#endif
+
 
 /*
  * Setup the pixel format for a Win32 window

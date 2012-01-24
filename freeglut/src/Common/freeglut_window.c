@@ -89,11 +89,6 @@
 #endif  /* TARGET_HOST_POSIX_X11 */
 
 
-#ifdef WM_TOUCH
-	typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
-   static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
-#endif
-
 /* pushing attribute/value pairs into an array */
 #define ATTRIB(a) attributes[where++]=(a)
 #define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}

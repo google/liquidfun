@@ -35,6 +35,13 @@ extern void fgNewWGLCreateContext( SFG_Window* window );
 extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                                      unsigned char layer_type );
 
+#ifdef WM_TOUCH
+typedef BOOL (WINAPI *pGetTouchInputInfo)(HTOUCHINPUT,UINT,PTOUCHINPUT,int);
+typedef BOOL (WINAPI *pCloseTouchInputHandle)(HTOUCHINPUT);
+static pGetTouchInputInfo fghGetTouchInputInfo = (pGetTouchInputInfo)0xDEADBEEF;
+static pCloseTouchInputHandle fghCloseTouchInputHandle = (pCloseTouchInputHandle)0xDEADBEEF;
+#endif
+
 
 
 void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
