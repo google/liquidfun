@@ -788,50 +788,47 @@ struct tagSFG_StrokeFont
 
 #if TARGET_HOST_MACINTOSH
 #    define _JS_MAX_AXES  9
-#endif
-
-#if TARGET_HOST_MAC_OSX
-#    define _JS_MAX_AXES 16
-#endif
-
-#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
-#    define _JS_MAX_AXES  8
-#endif
-
-#if TARGET_HOST_POSIX_X11
-#    define _JS_MAX_AXES 16
-#endif
-
-/*
- * Definition of "SFG_Joystick" structure -- based on JS's "jsJoystick" object class.
- * See "js.h" lines 80-178.
- */
-typedef struct tagSFG_Joystick SFG_Joystick;
-struct tagSFG_Joystick
+typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
+struct tagSFG_PlatformJoystick
 {
-#if TARGET_HOST_MACINTOSH
 #define  ISP_NUM_AXIS    9
 #define  ISP_NUM_NEEDS  41
     ISpElementReference isp_elem  [ ISP_NUM_NEEDS ];
     ISpNeed             isp_needs [ ISP_NUM_NEEDS ];
+};
 #endif
 
 #if TARGET_HOST_MAC_OSX
+#    define _JS_MAX_AXES 16
+typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
+struct tagSFG_PlatformJoystick
+{
     IOHIDDeviceInterface ** hidDev;
     IOHIDElementCookie buttonCookies[41];
     IOHIDElementCookie axisCookies[_JS_MAX_AXES];
-    long minReport[_JS_MAX_AXES],
-         maxReport[_JS_MAX_AXES];
+/* The next two variables are not used anywhere */
+/*    long minReport[_JS_MAX_AXES],
+ *         maxReport[_JS_MAX_AXES];
+ */
+};
 #endif
 
 #if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
+#    define _JS_MAX_AXES  8
+typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
+struct tagSFG_PlatformJoystick
+{
     JOYCAPS     jsCaps;
     JOYINFOEX   js;
     UINT        js_id;
+};
 #endif
 
-
 #if TARGET_HOST_POSIX_X11
+#    define _JS_MAX_AXES 16
+typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
+struct tagSFG_PlatformJoystick
+{
 #   if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
        struct os_specific_s *os;
 #   endif
@@ -846,7 +843,17 @@ struct tagSFG_Joystick
 
     char         fname [ 128 ];
     int          fd;
+};
 #endif
+
+/*
+ * Definition of "SFG_Joystick" structure -- based on JS's "jsJoystick" object class.
+ * See "js.h" lines 80-178.
+ */
+typedef struct tagSFG_Joystick SFG_Joystick;
+struct tagSFG_Joystick
+{
+	SFG_PlatformJoystick pJoystick;
 
     int          id;
     GLboolean    error;

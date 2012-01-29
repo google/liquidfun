@@ -594,7 +594,7 @@ static void fghJoystickAddAxisElement ( SFG_Joystick *joy, CFDictionaryRef axis 
         CFDictionaryGetValue ( axis, CFSTR(kIOHIDElementCookieKey) ),
         kCFNumberLongType, &cookie);
 
-    axisCookies[index] = (IOHIDElementCookie) cookie;
+    joy->pJoystick.axisCookies[index] = (IOHIDElementCookie) cookie;
 
     CFNumberGetValue ((CFNumberRef)
         CFDictionaryGetValue ( axis, CFSTR(kIOHIDElementMinKey) ),
@@ -618,7 +618,7 @@ static void fghJoystickAddButtonElement ( SFG_Joystick *joy, CFDictionaryRef but
             CFDictionaryGetValue ( button, CFSTR(kIOHIDElementCookieKey) ),
             kCFNumberLongType, &cookie);
 
-    joy->buttonCookies[num_buttons++] = (IOHIDElementCookie) cookie;
+    joy->pJoystick.buttonCookies[num_buttons++] = (IOHIDElementCookie) cookie;
     /* anything else for buttons? */
 }
 
@@ -645,7 +645,7 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
         for ( i = 0; i < joy->num_buttons; i++ )
         {
             UInt32 state;
-            int err = ISpElement_GetSimpleState ( isp_elem [ i + isp_num_axis ], &state);
+            int err = ISpElement_GetSimpleState ( joy->pJoystick.isp_elem [ i + ISP_NUM_AXIS ], &state);
             ISP_CHECK_ERR(err)
 
             *buttons |= state << i;
@@ -657,7 +657,7 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
         for ( i = 0; i < joy->num_axes; i++ )
         {
             UInt32 state;
-            int err = ISpElement_GetSimpleState ( isp_elem [ i ], &state );
+            int err = ISpElement_GetSimpleState ( joy->pJoystick.isp_elem [ i ], &state );
             ISP_CHECK_ERR(err)
 
             axes [i] = (float) state;
@@ -682,7 +682,7 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
         joy->error = GL_TRUE;
 
         /* initialize the needs structure */
-        ISpNeed temp_isp_needs[ isp_num_needs ] =
+        ISpNeed temp_isp_needs[ ISP_NUM_NEEDS ] =
         {
           { "\pX-Axis",  128, 0, 0, kISpElementKind_Axis,   kISpElementLabel_None, 0, 0, 0, 0 },
           { "\pY-Axis",  128, 0, 0, kISpElementKind_Axis,   kISpElementLabel_None, 0, 0, 0, 0 },
@@ -728,7 +728,7 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
           { "\pButton 31", 128, 0, 0, kISpElementKind_Button, kISpElementLabel_Btn_Select, 0, 0, 0, 0 },
         };
 
-        memcpy( joy->isp_needs, temp_isp_needs, sizeof (temp_isp_needs ) );
+        memcpy( joy->pJoystick.isp_needs, temp_isp_needs, sizeof (temp_isp_needs ) );
 
 
         /* next two calls allow keyboard and mouse to emulate other input
@@ -743,17 +743,17 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
           ISP_CHECK_ERR(err)
         */
 
-        err = ISpElement_NewVirtualFromNeeds( joy->isp_num_needs,
-                                              joy->isp_needs, joy->isp_elem,
+        err = ISpElement_NewVirtualFromNeeds( ISP_NUM_NEEDS,
+                                              joy->pJoystick.isp_needs, joy->pJoystick.isp_elem,
                                               0 );
         ISP_CHECK_ERR( err )
 
-        err = ISpInit( joy->isp_num_needs, joy->isp_needs, joy->isp_elem,
+        err = ISpInit( ISP_NUM_NEEDS, joy->pJoystick.isp_needs, joy->pJoystick.isp_elem,
                        'freeglut', nil, 0, 128, 0 );
         ISP_CHECK_ERR( err )
 
-        joy->num_buttons = joy->isp_num_needs - joy->isp_num_axis;
-        joy->num_axes    = joy->isp_num_axis;
+        joy->num_buttons = ISP_NUM_NEEDS - ISP_NUM_AXIS;
+        joy->num_axes    = ISP_NUM_AXIS;
 
         for( i = 0; i < joy->num_axes; i++ )
         {
@@ -774,7 +774,7 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
 void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
 {
     fgJoystick[ ident ]->id = ident;
-    snprintf( fgJoystick[ ident ]->fname, sizeof(fgJoystick[ ident ]->fname), "/dev/js%d", ident ); /* FIXME */
+    snprintf( fgJoystick[ ident ]->pJoystick.fname, sizeof(fgJoystick[ ident ]->pJoystick.fname), "/dev/js%d", ident ); /* FIXME */
     fgJoystick[ ident ]->error = GL_FALSE;
 }
 
@@ -799,7 +799,7 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
         for ( i = 0; i < joy->num_buttons; i++ )
         {
             IOHIDEventStruct hidEvent;
-            (*(joy->hidDev))->getElementValue ( joy->hidDev, buttonCookies[i], &hidEvent );
+            (*(joy->pJoystick.hidDev))->getElementValue ( joy->pJoystick.hidDev, joy->pJoystick.buttonCookies[i], &hidEvent );
             if ( hidEvent.value )
                 *buttons |= 1 << i;
         }
@@ -810,7 +810,7 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
         for ( i = 0; i < joy->num_axes; i++ )
         {
             IOHIDEventStruct hidEvent;
-            (*(joy->hidDev))->getElementValue ( joy->hidDev, axisCookies[i], &hidEvent );
+            (*(joy->pJoystick.hidDev))->getElementValue ( joy->pJoystick.hidDev, joy->pJoystick.axisCookies[i], &hidEvent );
             axes[i] = hidEvent.value;
         }
     }
@@ -849,18 +849,18 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
     pluginResult = ( *plugin )->QueryInterface(
         plugin,
         CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID),
-        &( LPVOID )joy->hidDev
+        &( LPVOID )joy->pJoystick.hidDev
     );
 
     if( pluginResult != S_OK )
         fgWarning ( "QI-ing IO plugin to HID Device interface failed" );
 
     ( *plugin )->Release( plugin ); /* don't leak a ref */
-    if( joy->hidDev == NULL )
+    if( joy->pJoystick.hidDev == NULL )
         return;
 
     /* store the interface in this instance */
-    rv = ( *( joy->hidDev ) )->open( joy->hidDev, 0 );
+    rv = ( *( joy->pJoystick.hidDev ) )->open( joy->pJoystick.hidDev, 0 );
     if( rv != kIOReturnSuccess )
     {
         fgWarning( "error opening device interface");
@@ -925,8 +925,8 @@ void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
 
 void fgPlatformJoystickClose ( int ident )
 {
-    ( *( fgJoystick[ ident ]->hidDev ) )->
-        close( fgJoystick[ ident ]->hidDev );
+    ( *( fgJoystick[ ident ]->pJoystick.hidDev ) )->
+        close( fgJoystick[ ident ]->pJoystick.hidDev );
 }
 #endif
 
@@ -940,34 +940,34 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
     int len;
 
-    if ( joy->os->is_analog )
+    if ( joy->pJoystick.os->is_analog )
     {
-        int status = read ( joy->os->fd, &joy->os->ajs, sizeof(joy->os->ajs) );
-        if ( status != sizeof(joy->os->ajs) ) {
-            perror ( joy->os->fname );
+        int status = read ( joy->pJoystick.os->fd, &joy->pJoystick.os->ajs, sizeof(joy->pJoystick.os->ajs) );
+        if ( status != sizeof(joy->pJoystick.os->ajs) ) {
+            perror ( joy->pJoystick.os->fname );
             joy->error = GL_TRUE;
             return;
         }
         if ( buttons != NULL )
-            *buttons = ( joy->os->ajs.b1 ? 1 : 0 ) | ( joy->os->ajs.b2 ? 2 : 0 );
+            *buttons = ( joy->pJoystick.os->ajs.b1 ? 1 : 0 ) | ( joy->pJoystick.os->ajs.b2 ? 2 : 0 );
 
         if ( axes != NULL )
         {
-            axes[0] = (float) joy->os->ajs.x;
-            axes[1] = (float) joy->os->ajs.y;
+            axes[0] = (float) joy->pJoystick.os->ajs.x;
+            axes[1] = (float) joy->pJoystick.os->ajs.y;
         }
 
         return;
     }
 
 #  ifdef HAVE_USB_JS
-    while ( ( len = read ( joy->os->fd, joy->os->hid_data_buf, joy->os->hid_dlen ) ) == joy->os->hid_dlen )
+    while ( ( len = read ( joy->pJoystick.os->fd, joy->pJoystick.os->hid_data_buf, joy->pJoystick.os->hid_dlen ) ) == joy->pJoystick.os->hid_dlen )
     {
         struct hid_item *h;
 
-        for  ( h = joy->os->hids; h; h = h->next )
+        for  ( h = joy->pJoystick.os->hids; h; h = h->next )
         {
-            int d = hid_get_data ( joy->os->hid_data_buf, h );
+            int d = hid_get_data ( joy->pJoystick.os->hid_data_buf, h );
 
             int page = HID_PAGE ( h->usage );
             int usage = HID_USAGE ( h->usage );
@@ -976,18 +976,18 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
             {
                 int i;
                 for ( i = 0; i < joy->num_axes; i++ )
-                    if (joy->os->axes_usage[i] == usage)
+                    if (joy->pJoystick.os->axes_usage[i] == usage)
                     {
                         if (usage == HUG_HAT_SWITCH)
                         {
                             if (d < 0 || d > 8)
                                 d = 0;  /* safety */
-                            joy->os->cache_axes[i] = (float)hatmap_x[d];
-                            joy->os->cache_axes[i + 1] = (float)hatmap_y[d];
+                            joy->pJoystick.os->cache_axes[i] = (float)hatmap_x[d];
+                            joy->pJoystick.os->cache_axes[i + 1] = (float)hatmap_y[d];
                         }
                         else
                         {
-                            joy->os->cache_axes[i] = (float)d;
+                            joy->pJoystick.os->cache_axes[i] = (float)d;
                         }
                         break;
                     }
@@ -997,9 +997,9 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
                if (usage > 0 && usage < _JS_MAX_BUTTONS + 1)
                {
                    if (d)
-                       joy->os->cache_buttons |=  (1 << ( usage - 1 ));
+                       joy->pJoystick.os->cache_buttons |=  (1 << ( usage - 1 ));
                    else
-                       joy->os->cache_buttons &= ~(1 << ( usage - 1 ));
+                       joy->pJoystick.os->cache_buttons &= ~(1 << ( usage - 1 ));
                }
             }
         }
@@ -1010,12 +1010,12 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
     if ( len < 0 )
 #    endif
     {
-        perror( joy->os->fname );
+        perror( joy->pJoystick.os->fname );
         joy->error = 1;
     }
-    if ( buttons != NULL ) *buttons = joy->os->cache_buttons;
+    if ( buttons != NULL ) *buttons = joy->pJoystick.os->cache_buttons;
     if ( axes    != NULL )
-        memcpy ( axes, joy->os->cache_axes, sizeof(float) * joy->num_axes );
+        memcpy ( axes, joy->pJoystick.os->cache_axes, sizeof(float) * joy->num_axes );
 #  endif
 #endif
 
@@ -1023,7 +1023,7 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 
     while ( 1 )
     {
-        status = read ( joy->fd, &joy->js, sizeof(struct js_event) );
+        status = read ( joy->pJoystick.fd, &joy->pJoystick.js, sizeof(struct js_event) );
 
         if ( status != sizeof( struct js_event ) )
         {
@@ -1032,35 +1032,35 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
             {
                 /* Use the old values */
                 if ( buttons )
-                    *buttons = joy->tmp_buttons;
+                    *buttons = joy->pJoystick.tmp_buttons;
                 if ( axes )
-                    memcpy( axes, joy->tmp_axes,
+                    memcpy( axes, joy->pJoystick.tmp_axes,
                             sizeof( float ) * joy->num_axes );
                 return;
             }
 #  endif
 
-            fgWarning ( "%s", joy->fname );
+            fgWarning ( "%s", joy->pJoystick.fname );
             joy->error = GL_TRUE;
             return;
         }
 
-        switch ( joy->js.type & ~JS_EVENT_INIT )
+        switch ( joy->pJoystick.js.type & ~JS_EVENT_INIT )
         {
         case JS_EVENT_BUTTON:
-            if( joy->js.value == 0 ) /* clear the flag */
-                joy->tmp_buttons &= ~( 1 << joy->js.number );
+            if( joy->pJoystick.js.value == 0 ) /* clear the flag */
+                joy->pJoystick.tmp_buttons &= ~( 1 << joy->pJoystick.js.number );
             else
-                joy->tmp_buttons |= ( 1 << joy->js.number );
+                joy->pJoystick.tmp_buttons |= ( 1 << joy->pJoystick.js.number );
             break;
 
         case JS_EVENT_AXIS:
-            if ( joy->js.number < joy->num_axes )
+            if ( joy->pJoystick.js.number < joy->num_axes )
             {
-                joy->tmp_axes[ joy->js.number ] = ( float )joy->js.value;
+                joy->pJoystick.tmp_axes[ joy->pJoystick.js.number ] = ( float )joy->pJoystick.js.value;
 
                 if( axes )
-                    memcpy( axes, joy->tmp_axes, sizeof(float) * joy->num_axes );
+                    memcpy( axes, joy->pJoystick.tmp_axes, sizeof(float) * joy->num_axes );
             }
             break;
 
@@ -1069,38 +1069,38 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 
             /* use the old values */
 
-            if ( buttons != NULL ) *buttons = joy->tmp_buttons;
+            if ( buttons != NULL ) *buttons = joy->pJoystick.tmp_buttons;
             if ( axes    != NULL )
-                memcpy ( axes, joy->tmp_axes, sizeof(float) * joy->num_axes );
+                memcpy ( axes, joy->pJoystick.tmp_axes, sizeof(float) * joy->num_axes );
 
             return;
         }
 
         if( buttons )
-            *buttons = joy->tmp_buttons;
+            *buttons = joy->pJoystick.tmp_buttons;
     }
 #else
 
-    status = read( joy->fd, &joy->js, JS_RETURN );
+    status = read( joy->pJoystick.fd, &joy->pJoystick.js, JS_RETURN );
 
     if ( status != JS_RETURN )
     {
-        fgWarning( "%s", joy->fname );
+        fgWarning( "%s", joy->pJoystick.fname );
         joy->error = GL_TRUE;
         return;
     }
 
     if ( buttons )
 #    if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
-        *buttons = ( joy->js.b1 ? 1 : 0 ) | ( joy->js.b2 ? 2 : 0 );  /* XXX Should not be here -- BSD is handled earlier */
+        *buttons = ( joy->pJoystick.js.b1 ? 1 : 0 ) | ( joy->pJoystick.js.b2 ? 2 : 0 );  /* XXX Should not be here -- BSD is handled earlier */
 #    else
-        *buttons = joy->js.buttons;
+        *buttons = joy->pJoystick.js.buttons;
 #    endif
 
     if ( axes )
     {
-        axes[ 0 ] = (float) joy->js.x;
-        axes[ 1 ] = (float) joy->js.y;
+        axes[ 0 ] = (float) joy->pJoystick.js.x;
+        axes[ 1 ] = (float) joy->pJoystick.js.y;
     }
 #endif
 }
@@ -1123,25 +1123,25 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
 
 #if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
     for( i = 0; i < _JS_MAX_AXES; i++ )
-        joy->os->cache_axes[ i ] = 0.0f;
+        joy->pJoystick.os->cache_axes[ i ] = 0.0f;
 
-    joy->os->cache_buttons = 0;
+    joy->pJoystick.os->cache_buttons = 0;
 
-    joy->os->fd = open( joy->os->fname, O_RDONLY | O_NONBLOCK);
+    joy->pJoystick.os->fd = open( joy->pJoystick.os->fname, O_RDONLY | O_NONBLOCK);
 
 #ifdef HAVE_ERRNO_H
-    if( joy->os->fd < 0 && errno == EACCES )
-        fgWarning ( "%s exists but is not readable by you", joy->os->fname );
+    if( joy->pJoystick.os->fd < 0 && errno == EACCES )
+        fgWarning ( "%s exists but is not readable by you", joy->pJoystick.os->fname );
 #endif
 
-    joy->error =( joy->os->fd < 0 );
+    joy->error =( joy->pJoystick.os->fd < 0 );
 
     if( joy->error )
         return;
 
     joy->num_axes = 0;
     joy->num_buttons = 0;
-    if( joy->os->is_analog )
+    if( joy->pJoystick.os->is_analog )
     {
         FILE *joyfile;
         char joyfname[ 1024 ];
@@ -1183,15 +1183,15 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
     }
 
 #    ifdef HAVE_USB_JS
-    if( ! fghJoystickInitializeHID( joy->os, &joy->num_axes,
+    if( ! fghJoystickInitializeHID( joy->pJoystick.os, &joy->num_axes,
                                     &joy->num_buttons ) )
     {
-        close( joy->os->fd );
+        close( joy->pJoystick.os->fd );
         joy->error = GL_TRUE;
         return;
     }
 
-    cp = strrchr( joy->os->fname, '/' );
+    cp = strrchr( joy->pJoystick.os->fname, '/' );
     if( cp )
     {
         if( fghJoystickFindUSBdev( &cp[1], joy->name, sizeof( joy->name ) ) ==
@@ -1208,7 +1208,7 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
          * to be quite unreliable for analog-to-USB converters. Punt for
          * now.
          */
-        if( joy->os->axes_usage[ i ] == HUG_HAT_SWITCH )
+        if( joy->pJoystick.os->axes_usage[ i ] == HUG_HAT_SWITCH )
         {
             joy->max   [ i ] = 1.0f;
             joy->center[ i ] = 0.0f;
@@ -1234,14 +1234,14 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
 
 #    ifdef JS_NEW
     for( i = 0; i < _JS_MAX_AXES; i++ )
-        joy->tmp_axes[ i ] = 0.0f;
+        joy->pJoystick.tmp_axes[ i ] = 0.0f;
 
-    joy->tmp_buttons = 0;
+    joy->pJoystick.tmp_buttons = 0;
 #    endif
 
-    joy->fd = open( joy->fname, O_RDONLY );
+    joy->pJoystick.fd = open( joy->pJoystick.fname, O_RDONLY );
 
-    joy->error =( joy->fd < 0 );
+    joy->error =( joy->pJoystick.fd < 0 );
 
     if( joy->error )
         return;
@@ -1252,12 +1252,12 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
      *  to the upper byte of an uninitialized word doesn't work.
      *  9 April 2003
      */
-    ioctl( joy->fd, JSIOCGAXES, &u );
+    ioctl( joy->pJoystick.fd, JSIOCGAXES, &u );
     joy->num_axes = u;
-    ioctl( joy->fd, JSIOCGBUTTONS, &u );
+    ioctl( joy->pJoystick.fd, JSIOCGBUTTONS, &u );
     joy->num_buttons = u;
-    ioctl( joy->fd, JSIOCGNAME( sizeof( joy->name ) ), joy->name );
-    fcntl( joy->fd, F_SETFL, O_NONBLOCK );
+    ioctl( joy->pJoystick.fd, JSIOCGNAME( sizeof( joy->name ) ), joy->name );
+    fcntl( joy->pJoystick.fd, F_SETFL, O_NONBLOCK );
 #    endif
 
     /*
@@ -1307,23 +1307,23 @@ void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
     fgJoystick[ ident ]->id = ident;
     fgJoystick[ ident ]->error = GL_FALSE;
 
-    fgJoystick[ ident ]->os = calloc( 1, sizeof( struct os_specific_s ) );
-    memset( fgJoystick[ ident ]->os, 0, sizeof( struct os_specific_s ) );
+    fgJoystick[ ident ]->pJoystick.os = calloc( 1, sizeof( struct os_specific_s ) );
+    memset( fgJoystick[ ident ]->pJoystick.os, 0, sizeof( struct os_specific_s ) );
     if( ident < USB_IDENT_OFFSET )
-        fgJoystick[ ident ]->os->is_analog = 1;
-    if( fgJoystick[ ident ]->os->is_analog )
-        snprintf( fgJoystick[ ident ]->os->fname, sizeof(fgJoystick[ ident ]->os->fname), "%s%d", AJSDEV, ident );
+        fgJoystick[ ident ]->pJoystick.os->is_analog = 1;
+    if( fgJoystick[ ident ]->pJoystick.os->is_analog )
+        snprintf( fgJoystick[ ident ]->pJoystick.os->fname, sizeof(fgJoystick[ ident ]->pJoystick.os->fname), "%s%d", AJSDEV, ident );
     else
-        snprintf( fgJoystick[ ident ]->os->fname, sizeof(fgJoystick[ ident ]->os->fname), "%s%d", UHIDDEV,
+        snprintf( fgJoystick[ ident ]->pJoystick.os->fname, sizeof(fgJoystick[ ident ]->pJoystick.os->fname), "%s%d", UHIDDEV,
                  ident - USB_IDENT_OFFSET );
 #elif defined( __linux__ )
     fgJoystick[ ident ]->id = ident;
     fgJoystick[ ident ]->error = GL_FALSE;
 
-    snprintf( fgJoystick[ident]->fname, sizeof(fgJoystick[ident]->fname), "/dev/input/js%d", ident );
+    snprintf( fgJoystick[ident]->pJoystick.fname, sizeof(fgJoystick[ident]->pJoystick.fname), "/dev/input/js%d", ident );
 
-    if( access( fgJoystick[ ident ]->fname, F_OK ) != 0 )
-        snprintf( fgJoystick[ ident ]->fname, sizeof(fgJoystick[ ident ]->fname), "/dev/js%d", ident );
+    if( access( fgJoystick[ ident ]->pJoystick.fname, F_OK ) != 0 )
+        snprintf( fgJoystick[ ident ]->pJoystick.fname, sizeof(fgJoystick[ ident ]->pJoystick.fname), "/dev/js%d", ident );
 #endif
 }
 
@@ -1331,22 +1331,22 @@ void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
 void fgPlatformJoystickClose ( int ident )
 {
 #if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
-    if( fgJoystick[ident]->os )
+    if( fgJoystick[ident]->pJoystick.os )
     {
         if( ! fgJoystick[ ident ]->error )
-            close( fgJoystick[ ident ]->os->fd );
+            close( fgJoystick[ ident ]->pJoystick.os->fd );
 #ifdef HAVE_USB_JS
-        if( fgJoystick[ ident ]->os->hids )
-            free (fgJoystick[ ident ]->os->hids);
-        if( fgJoystick[ ident ]->os->hid_data_buf )
-            free( fgJoystick[ ident ]->os->hid_data_buf );
+        if( fgJoystick[ ident ]->pJoystick.os->hids )
+            free (fgJoystick[ ident ]->pJoystick.os->hids);
+        if( fgJoystick[ ident ]->pJoystick.os->hid_data_buf )
+            free( fgJoystick[ ident ]->pJoystick.os->hid_data_buf );
 #endif
-        free( fgJoystick[ident]->os );
+        free( fgJoystick[ident]->pJoystick.os );
 	}
 #endif
 
     if( ! fgJoystick[ident]->error )
-         close( fgJoystick[ ident ]->fd );
+         close( fgJoystick[ ident ]->pJoystick.fd );
 }
 #endif
 

@@ -41,7 +41,7 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 {
     MMRESULT status;
 
-    status = joyGetPosEx( joy->js_id, &joy->js );
+    status = joyGetPosEx( joy->pJoystick.js_id, &joy->pJoystick.js );
 
     if ( status != JOYERR_NOERROR )
     {
@@ -50,7 +50,7 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
     }
 
     if ( buttons )
-        *buttons = joy->js.dwButtons;
+        *buttons = joy->pJoystick.js.dwButtons;
 
     if ( axes )
     {
@@ -64,7 +64,7 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
              * Low 16 bits of js.dwPOV gives heading (clockwise from ahead) in
              *   hundredths of a degree, or 0xFFFF when idle.
              */
-            if ( ( joy->js.dwPOV & 0xFFFF ) == 0xFFFF )
+            if ( ( joy->pJoystick.js.dwPOV & 0xFFFF ) == 0xFFFF )
             {
               axes [ 6 ] = 0.0;
               axes [ 7 ] = 0.0;
@@ -77,8 +77,8 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
                * But the accuracy of the value of PI is very unimportant at
                * this point.
                */
-              float s = (float) sin ( ( joy->js.dwPOV & 0xFFFF ) * ( 0.01 * 3.1415926535f / 180.0f ) );
-              float c = (float) cos ( ( joy->js.dwPOV & 0xFFFF ) * ( 0.01 * 3.1415926535f / 180.0f ) );
+              float s = (float) sin ( ( joy->pJoystick.js.dwPOV & 0xFFFF ) * ( 0.01 * 3.1415926535f / 180.0f ) );
+              float c = (float) cos ( ( joy->pJoystick.js.dwPOV & 0xFFFF ) * ( 0.01 * 3.1415926535f / 180.0f ) );
 
               /* Convert to coordinates on a square so that North-East
                * is (1,1) not (.7,.7), etc.
@@ -96,12 +96,12 @@ void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
               }
             }
 
-        case 6: axes[5] = (float) joy->js.dwVpos;
-        case 5: axes[4] = (float) joy->js.dwUpos;
-        case 4: axes[3] = (float) joy->js.dwRpos;
-        case 3: axes[2] = (float) joy->js.dwZpos;
-        case 2: axes[1] = (float) joy->js.dwYpos;
-        case 1: axes[0] = (float) joy->js.dwXpos;
+        case 6: axes[5] = (float) joy->pJoystick.js.dwVpos;
+        case 5: axes[4] = (float) joy->pJoystick.js.dwUpos;
+        case 4: axes[3] = (float) joy->pJoystick.js.dwRpos;
+        case 3: axes[2] = (float) joy->pJoystick.js.dwZpos;
+        case 2: axes[1] = (float) joy->pJoystick.js.dwYpos;
+        case 1: axes[0] = (float) joy->pJoystick.js.dwXpos;
         }
     }
 }
@@ -130,7 +130,7 @@ static int fghJoystickGetOEMProductName ( SFG_Joystick* joy, char *buf, int buf_
 
     /* Open .. MediaResources\CurrentJoystickSettings */
     _snprintf ( buffer, sizeof(buffer), "%s\\%s\\%s",
-                REGSTR_PATH_JOYCONFIG, joy->jsCaps.szRegKey,
+                REGSTR_PATH_JOYCONFIG, joy->pJoystick.jsCaps.szRegKey,
                 REGSTR_KEY_JOYCURR );
 
     lr = RegOpenKeyEx ( HKEY_LOCAL_MACHINE, buffer, 0, KEY_QUERY_VALUE, &hKey);
@@ -141,7 +141,7 @@ static int fghJoystickGetOEMProductName ( SFG_Joystick* joy, char *buf, int buf_
     dwcb = sizeof(OEMKey);
 
     /* JOYSTICKID1-16 is zero-based; registry entries for VJOYD are 1-based. */
-    _snprintf ( buffer, sizeof(buffer), "Joystick%d%s", joy->js_id + 1, REGSTR_VAL_JOYOEMNAME );
+    _snprintf ( buffer, sizeof(buffer), "Joystick%d%s", joy->pJoystick.js_id + 1, REGSTR_VAL_JOYOEMNAME );
 
     lr = RegQueryValueEx ( hKey, buffer, 0, 0, (LPBYTE) OEMKey, &dwcb);
     RegCloseKey ( hKey );
@@ -172,16 +172,16 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
 {
 	int i = 0;
 
-    joy->js.dwFlags = JOY_RETURNALL;
-    joy->js.dwSize  = sizeof( joy->js );
+    joy->pJoystick.js.dwFlags = JOY_RETURNALL;
+    joy->pJoystick.js.dwSize  = sizeof( joy->pJoystick.js );
 
-    memset( &joy->jsCaps, 0, sizeof( joy->jsCaps ) );
+    memset( &joy->pJoystick.jsCaps, 0, sizeof( joy->pJoystick.jsCaps ) );
 
     joy->error =
-        ( joyGetDevCaps( joy->js_id, &joy->jsCaps, sizeof( joy->jsCaps ) ) !=
+        ( joyGetDevCaps( joy->pJoystick.js_id, &joy->pJoystick.jsCaps, sizeof( joy->pJoystick.jsCaps ) ) !=
           JOYERR_NOERROR );
 
-    if( joy->jsCaps.wNumAxes == 0 )
+    if( joy->pJoystick.jsCaps.wNumAxes == 0 )
     {
         joy->num_axes = 0;
         joy->error = GL_TRUE;
@@ -195,13 +195,13 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
                                              sizeof( joy->name ) ) )
         {
             fgWarning( "JS: Failed to read joystick name from registry" );
-            strncpy( joy->name, joy->jsCaps.szPname, sizeof( joy->name ) );
+            strncpy( joy->name, joy->pJoystick.jsCaps.szPname, sizeof( joy->name ) );
         }
 
         /* Windows joystick drivers may provide any combination of
          * X,Y,Z,R,U,V,POV - not necessarily the first n of these.
          */
-        if( joy->jsCaps.wCaps & JOYCAPS_HASPOV )
+        if( joy->pJoystick.jsCaps.wCaps & JOYCAPS_HASPOV )
         {
             joy->num_axes = _JS_MAX_AXES;
             joy->min[ 7 ] = -1.0; joy->max[ 7 ] = 1.0;  /* POV Y */
@@ -210,18 +210,18 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
         else
             joy->num_axes = 6;
 
-        joy->min[ 5 ] = ( float )joy->jsCaps.wVmin;
-        joy->max[ 5 ] = ( float )joy->jsCaps.wVmax;
-        joy->min[ 4 ] = ( float )joy->jsCaps.wUmin;
-        joy->max[ 4 ] = ( float )joy->jsCaps.wUmax;
-        joy->min[ 3 ] = ( float )joy->jsCaps.wRmin;
-        joy->max[ 3 ] = ( float )joy->jsCaps.wRmax;
-        joy->min[ 2 ] = ( float )joy->jsCaps.wZmin;
-        joy->max[ 2 ] = ( float )joy->jsCaps.wZmax;
-        joy->min[ 1 ] = ( float )joy->jsCaps.wYmin;
-        joy->max[ 1 ] = ( float )joy->jsCaps.wYmax;
-        joy->min[ 0 ] = ( float )joy->jsCaps.wXmin;
-        joy->max[ 0 ] = ( float )joy->jsCaps.wXmax;
+        joy->min[ 5 ] = ( float )joy->pJoystick.jsCaps.wVmin;
+        joy->max[ 5 ] = ( float )joy->pJoystick.jsCaps.wVmax;
+        joy->min[ 4 ] = ( float )joy->pJoystick.jsCaps.wUmin;
+        joy->max[ 4 ] = ( float )joy->pJoystick.jsCaps.wUmax;
+        joy->min[ 3 ] = ( float )joy->pJoystick.jsCaps.wRmin;
+        joy->max[ 3 ] = ( float )joy->pJoystick.jsCaps.wRmax;
+        joy->min[ 2 ] = ( float )joy->pJoystick.jsCaps.wZmin;
+        joy->max[ 2 ] = ( float )joy->pJoystick.jsCaps.wZmax;
+        joy->min[ 1 ] = ( float )joy->pJoystick.jsCaps.wYmin;
+        joy->max[ 1 ] = ( float )joy->pJoystick.jsCaps.wYmax;
+        joy->min[ 0 ] = ( float )joy->pJoystick.jsCaps.wXmin;
+        joy->max[ 0 ] = ( float )joy->pJoystick.jsCaps.wXmax;
     }
 
     /* Guess all the rest judging on the axes extremals */
@@ -240,11 +240,11 @@ void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
     switch( ident )
     {
     case 0:
-        fgJoystick[ ident ]->js_id = JOYSTICKID1;
+        fgJoystick[ ident ]->pJoystick.js_id = JOYSTICKID1;
         fgJoystick[ ident ]->error = GL_FALSE;
         break;
     case 1:
-        fgJoystick[ ident ]->js_id = JOYSTICKID2;
+        fgJoystick[ ident ]->pJoystick.js_id = JOYSTICKID2;
         fgJoystick[ ident ]->error = GL_FALSE;
         break;
     default:
