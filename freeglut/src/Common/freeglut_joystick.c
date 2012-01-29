@@ -464,6 +464,51 @@ extern void fgPlatformJoystickClose ( int ident );
 #define MAX_NUM_JOYSTICKS  2
 static SFG_Joystick *fgJoystick [ MAX_NUM_JOYSTICKS ];
 
+/*
+ *  Platform-Specific Code
+ */
+
+#if TARGET_HOST_MACINTOSH
+void fgPlatformJoystickClose ( int ident )
+{
+    ISpSuspend( );
+    ISpStop( );
+    ISpShutdown( );
+}
+#endif
+
+#if TARGET_HOST_MAC_OSX
+void fgPlatformJoystickClose ( int ident )
+{
+    ( *( fgJoystick[ ident ]->hidDev ) )->
+        close( fgJoystick[ ident ]->hidDev );
+}
+#endif
+
+#if TARGET_HOST_POSIX_X11
+void fgPlatformJoystickClose ( int ident )
+{
+#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+    if( fgJoystick[ident]->os )
+    {
+        if( ! fgJoystick[ ident ]->error )
+            close( fgJoystick[ ident ]->os->fd );
+#ifdef HAVE_USB_JS
+        if( fgJoystick[ ident ]->os->hids )
+            free (fgJoystick[ ident ]->os->hids);
+        if( fgJoystick[ ident ]->os->hid_data_buf )
+            free( fgJoystick[ ident ]->os->hid_data_buf );
+#endif
+        free( fgJoystick[ident]->os );
+	}
+#endif
+
+    if( ! fgJoystick[ident]->error )
+         close( fgJoystick[ ident ]->fd );
+}
+#endif
+
+
 
 /*
  * Read the raw joystick data
@@ -1618,50 +1663,6 @@ void fgInitialiseJoysticks ( void )
         fgState.JoysticksInitialised = GL_TRUE;
     }
 }
-
-/*
- *
- */
-
-#if TARGET_HOST_MACINTOSH
-void fgPlatformJoystickClose ( int ident )
-{
-    ISpSuspend( );
-    ISpStop( );
-    ISpShutdown( );
-}
-#endif
-
-#if TARGET_HOST_MAC_OSX
-void fgPlatformJoystickClose ( int ident )
-{
-    ( *( fgJoystick[ ident ]->hidDev ) )->
-        close( fgJoystick[ ident ]->hidDev );
-}
-#endif
-
-#if TARGET_HOST_POSIX_X11
-void fgPlatformJoystickClose ( int ident )
-{
-#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
-    if( fgJoystick[ident]->os )
-    {
-        if( ! fgJoystick[ ident ]->error )
-            close( fgJoystick[ ident ]->os->fd );
-#ifdef HAVE_USB_JS
-        if( fgJoystick[ ident ]->os->hids )
-            free (fgJoystick[ ident ]->os->hids);
-        if( fgJoystick[ ident ]->os->hid_data_buf )
-            free( fgJoystick[ ident ]->os->hid_data_buf );
-#endif
-        free( fgJoystick[ident]->os );
-	}
-#endif
-
-    if( ! fgJoystick[ident]->error )
-         close( fgJoystick[ ident ]->fd );
-}
-#endif
 
 
 void fgJoystickClose( void )
