@@ -1078,3 +1078,12 @@ void fgPlatformGlutFullScreenToggle( SFG_Window *win )
 }
 
 
+/* -- PLATFORM-SPECIFIC INTERFACE FUNCTION -------------------------------------------------- */
+
+
+int FGAPIENTRY __glutCreateWindowWithExit( const char *title, void (__cdecl *exit_function)(int) )
+{
+  __glutExitFunc = exit_function;
+  return glutCreateWindow( title );
+}
+

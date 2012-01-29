@@ -49,6 +49,8 @@ struct tagSFG_PlatformContext
 };
 
 
+/* Function to be called on exit */
+extern void (__cdecl *__glutExitFunc)( int return_value );
 
 
 #endif  /* FREEGLUT_INTERNAL_MSWIN_H */

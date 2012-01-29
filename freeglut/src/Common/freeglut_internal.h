@@ -991,10 +991,6 @@ int fgHintPresent(Window window, Atom property, Atom hint);
 
 SFG_Proc fghGetProcAddress( const char *procName );
 
-#if TARGET_HOST_MS_WINDOWS
-extern void (__cdecl *__glutExitFunc)( int return_value );
-#endif
-
 #endif /* FREEGLUT_INTERNAL_H */
 
 /*** END OF FILE ***/
