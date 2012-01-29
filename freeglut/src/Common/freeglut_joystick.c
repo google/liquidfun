@@ -52,13 +52,6 @@
 #    include <IOKit/hid/IOHIDLib.h>
 #endif
 
-#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
-#    include <windows.h>
-#    include <mmsystem.h>
-#    include <regstr.h>
-
-#endif
-
 #if TARGET_HOST_POSIX_X11
 #    ifdef HAVE_SYS_IOCTL_H
 #        include <sys/ioctl.h>
