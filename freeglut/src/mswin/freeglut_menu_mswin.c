@@ -26,7 +26,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "freeglut_internal_mswin.h"
+#include "../Common/freeglut_internal.h"
 
 
 GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )

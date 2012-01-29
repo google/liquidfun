@@ -30,7 +30,5 @@
 
 
 
-#include "..\Common\freeglut_internal.h"
-
 
 #endif  /* FREEGLUT_INTERNAL_MSWIN_H */
