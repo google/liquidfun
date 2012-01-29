@@ -36,6 +36,78 @@
 
 
 
+
+void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
+{
+    MMRESULT status;
+
+    status = joyGetPosEx( joy->js_id, &joy->js );
+
+    if ( status != JOYERR_NOERROR )
+    {
+        joy->error = GL_TRUE;
+        return;
+    }
+
+    if ( buttons )
+        *buttons = joy->js.dwButtons;
+
+    if ( axes )
+    {
+        /*
+         * WARNING - Fall through case clauses!!
+         */
+        switch ( joy->num_axes )
+        {
+        case 8:
+            /* Generate two POV axes from the POV hat angle.
+             * Low 16 bits of js.dwPOV gives heading (clockwise from ahead) in
+             *   hundredths of a degree, or 0xFFFF when idle.
+             */
+            if ( ( joy->js.dwPOV & 0xFFFF ) == 0xFFFF )
+            {
+              axes [ 6 ] = 0.0;
+              axes [ 7 ] = 0.0;
+            }
+            else
+            {
+              /* This is the contentious bit: how to convert angle to X/Y.
+               *    wk: I know of no define for PI that we could use here:
+               *    SG_PI would pull in sg, M_PI is undefined for MSVC
+               * But the accuracy of the value of PI is very unimportant at
+               * this point.
+               */
+              float s = (float) sin ( ( joy->js.dwPOV & 0xFFFF ) * ( 0.01 * 3.1415926535f / 180.0f ) );
+              float c = (float) cos ( ( joy->js.dwPOV & 0xFFFF ) * ( 0.01 * 3.1415926535f / 180.0f ) );
+
+              /* Convert to coordinates on a square so that North-East
+               * is (1,1) not (.7,.7), etc.
+               * s and c cannot both be zero so we won't divide by zero.
+               */
+              if ( fabs ( s ) < fabs ( c ) )
+              {
+                axes [ 6 ] = ( c < 0.0 ) ? -s/c  : s/c ;
+                axes [ 7 ] = ( c < 0.0 ) ? -1.0f : 1.0f;
+              }
+              else
+              {
+                axes [ 6 ] = ( s < 0.0 ) ? -1.0f : 1.0f;
+                axes [ 7 ] = ( s < 0.0 ) ? -c/s  : c/s ;
+              }
+            }
+
+        case 6: axes[5] = (float) joy->js.dwVpos;
+        case 5: axes[4] = (float) joy->js.dwUpos;
+        case 4: axes[3] = (float) joy->js.dwRpos;
+        case 3: axes[2] = (float) joy->js.dwZpos;
+        case 2: axes[1] = (float) joy->js.dwYpos;
+        case 1: axes[0] = (float) joy->js.dwXpos;
+        }
+    }
+}
+
+
+
 /* Inspired by
    http://msdn.microsoft.com/archive/en-us/dnargame/html/msdn_sidewind3d.asp
  */
