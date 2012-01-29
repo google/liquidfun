@@ -813,17 +813,6 @@ struct tagSFG_PlatformJoystick
 };
 #endif
 
-#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
-#    define _JS_MAX_AXES  8
-typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
-struct tagSFG_PlatformJoystick
-{
-    JOYCAPS     jsCaps;
-    JOYINFOEX   js;
-    UINT        js_id;
-};
-#endif
-
 #if TARGET_HOST_POSIX_X11
 #    define _JS_MAX_AXES 16
 typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;

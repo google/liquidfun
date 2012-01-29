@@ -49,6 +49,20 @@ struct tagSFG_PlatformContext
 };
 
 
+/* Joystick-Specific Definitions */
+#if !defined(_WIN32_WCE)
+#    define _JS_MAX_AXES  8
+typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
+struct tagSFG_PlatformJoystick
+{
+    JOYCAPS     jsCaps;
+    JOYINFOEX   js;
+    UINT        js_id;
+};
+#endif
+
+
+
 /* Function to be called on exit */
 extern void (__cdecl *__glutExitFunc)( int return_value );
 
