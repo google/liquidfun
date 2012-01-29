@@ -57,14 +57,14 @@ static Cursor getEmptyCursor( void )
         Pixmap cursorNonePixmap;
         memset( cursorNoneBits, 0, sizeof( cursorNoneBits ) );
         memset( &dontCare, 0, sizeof( dontCare ) );
-        cursorNonePixmap = XCreateBitmapFromData ( fgDisplay.Display,
-                                                   fgDisplay.RootWindow,
+        cursorNonePixmap = XCreateBitmapFromData ( fgDisplay.pDisplay.Display,
+                                                   fgDisplay.pDisplay.RootWindow,
                                                    cursorNoneBits, 16, 16 );
         if( cursorNonePixmap != None ) {
-            cursorNone = XCreatePixmapCursor( fgDisplay.Display,
+            cursorNone = XCreatePixmapCursor( fgDisplay.pDisplay.Display,
                                               cursorNonePixmap, cursorNonePixmap,
                                               &dontCare, &dontCare, 0, 0 );
-            XFreePixmap( fgDisplay.Display, cursorNonePixmap );
+            XFreePixmap( fgDisplay.pDisplay.Display, cursorNonePixmap );
         }
     }
     return cursorNone;
@@ -120,7 +120,7 @@ void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
         cursorCacheEntry *entry = &cursorCache[ cursorIDToUse ];
         if( entry->cachedCursor == None ) {
             entry->cachedCursor =
-                XCreateFontCursor( fgDisplay.Display, entry->cursorShape );
+                XCreateFontCursor( fgDisplay.pDisplay.Display, entry->cursorShape );
         }
         cursor = entry->cachedCursor;
     } else {
@@ -141,9 +141,9 @@ void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
     }
 
     if ( cursorIDToUse == GLUT_CURSOR_INHERIT ) {
-        XUndefineCursor( fgDisplay.Display, window->Window.Handle );
+        XUndefineCursor( fgDisplay.pDisplay.Display, window->Window.Handle );
     } else if ( cursor != None ) {
-        XDefineCursor( fgDisplay.Display, window->Window.Handle, cursor );
+        XDefineCursor( fgDisplay.pDisplay.Display, window->Window.Handle, cursor );
     } else if ( cursorIDToUse != GLUT_CURSOR_NONE ) {
         fgError( "Failed to create cursor" );
     }
@@ -153,14 +153,14 @@ void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
 void fgPlatformWarpPointer ( int x, int y )
 {
     XWarpPointer(
-        fgDisplay.Display,
+        fgDisplay.pDisplay.Display,
         None,
         fgStructure.CurrentWindow->Window.Handle,
         0, 0, 0, 0,
         x, y
     );
     /* Make the warp visible immediately. */
-    XFlush( fgDisplay.Display );
+    XFlush( fgDisplay.pDisplay.Display );
 }
 #endif
 

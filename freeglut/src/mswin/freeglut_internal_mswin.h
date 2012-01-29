@@ -28,6 +28,13 @@
 #ifndef  FREEGLUT_INTERNAL_MSWIN_H
 #define  FREEGLUT_INTERNAL_MSWIN_H
 
+typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
+struct tagSFG_PlatformDisplay
+{
+    HINSTANCE       Instance;           /* The application's instance        */
+    DEVMODE         DisplayMode;        /* Desktop's display settings        */
+    char           *DisplayName;        /* Display name for multi display support*/ 
+};
 
 
 

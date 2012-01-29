@@ -62,7 +62,7 @@ void FGAPIENTRY glutSwapBuffers( void )
         return;
 
 #if TARGET_HOST_POSIX_X11
-    glXSwapBuffers( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
+    glXSwapBuffers( fgDisplay.pDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
 #elif TARGET_HOST_MS_WINDOWS
     SwapBuffers( fgStructure.CurrentWindow->Window.Device );
 #endif

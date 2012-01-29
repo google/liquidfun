@@ -98,9 +98,9 @@ extern void fgPlatformMainLoopPreliminaryWork ( void );
 #if TARGET_HOST_POSIX_X11
 void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 {
-    XResizeWindow( fgDisplay.Display, window->Window.Handle,
+    XResizeWindow( fgDisplay.pDisplay.Display, window->Window.Handle,
                    width, height );
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
 }
 #endif
 
@@ -427,14 +427,14 @@ void fgPlatformSleepForEvents( long msec )
      * need to allow that we may have an empty socket but non-
      * empty event queue.
      */
-    if( ! XPending( fgDisplay.Display ) )
+    if( ! XPending( fgDisplay.pDisplay.Display ) )
     {
         fd_set fdset;
         int err;
         int socket;
         struct timeval wait;
 
-        socket = ConnectionNumber( fgDisplay.Display );
+        socket = ConnectionNumber( fgDisplay.pDisplay.Display );
         FD_ZERO( &fdset );
         FD_SET( socket, &fdset );
         wait.tv_sec = msec / 1000;
@@ -943,9 +943,9 @@ void fgPlatformProcessSingleEvent ( void )
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMainLoopEvent" );
 
-    while( XPending( fgDisplay.Display ) )
+    while( XPending( fgDisplay.pDisplay.Display ) )
     {
-        XNextEvent( fgDisplay.Display, &event );
+        XNextEvent( fgDisplay.pDisplay.Display, &event );
 #if _DEBUG
         fghPrintEvent( &event );
 #endif
@@ -958,7 +958,7 @@ void fgPlatformProcessSingleEvent ( void )
                 break;
             }
             /* Destroy the window when the WM_DELETE_WINDOW message arrives */
-            if( (Atom) event.xclient.data.l[ 0 ] == fgDisplay.DeleteWindow )
+            if( (Atom) event.xclient.data.l[ 0 ] == fgDisplay.pDisplay.DeleteWindow )
             {
                 GETWINDOW( xclient );
 
@@ -1256,7 +1256,7 @@ void fgPlatformProcessSingleEvent ( void )
                      */
 
                     char keys[32];
-                    XQueryKeymap( fgDisplay.Display, keys ); /* Look at X11 keystate to detect repeat mode */
+                    XQueryKeymap( fgDisplay.pDisplay.Display, keys ); /* Look at X11 keystate to detect repeat mode */
 
                     if ( event.xkey.keycode<256 )            /* XQueryKeymap is limited to 256 keycodes    */
                     {

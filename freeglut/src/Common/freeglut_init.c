@@ -109,7 +109,7 @@ extern void fgPlatformCloseDisplay ( void );
 /* Return the atom associated with "name". */
 static Atom fghGetAtom(const char * name)
 {
-  return XInternAtom(fgDisplay.Display, name, False);
+  return XInternAtom(fgDisplay.pDisplay.Display, name, False);
 }
 
 /*
@@ -137,7 +137,7 @@ static int fghGetWindowProperty(Window window,
   unsigned long temp_bytes_after;        /*  Not used. */
 
 
-  status = XGetWindowProperty(fgDisplay.Display,
+  status = XGetWindowProperty(fgDisplay.pDisplay.Display,
 			      window,
 			      property,
 			      0,
@@ -181,7 +181,7 @@ static int fghNetWMSupported(void)
    * Check that the window manager has set this property on the root window.
    * The property must be the ID of a child window.
    */
-  number_of_windows = fghGetWindowProperty(fgDisplay.RootWindow,
+  number_of_windows = fghGetWindowProperty(fgDisplay.pDisplay.RootWindow,
                                            wm_check,
                                            XA_WINDOW,
                                            (unsigned char **) window_ptr_1);
@@ -248,47 +248,47 @@ int fgHintPresent(Window window, Atom property, Atom hint)
  */
 void fgPlatformInitialize( const char* displayName )
 {
-    fgDisplay.Display = XOpenDisplay( displayName );
+    fgDisplay.pDisplay.Display = XOpenDisplay( displayName );
 
-    if( fgDisplay.Display == NULL )
+    if( fgDisplay.pDisplay.Display == NULL )
         fgError( "failed to open display '%s'", XDisplayName( displayName ) );
 
-    if( !glXQueryExtension( fgDisplay.Display, NULL, NULL ) )
+    if( !glXQueryExtension( fgDisplay.pDisplay.Display, NULL, NULL ) )
         fgError( "OpenGL GLX extension not supported by display '%s'",
             XDisplayName( displayName ) );
 
-    fgDisplay.Screen = DefaultScreen( fgDisplay.Display );
-    fgDisplay.RootWindow = RootWindow(
-        fgDisplay.Display,
-        fgDisplay.Screen
+    fgDisplay.pDisplay.Screen = DefaultScreen( fgDisplay.pDisplay.Display );
+    fgDisplay.pDisplay.RootWindow = RootWindow(
+        fgDisplay.pDisplay.Display,
+        fgDisplay.pDisplay.Screen
     );
 
     fgDisplay.ScreenWidth  = DisplayWidth(
-        fgDisplay.Display,
-        fgDisplay.Screen
+        fgDisplay.pDisplay.Display,
+        fgDisplay.pDisplay.Screen
     );
     fgDisplay.ScreenHeight = DisplayHeight(
-        fgDisplay.Display,
-        fgDisplay.Screen
+        fgDisplay.pDisplay.Display,
+        fgDisplay.pDisplay.Screen
     );
 
     fgDisplay.ScreenWidthMM = DisplayWidthMM(
-        fgDisplay.Display,
-        fgDisplay.Screen
+        fgDisplay.pDisplay.Display,
+        fgDisplay.pDisplay.Screen
     );
     fgDisplay.ScreenHeightMM = DisplayHeightMM(
-        fgDisplay.Display,
-        fgDisplay.Screen
+        fgDisplay.pDisplay.Display,
+        fgDisplay.pDisplay.Screen
     );
 
-    fgDisplay.Connection = ConnectionNumber( fgDisplay.Display );
+    fgDisplay.pDisplay.Connection = ConnectionNumber( fgDisplay.pDisplay.Display );
 
     /* Create the window deletion atom */
-    fgDisplay.DeleteWindow = fghGetAtom("WM_DELETE_WINDOW");
+    fgDisplay.pDisplay.DeleteWindow = fghGetAtom("WM_DELETE_WINDOW");
 
     /* Create the state and full screen atoms */
-    fgDisplay.State           = None;
-    fgDisplay.StateFullScreen = None;
+    fgDisplay.pDisplay.State           = None;
+    fgDisplay.pDisplay.StateFullScreen = None;
 
     if (fghNetWMSupported())
     {
@@ -296,17 +296,17 @@ void fgPlatformInitialize( const char* displayName )
       const Atom state     = fghGetAtom("_NET_WM_STATE");
       
       /* Check if the state hint is supported. */
-      if (fgHintPresent(fgDisplay.RootWindow, supported, state))
+      if (fgHintPresent(fgDisplay.pDisplay.RootWindow, supported, state))
       {
         const Atom full_screen = fghGetAtom("_NET_WM_STATE_FULLSCREEN");
         
-        fgDisplay.State = state;
+        fgDisplay.pDisplay.State = state;
         
         /* Check if the window manager supports full screen. */
         /**  Check "_NET_WM_ALLOWED_ACTIONS" on our window instead? **/
-        if (fgHintPresent(fgDisplay.RootWindow, supported, full_screen))
+        if (fgHintPresent(fgDisplay.pDisplay.RootWindow, supported, full_screen))
         {
-          fgDisplay.StateFullScreen = full_screen;
+          fgDisplay.pDisplay.StateFullScreen = full_screen;
         }
       }
     }
@@ -452,13 +452,13 @@ void fgPlatformCloseDisplay ( void )
      * Make sure all X-client data we have created will be destroyed on
      * display closing
      */
-    XSetCloseDownMode( fgDisplay.Display, DestroyAll );
+    XSetCloseDownMode( fgDisplay.pDisplay.Display, DestroyAll );
 
     /*
      * Close the display connection, destroying all windows we have
      * created so far
      */
-    XCloseDisplay( fgDisplay.Display );
+    XCloseDisplay( fgDisplay.pDisplay.Display );
 }
 
 #endif
@@ -486,7 +486,7 @@ void fgDeinitialize( void )
     {
 #if TARGET_HOST_POSIX_X11
         /* Note that the MVisualInfo is not owned by the MenuContext! */
-        glXDestroyContext( fgDisplay.Display, fgStructure.MenuContext->MContext );
+        glXDestroyContext( fgDisplay.pDisplay.Display, fgStructure.MenuContext->MContext );
 #endif
         free( fgStructure.MenuContext );
         fgStructure.MenuContext = NULL;

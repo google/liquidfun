@@ -214,6 +214,39 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 
 /* Platform-specific includes */
 #if TARGET_HOST_POSIX_X11
+typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
+struct tagSFG_PlatformDisplay
+{
+    Display*        Display;            /* The display we are being run in.  */
+    int             Screen;             /* The screen we are about to use.   */
+    Window          RootWindow;         /* The screen's root window.         */
+    int             Connection;         /* The display's connection number   */
+    Atom            DeleteWindow;       /* The window deletion atom          */
+    Atom            State;              /* The state atom                    */
+    Atom            StateFullScreen;    /* The full screen atom              */
+
+#ifdef HAVE_X11_EXTENSIONS_XRANDR_H
+    int prev_xsz, prev_ysz;
+    int prev_refresh;
+    int prev_size_valid;
+#endif	/* HAVE_X11_EXTENSIONS_XRANDR_H */
+
+#ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
+    /*
+     * XF86VidMode may be compilable even if it fails at runtime.  Therefore,
+     * the validity of the VidMode has to be tracked
+     */
+    int             DisplayModeValid;   /* Flag that indicates runtime status*/
+    XF86VidModeModeLine DisplayMode;    /* Current screen's display settings */
+    int             DisplayModeClock;   /* The display mode's refresh rate   */
+    int             DisplayViewPortX;   /* saved X location of the viewport  */
+    int             DisplayViewPortY;   /* saved Y location of the viewport  */
+#endif /* HAVE_X11_EXTENSIONS_XF86VMODE_H */
+
+    int             DisplayPointerX;    /* saved X location of the pointer   */
+    int             DisplayPointerY;    /* saved Y location of the pointer   */
+};
+
 #endif
 #if TARGET_HOST_MS_WINDOWS
 #include "../mswin/freeglut_internal_mswin.h"
@@ -366,42 +399,7 @@ struct tagSFG_State
 typedef struct tagSFG_Display SFG_Display;
 struct tagSFG_Display
 {
-#if TARGET_HOST_POSIX_X11
-    Display*        Display;            /* The display we are being run in.  */
-    int             Screen;             /* The screen we are about to use.   */
-    Window          RootWindow;         /* The screen's root window.         */
-    int             Connection;         /* The display's connection number   */
-    Atom            DeleteWindow;       /* The window deletion atom          */
-    Atom            State;              /* The state atom                    */
-    Atom            StateFullScreen;    /* The full screen atom              */
-
-#ifdef HAVE_X11_EXTENSIONS_XRANDR_H
-    int prev_xsz, prev_ysz;
-    int prev_refresh;
-    int prev_size_valid;
-#endif	/* HAVE_X11_EXTENSIONS_XRANDR_H */
-
-#ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
-    /*
-     * XF86VidMode may be compilable even if it fails at runtime.  Therefore,
-     * the validity of the VidMode has to be tracked
-     */
-    int             DisplayModeValid;   /* Flag that indicates runtime status*/
-    XF86VidModeModeLine DisplayMode;    /* Current screen's display settings */
-    int             DisplayModeClock;   /* The display mode's refresh rate   */
-    int             DisplayViewPortX;   /* saved X location of the viewport  */
-    int             DisplayViewPortY;   /* saved Y location of the viewport  */
-#endif /* HAVE_X11_EXTENSIONS_XF86VMODE_H */
-
-    int             DisplayPointerX;    /* saved X location of the pointer   */
-    int             DisplayPointerY;    /* saved Y location of the pointer   */
-
-#elif TARGET_HOST_MS_WINDOWS
-    HINSTANCE       Instance;           /* The application's instance        */
-    DEVMODE         DisplayMode;        /* Desktop's display settings        */
-    char           *DisplayName;        /* Display name for multi display support*/ 
-
-#endif
+	SFG_PlatformDisplay pDisplay;
 
     int             ScreenWidth;        /* The screen's width in pixels      */
     int             ScreenHeight;       /* The screen's height in pixels     */

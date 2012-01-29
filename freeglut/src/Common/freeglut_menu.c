@@ -149,9 +149,9 @@ GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
     Window w;
 
     XTranslateCoordinates(
-        fgDisplay.Display,
+        fgDisplay.pDisplay.Display,
         window->Window.Handle,
-        fgDisplay.RootWindow,
+        fgDisplay.pDisplay.RootWindow,
         0, 0, &wx, &wy, &w);
 
     *x = fgState.GameModeSize.X + wx;

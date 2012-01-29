@@ -43,9 +43,9 @@ void fgPlatformInitialize( const char* displayName )
     ATOM atom;
 
     /* What we need to do is to initialize the fgDisplay global structure here. */
-    fgDisplay.Instance = GetModuleHandle( NULL );
-    fgDisplay.DisplayName= displayName ? strdup(displayName) : 0 ;
-    atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
+    fgDisplay.pDisplay.Instance = GetModuleHandle( NULL );
+    fgDisplay.pDisplay.DisplayName= displayName ? strdup(displayName) : 0 ;
+    atom = GetClassInfo( fgDisplay.pDisplay.Instance, _T("FREEGLUT"), &wc );
 
     if( atom == 0 )
     {
@@ -62,8 +62,8 @@ void fgPlatformInitialize( const char* displayName )
         wc.lpfnWndProc    = fgPlatformWindowProc;
         wc.cbClsExtra     = 0;
         wc.cbWndExtra     = 0;
-        wc.hInstance      = fgDisplay.Instance;
-        wc.hIcon          = LoadIcon( fgDisplay.Instance, _T("GLUT_ICON") );
+        wc.hInstance      = fgDisplay.pDisplay.Instance;
+        wc.hIcon          = LoadIcon( fgDisplay.pDisplay.Instance, _T("GLUT_ICON") );
 
 #if defined(_WIN32_WCE)
         wc.style          = CS_HREDRAW | CS_VREDRAW;
@@ -97,9 +97,9 @@ void fgPlatformInitialize( const char* displayName )
         ReleaseDC( desktop, context );
     }
     /* If we have a DisplayName try to use it for metrics */
-    if( fgDisplay.DisplayName )
+    if( fgDisplay.pDisplay.DisplayName )
     {
-        HDC context = CreateDC(fgDisplay.DisplayName,0,0,0);
+        HDC context = CreateDC(fgDisplay.pDisplay.DisplayName,0,0,0);
         if( context )
         {
 	    fgDisplay.ScreenWidth  = GetDeviceCaps( context, HORZRES );
@@ -147,10 +147,10 @@ void fgPlatformDeinitialiseInputDevices ( void )
 
 void fgPlatformCloseDisplay ( void )
 {
-    if( fgDisplay.DisplayName )
+    if( fgDisplay.pDisplay.DisplayName )
     {
-        free( fgDisplay.DisplayName );
-        fgDisplay.DisplayName = NULL;
+        free( fgDisplay.pDisplay.DisplayName );
+        fgDisplay.pDisplay.DisplayName = NULL;
     }
 
     /* Reset the timer granularity */

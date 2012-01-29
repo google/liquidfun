@@ -41,11 +41,11 @@ void fgPlatformRememberState( void )
 /* hack to get around my stupid cross-gcc headers */
 #define FREEGLUT_ENUM_CURRENT_SETTINGS -1
 
-    EnumDisplaySettings( fgDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS,
-                         &fgDisplay.DisplayMode );
+    EnumDisplaySettings( fgDisplay.pDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS,
+                         &fgDisplay.pDisplay.DisplayMode );
 
     /* Make sure we will be restoring all settings needed */
-    fgDisplay.DisplayMode.dmFields |=
+    fgDisplay.pDisplay.DisplayMode.dmFields |=
         DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY;
 
 }
@@ -56,7 +56,7 @@ void fgPlatformRememberState( void )
 void fgPlatformRestoreState( void )
 {
     /* Restore the previously remembered desktop display settings */
-    ChangeDisplaySettingsEx( fgDisplay.DisplayName,&fgDisplay.DisplayMode, 0,0,0 );
+    ChangeDisplaySettingsEx( fgDisplay.pDisplay.DisplayName,&fgDisplay.pDisplay.DisplayMode, 0,0,0 );
 
 }
 
@@ -75,7 +75,7 @@ GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
 
     success = GL_FALSE;
 
-    EnumDisplaySettings( fgDisplay.DisplayName, -1, &devMode ); 
+    EnumDisplaySettings( fgDisplay.pDisplay.DisplayName, -1, &devMode ); 
     devMode.dmFields = 0;
 
     if (fgState.GameModeSize.X!=-1)
@@ -99,7 +99,7 @@ GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
         devMode.dmFields |= DM_DISPLAYFREQUENCY;
     }
 
-    switch ( ChangeDisplaySettingsEx(fgDisplay.DisplayName, &devMode, NULL, haveToTest ? CDS_TEST : CDS_FULLSCREEN , NULL) )
+    switch ( ChangeDisplaySettingsEx(fgDisplay.pDisplay.DisplayName, &devMode, NULL, haveToTest ? CDS_TEST : CDS_FULLSCREEN , NULL) )
     {
     case DISP_CHANGE_SUCCESSFUL:
         success = GL_TRUE;
@@ -107,7 +107,7 @@ GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
         if (!haveToTest)
         {
             /* update vars in case if windows switched to proper mode */
-            EnumDisplaySettings( fgDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS, &devMode );
+            EnumDisplaySettings( fgDisplay.pDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS, &devMode );
             fgState.GameModeSize.X  = devMode.dmPelsWidth;        
             fgState.GameModeSize.Y  = devMode.dmPelsHeight;
             fgState.GameModeDepth   = devMode.dmBitsPerPel;

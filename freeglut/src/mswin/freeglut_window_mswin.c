@@ -313,12 +313,12 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
         /* create a dummy window */
         ZeroMemory(&wndCls, sizeof(wndCls));
         wndCls.lpfnWndProc = DefWindowProc;
-        wndCls.hInstance = fgDisplay.Instance;
+        wndCls.hInstance = fgDisplay.pDisplay.Instance;
         wndCls.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
         wndCls.lpszClassName = _T("FREEGLUT_dummy");
         RegisterClass( &wndCls );
 
-        hWnd=CreateWindow(_T("FREEGLUT_dummy"), _T(""), WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW , 0,0,0,0, 0, 0, fgDisplay.Instance, 0 );
+        hWnd=CreateWindow(_T("FREEGLUT_dummy"), _T(""), WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW , 0,0,0,0, 0, 0, fgDisplay.pDisplay.Instance, 0 );
         hDC=GetDC(hWnd);
         SetPixelFormat( hDC, pixelformat, ppfd );
 
@@ -350,7 +350,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
         wglDeleteContext(rc);
         ReleaseDC(hWnd, hDC);
         DestroyWindow(hWnd);
-        UnregisterClass(_T("FREEGLUT_dummy"), fgDisplay.Instance);
+        UnregisterClass(_T("FREEGLUT_dummy"), fgDisplay.pDisplay.Instance);
     }
 
     success = ( pixelformat != 0 ) && ( checkOnly || SetPixelFormat( current_hDC, pixelformat, ppfd ) );
@@ -571,7 +571,7 @@ static BOOL CALLBACK m_proc(HMONITOR mon,
 
 /* 
  * this function returns the origin of the screen identified by
- * fgDisplay.DisplayName, and 0 otherwise.
+ * fgDisplay.pDisplay.DisplayName, and 0 otherwise.
  * This is used in fgOpenWindow to open the gamemode window on the screen
  * identified by the -display command line argument. The function should
  * not be called otherwise.
@@ -582,12 +582,12 @@ static void get_display_origin(int *xp,int *yp)
     *xp = 0;
     *yp = 0;
 
-    if( fgDisplay.DisplayName )
+    if( fgDisplay.pDisplay.DisplayName )
     {
         m_proc_t st;
         st.x=xp;
         st.y=yp;
-        st.name=fgDisplay.DisplayName;
+        st.name=fgDisplay.pDisplay.DisplayName;
         EnumDisplayMonitors(0,0,m_proc,(LPARAM)&st);
     }
 }
@@ -599,7 +599,7 @@ static void get_display_origin(int *xp,int *yp)
     *xp = 0;
     *yp = 0;
 
-    if( fgDisplay.DisplayName )
+    if( fgDisplay.pDisplay.DisplayName )
     {
         fgWarning( "for working -display support FreeGLUT must be compiled with WINVER >= 0x0500");
     }
@@ -624,7 +624,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     ATOM atom;
 
     /* Grab the window class we have registered on glutInit(): */
-    atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
+    atom = GetClassInfo( fgDisplay.pDisplay.Instance, _T("FREEGLUT"), &wc );
     FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Info Not Found",
                                    "fgOpenWindow" );
 
@@ -748,7 +748,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
             0,0, 240,320,
             NULL,
             NULL,
-            fgDisplay.Instance,
+            fgDisplay.pDisplay.Instance,
             (LPVOID) window
         );
 
@@ -770,7 +770,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
         x, y, w, h,
         (HWND) window->Parent == NULL ? NULL : window->Parent->Window.Handle,
         (HMENU) NULL,
-        fgDisplay.Instance,
+        fgDisplay.pDisplay.Instance,
         (LPVOID) window
     );
 #endif /* defined(_WIN32_WCE) */
