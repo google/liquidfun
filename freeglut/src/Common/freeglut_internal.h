@@ -210,6 +210,16 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 
 #define INVALID_MODIFIERS 0xffffffff
 
+
+
+/* Platform-specific includes */
+#if TARGET_HOST_POSIX_X11
+#endif
+#if TARGET_HOST_MS_WINDOWS
+#include "../mswin/freeglut_internal_mswin.h"
+#endif
+
+
 /* -- GLOBAL TYPE DEFINITIONS ---------------------------------------------- */
 
 /* Freeglut callbacks type definitions */
