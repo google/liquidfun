@@ -214,6 +214,7 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 
 /* Platform-specific includes */
 #if TARGET_HOST_POSIX_X11
+
 typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
 struct tagSFG_PlatformDisplay
 {
@@ -246,6 +247,15 @@ struct tagSFG_PlatformDisplay
     int             DisplayPointerX;    /* saved X location of the pointer   */
     int             DisplayPointerY;    /* saved Y location of the pointer   */
 };
+
+
+/*
+ * Make "freeglut" window handle and context types so that we don't need so
+ * much conditionally-compiled code later in the library.
+ */
+typedef Window     SFG_WindowHandleType ;
+typedef GLXContext SFG_WindowContextType ;
+
 
 #endif
 #if TARGET_HOST_MS_WINDOWS
@@ -417,22 +427,6 @@ struct tagSFG_Timer
     FGCBTimer       Callback;           /* The timer callback                */
     long            TriggerTime;        /* The timer trigger time            */
 };
-
-/*
- * Make "freeglut" window handle and context types so that we don't need so
- * much conditionally-compiled code later in the library.
- */
-#if TARGET_HOST_POSIX_X11
-
-typedef Window     SFG_WindowHandleType ;
-typedef GLXContext SFG_WindowContextType ;
-
-#elif TARGET_HOST_MS_WINDOWS
-
-typedef HWND    SFG_WindowHandleType ;
-typedef HGLRC   SFG_WindowContextType ;
-
-#endif
 
 /*
  * A window and its OpenGL context. The contents of this structure

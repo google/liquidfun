@@ -36,6 +36,13 @@ struct tagSFG_PlatformDisplay
     char           *DisplayName;        /* Display name for multi display support*/ 
 };
 
+/*
+ * Make "freeglut" window handle and context types so that we don't need so
+ * much conditionally-compiled code later in the library.
+ */
+typedef HWND    SFG_WindowHandleType ;
+typedef HGLRC   SFG_WindowContextType ;
+
 
 
 #endif  /* FREEGLUT_INTERNAL_MSWIN_H */
