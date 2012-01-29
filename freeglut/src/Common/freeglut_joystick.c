@@ -455,6 +455,9 @@ static void fghJoystickAddHatElement ( SFG_Joystick* joy, CFDictionaryRef hat );
 #endif
 
 
+/* External function declarations (mostly platform-specific) */
+extern void fgPlatformJoystickClose ( int ident );
+
 /*
  * The static joystick structure pointer
  */
@@ -1619,6 +1622,48 @@ void fgInitialiseJoysticks ( void )
 /*
  *
  */
+
+#if TARGET_HOST_MACINTOSH
+void fgPlatformJoystickClose ( int ident )
+{
+    ISpSuspend( );
+    ISpStop( );
+    ISpShutdown( );
+}
+#endif
+
+#if TARGET_HOST_MAC_OSX
+void fgPlatformJoystickClose ( int ident )
+{
+    ( *( fgJoystick[ ident ]->hidDev ) )->
+        close( fgJoystick[ ident ]->hidDev );
+}
+#endif
+
+#if TARGET_HOST_POSIX_X11
+void fgPlatformJoystickClose ( int ident )
+{
+#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+    if( fgJoystick[ident]->os )
+    {
+        if( ! fgJoystick[ ident ]->error )
+            close( fgJoystick[ ident ]->os->fd );
+#ifdef HAVE_USB_JS
+        if( fgJoystick[ ident ]->os->hids )
+            free (fgJoystick[ ident ]->os->hids);
+        if( fgJoystick[ ident ]->os->hid_data_buf )
+            free( fgJoystick[ ident ]->os->hid_data_buf );
+#endif
+        free( fgJoystick[ident]->os );
+	}
+#endif
+
+    if( ! fgJoystick[ident]->error )
+         close( fgJoystick[ ident ]->fd );
+}
+#endif
+
+
 void fgJoystickClose( void )
 {
     int ident ;
@@ -1626,41 +1671,7 @@ void fgJoystickClose( void )
     {
         if( fgJoystick[ ident ] )
         {
-
-#if TARGET_HOST_MACINTOSH
-            ISpSuspend( );
-            ISpStop( );
-            ISpShutdown( );
-#endif
-
-#if TARGET_HOST_MAC_OSX
-            ( *( fgJoystick[ ident ]->hidDev ) )->
-                close( fgJoystick[ ident ]->hidDev );
-#endif
-
-#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
-            /* Do nothing special */
-#endif
-
-#if TARGET_HOST_POSIX_X11
-#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
-            if( fgJoystick[ident]->os )
-            {
-                if( ! fgJoystick[ ident ]->error )
-                    close( fgJoystick[ ident ]->os->fd );
-#ifdef HAVE_USB_JS
-                if( fgJoystick[ ident ]->os->hids )
-                    free (fgJoystick[ ident ]->os->hids);
-                if( fgJoystick[ ident ]->os->hid_data_buf )
-                    free( fgJoystick[ ident ]->os->hid_data_buf );
-#endif
-                free( fgJoystick[ident]->os );
-            }
-#endif
-
-            if( ! fgJoystick[ident]->error )
-                close( fgJoystick[ ident ]->fd );
-#endif
+			fgPlatformJoystickClose ( ident );
 
             free( fgJoystick[ ident ] );
             fgJoystick[ ident ] = NULL;
