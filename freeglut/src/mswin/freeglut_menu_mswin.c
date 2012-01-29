@@ -34,3 +34,15 @@ GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
     *x = glutGet ( GLUT_SCREEN_WIDTH );
     *y = glutGet ( GLUT_SCREEN_HEIGHT );
 }
+
+
+
+/* -- PLATFORM-SPECIFIC INTERFACE FUNCTION -------------------------------------------------- */
+
+
+int FGAPIENTRY __glutCreateMenuWithExit( void(* callback)( int ), void (__cdecl *exit_function)(int) )
+{
+  __glutExitFunc = exit_function;
+  return glutCreateMenu( callback );
+}
+
