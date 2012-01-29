@@ -978,10 +978,10 @@ void fgPlatformGlutFullScreen( SFG_Window *win )
 
         
         /* store current window rect */
-        GetWindowRect( win->Window.Handle, &win->State.OldRect );
+        GetWindowRect( win->Window.Handle, &win->State.pWState.OldRect );
 
         /* store current window style */
-        win->State.OldStyle = s = GetWindowLong(win->Window.Handle, GWL_STYLE);
+        win->State.pWState.OldStyle = s = GetWindowLong(win->Window.Handle, GWL_STYLE);
 
         /* remove decorations from style and add popup style*/
         s &= ~WS_OVERLAPPEDWINDOW;
@@ -992,7 +992,7 @@ void fgPlatformGlutFullScreen( SFG_Window *win )
         /* For fullscreen mode, find the monitor that is covered the most
          * by the window and get its rect as the resize target.
 	     */
-        hMonitor= MonitorFromRect(&win->State.OldRect, MONITOR_DEFAULTTONEAREST);
+        hMonitor= MonitorFromRect(&win->State.pWState.OldRect, MONITOR_DEFAULTTONEAREST);
         mi.cbSize = sizeof(mi);
         GetMonitorInfo(hMonitor, &mi);
         rect = mi.rcMonitor;
@@ -1048,16 +1048,16 @@ void fgPlatformGlutLeaveFullScreen( SFG_Window *win )
     }
 
     /* restore style of window before making it fullscreen */
-    SetWindowLong(win->Window.Handle, GWL_STYLE, win->State.OldStyle);
+    SetWindowLong(win->Window.Handle, GWL_STYLE, win->State.pWState.OldStyle);
     SetWindowPos(win->Window.Handle, HWND_TOP, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
     /* Then resize */
     SetWindowPos(win->Window.Handle,
         HWND_TOP,
-        win->State.OldRect.left,
-        win->State.OldRect.top,
-        win->State.OldRect.right  - win->State.OldRect.left,
-        win->State.OldRect.bottom - win->State.OldRect.top,
+        win->State.pWState.OldRect.left,
+        win->State.pWState.OldRect.top,
+        win->State.pWState.OldRect.right  - win->State.pWState.OldRect.left,
+        win->State.pWState.OldRect.bottom - win->State.pWState.OldRect.top,
         SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
         SWP_NOZORDER
         );

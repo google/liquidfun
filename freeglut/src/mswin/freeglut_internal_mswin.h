@@ -85,6 +85,16 @@ struct tagSFG_PlatformContext
 };
 
 
+/* Window's state description. This structure should be kept portable. */
+typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
+struct tagSFG_PlatformWindowState
+{
+    RECT            OldRect;            /* window rect - stored before the window is made fullscreen */
+    DWORD           OldStyle;           /* window style - stored before the window is made fullscreen */
+};
+
+
+
 /* Joystick-Specific Definitions */
 #if !defined(_WIN32_WCE)
 #    define _JS_MAX_AXES  8

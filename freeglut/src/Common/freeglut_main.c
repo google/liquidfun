@@ -1001,13 +1001,13 @@ void fgPlatformProcessSingleEvent ( void )
                     height = event.xconfigure.height;
                 }
 
-                if( ( width != window->State.OldWidth ) ||
-                    ( height != window->State.OldHeight ) )
+                if( ( width != window->State.pWState.OldWidth ) ||
+                    ( height != window->State.pWState.OldHeight ) )
                 {
                     SFG_Window *current_window = fgStructure.CurrentWindow;
 
-                    window->State.OldWidth = width;
-                    window->State.OldHeight = height;
+                    window->State.pWState.OldWidth = width;
+                    window->State.pWState.OldHeight = height;
                     if( FETCH_WCB( *window, Reshape ) )
                         INVOKE_WCB( *window, Reshape, ( width, height ) );
                     else

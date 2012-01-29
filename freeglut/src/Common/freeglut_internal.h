@@ -419,19 +419,24 @@ struct tagSFG_Context
 };
 
 /* Window's state description. This structure should be kept portable. */
+#if TARGET_HOST_POSIX_X11
+typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
+struct tagSFG_PlatformWindowState
+{
+    int             OldWidth;           /* Window width from before a resize */
+    int             OldHeight;          /*   "    height  "    "    "   "    */
+};
+#endif
+
+
 typedef struct tagSFG_WindowState SFG_WindowState;
 struct tagSFG_WindowState
 {
     /* Note that on Windows, sizes always refer to the client area, thus without the window decorations */
     int             Width;              /* Window's width in pixels          */
     int             Height;             /* The same about the height         */
-#if TARGET_HOST_POSIX_X11
-    int             OldWidth;           /* Window width from before a resize */
-    int             OldHeight;          /*   "    height  "    "    "   "    */
-#elif TARGET_HOST_MS_WINDOWS
-    RECT            OldRect;            /* window rect - stored before the window is made fullscreen */
-    DWORD           OldStyle;           /* window style - stored before the window is made fullscreen */
-#endif
+
+	SFG_PlatformWindowState pWState;    /* Window width/height (X11) or rectangle/style (Windows) from before a resize */
 
     GLboolean       Redisplay;          /* Do we have to redisplay?          */
     GLboolean       Visible;            /* Is the window visible now         */

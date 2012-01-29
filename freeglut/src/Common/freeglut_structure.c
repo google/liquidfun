@@ -65,7 +65,7 @@ void fgPlatformCreateWindow ( SFG_Window *window )
 {
     window->Window.pContext.FBConfig = NULL;
 
-    window->State.OldHeight = window->State.OldWidth = -1;
+    window->State.pWState.OldHeight = window->State.pWState.OldWidth = -1;
 }
 #endif
 

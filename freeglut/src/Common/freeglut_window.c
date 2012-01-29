@@ -449,8 +449,8 @@ static int fghResizeFullscrToggle(void)
         /* restore original window size */
         SFG_Window *win = fgStructure.CurrentWindow;
         fgStructure.CurrentWindow->State.NeedToResize = GL_TRUE;
-        fgStructure.CurrentWindow->State.Width  = win->State.OldWidth;
-        fgStructure.CurrentWindow->State.Height = win->State.OldHeight;
+        fgStructure.CurrentWindow->State.Width  = win->State.pWState.OldWidth;
+        fgStructure.CurrentWindow->State.Height = win->State.pWState.OldHeight;
 
     } else {
         /* resize the window to cover the entire screen */
