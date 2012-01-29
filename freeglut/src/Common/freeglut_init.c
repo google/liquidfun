@@ -648,16 +648,6 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     }
 }
 
-#if TARGET_HOST_MS_WINDOWS
-void (__cdecl *__glutExitFunc)( int return_value ) = NULL;
-
-void FGAPIENTRY __glutInitWithExit( int *pargc, char **argv, void (__cdecl *exit_function)(int) )
-{
-  __glutExitFunc = exit_function;
-  glutInit(pargc, argv);
-}
-#endif
-
 /*
  * Undoes all the "glutInit" stuff
  */

@@ -329,3 +329,14 @@ int XParseGeometry (
 
 
 
+/* -- PLATFORM-SPECIFIC INTERFACE FUNCTION -------------------------------------------------- */
+
+
+void (__cdecl *__glutExitFunc)( int return_value ) = NULL;
+
+void FGAPIENTRY __glutInitWithExit( int *pargc, char **argv, void (__cdecl *exit_function)(int) )
+{
+  __glutExitFunc = exit_function;
+  glutInit(pargc, argv);
+}
+
