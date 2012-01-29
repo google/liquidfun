@@ -388,6 +388,7 @@ static void fghJoystickAddHatElement ( SFG_Joystick* joy, CFDictionaryRef hat );
 
 
 /* External function declarations (mostly platform-specific) */
+extern void fgPlatformJoystickOpen( SFG_Joystick* joy );
 extern void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident );
 extern void fgPlatformJoystickClose ( int ident );
 
@@ -396,132 +397,6 @@ extern void fgPlatformJoystickClose ( int ident );
  */
 #define MAX_NUM_JOYSTICKS  2
 static SFG_Joystick *fgJoystick [ MAX_NUM_JOYSTICKS ];
-
-/*
- *  Platform-Specific Code
- */
-
-#if TARGET_HOST_MACINTOSH
-void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
-{
-    fgJoystick[ ident ]->id = ident;
-    snprintf( fgJoystick[ ident ]->fname, sizeof(fgJoystick[ ident ]->fname), "/dev/js%d", ident ); /* FIXME */
-    fgJoystick[ ident ]->error = GL_FALSE;
-}
-
-
-void fgPlatformJoystickClose ( int ident )
-{
-    ISpSuspend( );
-    ISpStop( );
-    ISpShutdown( );
-}
-#endif
-
-#if TARGET_HOST_MAC_OSX
-void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
-{
-    fgJoystick[ ident ]->id = ident;
-    fgJoystick[ ident ]->error = GL_FALSE;
-    fgJoystick[ ident ]->num_axes = 0;
-    fgJoystick[ ident ]->num_buttons = 0;
-
-    if( numDevices < 0 )
-    {
-        /* do first-time init (since we can't over-ride jsInit, hmm */
-        numDevices = 0;
-
-        mach_port_t masterPort;
-        IOReturn rv = IOMasterPort( bootstrap_port, &masterPort );
-        if( rv != kIOReturnSuccess )
-        {
-            fgWarning( "error getting master Mach port" );
-            return;
-        }
-        fghJoystickFindDevices( masterPort );
-    }
-
-    if ( ident >= numDevices )
-    {
-        fgJoystick[ ident ]->error = GL_TRUE;
-        return;
-    }
-
-    /* get the name now too */
-    CFDictionaryRef properties = getCFProperties( ioDevices[ ident ] );
-    CFTypeRef ref = CFDictionaryGetValue( properties,
-                                          CFSTR( kIOHIDProductKey ) );
-    if (!ref)
-        ref = CFDictionaryGetValue(properties, CFSTR( "USB Product Name" ) );
-
-    if( !ref ||
-        !CFStringGetCString( ( CFStringRef )ref, name, 128,
-                             CFStringGetSystemEncoding( ) ) )
-    {
-        fgWarning( "error getting device name" );
-        name[ 0 ] = '\0';
-    }
-}
-
-
-void fgPlatformJoystickClose ( int ident )
-{
-    ( *( fgJoystick[ ident ]->hidDev ) )->
-        close( fgJoystick[ ident ]->hidDev );
-}
-#endif
-
-#if TARGET_HOST_POSIX_X11
-void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
-{
-#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
-    fgJoystick[ ident ]->id = ident;
-    fgJoystick[ ident ]->error = GL_FALSE;
-
-    fgJoystick[ ident ]->os = calloc( 1, sizeof( struct os_specific_s ) );
-    memset( fgJoystick[ ident ]->os, 0, sizeof( struct os_specific_s ) );
-    if( ident < USB_IDENT_OFFSET )
-        fgJoystick[ ident ]->os->is_analog = 1;
-    if( fgJoystick[ ident ]->os->is_analog )
-        snprintf( fgJoystick[ ident ]->os->fname, sizeof(fgJoystick[ ident ]->os->fname), "%s%d", AJSDEV, ident );
-    else
-        snprintf( fgJoystick[ ident ]->os->fname, sizeof(fgJoystick[ ident ]->os->fname), "%s%d", UHIDDEV,
-                 ident - USB_IDENT_OFFSET );
-#elif defined( __linux__ )
-    fgJoystick[ ident ]->id = ident;
-    fgJoystick[ ident ]->error = GL_FALSE;
-
-    snprintf( fgJoystick[ident]->fname, sizeof(fgJoystick[ident]->fname), "/dev/input/js%d", ident );
-
-    if( access( fgJoystick[ ident ]->fname, F_OK ) != 0 )
-        snprintf( fgJoystick[ ident ]->fname, sizeof(fgJoystick[ ident ]->fname), "/dev/js%d", ident );
-#endif
-}
-
-
-void fgPlatformJoystickClose ( int ident )
-{
-#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
-    if( fgJoystick[ident]->os )
-    {
-        if( ! fgJoystick[ ident ]->error )
-            close( fgJoystick[ ident ]->os->fd );
-#ifdef HAVE_USB_JS
-        if( fgJoystick[ ident ]->os->hids )
-            free (fgJoystick[ ident ]->os->hids);
-        if( fgJoystick[ ident ]->os->hid_data_buf )
-            free( fgJoystick[ ident ]->os->hid_data_buf );
-#endif
-        free( fgJoystick[ident]->os );
-	}
-#endif
-
-    if( ! fgJoystick[ident]->error )
-         close( fgJoystick[ ident ]->fd );
-}
-#endif
-
-
 
 /*
  * Read the raw joystick data
@@ -1054,109 +929,16 @@ static void fghJoystickAddHatElement ( SFG_Joystick *joy, CFDictionaryRef button
 }
 #endif
 
-#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
-/* Inspired by
-   http://msdn.microsoft.com/archive/en-us/dnargame/html/msdn_sidewind3d.asp
+/*
+ *  Platform-Specific Code
  */
-#    if FREEGLUT_LIB_PRAGMAS
-#        pragma comment (lib, "advapi32.lib")
-#    endif
 
-static int fghJoystickGetOEMProductName ( SFG_Joystick* joy, char *buf, int buf_sz )
-{
-    char buffer [ 256 ];
-
-    char OEMKey [ 256 ];
-
-    HKEY  hKey;
-    DWORD dwcb;
-    LONG  lr;
-
-    if ( joy->error )
-        return 0;
-
-    /* Open .. MediaResources\CurrentJoystickSettings */
-    _snprintf ( buffer, sizeof(buffer), "%s\\%s\\%s",
-                REGSTR_PATH_JOYCONFIG, joy->jsCaps.szRegKey,
-                REGSTR_KEY_JOYCURR );
-
-    lr = RegOpenKeyEx ( HKEY_LOCAL_MACHINE, buffer, 0, KEY_QUERY_VALUE, &hKey);
-
-    if ( lr != ERROR_SUCCESS ) return 0;
-
-    /* Get OEM Key name */
-    dwcb = sizeof(OEMKey);
-
-    /* JOYSTICKID1-16 is zero-based; registry entries for VJOYD are 1-based. */
-    _snprintf ( buffer, sizeof(buffer), "Joystick%d%s", joy->js_id + 1, REGSTR_VAL_JOYOEMNAME );
-
-    lr = RegQueryValueEx ( hKey, buffer, 0, 0, (LPBYTE) OEMKey, &dwcb);
-    RegCloseKey ( hKey );
-
-    if ( lr != ERROR_SUCCESS ) return 0;
-
-    /* Open OEM Key from ...MediaProperties */
-    _snprintf ( buffer, sizeof(buffer), "%s\\%s", REGSTR_PATH_JOYOEM, OEMKey );
-
-    lr = RegOpenKeyEx ( HKEY_LOCAL_MACHINE, buffer, 0, KEY_QUERY_VALUE, &hKey );
-
-    if ( lr != ERROR_SUCCESS ) return 0;
-
-    /* Get OEM Name */
-    dwcb = buf_sz;
-
-    lr = RegQueryValueEx ( hKey, REGSTR_VAL_JOYOEMNAME, 0, 0, (LPBYTE) buf,
-                             &dwcb );
-    RegCloseKey ( hKey );
-
-    if ( lr != ERROR_SUCCESS ) return 0;
-
-    return 1;
-}
-#endif
-
-
-static void fghJoystickOpen( SFG_Joystick* joy )
-{
-    int i = 0;
 #if TARGET_HOST_MACINTOSH
+void fgPlatformJoystickOpen( SFG_Joystick* joy )
+{
+	int i = 0;
     OSStatus err;
-#endif
-#if TARGET_HOST_MAC_OSX
-        IOReturn rv;
-        SInt32 score;
-        IOCFPlugInInterface **plugin;
 
-        HRESULT pluginResult;
-
-        CFDictionaryRef props;
-    CFTypeRef topLevelElement;
-#endif
-#if TARGET_HOST_POSIX_X11
-#    if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
-       char *cp;
-#    endif
-#    ifdef JS_NEW
-       unsigned char u;
-#    else
-#      if defined( __linux__ ) || TARGET_HOST_SOLARIS
-         int counter = 0;
-#      endif
-#    endif
-#endif
-
-    /* Silence gcc, the correct #ifdefs would be too fragile... */
-    (void)i;
-
-    /*
-     * Default values (for no joystick -- each conditional will reset the
-     * error flag)
-     */
-    joy->error = TRUE;
-    joy->num_axes = joy->num_buttons = 0;
-    joy->name[ 0 ] = '\0';
-
-#if TARGET_HOST_MACINTOSH
     /* XXX FIXME: get joystick name in Mac */
 
     err = ISpStartup( );
@@ -1254,9 +1036,37 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     }
     else
         joy->num_buttons = joy->num_axes = 0;
+}
+
+
+void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
+{
+    fgJoystick[ ident ]->id = ident;
+    snprintf( fgJoystick[ ident ]->fname, sizeof(fgJoystick[ ident ]->fname), "/dev/js%d", ident ); /* FIXME */
+    fgJoystick[ ident ]->error = GL_FALSE;
+}
+
+
+void fgPlatformJoystickClose ( int ident )
+{
+    ISpSuspend( );
+    ISpStop( );
+    ISpShutdown( );
+}
 #endif
 
 #if TARGET_HOST_MAC_OSX
+void fgPlatformJoystickOpen( SFG_Joystick* joy )
+{
+    IOReturn rv;
+    SInt32 score;
+    IOCFPlugInInterface **plugin;
+
+    HRESULT pluginResult;
+
+    CFDictionaryRef props;
+    CFTypeRef topLevelElement;
+
     if( joy->id >= numDevices )
     {
         fgWarning( "device index out of range in fgJoystickOpen()" );
@@ -1304,71 +1114,77 @@ static void fghJoystickOpen( SFG_Joystick* joy )
     enumerateElements( topLevelElement );
 
     CFRelease( props );
-#endif
+}
 
-#if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE)
-    joy->js.dwFlags = JOY_RETURNALL;
-    joy->js.dwSize  = sizeof( joy->js );
 
-    memset( &joy->jsCaps, 0, sizeof( joy->jsCaps ) );
+void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
+{
+    fgJoystick[ ident ]->id = ident;
+    fgJoystick[ ident ]->error = GL_FALSE;
+    fgJoystick[ ident ]->num_axes = 0;
+    fgJoystick[ ident ]->num_buttons = 0;
 
-    joy->error =
-        ( joyGetDevCaps( joy->js_id, &joy->jsCaps, sizeof( joy->jsCaps ) ) !=
-          JOYERR_NOERROR );
-
-    if( joy->jsCaps.wNumAxes == 0 )
+    if( numDevices < 0 )
     {
-        joy->num_axes = 0;
-        joy->error = GL_TRUE;
-    }
-    else
-    {
-        /* Device name from jsCaps is often "Microsoft PC-joystick driver",
-         * at least for USB.  Try to get the real name from the registry.
-         */
-        if ( ! fghJoystickGetOEMProductName( joy, joy->name,
-                                             sizeof( joy->name ) ) )
+        /* do first-time init (since we can't over-ride jsInit, hmm */
+        numDevices = 0;
+
+        mach_port_t masterPort;
+        IOReturn rv = IOMasterPort( bootstrap_port, &masterPort );
+        if( rv != kIOReturnSuccess )
         {
-            fgWarning( "JS: Failed to read joystick name from registry" );
-            strncpy( joy->name, joy->jsCaps.szPname, sizeof( joy->name ) );
+            fgWarning( "error getting master Mach port" );
+            return;
         }
-
-        /* Windows joystick drivers may provide any combination of
-         * X,Y,Z,R,U,V,POV - not necessarily the first n of these.
-         */
-        if( joy->jsCaps.wCaps & JOYCAPS_HASPOV )
-        {
-            joy->num_axes = _JS_MAX_AXES;
-            joy->min[ 7 ] = -1.0; joy->max[ 7 ] = 1.0;  /* POV Y */
-            joy->min[ 6 ] = -1.0; joy->max[ 6 ] = 1.0;  /* POV X */
-        }
-        else
-            joy->num_axes = 6;
-
-        joy->min[ 5 ] = ( float )joy->jsCaps.wVmin;
-        joy->max[ 5 ] = ( float )joy->jsCaps.wVmax;
-        joy->min[ 4 ] = ( float )joy->jsCaps.wUmin;
-        joy->max[ 4 ] = ( float )joy->jsCaps.wUmax;
-        joy->min[ 3 ] = ( float )joy->jsCaps.wRmin;
-        joy->max[ 3 ] = ( float )joy->jsCaps.wRmax;
-        joy->min[ 2 ] = ( float )joy->jsCaps.wZmin;
-        joy->max[ 2 ] = ( float )joy->jsCaps.wZmax;
-        joy->min[ 1 ] = ( float )joy->jsCaps.wYmin;
-        joy->max[ 1 ] = ( float )joy->jsCaps.wYmax;
-        joy->min[ 0 ] = ( float )joy->jsCaps.wXmin;
-        joy->max[ 0 ] = ( float )joy->jsCaps.wXmax;
+        fghJoystickFindDevices( masterPort );
     }
 
-    /* Guess all the rest judging on the axes extremals */
-    for( i = 0; i < joy->num_axes; i++ )
+    if ( ident >= numDevices )
     {
-        joy->center   [ i ] = ( joy->max[ i ] + joy->min[ i ] ) * 0.5f;
-        joy->dead_band[ i ] = 0.0f;
-        joy->saturate [ i ] = 1.0f;
+        fgJoystick[ ident ]->error = GL_TRUE;
+        return;
     }
+
+    /* get the name now too */
+    CFDictionaryRef properties = getCFProperties( ioDevices[ ident ] );
+    CFTypeRef ref = CFDictionaryGetValue( properties,
+                                          CFSTR( kIOHIDProductKey ) );
+    if (!ref)
+        ref = CFDictionaryGetValue(properties, CFSTR( "USB Product Name" ) );
+
+    if( !ref ||
+        !CFStringGetCString( ( CFStringRef )ref, name, 128,
+                             CFStringGetSystemEncoding( ) ) )
+    {
+        fgWarning( "error getting device name" );
+        name[ 0 ] = '\0';
+    }
+}
+
+
+void fgPlatformJoystickClose ( int ident )
+{
+    ( *( fgJoystick[ ident ]->hidDev ) )->
+        close( fgJoystick[ ident ]->hidDev );
+}
 #endif
 
 #if TARGET_HOST_POSIX_X11
+void fgPlatformJoystickOpen( SFG_Joystick* joy )
+{
+#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+	int i = 0;
+       char *cp;
+#endif
+#ifdef JS_NEW
+       unsigned char u;
+#else
+#  if defined( __linux__ ) || TARGET_HOST_SOLARIS
+	int i = 0;
+    int counter = 0;
+#  endif
+#endif
+
 #if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
     for( i = 0; i < _JS_MAX_AXES; i++ )
         joy->os->cache_axes[ i ] = 0.0f;
@@ -1546,7 +1362,75 @@ static void fghJoystickOpen( SFG_Joystick* joy )
         joy->saturate [ i ] = 1.0f;
     }
 #endif
+}
+
+
+void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
+{
+#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+    fgJoystick[ ident ]->id = ident;
+    fgJoystick[ ident ]->error = GL_FALSE;
+
+    fgJoystick[ ident ]->os = calloc( 1, sizeof( struct os_specific_s ) );
+    memset( fgJoystick[ ident ]->os, 0, sizeof( struct os_specific_s ) );
+    if( ident < USB_IDENT_OFFSET )
+        fgJoystick[ ident ]->os->is_analog = 1;
+    if( fgJoystick[ ident ]->os->is_analog )
+        snprintf( fgJoystick[ ident ]->os->fname, sizeof(fgJoystick[ ident ]->os->fname), "%s%d", AJSDEV, ident );
+    else
+        snprintf( fgJoystick[ ident ]->os->fname, sizeof(fgJoystick[ ident ]->os->fname), "%s%d", UHIDDEV,
+                 ident - USB_IDENT_OFFSET );
+#elif defined( __linux__ )
+    fgJoystick[ ident ]->id = ident;
+    fgJoystick[ ident ]->error = GL_FALSE;
+
+    snprintf( fgJoystick[ident]->fname, sizeof(fgJoystick[ident]->fname), "/dev/input/js%d", ident );
+
+    if( access( fgJoystick[ ident ]->fname, F_OK ) != 0 )
+        snprintf( fgJoystick[ ident ]->fname, sizeof(fgJoystick[ ident ]->fname), "/dev/js%d", ident );
 #endif
+}
+
+
+void fgPlatformJoystickClose ( int ident )
+{
+#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+    if( fgJoystick[ident]->os )
+    {
+        if( ! fgJoystick[ ident ]->error )
+            close( fgJoystick[ ident ]->os->fd );
+#ifdef HAVE_USB_JS
+        if( fgJoystick[ ident ]->os->hids )
+            free (fgJoystick[ ident ]->os->hids);
+        if( fgJoystick[ ident ]->os->hid_data_buf )
+            free( fgJoystick[ ident ]->os->hid_data_buf );
+#endif
+        free( fgJoystick[ident]->os );
+	}
+#endif
+
+    if( ! fgJoystick[ident]->error )
+         close( fgJoystick[ ident ]->fd );
+}
+#endif
+
+
+
+
+
+
+static void fghJoystickOpen( SFG_Joystick* joy )
+{
+    /*
+     * Default values (for no joystick -- each conditional will reset the
+     * error flag)
+     */
+    joy->error = TRUE;
+    joy->num_axes = joy->num_buttons = 0;
+    joy->name[ 0 ] = '\0';
+
+	fgPlatformJoystickOpen ( joy );
+
 }
 
 /*
