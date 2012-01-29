@@ -28,6 +28,18 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
+
+/* Function prototypes */
+extern void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow );
+
+
+#if TARGET_HOST_POSIX_X11
+void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
+{
+    glXSwapBuffers( pDisplayPtr->Display, CurrentWindow->Window.Handle );
+}
+#endif
+
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
@@ -61,11 +73,7 @@ void FGAPIENTRY glutSwapBuffers( void )
     if( ! fgStructure.CurrentWindow->Window.DoubleBuffered )
         return;
 
-#if TARGET_HOST_POSIX_X11
-    glXSwapBuffers( fgDisplay.pDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
-#elif TARGET_HOST_MS_WINDOWS
-    SwapBuffers( fgStructure.CurrentWindow->Window.Device );
-#endif
+    fgPlatformGlutSwapBuffers( &fgDisplay.pDisplay, fgStructure.CurrentWindow );
 
     /* GLUT_FPS env var support */
     if( fgState.FPSInterval )
