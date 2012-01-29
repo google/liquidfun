@@ -28,6 +28,27 @@
 #ifndef  FREEGLUT_INTERNAL_MSWIN_H
 #define  FREEGLUT_INTERNAL_MSWIN_H
 
+
+/* All Win32 headers depend on the huge windows.h recursive include.
+ * Note: Lower-case header names are used, for best cross-platform
+ * compatibility.
+ */
+#if !defined(_WIN32_WCE)
+#    include <windows.h>
+#    include <windowsx.h>
+#    include <mmsystem.h>
+/* CYGWIN does not have tchar.h, but has TEXT(x), defined in winnt.h. */
+#    ifndef __CYGWIN__
+#      include <tchar.h>
+#    else
+#      define _TEXT(x) TEXT(x)
+#      define _T(x)    TEXT(x)
+#    endif
+
+#endif
+
+
+
 typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
 struct tagSFG_PlatformDisplay
 {
