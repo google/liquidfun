@@ -48,6 +48,21 @@
 #endif
 
 
+#define  HAVE_VFPRINTF 1
+
+/* MinGW may lack a prototype for ChangeDisplaySettingsEx() (depending on the version?) */
+#if !defined(ChangeDisplaySettingsEx)
+LONG WINAPI ChangeDisplaySettingsExA(LPCSTR,LPDEVMODEA,HWND,DWORD,LPVOID);
+LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
+#    ifdef UNICODE
+#        define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
+#    else
+#        define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
+#    endif
+#endif
+
+
+/* Structure Definitions */
 
 typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
 struct tagSFG_PlatformDisplay

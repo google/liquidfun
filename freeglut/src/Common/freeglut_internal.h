@@ -148,21 +148,6 @@
 #    endif
 #endif
 
-#if TARGET_HOST_MS_WINDOWS
-#    define  HAVE_VFPRINTF 1
-#endif
-
-/* MinGW may lack a prototype for ChangeDisplaySettingsEx() (depending on the version?) */
-#if TARGET_HOST_MS_WINDOWS && !defined(ChangeDisplaySettingsEx)
-LONG WINAPI ChangeDisplaySettingsExA(LPCSTR,LPDEVMODEA,HWND,DWORD,LPVOID);
-LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
-#    ifdef UNICODE
-#        define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
-#    else
-#        define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
-#    endif
-#endif
-
 #if defined(_MSC_VER) || defined(__WATCOMC__)
 /* strdup() is non-standard, for all but POSIX-2001 */
 #define strdup   _strdup
