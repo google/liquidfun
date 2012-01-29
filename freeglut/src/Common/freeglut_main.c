@@ -72,6 +72,7 @@ struct GXKeyList gxKeyList;
 
 extern void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height );
 extern void fgPlatformDisplayWindow ( SFG_Window *window );
+extern unsigned long fgPlatformSystemTime ( void );
 extern void fgPlatformSleepForEvents( long msec );
 extern void fgPlatformProcessSingleEvent ( void );
 extern void fgPlatformMainLoopPreliminaryWork ( void );
@@ -174,6 +175,16 @@ void fgPlatformDisplayWindow ( SFG_Window *window )
 {
         fghRedrawWindow ( window ) ;
 }
+
+
+unsigned long fgPlatformSystemTime ( void )
+{
+#if TARGET_HOST_SOLARIS || HAVE_GETTIMEOFDAY
+    struct timeval now;
+    gettimeofday( &now, NULL );
+    return now.tv_usec/1000 + now.tv_sec*1000;
+#endif
+}
 #endif
 
 static void fghcbDisplayWindow( SFG_Window *window,
@@ -262,18 +273,9 @@ static void fghCheckTimers( void )
  * when subtracting an initial start time, unless the total time exceeds
  * 32-bit, where the GLUT API return value is also overflowed.
  */  
-unsigned long fgSystemTime(void) {
-#if TARGET_HOST_SOLARIS || HAVE_GETTIMEOFDAY
-    struct timeval now;
-    gettimeofday( &now, NULL );
-    return now.tv_usec/1000 + now.tv_sec*1000;
-#elif TARGET_HOST_MS_WINDOWS
-#    if defined(_WIN32_WCE)
-    return GetTickCount();
-#    else
-    return timeGetTime();
-#    endif
-#endif
+unsigned long fgSystemTime(void)
+{
+	return fgPlatformSystemTime ();
 }
   
 /*

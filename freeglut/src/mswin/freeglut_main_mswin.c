@@ -108,6 +108,16 @@ void fgPlatformDisplayWindow ( SFG_Window *window )
 }
 
 
+unsigned long fgPlatformSystemTime ( void )
+{
+#if defined(_WIN32_WCE)
+    return GetTickCount();
+#else
+    return timeGetTime();
+#endif
+}
+
+
 void fgPlatformSleepForEvents( long msec )
 {
     MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLINPUT );
