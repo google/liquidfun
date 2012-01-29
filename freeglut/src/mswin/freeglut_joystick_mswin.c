@@ -30,6 +30,27 @@
 
 
 #if !defined(_WIN32_WCE)
+void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
+{
+    switch( ident )
+    {
+    case 0:
+        fgJoystick[ ident ]->js_id = JOYSTICKID1;
+        fgJoystick[ ident ]->error = GL_FALSE;
+        break;
+    case 1:
+        fgJoystick[ ident ]->js_id = JOYSTICKID2;
+        fgJoystick[ ident ]->error = GL_FALSE;
+        break;
+    default:
+        fgJoystick[ ident ]->num_axes = 0;
+        fgJoystick[ ident ]->error = GL_TRUE;
+        return;
+    }
+}
+
+
+
 void fgPlatformJoystickClose ( int ident )
 {
     /* Do nothing special */
