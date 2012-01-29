@@ -229,7 +229,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
     case GLUT_WINDOW_FORMAT_ID:
 #if !defined(_WIN32_WCE)
         if( fgStructure.CurrentWindow != NULL )
-            return GetPixelFormat( fgStructure.CurrentWindow->Window.Device );
+            return GetPixelFormat( fgStructure.CurrentWindow->Window.pContext.Device );
 #endif /* defined(_WIN32_WCE) */
         return 0;
 

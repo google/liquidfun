@@ -398,7 +398,7 @@ static GLXContext fghCreateNewContext( SFG_Window* window )
 
   /* "classic" context creation */
   Display *dpy = fgDisplay.Display;
-  GLXFBConfig config = *(window->Window.FBConfig);
+  GLXFBConfig config = *(window->Window.pContext.FBConfig);
   int render_type = ( !menu && index_mode ) ? GLX_COLOR_INDEX_TYPE : GLX_RGBA_TYPE;
   GLXContext share_list = NULL;
   Bool direct = ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT );
@@ -548,12 +548,12 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB ;
 
-    window->Window.FBConfig = fgChooseFBConfig( &num_FBConfigs );
+    window->Window.pContext.FBConfig = fgChooseFBConfig( &num_FBConfigs );
 
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = current_DisplayMode ;
 
-    if( ! window->Window.FBConfig )
+    if( ! window->Window.pContext.FBConfig )
     {
         /*
          * The "fgChooseFBConfig" returned a null meaning that the visual
@@ -563,25 +563,25 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
         if( !( fgState.DisplayMode & GLUT_DOUBLE ) )
         {
             fgState.DisplayMode |= GLUT_DOUBLE ;
-            window->Window.FBConfig = fgChooseFBConfig( &num_FBConfigs );
+            window->Window.pContext.FBConfig = fgChooseFBConfig( &num_FBConfigs );
             fgState.DisplayMode &= ~GLUT_DOUBLE;
         }
 
         if( fgState.DisplayMode & GLUT_MULTISAMPLE )
         {
             fgState.DisplayMode &= ~GLUT_MULTISAMPLE ;
-            window->Window.FBConfig = fgChooseFBConfig( &num_FBConfigs );
+            window->Window.pContext.FBConfig = fgChooseFBConfig( &num_FBConfigs );
             fgState.DisplayMode |= GLUT_MULTISAMPLE;
         }
     }
 
-    FREEGLUT_INTERNAL_ERROR_EXIT( window->Window.FBConfig != NULL,
+    FREEGLUT_INTERNAL_ERROR_EXIT( window->Window.pContext.FBConfig != NULL,
                                   "FBConfig with necessary capabilities not found", "fgOpenWindow" );
 
     /*  Get the X visual.  */
     for (i = 0; i < num_FBConfigs; i++) {
 	    visualInfo = glXGetVisualFromFBConfig( fgDisplay.Display,
-						   window->Window.FBConfig[i] );
+						   window->Window.pContext.FBConfig[i] );
 	    if (visualInfo)
 		break;
     }
@@ -750,7 +750,7 @@ void fgPlatformCloseWindow( SFG_Window* window )
 {
     if( window->Window.Context )
         glXDestroyContext( fgDisplay.Display, window->Window.Context );
-    XFree( window->Window.FBConfig );
+    XFree( window->Window.pContext.FBConfig );
 
     if( window->Window.Handle ) {
         XDestroyWindow( fgDisplay.Display, window->Window.Handle );

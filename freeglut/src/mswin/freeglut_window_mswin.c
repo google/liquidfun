@@ -169,9 +169,9 @@ void fgNewWGLCreateContext( SFG_Window* window )
         return;
     }
 
-    wglMakeCurrent( window->Window.Device, window->Window.Context );
+    wglMakeCurrent( window->Window.pContext.Device, window->Window.Context );
 
-    if ( !fghIsExtensionSupported( window->Window.Device, "WGL_ARB_create_context" ) )
+    if ( !fghIsExtensionSupported( window->Window.pContext.Device, "WGL_ARB_create_context" ) )
     {
         return;
     }
@@ -185,7 +185,7 @@ void fgNewWGLCreateContext( SFG_Window* window )
         fgError( "wglCreateContextAttribsARB not found" );
     }
 
-    context = wglCreateContextAttribsARB( window->Window.Device, 0, attributes );
+    context = wglCreateContextAttribsARB( window->Window.pContext.Device, 0, attributes );
     if ( context == NULL )
     {
         fghContextCreationError();
@@ -296,7 +296,7 @@ GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
     if (checkOnly)
       current_hDC = CreateDC(TEXT("DISPLAY"), NULL ,NULL ,NULL);
     else
-      current_hDC = window->Window.Device;
+      current_hDC = window->Window.pContext.Device;
 
     fghFillPFD( ppfd, current_hDC, layer_type );
     pixelformat = ChoosePixelFormat( current_hDC, ppfd );
@@ -370,13 +370,13 @@ void fgPlatformSetWindow ( SFG_Window *window )
     {
         if( fgStructure.CurrentWindow )
             ReleaseDC( fgStructure.CurrentWindow->Window.Handle,
-                       fgStructure.CurrentWindow->Window.Device );
+                       fgStructure.CurrentWindow->Window.pContext.Device );
 
         if ( window )
         {
-            window->Window.Device = GetDC( window->Window.Handle );
+            window->Window.pContext.Device = GetDC( window->Window.Handle );
             wglMakeCurrent(
-                window->Window.Device,
+                window->Window.pContext.Device,
                 window->Window.Context
             );
         }

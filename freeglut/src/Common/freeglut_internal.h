@@ -255,6 +255,12 @@ struct tagSFG_PlatformDisplay
  */
 typedef Window     SFG_WindowHandleType ;
 typedef GLXContext SFG_WindowContextType ;
+typedef struct tagSFG_PlatformContext SFG_PlatformContext;
+struct tagSFG_PlatformContext
+{
+    GLXFBConfig*    FBConfig;        /* The window's FBConfig               */
+};
+
 
 
 #endif
@@ -438,11 +444,7 @@ struct tagSFG_Context
     SFG_WindowHandleType  Handle;    /* The window's handle                 */
     SFG_WindowContextType Context;   /* The window's OpenGL/WGL context     */
 
-#if TARGET_HOST_POSIX_X11
-    GLXFBConfig*    FBConfig;        /* The window's FBConfig               */
-#elif TARGET_HOST_MS_WINDOWS
-    HDC             Device;          /* The window's device context         */
-#endif
+	SFG_PlatformContext pContext;    /* The window's FBConfig (X11) or device context (Windows) */
 
     int             DoubleBuffered;  /* Treat the window as double-buffered */
 };

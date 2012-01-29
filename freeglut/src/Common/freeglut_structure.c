@@ -63,7 +63,7 @@ static void fghClearCallBacks( SFG_Window *window )
 #if TARGET_HOST_POSIX_X11
 void fgPlatformCreateWindow ( SFG_Window *window )
 {
-    window->Window.FBConfig = NULL;
+    window->Window.pContext.FBConfig = NULL;
 
     window->State.OldHeight = window->State.OldWidth = -1;
 }

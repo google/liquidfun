@@ -66,7 +66,7 @@ static int fghGetConfig( int attribute )
 
   if( fgStructure.CurrentWindow )
       result = glXGetFBConfigAttrib( fgDisplay.Display,
-                                     *(fgStructure.CurrentWindow->Window.FBConfig),
+                                     *(fgStructure.CurrentWindow->Window.pContext.FBConfig),
                                      attribute,
                                      &returnValue );
 
@@ -125,7 +125,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
         else
         {
           const GLXFBConfig * fbconfig =
-                fgStructure.CurrentWindow->Window.FBConfig;
+                fgStructure.CurrentWindow->Window.pContext.FBConfig;
 
           XVisualInfo * visualInfo =
                 glXGetVisualFromFBConfig( fgDisplay.Display, *fbconfig );

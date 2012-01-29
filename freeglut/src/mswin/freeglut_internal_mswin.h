@@ -42,6 +42,12 @@ struct tagSFG_PlatformDisplay
  */
 typedef HWND    SFG_WindowHandleType ;
 typedef HGLRC   SFG_WindowContextType ;
+typedef struct tagSFG_PlatformContext SFG_PlatformContext;
+struct tagSFG_PlatformContext
+{
+    HDC             Device;          /* The window's device context         */
+};
+
 
 
 

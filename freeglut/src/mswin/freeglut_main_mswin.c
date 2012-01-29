@@ -329,7 +329,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                                        "fgPlatformWindowProc" );
 
         window->Window.Handle = hWnd;
-        window->Window.Device = GetDC( hWnd );
+        window->Window.pContext.Device = GetDC( hWnd );
         if( window->IsMenu )
         {
             unsigned int current_DisplayMode = fgState.DisplayMode;
@@ -340,7 +340,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             fgState.DisplayMode = current_DisplayMode;
 
             if( fgStructure.MenuContext )
-                wglMakeCurrent( window->Window.Device,
+                wglMakeCurrent( window->Window.pContext.Device,
                                 fgStructure.MenuContext->MContext
                 );
             else
@@ -348,11 +348,11 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 fgStructure.MenuContext =
                     (SFG_MenuContext *)malloc( sizeof(SFG_MenuContext) );
                 fgStructure.MenuContext->MContext =
-                    wglCreateContext( window->Window.Device );
+                    wglCreateContext( window->Window.pContext.Device );
             }
 
             /* window->Window.Context = wglGetCurrentContext ();   */
-            window->Window.Context = wglCreateContext( window->Window.Device );
+            window->Window.Context = wglCreateContext( window->Window.pContext.Device );
         }
         else
         {
@@ -362,13 +362,13 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
             if( ! fgState.UseCurrentContext )
                 window->Window.Context =
-                    wglCreateContext( window->Window.Device );
+                    wglCreateContext( window->Window.pContext.Device );
             else
             {
                 window->Window.Context = wglGetCurrentContext( );
                 if( ! window->Window.Context )
                     window->Window.Context =
-                        wglCreateContext( window->Window.Device );
+                        wglCreateContext( window->Window.pContext.Device );
             }
 
 #if !defined(_WIN32_WCE)
@@ -391,7 +391,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             fgSetWindow( current_window );
         }
 
-        ReleaseDC( window->Window.Handle, window->Window.Device );
+        ReleaseDC( window->Window.Handle, window->Window.pContext.Device );
 
 #if defined(_WIN32_WCE)
         /* Take over button handling */
