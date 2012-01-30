@@ -25,6 +25,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "../Common/freeglut_internal.h"
 
@@ -330,7 +331,6 @@ int XParseGeometry (
 
 
 /* -- PLATFORM-SPECIFIC INTERFACE FUNCTION -------------------------------------------------- */
-
 
 void (__cdecl *__glutExitFunc)( int return_value ) = NULL;
 

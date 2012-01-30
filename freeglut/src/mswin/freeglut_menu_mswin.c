@@ -25,6 +25,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "../Common/freeglut_internal.h"
 
@@ -38,7 +39,6 @@ GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
 
 
 /* -- PLATFORM-SPECIFIC INTERFACE FUNCTION -------------------------------------------------- */
-
 
 int FGAPIENTRY __glutCreateMenuWithExit( void(* callback)( int ), void (__cdecl *exit_function)(int) )
 {

@@ -25,6 +25,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "../Common/freeglut_internal.h"
 
@@ -1079,7 +1080,6 @@ void fgPlatformGlutFullScreenToggle( SFG_Window *win )
 
 
 /* -- PLATFORM-SPECIFIC INTERFACE FUNCTION -------------------------------------------------- */
-
 
 int FGAPIENTRY __glutCreateWindowWithExit( const char *title, void (__cdecl *exit_function)(int) )
 {
