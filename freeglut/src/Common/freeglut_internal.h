@@ -755,6 +755,82 @@ struct tagSFG_StrokeFont
 
 
 /* -- JOYSTICK-SPECIFIC STRUCTURES AND TYPES ------------------------------- */
+/*
+ * Initial defines from "js.h" starting around line 33 with the existing "freeglut_joystick.c"
+ * interspersed
+ */
+
+#if TARGET_HOST_MACINTOSH
+#    include <InputSprocket.h>
+#endif
+
+#if TARGET_HOST_MAC_OSX
+#    include <mach/mach.h>
+#    include <IOKit/IOkitLib.h>
+#    include <IOKit/hid/IOHIDLib.h>
+#endif
+
+#if TARGET_HOST_POSIX_X11
+#    ifdef HAVE_SYS_IOCTL_H
+#        include <sys/ioctl.h>
+#    endif
+#    ifdef HAVE_FCNTL_H
+#        include <fcntl.h>
+#    endif
+#    ifdef HAVE_ERRNO_H
+#        include <errno.h>
+#        include <string.h>
+#    endif
+#    if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
+/* XXX The below hack is done until freeglut's autoconf is updated. */
+#        define HAVE_USB_JS    1
+
+#        if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#            include <sys/joystick.h>
+#        else
+/*
+ * XXX NetBSD/amd64 systems may find that they have to steal the
+ * XXX /usr/include/machine/joystick.h from a NetBSD/i386 system.
+ * XXX I cannot comment whether that works for the interface, but
+ * XXX it lets you compile...(^&  I do not think that we can do away
+ * XXX with this header.
+ */
+#            include <machine/joystick.h>         /* For analog joysticks */
+#        endif
+#        define JS_DATA_TYPE joystick
+#        define JS_RETURN (sizeof(struct JS_DATA_TYPE))
+#    endif
+
+#    if defined(__linux__)
+#        include <linux/joystick.h>
+
+/* check the joystick driver version */
+#        if defined(JS_VERSION) && JS_VERSION >= 0x010000
+#            define JS_NEW
+#        endif
+#    else  /* Not BSD or Linux */
+#        ifndef JS_RETURN
+
+  /*
+   * We'll put these values in and that should
+   * allow the code to at least compile when there is
+   * no support. The JS open routine should error out
+   * and shut off all the code downstream anyway and if
+   * the application doesn't use a joystick we'll be fine.
+   */
+
+  struct JS_DATA_TYPE
+  {
+    int buttons;
+    int x;
+    int y;
+  };
+
+#            define JS_RETURN (sizeof(struct JS_DATA_TYPE))
+#        endif
+#    endif
+#endif
+
 /* XXX It might be better to poll the operating system for the numbers of buttons and
  * XXX axes and then dynamically allocate the arrays.
  */
