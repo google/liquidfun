@@ -35,24 +35,6 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-#if TARGET_HOST_POSIX_X11
-#ifdef HAVE_ERRNO_H
-#include <errno.h>
-#endif
-#include <sys/ioctl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <termios.h>
-#include <fcntl.h>
-
-struct {
-   int fd;
-   struct termios termio, termio_save;
-} _serialport;
-
-#endif
-
 typedef struct _serialport SERIALPORT;
 
 
@@ -127,12 +109,6 @@ int fgInputDeviceDetect( void )
 /*
  * Try initializing the input device(s)
  */
-#if TARGET_HOST_POSIX_X11
-void fgPlatformRegisterDialDevice ( const char *dial_device )
-{
-}
-#endif
-
 void fgInitialiseInputDevices ( void )
 {
     if( !fgState.InputDevsInitialised )
@@ -235,69 +211,3 @@ static void poll_dials ( int id )
     glutTimerFunc ( 2, poll_dials, 0 );
 }
 
-
-/******** OS Specific Serial I/O routines *******/
-#if TARGET_HOST_POSIX_X11 /* ==> Linux/BSD/UNIX POSIX serial I/O */
-static SERIALPORT *serial_open ( const char *device )
-{
-    int fd;
-    struct termios termio;
-    SERIALPORT *port;
-
-    fd = open(device, O_RDWR | O_NONBLOCK );
-    if (fd <0) {
-        perror(device);
-        return NULL;
-    }
-
-    port = malloc(sizeof(SERIALPORT));
-    memset(port, 0, sizeof(SERIALPORT));
-    port->fd = fd;
-
-    /* save current port settings */
-    tcgetattr(fd,&port->termio_save);
-
-    memset(&termio, 0, sizeof(termio));
-    termio.c_cflag = CS8 | CREAD | HUPCL ;
-    termio.c_iflag = IGNPAR | IGNBRK ;
-    termio.c_cc[VTIME]    = 0;   /* inter-character timer */
-    termio.c_cc[VMIN]     = 1;   /* block read until 1 chars received, when blocking I/O */
-
-    cfsetispeed(&termio, B9600);
-    cfsetospeed(&termio, B9600);
-    tcsetattr(fd,TCSANOW,&termio);
-
-    serial_flush(port);
-    return port;
-}
-
-static void serial_close(SERIALPORT *port)
-{
-    if (port)
-    {
-        /* restore old port settings */
-        tcsetattr(port->fd,TCSANOW,&port->termio_save);
-        close(port->fd);
-        free(port);
-    }
-}
-
-static int serial_getchar(SERIALPORT *port)
-{
-    unsigned char ch;
-    if (!port) return EOF;
-    if (read(port->fd,&ch,1)) return ch;
-    return EOF;
-}
-
-static int serial_putchar(SERIALPORT *port, unsigned char ch){
-    if (!port) return 0;
-    return write(port->fd,&ch,1);
-}
-
-static void serial_flush ( SERIALPORT *port )
-{
-    tcflush ( port->fd, TCIOFLUSH );
-}
-
-#endif
