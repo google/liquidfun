@@ -17,7 +17,6 @@ SET(FREEGLUT_SRCS
 	src/Common/freeglut_font_data.c
 	src/Common/freeglut_gamemode.c
 	src/Common/freeglut_geometry.c
-	src/Common/freeglut_glutfont_definitions.c
 	src/Common/freeglut_init.c
 	src/Common/freeglut_internal.h
 	src/Common/freeglut_input_devices.c

@@ -186,10 +186,6 @@ SOURCE=.\src\Common\freeglut_geometry.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Common\freeglut_glutfont_definitions.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\Common\freeglut_init.c
 # End Source File
 # Begin Source File
