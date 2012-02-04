@@ -39,7 +39,6 @@ lib@LIBRARY@_la_SOURCES = Common/freeglut_callbacks.c \
 			 Common/freeglut_teapot.c \
 			 Common/freeglut_videoresize.c \
 			 Common/freeglut_window.c \
-			 Common/freeglut_xinput.c \
 			 x11/freeglut_cursor_x11.c \
 			 x11/freeglut_display_x11.c \
 			 x11/freeglut_ext_x11.c \
@@ -53,7 +52,8 @@ lib@LIBRARY@_la_SOURCES = Common/freeglut_callbacks.c \
 			 x11/freeglut_spaceball_x11.c \
 			 x11/freeglut_state_x11.c \
 			 x11/freeglut_structure_x11.c \
-			 x11/freeglut_window_x11.c
+			 x11/freeglut_window_x11.c \
+			 x11/freeglut_xinput_x11.c
 
 #
 # Additional linker flags
