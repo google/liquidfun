@@ -34,7 +34,6 @@ SET(FREEGLUT_SRCS
 	src/Common/freeglut_teapot.c
 	src/Common/freeglut_videoresize.c
 	src/Common/freeglut_window.c
-	src/Common/freeglut_xinput.c
 )
 
 IF(WIN32)
@@ -71,6 +70,7 @@ ELSE()
 		src/x11/freeglut_state_x11.c
 		src/x11/freeglut_structure_x11.c
 		src/x11/freeglut_window_x11.c
+		src/x11/freeglut_xinput_x11.c
 )
 
 
