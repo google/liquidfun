@@ -33,13 +33,6 @@
 extern void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow );
 
 
-#if TARGET_HOST_POSIX_X11
-void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
-{
-    glXSwapBuffers( pDisplayPtr->Display, CurrentWindow->Window.Handle );
-}
-#endif
-
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
