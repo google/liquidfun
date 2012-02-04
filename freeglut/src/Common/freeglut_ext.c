@@ -29,8 +29,8 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-extern SFG_Proc fghGetProcAddress( const char *procName );
-extern GLUTproc fgPlatformGlutGetProcAddress( const char *procName );
+extern SFG_Proc fgPlatformGetProcAddress( const char *procName );
+extern GLUTproc fgPlatformGetGLUTProcAddress( const char *procName );
 
 static GLUTproc fghGetGLUTProcAddress( const char* procName )
 {
@@ -204,7 +204,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
 
 
 #if TARGET_HOST_POSIX_X11
-static GLUTproc fghGetGLUTProcAddress( const char* procName )
+static GLUTproc fgPlatformGetGLUTProcAddress( const char* procName )
 {
     /* optimization: quick initial check */
     if( strncmp( procName, "glut", 4 ) != 0 )
@@ -223,13 +223,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
 }
 
 
-GLUTproc fgPlatformGlutGetProcAddress( const char* procName )
-{
-    return NULL;
-}
-
-
-SFG_Proc fghGetProcAddress( const char *procName )
+SFG_Proc fgPlatformGetProcAddress( const char *procName )
 {
 #if defined( GLX_ARB_get_proc_address )
     return (SFG_Proc)glXGetProcAddressARB( ( const GLubyte * )procName );
@@ -251,7 +245,7 @@ glutGetProcAddress( const char *procName )
 
 	/* Some GLUT functions are platform-specific: */
 	if ( !p )
-      p = fgPlatformGlutGetProcAddress( procName );
+      p = fgPlatformGetGLUTProcAddress( procName );
 
-    return ( p != NULL ) ? p : fghGetProcAddress( procName );
+    return ( p != NULL ) ? p : fgPlatformGetProcAddress( procName );
 }

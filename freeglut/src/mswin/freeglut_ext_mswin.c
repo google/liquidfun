@@ -28,7 +28,7 @@
 #include <GL/freeglut.h>
 #include "../Common/freeglut_internal.h"
 
-GLUTproc fgPlatformGlutGetProcAddress( const char* procName )
+GLUTproc fgPlatformGetGLUTProcAddress( const char* procName )
 {
 #if !defined(_WIN32_WCE)
     /* optimization: quick initial check */
@@ -50,7 +50,7 @@ GLUTproc fgPlatformGlutGetProcAddress( const char* procName )
 
 
 
-SFG_Proc fghGetProcAddress( const char *procName )
+SFG_Proc fgPlatformGetProcAddress( const char *procName )
 {
     return (SFG_Proc)wglGetProcAddress( ( LPCSTR )procName );
 }
