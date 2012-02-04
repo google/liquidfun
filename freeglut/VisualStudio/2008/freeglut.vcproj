@@ -698,10 +698,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Common\freeglut_glutfont_definitions.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\Common\freeglut_init.c"
 				>
 			</File>

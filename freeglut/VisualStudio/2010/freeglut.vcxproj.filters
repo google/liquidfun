@@ -42,9 +42,6 @@
     <ClCompile Include="..\..\src\Common\freeglut_geometry.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Common\freeglut_glutfont_definitions.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Common\freeglut_init.c">
       <Filter>Source Files</Filter>
     </ClCompile>

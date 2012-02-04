@@ -329,7 +329,6 @@
     <ClCompile Include="..\..\src\Common\freeglut_font_data.c" />
     <ClCompile Include="..\..\src\Common\freeglut_gamemode.c" />
     <ClCompile Include="..\..\src\Common\freeglut_geometry.c" />
-    <ClCompile Include="..\..\src\Common\freeglut_glutfont_definitions.c" />
     <ClCompile Include="..\..\src\Common\freeglut_init.c" />
     <ClCompile Include="..\..\src\Common\freeglut_input_devices.c" />
     <ClCompile Include="..\..\src\Common\freeglut_joystick.c" />
