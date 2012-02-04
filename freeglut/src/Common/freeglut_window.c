@@ -306,7 +306,7 @@ GLXFBConfig* fgChooseFBConfig( int *numcfgs )
                     ATTRIB( None );
 
                     fbconfigArray = glXChooseFBConfig( fgDisplay.pDisplay.Display,
-                                                       fgDisplay.Screen,
+                                                       fgDisplay.pDisplay.Screen,
                                                        attributes,
                                                        &fbconfigArraySize );
                 }
@@ -477,16 +477,16 @@ static int fghEwmhFullscrToggle(void)
     XEvent xev;
     long evmask = SubstructureRedirectMask | SubstructureNotifyMask;
 
-    if(!fgDisplay.State || !fgDisplay.StateFullScreen) {
+    if(!fgDisplay.pDisplay.State || !fgDisplay.pDisplay.StateFullScreen) {
         return -1;
     }
 
     xev.type = ClientMessage;
     xev.xclient.window = fgStructure.CurrentWindow->Window.Handle;
-    xev.xclient.message_type = fgDisplay.State;
+    xev.xclient.message_type = fgDisplay.pDisplay.State;
     xev.xclient.format = 32;
     xev.xclient.data.l[0] = _NET_WM_STATE_TOGGLE;
-    xev.xclient.data.l[1] = fgDisplay.StateFullScreen;
+    xev.xclient.data.l[1] = fgDisplay.pDisplay.StateFullScreen;
     xev.xclient.data.l[2] = 0;	/* no second property to toggle */
     xev.xclient.data.l[3] = 1;	/* source indication: application */
     xev.xclient.data.l[4] = 0;	/* unused */

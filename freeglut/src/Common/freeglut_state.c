@@ -155,7 +155,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
         XTranslateCoordinates(
             fgDisplay.pDisplay.Display,
             fgStructure.CurrentWindow->Window.Handle,
-            fgDisplay.RootWindow,
+            fgDisplay.pDisplay.RootWindow,
             0, 0, &x, &y, &w);
 
         switch ( eWhat )

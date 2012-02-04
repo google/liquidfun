@@ -80,7 +80,7 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
             XRRFreeScreenConfigInfo(xrr_config);
         }
 
-        if(!(xrr_config = XRRGetScreenInfo(fgDisplay.pDisplay.Display, fgDisplay.RootWindow))) {
+        if(!(xrr_config = XRRGetScreenInfo(fgDisplay.pDisplay.Display, fgDisplay.pDisplay.RootWindow))) {
             fgWarning("XRRGetScreenInfo failed");
             break;
         }
@@ -622,7 +622,7 @@ int FGAPIENTRY glutEnterGameMode( void )
         Window child;
 
         /* Change to viewport to the window topleft edge: */
-        if( !XF86VidModeSetViewPort( fgDisplay.pDisplay.Display, fgDisplay.Screen, 0, 0 ) )
+        if( !XF86VidModeSetViewPort( fgDisplay.pDisplay.Display, fgDisplay.pDisplay.Screen, 0, 0 ) )
             fgWarning( "XF86VidModeSetViewPort failed" );
 
         /*
