@@ -8,7 +8,7 @@ lib_LTLIBRARIES = lib@LIBRARY@.la
 #
 # Headers and extra stuff we want to distribute
 #
-noinst_HEADERS = freeglut_internal.h freeglut_teapot_data.h
+noinst_HEADERS = Common/freeglut_internal.h Common/freeglut_teapot_data.h
 
 EXTRA_DIST = freeglutdll.def
 
@@ -39,7 +39,21 @@ lib@LIBRARY@_la_SOURCES = Common/freeglut_callbacks.c \
 			 Common/freeglut_teapot.c \
 			 Common/freeglut_videoresize.c \
 			 Common/freeglut_window.c \
-			 Common/freeglut_xinput.c
+			 Common/freeglut_xinput.c \
+			 x11/freeglut_cursor_x11.c \
+			 x11/freeglut_display_x11.c \
+			 x11/freeglut_ext_x11.c \
+			 x11/freeglut_gamemode_x11.c \
+			 x11/freeglut_glutfont_definitions_x11.c \
+			 x11/freeglut_init_x11.c \
+			 x11/freeglut_input_devices_x11.c \
+			 x11/freeglut_joystick_x11.c \
+			 x11/freeglut_main_x11.c \
+			 x11/freeglut_menu_x11.c \
+			 x11/freeglut_spaceball_x11.c \
+			 x11/freeglut_state_x11.c \
+			 x11/freeglut_structure_x11.c \
+			 x11/freeglut_window_x11.c
 
 #
 # Additional linker flags
@@ -47,7 +61,7 @@ lib@LIBRARY@_la_SOURCES = Common/freeglut_callbacks.c \
 lib@LIBRARY@_la_LIBADD  = $(GL_LIBS) $(X_LIBS) $(LIBM) $(LIBUSBHID)
 lib@LIBRARY@_la_LDFLAGS = $(VERSION_INFO) -no-undefined
 lib@LIBRARY@_la_CFLAGS  = $(GL_FLAGS) $(X_CFLAGS) $(EXPORT_FLAGS)
-lib@LIBRARY@_la_CPPFLAGS= -I$(top_srcdir)/include
+lib@LIBRARY@_la_CPPFLAGS= -I$(top_srcdir)/include -I$(top_srcdir)/src/Common
 
 #
 # End of file
