@@ -77,7 +77,7 @@ void fgInitialiseSpaceball(void)
 		}
 
         w = fgStructure.CurrentWindow->Window.Handle;
-        if(spnav_x11_open(fgDisplay.Display, w) == -1)
+        if(spnav_x11_open(fgDisplay.pDisplay.Display, w) == -1)
 		{
 			sball_initialized = -1;
             return;

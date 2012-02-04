@@ -28,7 +28,7 @@ void fgRegisterDevices( Display* dpy, Window* win ) {
 	unsigned char flags[2] = { 0, 0 };
 	int event, error;
 
-	/*Display* dpy = fgDisplay.Display;
+	/*Display* dpy = fgDisplay.pDisplay.Display;
 	Window* win = glutGetXWindow();*/
 
 	/* get XInput extension opcode */
@@ -148,7 +148,7 @@ void fgHandleExtensionEvents( XEvent* base_ev ) {
 	int i, button = 0;
 	XGenericEventCookie* cookie = (XGenericEventCookie*)&(base_ev->xcookie);
 
-	if ( XGetEventData( fgDisplay.Display, cookie ) && (cookie->type == GenericEvent) && (cookie->extension == xi_opcode) ) {
+	if ( XGetEventData( fgDisplay.pDisplay.Display, cookie ) && (cookie->type == GenericEvent) && (cookie->extension == xi_opcode) ) {
 
 		XIDeviceEvent* event = (XIDeviceEvent*)(cookie->data);
 		/*printf("XI2 event type: %d - %d\n", cookie->evtype, event->type );*/
@@ -212,7 +212,7 @@ void fgHandleExtensionEvents( XEvent* base_ev ) {
 		}
 		fgState.Modifiers = INVALID_MODIFIERS;
 	}
-	XFreeEventData( fgDisplay.Display, cookie );
+	XFreeEventData( fgDisplay.pDisplay.Display, cookie );
 }
 
 #endif

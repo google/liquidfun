@@ -65,7 +65,7 @@ static int fghGetConfig( int attribute )
   int result;  /*  Not checked  */
 
   if( fgStructure.CurrentWindow )
-      result = glXGetFBConfigAttrib( fgDisplay.Display,
+      result = glXGetFBConfigAttrib( fgDisplay.pDisplay.Display,
                                      *(fgStructure.CurrentWindow->Window.pContext.FBConfig),
                                      attribute,
                                      &returnValue );
@@ -128,7 +128,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
                 fgStructure.CurrentWindow->Window.pContext.FBConfig;
 
           XVisualInfo * visualInfo =
-                glXGetVisualFromFBConfig( fgDisplay.Display, *fbconfig );
+                glXGetVisualFromFBConfig( fgDisplay.pDisplay.Display, *fbconfig );
 
           const int result = visualInfo->visual->map_entries;
 
@@ -153,7 +153,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
             return 0;
 
         XTranslateCoordinates(
-            fgDisplay.Display,
+            fgDisplay.pDisplay.Display,
             fgStructure.CurrentWindow->Window.Handle,
             fgDisplay.RootWindow,
             0, 0, &x, &y, &w);
@@ -167,7 +167,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
         if ( w == 0 )
             return 0;
         XTranslateCoordinates(
-            fgDisplay.Display,
+            fgDisplay.pDisplay.Display,
             fgStructure.CurrentWindow->Window.Handle,
             w, 0, 0, &x, &y, &w);
 
@@ -186,7 +186,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
         if( fgStructure.CurrentWindow == NULL )
             return 0;
         XGetWindowAttributes(
-            fgDisplay.Display,
+            fgDisplay.pDisplay.Display,
             fgStructure.CurrentWindow->Window.Handle,
             &winAttributes
         );
@@ -259,7 +259,7 @@ int fgPlatformGlutDeviceGet ( GLenum eWhat )
          */
         {
             unsigned char map;
-            int nbuttons = XGetPointerMapping(fgDisplay.Display, &map,0);
+            int nbuttons = XGetPointerMapping(fgDisplay.pDisplay.Display, &map,0);
             return nbuttons;
         }
 
@@ -633,8 +633,8 @@ int * FGAPIENTRY glutGetModeValues(GLenum eWhat, int * size)
           break;
         }
 
-      fbconfigArray = glXChooseFBConfig(fgDisplay.Display,
-                                        fgDisplay.Screen,
+      fbconfigArray = glXChooseFBConfig(fgDisplay.pDisplay.Display,
+                                        fgDisplay.pDisplay.Screen,
                                         attributes,
                                         &fbconfigArraySize);
 
@@ -652,7 +652,7 @@ int * FGAPIENTRY glutGetModeValues(GLenum eWhat, int * size)
             {
               int value;
 
-              result = glXGetFBConfigAttrib(fgDisplay.Display,
+              result = glXGetFBConfigAttrib(fgDisplay.pDisplay.Display,
                                             fbconfigArray[i],
                                             attribute_name,
                                             &value);

@@ -259,8 +259,8 @@ GLXFBConfig* fgChooseFBConfig( int *numcfgs )
 
 
         /*  Get all FBConfigs that match "attributes".  */
-        fbconfigArray = glXChooseFBConfig( fgDisplay.Display,
-                                           fgDisplay.Screen,
+        fbconfigArray = glXChooseFBConfig( fgDisplay.pDisplay.Display,
+                                           fgDisplay.pDisplay.Screen,
                                            attributes,
                                            &fbconfigArraySize );
 
@@ -281,13 +281,13 @@ GLXFBConfig* fgChooseFBConfig( int *numcfgs )
 
                 /*  Get bufferSizeMin.  */
                 result =
-                  glXGetFBConfigAttrib( fgDisplay.Display,
+                  glXGetFBConfigAttrib( fgDisplay.pDisplay.Display,
                                         fbconfigArray[0],
                                         GLX_BUFFER_SIZE,
                                         &bufferSizeMin );
                 /*  Get bufferSizeMax.  */
                 result =
-                  glXGetFBConfigAttrib( fgDisplay.Display,
+                  glXGetFBConfigAttrib( fgDisplay.pDisplay.Display,
                                         fbconfigArray[fbconfigArraySize - 1],
                                         GLX_BUFFER_SIZE,
                                         &bufferSizeMax );
@@ -305,7 +305,7 @@ GLXFBConfig* fgChooseFBConfig( int *numcfgs )
                     ATTRIB_VAL( GLX_BUFFER_SIZE, bufferSizeMax );
                     ATTRIB( None );
 
-                    fbconfigArray = glXChooseFBConfig( fgDisplay.Display,
+                    fbconfigArray = glXChooseFBConfig( fgDisplay.pDisplay.Display,
                                                        fgDisplay.Screen,
                                                        attributes,
                                                        &fbconfigArraySize );
@@ -319,7 +319,7 @@ GLXFBConfig* fgChooseFBConfig( int *numcfgs )
              * int fbconfigXID;
              *
              *  - pick the XID of the FBConfig we want
-             * result = glXGetFBConfigAttrib( fgDisplay.Display,
+             * result = glXGetFBConfigAttrib( fgDisplay.pDisplay.Display,
              *                                fbconfigArray[0],
              *                                GLX_FBCONFIG_ID,
              *                                &fbconfigXID );
@@ -333,8 +333,8 @@ GLXFBConfig* fgChooseFBConfig( int *numcfgs )
              * ATTRIB( None );
              *
              * - get our FBConfig only
-             * fbconfig = glXChooseFBConfig( fgDisplay.Display,
-             *                               fgDisplay.Screen,
+             * fbconfig = glXChooseFBConfig( fgDisplay.pDisplay.Display,
+             *                               fgDisplay.pDisplay.Screen,
              *                               attributes,
              *                               &fbconfigArraySize );
              *
@@ -397,7 +397,7 @@ static GLXContext fghCreateNewContext( SFG_Window* window )
   int index_mode = ( fgState.DisplayMode & GLUT_INDEX );
 
   /* "classic" context creation */
-  Display *dpy = fgDisplay.Display;
+  Display *dpy = fgDisplay.pDisplay.Display;
   GLXFBConfig config = *(window->Window.pContext.FBConfig);
   int render_type = ( !menu && index_mode ) ? GLX_COLOR_INDEX_TYPE : GLX_RGBA_TYPE;
   GLXContext share_list = NULL;
@@ -454,7 +454,7 @@ static int fghResizeFullscrToggle(void)
 
     } else {
         /* resize the window to cover the entire screen */
-        XGetWindowAttributes(fgDisplay.Display,
+        XGetWindowAttributes(fgDisplay.pDisplay.Display,
                 fgStructure.CurrentWindow->Window.Handle,
                 &attributes);
         
@@ -462,7 +462,7 @@ static int fghResizeFullscrToggle(void)
          * The "x" and "y" members of "attributes" are the window's coordinates
          * relative to its parent, i.e. to the decoration window.
          */
-        XMoveResizeWindow(fgDisplay.Display,
+        XMoveResizeWindow(fgDisplay.pDisplay.Display,
                 fgStructure.CurrentWindow->Window.Handle,
                 -attributes.x,
                 -attributes.y,
@@ -491,7 +491,7 @@ static int fghEwmhFullscrToggle(void)
     xev.xclient.data.l[3] = 1;	/* source indication: application */
     xev.xclient.data.l[4] = 0;	/* unused */
 
-    if(!XSendEvent(fgDisplay.Display, fgDisplay.RootWindow, 0, evmask, &xev)) {
+    if(!XSendEvent(fgDisplay.pDisplay.Display, fgDisplay.pDisplay.RootWindow, 0, evmask, &xev)) {
         return -1;
     }
     return 0;
@@ -516,7 +516,7 @@ void fgPlatformSetWindow ( SFG_Window *window )
     if ( window )
     {
         glXMakeContextCurrent(
-            fgDisplay.Display,
+            fgDisplay.pDisplay.Display,
             window->Window.Handle,
             window->Window.Handle,
             window->Window.Context
@@ -580,7 +580,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
     /*  Get the X visual.  */
     for (i = 0; i < num_FBConfigs; i++) {
-	    visualInfo = glXGetVisualFromFBConfig( fgDisplay.Display,
+	    visualInfo = glXGetVisualFromFBConfig( fgDisplay.pDisplay.Display,
 						   window->Window.pContext.FBConfig[i] );
 	    if (visualInfo)
 		break;
@@ -609,7 +609,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     winAttr.border_pixel      = 0;
 
     winAttr.colormap = XCreateColormap(
-        fgDisplay.Display, fgDisplay.RootWindow,
+        fgDisplay.pDisplay.Display, fgDisplay.pDisplay.RootWindow,
         visualInfo->visual, AllocNone
     );
 
@@ -627,8 +627,8 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
         w = h = 300; /* default window size */
 
     window->Window.Handle = XCreateWindow(
-        fgDisplay.Display,
-        window->Parent == NULL ? fgDisplay.RootWindow :
+        fgDisplay.pDisplay.Display,
+        window->Parent == NULL ? fgDisplay.pDisplay.RootWindow :
         window->Parent->Window.Handle,
         x, y, w, h, 0,
         visualInfo->depth, InputOutput,
@@ -668,7 +668,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
         window->Window.Context = fghCreateNewContext( window );
 
 #if !defined( __FreeBSD__ ) && !defined( __NetBSD__ )
-    if(  !glXIsDirect( fgDisplay.Display, window->Window.Context ) )
+    if(  !glXIsDirect( fgDisplay.pDisplay.Display, window->Window.Context ) )
     {
       if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
         fgError( "Unable to force direct context rendering for window '%s'",
@@ -707,7 +707,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     XStringListToTextProperty( (char **) &title, 1, &textProperty );
 
     XSetWMProperties(
-        fgDisplay.Display,
+        fgDisplay.pDisplay.Display,
         window->Window.Handle,
         &textProperty,
         &textProperty,
@@ -719,11 +719,11 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     );
     XFree( textProperty.value );
 
-    XSetWMProtocols( fgDisplay.Display, window->Window.Handle,
-                     &fgDisplay.DeleteWindow, 1 );
+    XSetWMProtocols( fgDisplay.pDisplay.Display, window->Window.Handle,
+                     &fgDisplay.pDisplay.DeleteWindow, 1 );
 
     glXMakeContextCurrent(
-        fgDisplay.Display,
+        fgDisplay.pDisplay.Display,
         window->Window.Handle,
         window->Window.Handle,
         window->Window.Context
@@ -731,15 +731,15 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
     /* register extension events _before_ window is mapped */
     #ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
-       fgRegisterDevices( fgDisplay.Display, &(window->Window.Handle) );
+       fgRegisterDevices( fgDisplay.pDisplay.Display, &(window->Window.Handle) );
     #endif
 
-    XMapWindow( fgDisplay.Display, window->Window.Handle );
+    XMapWindow( fgDisplay.pDisplay.Display, window->Window.Handle );
 
     XFree(visualInfo);
 
     if( !isSubWindow)
-        XPeekIfEvent( fgDisplay.Display, &eventReturnBuffer, &fghWindowIsVisible, (XPointer)(window->Window.Handle) );
+        XPeekIfEvent( fgDisplay.pDisplay.Display, &eventReturnBuffer, &fghWindowIsVisible, (XPointer)(window->Window.Handle) );
 }
 
 
@@ -749,13 +749,13 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 void fgPlatformCloseWindow( SFG_Window* window )
 {
     if( window->Window.Context )
-        glXDestroyContext( fgDisplay.Display, window->Window.Context );
+        glXDestroyContext( fgDisplay.pDisplay.Display, window->Window.Context );
     XFree( window->Window.pContext.FBConfig );
 
     if( window->Window.Handle ) {
-        XDestroyWindow( fgDisplay.Display, window->Window.Handle );
+        XDestroyWindow( fgDisplay.pDisplay.Display, window->Window.Handle );
     }
-    /* XFlush( fgDisplay.Display ); */ /* XXX Shouldn't need this */
+    /* XFlush( fgDisplay.pDisplay.Display ); */ /* XXX Shouldn't need this */
 }
 
 
@@ -773,8 +773,8 @@ static Bool fghWindowIsVisible( Display *display, XEvent *event, XPointer arg)
  */
 void fgPlatformGlutShowWindow( void )
 {
-    XMapWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XMapWindow( fgDisplay.pDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
+    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
 }
 
 /*
@@ -783,13 +783,13 @@ void fgPlatformGlutShowWindow( void )
 void fgPlatformGlutHideWindow( void )
 {
     if( fgStructure.CurrentWindow->Parent == NULL )
-        XWithdrawWindow( fgDisplay.Display,
+        XWithdrawWindow( fgDisplay.pDisplay.Display,
                          fgStructure.CurrentWindow->Window.Handle,
-                         fgDisplay.Screen );
+                         fgDisplay.pDisplay.Screen );
     else
-        XUnmapWindow( fgDisplay.Display,
+        XUnmapWindow( fgDisplay.pDisplay.Display,
                       fgStructure.CurrentWindow->Window.Handle );
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
 }
 
 /*
@@ -797,9 +797,9 @@ void fgPlatformGlutHideWindow( void )
  */
 void fgPlatformGlutIconifyWindow( void )
 {
-    XIconifyWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle,
-                    fgDisplay.Screen );
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XIconifyWindow( fgDisplay.pDisplay.Display, fgStructure.CurrentWindow->Window.Handle,
+                    fgDisplay.pDisplay.Screen );
+    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
 }
 
 /*
@@ -815,12 +815,12 @@ void fgPlatformGlutSetWindowTitle( const char* title )
     text.nitems = strlen( title );
 
     XSetWMName(
-        fgDisplay.Display,
+        fgDisplay.pDisplay.Display,
         fgStructure.CurrentWindow->Window.Handle,
         &text
     );
 
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
 }
 
 /*
@@ -836,12 +836,12 @@ void fgPlatformGlutSetIconTitle( const char* title )
     text.nitems = strlen( title );
 
     XSetWMIconName(
-        fgDisplay.Display,
+        fgDisplay.pDisplay.Display,
         fgStructure.CurrentWindow->Window.Handle,
         &text
     );
 
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
 }
 
 /*
@@ -849,9 +849,9 @@ void fgPlatformGlutSetIconTitle( const char* title )
  */
 void fgPlatformGlutPositionWindow( int x, int y )
 {
-    XMoveWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle,
+    XMoveWindow( fgDisplay.pDisplay.Display, fgStructure.CurrentWindow->Window.Handle,
                  x, y );
-    XFlush( fgDisplay.Display ); /* XXX Shouldn't need this */
+    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
 }
 
 /*
@@ -859,7 +859,7 @@ void fgPlatformGlutPositionWindow( int x, int y )
  */
 void fgPlatformGlutPushWindow( void )
 {
-    XLowerWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
+    XLowerWindow( fgDisplay.pDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
 }
 
 /*
@@ -867,7 +867,7 @@ void fgPlatformGlutPushWindow( void )
  */
 void fgPlatformGlutPopWindow( void )
 {
-    XRaiseWindow( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
+    XRaiseWindow( fgDisplay.pDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
 }
 
 /*
