@@ -80,17 +80,6 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 #endif
 /* End of copying the necessary parts out of it. */
 
-/* pushing attribute/value pairs into an array */
-#define ATTRIB(a) attributes[where++]=(a)
-#define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
-
-
-extern int fghIsLegacyContextVersionRequested( void );
-extern int fghMapBit( int mask, int from, int to );
-extern int fghIsLegacyContextRequested( void );
-extern void fghContextCreationError( void );
-extern int fghNumberOfAuxBuffersRequested( void );
-
 #ifdef WM_TOUCH
 typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
 static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;

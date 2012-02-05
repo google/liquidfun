@@ -1121,6 +1121,17 @@ int fgHintPresent(Window window, Atom property, Atom hint);
 
 SFG_Proc fgPlatformGetProcAddress( const char *procName );
 
+/* Window functions needed for Platform implementations */
+/* pushing attribute/value pairs into an array */
+#define ATTRIB(a) attributes[where++]=(a)
+#define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
+
+extern int fghIsLegacyContextVersionRequested( void );
+extern int fghMapBit( int mask, int from, int to );
+extern int fghIsLegacyContextRequested( void );
+extern void fghContextCreationError( void );
+extern int fghNumberOfAuxBuffersRequested( void );
+
 #endif /* FREEGLUT_INTERNAL_H */
 
 /*** END OF FILE ***/
