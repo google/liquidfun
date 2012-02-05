@@ -60,15 +60,6 @@ static void fghClearCallBacks( SFG_Window *window )
     }
 }
 
-#if TARGET_HOST_POSIX_X11
-void fgPlatformCreateWindow ( SFG_Window *window )
-{
-    window->Window.pContext.FBConfig = NULL;
-
-    window->State.pWState.OldHeight = window->State.pWState.OldWidth = -1;
-}
-#endif
-
 /*
  * This private function creates, opens and adds to the hierarchy
  * a freeglut window complete with OpenGL context and stuff...
