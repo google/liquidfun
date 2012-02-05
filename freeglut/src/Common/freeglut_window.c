@@ -525,6 +525,13 @@ void fgPlatformSetWindow ( SFG_Window *window )
 }
 
 
+static Bool fghWindowIsVisible( Display *display, XEvent *event, XPointer arg)
+{
+    Window window = (Window)arg;
+    return (event->type == MapNotify) && (event->xmap.window == window);
+}
+
+
 /*
  * Opens a window. Requires a SFG_Window object created and attached
  * to the freeglut structure. OpenGL context is created here.
@@ -756,13 +763,6 @@ void fgPlatformCloseWindow( SFG_Window* window )
         XDestroyWindow( fgDisplay.pDisplay.Display, window->Window.Handle );
     }
     /* XFlush( fgDisplay.pDisplay.Display ); */ /* XXX Shouldn't need this */
-}
-
-
-static Bool fghWindowIsVisible( Display *display, XEvent *event, XPointer arg)
-{
-    Window window = (Window)arg;
-    return (event->type == MapNotify) && (event->xmap.window == window);
 }
 
 

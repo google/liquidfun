@@ -20,7 +20,6 @@ lib@LIBRARY@_la_SOURCES = Common/freeglut_callbacks.c \
 			 Common/freeglut_display.c \
 			 Common/freeglut_ext.c \
 			 Common/freeglut_font.c \
-			 Common/freeglut_glutfont_definitions.c \
 			 Common/freeglut_font_data.c \
 			 Common/freeglut_stroke_roman.c \
 			 Common/freeglut_stroke_mono_roman.c \

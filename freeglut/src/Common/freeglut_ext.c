@@ -204,7 +204,7 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
 
 
 #if TARGET_HOST_POSIX_X11
-static GLUTproc fgPlatformGetGLUTProcAddress( const char* procName )
+GLUTproc fgPlatformGetGLUTProcAddress( const char* procName )
 {
     /* optimization: quick initial check */
     if( strncmp( procName, "glut", 4 ) != 0 )

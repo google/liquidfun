@@ -1037,6 +1037,7 @@ void fgPlatformJoystickOpen( SFG_Joystick* joy )
        char *cp;
 #endif
 #ifdef JS_NEW
+	int i = 0;
        unsigned char u;
 #else
 #  if defined( __linux__ ) || TARGET_HOST_SOLARIS
