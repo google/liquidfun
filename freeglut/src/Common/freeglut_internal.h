@@ -86,31 +86,6 @@
 
 #define  FREEGLUT_MAX_MENUS         3
 
-/* -- PLATFORM-SPECIFIC INCLUDES ------------------------------------------- */
-
-#if TARGET_HOST_POSIX_X11
-#    include <GL/glx.h>
-#    include <X11/Xlib.h>
-#    include <X11/Xatom.h>
-#    include <X11/keysym.h>
-#    include <X11/extensions/XInput.h>
-#    ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
-#        include <X11/extensions/xf86vmode.h>
-#    endif
-#    ifdef HAVE_X11_EXTENSIONS_XRANDR_H
-#        include <X11/extensions/Xrandr.h>
-#    endif
-/* If GLX is too old, we will fail during runtime when multisampling
-   is requested, but at least freeglut compiles. */
-#    ifndef GLX_SAMPLE_BUFFERS
-#        define GLX_SAMPLE_BUFFERS 0x80A8
-#    endif
-#    ifndef GLX_SAMPLES
-#        define GLX_SAMPLES 0x80A9
-#    endif
-
-#endif
-
 /* These files should be available on every platform. */
 #include <stdio.h>
 #include <string.h>
@@ -183,55 +158,7 @@
 
 /* Platform-specific includes */
 #if TARGET_HOST_POSIX_X11
-
-typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
-struct tagSFG_PlatformDisplay
-{
-    Display*        Display;            /* The display we are being run in.  */
-    int             Screen;             /* The screen we are about to use.   */
-    Window          RootWindow;         /* The screen's root window.         */
-    int             Connection;         /* The display's connection number   */
-    Atom            DeleteWindow;       /* The window deletion atom          */
-    Atom            State;              /* The state atom                    */
-    Atom            StateFullScreen;    /* The full screen atom              */
-
-#ifdef HAVE_X11_EXTENSIONS_XRANDR_H
-    int prev_xsz, prev_ysz;
-    int prev_refresh;
-    int prev_size_valid;
-#endif	/* HAVE_X11_EXTENSIONS_XRANDR_H */
-
-#ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
-    /*
-     * XF86VidMode may be compilable even if it fails at runtime.  Therefore,
-     * the validity of the VidMode has to be tracked
-     */
-    int             DisplayModeValid;   /* Flag that indicates runtime status*/
-    XF86VidModeModeLine DisplayMode;    /* Current screen's display settings */
-    int             DisplayModeClock;   /* The display mode's refresh rate   */
-    int             DisplayViewPortX;   /* saved X location of the viewport  */
-    int             DisplayViewPortY;   /* saved Y location of the viewport  */
-#endif /* HAVE_X11_EXTENSIONS_XF86VMODE_H */
-
-    int             DisplayPointerX;    /* saved X location of the pointer   */
-    int             DisplayPointerY;    /* saved Y location of the pointer   */
-};
-
-
-/*
- * Make "freeglut" window handle and context types so that we don't need so
- * much conditionally-compiled code later in the library.
- */
-typedef Window     SFG_WindowHandleType ;
-typedef GLXContext SFG_WindowContextType ;
-typedef struct tagSFG_PlatformContext SFG_PlatformContext;
-struct tagSFG_PlatformContext
-{
-    GLXFBConfig*    FBConfig;        /* The window's FBConfig               */
-};
-
-
-
+#include "../x11/freeglut_internal_x11.h"
 #endif
 #if TARGET_HOST_MS_WINDOWS
 #include "../mswin/freeglut_internal_mswin.h"
@@ -417,16 +344,6 @@ struct tagSFG_Context
 
     int             DoubleBuffered;  /* Treat the window as double-buffered */
 };
-
-/* Window's state description. This structure should be kept portable. */
-#if TARGET_HOST_POSIX_X11
-typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
-struct tagSFG_PlatformWindowState
-{
-    int             OldWidth;           /* Window width from before a resize */
-    int             OldHeight;          /*   "    height  "    "    "   "    */
-};
-#endif
 
 
 typedef struct tagSFG_WindowState SFG_WindowState;
@@ -770,67 +687,6 @@ struct tagSFG_StrokeFont
 #    include <IOKit/hid/IOHIDLib.h>
 #endif
 
-#if TARGET_HOST_POSIX_X11
-#    ifdef HAVE_SYS_IOCTL_H
-#        include <sys/ioctl.h>
-#    endif
-#    ifdef HAVE_FCNTL_H
-#        include <fcntl.h>
-#    endif
-#    ifdef HAVE_ERRNO_H
-#        include <errno.h>
-#        include <string.h>
-#    endif
-#    if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
-/* XXX The below hack is done until freeglut's autoconf is updated. */
-#        define HAVE_USB_JS    1
-
-#        if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-#            include <sys/joystick.h>
-#        else
-/*
- * XXX NetBSD/amd64 systems may find that they have to steal the
- * XXX /usr/include/machine/joystick.h from a NetBSD/i386 system.
- * XXX I cannot comment whether that works for the interface, but
- * XXX it lets you compile...(^&  I do not think that we can do away
- * XXX with this header.
- */
-#            include <machine/joystick.h>         /* For analog joysticks */
-#        endif
-#        define JS_DATA_TYPE joystick
-#        define JS_RETURN (sizeof(struct JS_DATA_TYPE))
-#    endif
-
-#    if defined(__linux__)
-#        include <linux/joystick.h>
-
-/* check the joystick driver version */
-#        if defined(JS_VERSION) && JS_VERSION >= 0x010000
-#            define JS_NEW
-#        endif
-#    else  /* Not BSD or Linux */
-#        ifndef JS_RETURN
-
-  /*
-   * We'll put these values in and that should
-   * allow the code to at least compile when there is
-   * no support. The JS open routine should error out
-   * and shut off all the code downstream anyway and if
-   * the application doesn't use a joystick we'll be fine.
-   */
-
-  struct JS_DATA_TYPE
-  {
-    int buttons;
-    int x;
-    int y;
-  };
-
-#            define JS_RETURN (sizeof(struct JS_DATA_TYPE))
-#        endif
-#    endif
-#endif
-
 /* XXX It might be better to poll the operating system for the numbers of buttons and
  * XXX axes and then dynamically allocate the arrays.
  */
@@ -863,27 +719,6 @@ struct tagSFG_PlatformJoystick
 };
 #endif
 
-#if TARGET_HOST_POSIX_X11
-#    define _JS_MAX_AXES 16
-typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
-struct tagSFG_PlatformJoystick
-{
-#   if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
-       struct os_specific_s *os;
-#   endif
-
-#   ifdef JS_NEW
-       struct js_event     js;
-       int          tmp_buttons;
-       float        tmp_axes [ _JS_MAX_AXES ];
-#   else
-       struct JS_DATA_TYPE js;
-#   endif
-
-    char         fname [ 128 ];
-    int          fd;
-};
-#endif
 
 /*
  * Definition of "SFG_Joystick" structure -- based on JS's "jsJoystick" object class.
@@ -1028,11 +863,6 @@ void        fgSpaceballSetWindow( SFG_Window *window );
 int         fgHasSpaceball( void );
 int         fgSpaceballNumButtons( void );
 
-#if TARGET_HOST_POSIX_X11
-int         fgIsSpaceballXEvent( const XEvent *ev );
-void        fgSpaceballHandleXEvent( const XEvent *ev );
-#endif
-
 /* Setting the cursor for a given window */
 void fgSetCursor ( SFG_Window *window, int cursorID );
 
@@ -1104,20 +934,6 @@ void fgListInsert(SFG_List *list, SFG_Node *next, SFG_Node *node);
 /* Error Message functions */
 void fgError( const char *fmt, ... );
 void fgWarning( const char *fmt, ... );
-
-/*
- * Check if "hint" is present in "property" for "window".  See freeglut_init.c
- */
-#if TARGET_HOST_POSIX_X11
-int fgHintPresent(Window window, Atom property, Atom hint);
-
-/* Handler for X extension Events */
-#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
-  void fgHandleExtensionEvents( XEvent * ev );
-  void fgRegisterDevices( Display* dpy, Window* win );
-#endif
-
-#endif
 
 SFG_Proc fgPlatformGetProcAddress( const char *procName );
 
