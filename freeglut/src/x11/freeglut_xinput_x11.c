@@ -215,3 +215,5 @@ void fgHandleExtensionEvents( XEvent* base_ev ) {
 	XFreeEventData( fgDisplay.pDisplay.Display, cookie );
 }
 
+#endif
+
