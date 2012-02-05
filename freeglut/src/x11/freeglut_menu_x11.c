@@ -1,7 +1,7 @@
 /*
- * freeglut_callbacks.c
+ * freeglut_menu_x11.c
  *
- * The callbacks setting methods.
+ * Pull-down menu creation and handling.
  *
  * Copyright (c) 1999-2000 Pawel W. Olszta. All Rights Reserved.
  * Written by Pawel W. Olszta, <olszta@sourceforge.net>

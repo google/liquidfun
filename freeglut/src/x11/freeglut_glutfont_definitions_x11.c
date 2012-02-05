@@ -1,5 +1,5 @@
 /*
- * freeglut_glutfont_definitions.c
+ * freeglut_glutfont_definitions_x11.c
  *
  * Bitmap and stroke fonts displaying.
  *
