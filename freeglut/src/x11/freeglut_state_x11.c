@@ -35,9 +35,7 @@
  */
 
 /* A helper function to check if a display mode is possible to use */
-#if TARGET_HOST_POSIX_X11
 GLXFBConfig* fgPlatformChooseFBConfig( int* numcfgs );
-#endif
 
 /*
  * Queries the GL context about some attributes
