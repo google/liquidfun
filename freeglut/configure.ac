@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([freeglut library], [2.6.0], [freeglut-bugs@lists.sourceforge.net], [freeglut])
+AC_INIT([freeglut library], [3.0.0], [freeglut-bugs@lists.sourceforge.net], [freeglut])
 AM_INIT_AUTOMAKE
 AC_PREREQ([2.56])
 AC_CONFIG_SRCDIR([AUTHORS])
@@ -21,21 +21,54 @@ AC_SUBST([LIBTOOL_DEPS])
 # Checks for libraries.
 AC_PATH_XTRA
 
-if test "x$no_x" = xyes; then
-  GL_LIBS="-lopengl32 -lgdi32 -lwinmm"
-  LIBXXF86VM=
-  LIBXI=
-  VERSION_INFO=
-  EXPORT_FLAGS="-DFREEGLUT_EXPORTS"
-else
-  GL_LIBS="-lGL -lXext -lX11"
-  AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode])
-  AC_CHECK_LIB([Xrandr], [XRRQueryExtension])
-  AC_CHECK_LIB([Xi], [XISelectEvents])
-  LIBXI=-lXi
-  VERSION_INFO="-version-info 12:0:9"
-  EXPORT_FLAGS=
-fi
+#if test "x$no_x" = xyes; then
+#  GL_LIBS="-lopengl32 -lgdi32 -lwinmm"
+#  LIBXXF86VM=
+#  LIBXI=
+#  VERSION_INFO=
+#  EXPORT_FLAGS="-DFREEGLUT_EXPORTS"
+#else
+#  GL_LIBS="-lGL -lXext -lX11"
+#  AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode])
+#  AC_CHECK_LIB([Xrandr], [XRRQueryExtension])
+#  AC_CHECK_LIB([Xi], [XISelectEvents])
+#  LIBXI=-lXi
+#  VERSION_INFO="-version-info 12:0:9"
+#  EXPORT_FLAGS=
+#fi
+VERSION_INFO="-version-info 12:0:9"
+AM_CONDITIONAL(TARGET_HOST_MS_WINDOWS, false)
+AM_CONDITIONAL(TARGET_HOST_POSIX_X11, false)
+AM_CONDITIONAL(TARGET_HOST_ANDROID, false)
+case "${host}" in
+    *-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows*)
+	# Windows+Cygwin/MSYS, MinGW cross-compilation
+	GL_LIBS="-lopengl32 -lgdi32 -lwinmm"
+	LIBXXF86VM=
+	LIBXI=
+	CPPFLAGS="$CPPFLAGS -DFREEGLUT_EXPORTS"
+	AM_CONDITIONAL(TARGET_HOST_MS_WINDOWS, true)
+	;;
+    *-*-linux-androideabi)
+	# Android
+	# e.g. arm-unknown-linux-androideabi
+	GL_LIBS="-lEGL -lGLESv2"
+	LIBXXF86VM=
+	LIBXI=
+	CPPFLAGS="$CPPFLAGS -DANDROID"
+	AM_CONDITIONAL(TARGET_HOST_ANDROID, true)
+	;;
+    *)
+	# Unix/X11
+	GL_LIBS="-lGL -lXext -lX11"
+	AC_CHECK_LIB([Xxf86vm], [XF86VidModeSwitchToMode])
+	AC_CHECK_LIB([Xrandr], [XRRQueryExtension])
+	AC_CHECK_LIB([Xi], [XISelectEvents])
+	LIBXI=-lXi
+	AM_CONDITIONAL(TARGET_HOST_POSIX_X11, true)
+	;;
+esac
+
 AC_SUBST([GL_LIBS])
 AC_SUBST([LIBXXF86VM])
 AC_SUBST([LIBXI])

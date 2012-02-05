@@ -25,31 +25,45 @@ EXTRA_DIST = \
 	freeglut_static.dsp \
 	freeglut_static.mak \
 	freeglut_static.tgt \
-	freeglut_static_vs2008.vcproj \
-	freeglut_vs2008.sln \
-	freeglut_vs2008.vcproj \
+	VisualStudio/2010/freeglut.vcxproj.filters \
+	VisualStudio/2010/smooth_opengl3/smooth_opengl3.vcxproj.filters \
+	VisualStudio/2010/smooth_opengl3/smooth_opengl3.vcxproj \
+	VisualStudio/2010/One/One.vcxproj \
+	VisualStudio/2010/One/One.vcxproj.filters \
+	VisualStudio/2010/Fractals_random/Fractals_random.vcxproj \
+	VisualStudio/2010/Fractals_random/Fractals_random.vcxproj.filters \
+	VisualStudio/2010/Resizer/Resizer.vcxproj \
+	VisualStudio/2010/Resizer/Resizer.vcxproj.filters \
+	VisualStudio/2010/freeglut.sln \
+	VisualStudio/2010/Lorenz/Lorenz.vcxproj.filters \
+	VisualStudio/2010/Lorenz/Lorenz.vcxproj \
+	VisualStudio/2010/shapes/shapes.vcxproj.filters \
+	VisualStudio/2010/shapes/shapes.vcxproj \
+	VisualStudio/2010/Fractals/Fractals.vcxproj.filters \
+	VisualStudio/2010/Fractals/Fractals.vcxproj \
+	VisualStudio/2010/freeglut.vcxproj \
+	VisualStudio/2010/subwin/subwin.vcxproj.filters \
+	VisualStudio/2010/subwin/subwin.vcxproj \
+	VisualStudio/2010/CallbackMaker/CallbackMaker.vcxproj \
+	VisualStudio/2010/CallbackMaker/CallbackMaker.vcxproj.filters \
+	VisualStudio/2008/smooth_opengl3/smooth_opengl3.vcproj \
+	VisualStudio/2008/One/One.vcproj \
+	VisualStudio/2008/Fractals_random/Fractals_random.vcproj \
+	VisualStudio/2008/Resizer/Resizer.vcproj \
+	VisualStudio/2008/freeglut.sln \
+	VisualStudio/2008/Lorenz/Lorenz.vcproj \
+	VisualStudio/2008/shapes/shapes.vcproj \
+	VisualStudio/2008/Fractals/Fractals.vcproj \
+	VisualStudio/2008/subwin/subwin.vcproj \
+	VisualStudio/2008/CallbackMaker/CallbackMaker.vcproj \
+	VisualStudio/2008/freeglut.vcproj \
 	progs/demos/CallbackMaker/CallbackMakerStatic.dsp \
-	progs/demos/CallbackMaker/CallbackMakerStatic_vs2008.vcproj \
-	progs/demos/CallbackMaker/CallbackMaker_vs2008.vcproj \
 	progs/demos/Fractals/FractalsStatic.dsp \
-	progs/demos/Fractals/FractalsStatic_vs2008.vcproj \
-	progs/demos/Fractals/Fractals_vs2008.vcproj \
 	progs/demos/Fractals_random/Fractals_randomStatic.dsp \
-	progs/demos/Fractals_random/Fractals_randomStatic_vs2008.vcproj \
-	progs/demos/Fractals_random/Fractals_random_vs2008.vcproj \
 	progs/demos/Lorenz/lorenzStatic.dsp \
-	progs/demos/Lorenz/lorenzStatic_vs2008.vcproj \
-	progs/demos/Lorenz/lorenz_vs2008.vcproj \
 	progs/demos/One/oneStatic.dsp \
-	progs/demos/One/oneStatic_vs2008.vcproj \
-	progs/demos/One/one_vs2008.vcproj \
-	progs/demos/demos_vs2008.sln \
 	progs/demos/shapes/shapesStatic.dsp \
-	progs/demos/shapes/shapesStatic_vs2008.vcproj \
-	progs/demos/shapes/shapes_vs2008.vcproj \
-	progs/demos/smooth_opengl3/smooth_opengl3Static.dsp \
-	progs/demos/smooth_opengl3/smooth_opengl3Static_vs2008.vcproj \
-	progs/demos/smooth_opengl3/smooth_opengl3_vs2008.vcproj
+	progs/demos/smooth_opengl3/smooth_opengl3Static.dsp
 
 # Thanks to WinDoze, some files in CVS have the "execute" bit set when they
 # shouldn't. We could fix this if we had direct access to the CVS repository,
