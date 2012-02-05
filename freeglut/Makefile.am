@@ -17,14 +17,11 @@ EXTRA_DIST = \
 	freeglut.mak \
 	freeglut.rc \
 	freeglut.spec \
-	freeglut.tgt \
-	freeglut.wpj \
 	freeglut_evc4.vcp \
 	freeglut_evc4.vcw \
 	freeglut_static.dep \
 	freeglut_static.dsp \
 	freeglut_static.mak \
-	freeglut_static.tgt \
 	VisualStudio/2010/freeglut.vcxproj.filters \
 	VisualStudio/2010/smooth_opengl3/smooth_opengl3.vcxproj.filters \
 	VisualStudio/2010/smooth_opengl3/smooth_opengl3.vcxproj \
