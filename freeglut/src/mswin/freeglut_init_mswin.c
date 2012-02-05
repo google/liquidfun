@@ -158,7 +158,10 @@ void fgPlatformCloseDisplay ( void )
     timeEndPeriod ( 1 );
 }
 
-
+void fgPlatformDestroyContext ( SFG_PlatformDisplay pDisplay, SFG_WindowContextType MContext )
+{
+	/* Do nothing -- this is required for X11 */
+}
 
 /*
  * Everything down to the end of the next two functions is copied from the X sources.

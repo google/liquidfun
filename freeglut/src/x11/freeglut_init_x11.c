@@ -265,3 +265,9 @@ void fgPlatformCloseDisplay ( void )
     XCloseDisplay( fgDisplay.pDisplay.Display );
 }
 
+
+void fgPlatformDestroyContext ( SFG_PlatformDisplay pDisplay, SFG_WindowContextType MContext )
+{
+    /* Note that the MVisualInfo is not owned by the MenuContext! */
+    glXDestroyContext( pDisplay.Display, MContext );
+}

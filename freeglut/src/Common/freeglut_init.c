@@ -99,6 +99,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
 extern void fgPlatformInitialize( const char* displayName );
 extern void fgPlatformDeinitialiseInputDevices ( void );
 extern void fgPlatformCloseDisplay ( void );
+extern void fgPlatformDestroyContext ( SFG_PlatformDisplay pDisplay, SFG_WindowContextType MContext );
 
 
 void fghParseCommandLineArguments ( int* pargc, char** argv, char **pDisplayName, char **pGeometry )
@@ -234,10 +235,7 @@ void fgDeinitialize( void )
     /* If there was a menu created, destroy the rendering context */
     if( fgStructure.MenuContext )
     {
-#if TARGET_HOST_POSIX_X11
-        /* Note that the MVisualInfo is not owned by the MenuContext! */
-        glXDestroyContext( fgDisplay.pDisplay.Display, fgStructure.MenuContext->MContext );
-#endif
+		fgPlatformDestroyContext (fgDisplay.pDisplay, fgStructure.MenuContext->MContext );
         free( fgStructure.MenuContext );
         fgStructure.MenuContext = NULL;
     }
