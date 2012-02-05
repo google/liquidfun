@@ -53,11 +53,7 @@
  * that that wasn't the original intent...if not, perhaps we need another
  * symbolic constant, FREEGLUT_MENU_ITEM_BORDER, or such.)
  */
-#if TARGET_HOST_MS_WINDOWS
-#define  FREEGLUT_MENU_FONT    GLUT_BITMAP_8_BY_13
-#else
-#define  FREEGLUT_MENU_FONT    GLUT_BITMAP_HELVETICA_18
-#endif
+/* See platform-specific header files for menu font and color definitions */
 
 #define  FREEGLUT_MENU_HEIGHT  (glutBitmapHeight(FREEGLUT_MENU_FONT) + \
                                 FREEGLUT_MENU_BORDER)
@@ -72,17 +68,10 @@
  * too.  These variables should be stuffed into global state and initialized
  * via the glutInit*() system.
  */
-#if TARGET_HOST_MS_WINDOWS
-static float menu_pen_fore  [4] = {0.0f,  0.0f,  0.0f,  1.0f};
-static float menu_pen_back  [4] = {0.85f, 0.85f, 0.85f, 1.0f};
-static float menu_pen_hfore [4] = {1.0f,  1.0f,  1.0f,  1.0f};
-static float menu_pen_hback [4] = {0.15f, 0.15f, 0.45f, 1.0f};
-#else
-static float menu_pen_fore  [4] = {0.0f,  0.0f,  0.0f,  1.0f};
-static float menu_pen_back  [4] = {0.70f, 0.70f, 0.70f, 1.0f};
-static float menu_pen_hfore [4] = {0.0f,  0.0f,  0.0f,  1.0f};
-static float menu_pen_hback [4] = {1.0f,  1.0f,  1.0f,  1.0f};
-#endif
+static float menu_pen_fore  [4] = FREEGLUT_MENU_PEN_FORE_COLORS ;
+static float menu_pen_back  [4] = FREEGLUT_MENU_PEN_BACK_COLORS ;
+static float menu_pen_hfore [4] = FREEGLUT_MENU_PEN_HFORE_COLORS;
+static float menu_pen_hback [4] = FREEGLUT_MENU_PEN_HBACK_COLORS;
 
 
 extern GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y );

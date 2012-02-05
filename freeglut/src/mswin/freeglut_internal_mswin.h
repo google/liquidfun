@@ -108,6 +108,14 @@ struct tagSFG_PlatformJoystick
 #endif
 
 
+/* Menu font and color definitions */
+#define  FREEGLUT_MENU_FONT    GLUT_BITMAP_8_BY_13
+
+#define  FREEGLUT_MENU_PEN_FORE_COLORS   {0.0f,  0.0f,  0.0f,  1.0f}
+#define  FREEGLUT_MENU_PEN_BACK_COLORS   {0.85f, 0.85f, 0.85f, 1.0f}
+#define  FREEGLUT_MENU_PEN_HFORE_COLORS  {1.0f,  1.0f,  1.0f,  1.0f}
+#define  FREEGLUT_MENU_PEN_HBACK_COLORS  {0.15f, 0.15f, 0.45f, 1.0f}
+
 
 /* Function to be called on exit */
 extern void (__cdecl *__glutExitFunc)( int return_value );
