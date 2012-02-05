@@ -40,7 +40,6 @@
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
- *  fgChooseFBConfig()      -- OK, but what about glutInitDisplayString()?
  *  fgSetupPixelFormat      -- ignores the display mode settings
  *  fgOpenWindow()          -- check the Win32 version, -iconic handling!
  *  fgCloseWindow()         -- check the Win32 version

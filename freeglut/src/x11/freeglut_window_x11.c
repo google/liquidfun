@@ -86,7 +86,7 @@
  * Chooses a visual basing on the current display mode settings
  */
 
-GLXFBConfig* fgChooseFBConfig( int *numcfgs )
+GLXFBConfig* fgPlatformChooseFBConfig( int *numcfgs )
 {
   GLboolean wantIndexedMode = GL_FALSE;
   int attributes[ 100 ];
@@ -451,7 +451,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB ;
 
-    window->Window.pContext.FBConfig = fgChooseFBConfig( &num_FBConfigs );
+    window->Window.pContext.FBConfig = fgPlatformChooseFBConfig( &num_FBConfigs );
 
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = current_DisplayMode ;
@@ -459,21 +459,21 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     if( ! window->Window.pContext.FBConfig )
     {
         /*
-         * The "fgChooseFBConfig" returned a null meaning that the visual
+         * The "fgPlatformChooseFBConfig" returned a null meaning that the visual
          * context is not available.
          * Try a couple of variations to see if they will work.
          */
         if( !( fgState.DisplayMode & GLUT_DOUBLE ) )
         {
             fgState.DisplayMode |= GLUT_DOUBLE ;
-            window->Window.pContext.FBConfig = fgChooseFBConfig( &num_FBConfigs );
+            window->Window.pContext.FBConfig = fgPlatformChooseFBConfig( &num_FBConfigs );
             fgState.DisplayMode &= ~GLUT_DOUBLE;
         }
 
         if( fgState.DisplayMode & GLUT_MULTISAMPLE )
         {
             fgState.DisplayMode &= ~GLUT_MULTISAMPLE ;
-            window->Window.pContext.FBConfig = fgChooseFBConfig( &num_FBConfigs );
+            window->Window.pContext.FBConfig = fgPlatformChooseFBConfig( &num_FBConfigs );
             fgState.DisplayMode |= GLUT_MULTISAMPLE;
         }
     }

@@ -1,7 +1,7 @@
 /*
  * freeglut_state_mswin.c
  *
- * The Windows-specific mouse cursor related stuff.
+ * The Windows-specific state query methods.
  *
  * Copyright (c) 2012 Stephen J. Baker. All Rights Reserved.
  * Written by John F. Fay, <fayjf@sourceforge.net>
@@ -335,4 +335,9 @@ int fgPlatformGlutLayerGet( GLenum eWhat )
 }
 
 
-
+/* MSwin does not currently have any Mode values? */
+int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
+{
+  *size = 0;
+  return NULL;
+}
