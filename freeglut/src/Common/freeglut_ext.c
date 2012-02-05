@@ -203,36 +203,6 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
 }
 
 
-#if TARGET_HOST_POSIX_X11
-GLUTproc fgPlatformGetGLUTProcAddress( const char* procName )
-{
-    /* optimization: quick initial check */
-    if( strncmp( procName, "glut", 4 ) != 0 )
-        return NULL;
-
-#define CHECK_NAME(x) if( strcmp( procName, #x ) == 0) return (GLUTproc)x;
-    CHECK_NAME(glutJoystickFunc);
-    CHECK_NAME(glutForceJoystickFunc);
-    CHECK_NAME(glutGameModeString);
-    CHECK_NAME(glutEnterGameMode);
-    CHECK_NAME(glutLeaveGameMode);
-    CHECK_NAME(glutGameModeGet);
-#undef CHECK_NAME
-
-    return NULL;
-}
-
-
-SFG_Proc fgPlatformGetProcAddress( const char *procName )
-{
-#if defined( GLX_ARB_get_proc_address )
-    return (SFG_Proc)glXGetProcAddressARB( ( const GLubyte * )procName );
-#else
-    return NULL;
-#endif
-}
-#endif
-
 
 GLUTproc FGAPIENTRY
 glutGetProcAddress( const char *procName )
