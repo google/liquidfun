@@ -406,7 +406,7 @@ static GLXContext fghCreateNewContext( SFG_Window* window )
 
   /* new context creation */
   int attributes[9];
-  CreateContextAttribsProc createContextAttribs = (CreateContextAttribsProc) fghGetProcAddress( "glXCreateContextAttribsARB" );
+  CreateContextAttribsProc createContextAttribs = (CreateContextAttribsProc) fgPlatformGetProcAddress( "glXCreateContextAttribsARB" );
  
   /* glXCreateContextAttribsARB not found, yet the user has requested the new context creation */
   if ( !createContextAttribs && !fghIsLegacyContextRequested() ) {

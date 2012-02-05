@@ -1119,7 +1119,7 @@ int fgHintPresent(Window window, Atom property, Atom hint);
 
 #endif
 
-SFG_Proc fghGetProcAddress( const char *procName );
+SFG_Proc fgPlatformGetProcAddress( const char *procName );
 
 #endif /* FREEGLUT_INTERNAL_H */
 
