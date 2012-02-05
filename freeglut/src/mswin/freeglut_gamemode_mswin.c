@@ -147,3 +147,11 @@ GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
     return success;
 }
 
+void fgPlatformEnterGameMode( void ) 
+{
+}
+
+void fgPlatformLeaveGameMode( void ) 
+{
+}
+
