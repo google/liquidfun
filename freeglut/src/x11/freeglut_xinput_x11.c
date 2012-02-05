@@ -5,7 +5,7 @@
 
 #include "freeglut_internal.h"
 
-#if TARGET_HOST_POSIX_X11 && HAVE_X11_EXTENSIONS_XINPUT2_H
+#if HAVE_X11_EXTENSIONS_XINPUT2_H
 
 #include <errno.h>
 #include <stdarg.h>
@@ -214,6 +214,4 @@ void fgHandleExtensionEvents( XEvent* base_ev ) {
 	}
 	XFreeEventData( fgDisplay.pDisplay.Display, cookie );
 }
-
-#endif
 
