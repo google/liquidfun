@@ -27,7 +27,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "../Common/freeglut_internal.h"
 
 void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
 {

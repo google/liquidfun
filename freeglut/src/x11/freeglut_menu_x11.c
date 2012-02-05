@@ -27,7 +27,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "../Common/freeglut_internal.h"
 
 /*
  *  * Private function to get the virtual maximum screen extent

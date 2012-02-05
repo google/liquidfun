@@ -29,7 +29,7 @@
 #define FREEGLUT_BUILDING_LIB
 #include <limits.h>  /* LONG_MAX */
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "../Common/freeglut_internal.h"
 
 /* Return the atom associated with "name". */
 static Atom fghGetAtom(const char * name)

@@ -30,7 +30,7 @@
 #include <GL/freeglut.h>
 #include <limits.h>  /* LONG_MAX */
 #include <unistd.h>  /* usleep */
-#include "freeglut_internal.h"
+#include "../Common/freeglut_internal.h"
 
 /* pushing attribute/value pairs into an array */
 #define ATTRIB(a) attributes[where++]=(a)

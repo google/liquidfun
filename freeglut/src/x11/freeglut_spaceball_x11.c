@@ -10,7 +10,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "../Common/freeglut_internal.h"
 
 #include <X11/Xlib.h>
 

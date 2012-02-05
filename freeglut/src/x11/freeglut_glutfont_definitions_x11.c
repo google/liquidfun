@@ -71,9 +71,7 @@
 #undef glutBitmapHelvetica12
 #undef glutBitmapHelvetica18
 
-#include "freeglut_internal.h"
-
-#if TARGET_HOST_POSIX_X11
+#include "../Common/freeglut_internal.h"
 
 struct freeglutStrokeFont
 {
@@ -103,6 +101,4 @@ struct freeglutBitmapFont glutBitmapTimesRoman24 ;
 struct freeglutBitmapFont glutBitmapHelvetica10 ;
 struct freeglutBitmapFont glutBitmapHelvetica12 ;
 struct freeglutBitmapFont glutBitmapHelvetica18 ;
-
-#endif
 

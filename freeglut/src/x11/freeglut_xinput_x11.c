@@ -3,7 +3,7 @@
 
 #include <GL/freeglut.h>
 
-#include "freeglut_internal.h"
+#include "../Common/freeglut_internal.h"
 
 #if HAVE_X11_EXTENSIONS_XINPUT2_H
 
