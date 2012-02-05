@@ -1,0 +1,24 @@
+Cross-compilation from GNU/Linux (static and shared DLL)
+========================================================
+
+Install MinGW32 and prepare FreeGLUT on Debian/Ubuntu:
+
+  apt-get install mingw32
+  ./configure --host=i586-mingw32msvc --prefix=/freeglut
+
+Install MinGW32 and prepare FreeGLUT on Fedora:
+
+  yum install mingw32-gcc
+  ./configure --host=i686-pc-mingw32 --prefix=/freeglut
+
+Cross-compile!
+
+  make
+  make install DESTDIR=$(pwd)
+
+Everything is in the new freeglut/ directory.
+The .dll is in the freeglut/bin/.
+
+
+Compilation of your own programs is done as usual.
+See README.cygwin_mingw for details.
