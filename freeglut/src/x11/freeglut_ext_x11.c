@@ -30,7 +30,7 @@
 #include <GL/freeglut.h>
 #include "../Common/freeglut_internal.h"
 
-GLUTproc fgPlatformGlutGetProcAddress( const char* procName )
+GLUTproc fgPlatformGetGLUTProcAddress( const char* procName )
 {
     /* optimization: quick initial check */
     if( strncmp( procName, "glut", 4 ) != 0 )
