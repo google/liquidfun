@@ -81,7 +81,8 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 # BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
 # re-declare it here so it will show up in the GUI.
-OPTION(BUILD_SHARED_LIBS "Build FreeGLUT as a shared library." ON)
+OPTION(BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
+OPTION(BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
 
 FIND_PACKAGE(OpenGL REQUIRED)
 
@@ -92,10 +93,20 @@ IF(WIN32)
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 ENDIF()
 
-INCLUDE(CheckIncludeFiles)
+if(UNIX)
+	FIND_PACKAGE(X11 REQUIRED)
+	LIST(APPEND LIBS ${X11_LIBRARIES})
+	IF(X11_Xrandr_FOUND)
+		SET(HAVE_X11_EXTENSIONS_XRANDR_H TRUE)
+		LIST(APPEND LIBS ${X11_Xrandr_LIB})
+	ENDIF()
+	IF(X11_xf86vmode_FOUND)
+		SET(HAVE_X11_EXTENSIONS_XF86VMODE_H TRUE)
+		LIST(APPEND LIBS ${X11_xf86vmode_LIB})
+	ENDIF()
+ENDIF()
 
-CHECK_INCLUDE_FILES(X11/extensions/xf86vmode.h 	HAVE_X11_EXTENSIONS_XF86VMODE_H)
-CHECK_INCLUDE_FILES(X11/extensions/Xrandr.h 	HAVE_X11_EXTENSIONS_XRANDR_H)
+INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES(sys/types.h HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(unistd.h 	HAVE_UNISTD_H)
 CHECK_INCLUDE_FILES(sys/time.h 	HAVE_SYS_TIME_H)
@@ -113,33 +124,57 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
 ADD_DEFINITIONS(-DHAVE_CONFIG_H)
 
+# by default, at least on UNIX, we want to build both
 IF(BUILD_SHARED_LIBS)
-	IF(WIN32)
+	ADD_LIBRARY(freeglut SHARED ${FREEGLUT_SRCS})
+ENDIF()
+IF(BUILD_STATIC_LIBS)
+	ADD_LIBRARY(freeglut_static STATIC ${FREEGLUT_SRCS})
+ENDIF()
+
+
+IF(WIN32)
+	IF(BUILD_SHARED_LIBS)
 		LIST(APPEND FREEGLUT_SRCS src/Common/freeglutdll.def freeglut.rc)
+		# XXX I assume that if we want both shared and static this one is appropriate
+		ADD_DEFINITIONS(-DFREEGLUT_EXPORTS)
+	ELSE()
+		ADD_DEFINITIONS(-DFREEGLUT_STATIC)
 	ENDIF()
-	ADD_DEFINITIONS(-DFREEGLUT_EXPORTS)
 ELSE()
-	ADD_DEFINITIONS(-DFREEGLUT_STATIC)
+	# on UNIX we need to make sure:
+	# - all shared libraries must have a soname/version
+	# - the output library should be named glut so it'll be linkable with -lglut
+	# - the shared library should link to the dependency libraries so that the user
+	#   won't have to link them explicitly (they shouldn't have to know that we depend
+	#   on Xrandr or Xxf86vm)
+	SET_TARGET_PROPERTIES(freeglut PROPERTIES VERSION 3.9.0 SOVERSION 3 OUTPUT_NAME glut)
+	SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME glut)
+	TARGET_LINK_LIBRARIES(freeglut ${LIBS})
 ENDIF()
 
-# The default library type is determined by BUILD_SHARED_LIBS
-ADD_LIBRARY(freeglut ${FREEGLUT_SRCS})
-
-IF(NOT BUILD_SHARED_LIBS)
-	SET_TARGET_PROPERTIES(freeglut PROPERTIES OUTPUT_NAME freeglut_static)
+IF(BUILD_SHARED_LIBS)
+	INSTALL(TARGETS freeglut DESTINATION lib)
 ENDIF()
-
-INSTALL(TARGETS freeglut DESTINATION lib)
+IF(BUILD_STATIC_LIBS)
+	INSTALL(TARGETS freeglut_static DESTINATION lib)
+ENDIF()
 INSTALL(FILES ${FREEGLUT_HEADERS} DESTINATION include/GL)
+
+
 
 # Optionally build demos, on by default.
 option( FREEGLUT_BUILD_DEMOS "Build FreeGLUT demos." ON )
 
+SET(DEMO_LIBS ${OPENGL_LIBRARY} ${LIBS})
 MACRO(ADD_DEMO name)
 	if( FREEGLUT_BUILD_DEMOS )
 		ADD_EXECUTABLE(${name} ${ARGN})
-		TARGET_LINK_LIBRARIES(${name} freeglut)
-		INSTALL(TARGETS ${name} DESTINATION bin)
+		IF(BUILD_SHARED_LIBS)
+			TARGET_LINK_LIBRARIES(${name} ${DEMO_LIBS} freeglut)
+		ELSE()
+			TARGET_LINK_LIBRARIES(${name} ${DEMO_LIBS} freeglut_static)
+		ENDIF()
 	endif()
 ENDMACRO()
 
