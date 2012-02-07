@@ -211,6 +211,8 @@ int fgPlatformGlutGet ( GLenum eWhat )
         fgWarning( "glutGet(): missing enum handle %d", eWhat );
         break;
     }
+
+	return -1;
 }
 
 
