@@ -91,10 +91,16 @@ void fgPlatformDisplayWindow ( SFG_Window *window )
 
 unsigned long fgPlatformSystemTime ( void )
 {
+#ifdef CLOCK_MONOTONIC
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    return now.tv_nsec/1000000 + now.tv_sec*1000;
+#else
 #ifdef HAVE_GETTIMEOFDAY
     struct timeval now;
     gettimeofday( &now, NULL );
     return now.tv_usec/1000 + now.tv_sec*1000;
+#endif
 #endif
 }
 
