@@ -937,7 +937,6 @@ void fgWarning( const char *fmt, ... );
 
 SFG_Proc fgPlatformGetProcAddress( const char *procName );
 
-/* Window functions needed for Platform implementations */
 /* pushing attribute/value pairs into an array */
 #define ATTRIB(a) attributes[where++]=(a)
 #define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}

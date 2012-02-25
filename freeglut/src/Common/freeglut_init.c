@@ -44,7 +44,7 @@
 /* -- GLOBAL VARIABLES ----------------------------------------------------- */
 
 /*
- * A structure pointed by g_pDisplay holds all information
+ * A structure pointed by fgDisplay holds all information
  * regarding the display, screen, root window etc.
  */
 SFG_Display fgDisplay;
@@ -350,7 +350,7 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     fgPlatformInitialize( displayName );
 
     /*
-     * Geometry parsing deffered until here because we may need the screen
+     * Geometry parsing deferred until here because we may need the screen
      * size.
      */
 

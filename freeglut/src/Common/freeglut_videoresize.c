@@ -42,9 +42,3 @@ void FGAPIENTRY glutVideoPan( int x, int y, int w, int h )    { /* Not implement
 
 /*** END OF FILE ***/
 
-
-
-
-
-
-
