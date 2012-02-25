@@ -107,6 +107,7 @@ if(UNIX)
 ENDIF()
 
 INCLUDE(CheckIncludeFiles)
+INCLUDE(CheckFunctionExists)
 CHECK_INCLUDE_FILES(sys/types.h HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(unistd.h 	HAVE_UNISTD_H)
 CHECK_INCLUDE_FILES(sys/time.h 	HAVE_SYS_TIME_H)
@@ -116,6 +117,7 @@ CHECK_INCLUDE_FILES(sys/ioctl.h HAVE_SYS_IOCTL_H)
 CHECK_INCLUDE_FILES(fcntl.h 	HAVE_FCNTL_H)
 CHECK_INCLUDE_FILES(errno.h 	HAVE_ERRNO_H)
 CHECK_INCLUDE_FILES(usbhid.h 	HAVE_USBHID_H)
+CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
 
 # The generated config.h is placed in the project's build directory, just to
 # ensure that all CMake-generated files are kept away from the main source tree.

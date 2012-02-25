@@ -91,7 +91,7 @@ void fgPlatformDisplayWindow ( SFG_Window *window )
 
 unsigned long fgPlatformSystemTime ( void )
 {
-#if TARGET_HOST_SOLARIS || HAVE_GETTIMEOFDAY
+#ifdef HAVE_GETTIMEOFDAY
     struct timeval now;
     gettimeofday( &now, NULL );
     return now.tv_usec/1000 + now.tv_sec*1000;

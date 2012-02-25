@@ -9,3 +9,4 @@
 #cmakedefine HAVE_FCNTL_H
 #cmakedefine HAVE_ERRNO_H
 #cmakedefine HAVE_USBHID_H
+#cmakedefine HAVE_GETTIMEOFDAY
