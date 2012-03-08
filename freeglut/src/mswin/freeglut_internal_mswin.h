@@ -34,16 +34,16 @@
  * compatibility.
  */
 #if !defined(_WIN32_WCE)
-#    include <windows.h>
-#    include <windowsx.h>
-#    include <mmsystem.h>
+#   include <windows.h>
+#   include <windowsx.h>
+#   include <mmsystem.h>
 /* CYGWIN does not have tchar.h, but has TEXT(x), defined in winnt.h. */
-#    ifndef __CYGWIN__
-#      include <tchar.h>
-#    else
-#      define _TEXT(x) TEXT(x)
-#      define _T(x)    TEXT(x)
-#    endif
+#   ifndef __CYGWIN__
+#       include <tchar.h>
+#   else
+#       define _TEXT(x) TEXT(x)
+#       define _T(x)    TEXT(x)
+#   endif
 
 #endif
 
@@ -54,11 +54,11 @@
 #if !defined(ChangeDisplaySettingsEx)
 LONG WINAPI ChangeDisplaySettingsExA(LPCSTR,LPDEVMODEA,HWND,DWORD,LPVOID);
 LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
-#    ifdef UNICODE
-#        define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
-#    else
-#        define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
-#    endif
+#   ifdef UNICODE
+#       define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
+#   else
+#       define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
+#   endif
 #endif
 
 
@@ -76,12 +76,12 @@ struct tagSFG_PlatformDisplay
  * Make "freeglut" window handle and context types so that we don't need so
  * much conditionally-compiled code later in the library.
  */
-typedef HWND    SFG_WindowHandleType ;
-typedef HGLRC   SFG_WindowContextType ;
+typedef HWND    SFG_WindowHandleType;
+typedef HGLRC   SFG_WindowContextType;
 typedef struct tagSFG_PlatformContext SFG_PlatformContext;
 struct tagSFG_PlatformContext
 {
-    HDC             Device;          /* The window's device context         */
+    HDC             Device;             /* The window's device context         */
 };
 
 
@@ -109,14 +109,14 @@ extern int XParseGeometry (
     const char *string,
     int *x,
     int *y,
-    unsigned int *width,    /* RETURN */
+    unsigned int *width,      /* RETURN */
     unsigned int *height);    /* RETURN */
 
 
 
 /* Joystick-Specific Definitions */
 #if !defined(_WIN32_WCE)
-#    define _JS_MAX_AXES  8
+#   define _JS_MAX_AXES  8
 typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
 struct tagSFG_PlatformJoystick
 {
