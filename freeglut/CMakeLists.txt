@@ -123,6 +123,8 @@ CHECK_INCLUDE_FILES(fcntl.h 	HAVE_FCNTL_H)
 CHECK_INCLUDE_FILES(errno.h 	HAVE_ERRNO_H)
 CHECK_INCLUDE_FILES(usbhid.h 	HAVE_USBHID_H)
 CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
+CHECK_FUNCTION_EXISTS(vfprintf HAVE_VFPRINTF)
+CHECK_FUNCTION_EXISTS(_doprnt HAVE_DOPRNT)
 
 # The generated config.h is placed in the project's build directory, just to
 # ensure that all CMake-generated files are kept away from the main source tree.

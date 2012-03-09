@@ -10,3 +10,5 @@
 #cmakedefine HAVE_ERRNO_H
 #cmakedefine HAVE_USBHID_H
 #cmakedefine HAVE_GETTIMEOFDAY
+#cmakedefine HAVE_VFPRINTF
+#cmakedefine HAVE_DOPRNT
