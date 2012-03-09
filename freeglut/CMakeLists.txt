@@ -143,6 +143,7 @@ ENDIF()
 
 
 IF(WIN32)
+	LIST(APPEND LIBS winmm)
 	IF(BUILD_SHARED_LIBS)
 		LIST(APPEND FREEGLUT_SRCS src/Common/freeglutdll.def freeglut.rc)
 		# XXX I assume that if we want both shared and static this one is appropriate
@@ -159,8 +160,9 @@ ELSE()
 	#   on Xrandr or Xxf86vm)
 	SET_TARGET_PROPERTIES(freeglut PROPERTIES VERSION 3.9.0 SOVERSION 3 OUTPUT_NAME glut)
 	SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME glut)
-	TARGET_LINK_LIBRARIES(freeglut ${LIBS})
 ENDIF()
+TARGET_LINK_LIBRARIES(freeglut ${LIBS})
+TARGET_LINK_LIBRARIES(freeglut_static ${LIBS})
 
 IF(BUILD_SHARED_LIBS)
 	INSTALL(TARGETS freeglut DESTINATION lib)
