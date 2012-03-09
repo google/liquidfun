@@ -102,7 +102,11 @@ if(UNIX)
 	ENDIF()
 	IF(X11_xf86vmode_FOUND)
 		SET(HAVE_X11_EXTENSIONS_XF86VMODE_H TRUE)
-		LIST(APPEND LIBS ${X11_xf86vmode_LIB})
+		# Work-around http://www.cmake.org/Bug/bug_view_page.php?bug_id=6976
+		IF(NOT "${X11_Xxf86vm_LIB}")
+			SET(X11_Xxf86vm_LIB "Xxf86vm")
+		ENDIF()
+		LIST(APPEND LIBS ${X11_Xxf86vm_LIB})
 	ENDIF()
 ENDIF()
 
