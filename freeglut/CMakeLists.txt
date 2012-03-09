@@ -37,6 +37,8 @@ SET(FREEGLUT_SRCS
 
 IF(WIN32)
 	LIST(APPEND FREEGLUT_SRCS
+		src/Common/xparsegeometry_repl.c
+		src/Common/xparsegeometry_repl.h
 		src/mswin/freeglut_cursor_mswin.c
 		src/mswin/freeglut_display_mswin.c
 		src/mswin/freeglut_ext_mswin.c
@@ -85,7 +87,7 @@ OPTION(BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
 OPTION(BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
 
 FIND_PACKAGE(OpenGL REQUIRED)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include ${OPENGL_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
 LIST(APPEND LIBS ${OPENGL_gl_LIBRARY})
 LIST(APPEND LIBS m)
 
@@ -130,7 +132,7 @@ CHECK_FUNCTION_EXISTS(_doprnt HAVE_DOPRNT)
 # ensure that all CMake-generated files are kept away from the main source tree.
 # As a result, the build directory must to be added to the include path list.
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
-INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
 ADD_DEFINITIONS(-DHAVE_CONFIG_H)
 
 # by default, at least on UNIX, we want to build both

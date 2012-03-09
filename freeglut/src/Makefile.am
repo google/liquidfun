@@ -41,6 +41,8 @@ lib@LIBRARY@_la_SOURCES = Common/freeglut_callbacks.c \
 
 if TARGET_HOST_MS_WINDOWS
 lib@LIBRARY@_la_SOURCES += \
+	Common/xparsegeometry_repl.c \
+	Common/xparsegeometry_repl.h \
 	mswin/freeglut_cursor_mswin.c \
 	mswin/freeglut_display_mswin.c \
 	mswin/freeglut_ext_mswin.c \
