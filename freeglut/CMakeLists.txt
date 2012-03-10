@@ -219,5 +219,4 @@ ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c
                          progs/demos/spaceball/vmath.c
                          progs/demos/spaceball/vmath.h)
 ADD_DEMO(subwin          progs/demos/subwin/subwin.c)
-
-
+ADD_DEMO(timer           progs/demos/timer/timer.c)
