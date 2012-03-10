@@ -315,9 +315,8 @@ void fgDeinitialize( void )
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
-
 #if !TARGET_HOST_POSIX_X11
-#include "Common/xparsegeometry_repl.h"
+#   include "../Common/xparsegeometry_repl.h"
 #endif
 
 /*
@@ -499,7 +498,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
                      configuration is conformant or not */
             break ;
 
-        case 6 : /* "depth":  Number of bits of precsion in the depth buffer */
+        case 6 : /* "depth":  Number of bits of precision in the depth buffer */
             glut_state_flag |= GLUT_DEPTH ;  /* Somebody fix this for me! */
             break ;
 
@@ -619,8 +618,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
             break ;
 
         case 35 :  /* "borderless":  windows should not have borders */
-#if TARGET_HOST_POSIX_X11
-#endif
+            glut_state_flag |= GLUT_BORDERLESS;
             break ;
 
         case 36 :  /* "aux":  some number of aux buffers */
@@ -646,7 +644,7 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 
 void FGAPIENTRY glutInitContextVersion( int majorVersion, int minorVersion )
 {
-    /* We will make use of these valuse when creating a new OpenGL context... */
+    /* We will make use of these value when creating a new OpenGL context... */
     fgState.MajorVersion = majorVersion;
     fgState.MinorVersion = minorVersion;
 }

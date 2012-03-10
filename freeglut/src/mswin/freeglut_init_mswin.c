@@ -121,9 +121,10 @@ void fgPlatformInitialize( const char* displayName )
 
     fgState.Initialised = GL_TRUE;
 
-    /* Avoid registering atexit callback on Win32 as it results in an access
-     * violation due to calling into a module which has been unloaded.
-     * Any cleanup isn't needed on Windows anyway, the OS takes care of it.c
+    /* Avoid registering atexit callback on Win32 as it can result in an
+     * access violation due to calling into a module which has been
+     * unloaded.
+     * Any cleanup isn't needed on Windows anyway, the OS takes care of it.
      * see: http://blogs.msdn.com/b/oldnewthing/archive/2012/01/05/10253268.aspx
      */
 /*    atexit(fgDeinitialize); */

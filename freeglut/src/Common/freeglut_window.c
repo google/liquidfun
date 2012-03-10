@@ -47,14 +47,11 @@
  *  glutCreateSubWindow()   -- Check when default position and size is {-1,-1}
  *  glutDestroyWindow()     -- check the Win32 version
  *  glutSetWindow()         -- check the Win32 version
- *  glutGetWindow()         -- OK
  *  glutSetWindowTitle()    -- check the Win32 version
  *  glutSetIconTitle()      -- check the Win32 version
  *  glutShowWindow()        -- check the Win32 version
  *  glutHideWindow()        -- check the Win32 version
  *  glutIconifyWindow()     -- check the Win32 version
- *  glutReshapeWindow()     -- check the Win32 version
- *  glutPositionWindow()    -- check the Win32 version
  *  glutPushWindow()        -- check the Win32 version
  *  glutPopWindow()         -- check the Win32 version
  */
@@ -261,7 +258,7 @@ void FGAPIENTRY glutDestroyWindow( int windowID )
 }
 
 /*
- * This function selects the current window
+ * This function selects the specified window as the current window
  */
 void FGAPIENTRY glutSetWindow( int ID )
 {

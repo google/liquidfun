@@ -250,10 +250,6 @@ int fgPlatformGlutDeviceGet ( GLenum eWhat )
         /*
          * Win32 is assumed a keyboard, and this cannot be queried,
          * except for WindowsCE.
-         *
-         * X11 has a core keyboard by definition, although it can
-         * be present as a virtual/dummy keyboard. For now, there
-         * is no reliable way to tell if a real keyboard is present.
          */
 #if defined(_WIN32_CE)
         return ( GetKeyboardStatus() & KBDI_KEYBOARD_PRESENT ) ? 1 : 0;

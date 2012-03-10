@@ -126,6 +126,9 @@
     <ClCompile Include="..\..\src\mswin\freeglut_window_mswin.c">
       <Filter>Source Files\mswin</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Common\xparsegeometry_repl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\Common\freeglutdll.def">
@@ -152,6 +155,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\mswin\freeglut_internal_mswin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Common\xparsegeometry_repl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

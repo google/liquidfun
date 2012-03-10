@@ -32,10 +32,10 @@ from The Open Group.
 
 */
 
-#include "Common/xparsegeometry_repl.h"
+#include "../Common/xparsegeometry_repl.h"
 
 /*
- *    XParseGeometry parses strings of the form
+ *   XParseGeometry parses strings of the form
  *   "=<width>x<height>{+-}<xoffset>{+-}<yoffset>", where
  *   width, height, xoffset, and yoffset are unsigned integers.
  *   Example:  "=80x24+300-49"

@@ -42,11 +42,9 @@ from The Open Group.
 #define XNegative       0x0010
 #define YNegative       0x0020
 
-extern int XParseGeometry (
-    const char *string,
-    int *x,
-    int *y,
-    unsigned int *width,    /* RETURN */
-    unsigned int *height);    /* RETURN */
+extern int XParseGeometry (const char *string,                         /* INPUT */
+                           int *x, int *y,                             /* RETURN */
+                           unsigned int *width, unsigned int *height); /* RETURN */
+
 
 #endif

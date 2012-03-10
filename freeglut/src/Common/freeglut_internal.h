@@ -941,11 +941,11 @@ SFG_Proc fgPlatformGetProcAddress( const char *procName );
 #define ATTRIB(a) attributes[where++]=(a)
 #define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
 
-extern int fghIsLegacyContextVersionRequested( void );
-extern int fghMapBit( int mask, int from, int to );
-extern int fghIsLegacyContextRequested( void );
-extern void fghContextCreationError( void );
-extern int fghNumberOfAuxBuffersRequested( void );
+int fghIsLegacyContextVersionRequested( void );
+int fghMapBit( int mask, int from, int to );
+int fghIsLegacyContextRequested( void );
+void fghContextCreationError( void );
+int fghNumberOfAuxBuffersRequested( void );
 
 #endif /* FREEGLUT_INTERNAL_H */
 

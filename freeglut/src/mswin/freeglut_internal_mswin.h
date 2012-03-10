@@ -69,8 +69,8 @@ LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
 struct tagSFG_PlatformDisplay
 {
-    HINSTANCE       Instance;           /* The application's instance        */
-    DEVMODE         DisplayMode;        /* Desktop's display settings        */
+    HINSTANCE       Instance;           /* The application's instance */
+    DEVMODE         DisplayMode;        /* Desktop's display settings */
     char           *DisplayName;        /* Display name for multi display support*/ 
 };
 
@@ -83,7 +83,7 @@ typedef HGLRC   SFG_WindowContextType;
 typedef struct tagSFG_PlatformContext SFG_PlatformContext;
 struct tagSFG_PlatformContext
 {
-    HDC             Device;             /* The window's device context         */
+    HDC             Device;             /* The window's device context */
 };
 
 
@@ -91,28 +91,9 @@ struct tagSFG_PlatformContext
 typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
 struct tagSFG_PlatformWindowState
 {
-    RECT            OldRect;            /* window rect - stored before the window is made fullscreen */
+    RECT            OldRect;            /* window rect  - stored before the window is made fullscreen */
     DWORD           OldStyle;           /* window style - stored before the window is made fullscreen */
 };
-
-
-
-/* For "freeglut_init.c", some definitions of symbols and a prototype to emulate the X11 functionality */
-#define NoValue         0x0000
-#define XValue          0x0001
-#define YValue          0x0002
-#define WidthValue      0x0004
-#define HeightValue     0x0008
-#define AllValues       0x000F
-#define XNegative       0x0010
-#define YNegative       0x0020
-
-extern int XParseGeometry (
-    const char *string,
-    int *x,
-    int *y,
-    unsigned int *width,      /* RETURN */
-    unsigned int *height);    /* RETURN */
 
 
 

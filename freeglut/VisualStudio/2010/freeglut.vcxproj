@@ -344,6 +344,7 @@
     <ClCompile Include="..\..\src\Common\freeglut_teapot.c" />
     <ClCompile Include="..\..\src\Common\freeglut_videoresize.c" />
     <ClCompile Include="..\..\src\Common\freeglut_window.c" />
+    <ClCompile Include="..\..\src\Common\xparsegeometry_repl.c" />
     <ClCompile Include="..\..\src\mswin\freeglut_cursor_mswin.c" />
     <ClCompile Include="..\..\src\mswin\freeglut_display_mswin.c" />
     <ClCompile Include="..\..\src\mswin\freeglut_ext_mswin.c" />
@@ -368,6 +369,7 @@
     <ClInclude Include="..\..\include\GL\freeglut_std.h" />
     <ClInclude Include="..\..\src\Common\freeglut_teapot_data.h" />
     <ClInclude Include="..\..\include\GL\glut.h" />
+    <ClInclude Include="..\..\src\Common\xparsegeometry_repl.h" />
     <ClInclude Include="..\..\src\mswin\freeglut_internal_mswin.h" />
   </ItemGroup>
   <ItemGroup>
