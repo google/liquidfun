@@ -34,12 +34,10 @@
  */
 void fgPlatformRememberState( void )
 {
-/*    DEVMODE devMode; */
-
     /* Grab the current desktop settings... */
 
-/* hack to get around my stupid cross-gcc headers */
-#define FREEGLUT_ENUM_CURRENT_SETTINGS -1
+    /* hack to get around my stupid cross-gcc headers */
+    #define FREEGLUT_ENUM_CURRENT_SETTINGS -1
 
     EnumDisplaySettings( fgDisplay.pDisplay.DisplayName, FREEGLUT_ENUM_CURRENT_SETTINGS,
                          &fgDisplay.pDisplay.DisplayMode );
@@ -57,7 +55,6 @@ void fgPlatformRestoreState( void )
 {
     /* Restore the previously remembered desktop display settings */
     ChangeDisplaySettingsEx( fgDisplay.pDisplay.DisplayName,&fgDisplay.pDisplay.DisplayMode, 0,0,0 );
-
 }
 
 
@@ -154,4 +151,3 @@ void fgPlatformEnterGameMode( void )
 void fgPlatformLeaveGameMode( void ) 
 {
 }
-
