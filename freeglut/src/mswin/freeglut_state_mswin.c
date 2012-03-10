@@ -47,6 +47,13 @@ extern void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* y
  */
 #define WGL_SAMPLES_ARB                0x2042
 
+#if defined(_WIN32_WCE)
+#   include <Aygshell.h>
+#   ifdef FREEGLUT_LIB_PRAGMAS
+#       pragma comment( lib, "Aygshell.lib" )
+#   endif
+#endif /* defined(_WIN32_WCE) */
+
 
 
 int fgPlatformGlutGet ( GLenum eWhat )
@@ -283,55 +290,15 @@ int fgPlatformGlutDeviceGet ( GLenum eWhat )
     return -1;
 }
 
-
-int fgPlatformGlutLayerGet( GLenum eWhat )
-{
-    /*
-     * This is easy as layers are not implemented ;-)
-     *
-     * XXX Can we merge the UNIX/X11 and WIN32 sections?  Or
-     * XXX is overlay support planned?
-     */
-    switch( eWhat )
-    {
-
-    case GLUT_OVERLAY_POSSIBLE:
-/*      return fgSetupPixelFormat( fgStructure.CurrentWindow, GL_TRUE,
-                                   PFD_OVERLAY_PLANE ); */
-      return 0 ;
-
-    case GLUT_LAYER_IN_USE:
-        return GLUT_NORMAL;
-
-    case GLUT_HAS_OVERLAY:
-        return 0;
-
-    case GLUT_TRANSPARENT_INDEX:
-        /*
-         * Return just anything, which is always defined as zero
-         *
-         * XXX HUH?
-         */
-        return 0;
-
-    case GLUT_NORMAL_DAMAGED:
-        /* XXX Actually I do not know. Maybe. */
-        return 0;
-
-    case GLUT_OVERLAY_DAMAGED:
-        return -1;
-
-    default:
-        fgWarning( "glutLayerGet(): missing enum handle %d", eWhat );
-        break;
-    }
-
-    /* And fail. That's good. Programs do love failing. */
-    return -1;
-}
-
-
-/* MSwin does not currently have any Mode values? */
+/*
+ * This is for querying the number of supported auxiliary or multisample
+ * buffers for a (the current?) display mode.
+ * see http://old.nabble.com/-GLX--glutGetModeValues-to13514723.html#a13514723
+ * Not currently implemented, but we should be able to query the relevant
+ * info using
+ * http://www.opengl.org/registry/specs/ARB/wgl_pixel_format.txt
+ * (if supported on the executing machine!)
+ */
 int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
 {
   *size = 0;

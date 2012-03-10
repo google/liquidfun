@@ -42,6 +42,20 @@ static pGetTouchInputInfo fghGetTouchInputInfo = (pGetTouchInputInfo)0xDEADBEEF;
 static pCloseTouchInputHandle fghCloseTouchInputHandle = (pCloseTouchInputHandle)0xDEADBEEF;
 #endif
 
+#ifdef _WIN32_WCE
+typedef struct GXDisplayProperties GXDisplayProperties;
+typedef struct GXKeyList GXKeyList;
+#include <gx.h>
+
+typedef struct GXKeyList (*GXGETDEFAULTKEYS)(int);
+typedef int (*GXOPENINPUT)();
+
+GXGETDEFAULTKEYS GXGetDefaultKeys_ = NULL;
+GXOPENINPUT GXOpenInput_ = NULL;
+
+struct GXKeyList gxKeyList;
+#endif /* _WIN32_WCE */
+
 /* 
  * Helper functions for getting client area from the window rect
  * and the window rect from the client area given the style of the window

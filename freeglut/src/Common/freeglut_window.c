@@ -29,14 +29,6 @@
 #include <GL/freeglut.h>
 #include "freeglut_internal.h"
 
-#if defined(_WIN32_WCE)
-#   include <Aygshell.h>
-#   ifdef FREEGLUT_LIB_PRAGMAS
-#       pragma comment( lib, "Aygshell.lib" )
-#   endif
-#endif /* defined(_WIN32_WCE) */
-
-
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *

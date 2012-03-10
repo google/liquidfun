@@ -39,22 +39,6 @@
 #    define VFPRINTF(s,f,a)
 #endif
 
-#ifdef _WIN32_WCE
-
-typedef struct GXDisplayProperties GXDisplayProperties;
-typedef struct GXKeyList GXKeyList;
-#include <gx.h>
-
-typedef struct GXKeyList (*GXGETDEFAULTKEYS)(int);
-typedef int (*GXOPENINPUT)();
-
-GXGETDEFAULTKEYS GXGetDefaultKeys_ = NULL;
-GXOPENINPUT GXOpenInput_ = NULL;
-
-struct GXKeyList gxKeyList;
-
-#endif /* _WIN32_WCE */
-
 /*
  * Try to get the maximum value allowed for ints, falling back to the minimum
  * guaranteed by ISO C99 if there is no suitable header.

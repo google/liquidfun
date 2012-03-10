@@ -255,49 +255,6 @@ int fgPlatformGlutDeviceGet ( GLenum eWhat )
     return -1;
 }
 
-int fgPlatformGlutLayerGet( GLenum eWhat )
-{
-    /*
-     * This is easy as layers are not implemented ;-)
-     *
-     * XXX Can we merge the UNIX/X11 and WIN32 sections?  Or
-     * XXX is overlay support planned?
-     */
-    switch( eWhat )
-    {
-    case GLUT_OVERLAY_POSSIBLE:
-        return 0;
-
-    case GLUT_LAYER_IN_USE:
-        return GLUT_NORMAL;
-
-    case GLUT_HAS_OVERLAY:
-        return 0;
-
-    case GLUT_TRANSPARENT_INDEX:
-        /*
-         * Return just anything, which is always defined as zero
-         *
-         * XXX HUH?
-         */
-        return 0;
-
-    case GLUT_NORMAL_DAMAGED:
-        /* XXX Actually I do not know. Maybe. */
-        return 0;
-
-    case GLUT_OVERLAY_DAMAGED:
-        return -1;
-
-    default:
-        fgWarning( "glutLayerGet(): missing enum handle %d", eWhat );
-        break;
-    }
-
-    /* And fail. That's good. Programs do love failing. */
-    return -1;
-}
-
 
 int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
 {

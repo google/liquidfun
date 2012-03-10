@@ -43,7 +43,6 @@
 
 extern int fgPlatformGlutGet ( GLenum eWhat );
 extern int fgPlatformGlutDeviceGet ( GLenum eWhat );
-extern int fgPlatformGlutLayerGet ( GLenum eWhat );
 extern int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size);
 
 
@@ -291,16 +290,41 @@ int FGAPIENTRY glutLayerGet( GLenum eWhat )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutLayerGet" );
 
     /*
-     * This is easy as layers are not implemented ;-)
-     *
-     * XXX Can we merge the UNIX/X11 and WIN32 sections?  Or
-     * XXX is overlay support planned?
+     * This is easy as layers are not implemented and
+     * overlay support is not planned. E.g. on Windows,
+     * overlay requests in PFDs are ignored
+     * (see iLayerType at http://msdn.microsoft.com/en-us/library/dd368826(v=vs.85).aspx)
      */
     switch( eWhat )
     {
 
+    case GLUT_OVERLAY_POSSIBLE:
+        return 0 ;
+
+    case GLUT_LAYER_IN_USE:
+        return GLUT_NORMAL;
+
+    case GLUT_HAS_OVERLAY:
+        return 0;
+
+    case GLUT_TRANSPARENT_INDEX:
+        /*
+        * Return just anything, which is always defined as zero
+        *
+        * XXX HUH?
+        */
+        return 0;
+
+    case GLUT_NORMAL_DAMAGED:
+        /* XXX Actually I do not know. Maybe. */
+        return 0;
+
+    case GLUT_OVERLAY_DAMAGED:
+        return -1;
+
     default:
-        return fgPlatformGlutLayerGet( eWhat );
+        fgWarning( "glutLayerGet(): missing enum handle %d", eWhat );
+        break;
     }
 
     /* And fail. That's good. Programs do love failing. */

@@ -976,8 +976,21 @@ int fgJoystickDetect( void )
 }
 
 /*
- * Joystick information functions
+ * Joystick information, setup and execution functions
  */
+
+/*
+ * Forces the joystick callback to be executed
+ */
+void FGAPIENTRY glutForceJoystickFunc( void )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutForceJoystickFunc" );
+#if !defined(_WIN32_WCE)
+    freeglut_return_if_fail( fgStructure.CurrentWindow != NULL );
+    freeglut_return_if_fail( FETCH_WCB( *( fgStructure.CurrentWindow ), Joystick ) );
+    fgJoystickPollWindow( fgStructure.CurrentWindow );
+#endif /* !defined(_WIN32_WCE) */
+}
 int  glutJoystickGetNumAxes( int ident )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutJoystickGetNumAxes" );
