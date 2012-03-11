@@ -27,7 +27,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "Common/freeglut_internal.h"
+#include "fg_internal.h"
 
 #include <android/log.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))

@@ -1,11 +1,9 @@
 /*
- * freeglut_spaceball_android.c
+ * freeglut_display_android.c
  *
- * Spaceball support for Windows
+ * Display message posting, context buffer swapping.
  *
- * Copyright (c) 2012 Stephen J. Baker. All Rights Reserved.
- * Written by Evan Felix <karcaw at gmail.com>
- * Creation date: Sat Feb 4, 2012
+ * Copyright (C) 2012  Sylvain Beucler
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,35 +22,15 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/*
- * This code is a very complicated way of doing nothing.  
- * But is needed for Android platform builds.
- */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "fg_internal.h"
 
-void fgPlatformInitializeSpaceball(void)
-{
-	return;
-}
+#include <android/log.h>
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))
 
-void fgPlatformSpaceballClose(void)
+void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
 {
-	return;
-}
-
-int fgPlatformHasSpaceball(void)
-{
-	return 0;
-}
-
-int fgPlatformSpaceballNumButtons(void)
-{
-	return 0;
-}
-
-void fgPlatformSpaceballSetWindow(SFG_Window *window)
-{
-	return;
+  /* LOGI("Swap!"); */
+  eglSwapBuffers( pDisplayPtr->eglDisplay, CurrentWindow->Window.pContext.eglSurface );
 }

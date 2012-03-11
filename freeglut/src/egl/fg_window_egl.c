@@ -24,7 +24,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "fg_internal.h"
 
 /**
  * Initialize an EGL context for the current display.

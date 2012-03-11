@@ -26,9 +26,9 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
-
+#include <stdio.h>
 #include <android/native_window.h>
+#include "fg_internal.h"
 
 int fgPlatformGlutGet ( GLenum eWhat )
 {

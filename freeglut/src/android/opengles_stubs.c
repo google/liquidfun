@@ -1,5 +1,5 @@
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "fg_internal.h"
 
 void fgDeactivateMenu( SFG_Window *window ) {
   fprintf(stderr, "fgDeactivateMenu: STUB\n");

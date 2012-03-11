@@ -1,8 +1,11 @@
 /*
- * freeglut_gamemode_x11.c
+ * freeglut_joystick_android.c
  *
- * The game mode handling code.
+ * Joystick handling code
  *
+ * Copyright (c) 1999-2000 Pawel W. Olszta. All Rights Reserved.
+ * Written by Steve Baker, <sjbaker1@airmail.net>
+ * Copied for Platform code by Evan Felix <karcaw at gmail.com>
  * Copyright (C) 2012  Sylvain Beucler
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -24,34 +27,24 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "fg_internal.h"
 
-/*
- * Changes the current display mode to match user's settings
- */
-GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
+void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 {
-  fprintf(stderr, "fgPlatformChangeDisplayMode: STUB\n");
-  return GL_FALSE;
+  fprintf(stderr, "fgPlatformJoystickRawRead: STUB\n");
 }
 
-void fgPlatformEnterGameMode( void )
+void fgPlatformJoystickOpen( SFG_Joystick* joy )
 {
-  fprintf(stderr, "fgPlatformEnterGameMode: STUB\n");
+  fprintf(stderr, "fgPlatformJoystickOpen: STUB\n");
 }
 
-void fgPlatformRememberState( void )
+void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
 {
-  fprintf(stderr, "fgPlatformRememberState: STUB\n");
+  fprintf(stderr, "fgJoystick: STUB\n");
 }
 
-void fgPlatformRestoreState( void )
+void fgPlatformJoystickClose ( int ident )
 {
-  fprintf(stderr, "fgPlatformRestoreState: STUB\n");
+  fprintf(stderr, "fgPlatformJoystickClose: STUB\n");
 }
-
-void fgPlatformLeaveGameMode( void ) 
-{
-  fprintf(stderr, "fgPlatformLeaveGameMode: STUB\n");
-}
-

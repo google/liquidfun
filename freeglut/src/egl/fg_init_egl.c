@@ -25,7 +25,7 @@
 
 #define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "fg_internal.h"
 
 #include <android/native_app_glue/android_native_app_glue.h>
 

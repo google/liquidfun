@@ -1,9 +1,11 @@
 /*
- * freeglut_structure_egl.c
+ * freeglut_spaceball_android.c
  *
- * Windows and menus need tree structure
+ * Spaceball support for Windows
  *
- * Copyright (C) 2012  Sylvain Beucler
+ * Copyright (c) 2012 Stephen J. Baker. All Rights Reserved.
+ * Written by Evan Felix <karcaw at gmail.com>
+ * Creation date: Sat Feb 4, 2012
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,13 +24,35 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/*
+ * This code is a very complicated way of doing nothing.  
+ * But is needed for Android platform builds.
+ */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "fg_internal.h"
 
-extern SFG_Structure fgStructure;
-
-void fgPlatformCreateWindow ( SFG_Window *window )
+void fgPlatformInitializeSpaceball(void)
 {
-  window->Window.pContext.eglSurface = EGL_NO_SURFACE;
+	return;
+}
+
+void fgPlatformSpaceballClose(void)
+{
+	return;
+}
+
+int fgPlatformHasSpaceball(void)
+{
+	return 0;
+}
+
+int fgPlatformSpaceballNumButtons(void)
+{
+	return 0;
+}
+
+void fgPlatformSpaceballSetWindow(SFG_Window *window)
+{
+	return;
 }

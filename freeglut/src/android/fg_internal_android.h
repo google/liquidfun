@@ -29,7 +29,7 @@
 
 /* -- PLATFORM-SPECIFIC INCLUDES ------------------------------------------- */
 /* Android OpenGL ES is accessed through EGL */
-#include "../egl/freeglut_internal_egl.h"
+#include "egl/fg_internal_egl.h"
 
 /**
  * Virtual PAD (spots on touchscreen that simulate keys)

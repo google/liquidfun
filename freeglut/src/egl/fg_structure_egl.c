@@ -1,7 +1,7 @@
 /*
- * freeglut_display_android.c
+ * freeglut_structure_egl.c
  *
- * Display message posting, context buffer swapping.
+ * Windows and menus need tree structure
  *
  * Copyright (C) 2012  Sylvain Beucler
  *
@@ -24,13 +24,11 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "fg_internal.h"
 
-#include <android/log.h>
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))
+extern SFG_Structure fgStructure;
 
-void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
+void fgPlatformCreateWindow ( SFG_Window *window )
 {
-  /* LOGI("Swap!"); */
-  eglSwapBuffers( pDisplayPtr->eglDisplay, CurrentWindow->Window.pContext.eglSurface );
+  window->Window.pContext.eglSurface = EGL_NO_SURFACE;
 }
