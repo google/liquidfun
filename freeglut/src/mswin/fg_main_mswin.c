@@ -142,7 +142,7 @@ fg_time_t fgPlatformSystemTime ( void )
 
 void fgPlatformSleepForEvents( fg_time_t msec )
 {
-    MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLINPUT );
+    MsgWaitForMultipleObjects( 0, NULL, FALSE, (DWORD) msec, QS_ALLINPUT );
 }
 
 

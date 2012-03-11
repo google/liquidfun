@@ -9,97 +9,97 @@ SET(FREEGLUT_HEADERS
 )
 SET(FREEGLUT_SRCS
 	${FREEGLUT_HEADERS}
-	src/Common/freeglut_callbacks.c
-	src/Common/freeglut_cursor.c
-	src/Common/freeglut_display.c
-	src/Common/freeglut_ext.c
-	src/Common/freeglut_font_data.c
-	src/Common/freeglut_gamemode.c
-	src/Common/freeglut_init.c
-	src/Common/freeglut_internal.h
-	src/Common/freeglut_input_devices.c
-	src/Common/freeglut_joystick.c
-	src/Common/freeglut_main.c
-	src/Common/freeglut_misc.c
-	src/Common/freeglut_overlay.c
-	src/Common/freeglut_spaceball.c
-	src/Common/freeglut_state.c
-	src/Common/freeglut_stroke_mono_roman.c
-	src/Common/freeglut_stroke_roman.c
-	src/Common/freeglut_structure.c
-	src/Common/freeglut_videoresize.c
-	src/Common/freeglut_window.c
+	src/fg_callbacks.c
+	src/fg_cursor.c
+	src/fg_display.c
+	src/fg_ext.c
+	src/fg_font_data.c
+	src/fg_gamemode.c
+	src/fg_init.c
+	src/fg_internal.h
+	src/fg_input_devices.c
+	src/fg_joystick.c
+	src/fg_main.c
+	src/fg_misc.c
+	src/fg_overlay.c
+	src/fg_spaceball.c
+	src/fg_state.c
+	src/fg_stroke_mono_roman.c
+	src/fg_stroke_roman.c
+	src/fg_structure.c
+	src/fg_videoresize.c
+	src/fg_window.c
 )
 # Android port requires adding a version of these compatible with
 # OpenGL ES (TODO):
 IF(NOT ANDROID)
        LIST(APPEND FREEGLUT_SRCS
-               src/Common/freeglut_font.c
-               src/Common/freeglut_geometry.c
-               src/Common/freeglut_menu.c
-               src/Common/freeglut_teapot.c
+               src/fg_font.c
+               src/fg_geometry.c
+               src/fg_menu.c
+               src/fg_teapot.c
 )
 ENDIF()
 
-IF(WIN32)
+IF(WIN32)   # TODO: is this true for 64 bit as well? Chaneg to WINDOWS?
 	LIST(APPEND FREEGLUT_SRCS
-		src/Common/xparsegeometry_repl.c
-		src/Common/xparsegeometry_repl.h
-		src/mswin/freeglut_cursor_mswin.c
-		src/mswin/freeglut_display_mswin.c
-		src/mswin/freeglut_ext_mswin.c
-		src/mswin/freeglut_gamemode_mswin.c
-		src/mswin/freeglut_init_mswin.c
-		src/mswin/freeglut_internal_mswin.h
-		src/mswin/freeglut_input_devices_mswin.c
-		src/mswin/freeglut_joystick_mswin.c
-		src/mswin/freeglut_main_mswin.c
-		src/mswin/freeglut_menu_mswin.c
-		src/mswin/freeglut_spaceball_mswin.c
-		src/mswin/freeglut_state_mswin.c
-		src/mswin/freeglut_structure_mswin.c
-		src/mswin/freeglut_window_mswin.c
+		src/util/xparsegeometry_repl.c  # TODO: instead of this, detect if function is available and include if not
+		src/util/xparsegeometry_repl.h
+		src/mswin/fg_cursor_mswin.c
+		src/mswin/fg_display_mswin.c
+		src/mswin/fg_ext_mswin.c
+		src/mswin/fg_gamemode_mswin.c
+		src/mswin/fg_init_mswin.c
+		src/mswin/fg_internal_mswin.h
+		src/mswin/fg_input_devices_mswin.c
+		src/mswin/fg_joystick_mswin.c
+		src/mswin/fg_main_mswin.c
+		src/mswin/fg_menu_mswin.c
+		src/mswin/fg_spaceball_mswin.c
+		src/mswin/fg_state_mswin.c
+		src/mswin/fg_structure_mswin.c
+		src/mswin/fg_window_mswin.c
 )
 ELSEIF(ANDROID)
        LIST(APPEND FREEGLUT_SRCS
-               src/Common/xparsegeometry_repl.c
-               src/Common/xparsegeometry_repl.h
-               src/egl/freeglut_internal_egl.h
-               src/egl/freeglut_display_egl.c
-               src/egl/freeglut_init_egl.c
-               src/egl/freeglut_structure_egl.c
-               src/egl/freeglut_window_egl.c
+               src/util/xparsegeometry_repl.c
+               src/util/xparsegeometry_repl.h
+               src/egl/fg_internal_egl.h
+               src/egl/fg_display_egl.c
+               src/egl/fg_init_egl.c
+               src/egl/fg_structure_egl.c
+               src/egl/fg_window_egl.c
                src/android/native_app_glue/android_native_app_glue.c
                src/android/native_app_glue/android_native_app_glue.h
-               src/android/freeglut_runtime_android.c
-               src/android/freeglut_gamemode_android.c
-               src/android/freeglut_input_devices_android.c
-               src/android/freeglut_joystick_android.c
-               src/android/freeglut_main_android.c
-               src/android/freeglut_spaceball_android.c
-               src/android/freeglut_state_android.c
-               src/android/freeglut_window_android.c
+               src/android/fg_runtime_android.c
+               src/android/fg_gamemode_android.c
+               src/android/fg_input_devices_android.c
+               src/android/fg_joystick_android.c
+               src/android/fg_main_android.c
+               src/android/fg_spaceball_android.c
+               src/android/fg_state_android.c
+               src/android/fg_window_android.c
                src/android/opengles_stubs.c
-               src/android/freeglut_internal_android.h
+               src/android/fg_internal_android.h
 )
 ELSE()
 	LIST(APPEND FREEGLUT_SRCS
-		src/x11/freeglut_cursor_x11.c
-		src/x11/freeglut_display_x11.c
-		src/x11/freeglut_ext_x11.c
-		src/x11/freeglut_gamemode_x11.c
-		src/x11/freeglut_glutfont_definitions_x11.c
-		src/x11/freeglut_init_x11.c
-		src/x11/freeglut_internal_x11.h
-		src/x11/freeglut_input_devices_x11.c
-		src/x11/freeglut_joystick_x11.c
-		src/x11/freeglut_main_x11.c
-		src/x11/freeglut_menu_x11.c
-		src/x11/freeglut_spaceball_x11.c
-		src/x11/freeglut_state_x11.c
-		src/x11/freeglut_structure_x11.c
-		src/x11/freeglut_window_x11.c
-		src/x11/freeglut_xinput_x11.c
+		src/x11/fg_cursor_x11.c
+		src/x11/fg_display_x11.c
+		src/x11/fg_ext_x11.c
+		src/x11/fg_gamemode_x11.c
+		src/x11/fg_glutfont_definitions_x11.c
+		src/x11/fg_init_x11.c
+		src/x11/fg_internal_x11.h
+		src/x11/fg_input_devices_x11.c
+		src/x11/fg_joystick_x11.c
+		src/x11/fg_main_x11.c
+		src/x11/fg_menu_x11.c
+		src/x11/fg_spaceball_x11.c
+		src/x11/fg_state_x11.c
+		src/x11/fg_structure_x11.c
+		src/x11/fg_window_x11.c
+		src/x11/fg_xinput_x11.c
 )
 
 
