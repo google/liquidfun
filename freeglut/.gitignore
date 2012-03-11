@@ -1,0 +1,32 @@
+Makefile.in
+Makefile
+INSTALL
+.deps
+aclocal.m4
+autom4te.cache
+compile
+config.guess
+config.sub
+configure
+configure.cache
+config.log
+config.status
+# config.h.in is now static and used with CMake, keep it:
+#config.h.in
+config.h
+depcomp
+install-sh
+ltmain.sh
+missing
+stamp-h1
+*.tar
+*.tar.gz
+*.tar.bz2
+*.zip
+*.o
+*.a
+*~
+# my build dirs:
+cross-android
+cross-woe
+native
