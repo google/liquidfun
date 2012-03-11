@@ -122,17 +122,25 @@ void fgPlatformDisplayWindow ( SFG_Window *window )
 }
 
 
-unsigned long fgPlatformSystemTime ( void )
+fg_time_t fgPlatformSystemTime ( void )
 {
 #if defined(_WIN32_WCE)
     return GetTickCount();
 #else
+    /* TODO: do this with QueryPerformanceCounter as timeGetTime has
+     * insufficient resolution (only about 5 ms on system under low load).
+     * See:
+     * http://msdn.microsoft.com/en-us/library/windows/desktop/dd757629(v=vs.85).aspx
+     * Or maybe QueryPerformanceCounter is not a good idea either, see
+     * http://old.nabble.com/Re%3A-glutTimerFunc-does-not-detect-if-system-time-moved-backward-p33479674.html
+     * for some other ideas (at bottom)...
+     */
     return timeGetTime();
 #endif
 }
 
 
-void fgPlatformSleepForEvents( long msec )
+void fgPlatformSleepForEvents( fg_time_t msec )
 {
     MsgWaitForMultipleObjects( 0, NULL, FALSE, msec, QS_ALLINPUT );
 }

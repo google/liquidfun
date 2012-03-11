@@ -123,15 +123,15 @@
 /* Use EGL (implies OpenGL ES) */
 /* TODO: EGL/GLES builds should be more generally defined, possibly by
    generating this file dynamically */
-#include <EGL/egl.h>
+#   include <EGL/egl.h>
 /* TODO: we probably need 2 builds: -lGLESv1 and -lGLESv2 */
 /* #include <GLES/gl.h> */
-#include <GLES2/gl2.h>
+#   include <GLES2/gl2.h>
 /* TODO: temporary work-around for e.g. glutWireCube */
-#define GLdouble     GLfloat
+#   define GLdouble     GLfloat
 #else
-#include <GL/gl.h>
-#include <GL/glu.h>
+#   include <GL/gl.h>
+#   include <GL/glu.h>
 #endif
 
 /*

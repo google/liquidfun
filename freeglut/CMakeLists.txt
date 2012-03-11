@@ -159,6 +159,7 @@ ENDIF()
 
 INCLUDE(CheckIncludeFiles)
 INCLUDE(CheckFunctionExists)
+INCLUDE(CheckTypeSize)
 CHECK_INCLUDE_FILES(sys/types.h HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(unistd.h 	HAVE_UNISTD_H)
 CHECK_INCLUDE_FILES(sys/time.h 	HAVE_SYS_TIME_H)
@@ -169,8 +170,13 @@ CHECK_INCLUDE_FILES(fcntl.h 	HAVE_FCNTL_H)
 CHECK_INCLUDE_FILES(errno.h 	HAVE_ERRNO_H)
 CHECK_INCLUDE_FILES(usbhid.h 	HAVE_USBHID_H)
 CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
-CHECK_FUNCTION_EXISTS(vfprintf HAVE_VFPRINTF)
-CHECK_FUNCTION_EXISTS(_doprnt HAVE_DOPRNT)
+CHECK_FUNCTION_EXISTS(vfprintf  HAVE_VFPRINTF)
+CHECK_FUNCTION_EXISTS(_doprnt   HAVE_DOPRNT)
+# decide on suitable type for internal time keeping, 64-bit if possible
+CHECK_INCLUDE_FILES(stdint.h    HAVE_STDINT_H)
+CHECK_INCLUDE_FILES(inttypes.h  HAVE_INTTYPES_H)
+CHECK_TYPE_SIZE("unsigned long long" ULONG_LONG BUILTIN_TYPES_ONLY)
+
 
 # The generated config.h is placed in the project's build directory, just to
 # ensure that all CMake-generated files are kept away from the main source tree.

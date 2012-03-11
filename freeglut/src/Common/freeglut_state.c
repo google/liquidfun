@@ -128,7 +128,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
         return fgState.Initialised;
 
     case GLUT_ELAPSED_TIME:
-        return fgElapsedTime();
+        return (int) fgElapsedTime();
     }
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGet" );

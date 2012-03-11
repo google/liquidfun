@@ -154,8 +154,20 @@
 #endif
 
 /* General defines */
-
 #define INVALID_MODIFIERS 0xffffffff
+
+/* FreeGLUT internal time type */
+#if defined(HAVE_STDINT_H)
+#   include <stdint.h>
+    typedef uint64_t fg_time_t;
+#elif defined(HAVE_INTTYPES_H)
+#   include <inttypes.h>
+    typedef uint64_t fg_time_t;
+#elif defined(HAVE_ULONG_LONG)
+    typedef unsigned long long fg_time_t;
+#else
+    typedef unsigned long fg_time_t;
+#endif
 
 
 
@@ -278,7 +290,7 @@ struct tagSFG_State
     GLuint           SwapCount;            /* Count of glutSwapBuffer calls  */
     GLuint           SwapTime;             /* Time of last SwapBuffers       */
 
-    unsigned long    Time;                 /* Time that glutInit was called  */
+    fg_time_t        Time;                 /* Time that glutInit was called  */
     SFG_List         Timers;               /* The freeglut timer hooks       */
     SFG_List         FreeTimers;           /* The unused timer hooks         */
 
@@ -333,7 +345,7 @@ struct tagSFG_Timer
     SFG_Node        Node;
     int             ID;                 /* The timer ID integer              */
     FGCBTimer       Callback;           /* The timer callback                */
-    long            TriggerTime;        /* The timer trigger time            */
+    fg_time_t       TriggerTime;        /* The timer trigger time            */
 };
 
 /*
@@ -367,7 +379,7 @@ struct tagSFG_WindowState
     int             Cursor;             /* The currently selected cursor     */
 
     long            JoystickPollRate;   /* The joystick polling rate         */
-    long            JoystickLastPoll;   /* When the last poll happened       */
+    fg_time_t       JoystickLastPoll;   /* When the last poll happened       */
 
     int             MouseX, MouseY;     /* The most recent mouse position    */
 
@@ -925,10 +937,10 @@ void fgDeactivateMenu( SFG_Window *window );
 void fgDisplayMenu( void );
 
 /* Elapsed time as per glutGet(GLUT_ELAPSED_TIME). */
-long fgElapsedTime( void );
+fg_time_t fgElapsedTime( void );
 
 /* System time in milliseconds */
-long unsigned fgSystemTime(void);
+fg_time_t fgSystemTime(void);
 
 /* List functions */
 void fgListInit(SFG_List *list);

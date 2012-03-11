@@ -56,8 +56,8 @@
 
 extern void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height );
 extern void fgPlatformDisplayWindow ( SFG_Window *window );
-extern unsigned long fgPlatformSystemTime ( void );
-extern void fgPlatformSleepForEvents( long msec );
+extern fg_time_t fgPlatformSystemTime ( void );
+extern void fgPlatformSleepForEvents( fg_time_t msec );
 extern void fgPlatformProcessSingleEvent ( void );
 extern void fgPlatformMainLoopPreliminaryWork ( void );
 
@@ -161,7 +161,7 @@ static void fghDisplayAll( void )
 static void fghcbCheckJoystickPolls( SFG_Window *window,
                                      SFG_Enumerator *enumerator )
 {
-    long int checkTime = fgElapsedTime( );
+    fg_time_t checkTime = fgElapsedTime( );
 
     if( window->State.JoystickLastPoll + window->State.JoystickPollRate <=
         checkTime )
@@ -193,7 +193,7 @@ static void fghCheckJoystickPolls( void )
  */
 static void fghCheckTimers( void )
 {
-    long checkTime = fgElapsedTime( );
+    fg_time_t checkTime = fgElapsedTime( );
 
     while( fgState.Timers.First )
     {
@@ -210,22 +210,27 @@ static void fghCheckTimers( void )
 }
 
  
-/* Platform-dependent time in milliseconds, as an unsigned 32-bit integer.
+/* Platform-dependent time in milliseconds, as an unsigned 64-bit integer.
+ * This doesn't overflow in any reasonable time, so no need to worry about
+ * that. The GLUT API return value will however overflow after 49.7 days,
+ * and on Windows we (currently) do not have access to a 64-bit timestamp,
+ * which means internal time will still get in trouble when running the
+ * application for more than 49.7 days.
  * This value wraps every 49.7 days, but integer overflows cancel
  * when subtracting an initial start time, unless the total time exceeds
  * 32-bit, where the GLUT API return value is also overflowed.
  */  
-unsigned long fgSystemTime(void)
+fg_time_t fgSystemTime(void)
 {
-	return fgPlatformSystemTime ();
+	return fgPlatformSystemTime();
 }
   
 /*
  * Elapsed Time
  */
-long fgElapsedTime( void )
+fg_time_t fgElapsedTime( void )
 {
-    return (long) (fgSystemTime() - fgState.Time);
+    return fgSystemTime() - fgState.Time;
 }
 
 /*
@@ -342,22 +347,23 @@ static int fghHavePendingRedisplays (void)
 /*
  * Returns the number of GLUT ticks (milliseconds) till the next timer event.
  */
-static long fghNextTimer( void )
+static fg_time_t fghNextTimer( void )
 {
-    long ret = INT_MAX;
+    fg_time_t currentTime = fgElapsedTime();
     SFG_Timer *timer = fgState.Timers.First;
 
-    if( timer )
-        ret = timer->TriggerTime - fgElapsedTime();
-    if( ret < 0 )
-        ret = 0;
+    if( !timer )
+        return INT_MAX;
 
-    return ret;
+    if( timer->TriggerTime < currentTime )
+        return 0;
+    else
+        return timer->TriggerTime - currentTime;
 }
 
 static void fghSleepForEvents( void )
 {
-    long msec;
+    fg_time_t msec;
 
     if( fgState.IdleCallback || fghHavePendingRedisplays( ) )
         return;
