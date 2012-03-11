@@ -119,8 +119,20 @@
 /*
  * Always include OpenGL and GLU headers
  */
+#ifdef ANDROID
+/* Use EGL (implies OpenGL ES) */
+/* TODO: EGL/GLES builds should be more generally defined, possibly by
+   generating this file dynamically */
+#include <EGL/egl.h>
+/* TODO: we probably need 2 builds: -lGLESv1 and -lGLESv2 */
+/* #include <GLES/gl.h> */
+#include <GLES2/gl2.h>
+/* TODO: temporary work-around for e.g. glutWireCube */
+#define GLdouble     GLfloat
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
 
 /*
  * GLUT API macro definitions -- the special key codes:

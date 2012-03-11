@@ -145,11 +145,13 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     window->Window.DoubleBuffered =
         ( fgState.DisplayMode & GLUT_DOUBLE ) ? 1 : 0;
 
+#ifndef EGL_VERSION_1_0  /* No glDrawBuffer/glReadBuffer in GLES */
     if ( ! window->Window.DoubleBuffered )
     {
         glDrawBuffer ( GL_FRONT );
         glReadBuffer ( GL_FRONT );
     }
+#endif
 }
 
 /*

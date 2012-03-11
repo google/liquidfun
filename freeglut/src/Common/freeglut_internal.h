@@ -47,6 +47,9 @@
     || ( defined(__CYGWIN__) && defined(X_DISPLAY_MISSING) )
 #   define  TARGET_HOST_MS_WINDOWS 1
 
+#elif defined (ANDROID)
+#   define  TARGET_HOST_ANDROID  1
+
 #elif defined(__posix__) || defined(__unix__) || defined(__linux__) || defined(__sun)
 #   define  TARGET_HOST_POSIX_X11  1
 
@@ -162,6 +165,9 @@
 #endif
 #if TARGET_HOST_MS_WINDOWS
 #include "../mswin/freeglut_internal_mswin.h"
+#endif
+#if TARGET_HOST_ANDROID
+#include "../android/freeglut_internal_android.h"
 #endif
 
 
