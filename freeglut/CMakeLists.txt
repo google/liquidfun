@@ -199,8 +199,10 @@ IF(WIN32)
 	ENDIF()
 ELSE()
 	# on UNIX we need to make sure:
-	# - all shared libraries must have a soname/version (see
-    #   http://sourceware.org/autobook/autobook/autobook_91.html#SEC91)
+	# - all shared libraries must have a soname/version, see :
+	#   http://sourceware.org/autobook/autobook/autobook_91.html#SEC91
+	#   http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+	#   Current: -version-info 12:0:9 -> 3.9.0
 	# - the output library should be named glut so it'll be linkable with -lglut
 	# - the shared library should link to the dependency libraries so that the user
 	#   won't have to link them explicitly (they shouldn't have to know that we depend
