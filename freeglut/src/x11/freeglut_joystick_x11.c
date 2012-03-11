@@ -34,7 +34,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "../fg_internal.h"
 #ifdef HAVE_SYS_PARAM_H
 #    include <sys/param.h>
 #endif

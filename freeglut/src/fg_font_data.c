@@ -51,7 +51,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "fg_internal.h"
 
 /*
  * The following bitmapped fonts are defined in this file:

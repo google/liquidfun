@@ -27,7 +27,7 @@
 
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "fg_internal.h"
 
 extern SFG_Proc fgPlatformGetProcAddress( const char *procName );
 extern GLUTproc fgPlatformGetGLUTProcAddress( const char *procName );

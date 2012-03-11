@@ -71,7 +71,7 @@
 #undef glutBitmapHelvetica12
 #undef glutBitmapHelvetica18
 
-#include "../Common/freeglut_internal.h"
+#include "../fg_internal.h"
 
 struct freeglutStrokeFont
 {

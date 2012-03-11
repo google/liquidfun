@@ -27,7 +27,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "../fg_internal.h"
 #ifdef HAVE_ERRNO_H
 #    include <errno.h>
 #endif

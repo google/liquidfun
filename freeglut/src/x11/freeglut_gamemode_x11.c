@@ -27,7 +27,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "../fg_internal.h"
 
 static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
 {

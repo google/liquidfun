@@ -26,7 +26,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "../fg_internal.h"
 
 
 extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,

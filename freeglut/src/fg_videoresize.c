@@ -26,7 +26,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "fg_internal.h"
 
 /*
  * NOTE: functions declared in this file probably will not be implemented.

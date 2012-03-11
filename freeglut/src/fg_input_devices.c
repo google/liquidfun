@@ -33,7 +33,7 @@
 #endif
 
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "fg_internal.h"
 
 typedef struct _serialport SERIALPORT;
 

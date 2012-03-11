@@ -1,5 +1,5 @@
 /*
- * freeglut_internal.h
+ * fg_internal.h
  *
  * The freeglut library private include file.
  *
@@ -173,13 +173,13 @@
 
 /* Platform-specific includes */
 #if TARGET_HOST_POSIX_X11
-#include "../x11/freeglut_internal_x11.h"
+#include "x11/fg_internal_x11.h"
 #endif
 #if TARGET_HOST_MS_WINDOWS
-#include "../mswin/freeglut_internal_mswin.h"
+#include "mswin/fg_internal_mswin.h"
 #endif
 #if TARGET_HOST_ANDROID
-#include "../android/freeglut_internal_android.h"
+#include "android/fg_internal_android.h"
 #endif
 
 

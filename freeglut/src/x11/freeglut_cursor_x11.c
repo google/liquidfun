@@ -26,7 +26,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "../Common/freeglut_internal.h"
+#include "../fg_internal.h"
 
 /* This code is for Posix/X11, Solaris, and OSX */
 #include <X11/cursorfont.h>

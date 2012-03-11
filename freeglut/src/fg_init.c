@@ -27,7 +27,7 @@
 
 #define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "fg_internal.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -316,7 +316,7 @@ void fgDeinitialize( void )
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 #if !TARGET_HOST_POSIX_X11
-#   include "../Common/xparsegeometry_repl.h"
+#   include "util/xparsegeometry_repl.h"
 #endif
 
 /*

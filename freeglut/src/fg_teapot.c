@@ -73,8 +73,8 @@
  */
 
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
-#include "freeglut_teapot_data.h"
+#include "fg_internal.h"
+#include "fg_teapot_data.h"
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 

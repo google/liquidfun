@@ -8,7 +8,7 @@
  */
 
 #include <GL/freeglut.h>
-#include "freeglut_internal.h"
+#include "fg_internal.h"
 
 /* -- PRIVATE FUNCTIONS --------------------------------------------------- */
 

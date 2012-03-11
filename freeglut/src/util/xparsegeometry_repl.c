@@ -32,7 +32,7 @@ from The Open Group.
 
 */
 
-#include "../Common/xparsegeometry_repl.h"
+#include "xparsegeometry_repl.h"
 
 /*
  *   XParseGeometry parses strings of the form
