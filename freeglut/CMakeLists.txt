@@ -43,8 +43,6 @@ ENDIF()
 
 IF(WIN32)   # TODO: is this true for 64 bit as well? Chaneg to WINDOWS?
 	LIST(APPEND FREEGLUT_SRCS
-		src/util/xparsegeometry_repl.c  # TODO: instead of this, detect if function is available and include if not
-		src/util/xparsegeometry_repl.h
 		src/mswin/fg_cursor_mswin.c
 		src/mswin/fg_display_mswin.c
 		src/mswin/fg_ext_mswin.c
@@ -61,26 +59,24 @@ IF(WIN32)   # TODO: is this true for 64 bit as well? Chaneg to WINDOWS?
 		src/mswin/fg_window_mswin.c
 )
 ELSEIF(ANDROID)
-       LIST(APPEND FREEGLUT_SRCS
-               src/util/xparsegeometry_repl.c
-               src/util/xparsegeometry_repl.h
-               src/egl/fg_internal_egl.h
-               src/egl/fg_display_egl.c
-               src/egl/fg_init_egl.c
-               src/egl/fg_structure_egl.c
-               src/egl/fg_window_egl.c
-               src/android/native_app_glue/android_native_app_glue.c
-               src/android/native_app_glue/android_native_app_glue.h
-               src/android/fg_runtime_android.c
-               src/android/fg_gamemode_android.c
-               src/android/fg_input_devices_android.c
-               src/android/fg_joystick_android.c
-               src/android/fg_main_android.c
-               src/android/fg_spaceball_android.c
-               src/android/fg_state_android.c
-               src/android/fg_window_android.c
-               src/android/opengles_stubs.c
-               src/android/fg_internal_android.h
+    LIST(APPEND FREEGLUT_SRCS
+        src/egl/fg_internal_egl.h
+        src/egl/fg_display_egl.c
+        src/egl/fg_init_egl.c
+        src/egl/fg_structure_egl.c
+        src/egl/fg_window_egl.c
+        src/android/native_app_glue/android_native_app_glue.c
+        src/android/native_app_glue/android_native_app_glue.h
+        src/android/fg_runtime_android.c
+        src/android/fg_gamemode_android.c
+        src/android/fg_input_devices_android.c
+        src/android/fg_joystick_android.c
+        src/android/fg_main_android.c
+        src/android/fg_spaceball_android.c
+        src/android/fg_state_android.c
+        src/android/fg_window_android.c
+        src/android/opengles_stubs.c
+        src/android/fg_internal_android.h
 )
 ELSE()
 	LIST(APPEND FREEGLUT_SRCS
@@ -172,6 +168,13 @@ CHECK_INCLUDE_FILES(usbhid.h 	HAVE_USBHID_H)
 CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
 CHECK_FUNCTION_EXISTS(vfprintf  HAVE_VFPRINTF)
 CHECK_FUNCTION_EXISTS(_doprnt   HAVE_DOPRNT)
+CHECK_FUNCTION_EXISTS(XParseGeometry   HAVE_XPARSEGEOMETRY)
+IF (NOT HAVE_XPARSEGEOMETRY)
+   LIST(APPEND FREEGLUT_SRCS
+		src/util/xparsegeometry_repl.c
+		src/util/xparsegeometry_repl.h)
+   SET(NEED_XPARSEGEOMETRY_IMPL TRUE)
+ENDIF()
 # decide on suitable type for internal time keeping, 64-bit if possible
 CHECK_INCLUDE_FILES(stdint.h    HAVE_STDINT_H)
 CHECK_INCLUDE_FILES(inttypes.h  HAVE_INTTYPES_H)

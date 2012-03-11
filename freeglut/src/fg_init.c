@@ -315,7 +315,7 @@ void fgDeinitialize( void )
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
-#if !TARGET_HOST_POSIX_X11
+#if defined(NEED_XPARSEGEOMETRY_IMPL)
 #   include "util/xparsegeometry_repl.h"
 #endif
 
