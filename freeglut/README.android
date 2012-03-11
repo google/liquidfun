@@ -1,0 +1,61 @@
+Create a module compatible with the NDK build-system
+====================================================
+
+- Use your own cross-compiler for Android, or export the one from the
+  NDK:
+
+  /usr/src/android-ndk-r7/build/tools/make-standalone-toolchain.sh \
+    --platform=android-9 \
+    --install-dir=/usr/src/ndk-standalone-9
+
+- Build FreeGLUT with a '/freeglut' prefix :
+
+  PATH=/usr/src/ndk-standalone-9/bin:$PATH
+  cd /usr/src/freeglut-3.0.0/
+  cmake \
+    -D CMAKE_TOOLCHAIN_FILE=android_toolchain.cmake \
+    -D CMAKE_INSTALL_PREFIX=/freeglut \
+    -D FREEGLUT_GLES2=ON \
+    -D FREEGLUT_BUILD_DEMOS=NO \
+    .
+  make -j4
+  make install DESTDIR=$(pwd)
+
+- Copy Android.mk in the new 'freeglut/' directory :
+
+  cp android/Android.mk freeglut/
+
+- Reference this module in your jni/Android.mk:
+
+  LOCAL_STATIC_LIBRARIES := ... freeglut
+  ...
+  $(call import-module,freeglut)
+
+- You now can point your NDK_MODULE_PATH to this module!
+
+  ndk-build NDK_MODULE_PATH=/usr/src/freeglut-3.0.0/freeglut/
+
+
+Compile FreeGLUT for a traditional cross-compiler environment
+=============================================================
+
+- Use your own cross-compiler for Android, or export the one from the
+  NDK:
+
+  /usr/src/android-ndk-r7/build/tools/make-standalone-toolchain.sh \
+    --platform=android-9 \
+    --install-dir=/usr/src/ndk-standalone-9
+
+- Compile FreeGLUT and install it in your Android cross-compiler path:
+
+  PATH=/usr/src/ndk-standalone-9/bin:$PATH
+  ./configure --host=arm-linux-androideabi --prefix=/usr/src/ndk-standalone-9
+  make
+  make install
+
+- Compile your own project, for instance if you use the autotools:
+
+  PATH=/usr/src/ndk-standalone-9/bin:$PATH
+  ./configure --host=arm-linux-androideabi --prefix=/somewhere
+  make
+  make install
