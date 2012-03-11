@@ -55,6 +55,12 @@ case "${host}" in
 	GL_LIBS="-lEGL -lGLESv2"
 	LIBXXF86VM=
 	LIBXI=
+	#CFLAGS="$CFLAGS"
+	# '-mandroid' is not mandatory but doesn't hurt
+	# '-O0 -gstabs+' helps the currently buggy GDB port, better
+	#   remove it for releases
+	# '-DANDROID' is the Android build system convention
+	CFLAGS="-mandroid -O0 -gstabs+"
 	CPPFLAGS="$CPPFLAGS -DANDROID"
 	AM_CONDITIONAL(TARGET_HOST_ANDROID, true)
 	;;
@@ -83,7 +89,7 @@ AC_SUBST(LIBUSBHID)
 AC_HEADER_STDC
 save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-AC_CHECK_HEADERS([usbhid.h libusbhid.h errno.h GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
+AC_CHECK_HEADERS([usbhid.h libusbhid.h errno.h GL/gl.h GL/glu.h GL/glx.h GLES/gl.h GLES2/gl2.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
 AC_HEADER_TIME
 AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [], [], [#include <X11/Xlib.h>])
 AC_CHECK_HEADERS([X11/extensions/Xrandr.h])
