@@ -31,6 +31,9 @@ int main(int argc, char **argv)
 
 	glutDisplayFunc(disp);
 
+    /* get timer started, its reset in the timer function itself */
+    glutTimerFunc(1000, timer_func, 0);
+
 	glutMainLoop();
 	return 0;
 }
@@ -40,8 +43,6 @@ void disp(void)
 	glClearColor(color[cidx][0], color[cidx][1], color[cidx][2], 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	/* set the timer callback and ask glut to call it in 1 second */
-	glutTimerFunc(1000, timer_func, 0);
 	glutSwapBuffers();
 }
 
@@ -50,4 +51,7 @@ void timer_func(int unused)
 	/* advance the color index and trigger a redisplay */
 	cidx = (cidx + 1) % (sizeof color / sizeof *color);
 	glutPostRedisplay();
+
+	/* (re)set the timer callback and ask glut to call it in 1 second */
+	glutTimerFunc(1000, timer_func, 0);
 }

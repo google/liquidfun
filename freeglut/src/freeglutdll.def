@@ -144,8 +144,8 @@ EXPORTS
 	glutInitContextFlags
 	glutInitContextVersion
 	glutInitContextProfile
-    glutInitErrorFunc
-    glutInitWarningFunc
+	glutInitErrorFunc
+	glutInitWarningFunc
 	__glutInitWithExit
 	__glutCreateWindowWithExit
 	__glutCreateMenuWithExit
