@@ -1,6 +1,10 @@
 PROJECT(freeglut)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+
+
 SET(FREEGLUT_HEADERS
 	include/GL/freeglut.h
 	include/GL/freeglut_ext.h
@@ -305,3 +309,33 @@ ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c
                          progs/demos/spaceball/vmath.h)
 ADD_DEMO(subwin          progs/demos/subwin/subwin.c)
 ADD_DEMO(timer           progs/demos/timer/timer.c)
+
+# finally, if any demos are built, copy needed files to output directory
+# (currently, 1) dll, and 2) input for Fractals demo)
+IF(FREEGLUT_BUILD_DEMOS)
+    # 1) copy dll. Make it an action to occur after freeglut dll is
+    # built, otherwise we'd have to hijack one of the demos above to do
+    # it. Not sure whats cleaner really... MSVC only for now...
+    GET_TARGET_PROPERTY(DEMO_OUTPUT_DIRECTORY CallbackMaker RUNTIME_OUTPUT_DIRECTORY)
+    GET_TARGET_PROPERTY(LIB_OUTPUT_DIRECTORY freeglut LIBRARY_OUTPUT_DIRECTORY)
+    if(MSVC AND BUILD_SHARED_LIBS)
+        # $(Configuration) gets replaced by MSBuild (not by CMake) with
+        # Debug, Release or whatever the current build is.
+        ADD_CUSTOM_COMMAND(
+            TARGET freeglut
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${LIB_OUTPUT_DIRECTORY}/$(Configuration)/freeglut${CMAKE_SHARED_LIBRARY_SUFFIX}
+            ${DEMO_OUTPUT_DIRECTORY}/$(Configuration)
+        )
+    ENDIF()
+
+    # 2) copy fractals.dat from freeglut/progs/demos/Fractals
+    ADD_CUSTOM_COMMAND(
+        TARGET freeglut
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${PROJECT_SOURCE_DIR}/progs/demos/Fractals/fractals.dat
+        ${DEMO_OUTPUT_DIRECTORY}/$(Configuration)
+    )
+ENDIF()
