@@ -33,15 +33,15 @@ SET(FREEGLUT_SRCS
 # Android port requires adding a version of these compatible with
 # OpenGL ES (TODO):
 IF(NOT ANDROID)
-       LIST(APPEND FREEGLUT_SRCS
-               src/fg_font.c
-               src/fg_geometry.c
-               src/fg_menu.c
-               src/fg_teapot.c
+    LIST(APPEND FREEGLUT_SRCS
+        src/fg_font.c
+        src/fg_geometry.c
+        src/fg_menu.c
+        src/fg_teapot.c
 )
 ENDIF()
 
-IF(WIN32)   # TODO: is this true for 64 bit as well? Chaneg to WINDOWS?
+IF(WIN32)
 	LIST(APPEND FREEGLUT_SRCS
 		src/mswin/fg_cursor_mswin.c
 		src/mswin/fg_display_mswin.c
@@ -209,11 +209,15 @@ ENDIF()
 IF(WIN32)
 	LIST(APPEND LIBS winmm)
 	IF(BUILD_SHARED_LIBS)
-		LIST(APPEND FREEGLUT_SRCS src/Common/freeglutdll.def freeglut.rc)
-		# XXX I assume that if we want both shared and static this one is appropriate
-		ADD_DEFINITIONS(-DFREEGLUT_EXPORTS)
-	ELSE()
-		ADD_DEFINITIONS(-DFREEGLUT_STATIC)
+		LIST(APPEND FREEGLUT_SRCS freeglut.rc)
+        IF (NOT CMAKE_CL_64)
+            # .def file only for 32bit Windows builds
+            LIST(APPEND FREEGLUT_SRCS src/Common/freeglutdll.def)
+        ENDIF()
+		SET_TARGET_PROPERTIES(freeglut PROPERTIES COMPILE_FLAGS -DFREEGLUT_EXPORTS)
+	ENDIF()
+    IF(BUILD_STATIC_LIBS)
+    	SET_TARGET_PROPERTIES(freeglut_static PROPERTIES COMPILE_FLAGS -DFREEGLUT_STATIC)
 	ENDIF()
 ELSE()
 	# on UNIX we need to make sure:
@@ -276,6 +280,7 @@ MACRO(ADD_DEMO name)
         IF(BUILD_STATIC_LIBS)
             ADD_EXECUTABLE(${name}_static ${ARGN})
             TARGET_LINK_LIBRARIES(${name}_static ${DEMO_LIBS} freeglut_static)
+            SET_TARGET_PROPERTIES(${name}_static PROPERTIES COMPILE_FLAGS -DFREEGLUT_STATIC)
         ENDIF()
     ENDIF()
 ENDMACRO()
