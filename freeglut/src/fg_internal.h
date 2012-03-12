@@ -163,6 +163,8 @@
 #elif defined(HAVE_INTTYPES_H)
 #   include <inttypes.h>
     typedef uint64_t fg_time_t;
+#elif defined(HAVE_U__INT64)
+    typedef unsigned __int64 fg_time_t;
 #elif defined(HAVE_ULONG_LONG)
     typedef unsigned long long fg_time_t;
 #else

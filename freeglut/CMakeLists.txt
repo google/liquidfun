@@ -178,7 +178,16 @@ ENDIF()
 # decide on suitable type for internal time keeping, 64-bit if possible
 CHECK_INCLUDE_FILES(stdint.h    HAVE_STDINT_H)
 CHECK_INCLUDE_FILES(inttypes.h  HAVE_INTTYPES_H)
-CHECK_TYPE_SIZE("unsigned long long" ULONG_LONG BUILTIN_TYPES_ONLY)
+IF (NOT (HAVE_STDINT_H OR HAVE_INTTYPES_H))
+    IF (MSVC)
+        # Some old Microsoft VC don't support unsigned long long, but all we
+        # care about support unsigned __int64, so test for presence of that
+        # type
+        CHECK_TYPE_SIZE("unsigned __int64" U__INT64 BUILTIN_TYPES_ONLY)
+    ELSEIF()
+        CHECK_TYPE_SIZE("unsigned long long" ULONG_LONG BUILTIN_TYPES_ONLY)
+    ENDIF()
+ENDIF()
 
 
 # The generated config.h is placed in the project's build directory, just to

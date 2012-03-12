@@ -16,3 +16,4 @@
 #cmakedefine HAVE_STDINT_H
 #cmakedefine HAVE_INTTYPES_H
 #cmakedefine HAVE_ULONG_LONG
+#cmakedefine HAVE_U__INT64
