@@ -1,5 +1,5 @@
 LIBRARY freeglut
-VERSION 2.6
+VERSION 3.0
 EXPORTS
 	glutInit
 	glutInitWindowPosition
@@ -144,8 +144,8 @@ EXPORTS
 	glutInitContextFlags
 	glutInitContextVersion
 	glutInitContextProfile
-        glutInitErrorFunc
-        glutInitWarningFunc
+    glutInitErrorFunc
+    glutInitWarningFunc
 	__glutInitWithExit
 	__glutCreateWindowWithExit
 	__glutCreateMenuWithExit

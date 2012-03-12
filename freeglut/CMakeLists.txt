@@ -38,7 +38,7 @@ IF(NOT ANDROID)
         src/fg_geometry.c
         src/fg_menu.c
         src/fg_teapot.c
-)
+    )
 ENDIF()
 
 IF(WIN32)
@@ -57,7 +57,15 @@ IF(WIN32)
 		src/mswin/fg_state_mswin.c
 		src/mswin/fg_structure_mswin.c
 		src/mswin/fg_window_mswin.c
-)
+        freeglut.rc
+    )
+    IF (NOT CMAKE_CL_64)
+        # .def file only for 32bit Windows builds
+        LIST(APPEND FREEGLUT_SRCS
+            src/freeglutdll.def
+        )
+    ENDIF()
+
 ELSEIF(ANDROID)
     LIST(APPEND FREEGLUT_SRCS
         src/egl/fg_internal_egl.h
@@ -77,7 +85,7 @@ ELSEIF(ANDROID)
         src/android/fg_window_android.c
         src/android/opengles_stubs.c
         src/android/fg_internal_android.h
-)
+    )
 ELSE()
 	LIST(APPEND FREEGLUT_SRCS
 		src/x11/fg_cursor_x11.c
@@ -96,9 +104,7 @@ ELSE()
 		src/x11/fg_structure_x11.c
 		src/x11/fg_window_x11.c
 		src/x11/fg_xinput_x11.c
-)
-
-
+    )
 ENDIF()
 
 # Neatly organize all of the output files in the build directory
@@ -209,15 +215,24 @@ ENDIF()
 IF(WIN32)
 	LIST(APPEND LIBS winmm)
 	IF(BUILD_SHARED_LIBS)
-		LIST(APPEND FREEGLUT_SRCS freeglut.rc)
-        IF (NOT CMAKE_CL_64)
-            # .def file only for 32bit Windows builds
-            LIST(APPEND FREEGLUT_SRCS src/Common/freeglutdll.def)
-        ENDIF()
 		SET_TARGET_PROPERTIES(freeglut PROPERTIES COMPILE_FLAGS -DFREEGLUT_EXPORTS)
+        IF (CMAKE_CL_64)
+            # 64bit build
+            SET_TARGET_PROPERTIES(freeglut PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
+        ELSE()
+            # 32bit build
+            SET_TARGET_PROPERTIES(freeglut PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x86")
+        ENDIF()
 	ENDIF()
     IF(BUILD_STATIC_LIBS)
     	SET_TARGET_PROPERTIES(freeglut_static PROPERTIES COMPILE_FLAGS -DFREEGLUT_STATIC)
+        IF (CMAKE_CL_64)
+            # 64bit build
+            SET_TARGET_PROPERTIES(freeglut_static PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
+        ELSE()
+            # 32bit build
+            SET_TARGET_PROPERTIES(freeglut_static PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x86")
+        ENDIF()
 	ENDIF()
 ELSE()
 	# on UNIX we need to make sure:
