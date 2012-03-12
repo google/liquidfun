@@ -216,22 +216,14 @@ IF(WIN32)
 	LIST(APPEND LIBS winmm)
 	IF(BUILD_SHARED_LIBS)
 		SET_TARGET_PROPERTIES(freeglut PROPERTIES COMPILE_FLAGS -DFREEGLUT_EXPORTS)
-        IF (CMAKE_CL_64)
-            # 64bit build
-            SET_TARGET_PROPERTIES(freeglut PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
-        ELSE()
-            # 32bit build
-            SET_TARGET_PROPERTIES(freeglut PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x86")
-        ENDIF()
 	ENDIF()
     IF(BUILD_STATIC_LIBS)
     	SET_TARGET_PROPERTIES(freeglut_static PROPERTIES COMPILE_FLAGS -DFREEGLUT_STATIC)
+        # need to set machine:x64 for linker, at least for VC10, and
+        # doesn't hurt for older compilers:
+        # http://public.kitware.com/Bug/view.php?id=11240#c22768
         IF (CMAKE_CL_64)
-            # 64bit build
             SET_TARGET_PROPERTIES(freeglut_static PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
-        ELSE()
-            # 32bit build
-            SET_TARGET_PROPERTIES(freeglut_static PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x86")
         ENDIF()
 	ENDIF()
 ELSE()
