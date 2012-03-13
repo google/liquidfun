@@ -1,8 +1,15 @@
 PROJECT(freeglut)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+# NOTE: On Windows and Cygwin, the dll's are placed in the
+# CMAKE_RUNTIME_OUTPUT_DIRECTORY, while their corresponding import
+# libraries end up in CMAKE_ARCHIVE_OUTPUT_DIRECTORY. On other
+# platforms, such as Linux, the shared libraries are put in
+# CMAKE_ARCHIVE_OUTPUT_DIRECTORY instead.
+# Static libraries end up in CMAKE_ARCHIVE_OUTPUT_DIRECTORY on all
+# platforms (unless 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 
 SET(FREEGLUT_HEADERS
@@ -111,12 +118,9 @@ ELSE()
     )
 ENDIF()
 
-# Neatly organize all of the output files in the build directory
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
-
 # BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
 # re-declare it here so it will show up in the GUI.
+# by default, we want to build both
 OPTION(BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
 OPTION(BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
 
@@ -207,7 +211,6 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
 ADD_DEFINITIONS(-DHAVE_CONFIG_H)
 
-# by default, at least on UNIX, we want to build both
 IF(BUILD_SHARED_LIBS)
 	ADD_LIBRARY(freeglut SHARED ${FREEGLUT_SRCS})
 ENDIF()
@@ -311,31 +314,20 @@ ADD_DEMO(subwin          progs/demos/subwin/subwin.c)
 ADD_DEMO(timer           progs/demos/timer/timer.c)
 
 # finally, if any demos are built, copy needed files to output directory
-# (currently, 1) dll, and 2) input for Fractals demo)
+# (currently, thats just the input file for the Fractals demo)
 IF(FREEGLUT_BUILD_DEMOS)
-    # 1) copy dll. Make it an action to occur after freeglut dll is
-    # built, otherwise we'd have to hijack one of the demos above to do
-    # it. Not sure whats cleaner really... MSVC only for now...
-    GET_TARGET_PROPERTY(DEMO_OUTPUT_DIRECTORY CallbackMaker RUNTIME_OUTPUT_DIRECTORY)
-    GET_TARGET_PROPERTY(LIB_OUTPUT_DIRECTORY freeglut LIBRARY_OUTPUT_DIRECTORY)
-    if(MSVC AND BUILD_SHARED_LIBS)
-        # $(Configuration) gets replaced by MSBuild (not by CMake) with
-        # Debug, Release or whatever the current build is.
-        ADD_CUSTOM_COMMAND(
-            TARGET freeglut
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${LIB_OUTPUT_DIRECTORY}/$(Configuration)/freeglut${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${DEMO_OUTPUT_DIRECTORY}/$(Configuration)
-        )
+    # 1) copy fractals.dat from freeglut/progs/demos/Fractals
+    IF(BUILD_SHARED_LIBS)
+        SET(Frac_target Fractals)
+    ELSE()
+        SET(Frac_target Fractals_static)
     ENDIF()
-
-    # 2) copy fractals.dat from freeglut/progs/demos/Fractals
+    GET_TARGET_PROPERTY(DEMO_OUTPUT_DIRECTORY ${Frac_target} RUNTIME_OUTPUT_DIRECTORY)
     ADD_CUSTOM_COMMAND(
-        TARGET freeglut
+        TARGET ${Frac_target}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${PROJECT_SOURCE_DIR}/progs/demos/Fractals/fractals.dat
-        ${DEMO_OUTPUT_DIRECTORY}/$(Configuration)
+        ${DEMO_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
     )
 ENDIF()
