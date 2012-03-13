@@ -1,4 +1,5 @@
-How to build freeglut with CMake:
+How to build freeglut with CMake on Windows (MS Visual Studio)
+--------------------------------------------------------------
 1.  Download CMake (http://www.cmake.org/cmake/resources/software.html).
     Get one of the releases from the binary distribution section.
 2.  Run the CMake installer, install wherever you like. 
@@ -28,6 +29,26 @@ Open the freeglut.sln file that was generated in your build directory,
 and compile as usual
 
 
+How to build freeglut on UNIX
+-----------------------------
+1.  Make sure you have cmake installed. Examples:
+    - Debian/Ubuntu: apt-get install cmake
+    - Fedora: yum install cmake
+    - FreeBSD: cd /usr/ports/devel/cmake && make install
+    Or directly from their website:
+    http://www.cmake.org/cmake/resources/software.html
+2.  Run cmake . in the freeglut directory to generate the makefile.
+3.  Run make to build, and make install to install, freeglut.
+4.  If you wish to change any build options run ccmake .
 
-Breakdown of CMake configuration options:
-TODO
+
+Breakdown of CMake configuration options
+----------------------------------------
+BUILD_SHARED_LIBS       [ON, OFF] Build freeglut as a shared library
+BUILD_STATIC_LIBS       [ON, OFF] Build freeglut as a static library
+CMAKE_BUILD_TYPE        [Empty, Debug, Release] Can be overriden by passing it
+                        as a make variable during build.
+CMAKE_INSTALL_PREFIX	Installation prefix (e.g. /usr/local on UNIX)
+FREEGLUT_BUILD_DEMOS	[ON, OFF] Controls whether the demos are built or not.
+FREEGLUT_GLES1          [ON, OFF] TODO
+FREEGLUT_GLES2          [ON, OFF] TODO
