@@ -1,0 +1,33 @@
+How to build freeglut with CMake:
+1.  Download CMake (http://www.cmake.org/cmake/resources/software.html).
+    Get one of the releases from the binary distribution section.
+2.  Run the CMake installer, install wherever you like. 
+3.  Launch CMake via Start > Program Files > CMake 2.8 > CMake (GUI)
+    (note that the shortcut put by the installer on your desktop does NOT
+    point to the CMake GUI program!)
+4.  In the "Where is the source code" box, type or browse to the root
+    directory of your freeglut source (so that's /freeglut, not
+    /freeglut/src).
+5.  In the "Where to build the binaries" box, type or browse to any
+    folder you like - this will be where the Visual Studio solution will be
+    generated. This folder does not have to exist yet.
+6.  Hit the Configure button near the bottom of the window. 
+7.  Pick your target compiler, make sure that its installed on your
+    system of course!
+8.  Answer Ok when asked if you want to create the build directory. 
+9.  Wait for the configure process to finish. 
+10. The screen will now have some configuration options on it, for
+    instance specifying whether you want to build static and/or shared
+    libraries (see below for a complete list). When you've selected your
+    options, click the Configure button again.
+11. The Generate button at the bottom will now be enabled. Click Generate.
+12. The build files will now be generated in the location you picked. 
+
+You can now navigate to the build directory you specified in step 5.
+Open the freeglut.sln file that was generated in your build directory,
+and compile as usual
+
+
+
+Breakdown of CMake configuration options:
+TODO
