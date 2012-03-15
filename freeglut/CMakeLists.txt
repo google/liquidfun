@@ -152,7 +152,7 @@ IF (NOT WIN32)
 ENDIF()
 
 IF(WIN32)
-    MESSAGE(WARNING "Insecure CRT warnings hidden (might want to fix these)")
+    # hide insecure CRT warnings, common practice
     ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 ENDIF()
 
