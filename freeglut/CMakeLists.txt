@@ -11,6 +11,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
+# setup version numbers
+# TODO: Update these for each release!
+set(VERSION_MAJOR 3)
+set(VERSION_MINOR 0)
+set(VERSION_PATCH 0)
+
 
 SET(FREEGLUT_HEADERS
 	include/GL/freeglut.h
@@ -68,12 +74,12 @@ IF(WIN32)
 		src/mswin/fg_state_mswin.c
 		src/mswin/fg_structure_mswin.c
 		src/mswin/fg_window_mswin.c
-        freeglut.rc
+        ${CMAKE_BINARY_DIR}/freeglut.rc # generated below from freeglut.rc.in
     )
     IF (NOT CMAKE_CL_64)
         # .def file only for 32bit Windows builds
         LIST(APPEND FREEGLUT_SRCS
-            src/freeglutdll.def
+            ${CMAKE_BINARY_DIR}/freeglutdll.def # generated below from src/freeglutdll.def.in
         )
     ENDIF()
 
@@ -210,6 +216,15 @@ ENDIF()
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
 ADD_DEFINITIONS(-DHAVE_CONFIG_H)
+IF(WIN32)
+    # we also have to generate freeglut.rc, which contains the version
+    # number
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/freeglut.rc.in ${CMAKE_BINARY_DIR}/freeglut.rc)
+    IF (NOT CMAKE_CL_64)
+        # .def file only for 32bit Windows builds
+        CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/freeglutdll.def.in ${CMAKE_BINARY_DIR}/freeglutdll.def)
+    ENDIF()
+ENDIF()
 
 IF(BUILD_SHARED_LIBS)
 	ADD_LIBRARY(freeglut SHARED ${FREEGLUT_SRCS})
