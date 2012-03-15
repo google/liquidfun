@@ -19,33 +19,33 @@ set(VERSION_PATCH 0)
 
 
 SET(FREEGLUT_HEADERS
-	include/GL/freeglut.h
-	include/GL/freeglut_ext.h
-	include/GL/freeglut_std.h
-	include/GL/glut.h
+    include/GL/freeglut.h
+    include/GL/freeglut_ext.h
+    include/GL/freeglut_std.h
+    include/GL/glut.h
 )
 SET(FREEGLUT_SRCS
-	${FREEGLUT_HEADERS}
-	src/fg_callbacks.c
-	src/fg_cursor.c
-	src/fg_display.c
-	src/fg_ext.c
-	src/fg_font_data.c
-	src/fg_gamemode.c
-	src/fg_init.c
-	src/fg_internal.h
-	src/fg_input_devices.c
-	src/fg_joystick.c
-	src/fg_main.c
-	src/fg_misc.c
-	src/fg_overlay.c
-	src/fg_spaceball.c
-	src/fg_state.c
-	src/fg_stroke_mono_roman.c
-	src/fg_stroke_roman.c
-	src/fg_structure.c
-	src/fg_videoresize.c
-	src/fg_window.c
+    ${FREEGLUT_HEADERS}
+    src/fg_callbacks.c
+    src/fg_cursor.c
+    src/fg_display.c
+    src/fg_ext.c
+    src/fg_font_data.c
+    src/fg_gamemode.c
+    src/fg_init.c
+    src/fg_internal.h
+    src/fg_input_devices.c
+    src/fg_joystick.c
+    src/fg_main.c
+    src/fg_misc.c
+    src/fg_overlay.c
+    src/fg_spaceball.c
+    src/fg_state.c
+    src/fg_stroke_mono_roman.c
+    src/fg_stroke_roman.c
+    src/fg_structure.c
+    src/fg_videoresize.c
+    src/fg_window.c
 )
 # Android port requires adding a version of these compatible with
 # OpenGL ES (TODO):
@@ -59,21 +59,21 @@ IF(NOT ANDROID)
 ENDIF()
 
 IF(WIN32)
-	LIST(APPEND FREEGLUT_SRCS
-		src/mswin/fg_cursor_mswin.c
-		src/mswin/fg_display_mswin.c
-		src/mswin/fg_ext_mswin.c
-		src/mswin/fg_gamemode_mswin.c
-		src/mswin/fg_init_mswin.c
-		src/mswin/fg_internal_mswin.h
-		src/mswin/fg_input_devices_mswin.c
-		src/mswin/fg_joystick_mswin.c
-		src/mswin/fg_main_mswin.c
-		src/mswin/fg_menu_mswin.c
-		src/mswin/fg_spaceball_mswin.c
-		src/mswin/fg_state_mswin.c
-		src/mswin/fg_structure_mswin.c
-		src/mswin/fg_window_mswin.c
+    LIST(APPEND FREEGLUT_SRCS
+        src/mswin/fg_cursor_mswin.c
+        src/mswin/fg_display_mswin.c
+        src/mswin/fg_ext_mswin.c
+        src/mswin/fg_gamemode_mswin.c
+        src/mswin/fg_init_mswin.c
+        src/mswin/fg_internal_mswin.h
+        src/mswin/fg_input_devices_mswin.c
+        src/mswin/fg_joystick_mswin.c
+        src/mswin/fg_main_mswin.c
+        src/mswin/fg_menu_mswin.c
+        src/mswin/fg_spaceball_mswin.c
+        src/mswin/fg_state_mswin.c
+        src/mswin/fg_structure_mswin.c
+        src/mswin/fg_window_mswin.c
         ${CMAKE_BINARY_DIR}/freeglut.rc # generated below from freeglut.rc.in
     )
     IF (NOT CMAKE_CL_64)
@@ -104,23 +104,23 @@ ELSEIF(ANDROID)
         src/android/fg_internal_android.h
     )
 ELSE()
-	LIST(APPEND FREEGLUT_SRCS
-		src/x11/fg_cursor_x11.c
-		src/x11/fg_display_x11.c
-		src/x11/fg_ext_x11.c
-		src/x11/fg_gamemode_x11.c
-		src/x11/fg_glutfont_definitions_x11.c
-		src/x11/fg_init_x11.c
-		src/x11/fg_internal_x11.h
-		src/x11/fg_input_devices_x11.c
-		src/x11/fg_joystick_x11.c
-		src/x11/fg_main_x11.c
-		src/x11/fg_menu_x11.c
-		src/x11/fg_spaceball_x11.c
-		src/x11/fg_state_x11.c
-		src/x11/fg_structure_x11.c
-		src/x11/fg_window_x11.c
-		src/x11/fg_xinput_x11.c
+    LIST(APPEND FREEGLUT_SRCS
+        src/x11/fg_cursor_x11.c
+        src/x11/fg_display_x11.c
+        src/x11/fg_ext_x11.c
+        src/x11/fg_gamemode_x11.c
+        src/x11/fg_glutfont_definitions_x11.c
+        src/x11/fg_init_x11.c
+        src/x11/fg_internal_x11.h
+        src/x11/fg_input_devices_x11.c
+        src/x11/fg_joystick_x11.c
+        src/x11/fg_main_x11.c
+        src/x11/fg_menu_x11.c
+        src/x11/fg_spaceball_x11.c
+        src/x11/fg_state_x11.c
+        src/x11/fg_structure_x11.c
+        src/x11/fg_window_x11.c
+        src/x11/fg_xinput_x11.c
     )
 ENDIF()
 
@@ -152,25 +152,25 @@ IF (NOT WIN32)
 ENDIF()
 
 IF(WIN32)
-	MESSAGE(WARNING "Insecure CRT warnings hidden (might want to fix these)")
-	ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+    MESSAGE(WARNING "Insecure CRT warnings hidden (might want to fix these)")
+    ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 ENDIF()
 
 if(UNIX AND NOT ANDROID)
-	FIND_PACKAGE(X11 REQUIRED)
-	LIST(APPEND LIBS ${X11_LIBRARIES})
-	IF(X11_Xrandr_FOUND)
-		SET(HAVE_X11_EXTENSIONS_XRANDR_H TRUE)
-		LIST(APPEND LIBS ${X11_Xrandr_LIB})
-	ENDIF()
-	IF(X11_xf86vmode_FOUND)
-		SET(HAVE_X11_EXTENSIONS_XF86VMODE_H TRUE)
-		# Work-around http://www.cmake.org/Bug/bug_view_page.php?bug_id=6976
-		IF(NOT "${X11_Xxf86vm_LIB}")
-			SET(X11_Xxf86vm_LIB "Xxf86vm")
-		ENDIF()
-		LIST(APPEND LIBS ${X11_Xxf86vm_LIB})
-	ENDIF()
+    FIND_PACKAGE(X11 REQUIRED)
+    LIST(APPEND LIBS ${X11_LIBRARIES})
+    IF(X11_Xrandr_FOUND)
+        SET(HAVE_X11_EXTENSIONS_XRANDR_H TRUE)
+        LIST(APPEND LIBS ${X11_Xrandr_LIB})
+    ENDIF()
+    IF(X11_xf86vmode_FOUND)
+        SET(HAVE_X11_EXTENSIONS_XF86VMODE_H TRUE)
+        # Work-around http://www.cmake.org/Bug/bug_view_page.php?bug_id=6976
+        IF(NOT "${X11_Xxf86vm_LIB}")
+            SET(X11_Xxf86vm_LIB "Xxf86vm")
+        ENDIF()
+        LIST(APPEND LIBS ${X11_Xxf86vm_LIB})
+    ENDIF()
 ENDIF()
 
 INCLUDE(CheckIncludeFiles)
@@ -191,8 +191,8 @@ CHECK_FUNCTION_EXISTS(_doprnt   HAVE_DOPRNT)
 CHECK_FUNCTION_EXISTS(XParseGeometry   HAVE_XPARSEGEOMETRY)
 IF (NOT HAVE_XPARSEGEOMETRY)
    LIST(APPEND FREEGLUT_SRCS
-		src/util/xparsegeometry_repl.c
-		src/util/xparsegeometry_repl.h)
+        src/util/xparsegeometry_repl.c
+        src/util/xparsegeometry_repl.h)
    SET(NEED_XPARSEGEOMETRY_IMPL TRUE)
 ENDIF()
 # decide on suitable type for internal time keeping, 64-bit if possible
@@ -227,52 +227,52 @@ IF(WIN32)
 ENDIF()
 
 IF(BUILD_SHARED_LIBS)
-	ADD_LIBRARY(freeglut SHARED ${FREEGLUT_SRCS})
+    ADD_LIBRARY(freeglut SHARED ${FREEGLUT_SRCS})
 ENDIF()
 IF(BUILD_STATIC_LIBS)
-	ADD_LIBRARY(freeglut_static STATIC ${FREEGLUT_SRCS})
+    ADD_LIBRARY(freeglut_static STATIC ${FREEGLUT_SRCS})
 ENDIF()
 
 
 IF(WIN32)
-	LIST(APPEND LIBS winmm)
-	IF(BUILD_SHARED_LIBS)
-		SET_TARGET_PROPERTIES(freeglut PROPERTIES COMPILE_FLAGS -DFREEGLUT_EXPORTS)
-	ENDIF()
+    LIST(APPEND LIBS winmm)
+    IF(BUILD_SHARED_LIBS)
+        SET_TARGET_PROPERTIES(freeglut PROPERTIES COMPILE_FLAGS -DFREEGLUT_EXPORTS)
+    ENDIF()
     IF(BUILD_STATIC_LIBS)
-    	SET_TARGET_PROPERTIES(freeglut_static PROPERTIES COMPILE_FLAGS -DFREEGLUT_STATIC)
+        SET_TARGET_PROPERTIES(freeglut_static PROPERTIES COMPILE_FLAGS -DFREEGLUT_STATIC)
         # need to set machine:x64 for linker, at least for VC10, and
         # doesn't hurt for older compilers:
         # http://public.kitware.com/Bug/view.php?id=11240#c22768
         IF (CMAKE_CL_64)
             SET_TARGET_PROPERTIES(freeglut_static PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
         ENDIF()
-	ENDIF()
+    ENDIF()
 ELSE()
-	# on UNIX we need to make sure:
-	# - all shared libraries must have a soname/version, see :
-	#   http://sourceware.org/autobook/autobook/autobook_91.html#SEC91
-	#   http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-	#   Current: -version-info 12:0:9 -> 3.9.0
-	# - the output library should be named glut so it'll be linkable with -lglut
-	# - the shared library should link to the dependency libraries so that the user
-	#   won't have to link them explicitly (they shouldn't have to know that we depend
-	#   on Xrandr or Xxf86vm)
-	SET_TARGET_PROPERTIES(freeglut PROPERTIES VERSION 3.9.0 SOVERSION 3 OUTPUT_NAME glut)
-	SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME glut)
-	IF(ANDROID)
-		# Not in CMake toolchain file, because the toolchain
-		# file is called several times and generally doesn't
-		# seem to be meant for it:
-		# '-mandroid' is not mandatory but doesn't hurt
-		# '-O0 -gstabs+' helps the currently buggy GDB port
-		# '-DANDROID' is the Android build system convention
-		# Too late to manipulate ENV: SET(ENV{CFLAGS} "$ENV{CFLAGS} -mandroid")
-		# Not using _INIT variables, they seem to be used internally only
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mandroid")
-		SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -gstabs+")
-		ADD_DEFINITIONS(-DANDROID)
-	ENDIF()
+    # on UNIX we need to make sure:
+    # - all shared libraries must have a soname/version, see :
+    #   http://sourceware.org/autobook/autobook/autobook_91.html#SEC91
+    #   http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+    #   Current: -version-info 12:0:9 -> 3.9.0
+    # - the output library should be named glut so it'll be linkable with -lglut
+    # - the shared library should link to the dependency libraries so that the user
+    #   won't have to link them explicitly (they shouldn't have to know that we depend
+    #   on Xrandr or Xxf86vm)
+    SET_TARGET_PROPERTIES(freeglut PROPERTIES VERSION 3.9.0 SOVERSION 3 OUTPUT_NAME glut)
+    SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME glut)
+    IF(ANDROID)
+        # Not in CMake toolchain file, because the toolchain
+        # file is called several times and generally doesn't
+        # seem to be meant for it:
+        # '-mandroid' is not mandatory but doesn't hurt
+        # '-O0 -gstabs+' helps the currently buggy GDB port
+        # '-DANDROID' is the Android build system convention
+        # Too late to manipulate ENV: SET(ENV{CFLAGS} "$ENV{CFLAGS} -mandroid")
+        # Not using _INIT variables, they seem to be used internally only
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mandroid")
+        SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -gstabs+")
+        ADD_DEFINITIONS(-DANDROID)
+    ENDIF()
 ENDIF()
 IF(BUILD_SHARED_LIBS)
     TARGET_LINK_LIBRARIES(freeglut ${LIBS})
@@ -282,10 +282,10 @@ IF(BUILD_STATIC_LIBS)
 ENDIF()
 
 IF(BUILD_SHARED_LIBS)
-	INSTALL(TARGETS freeglut DESTINATION lib)
+    INSTALL(TARGETS freeglut DESTINATION lib)
 ENDIF()
 IF(BUILD_STATIC_LIBS)
-	INSTALL(TARGETS freeglut_static DESTINATION lib)
+    INSTALL(TARGETS freeglut_static DESTINATION lib)
 ENDIF()
 INSTALL(FILES ${FREEGLUT_HEADERS} DESTINATION include/GL)
 
