@@ -101,7 +101,7 @@ clean:
 
 
 
-Quelques remarques sur le makefile
+Quelques remarques sur le Makefile
 
     * Ce makefile crée une dll, une bibliothèque statique (une archive, en
       d'autres termes) et la bibliothèque dynamique qui permettra l'utilisation
@@ -150,7 +150,7 @@ Installation
             include, correspondants à Glut, si vous l'avez installé avec Cygwin.
 
 
-Utilisation de la librairie
+Utilisation de la bibliothèque
 
     * Nous allons tester avec le programme shapes, présent dans
       progs/demos/shapes
@@ -214,5 +214,5 @@ Quelque chose a survécu ...
       (paix à ses cendres).
           o Rien de particulier à signaler.
 
-    * Merci à tous les mainteneurs courageux de Freeglut, qu'on croyait mort,
-      mais qui bouge encore.
+    * Merci à tous les mainteneurs courageux de Freeglut, qu'on croyait morts,
+      mais qui bougent encore.

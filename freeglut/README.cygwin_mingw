@@ -8,24 +8,21 @@ Freeglut is an open-source evolution of GLUT.
 Under Windows, one can use it with Cygwin.
 Easy? Yes, if one agrees to distribute "cygwin1.dll".
 Let us help freeglut gain its independence !
-m.à.j 10/7/2009: generation of a library for linking without the DLL.
+Update 10/7/2009: generation of a library for linking without the DLL.
 
 
-Recovery of the sources
+Grabbing the sources
 
-    * Download the sources of version 2.6.0 which integrates recent changes.
-    * For the moment, it is a RC (Release Candidate), but the final version
-      should not delay.
-    * The use of the 2.6 is preferable with the 2.4-stable branch because many
+    * Download the sources for version 2.6.0 which integrates recent changes.
+    * Using version 2.6 is better than the 2.4-stable branch because many
       bugs have been corrected.
     * You will find the sources on the site of Freeglut:
           o http://freeglut.sourceforge.net/
 
 
-Objectives and preparation
-Objectives
+Goals
 
-    * We will create a DLL related to Cygwin, and an independent static library
+    * We will create a DLL for Cygwin, and an independent static library
     * We will also create a dynamic library, allowing linking with the DLL.
 
 
@@ -67,7 +64,7 @@ Compilation
     * Here Makefile which will make the deal:
 
 #Makefile for Freeglut 2.6.0-rc and Cygwin
-#To place in the directory “src/Common”
+#To place in the directory 'src/Common'
 
 sources=$ (wildcard *.c)
 objs=$ (sources: .c=.o)
@@ -81,25 +78,25 @@ nocyg=-mno-cygwin - mwindows
 
 all: $ (objs)
         #construction DLL related to cygwin1.dll
-        GCC $ (nocyg) $ (objs) - shared $ (LDFLAGS) - O $ (libname) .dll
-        Nm $ (libname) .dll  | awk “BEGIN {print “EXPORTS”} /T _glut/{sub (/^.*T _/,” \ T "); print}” > $ (libname) .def
-        dlltool --dllname $ (libname) .dll --input-def $ (libname) .def --output-lib lib$ (libname) dll.a
+        gcc $(nocyg) $(objs) -shared $(LDFLAGS) -o $(libname).dll
+        nm $(libname).dll  | awk 'BEGIN { print "EXPORTS" } /T _glut/ {sub( /^.*T _/, "\t"); print}' > $(libname).def
+        dlltool --dllname $(libname).dll --input-def $(libname).def --output-lib lib$(libname)dll.a
 
         #construction static library independent of cygwin
-        rear Cr lib$ (libname) .a $ (objs)
+        ar cr lib$(libname).a $(objs)
         #pas inevitably obligatory (creation of an index to accelerate the accesses)
-        ranlib lib$ (libname) .a
+        ranlib lib$(libname).a
 
 %.o: %.c
-        GCC $ (nocyg) - C $ (CFLAGS) $<
+        gcc $(nocyg) -c $(CFLAGS) $<
 
 clean:
-        rm - F *.o $ (libname) .dll $ (libname) .def lib$ (libname) dll.a lib$ (libname) .a
+        rm -f *.o $(libname).dll $(libname).def lib$(libname)dll.a lib$(libname).a
 
 
 
 
-Some remarks on the makefile
+Some remarks on the Makefile
 
     * This makefile creates a DLL, a static library (a file, in other words) and
       the dynamic library which will allow the use of the DLL.
@@ -127,8 +124,8 @@ Some remarks on the makefile
             library the functions that are not related to freeglut.
           o then, one uses dlltool in a very traditional way.
 
-Nm $ (libname) .dll  | awk “BEGIN {print “EXPORTS”} /T _glut/{sub (/^.*T _/,” \ T "); print}” > $ (libname) .def
-dlltool --dllname $ (libname) .dll --input-def $ (libname) .def --output-lib lib$ (libname) dll.a
+nm $(libname).dll  | awk 'BEGIN { print "EXPORTS" } /T _glut/ {sub( /^.*T _/, "\t"); print}' > $(libname).def
+dlltool --dllname $(libname).dll --input-def $(libname).def --output-lib lib$(libname)dll.a
 
 
 
@@ -202,7 +199,7 @@ Where are the dooooocs?
           o http://jocelyn.frechot.free.fr/freeglut/
 
 
-Something survived…
+Something survived...
 
     * I also tested the recompiling of the demonstrations of the original lib
       GLUT (peace with its ashes).
