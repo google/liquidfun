@@ -220,8 +220,8 @@ IF(WIN32)
     # we also have to generate freeglut.rc, which contains the version
     # number
     CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/freeglut.rc.in ${CMAKE_BINARY_DIR}/freeglut.rc)
-    IF (NOT CMAKE_CL_64)
-        # .def file only for 32bit Windows builds
+    IF (MSVC AND NOT CMAKE_CL_64)
+        # .def file only for 32bit Windows builds with Visual Studio
         CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/freeglutdll.def.in ${CMAKE_BINARY_DIR}/freeglutdll.def)
     ENDIF()
 ENDIF()
