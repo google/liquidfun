@@ -32,5 +32,6 @@
 void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
 {
   /* LOGI("Swap!"); */
-  eglSwapBuffers( pDisplayPtr->eglDisplay, CurrentWindow->Window.pContext.eglSurface );
+  if (!eglSwapBuffers(pDisplayPtr->eglDisplay, CurrentWindow->Window.pContext.eglSurface))
+    fgError("eglSwapBuffers: error %x\n", eglGetError());
 }
