@@ -85,10 +85,10 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       0,                      /* MouseWheelTicks */
                       1,                      /* AuxiliaryBufferNumber */
                       4,                      /* SampleNumber */
-                      1,                      /* MajorVersion */
-                      0,                      /* MinorVersion */
-                      0,                      /* ContextFlags */
-                      0,                      /* ContextProfile */
+                      1,                      /* OpenGL context MajorVersion */
+                      0,                      /* OpenGL context MinorVersion */
+                      0,                      /* OpenGL ContextFlags */
+                      0,                      /* OpenGL ContextProfile */
                       NULL,                   /* ErrorFunc */
                       NULL                    /* WarningFunc */
 };
