@@ -263,15 +263,13 @@ ELSE()
     IF(ANDROID)
         # Not in CMake toolchain file, because the toolchain
         # file is called several times and generally doesn't
-        # seem to be meant for it:
+        # seem to be meant for modifying CFLAGS:
         # '-mandroid' is not mandatory but doesn't hurt
         # '-O0 -gstabs+' helps the currently buggy GDB port
-        # '-DANDROID' is the Android build system convention
         # Too late to manipulate ENV: SET(ENV{CFLAGS} "$ENV{CFLAGS} -mandroid")
         # Not using _INIT variables, they seem to be used internally only
         SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mandroid")
         SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -gstabs+")
-        ADD_DEFINITIONS(-DANDROID)
     ENDIF()
 ENDIF()
 IF(BUILD_SHARED_LIBS)
@@ -346,3 +344,15 @@ IF(FREEGLUT_BUILD_DEMOS)
         ${DEMO_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
     )
 ENDIF()
+
+# pkg-config support, to install at $(libdir)/pkgconfig
+# Define static build dependencies
+IF(WIN32)
+  SET(LIBS_PRIVATE "-lopengl32 -lwinmm -lgdi32")
+ELSEIF(ANDROID)
+  SET(LIBS_PRIVATE "-llog -landroid -lGLESv2 -lEGL")
+ELSE()
+  SET(LIBS_PRIVATE "-lX11 -lXxf86vm -lXrandr -lGLESv2 -lEGL")
+ENDIF()
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/freeglut.pc.in ${CMAKE_BINARY_DIR}/freeglut.pc @ONLY)
+INSTALL(FILES ${CMAKE_BINARY_DIR}/freeglut.pc DESTINATION share/pkgconfig)

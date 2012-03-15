@@ -83,9 +83,23 @@ Compile FreeGLUT for a traditional cross-compiler environment
   make -j4
   make install
 
-- Compile your own project, for instance if you use the autotools:
+- Compile your own project.
+
+For instance if you use the autotools:
 
   PATH=/usr/src/ndk-standalone-9/bin:$PATH
   ./configure --host=arm-linux-androideabi --prefix=/somewhere
   make
+  make install
+
+If you use CMake, you may want to copy our Android toolchain
+'android_toolchain.cmake':
+
+  cp .../android_toolchain.cmake .
+  cmake \
+    -D CMAKE_TOOLCHAIN_FILE=android_toolchain.cmake
+    -D CMAKE_INSTALL_PREFIX=/somewhere \
+    -D MY_PROG_OPTION=something ... \
+    .
+  make -j4
   make install
