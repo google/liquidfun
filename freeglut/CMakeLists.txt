@@ -356,3 +356,4 @@ ELSE()
 ENDIF()
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/freeglut.pc.in ${CMAKE_BINARY_DIR}/freeglut.pc @ONLY)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/freeglut.pc DESTINATION share/pkgconfig)
+# TODO: change the library name when building for GLES, e.g. -lglut-GLES2
