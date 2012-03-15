@@ -97,6 +97,7 @@
 
 /*
  * Context-related flags, see freeglut_state.c
+ * Set the requested OpenGL version
  */
 #define  GLUT_INIT_MAJOR_VERSION            0x0200
 #define  GLUT_INIT_MINOR_VERSION            0x0201
