@@ -126,9 +126,9 @@ static GLdouble cube_v[CUBE_NUM_VERT][3] =
 /* Normal Vectors */
 static GLdouble cube_n[CUBE_NUM_FACES][3] =
 {
+    { 0.0, 0.0, 1.0},
     { 1.0, 0.0, 0.0},
     { 0.0, 1.0, 0.0},
-    { 0.0, 0.0, 1.0},
     {-1.0, 0.0, 0.0},
     { 0.0,-1.0, 0.0},
     { 0.0, 0.0,-1.0}
