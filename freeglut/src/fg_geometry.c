@@ -94,7 +94,10 @@ static void fghDrawGeometry(GLenum vertexMode, double* vertices, double* normals
 
 
 /* -- INTERNAL SETUP OF GEOMETRY --------------------------------------- */
-/* -- first the cachable ones -- */
+static unsigned int ipow (int x, unsigned int y)
+{
+    return y==0? 1: y==1? x: (y%2? x: 1) * ipow(x*x, y/2);
+}
 
 /* Magic Numbers:  r0 = ( 1, 0, 0 )
  *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
@@ -106,9 +109,11 @@ static void fghDrawGeometry(GLenum vertexMode, double* vertices, double* normals
  * Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
 */
 
-/* -- TetraHedron -- */
+/* -- Tetrahedron -- */
 #define TETR_NUM_FACES          4
 #define TETR_NUM_VERT_PER_FACE  3
+#define TETR_VERT_PER_TETR      TETR_NUM_FACES*TETR_NUM_VERT_PER_FACE
+#define TETR_VERT_ELEM_PER_TETR TETR_VERT_PER_TETR*3
 
 /* Vertex Coordinates */
 static GLdouble tet_r[TETR_NUM_FACES][TETR_NUM_VERT_PER_FACE] =
@@ -132,30 +137,66 @@ static GLubyte tet_n[TETR_NUM_FACES] =
 
 /* Cache of input to glDrawArrays */
 static GLboolean tetrCached = FALSE;
-static double tetr_verts[TETR_NUM_FACES * TETR_NUM_VERT_PER_FACE * 3];
-static double tetr_norms[TETR_NUM_FACES * TETR_NUM_VERT_PER_FACE * 3];
+static double tetr_verts[TETR_VERT_ELEM_PER_TETR];
+static double tetr_norms[TETR_VERT_ELEM_PER_TETR];
 
-static void fghTetrahedronCache()
+static void fghTetrahedronGenerate()
 {
-    int p,q;
+    int i,j;
     /*
     * Build array with vertices from vertex coordinates and vertex indices 
     * Do same for normals.
     * Need to do this because of different normals at shared vertices
     * (and because normals' coordinates need to be negated).
     */
-    for (p=0; p<TETR_NUM_FACES; p++)
+    for (i=0; i<TETR_NUM_FACES; i++)
     {
-        for (q=0; q<TETR_NUM_VERT_PER_FACE; q++)
+        for (j=0; j<TETR_NUM_VERT_PER_FACE; j++)
         {
-            int idx = p*TETR_NUM_VERT_PER_FACE*3+q*3;
-            tetr_verts[idx  ] =  tet_r[tet_i[p][q]][0];
-            tetr_verts[idx+1] =  tet_r[tet_i[p][q]][1];
-            tetr_verts[idx+2] =  tet_r[tet_i[p][q]][2];
+            int idx = i*TETR_NUM_VERT_PER_FACE*3+j*3;
+            tetr_verts[idx  ] =  tet_r[tet_i[i][j]][0];
+            tetr_verts[idx+1] =  tet_r[tet_i[i][j]][1];
+            tetr_verts[idx+2] =  tet_r[tet_i[i][j]][2];
 
-            tetr_norms[idx  ] = -tet_r[tet_n[p]][0];
-            tetr_norms[idx+1] = -tet_r[tet_n[p]][1];
-            tetr_norms[idx+2] = -tet_r[tet_n[p]][2];
+            tetr_norms[idx  ] = -tet_r[tet_n[i]][0];
+            tetr_norms[idx+1] = -tet_r[tet_n[i]][1];
+            tetr_norms[idx+2] = -tet_r[tet_n[i]][2];
+        }
+    }
+}
+
+/* -- Sierpinski Sponge -- */
+static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLdouble scale, double* vertices, double* normals )
+{
+    int i, j;
+    if ( numLevels == 0 )
+    {
+        for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
+        {
+            for ( j = 0; j < TETR_NUM_VERT_PER_FACE; j++ )
+            {
+                int idx = i*TETR_NUM_VERT_PER_FACE*3+j*3;
+                vertices[idx  ] =  offset[0] + scale * tet_r[tet_i[i][j]][0];
+                vertices[idx+1] =  offset[1] + scale * tet_r[tet_i[i][j]][1];
+                vertices[idx+2] =  offset[2] + scale * tet_r[tet_i[i][j]][2];
+
+                normals[idx  ] = -tet_r[tet_n[i]][0];
+                normals[idx+1] = -tet_r[tet_n[i]][1];
+                normals[idx+2] = -tet_r[tet_n[i]][2];
+            }
+        }
+    }
+    else if ( numLevels > 0 )
+    {
+        GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
+        unsigned int stride = ipow(4,--numLevels)*TETR_VERT_ELEM_PER_TETR;
+        scale /= 2.0 ;
+        for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
+        {
+            local_offset[0] = offset[0] + scale * tet_r[i][0];
+            local_offset[1] = offset[1] + scale * tet_r[i][1];
+            local_offset[2] = offset[2] + scale * tet_r[i][2];
+            fghSierpinskiSpongeGenerate ( numLevels, local_offset, scale, vertices+i*stride, normals+i*stride );
         }
     }
 }
@@ -219,9 +260,32 @@ static void fghCircleTable(double **sint,double **cost,const int n)
 static void fghTetrahedron( GLboolean useWireMode )
 {
     if (!tetrCached)
-        fghTetrahedronCache();
+        fghTetrahedronGenerate();
 
-    fghDrawGeometry(GL_TRIANGLES,tetr_verts,tetr_norms,TETR_NUM_FACES*TETR_NUM_VERT_PER_FACE,useWireMode);
+    fghDrawGeometry(GL_TRIANGLES,tetr_verts,tetr_norms,TETR_VERT_PER_TETR,useWireMode);
+}
+
+static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble scale, GLboolean useWireMode )
+{
+    double      *vertices;
+    double      * normals;
+    unsigned int  numTetr = numLevels<0? 0 : ipow(4,numLevels); /* No sponge for numLevels below 0 */
+    unsigned int  numVert = numTetr*TETR_VERT_PER_TETR;
+
+    if (numTetr)
+    {
+        /* Allocate memory */
+        vertices = malloc(numVert*3 * sizeof(double));
+        normals  = malloc(numVert*3 * sizeof(double));
+
+        /* Generate elements */
+        fghSierpinskiSpongeGenerate ( numLevels, offset, scale, vertices, normals );
+
+        /* Draw and cleanup */
+        fghDrawGeometry(GL_TRIANGLES,vertices,normals,numVert,useWireMode);
+        free(vertices);
+        free(normals );
+    }
 }
 
 
@@ -1196,84 +1260,6 @@ void FGAPIENTRY glutSolidRhombicDodecahedron( void )
   glEnd () ;
 }
 
-void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
-{
-  int i, j ;
-
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSierpinskiSponge" );
-
-  if ( num_levels == 0 )
-  {
-
-    for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
-    {
-      glBegin ( GL_LINE_LOOP ) ;
-      glNormal3d ( -tet_r[i][0], -tet_r[i][1], -tet_r[i][2] ) ;
-      for ( j = 0; j < 3; j++ )
-      {
-        double x = offset[0] + scale * tet_r[tet_i[i][j]][0] ;
-        double y = offset[1] + scale * tet_r[tet_i[i][j]][1] ;
-        double z = offset[2] + scale * tet_r[tet_i[i][j]][2] ;
-        glVertex3d ( x, y, z ) ;
-      }
-
-      glEnd () ;
-    }
-  }
-  else if ( num_levels > 0 )
-  {
-    GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
-    num_levels -- ;
-    scale /= 2.0 ;
-    for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
-    {
-      local_offset[0] = offset[0] + scale * tet_r[i][0] ;
-      local_offset[1] = offset[1] + scale * tet_r[i][1] ;
-      local_offset[2] = offset[2] + scale * tet_r[i][2] ;
-      glutWireSierpinskiSponge ( num_levels, local_offset, scale ) ;
-    }
-  }
-}
-
-void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
-{
-  int i, j ;
-
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSierpinskiSponge" );
-
-  if ( num_levels == 0 )
-  {
-    glBegin ( GL_TRIANGLES ) ;
-
-    for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
-    {
-      glNormal3d ( -tet_r[i][0], -tet_r[i][1], -tet_r[i][2] ) ;
-      for ( j = 0; j < 3; j++ )
-      {
-        double x = offset[0] + scale * tet_r[tet_i[i][j]][0] ;
-        double y = offset[1] + scale * tet_r[tet_i[i][j]][1] ;
-        double z = offset[2] + scale * tet_r[tet_i[i][j]][2] ;
-        glVertex3d ( x, y, z ) ;
-      }
-    }
-
-    glEnd () ;
-  }
-  else if ( num_levels > 0 )
-  {
-    GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
-    num_levels -- ;
-    scale /= 2.0 ;
-    for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
-    {
-      local_offset[0] = offset[0] + scale * tet_r[i][0] ;
-      local_offset[1] = offset[1] + scale * tet_r[i][1] ;
-      local_offset[2] = offset[2] + scale * tet_r[i][2] ;
-      glutSolidSierpinskiSponge ( num_levels, local_offset, scale ) ;
-    }
-  }
-}
-
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
@@ -1282,14 +1268,23 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
 void FGAPIENTRY glutWireTetrahedron( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTetrahedron" );
-
     fghTetrahedron( TRUE );
 }
 void FGAPIENTRY glutSolidTetrahedron( void )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTetrahedron" );
-
     fghTetrahedron( FALSE );
+}
+
+void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSierpinskiSponge" );
+    fghSierpinskiSponge ( num_levels, offset, scale, TRUE );
+}
+void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSierpinskiSponge" );
+    fghSierpinskiSponge ( num_levels, offset, scale, FALSE );
 }
 
 
