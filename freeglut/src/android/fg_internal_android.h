@@ -31,6 +31,23 @@
 /* Android OpenGL ES is accessed through EGL */
 #include "egl/fg_internal_egl.h"
 
+/* -- GLOBAL TYPE DEFINITIONS ---------------------------------------------- */
+/* The structure used by display initialization in freeglut_init.c */
+typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
+struct tagSFG_PlatformDisplay
+{
+  struct tagSFG_PlatformDisplayEGL egl;
+  struct tagSFG_Window* single_window;
+};
+
+typedef struct tagSFG_PlatformContext SFG_PlatformContext;
+/* SFG_PlatformContext is used for SFG_Window.Window */
+struct tagSFG_PlatformContext
+{
+  struct tagSFG_PlatformContextEGL egl;
+};
+
+
 /**
  * Virtual PAD (spots on touchscreen that simulate keys)
  */

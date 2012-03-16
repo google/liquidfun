@@ -100,6 +100,7 @@ ELSEIF(ANDROID)
         src/egl/fg_init_egl.c
         src/egl/fg_structure_egl.c
         src/egl/fg_window_egl.c
+        src/egl/fg_window_egl.h
         src/android/native_app_glue/android_native_app_glue.c
         src/android/native_app_glue/android_native_app_glue.h
         src/android/fg_runtime_android.c

@@ -30,16 +30,11 @@
 
 /* -- GLOBAL TYPE DEFINITIONS ---------------------------------------------- */
 /* The structure used by display initialization in freeglut_init.c */
-typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
 struct tagSFG_Window;
-struct tagSFG_PlatformDisplay
+struct tagSFG_PlatformDisplayEGL
 {
   /* Used to initialize and deinitialize EGL */
-  EGLDisplay          eglDisplay;
-  EGLContext          eglContext;
-  EGLConfig           eglContextConfig;
-  EGLint              eglContextFormat;
-  struct tagSFG_Window* single_window;
+  EGLDisplay          Display;
 };
 
 
@@ -49,11 +44,11 @@ struct tagSFG_PlatformDisplay
  */
 typedef EGLNativeWindowType SFG_WindowHandleType ;
 typedef EGLContext SFG_WindowContextType ;
-typedef struct tagSFG_PlatformContext SFG_PlatformContext;
-/* SFG_PlatformContext is used for SFG_Window.Window */
-struct tagSFG_PlatformContext
+struct tagSFG_PlatformContextEGL
 {
-  EGLSurface          eglSurface;
+  EGLSurface          Surface;
+  EGLConfig           ContextConfig;
+  EGLint              ContextFormat;
 };
 
 

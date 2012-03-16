@@ -1,7 +1,7 @@
 /*
  * freeglut_display_android.c
  *
- * Display message posting, context buffer swapping.
+ * Window management methods for EGL
  *
  * Copyright (C) 2012  Sylvain Beucler
  *
@@ -23,15 +23,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/freeglut.h>
-#include "fg_internal.h"
+#ifndef __FG_WINDOW_EGL_H__
+#define __FG_WINDOW_EGL_H__
 
-#include <android/log.h>
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))
+extern void fghPlatformOpenWindowEGL( SFG_Window* window );
+extern void fghCreateNewContextEGL( SFG_Window* window );
+extern void fghPlatformCloseWindowEGL( SFG_Window* window );
 
-void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
-{
-  /* LOGI("Swap!"); */
-  if (!eglSwapBuffers(pDisplayPtr->egl.Display, CurrentWindow->Window.pContext.egl.Surface))
-    fgError("eglSwapBuffers: error %x\n", eglGetError());
-}
+#endif

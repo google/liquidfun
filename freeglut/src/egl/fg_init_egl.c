@@ -40,15 +40,12 @@ void fgPlatformInitialize( const char* displayName )
   /* CreateDisplay */
   /* Using EGL_DEFAULT_DISPLAY, or a specific native display */
   EGLNativeDisplayType nativeDisplay = EGL_DEFAULT_DISPLAY;
-  fgDisplay.pDisplay.eglDisplay = eglGetDisplay(nativeDisplay);
+  fgDisplay.pDisplay.egl.Display = eglGetDisplay(nativeDisplay);
 
-  FREEGLUT_INTERNAL_ERROR_EXIT(fgDisplay.pDisplay.eglDisplay != EGL_NO_DISPLAY,
+  FREEGLUT_INTERNAL_ERROR_EXIT(fgDisplay.pDisplay.egl.Display != EGL_NO_DISPLAY,
 			       "No display available", "fgPlatformInitialize");
-  if (!eglInitialize(fgDisplay.pDisplay.eglDisplay, NULL, NULL))
+  if (!eglInitialize(fgDisplay.pDisplay.egl.Display, NULL, NULL))
     fgError("eglInitialize: error %x\n", eglGetError());
-
-  /* CreateContext */
-  fghCreateContext();
 
   // fgDisplay.ScreenWidth = ...;
   // fgDisplay.ScreenHeight = ...;
@@ -58,15 +55,9 @@ void fgPlatformInitialize( const char* displayName )
 
 void fgPlatformCloseDisplay ( void )
 {
-  eglMakeCurrent(fgDisplay.pDisplay.eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-  if (fgDisplay.pDisplay.eglContext != EGL_NO_CONTEXT) {
-    eglDestroyContext(fgDisplay.pDisplay.eglDisplay, fgDisplay.pDisplay.eglContext);
-    fgDisplay.pDisplay.eglContext = EGL_NO_CONTEXT;
-  }
-
-  if (fgDisplay.pDisplay.eglDisplay != EGL_NO_DISPLAY) {
-    eglTerminate(fgDisplay.pDisplay.eglDisplay);
-    fgDisplay.pDisplay.eglDisplay = EGL_NO_DISPLAY;
+  if (fgDisplay.pDisplay.egl.Display != EGL_NO_DISPLAY) {
+    eglTerminate(fgDisplay.pDisplay.egl.Display);
+    fgDisplay.pDisplay.egl.Display = EGL_NO_DISPLAY;
   }
 }
 
@@ -76,5 +67,5 @@ void fgPlatformCloseDisplay ( void )
 void fgPlatformDestroyContext ( SFG_PlatformDisplay pDisplay, SFG_WindowContextType MContext )
 {
   if (MContext != EGL_NO_CONTEXT)
-    eglDestroyContext(pDisplay.eglDisplay, MContext);
+    eglDestroyContext(pDisplay.egl.Display, MContext);
 }

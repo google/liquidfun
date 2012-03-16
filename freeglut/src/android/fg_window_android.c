@@ -29,7 +29,7 @@
 #define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "fg_internal.h"
-extern EGLSurface fghEGLPlatformOpenWindow( EGLNativeWindowType handle );
+#include "egl/fg_window_egl.h"
 
 /*
  * Opens a window. Requires a SFG_Window object created and attached
@@ -52,6 +52,8 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     return;
   }
 
+  fghCreateNewContextEGL(window);
+
   /* Wait until window is available and OpenGL context is created */
   /* Normally events are processed through glutMainLoop(), but the
      user didn't call it yet, and the Android may not have initialized
@@ -64,12 +66,21 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     fgPlatformProcessSingleEvent();
   }
 
-  EGLDisplay display = fgDisplay.pDisplay.eglDisplay;
-  EGLint format = fgDisplay.pDisplay.eglContextFormat;
+  EGLDisplay display = fgDisplay.pDisplay.egl.Display;
+  EGLint format = fgDisplay.pDisplay.single_window->Window.pContext.egl.ContextFormat;
   ANativeWindow_setBuffersGeometry(window->Window.Handle, 0, 0, format);
-  window->Window.pContext.eglSurface = fghEGLPlatformOpenWindow(window->Window.Handle);
+  fghPlatformOpenWindowEGL(window);
 
   window->State.Visible = GL_TRUE;
+}
+
+/*
+ * Closes a window, destroying the frame and OpenGL context
+ */
+void fgPlatformCloseWindow( SFG_Window* window )
+{
+  fghPlatformCloseWindowEGL(window);
+  /* Window pre-created by Android, no way to delete it */
 }
 
 void fgPlatformSetWindow ( SFG_Window *window )

@@ -329,7 +329,7 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     break;
   case APP_CMD_WINDOW_RESIZED:
     LOGI("handle_cmd: APP_CMD_WINDOW_RESIZED");
-    if (fgDisplay.pDisplay.single_window->Window.pContext.eglSurface != EGL_NO_SURFACE)
+    if (fgDisplay.pDisplay.single_window->Window.pContext.egl.Surface != EGL_NO_SURFACE)
       /* Make ProcessSingleEvent detect the new size, only available
 	 after the next SwapBuffer */
       glutPostRedisplay();
