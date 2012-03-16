@@ -29,6 +29,9 @@
 #include "fg_internal.h"
 
 /*
+ *
+ * Need more types of polyhedra? See CPolyhedron in MRPT
+ * 
  * TODO BEFORE THE STABLE RELEASE:
  *
  * See fghTetrahedron
@@ -67,7 +70,7 @@
  * useWireMode controls the drawing of solids (false) or wire frame
  * versions (TRUE) of the geometry you pass
  */
-static void fghDrawGeometry(GLenum vertexMode, GLdouble* vertices, GLdouble* normals, GLsizei numVertices, GLboolean useWireMode)
+static void fghDrawGeometry(GLenum vertexMode, GLdouble *vertices, GLdouble *normals, GLboolean *edgeFlags, GLsizei numVertices, GLboolean useWireMode)
 {
     if (useWireMode)
     {
@@ -79,13 +82,19 @@ static void fghDrawGeometry(GLenum vertexMode, GLdouble* vertices, GLdouble* nor
     {
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
+        if (edgeFlags)
+            glEnableClientState(GL_EDGE_FLAG_ARRAY);
 
         glVertexPointer(3, GL_DOUBLE, 0, vertices);
         glNormalPointer(GL_DOUBLE, 0, normals);
+        if (edgeFlags)
+            glEdgeFlagPointer(0,edgeFlags);
         glDrawArrays(vertexMode, 0, numVertices);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
+        if (edgeFlags)
+            glDisableClientState(GL_EDGE_FLAG_ARRAY);
     }
     else
     {
@@ -93,6 +102,7 @@ static void fghDrawGeometry(GLenum vertexMode, GLdouble* vertices, GLdouble* nor
         glBegin(vertexMode);
             for(i=0; i<numVertices; i++)
             {
+                glEdgeFlag(edgeFlags[i]);
                 glNormal3dv(normals+i*3);
                 printf("n(%i) = (%1.4f,%1.4f,%1.4f)\n",i,*(normals+i*3),*(normals+i*3+1),*(normals+i*3+2));
                 glVertex3dv(vertices+i*3);
@@ -107,7 +117,7 @@ static void fghDrawGeometry(GLenum vertexMode, GLdouble* vertices, GLdouble* nor
     }
 }
 
-static void fghGenerateGeometry(int numFaces, int numVertPerFace, GLdouble *vertices, GLubyte* vertIndices, GLdouble *normals, GLdouble *vertOut, GLdouble *normOut)
+static void fghGenerateGeometryWithEdgeFlag(int numFaces, int numEdgePerFace, GLdouble *vertices, GLubyte *vertIndices, GLdouble *normals, GLboolean *edgeFlags, GLdouble *vertOut, GLdouble *normOut, GLboolean *edgeFlagsOut)
 {
     int i,j;
     /*
@@ -119,10 +129,10 @@ static void fghGenerateGeometry(int numFaces, int numVertPerFace, GLdouble *vert
     for (i=0; i<numFaces; i++)
     {
         int normIdx         = i*3;
-        int faceIdxVertIdx  = i*numVertPerFace;
-        for (j=0; j<numVertPerFace; j++)
+        int faceIdxVertIdx  = i*numEdgePerFace; // index to first element of "row" in vertex indices
+        for (j=0; j<numEdgePerFace; j++)
         {
-            int outIdx  = i*numVertPerFace*3+j*3;
+            int outIdx  = i*numEdgePerFace*3+j*3;
             int vertIdx = vertIndices[faceIdxVertIdx+j]*3;
 
             vertOut[outIdx  ] = vertices[vertIdx  ];
@@ -132,8 +142,16 @@ static void fghGenerateGeometry(int numFaces, int numVertPerFace, GLdouble *vert
             normOut[outIdx  ] = normals [normIdx  ];
             normOut[outIdx+1] = normals [normIdx+1];
             normOut[outIdx+2] = normals [normIdx+2];
+
+            if (edgeFlagsOut)
+                edgeFlagsOut[faceIdxVertIdx+j] = edgeFlags[j];
         }
     }
+}
+
+static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLdouble *vertices, GLubyte *vertIndices, GLdouble *normals, GLdouble *vertOut, GLdouble *normOut)
+{
+    fghGenerateGeometryWithEdgeFlag(numFaces, numEdgePerFace, vertices, vertIndices, normals, NULL, vertOut, normOut, NULL);
 }
 
 
@@ -151,9 +169,20 @@ static unsigned int ipow (int x, unsigned int y)
     static GLdouble name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
     static void fgh##nameICaps##Generate()\
     {\
-        fghGenerateGeometry(nameCaps##_NUM_FACES, nameCaps##_NUM_VERT_PER_FACE,\
+        fghGenerateGeometry(nameCaps##_NUM_FACES, nameCaps##_NUM_EDGE_PER_FACE,\
                             name##_v, name##_vi, name##_n,\
                             name##_verts, name##_norms);\
+    }
+#define DECLARE_SHAPE_CACHE_WITH_EDGE_FLAG(name,nameICaps,nameCaps)\
+    static GLboolean name##Cached = FALSE;\
+    static GLdouble  name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLdouble  name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLboolean name##_edgeFlags[nameCaps##_VERT_PER_OBJ];\
+    static void fgh##nameICaps##Generate()\
+    {\
+        fghGenerateGeometryWithEdgeFlag(nameCaps##_NUM_FACES, nameCaps##_NUM_EDGE_PER_FACE,\
+                                        name##_v, name##_vi, name##_n, name##_ef,\
+                                        name##_verts, name##_norms, name##_edgeFlags);\
     }
 /*
  * In general, we build arrays with all vertices or normals.
@@ -164,9 +193,9 @@ static unsigned int ipow (int x, unsigned int y)
 /* -- Cube -- */
 #define CUBE_NUM_VERT           8
 #define CUBE_NUM_FACES          6
-#define CUBE_NUM_VERT_PER_FACE  4
-#define CUBE_VERT_PER_OBJ       CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE
-#define CUBE_VERT_ELEM_PER_OBJ  CUBE_VERT_PER_OBJ*3
+#define CUBE_NUM_EDGE_PER_FACE  4+2   /* 1.5 is overhead factor when drawing quads as triangles */
+#define CUBE_VERT_PER_OBJ       (CUBE_NUM_FACES)*(CUBE_NUM_EDGE_PER_FACE)
+#define CUBE_VERT_ELEM_PER_OBJ  (CUBE_VERT_PER_OBJ)*3
 /* Vertex Coordinates */
 static GLdouble cube_v[CUBE_NUM_VERT*3] =
 {
@@ -193,20 +222,25 @@ static GLdouble cube_n[CUBE_NUM_FACES*3] =
 /* Vertex indices */
 static GLubyte cube_vi[CUBE_VERT_PER_OBJ] =
 {
-    0,1,2,3,
-    0,3,4,5,
-    0,5,6,1,
-    1,6,7,2,
-    7,4,3,2,
-    4,7,6,5
+    0,1,2,0,2,3,
+    0,3,4,0,4,5,
+    0,5,6,0,6,1,
+    1,6,7,1,7,2,
+    7,4,3,7,3,2,
+    4,7,6,4,6,5
 };
-DECLARE_SHAPE_CACHE(cube,Cube,CUBE);
+/* edge flags */
+static GLboolean cube_ef[CUBE_NUM_EDGE_PER_FACE] =
+{
+    1,1,0,0,1,1
+};
+DECLARE_SHAPE_CACHE_WITH_EDGE_FLAG(cube,Cube,CUBE);
 
 /* Icosahedron */
 #define ICOSAHEDRON_NUM_VERT           12
 #define ICOSAHEDRON_NUM_FACES          20
-#define ICOSAHEDRON_NUM_VERT_PER_FACE  3
-#define ICOSAHEDRON_VERT_PER_OBJ       ICOSAHEDRON_NUM_FACES*ICOSAHEDRON_NUM_VERT_PER_FACE
+#define ICOSAHEDRON_NUM_EDGE_PER_FACE  3
+#define ICOSAHEDRON_VERT_PER_OBJ       ICOSAHEDRON_NUM_FACES*ICOSAHEDRON_NUM_EDGE_PER_FACE
 #define ICOSAHEDRON_VERT_ELEM_PER_OBJ  ICOSAHEDRON_VERT_PER_OBJ*3
 /* Vertex Coordinates */
 static GLdouble icosahedron_v[ICOSAHEDRON_NUM_VERT*3] =
@@ -282,8 +316,8 @@ DECLARE_SHAPE_CACHE(icosahedron,Icosahedron,ICOSAHEDRON);
 /* -- Octahedron -- */
 #define OCTAHEDRON_NUM_VERT           6
 #define OCTAHEDRON_NUM_FACES          8
-#define OCTAHEDRON_NUM_VERT_PER_FACE  3
-#define OCTAHEDRON_VERT_PER_OBJ       OCTAHEDRON_NUM_FACES*OCTAHEDRON_NUM_VERT_PER_FACE
+#define OCTAHEDRON_NUM_EDGE_PER_FACE  3
+#define OCTAHEDRON_VERT_PER_OBJ       OCTAHEDRON_NUM_FACES*OCTAHEDRON_NUM_EDGE_PER_FACE
 #define OCTAHEDRON_VERT_ELEM_PER_OBJ  OCTAHEDRON_VERT_PER_OBJ*3
 
 /* Vertex Coordinates */
@@ -328,8 +362,8 @@ DECLARE_SHAPE_CACHE(octahedron,Octahedron,OCTAHEDRON);
 /* -- RhombicDodecahedron -- */
 #define RHOMBICDODECAHEDRON_NUM_VERT            14
 #define RHOMBICDODECAHEDRON_NUM_FACES           12
-#define RHOMBICDODECAHEDRON_NUM_VERT_PER_FACE   4
-#define RHOMBICDODECAHEDRON_VERT_PER_OBJ        RHOMBICDODECAHEDRON_NUM_FACES*RHOMBICDODECAHEDRON_NUM_VERT_PER_FACE
+#define RHOMBICDODECAHEDRON_NUM_EDGE_PER_FACE   4
+#define RHOMBICDODECAHEDRON_VERT_PER_OBJ        RHOMBICDODECAHEDRON_NUM_FACES*RHOMBICDODECAHEDRON_NUM_EDGE_PER_FACE
 #define RHOMBICDODECAHEDRON_VERT_ELEM_PER_OBJ   RHOMBICDODECAHEDRON_VERT_PER_OBJ*3
 
 /* Vertex Coordinates */
@@ -397,8 +431,8 @@ DECLARE_SHAPE_CACHE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON)
  */
 #define TETRAHEDRON_NUM_VERT            4
 #define TETRAHEDRON_NUM_FACES           4
-#define TETRAHEDRON_NUM_VERT_PER_FACE   3
-#define TETRAHEDRON_VERT_PER_OBJ        TETRAHEDRON_NUM_FACES*TETRAHEDRON_NUM_VERT_PER_FACE
+#define TETRAHEDRON_NUM_EDGE_PER_FACE   3
+#define TETRAHEDRON_VERT_PER_OBJ        TETRAHEDRON_NUM_FACES*TETRAHEDRON_NUM_EDGE_PER_FACE
 #define TETRAHEDRON_VERT_ELEM_PER_OBJ   TETRAHEDRON_VERT_PER_OBJ*3
 
 /* Vertex Coordinates */
@@ -437,10 +471,10 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
         for (i=0; i<TETRAHEDRON_NUM_FACES; i++)
         {
             int normIdx         = i*3;
-            int faceIdxVertIdx  = i*TETRAHEDRON_NUM_VERT_PER_FACE;
-            for (j=0; j<TETRAHEDRON_NUM_VERT_PER_FACE; j++)
+            int faceIdxVertIdx  = i*TETRAHEDRON_NUM_EDGE_PER_FACE;
+            for (j=0; j<TETRAHEDRON_NUM_EDGE_PER_FACE; j++)
             {
-                int outIdx  = i*TETRAHEDRON_NUM_VERT_PER_FACE*3+j*3;
+                int outIdx  = i*TETRAHEDRON_NUM_EDGE_PER_FACE*3+j*3;
                 int vertIdx = tetrahedron_vi[faceIdxVertIdx+j]*3;
 
                 vertices[outIdx  ] = offset[0] + scale * tetrahedron_v[vertIdx  ];
@@ -530,9 +564,9 @@ static void fghCircleTable(double **sint,double **cost,const int n)
         if (!name##Cached)\
         {\
             fgh##nameICaps##Generate();\
-            name##Cached = TRUE;\
+            name##Cached = GL_TRUE;\
         }\
-        fghDrawGeometry(vertexMode,name##_verts,name##_norms,nameCaps##_VERT_PER_OBJ,useWireMode);\
+        fghDrawGeometry(vertexMode,name##_verts,name##_norms,NULL,nameCaps##_VERT_PER_OBJ,useWireMode);\
     }
 
 static void fghCube( GLdouble dSize, GLboolean useWireMode )
@@ -540,7 +574,7 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
     if (!cubeCached)
     {
         fghCubeGenerate();
-        cubeCached = TRUE;
+        cubeCached = GL_TRUE;
     }
 
     if (dSize!=1.)
@@ -552,10 +586,10 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
         for (i=0; i<CUBE_VERT_ELEM_PER_OBJ; i++)
             vertices[i] = dSize*cube_verts[i];
 
-        fghDrawGeometry(GL_QUADS,vertices  ,cube_norms,CUBE_VERT_PER_OBJ,useWireMode);
+        fghDrawGeometry(GL_TRIANGLES,vertices  ,cube_norms,cube_edgeFlags,CUBE_VERT_PER_OBJ,useWireMode);
     }
     else
-        fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_OBJ,useWireMode);
+        fghDrawGeometry(GL_TRIANGLES,cube_verts,cube_norms,cube_edgeFlags,CUBE_VERT_PER_OBJ,useWireMode);
 }
 
 DECLARE_INTERNAL_DRAW(GL_TRIANGLES,icosahedron,Icosahedron,ICOSAHEDRON);
@@ -580,7 +614,7 @@ static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble sc
         fghSierpinskiSpongeGenerate ( numLevels, offset, scale, vertices, normals );
 
         /* Draw and cleanup */
-        fghDrawGeometry(GL_TRIANGLES,vertices,normals,numVert,useWireMode);
+        fghDrawGeometry(GL_TRIANGLES,vertices,normals,NULL,numVert,useWireMode);
         free(vertices);
         free(normals );
     }
