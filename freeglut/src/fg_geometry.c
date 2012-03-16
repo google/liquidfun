@@ -138,8 +138,8 @@ static unsigned int ipow (int x, unsigned int y)
 #define CUBE_NUM_VERT           8
 #define CUBE_NUM_FACES          6
 #define CUBE_NUM_VERT_PER_FACE  4
-#define CUBE_VERT_PER_TETR      CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE
-#define CUBE_VERT_ELEM_PER_TETR CUBE_VERT_PER_TETR*3
+#define CUBE_VERT_PER_CUBE      CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE
+#define CUBE_VERT_ELEM_PER_CUBE CUBE_VERT_PER_CUBE*3
 /* Vertex Coordinates */
 static GLdouble cube_v[CUBE_NUM_VERT*3] =
 {
@@ -176,8 +176,8 @@ static GLubyte cube_vi[CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE] =
 
 /* Cache of input to glDrawArrays */
 static GLboolean cubeCached = FALSE;
-static double cube_verts[CUBE_VERT_ELEM_PER_TETR];
-static double cube_norms[CUBE_VERT_ELEM_PER_TETR];
+static double cube_verts[CUBE_VERT_ELEM_PER_CUBE];
+static double cube_norms[CUBE_VERT_ELEM_PER_CUBE];
 
 static void fghCubeGenerate()
 {
@@ -343,11 +343,17 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
 
     if (dSize!=1.)
     {
-        /* Need to build new */
-        fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_TETR,useWireMode);
+        int i;
+
+        /* Need to build new vertex list containing vertices for cube of different size */
+        GLdouble *vertices = malloc(CUBE_VERT_ELEM_PER_CUBE * sizeof(double));
+        for (i=0; i<CUBE_VERT_ELEM_PER_CUBE; i++)
+            vertices[i] = dSize*cube_verts[i];
+
+        fghDrawGeometry(GL_QUADS,vertices  ,cube_norms,CUBE_VERT_PER_CUBE,useWireMode);
     }
     else
-        fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_TETR,useWireMode);
+        fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_CUBE,useWireMode);
 }
 
 static void fghTetrahedron( GLboolean useWireMode )
@@ -363,10 +369,10 @@ static void fghTetrahedron( GLboolean useWireMode )
 
 static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble scale, GLboolean useWireMode )
 {
-    double      *vertices;
-    double      * normals;
-    unsigned int  numTetr = numLevels<0? 0 : ipow(4,numLevels); /* No sponge for numLevels below 0 */
-    unsigned int  numVert = numTetr*TETR_VERT_PER_TETR;
+    GLdouble *vertices;
+    GLdouble * normals;
+    GLsizei    numTetr = numLevels<0? 0 : ipow(4,numLevels); /* No sponge for numLevels below 0 */
+    GLsizei    numVert = numTetr*TETR_VERT_PER_TETR;
 
     if (numTetr)
     {
