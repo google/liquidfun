@@ -76,7 +76,7 @@ IF(WIN32)
         src/mswin/fg_window_mswin.c
         ${CMAKE_BINARY_DIR}/freeglut.rc # generated below from freeglut.rc.in
     )
-    IF (NOT CMAKE_CL_64)
+    IF (MSVC AND NOT CMAKE_CL_64)
         # .def file only for 32bit Windows builds
         LIST(APPEND FREEGLUT_SRCS
             ${CMAKE_BINARY_DIR}/freeglutdll.def # generated below from src/freeglutdll.def.in
