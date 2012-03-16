@@ -328,7 +328,10 @@ static void fghCircleTable(double **sint,double **cost,const int n)
 static void fghCube( GLdouble dSize, GLboolean useWireMode )
 {
     if (!cubeCached)
+    {
         fghCubeGenerate();
+        cubeCached = TRUE;
+    }
 
     if (dSize!=1.)
     {
@@ -342,7 +345,10 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
 static void fghTetrahedron( GLboolean useWireMode )
 {
     if (!tetrCached)
+    {
         fghTetrahedronGenerate();
+        tetrCached = TRUE;
+    }
 
     fghDrawGeometry(GL_TRIANGLES,tetr_verts,tetr_norms,TETR_VERT_PER_TETR,useWireMode);
 }
