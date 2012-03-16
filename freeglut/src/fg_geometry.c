@@ -181,7 +181,7 @@ static void fghCubeGenerate()
 #define TETR_VERT_ELEM_PER_TETR TETR_VERT_PER_TETR*3
 
 /* Vertex Coordinates */
-static GLdouble tet_r[TETR_NUM_VERT][TETR_NUM_VERT_PER_FACE] =
+static GLdouble tet_r[TETR_NUM_VERT][3] =
 {
     {             1.0,             0.0,             0.0 },
     { -0.333333333333,  0.942809041582,             0.0 },
