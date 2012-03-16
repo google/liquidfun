@@ -119,16 +119,12 @@
 /*
  * Always include OpenGL and GLU headers
  */
-#ifdef ANDROID
-/* Use EGL (implies OpenGL ES) */
-/* TODO: EGL/GLES builds should be more generally defined, possibly by
-   generating this file dynamically */
+#ifdef FREEGLUT_GLES2
 #   include <EGL/egl.h>
-/* TODO: we probably need 2 builds: -lGLESv1 and -lGLESv2 */
-/* #include <GLES/gl.h> */
 #   include <GLES2/gl2.h>
-/* TODO: temporary work-around for e.g. glutWireCube */
-#   define GLdouble     GLfloat
+#elif FREEGLUT_GLES1
+#   include <EGL/egl.h>
+#   include <GLES/gl.h>
 #else
 #   include <GL/gl.h>
 #   include <GL/glu.h>
@@ -525,6 +521,11 @@ FGAPI int     FGAPIENTRY glutStrokeLength( void* font, const unsigned char* stri
 /*
  * Geometry functions, see freeglut_geometry.c
  */
+#ifdef EGL_VERSION_1_0
+/* TODO: temporary work-around for missing GLdouble in GLES */
+#   define GLdouble     GLfloat  
+#endif
+
 FGAPI void    FGAPIENTRY glutWireCube( GLdouble size );
 FGAPI void    FGAPIENTRY glutSolidCube( GLdouble size );
 FGAPI void    FGAPIENTRY glutWireSphere( GLdouble radius, GLint slices, GLint stacks );

@@ -134,11 +134,17 @@ OPTION(BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
 OPTION(FREEGLUT_GLES1 "Use OpenGL ES 1.x (requires EGL)" OFF)
 OPTION(FREEGLUT_GLES2 "Use OpenGL ES 2.x (requires EGL) (overrides BUILD_GLES1)" OFF)
 
+# For OpenGL ES (GLES):
+# - compile with -DFREEGLUT_GLES1 and -DFREEGLUT_GLES2 to cleanly
+#   bootstrap headers inclusion in freeglut_std.h; these constants
+#   also need to be defined in client applications (e.g through
+#   pkg-config), but use GLES constants directly for all other needs
+# - define GLES version-specific library
 IF(FREEGLUT_GLES2)
-  ADD_DEFINITIONS(-DGLESv2)
+  ADD_DEFINITIONS(-DFREEGLUT_GLES2)
   LIST(APPEND LIBS GLESv2 EGL)
 ELSEIF(FREEGLUT_GLES1)
-  ADD_DEFINITIONS(-DGLESv1)
+  ADD_DEFINITIONS(-DFREEGLUT_GLES1)
   LIST(APPEND LIBS GLESv1 EGL)
 ELSE()
   FIND_PACKAGE(OpenGL REQUIRED)
@@ -348,12 +354,20 @@ ENDIF()
 # pkg-config support, to install at $(libdir)/pkgconfig
 # Define static build dependencies
 IF(WIN32)
-  SET(LIBS_PRIVATE "-lopengl32 -lwinmm -lgdi32")
+  SET(PC_LIBS_PRIVATE "-lopengl32 -lwinmm -lgdi32")
 ELSEIF(ANDROID)
-  SET(LIBS_PRIVATE "-llog -landroid -lGLESv2 -lEGL")
+  SET(PC_LIBS_PRIVATE "-llog -landroid -lGLESv2 -lEGL")
 ELSE()
-  SET(LIBS_PRIVATE "-lX11 -lXxf86vm -lXrandr -lGLESv2 -lEGL")
+  SET(PC_LIBS_PRIVATE "-lX11 -lXxf86vm -lXrandr -lGLESv2 -lEGL")
+ENDIF()
+# Client applications need to define FreeGLUT GLES version to
+# bootstrap headers inclusion in freeglut_std.h:
+IF(FREEGLUT_GLES2)
+  SET(PC_CFLAGS "-DFREEGLUT_GLES2")
+ELSEIF(FREEGLUT_GLES1)
+  SET(PC_CFLAGS "-DFREEGLUT_GLES1")
 ENDIF()
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/freeglut.pc.in ${CMAKE_BINARY_DIR}/freeglut.pc @ONLY)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/freeglut.pc DESTINATION share/pkgconfig)
-# TODO: change the library name when building for GLES, e.g. -lglut-GLES2
+# TODO: change the library and .pc name when building for GLES,
+# e.g. -lglut-GLES2
