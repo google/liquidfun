@@ -325,6 +325,66 @@ static GLubyte octahedron_vi[OCTAHEDRON_VERT_PER_OBJ] =
 };
 DECLARE_SHAPE_CACHE(octahedron,Octahedron,OCTAHEDRON);
 
+/* -- RhombicDodecahedron -- */
+#define RHOMBICDODECAHEDRON_NUM_VERT            14
+#define RHOMBICDODECAHEDRON_NUM_FACES           12
+#define RHOMBICDODECAHEDRON_NUM_VERT_PER_FACE   4
+#define RHOMBICDODECAHEDRON_VERT_PER_OBJ        RHOMBICDODECAHEDRON_NUM_FACES*RHOMBICDODECAHEDRON_NUM_VERT_PER_FACE
+#define RHOMBICDODECAHEDRON_VERT_ELEM_PER_OBJ   RHOMBICDODECAHEDRON_VERT_PER_OBJ*3
+
+/* Vertex Coordinates */
+static GLdouble rhombicdodecahedron_v[RHOMBICDODECAHEDRON_NUM_VERT*3] =
+{
+     0.0,             0.0,             1.0,
+     0.707106781187,  0.0           ,  0.5,
+     0.0           ,  0.707106781187,  0.5,
+    -0.707106781187,  0.0           ,  0.5,
+     0.0           , -0.707106781187,  0.5,
+     0.707106781187,  0.707106781187,  0.0,
+    -0.707106781187,  0.707106781187,  0.0,
+    -0.707106781187, -0.707106781187,  0.0,
+     0.707106781187, -0.707106781187,  0.0,
+     0.707106781187,  0.0           , -0.5,
+     0.0           ,  0.707106781187, -0.5,
+    -0.707106781187,  0.0           , -0.5,
+     0.0           , -0.707106781187, -0.5,
+     0.0,             0.0,            -1.0
+};
+/* Normal Vectors */
+static GLdouble rhombicdodecahedron_n[RHOMBICDODECAHEDRON_NUM_FACES*3] =
+{
+     0.353553390594,  0.353553390594,  0.5,
+    -0.353553390594,  0.353553390594,  0.5,
+    -0.353553390594, -0.353553390594,  0.5,
+     0.353553390594, -0.353553390594,  0.5,
+     0.0           ,  1.0           ,  0.0,
+    -1.0           ,  0.0           ,  0.0,
+     0.0           , -1.0           ,  0.0,
+     1.0           ,  0.0           ,  0.0,
+     0.353553390594,  0.353553390594, -0.5,
+    -0.353553390594,  0.353553390594, -0.5,
+    -0.353553390594, -0.353553390594, -0.5,
+     0.353553390594, -0.353553390594, -0.5
+};
+
+/* Vertex indices */
+static GLubyte rhombicdodecahedron_vi[RHOMBICDODECAHEDRON_VERT_PER_OBJ] =
+{
+    0,  1,  5,  2,
+    0,  2,  6,  3,
+    0,  3,  7,  4,
+    0,  4,  8,  1,
+    5, 10,  6,  2,
+    6, 11,  7,  3,
+    7, 12,  8,  4,
+    8,  9,  5,  1,
+    5,  9, 13, 10,
+    6, 10, 13, 11,
+    7, 11, 13, 12,
+    8, 12, 13,  9
+};
+DECLARE_SHAPE_CACHE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON);
+
 /* -- Tetrahedron -- */
 /* Magic Numbers:  r0 = ( 1, 0, 0 )
  *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
@@ -464,7 +524,7 @@ static void fghCircleTable(double **sint,double **cost,const int n)
 
 
 /* -- INTERNAL DRAWING functions to avoid code duplication ------------- */
-#define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps)\
+#define DECLARE_INTERNAL_DRAW(vertexMode,name,nameICaps,nameCaps)\
     static void fgh##nameICaps( GLboolean useWireMode )\
     {\
         if (!name##Cached)\
@@ -472,7 +532,7 @@ static void fghCircleTable(double **sint,double **cost,const int n)
             fgh##nameICaps##Generate();\
             name##Cached = TRUE;\
         }\
-        fghDrawGeometry(GL_TRIANGLES,name##_verts,name##_norms,nameCaps##_VERT_PER_OBJ,useWireMode);\
+        fghDrawGeometry(vertexMode,name##_verts,name##_norms,nameCaps##_VERT_PER_OBJ,useWireMode);\
     }
 
 static void fghCube( GLdouble dSize, GLboolean useWireMode )
@@ -497,9 +557,11 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
     else
         fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_OBJ,useWireMode);
 }
-DECLARE_INTERNAL_DRAW(icosahedron,Icosahedron,ICOSAHEDRON);
-DECLARE_INTERNAL_DRAW(octahedron,Octahedron,OCTAHEDRON);
-DECLARE_INTERNAL_DRAW(tetrahedron,Tetrahedron,TETRAHEDRON);
+
+DECLARE_INTERNAL_DRAW(GL_TRIANGLES,icosahedron,Icosahedron,ICOSAHEDRON);
+DECLARE_INTERNAL_DRAW(GL_TRIANGLES,octahedron,Octahedron,OCTAHEDRON);
+DECLARE_INTERNAL_DRAW(GL_QUADS,rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON);
+DECLARE_INTERNAL_DRAW(GL_TRIANGLES,tetrahedron,Tetrahedron,TETRAHEDRON);
 
 static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble scale, GLboolean useWireMode )
 {
@@ -1227,96 +1289,6 @@ void FGAPIENTRY glutSolidDodecahedron( void )
   glEnd () ;
 }
 
-/*
- *
- */
-static double rdod_r[14][3] = {
-    {  0.0,             0.0,             1.0 },
-    {  0.707106781187,  0.000000000000,  0.5 },
-    {  0.000000000000,  0.707106781187,  0.5 },
-    { -0.707106781187,  0.000000000000,  0.5 },
-    {  0.000000000000, -0.707106781187,  0.5 },
-    {  0.707106781187,  0.707106781187,  0.0 },
-    { -0.707106781187,  0.707106781187,  0.0 },
-    { -0.707106781187, -0.707106781187,  0.0 },
-    {  0.707106781187, -0.707106781187,  0.0 },
-    {  0.707106781187,  0.000000000000, -0.5 },
-    {  0.000000000000,  0.707106781187, -0.5 },
-    { -0.707106781187,  0.000000000000, -0.5 },
-    {  0.000000000000, -0.707106781187, -0.5 },
-    {  0.0,             0.0,            -1.0 }
-} ;
-
-static int rdod_v [12][4] = {
-    { 0,  1,  5,  2 },
-    { 0,  2,  6,  3 },
-    { 0,  3,  7,  4 },
-    { 0,  4,  8,  1 },
-    { 5, 10,  6,  2 },
-    { 6, 11,  7,  3 },
-    { 7, 12,  8,  4 },
-    { 8,  9,  5,  1 },
-    { 5,  9, 13, 10 },
-    { 6, 10, 13, 11 },
-    { 7, 11, 13, 12 },
-    { 8, 12, 13,  9 }
-};
-
-static double rdod_n[12][3] = {
-    {  0.353553390594,  0.353553390594,  0.5 },
-    { -0.353553390594,  0.353553390594,  0.5 },
-    { -0.353553390594, -0.353553390594,  0.5 },
-    {  0.353553390594, -0.353553390594,  0.5 },
-    {  0.000000000000,  1.000000000000,  0.0 },
-    { -1.000000000000,  0.000000000000,  0.0 },
-    {  0.000000000000, -1.000000000000,  0.0 },
-    {  1.000000000000,  0.000000000000,  0.0 },
-    {  0.353553390594,  0.353553390594, -0.5 },
-    { -0.353553390594,  0.353553390594, -0.5 },
-    { -0.353553390594, -0.353553390594, -0.5 },
-    {  0.353553390594, -0.353553390594, -0.5 }
-};
-
-void FGAPIENTRY glutWireRhombicDodecahedron( void )
-{
-  int i ;
-
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireRhombicDodecahedron" );
-
-  for ( i = 0; i < 12; i++ )
-  {
-    glBegin ( GL_LINE_LOOP ) ;
-      glNormal3dv ( rdod_n[i] ) ;
-      glVertex3dv ( rdod_r[rdod_v[i][0]] ) ;
-      glVertex3dv ( rdod_r[rdod_v[i][1]] ) ;
-      glVertex3dv ( rdod_r[rdod_v[i][2]] ) ;
-      glVertex3dv ( rdod_r[rdod_v[i][3]] ) ;
-    glEnd () ;
-  }
-}
-
-/*
- *
- */
-void FGAPIENTRY glutSolidRhombicDodecahedron( void )
-{
-  int i ;
-
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidRhombicDodecahedron" );
-
-  glBegin ( GL_QUADS ) ;
-  for ( i = 0; i < 12; i++ )
-  {
-      glNormal3dv ( rdod_n[i] ) ;
-      glVertex3dv ( rdod_r[rdod_v[i][0]] ) ;
-      glVertex3dv ( rdod_r[rdod_v[i][1]] ) ;
-      glVertex3dv ( rdod_r[rdod_v[i][2]] ) ;
-      glVertex3dv ( rdod_r[rdod_v[i][3]] ) ;
-  }
-
-  glEnd () ;
-}
-
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
@@ -1346,6 +1318,7 @@ void FGAPIENTRY glutSolidCube( GLdouble dSize )
 
 DECLARE_SHAPE_INTERFACE(Icosahedron);
 DECLARE_SHAPE_INTERFACE(Octahedron);
+DECLARE_SHAPE_INTERFACE(RhombicDodecahedron);
 
 void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
 {
