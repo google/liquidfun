@@ -202,6 +202,83 @@ static GLubyte cube_vi[CUBE_VERT_PER_OBJ] =
 };
 DECLARE_SHAPE_CACHE(cube,Cube,CUBE);
 
+/* Icosahedron */
+#define ICOSAHEDRON_NUM_VERT           12
+#define ICOSAHEDRON_NUM_FACES          20
+#define ICOSAHEDRON_NUM_VERT_PER_FACE  3
+#define ICOSAHEDRON_VERT_PER_OBJ       ICOSAHEDRON_NUM_FACES*ICOSAHEDRON_NUM_VERT_PER_FACE
+#define ICOSAHEDRON_VERT_ELEM_PER_OBJ  ICOSAHEDRON_VERT_PER_OBJ*3
+/* Vertex Coordinates */
+static GLdouble icosahedron_v[ICOSAHEDRON_NUM_VERT*3] =
+{
+     1.0,             0.0,             0.0           ,
+     0.447213595500,  0.894427191000,  0.0           ,
+     0.447213595500,  0.276393202252,  0.850650808354,
+     0.447213595500, -0.723606797748,  0.525731112119,
+     0.447213595500, -0.723606797748, -0.525731112119,
+     0.447213595500,  0.276393202252, -0.850650808354,
+    -0.447213595500, -0.894427191000,  0.0           ,
+    -0.447213595500, -0.276393202252,  0.850650808354,
+    -0.447213595500,  0.723606797748,  0.525731112119,
+    -0.447213595500,  0.723606797748, -0.525731112119,
+    -0.447213595500, -0.276393202252, -0.850650808354,
+    -1.0,             0.0,             0.0           
+};
+/* Normal Vectors:
+ * icosahedron_n[i][0] = ( icosahedron_v[icosahedron_vi[i][1]][1] - icosahedron_v[icosahedron_vi[i][0]][1] ) * ( icosahedron_v[icosahedron_vi[i][2]][2] - icosahedron_v[icosahedron_vi[i][0]][2] ) - ( icosahedron_v[icosahedron_vi[i][1]][2] - icosahedron_v[icosahedron_vi[i][0]][2] ) * ( icosahedron_v[icosahedron_vi[i][2]][1] - icosahedron_v[icosahedron_vi[i][0]][1] ) ;
+ * icosahedron_n[i][1] = ( icosahedron_v[icosahedron_vi[i][1]][2] - icosahedron_v[icosahedron_vi[i][0]][2] ) * ( icosahedron_v[icosahedron_vi[i][2]][0] - icosahedron_v[icosahedron_vi[i][0]][0] ) - ( icosahedron_v[icosahedron_vi[i][1]][0] - icosahedron_v[icosahedron_vi[i][0]][0] ) * ( icosahedron_v[icosahedron_vi[i][2]][2] - icosahedron_v[icosahedron_vi[i][0]][2] ) ;
+ * icosahedron_n[i][2] = ( icosahedron_v[icosahedron_vi[i][1]][0] - icosahedron_v[icosahedron_vi[i][0]][0] ) * ( icosahedron_v[icosahedron_vi[i][2]][1] - icosahedron_v[icosahedron_vi[i][0]][1] ) - ( icosahedron_v[icosahedron_vi[i][1]][1] - icosahedron_v[icosahedron_vi[i][0]][1] ) * ( icosahedron_v[icosahedron_vi[i][2]][0] - icosahedron_v[icosahedron_vi[i][0]][0] ) ;
+*/
+static GLdouble icosahedron_n[ICOSAHEDRON_NUM_FACES*3] =
+{
+     0.760845213037948,  0.470228201835026,  0.341640786498800,
+     0.760845213036861, -0.179611190632978,  0.552786404500000,
+     0.760845213033849, -0.581234022404097,                  0,
+     0.760845213036861, -0.179611190632978, -0.552786404500000,
+     0.760845213037948,  0.470228201835026, -0.341640786498800,
+     0.179611190628666,  0.760845213037948,  0.552786404498399,
+     0.179611190634277, -0.290617011204044,  0.894427191000000,
+     0.179611190633958, -0.940456403667806,                  0,
+     0.179611190634278, -0.290617011204044, -0.894427191000000,
+     0.179611190628666,  0.760845213037948, -0.552786404498399,
+    -0.179611190633958,  0.940456403667806,                  0,
+    -0.179611190634277,  0.290617011204044,  0.894427191000000,
+    -0.179611190628666, -0.760845213037948,  0.552786404498399,
+    -0.179611190628666, -0.760845213037948, -0.552786404498399,
+    -0.179611190634277,  0.290617011204044, -0.894427191000000,
+    -0.760845213036861,  0.179611190632978, -0.552786404500000,
+    -0.760845213033849,  0.581234022404097,                  0,
+    -0.760845213036861,  0.179611190632978,  0.552786404500000,
+    -0.760845213037948, -0.470228201835026,  0.341640786498800,
+    -0.760845213037948, -0.470228201835026, -0.341640786498800,
+};
+
+/* Vertex indices */
+static GLubyte icosahedron_vi[ICOSAHEDRON_VERT_PER_OBJ] =
+{
+    0,   1,  2 ,
+    0,   2,  3 ,
+    0,   3,  4 ,
+    0,   4,  5 ,
+    0,   5,  1 ,
+    1,   8,  2 ,
+    2,   7,  3 ,
+    3,   6,  4 ,
+    4,  10,  5 ,
+    5,   9,  1 ,
+    1,   9,  8 ,
+    2,   8,  7 ,
+    3,   7,  6 ,
+    4,   6, 10 ,
+    5,  10,  9 ,
+    11,  9, 10 ,
+    11,  8,  9 ,
+    11,  7,  8 ,
+    11,  6,  7 ,
+    11, 10,  6 
+};
+DECLARE_SHAPE_CACHE(icosahedron,Icosahedron,ICOSAHEDRON);
+
 /* -- Octahedron -- */
 #define OCTAHEDRON_NUM_VERT           6
 #define OCTAHEDRON_NUM_FACES          8
@@ -420,6 +497,7 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
     else
         fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_OBJ,useWireMode);
 }
+DECLARE_INTERNAL_DRAW(icosahedron,Icosahedron,ICOSAHEDRON);
 DECLARE_INTERNAL_DRAW(octahedron,Octahedron,OCTAHEDRON);
 DECLARE_INTERNAL_DRAW(tetrahedron,Tetrahedron,TETRAHEDRON);
 
@@ -1152,93 +1230,6 @@ void FGAPIENTRY glutSolidDodecahedron( void )
 /*
  *
  */
-static double icos_r[12][3] = {
-    {  1.0,             0.0,             0.0            },
-    {  0.447213595500,  0.894427191000,  0.0            },
-    {  0.447213595500,  0.276393202252,  0.850650808354 },
-    {  0.447213595500, -0.723606797748,  0.525731112119 },
-    {  0.447213595500, -0.723606797748, -0.525731112119 },
-    {  0.447213595500,  0.276393202252, -0.850650808354 },
-    { -0.447213595500, -0.894427191000,  0.0 },
-    { -0.447213595500, -0.276393202252,  0.850650808354 },
-    { -0.447213595500,  0.723606797748,  0.525731112119 },
-    { -0.447213595500,  0.723606797748, -0.525731112119 },
-    { -0.447213595500, -0.276393202252, -0.850650808354 },
-    { -1.0,             0.0,             0.0            }
-};
-
-static int icos_v [20][3] = {
-    {  0,  1,  2 },
-    {  0,  2,  3 },
-    {  0,  3,  4 },
-    {  0,  4,  5 },
-    {  0,  5,  1 },
-    {  1,  8,  2 },
-    {  2,  7,  3 },
-    {  3,  6,  4 },
-    {  4, 10,  5 },
-    {  5,  9,  1 },
-    {  1,  9,  8 },
-    {  2,  8,  7 },
-    {  3,  7,  6 },
-    {  4,  6, 10 },
-    {  5, 10,  9 },
-    { 11,  9, 10 },
-    { 11,  8,  9 },
-    { 11,  7,  8 },
-    { 11,  6,  7 },
-    { 11, 10,  6 }
-};
-
-void FGAPIENTRY glutWireIcosahedron( void )
-{
-  int i ;
-
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireIcosahedron" );
-
-  for ( i = 0; i < 20; i++ )
-  {
-    double normal[3] ;
-    normal[0] = ( icos_r[icos_v[i][1]][1] - icos_r[icos_v[i][0]][1] ) * ( icos_r[icos_v[i][2]][2] - icos_r[icos_v[i][0]][2] ) - ( icos_r[icos_v[i][1]][2] - icos_r[icos_v[i][0]][2] ) * ( icos_r[icos_v[i][2]][1] - icos_r[icos_v[i][0]][1] ) ;
-    normal[1] = ( icos_r[icos_v[i][1]][2] - icos_r[icos_v[i][0]][2] ) * ( icos_r[icos_v[i][2]][0] - icos_r[icos_v[i][0]][0] ) - ( icos_r[icos_v[i][1]][0] - icos_r[icos_v[i][0]][0] ) * ( icos_r[icos_v[i][2]][2] - icos_r[icos_v[i][0]][2] ) ;
-    normal[2] = ( icos_r[icos_v[i][1]][0] - icos_r[icos_v[i][0]][0] ) * ( icos_r[icos_v[i][2]][1] - icos_r[icos_v[i][0]][1] ) - ( icos_r[icos_v[i][1]][1] - icos_r[icos_v[i][0]][1] ) * ( icos_r[icos_v[i][2]][0] - icos_r[icos_v[i][0]][0] ) ;
-    glBegin ( GL_LINE_LOOP ) ;
-      glNormal3dv ( normal ) ;
-      glVertex3dv ( icos_r[icos_v[i][0]] ) ;
-      glVertex3dv ( icos_r[icos_v[i][1]] ) ;
-      glVertex3dv ( icos_r[icos_v[i][2]] ) ;
-    glEnd () ;
-  }
-}
-
-/*
- *
- */
-void FGAPIENTRY glutSolidIcosahedron( void )
-{
-  int i ;
-
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidIcosahedron" );
-
-  glBegin ( GL_TRIANGLES ) ;
-  for ( i = 0; i < 20; i++ )
-  {
-    double normal[3] ;
-    normal[0] = ( icos_r[icos_v[i][1]][1] - icos_r[icos_v[i][0]][1] ) * ( icos_r[icos_v[i][2]][2] - icos_r[icos_v[i][0]][2] ) - ( icos_r[icos_v[i][1]][2] - icos_r[icos_v[i][0]][2] ) * ( icos_r[icos_v[i][2]][1] - icos_r[icos_v[i][0]][1] ) ;
-    normal[1] = ( icos_r[icos_v[i][1]][2] - icos_r[icos_v[i][0]][2] ) * ( icos_r[icos_v[i][2]][0] - icos_r[icos_v[i][0]][0] ) - ( icos_r[icos_v[i][1]][0] - icos_r[icos_v[i][0]][0] ) * ( icos_r[icos_v[i][2]][2] - icos_r[icos_v[i][0]][2] ) ;
-    normal[2] = ( icos_r[icos_v[i][1]][0] - icos_r[icos_v[i][0]][0] ) * ( icos_r[icos_v[i][2]][1] - icos_r[icos_v[i][0]][1] ) - ( icos_r[icos_v[i][1]][1] - icos_r[icos_v[i][0]][1] ) * ( icos_r[icos_v[i][2]][0] - icos_r[icos_v[i][0]][0] ) ;
-      glNormal3dv ( normal ) ;
-      glVertex3dv ( icos_r[icos_v[i][0]] ) ;
-      glVertex3dv ( icos_r[icos_v[i][1]] ) ;
-      glVertex3dv ( icos_r[icos_v[i][2]] ) ;
-  }
-
-  glEnd () ;
-}
-
-/*
- *
- */
 static double rdod_r[14][3] = {
     {  0.0,             0.0,             1.0 },
     {  0.707106781187,  0.000000000000,  0.5 },
@@ -1329,9 +1320,19 @@ void FGAPIENTRY glutSolidRhombicDodecahedron( void )
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
-/*
- * Draws a wireframed cube.
- */
+/* Macro to generate interface functions */
+#define DECLARE_SHAPE_INTERFACE(nameICaps)\
+    void FGAPIENTRY glutWire##nameICaps( void )\
+    {\
+        FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWire"#nameICaps );\
+        fgh##nameICaps( TRUE );\
+    }\
+    void FGAPIENTRY glutSolid##nameICaps( void )\
+    {\
+        FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolid"#nameICaps );\
+        fgh##nameICaps( FALSE );\
+    }
+
 void FGAPIENTRY glutWireCube( GLdouble dSize )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCube" );
@@ -1343,16 +1344,8 @@ void FGAPIENTRY glutSolidCube( GLdouble dSize )
     fghCube( dSize, FALSE );
 }
 
-void FGAPIENTRY glutWireOctahedron( void )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireOctahedron" );
-    fghOctahedron( TRUE );
-}
-void FGAPIENTRY glutSolidOctahedron( void )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidOctahedron" );
-    fghOctahedron( FALSE );
-}
+DECLARE_SHAPE_INTERFACE(Icosahedron);
+DECLARE_SHAPE_INTERFACE(Octahedron);
 
 void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
 {
@@ -1365,16 +1358,7 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
     fghSierpinskiSponge ( num_levels, offset, scale, FALSE );
 }
 
-void FGAPIENTRY glutWireTetrahedron( void )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTetrahedron" );
-    fghTetrahedron( TRUE );
-}
-void FGAPIENTRY glutSolidTetrahedron( void )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTetrahedron" );
-    fghTetrahedron( FALSE );
-}
+DECLARE_SHAPE_INTERFACE(Tetrahedron);
 
 
 /*** END OF FILE ***/
