@@ -91,6 +91,35 @@ static void fghDrawGeometry(GLenum vertexMode, double* vertices, double* normals
     }
 }
 
+static void fghGenerateGeometry(int numFaces, int numVertPerFace, GLdouble *vertices, GLubyte* vertIndices, GLdouble *normals, GLdouble *vertOut, GLdouble *normOut)
+{
+    int i,j;
+    /*
+     * Build array with vertices from vertex coordinates and vertex indices 
+     * Do same for normals.
+     * Need to do this because of different normals at shared vertices
+     * (and because normals' coordinates need to be negated).
+     */
+    for (i=0; i<numFaces; i++)
+    {
+        int normIdx         = i*3;
+        int faceIdxVertIdx  = i*numVertPerFace;
+        for (j=0; j<numVertPerFace; j++)
+        {
+            int outIdx  = i*numVertPerFace*3+j*3;
+            int vertIdx = vertIndices[faceIdxVertIdx+j]*3;
+
+            vertOut[outIdx  ] = vertices[vertIdx  ];
+            vertOut[outIdx+1] = vertices[vertIdx+1];
+            vertOut[outIdx+2] = vertices[vertIdx+2];
+
+            normOut[outIdx  ] = normals [normIdx  ];
+            normOut[outIdx+1] = normals [normIdx+1];
+            normOut[outIdx+2] = normals [normIdx+2];
+        }
+    }
+}
+
 
 /* -- INTERNAL SETUP OF GEOMETRY --------------------------------------- */
 static unsigned int ipow (int x, unsigned int y)
@@ -112,32 +141,37 @@ static unsigned int ipow (int x, unsigned int y)
 #define CUBE_VERT_PER_TETR      CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE
 #define CUBE_VERT_ELEM_PER_TETR CUBE_VERT_PER_TETR*3
 /* Vertex Coordinates */
-static GLdouble cube_v[CUBE_NUM_VERT][3] =
+static GLdouble cube_v[CUBE_NUM_VERT*3] =
 {
-    { .5, .5, .5},
-    {-.5, .5, .5},
-    {-.5,-.5, .5},
-    { .5,-.5, .5},
-    { .5,-.5,-.5},
-    { .5, .5,-.5},
-    {-.5, .5,-.5},
-    {-.5,-.5,-.5}
+     .5, .5, .5,
+    -.5, .5, .5,
+    -.5,-.5, .5,
+     .5,-.5, .5,
+     .5,-.5,-.5,
+     .5, .5,-.5,
+    -.5, .5,-.5,
+    -.5,-.5,-.5
 };
 /* Normal Vectors */
-static GLdouble cube_n[CUBE_NUM_FACES][3] =
+static GLdouble cube_n[CUBE_NUM_FACES*3] =
 {
-    { 0.0, 0.0, 1.0},
-    { 1.0, 0.0, 0.0},
-    { 0.0, 1.0, 0.0},
-    {-1.0, 0.0, 0.0},
-    { 0.0,-1.0, 0.0},
-    { 0.0, 0.0,-1.0}
+     0.0, 0.0, 1.0,
+     1.0, 0.0, 0.0,
+     0.0, 1.0, 0.0,
+    -1.0, 0.0, 0.0,
+     0.0,-1.0, 0.0,
+     0.0, 0.0,-1.0
 };
 
 /* Vertex indices */
-static GLubyte cube_vi[CUBE_NUM_FACES][CUBE_NUM_VERT_PER_FACE] =
+static GLubyte cube_vi[CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE] =
 {
-    {0,1,2,3}, {0,3,4,5}, {0,5,6,1}, {1,6,7,2}, {7,4,3,2}, {4,7,6,5}
+    0,1,2,3,
+    0,3,4,5,
+    0,5,6,1,
+    1,6,7,2,
+    7,4,3,2,
+    4,7,6,5
 };
 
 /* Cache of input to glDrawArrays */
@@ -146,22 +180,8 @@ static double cube_verts[CUBE_VERT_ELEM_PER_TETR];
 static double cube_norms[CUBE_VERT_ELEM_PER_TETR];
 
 static void fghCubeGenerate()
-{   
-    int i,j;
-    for (i=0; i<CUBE_NUM_FACES; i++)
-    {
-        for (j=0; j<CUBE_NUM_VERT_PER_FACE; j++)
-        {
-            int idx = i*CUBE_NUM_VERT_PER_FACE*3+j*3;
-            cube_verts[idx  ] = cube_v[cube_vi[i][j]][0];
-            cube_verts[idx+1] = cube_v[cube_vi[i][j]][1];
-            cube_verts[idx+2] = cube_v[cube_vi[i][j]][2];
-
-            cube_norms[idx  ] = cube_n[i][0];
-            cube_norms[idx+1] = cube_n[i][1];
-            cube_norms[idx+2] = cube_n[i][2];
-        }
-    }
+{
+    fghGenerateGeometry(CUBE_NUM_FACES, CUBE_NUM_VERT_PER_FACE, cube_v, cube_vi, cube_n, cube_verts, cube_norms);
 }
 
 /* -- Tetrahedron -- */
@@ -181,26 +201,29 @@ static void fghCubeGenerate()
 #define TETR_VERT_ELEM_PER_TETR TETR_VERT_PER_TETR*3
 
 /* Vertex Coordinates */
-static GLdouble tet_r[TETR_NUM_VERT][3] =
+static GLdouble tetr_v[TETR_NUM_VERT*3] =
 {
-    {             1.0,             0.0,             0.0 },
-    { -0.333333333333,  0.942809041582,             0.0 },
-    { -0.333333333333, -0.471404520791,  0.816496580928 },
-    { -0.333333333333, -0.471404520791, -0.816496580928 }
+                1.0,             0.0,             0.0,
+    -0.333333333333,  0.942809041582,             0.0,
+    -0.333333333333, -0.471404520791,  0.816496580928,
+    -0.333333333333, -0.471404520791, -0.816496580928
 };
 /* Normal Vectors */
-static GLdouble tet_n[CUBE_NUM_FACES][3] =
+static GLdouble tetr_n[CUBE_NUM_FACES*3] =
 {
-    { -           1.0,             0.0,             0.0 },
-    {  0.333333333333, -0.942809041582,             0.0 },
-    {  0.333333333333,  0.471404520791, -0.816496580928 },
-    {  0.333333333333,  0.471404520791,  0.816496580928 }
+    -           1.0,             0.0,             0.0,
+     0.333333333333, -0.942809041582,             0.0,
+     0.333333333333,  0.471404520791, -0.816496580928,
+     0.333333333333,  0.471404520791,  0.816496580928
 };
 
 /* Vertex indices */
-static GLubyte tet_i[TETR_NUM_FACES][TETR_NUM_VERT_PER_FACE] =
+static GLubyte tetr_vi[TETR_NUM_FACES*TETR_NUM_VERT_PER_FACE] =
 {
-    { 1, 3, 2 }, { 0, 2, 3 }, { 0, 3, 1 }, { 0, 1, 2 }
+    1, 3, 2,
+    0, 2, 3,
+    0, 3, 1,
+    0, 1, 2
 };
 
 /* Cache of input to glDrawArrays */
@@ -210,27 +233,7 @@ static double tetr_norms[TETR_VERT_ELEM_PER_TETR];
 
 static void fghTetrahedronGenerate()
 {
-    int i,j;
-    /*
-     * Build array with vertices from vertex coordinates and vertex indices 
-     * Do same for normals.
-     * Need to do this because of different normals at shared vertices
-     * (and because normals' coordinates need to be negated).
-     */
-    for (i=0; i<TETR_NUM_FACES; i++)
-    {
-        for (j=0; j<TETR_NUM_VERT_PER_FACE; j++)
-        {
-            int idx = i*TETR_NUM_VERT_PER_FACE*3+j*3;
-            tetr_verts[idx  ] =  tet_r[tet_i[i][j]][0];
-            tetr_verts[idx+1] =  tet_r[tet_i[i][j]][1];
-            tetr_verts[idx+2] =  tet_r[tet_i[i][j]][2];
-
-            tetr_norms[idx  ] =  tet_n[i][0];
-            tetr_norms[idx+1] =  tet_n[i][1];
-            tetr_norms[idx+2] =  tet_n[i][2];
-        }
-    }
+    fghGenerateGeometry(TETR_NUM_FACES, TETR_NUM_VERT_PER_FACE, tetr_v, tetr_vi, tetr_n, tetr_verts, tetr_norms);
 }
 
 /* -- Sierpinski Sponge -- */
@@ -239,18 +242,22 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
     int i, j;
     if ( numLevels == 0 )
     {
-        for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
+        for (i=0; i<TETR_NUM_FACES; i++)
         {
-            for ( j = 0; j < TETR_NUM_VERT_PER_FACE; j++ )
+            int normIdx         = i*3;
+            int faceIdxVertIdx  = i*TETR_NUM_VERT_PER_FACE;
+            for (j=0; j<TETR_NUM_VERT_PER_FACE; j++)
             {
-                int idx = i*TETR_NUM_VERT_PER_FACE*3+j*3;
-                vertices[idx  ] =  offset[0] + scale * tet_r[tet_i[i][j]][0];
-                vertices[idx+1] =  offset[1] + scale * tet_r[tet_i[i][j]][1];
-                vertices[idx+2] =  offset[2] + scale * tet_r[tet_i[i][j]][2];
+                int outIdx  = i*TETR_NUM_VERT_PER_FACE*3+j*3;
+                int vertIdx = tetr_vi[faceIdxVertIdx+j]*3;
 
-                normals [idx  ] = -tet_r[i][0];
-                normals [idx+1] = -tet_r[i][1];
-                normals [idx+2] = -tet_r[i][2];
+                vertices[outIdx  ] = offset[0] + scale * tetr_v[vertIdx  ];
+                vertices[outIdx+1] = offset[1] + scale * tetr_v[vertIdx+1];
+                vertices[outIdx+2] = offset[2] + scale * tetr_v[vertIdx+2];
+
+                normals [outIdx  ] = tetr_n[normIdx  ];
+                normals [outIdx+1] = tetr_n[normIdx+1];
+                normals [outIdx+2] = tetr_n[normIdx+2];
             }
         }
     }
@@ -261,9 +268,10 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
         scale /= 2.0 ;
         for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
         {
-            local_offset[0] = offset[0] + scale * tet_r[i][0];
-            local_offset[1] = offset[1] + scale * tet_r[i][1];
-            local_offset[2] = offset[2] + scale * tet_r[i][2];
+            int idx         = i*3;
+            local_offset[0] = offset[0] + scale * tetr_v[idx  ];
+            local_offset[1] = offset[1] + scale * tetr_v[idx+1];
+            local_offset[2] = offset[2] + scale * tetr_v[idx+2];
             fghSierpinskiSpongeGenerate ( numLevels, local_offset, scale, vertices+i*stride, normals+i*stride );
         }
     }
