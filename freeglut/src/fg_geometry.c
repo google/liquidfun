@@ -144,6 +144,17 @@ static unsigned int ipow (int x, unsigned int y)
 }
 
 /* -- stuff that can be cached -- */
+/* Cache of input to glDrawArrays */
+#define DECLARE_SHAPE_CACHE(name,nameICaps,nameCaps)\
+    static GLboolean name##Cached = FALSE;\
+    static GLdouble name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLdouble name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static void fgh##nameICaps##Generate()\
+    {\
+        fghGenerateGeometry(nameCaps##_NUM_FACES, nameCaps##_NUM_VERT_PER_FACE,\
+                            name##_v, name##_vi, name##_n,\
+                            name##_verts, name##_norms);\
+    }
 /*
  * In general, we build arrays with all vertices or normals.
  * We cant compress this and use glDrawElements as all combinations of
@@ -154,8 +165,8 @@ static unsigned int ipow (int x, unsigned int y)
 #define CUBE_NUM_VERT           8
 #define CUBE_NUM_FACES          6
 #define CUBE_NUM_VERT_PER_FACE  4
-#define CUBE_VERT_PER_CUBE      CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE
-#define CUBE_VERT_ELEM_PER_CUBE CUBE_VERT_PER_CUBE*3
+#define CUBE_VERT_PER_OBJ       CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE
+#define CUBE_VERT_ELEM_PER_OBJ  CUBE_VERT_PER_OBJ*3
 /* Vertex Coordinates */
 static GLdouble cube_v[CUBE_NUM_VERT*3] =
 {
@@ -180,7 +191,7 @@ static GLdouble cube_n[CUBE_NUM_FACES*3] =
 };
 
 /* Vertex indices */
-static GLubyte cube_vi[CUBE_VERT_PER_CUBE] =
+static GLubyte cube_vi[CUBE_VERT_PER_OBJ] =
 {
     0,1,2,3,
     0,3,4,5,
@@ -189,23 +200,14 @@ static GLubyte cube_vi[CUBE_VERT_PER_CUBE] =
     7,4,3,2,
     4,7,6,5
 };
-
-/* Cache of input to glDrawArrays */
-static GLboolean cubeCached = FALSE;
-static GLdouble cube_verts[CUBE_VERT_ELEM_PER_CUBE];
-static GLdouble cube_norms[CUBE_VERT_ELEM_PER_CUBE];
-
-static void fghCubeGenerate()
-{
-    fghGenerateGeometry(CUBE_NUM_FACES, CUBE_NUM_VERT_PER_FACE, cube_v, cube_vi, cube_n, cube_verts, cube_norms);
-}
+DECLARE_SHAPE_CACHE(cube,Cube,CUBE);
 
 /* -- Octahedron -- */
 #define OCTAHEDRON_NUM_VERT           6
 #define OCTAHEDRON_NUM_FACES          8
 #define OCTAHEDRON_NUM_VERT_PER_FACE  3
-#define OCTAHEDRON_VERT_PER_OCTA      OCTAHEDRON_NUM_FACES*OCTAHEDRON_NUM_VERT_PER_FACE
-#define OCTAHEDRON_VERT_ELEM_PER_OCTA OCTAHEDRON_VERT_PER_OCTA*3
+#define OCTAHEDRON_VERT_PER_OBJ       OCTAHEDRON_NUM_FACES*OCTAHEDRON_NUM_VERT_PER_FACE
+#define OCTAHEDRON_VERT_ELEM_PER_OBJ  OCTAHEDRON_VERT_PER_OBJ*3
 
 /* Vertex Coordinates */
 static GLdouble octahedron_v[OCTAHEDRON_NUM_VERT*3] =
@@ -233,7 +235,7 @@ static GLdouble octahedron_n[OCTAHEDRON_NUM_FACES*3] =
 };
 
 /* Vertex indices */
-static GLubyte octahedron_vi[OCTAHEDRON_VERT_PER_OCTA] =
+static GLubyte octahedron_vi[OCTAHEDRON_VERT_PER_OBJ] =
 {
     0, 1, 2,
     0, 5, 1,
@@ -244,16 +246,7 @@ static GLubyte octahedron_vi[OCTAHEDRON_VERT_PER_OCTA] =
     3, 4, 2,
     3, 5, 4
 };
-
-/* Cache of input to glDrawArrays */
-static GLboolean octahedronCached = FALSE;
-static GLdouble octahedron_verts[OCTAHEDRON_VERT_ELEM_PER_OCTA];
-static GLdouble octahedron_norms[OCTAHEDRON_VERT_ELEM_PER_OCTA];
-
-static void fghOctahedronGenerate()
-{
-    fghGenerateGeometry(OCTAHEDRON_NUM_FACES, OCTAHEDRON_NUM_VERT_PER_FACE, octahedron_v, octahedron_vi, octahedron_n, octahedron_verts, octahedron_norms);
-}
+DECLARE_SHAPE_CACHE(octahedron,Octahedron,OCTAHEDRON);
 
 /* -- Tetrahedron -- */
 /* Magic Numbers:  r0 = ( 1, 0, 0 )
@@ -265,14 +258,14 @@ static void fghOctahedronGenerate()
  *
  * Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
  */
-#define TETR_NUM_VERT           4
-#define TETR_NUM_FACES          4
-#define TETR_NUM_VERT_PER_FACE  3
-#define TETR_VERT_PER_TETR      TETR_NUM_FACES*TETR_NUM_VERT_PER_FACE
-#define TETR_VERT_ELEM_PER_TETR TETR_VERT_PER_TETR*3
+#define TETRAHEDRON_NUM_VERT            4
+#define TETRAHEDRON_NUM_FACES           4
+#define TETRAHEDRON_NUM_VERT_PER_FACE   3
+#define TETRAHEDRON_VERT_PER_OBJ        TETRAHEDRON_NUM_FACES*TETRAHEDRON_NUM_VERT_PER_FACE
+#define TETRAHEDRON_VERT_ELEM_PER_OBJ   TETRAHEDRON_VERT_PER_OBJ*3
 
 /* Vertex Coordinates */
-static GLdouble tetr_v[TETR_NUM_VERT*3] =
+static GLdouble tetrahedron_v[TETRAHEDRON_NUM_VERT*3] =
 {
                 1.0,             0.0,             0.0,
     -0.333333333333,  0.942809041582,             0.0,
@@ -280,7 +273,7 @@ static GLdouble tetr_v[TETR_NUM_VERT*3] =
     -0.333333333333, -0.471404520791, -0.816496580928
 };
 /* Normal Vectors */
-static GLdouble tetr_n[CUBE_NUM_FACES*3] =
+static GLdouble tetrahedron_n[TETRAHEDRON_NUM_FACES*3] =
 {
     -           1.0,             0.0,             0.0,
      0.333333333333, -0.942809041582,             0.0,
@@ -289,23 +282,14 @@ static GLdouble tetr_n[CUBE_NUM_FACES*3] =
 };
 
 /* Vertex indices */
-static GLubyte tetr_vi[TETR_VERT_PER_TETR] =
+static GLubyte tetrahedron_vi[TETRAHEDRON_VERT_PER_OBJ] =
 {
     1, 3, 2,
     0, 2, 3,
     0, 3, 1,
     0, 1, 2
 };
-
-/* Cache of input to glDrawArrays */
-static GLboolean tetrCached = FALSE;
-static GLdouble tetr_verts[TETR_VERT_ELEM_PER_TETR];
-static GLdouble tetr_norms[TETR_VERT_ELEM_PER_TETR];
-
-static void fghTetrahedronGenerate()
-{
-    fghGenerateGeometry(TETR_NUM_FACES, TETR_NUM_VERT_PER_FACE, tetr_v, tetr_vi, tetr_n, tetr_verts, tetr_norms);
-}
+DECLARE_SHAPE_CACHE(tetrahedron,Tetrahedron,TETRAHEDRON);
 
 /* -- Sierpinski Sponge -- */
 static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLdouble scale, GLdouble* vertices, GLdouble* normals )
@@ -313,36 +297,36 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
     int i, j;
     if ( numLevels == 0 )
     {
-        for (i=0; i<TETR_NUM_FACES; i++)
+        for (i=0; i<TETRAHEDRON_NUM_FACES; i++)
         {
             int normIdx         = i*3;
-            int faceIdxVertIdx  = i*TETR_NUM_VERT_PER_FACE;
-            for (j=0; j<TETR_NUM_VERT_PER_FACE; j++)
+            int faceIdxVertIdx  = i*TETRAHEDRON_NUM_VERT_PER_FACE;
+            for (j=0; j<TETRAHEDRON_NUM_VERT_PER_FACE; j++)
             {
-                int outIdx  = i*TETR_NUM_VERT_PER_FACE*3+j*3;
-                int vertIdx = tetr_vi[faceIdxVertIdx+j]*3;
+                int outIdx  = i*TETRAHEDRON_NUM_VERT_PER_FACE*3+j*3;
+                int vertIdx = tetrahedron_vi[faceIdxVertIdx+j]*3;
 
-                vertices[outIdx  ] = offset[0] + scale * tetr_v[vertIdx  ];
-                vertices[outIdx+1] = offset[1] + scale * tetr_v[vertIdx+1];
-                vertices[outIdx+2] = offset[2] + scale * tetr_v[vertIdx+2];
+                vertices[outIdx  ] = offset[0] + scale * tetrahedron_v[vertIdx  ];
+                vertices[outIdx+1] = offset[1] + scale * tetrahedron_v[vertIdx+1];
+                vertices[outIdx+2] = offset[2] + scale * tetrahedron_v[vertIdx+2];
 
-                normals [outIdx  ] = tetr_n[normIdx  ];
-                normals [outIdx+1] = tetr_n[normIdx+1];
-                normals [outIdx+2] = tetr_n[normIdx+2];
+                normals [outIdx  ] = tetrahedron_n[normIdx  ];
+                normals [outIdx+1] = tetrahedron_n[normIdx+1];
+                normals [outIdx+2] = tetrahedron_n[normIdx+2];
             }
         }
     }
     else if ( numLevels > 0 )
     {
         GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
-        unsigned int stride = ipow(4,--numLevels)*TETR_VERT_ELEM_PER_TETR;
+        unsigned int stride = ipow(4,--numLevels)*TETRAHEDRON_VERT_ELEM_PER_OBJ;
         scale /= 2.0 ;
-        for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
+        for ( i = 0 ; i < TETRAHEDRON_NUM_FACES ; i++ )
         {
             int idx         = i*3;
-            local_offset[0] = offset[0] + scale * tetr_v[idx  ];
-            local_offset[1] = offset[1] + scale * tetr_v[idx+1];
-            local_offset[2] = offset[2] + scale * tetr_v[idx+2];
+            local_offset[0] = offset[0] + scale * tetrahedron_v[idx  ];
+            local_offset[1] = offset[1] + scale * tetrahedron_v[idx+1];
+            local_offset[2] = offset[2] + scale * tetrahedron_v[idx+2];
             fghSierpinskiSpongeGenerate ( numLevels, local_offset, scale, vertices+i*stride, normals+i*stride );
         }
     }
@@ -403,6 +387,16 @@ static void fghCircleTable(double **sint,double **cost,const int n)
 
 
 /* -- INTERNAL DRAWING functions to avoid code duplication ------------- */
+#define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps)\
+    static void fgh##nameICaps( GLboolean useWireMode )\
+    {\
+        if (!name##Cached)\
+        {\
+            fgh##nameICaps##Generate();\
+            name##Cached = TRUE;\
+        }\
+        fghDrawGeometry(GL_TRIANGLES,name##_verts,name##_norms,nameCaps##_VERT_PER_OBJ,useWireMode);\
+    }
 
 static void fghCube( GLdouble dSize, GLboolean useWireMode )
 {
@@ -417,44 +411,24 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
         int i;
 
         /* Need to build new vertex list containing vertices for cube of different size */
-        GLdouble *vertices = malloc(CUBE_VERT_ELEM_PER_CUBE * sizeof(GLdouble));
-        for (i=0; i<CUBE_VERT_ELEM_PER_CUBE; i++)
+        GLdouble *vertices = malloc(CUBE_VERT_ELEM_PER_OBJ * sizeof(GLdouble));
+        for (i=0; i<CUBE_VERT_ELEM_PER_OBJ; i++)
             vertices[i] = dSize*cube_verts[i];
 
-        fghDrawGeometry(GL_QUADS,vertices  ,cube_norms,CUBE_VERT_PER_CUBE,useWireMode);
+        fghDrawGeometry(GL_QUADS,vertices  ,cube_norms,CUBE_VERT_PER_OBJ,useWireMode);
     }
     else
-        fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_CUBE,useWireMode);
+        fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_OBJ,useWireMode);
 }
-
-static void fghOctahedron( GLboolean useWireMode )
-{
-    if (!octahedronCached)
-    {
-        fghOctahedronGenerate();
-        octahedronCached = TRUE;
-    }
-
-    fghDrawGeometry(GL_TRIANGLES,octahedron_verts,octahedron_norms,OCTAHEDRON_VERT_PER_OCTA,useWireMode);
-}
-
-static void fghTetrahedron( GLboolean useWireMode )
-{
-    if (!tetrCached)
-    {
-        fghTetrahedronGenerate();
-        tetrCached = TRUE;
-    }
-
-    fghDrawGeometry(GL_TRIANGLES,tetr_verts,tetr_norms,TETR_VERT_PER_TETR,useWireMode);
-}
+DECLARE_INTERNAL_DRAW(octahedron,Octahedron,OCTAHEDRON);
+DECLARE_INTERNAL_DRAW(tetrahedron,Tetrahedron,TETRAHEDRON);
 
 static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble scale, GLboolean useWireMode )
 {
     GLdouble *vertices;
     GLdouble * normals;
     GLsizei    numTetr = numLevels<0? 0 : ipow(4,numLevels); /* No sponge for numLevels below 0 */
-    GLsizei    numVert = numTetr*TETR_VERT_PER_TETR;
+    GLsizei    numVert = numTetr*TETRAHEDRON_VERT_PER_OBJ;
 
     if (numTetr)
     {
