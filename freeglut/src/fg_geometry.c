@@ -31,6 +31,8 @@
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
+ * See fghTetrahedron
+ *
  * Following functions have been contributed by Andreas Umbach.
  *
  *      glutWireCube()          -- looks OK
@@ -59,7 +61,171 @@
  */
 
 
-/* -- INTERFACE FUNCTIONS -------------------------------------------------- */
+/*
+ * General function for drawing geometry. As for all geometry we have no 
+ * redundancy (or hardly any in the case of cones and cylinders) in terms
+ * of the vertex/normal combinations, we just use glDrawArrays.
+ * useWireMode controls the drawing of solids (false) or wire frame
+ * versions (TRUE) of the geometry you pass
+ */
+static void fghDrawGeometry(GLenum vertexMode, double* vertices, double* normals, GLsizei numVertices, GLboolean useWireMode)
+{
+    if (useWireMode)
+    {
+        glPushAttrib(GL_POLYGON_BIT);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+
+    glVertexPointer(3, GL_DOUBLE, 0, vertices);
+    glNormalPointer(GL_DOUBLE, 0, normals);
+    glDrawArrays(vertexMode,0,numVertices);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+
+    if (useWireMode)
+    {
+        glPopAttrib();
+    }
+}
+
+
+/* -- INTERNAL SETUP OF GEOMETRY --------------------------------------- */
+/* -- first the cachable ones -- */
+
+/* Magic Numbers:  r0 = ( 1, 0, 0 )
+ *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
+ *                 r2 = ( -1/3, - sqrt(2) / 3,  sqrt(6) / 3 )
+ *                 r3 = ( -1/3, - sqrt(2) / 3, -sqrt(6) / 3 )
+ * |r0| = |r1| = |r2| = |r3| = 1
+ * Distance between any two points is 2 sqrt(6) / 3
+ *
+ * Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
+*/
+
+/* -- TetraHedron -- */
+#define TETR_NUM_FACES          4
+#define TETR_NUM_VERT_PER_FACE  3
+
+/* Vertex Coordinates */
+static GLdouble tet_r[TETR_NUM_FACES][TETR_NUM_VERT_PER_FACE] =
+{
+    {             1.0,             0.0,             0.0 },
+    { -0.333333333333,  0.942809041582,             0.0 },
+    { -0.333333333333, -0.471404520791,  0.816496580928 },
+    { -0.333333333333, -0.471404520791, -0.816496580928 }
+};
+
+/* Vertex indices */
+static GLubyte tet_i[TETR_NUM_FACES][TETR_NUM_VERT_PER_FACE] =
+{
+    { 1, 3, 2 }, { 0, 2, 3 }, { 0, 3, 1 }, { 0, 1, 2 }
+};
+/* Normal indices */
+static GLubyte tet_n[TETR_NUM_FACES] =
+{
+    0, 1, 2, 3
+};
+
+/* Cache of input to glDrawArrays */
+static GLboolean tetrCached = FALSE;
+static double tetr_verts[TETR_NUM_FACES * TETR_NUM_VERT_PER_FACE * 3];
+static double tetr_norms[TETR_NUM_FACES * TETR_NUM_VERT_PER_FACE * 3];
+
+static void fghTetrahedronCache()
+{
+    int p,q;
+    /*
+    * Build array with vertices from vertex coordinates and vertex indices 
+    * Do same for normals.
+    * Need to do this because of different normals at shared vertices
+    * (and because normals' coordinates need to be negated).
+    */
+    for (p=0; p<TETR_NUM_FACES; p++)
+    {
+        for (q=0; q<TETR_NUM_VERT_PER_FACE; q++)
+        {
+            int idx = p*TETR_NUM_VERT_PER_FACE*3+q*3;
+            tetr_verts[idx  ] =  tet_r[tet_i[p][q]][0];
+            tetr_verts[idx+1] =  tet_r[tet_i[p][q]][1];
+            tetr_verts[idx+2] =  tet_r[tet_i[p][q]][2];
+
+            tetr_norms[idx  ] = -tet_r[tet_n[p]][0];
+            tetr_norms[idx+1] = -tet_r[tet_n[p]][1];
+            tetr_norms[idx+2] = -tet_r[tet_n[p]][2];
+        }
+    }
+}
+
+/* -- Now the various shapes involving circles -- */
+/*
+ * Compute lookup table of cos and sin values forming a cirle
+ *
+ * Notes:
+ *    It is the responsibility of the caller to free these tables
+ *    The size of the table is (n+1) to form a connected loop
+ *    The last entry is exactly the same as the first
+ *    The sign of n can be flipped to get the reverse loop
+ */
+static void fghCircleTable(double **sint,double **cost,const int n)
+{
+    int i;
+
+    /* Table size, the sign of n flips the circle direction */
+
+    const int size = abs(n);
+
+    /* Determine the angle between samples */
+
+    const double angle = 2*M_PI/(double)( ( n == 0 ) ? 1 : n );
+
+    /* Allocate memory for n samples, plus duplicate of first entry at the end */
+
+    *sint = (double *) calloc(sizeof(double), size+1);
+    *cost = (double *) calloc(sizeof(double), size+1);
+
+    /* Bail out if memory allocation fails, fgError never returns */
+
+    if (!(*sint) || !(*cost))
+    {
+        free(*sint);
+        free(*cost);
+        fgError("Failed to allocate memory in fghCircleTable");
+    }
+
+    /* Compute cos and sin around the circle */
+
+    (*sint)[0] = 0.0;
+    (*cost)[0] = 1.0;
+
+    for (i=1; i<size; i++)
+    {
+        (*sint)[i] = sin(angle*i);
+        (*cost)[i] = cos(angle*i);
+    }
+
+    /* Last sample is duplicate of the first */
+
+    (*sint)[size] = (*sint)[0];
+    (*cost)[size] = (*cost)[0];
+}
+
+
+/* -- INTERNAL DRAWING functions to avoid code duplication ------------- */
+
+static void fghTetrahedron( GLboolean useWireMode )
+{
+    if (!tetrCached)
+        fghTetrahedronCache();
+
+    fghDrawGeometry(GL_TRIANGLES,tetr_verts,tetr_norms,TETR_NUM_FACES*TETR_NUM_VERT_PER_FACE,useWireMode);
+}
+
+
+/* -- INTERFACE FUNCTIONS ---------------------------------------------- */
 
 /*
  * Draws a wireframed cube. Code contributed by Andreas Umbach <marvin@dataway.ch>
@@ -111,58 +277,6 @@ void FGAPIENTRY glutSolidCube( GLdouble dSize )
 #   undef N
 }
 
-/*
- * Compute lookup table of cos and sin values forming a cirle
- *
- * Notes:
- *    It is the responsibility of the caller to free these tables
- *    The size of the table is (n+1) to form a connected loop
- *    The last entry is exactly the same as the first
- *    The sign of n can be flipped to get the reverse loop
- */
-
-static void fghCircleTable(double **sint,double **cost,const int n)
-{
-    int i;
-
-    /* Table size, the sign of n flips the circle direction */
-
-    const int size = abs(n);
-
-    /* Determine the angle between samples */
-
-    const double angle = 2*M_PI/(double)( ( n == 0 ) ? 1 : n );
-
-    /* Allocate memory for n samples, plus duplicate of first entry at the end */
-
-    *sint = (double *) calloc(sizeof(double), size+1);
-    *cost = (double *) calloc(sizeof(double), size+1);
-
-    /* Bail out if memory allocation fails, fgError never returns */
-
-    if (!(*sint) || !(*cost))
-    {
-        free(*sint);
-        free(*cost);
-        fgError("Failed to allocate memory in fghCircleTable");
-    }
-
-    /* Compute cos and sin around the circle */
-
-    (*sint)[0] = 0.0;
-    (*cost)[0] = 1.0;
-
-    for (i=1; i<size; i++)
-    {
-        (*sint)[i] = sin(angle*i);
-        (*cost)[i] = cos(angle*i);
-    }
-
-    /* Last sample is duplicate of the first */
-
-    (*sint)[size] = (*sint)[0];
-    (*cost)[size] = (*cost)[0];
-}
 
 /*
  * Draws a solid sphere
@@ -905,58 +1019,6 @@ void FGAPIENTRY glutSolidOctahedron( void )
 #undef RADIUS
 }
 
-/* Magic Numbers:  r0 = ( 1, 0, 0 )
- *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
- *                 r2 = ( -1/3, -sqrt(2) / 3, sqrt(6) / 3 )
- *                 r3 = ( -1/3, -sqrt(2) / 3, -sqrt(6) / 3 )
- * |r0| = |r1| = |r2| = |r3| = 1
- * Distance between any two points is 2 sqrt(6) / 3
- *
- * Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
- */
-
-#define NUM_TETR_FACES     4
-
-static GLdouble tet_r[4][3] = { {             1.0,             0.0,             0.0 },
-                                { -0.333333333333,  0.942809041582,             0.0 },
-                                { -0.333333333333, -0.471404520791,  0.816496580928 },
-                                { -0.333333333333, -0.471404520791, -0.816496580928 } } ;
-
-static GLint tet_i[4][3] =  /* Vertex indices */
-{
-  { 1, 3, 2 }, { 0, 2, 3 }, { 0, 3, 1 }, { 0, 1, 2 }
-} ;
-
-/*
- *
- */
-void FGAPIENTRY glutWireTetrahedron( void )
-{
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTetrahedron" );
-
-  glBegin( GL_LINE_LOOP ) ;
-    glNormal3d ( -tet_r[0][0], -tet_r[0][1], -tet_r[0][2] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[2] ) ;
-    glNormal3d ( -tet_r[1][0], -tet_r[1][1], -tet_r[1][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[2] ) ; glVertex3dv ( tet_r[3] ) ;
-    glNormal3d ( -tet_r[2][0], -tet_r[2][1], -tet_r[2][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[1] ) ;
-    glNormal3d ( -tet_r[3][0], -tet_r[3][1], -tet_r[3][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[2] ) ;
-  glEnd() ;
-}
-
-/*
- *
- */
-void FGAPIENTRY glutSolidTetrahedron( void )
-{
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTetrahedron" );
-
-  glBegin( GL_TRIANGLES ) ;
-    glNormal3d ( -tet_r[0][0], -tet_r[0][1], -tet_r[0][2] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[2] ) ;
-    glNormal3d ( -tet_r[1][0], -tet_r[1][1], -tet_r[1][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[2] ) ; glVertex3dv ( tet_r[3] ) ;
-    glNormal3d ( -tet_r[2][0], -tet_r[2][1], -tet_r[2][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[3] ) ; glVertex3dv ( tet_r[1] ) ;
-    glNormal3d ( -tet_r[3][0], -tet_r[3][1], -tet_r[3][2] ) ; glVertex3dv ( tet_r[0] ) ; glVertex3dv ( tet_r[1] ) ; glVertex3dv ( tet_r[2] ) ;
-  glEnd() ;
-}
-
 /*
  *
  */
@@ -1143,7 +1205,7 @@ void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], G
   if ( num_levels == 0 )
   {
 
-    for ( i = 0 ; i < NUM_TETR_FACES ; i++ )
+    for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
     {
       glBegin ( GL_LINE_LOOP ) ;
       glNormal3d ( -tet_r[i][0], -tet_r[i][1], -tet_r[i][2] ) ;
@@ -1163,7 +1225,7 @@ void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], G
     GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
     num_levels -- ;
     scale /= 2.0 ;
-    for ( i = 0 ; i < NUM_TETR_FACES ; i++ )
+    for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
     {
       local_offset[0] = offset[0] + scale * tet_r[i][0] ;
       local_offset[1] = offset[1] + scale * tet_r[i][1] ;
@@ -1183,7 +1245,7 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
   {
     glBegin ( GL_TRIANGLES ) ;
 
-    for ( i = 0 ; i < NUM_TETR_FACES ; i++ )
+    for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
     {
       glNormal3d ( -tet_r[i][0], -tet_r[i][1], -tet_r[i][2] ) ;
       for ( j = 0; j < 3; j++ )
@@ -1202,7 +1264,7 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
     GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
     num_levels -- ;
     scale /= 2.0 ;
-    for ( i = 0 ; i < NUM_TETR_FACES ; i++ )
+    for ( i = 0 ; i < TETR_NUM_FACES ; i++ )
     {
       local_offset[0] = offset[0] + scale * tet_r[i][0] ;
       local_offset[1] = offset[1] + scale * tet_r[i][1] ;
@@ -1211,5 +1273,24 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
     }
   }
 }
+
+
+
+/* -- INTERFACE FUNCTIONS -------------------------------------------------- */
+
+
+void FGAPIENTRY glutWireTetrahedron( void )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTetrahedron" );
+
+    fghTetrahedron( TRUE );
+}
+void FGAPIENTRY glutSolidTetrahedron( void )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTetrahedron" );
+
+    fghTetrahedron( FALSE );
+}
+
 
 /*** END OF FILE ***/
