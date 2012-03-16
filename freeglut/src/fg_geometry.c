@@ -67,7 +67,7 @@
  * useWireMode controls the drawing of solids (false) or wire frame
  * versions (TRUE) of the geometry you pass
  */
-static void fghDrawGeometry(GLenum vertexMode, double* vertices, double* normals, GLsizei numVertices, GLboolean useWireMode)
+static void fghDrawGeometry(GLenum vertexMode, GLdouble* vertices, GLdouble* normals, GLsizei numVertices, GLboolean useWireMode)
 {
     if (useWireMode)
     {
@@ -75,15 +75,31 @@ static void fghDrawGeometry(GLenum vertexMode, double* vertices, double* normals
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
+    if (1)
+    {
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
 
-    glVertexPointer(3, GL_DOUBLE, 0, vertices);
-    glNormalPointer(GL_DOUBLE, 0, normals);
-    glDrawArrays(vertexMode,0,numVertices);
+        glVertexPointer(3, GL_DOUBLE, 0, vertices);
+        glNormalPointer(GL_DOUBLE, 0, normals);
+        glDrawArrays(vertexMode, 0, numVertices);
 
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+    else
+    {
+        int i;
+        glBegin(vertexMode);
+            for(i=0; i<numVertices; i++)
+            {
+                glNormal3dv(normals+i*3);
+                printf("n(%i) = (%1.4f,%1.4f,%1.4f)\n",i,*(normals+i*3),*(normals+i*3+1),*(normals+i*3+2));
+                glVertex3dv(vertices+i*3);
+                printf("v(%i) = (%1.4f,%1.4f,%1.4f)\n",i,*(vertices+i*3),*(vertices+i*3+1),*(vertices+i*3+2));
+            }
+        glEnd();
+    }
 
     if (useWireMode)
     {
@@ -164,7 +180,7 @@ static GLdouble cube_n[CUBE_NUM_FACES*3] =
 };
 
 /* Vertex indices */
-static GLubyte cube_vi[CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE] =
+static GLubyte cube_vi[CUBE_VERT_PER_CUBE] =
 {
     0,1,2,3,
     0,3,4,5,
@@ -176,12 +192,67 @@ static GLubyte cube_vi[CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE] =
 
 /* Cache of input to glDrawArrays */
 static GLboolean cubeCached = FALSE;
-static double cube_verts[CUBE_VERT_ELEM_PER_CUBE];
-static double cube_norms[CUBE_VERT_ELEM_PER_CUBE];
+static GLdouble cube_verts[CUBE_VERT_ELEM_PER_CUBE];
+static GLdouble cube_norms[CUBE_VERT_ELEM_PER_CUBE];
 
 static void fghCubeGenerate()
 {
     fghGenerateGeometry(CUBE_NUM_FACES, CUBE_NUM_VERT_PER_FACE, cube_v, cube_vi, cube_n, cube_verts, cube_norms);
+}
+
+/* -- Octahedron -- */
+#define OCTAHEDRON_NUM_VERT           6
+#define OCTAHEDRON_NUM_FACES          8
+#define OCTAHEDRON_NUM_VERT_PER_FACE  3
+#define OCTAHEDRON_VERT_PER_OCTA      OCTAHEDRON_NUM_FACES*OCTAHEDRON_NUM_VERT_PER_FACE
+#define OCTAHEDRON_VERT_ELEM_PER_OCTA OCTAHEDRON_VERT_PER_OCTA*3
+
+/* Vertex Coordinates */
+static GLdouble octahedron_v[OCTAHEDRON_NUM_VERT*3] =
+{
+     1.,  0.,  0.,
+     0.,  1.,  0.,
+     0.,  0.,  1.,
+    -1.,  0.,  0.,
+     0., -1.,  0.,
+     0.,  0., -1.,
+
+};
+/* Normal Vectors */
+static GLdouble octahedron_n[OCTAHEDRON_NUM_FACES*3] =
+{
+     0.577350269189, 0.577350269189, 0.577350269189,    /* sqrt(1/3) */
+     0.577350269189, 0.577350269189,-0.577350269189,
+     0.577350269189,-0.577350269189, 0.577350269189,
+     0.577350269189,-0.577350269189,-0.577350269189,
+    -0.577350269189, 0.577350269189, 0.577350269189,
+    -0.577350269189, 0.577350269189,-0.577350269189,
+    -0.577350269189,-0.577350269189, 0.577350269189,
+    -0.577350269189,-0.577350269189,-0.577350269189
+
+};
+
+/* Vertex indices */
+static GLubyte octahedron_vi[OCTAHEDRON_VERT_PER_OCTA] =
+{
+    0, 1, 2,
+    0, 5, 1,
+    0, 2, 4,
+    0, 4, 5,
+    3, 2, 1,
+    3, 1, 5,
+    3, 4, 2,
+    3, 5, 4
+};
+
+/* Cache of input to glDrawArrays */
+static GLboolean octahedronCached = FALSE;
+static GLdouble octahedron_verts[OCTAHEDRON_VERT_ELEM_PER_OCTA];
+static GLdouble octahedron_norms[OCTAHEDRON_VERT_ELEM_PER_OCTA];
+
+static void fghOctahedronGenerate()
+{
+    fghGenerateGeometry(OCTAHEDRON_NUM_FACES, OCTAHEDRON_NUM_VERT_PER_FACE, octahedron_v, octahedron_vi, octahedron_n, octahedron_verts, octahedron_norms);
 }
 
 /* -- Tetrahedron -- */
@@ -218,7 +289,7 @@ static GLdouble tetr_n[CUBE_NUM_FACES*3] =
 };
 
 /* Vertex indices */
-static GLubyte tetr_vi[TETR_NUM_FACES*TETR_NUM_VERT_PER_FACE] =
+static GLubyte tetr_vi[TETR_VERT_PER_TETR] =
 {
     1, 3, 2,
     0, 2, 3,
@@ -228,8 +299,8 @@ static GLubyte tetr_vi[TETR_NUM_FACES*TETR_NUM_VERT_PER_FACE] =
 
 /* Cache of input to glDrawArrays */
 static GLboolean tetrCached = FALSE;
-static double tetr_verts[TETR_VERT_ELEM_PER_TETR];
-static double tetr_norms[TETR_VERT_ELEM_PER_TETR];
+static GLdouble tetr_verts[TETR_VERT_ELEM_PER_TETR];
+static GLdouble tetr_norms[TETR_VERT_ELEM_PER_TETR];
 
 static void fghTetrahedronGenerate()
 {
@@ -237,7 +308,7 @@ static void fghTetrahedronGenerate()
 }
 
 /* -- Sierpinski Sponge -- */
-static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLdouble scale, double* vertices, double* normals )
+static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLdouble scale, GLdouble* vertices, GLdouble* normals )
 {
     int i, j;
     if ( numLevels == 0 )
@@ -346,7 +417,7 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
         int i;
 
         /* Need to build new vertex list containing vertices for cube of different size */
-        GLdouble *vertices = malloc(CUBE_VERT_ELEM_PER_CUBE * sizeof(double));
+        GLdouble *vertices = malloc(CUBE_VERT_ELEM_PER_CUBE * sizeof(GLdouble));
         for (i=0; i<CUBE_VERT_ELEM_PER_CUBE; i++)
             vertices[i] = dSize*cube_verts[i];
 
@@ -354,6 +425,17 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
     }
     else
         fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_CUBE,useWireMode);
+}
+
+static void fghOctahedron( GLboolean useWireMode )
+{
+    if (!octahedronCached)
+    {
+        fghOctahedronGenerate();
+        octahedronCached = TRUE;
+    }
+
+    fghDrawGeometry(GL_TRIANGLES,octahedron_verts,octahedron_norms,OCTAHEDRON_VERT_PER_OCTA,useWireMode);
 }
 
 static void fghTetrahedron( GLboolean useWireMode )
@@ -377,8 +459,8 @@ static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble sc
     if (numTetr)
     {
         /* Allocate memory */
-        vertices = malloc(numVert*3 * sizeof(double));
-        normals  = malloc(numVert*3 * sizeof(double));
+        vertices = malloc(numVert*3 * sizeof(GLdouble));
+        normals  = malloc(numVert*3 * sizeof(GLdouble));
 
         /* Generate elements */
         fghSierpinskiSpongeGenerate ( numLevels, offset, scale, vertices, normals );
@@ -1096,48 +1178,6 @@ void FGAPIENTRY glutSolidDodecahedron( void )
 /*
  *
  */
-void FGAPIENTRY glutWireOctahedron( void )
-{
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireOctahedron" );
-
-#define RADIUS    1.0f
-  glBegin( GL_LINE_LOOP );
-    glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
-    glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS, 0.0 );
-    glNormal3d( 0.577350269189,-0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, 0.0 );
-    glNormal3d( 0.577350269189,-0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
-    glNormal3d(-0.577350269189, 0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, 0.0 );
-    glNormal3d(-0.577350269189, 0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
-    glNormal3d(-0.577350269189,-0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
-    glNormal3d(-0.577350269189,-0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS, 0.0 );
-  glEnd();
-#undef RADIUS
-}
-
-/*
- *
- */
-void FGAPIENTRY glutSolidOctahedron( void )
-{
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidOctahedron" );
-
-#define RADIUS    1.0f
-  glBegin( GL_TRIANGLES );
-    glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
-    glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS, 0.0 );
-    glNormal3d( 0.577350269189,-0.577350269189, 0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, 0.0 );
-    glNormal3d( 0.577350269189,-0.577350269189,-0.577350269189); glVertex3d( RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
-    glNormal3d(-0.577350269189, 0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, 0.0 );
-    glNormal3d(-0.577350269189, 0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, RADIUS, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS );
-    glNormal3d(-0.577350269189,-0.577350269189, 0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0,-RADIUS, 0.0 ); glVertex3d( 0.0, 0.0, RADIUS );
-    glNormal3d(-0.577350269189,-0.577350269189,-0.577350269189); glVertex3d(-RADIUS, 0.0, 0.0 ); glVertex3d( 0.0, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS, 0.0 );
-  glEnd();
-#undef RADIUS
-}
-
-/*
- *
- */
 static double icos_r[12][3] = {
     {  1.0,             0.0,             0.0            },
     {  0.447213595500,  0.894427191000,  0.0            },
@@ -1329,15 +1369,15 @@ void FGAPIENTRY glutSolidCube( GLdouble dSize )
     fghCube( dSize, FALSE );
 }
 
-void FGAPIENTRY glutWireTetrahedron( void )
+void FGAPIENTRY glutWireOctahedron( void )
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTetrahedron" );
-    fghTetrahedron( TRUE );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireOctahedron" );
+    fghOctahedron( TRUE );
 }
-void FGAPIENTRY glutSolidTetrahedron( void )
+void FGAPIENTRY glutSolidOctahedron( void )
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTetrahedron" );
-    fghTetrahedron( FALSE );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidOctahedron" );
+    fghOctahedron( FALSE );
 }
 
 void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
@@ -1349,6 +1389,17 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], 
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSierpinskiSponge" );
     fghSierpinskiSponge ( num_levels, offset, scale, FALSE );
+}
+
+void FGAPIENTRY glutWireTetrahedron( void )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTetrahedron" );
+    fghTetrahedron( TRUE );
+}
+void FGAPIENTRY glutSolidTetrahedron( void )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTetrahedron" );
+    fghTetrahedron( FALSE );
 }
 
 
