@@ -18,6 +18,17 @@ set(VERSION_MINOR 0)
 set(VERSION_PATCH 0)
 
 
+# BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
+# re-declare it here so it will show up in the GUI.
+# by default, we want to build both
+OPTION(BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
+OPTION(BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
+
+# OpenGL ES support
+OPTION(FREEGLUT_GLES1 "Use OpenGL ES 1.x (requires EGL)" OFF)
+OPTION(FREEGLUT_GLES2 "Use OpenGL ES 2.x (requires EGL) (overrides BUILD_GLES1)" OFF)
+
+
 SET(FREEGLUT_HEADERS
     include/GL/freeglut.h
     include/GL/freeglut_ext.h
@@ -47,9 +58,8 @@ SET(FREEGLUT_SRCS
     src/fg_videoresize.c
     src/fg_window.c
 )
-# Android port requires adding a version of these compatible with
-# OpenGL ES (TODO):
-IF(NOT ANDROID)
+# TODO: OpenGL ES requires a compatible version of these files:
+IF(NOT FREEGLUT_GLES2 AND NOT FREEGLUT_GLES1)
     LIST(APPEND FREEGLUT_SRCS
         src/fg_font.c
         src/fg_geometry.c
@@ -123,16 +133,6 @@ ELSE()
         src/x11/fg_xinput_x11.c
     )
 ENDIF()
-
-# BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
-# re-declare it here so it will show up in the GUI.
-# by default, we want to build both
-OPTION(BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
-OPTION(BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
-
-# OpenGL ES support
-OPTION(FREEGLUT_GLES1 "Use OpenGL ES 1.x (requires EGL)" OFF)
-OPTION(FREEGLUT_GLES2 "Use OpenGL ES 2.x (requires EGL) (overrides BUILD_GLES1)" OFF)
 
 # For OpenGL ES (GLES):
 # - compile with -DFREEGLUT_GLES1 and -DFREEGLUT_GLES2 to cleanly
