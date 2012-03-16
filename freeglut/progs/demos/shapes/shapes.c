@@ -13,6 +13,7 @@
       -    <tt>Esc &nbsp;</tt> Quit
       -    <tt>q Q &nbsp;</tt> Quit
       -    <tt>i I &nbsp;</tt> Show info
+      -    <tt>p P &nbsp;</tt> Toggle perspective or orthographic projection
       -    <tt>= + &nbsp;</tt> Increase \a slices
       -    <tt>- _ &nbsp;</tt> Decreate \a slices
       -    <tt>, < &nbsp;</tt> Decreate \a stacks
@@ -64,6 +65,8 @@ static double orad = 1.0;   /* doubles as size for objects other than Torus */
 static int depth = 4;
 static double offset[ 3 ] = { 0, 0, 0 };
 static GLboolean show_info = GL_TRUE;
+static float ar;
+static int persProject = 1;
 
 /*
  * These one-liners draw particular objects, fetching appropriate
@@ -224,22 +227,24 @@ static void shapesPrintf (int row, int col, const char *fmt, ...)
 static void
 resize(int width, int height)
 {
-    const float ar = (float) width / (float) height;
+    ar = (float) width / (float) height;
 
     glViewport(0, 0, width, height);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity() ;
 }
 
 static void display(void)
 {
     const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
     const double a = t*90.0;
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    if (persProject)
+        glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+    else
+        glOrtho(-ar*3, ar*3, -3.0, 3.0, 2.0, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -308,6 +313,9 @@ key(unsigned char key, int x, int y)
 
     case '0': 
     case ')': ++depth;                    break;
+
+    case 'P':
+    case 'p': persProject=!persProject;   break;
 
     default:
         break;
