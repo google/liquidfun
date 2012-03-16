@@ -61,8 +61,7 @@
  */
 
 
-/*
- * General function for drawing geometry. As for all geometry we have no 
+/* General function for drawing geometry. As for all geometry we have no 
  * redundancy (or hardly any in the case of cones and cylinders) in terms
  * of the vertex/normal combinations, we just use glDrawArrays.
  * useWireMode controls the drawing of solids (false) or wire frame
@@ -99,6 +98,73 @@ static unsigned int ipow (int x, unsigned int y)
     return y==0? 1: y==1? x: (y%2? x: 1) * ipow(x*x, y/2);
 }
 
+/* -- stuff that can be cached -- */
+/*
+ * In general, we build arrays with all vertices or normals.
+ * We cant compress this and use glDrawElements as all combinations of
+ * vertex and normals are unique.
+ */
+
+/* -- Cube -- */
+#define CUBE_NUM_VERT           8
+#define CUBE_NUM_FACES          6
+#define CUBE_NUM_VERT_PER_FACE  4
+#define CUBE_VERT_PER_TETR      CUBE_NUM_FACES*CUBE_NUM_VERT_PER_FACE
+#define CUBE_VERT_ELEM_PER_TETR CUBE_VERT_PER_TETR*3
+/* Vertex Coordinates */
+static GLdouble cube_v[CUBE_NUM_VERT][3] =
+{
+    { .5, .5, .5},
+    {-.5, .5, .5},
+    {-.5,-.5, .5},
+    { .5,-.5, .5},
+    { .5,-.5,-.5},
+    { .5, .5,-.5},
+    {-.5, .5,-.5},
+    {-.5,-.5,-.5}
+};
+/* Normal Vectors */
+static GLdouble cube_n[CUBE_NUM_FACES][3] =
+{
+    { 1.0, 0.0, 0.0},
+    { 0.0, 1.0, 0.0},
+    { 0.0, 0.0, 1.0},
+    {-1.0, 0.0, 0.0},
+    { 0.0,-1.0, 0.0},
+    { 0.0, 0.0,-1.0}
+};
+
+/* Vertex indices */
+static GLubyte cube_vi[CUBE_NUM_FACES][CUBE_NUM_VERT_PER_FACE] =
+{
+    {0,1,2,3}, {0,3,4,5}, {0,5,6,1}, {1,6,7,2}, {7,4,3,2}, {4,7,6,5}
+};
+
+/* Cache of input to glDrawArrays */
+static GLboolean cubeCached = FALSE;
+static double cube_verts[CUBE_VERT_ELEM_PER_TETR];
+static double cube_norms[CUBE_VERT_ELEM_PER_TETR];
+
+static void fghCubeGenerate()
+{   
+    int i,j;
+    for (i=0; i<CUBE_NUM_FACES; i++)
+    {
+        for (j=0; j<CUBE_NUM_VERT_PER_FACE; j++)
+        {
+            int idx = i*CUBE_NUM_VERT_PER_FACE*3+j*3;
+            cube_verts[idx  ] = cube_v[cube_vi[i][j]][0];
+            cube_verts[idx+1] = cube_v[cube_vi[i][j]][1];
+            cube_verts[idx+2] = cube_v[cube_vi[i][j]][2];
+
+            cube_norms[idx  ] = cube_n[i][0];
+            cube_norms[idx+1] = cube_n[i][1];
+            cube_norms[idx+2] = cube_n[i][2];
+        }
+    }
+}
+
+/* -- Tetrahedron -- */
 /* Magic Numbers:  r0 = ( 1, 0, 0 )
  *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
  *                 r2 = ( -1/3, - sqrt(2) / 3,  sqrt(6) / 3 )
@@ -107,32 +173,34 @@ static unsigned int ipow (int x, unsigned int y)
  * Distance between any two points is 2 sqrt(6) / 3
  *
  * Normals:  The unit normals are simply the negative of the coordinates of the point not on the surface.
-*/
-
-/* -- Tetrahedron -- */
+ */
+#define TETR_NUM_VERT           4
 #define TETR_NUM_FACES          4
 #define TETR_NUM_VERT_PER_FACE  3
 #define TETR_VERT_PER_TETR      TETR_NUM_FACES*TETR_NUM_VERT_PER_FACE
 #define TETR_VERT_ELEM_PER_TETR TETR_VERT_PER_TETR*3
 
 /* Vertex Coordinates */
-static GLdouble tet_r[TETR_NUM_FACES][TETR_NUM_VERT_PER_FACE] =
+static GLdouble tet_r[TETR_NUM_VERT][TETR_NUM_VERT_PER_FACE] =
 {
     {             1.0,             0.0,             0.0 },
     { -0.333333333333,  0.942809041582,             0.0 },
     { -0.333333333333, -0.471404520791,  0.816496580928 },
     { -0.333333333333, -0.471404520791, -0.816496580928 }
 };
+/* Normal Vectors */
+static GLdouble tet_n[CUBE_NUM_FACES][3] =
+{
+    { -           1.0,             0.0,             0.0 },
+    {  0.333333333333, -0.942809041582,             0.0 },
+    {  0.333333333333,  0.471404520791, -0.816496580928 },
+    {  0.333333333333,  0.471404520791,  0.816496580928 }
+};
 
 /* Vertex indices */
 static GLubyte tet_i[TETR_NUM_FACES][TETR_NUM_VERT_PER_FACE] =
 {
     { 1, 3, 2 }, { 0, 2, 3 }, { 0, 3, 1 }, { 0, 1, 2 }
-};
-/* Normal indices */
-static GLubyte tet_n[TETR_NUM_FACES] =
-{
-    0, 1, 2, 3
 };
 
 /* Cache of input to glDrawArrays */
@@ -144,11 +212,11 @@ static void fghTetrahedronGenerate()
 {
     int i,j;
     /*
-    * Build array with vertices from vertex coordinates and vertex indices 
-    * Do same for normals.
-    * Need to do this because of different normals at shared vertices
-    * (and because normals' coordinates need to be negated).
-    */
+     * Build array with vertices from vertex coordinates and vertex indices 
+     * Do same for normals.
+     * Need to do this because of different normals at shared vertices
+     * (and because normals' coordinates need to be negated).
+     */
     for (i=0; i<TETR_NUM_FACES; i++)
     {
         for (j=0; j<TETR_NUM_VERT_PER_FACE; j++)
@@ -158,9 +226,9 @@ static void fghTetrahedronGenerate()
             tetr_verts[idx+1] =  tet_r[tet_i[i][j]][1];
             tetr_verts[idx+2] =  tet_r[tet_i[i][j]][2];
 
-            tetr_norms[idx  ] = -tet_r[tet_n[i]][0];
-            tetr_norms[idx+1] = -tet_r[tet_n[i]][1];
-            tetr_norms[idx+2] = -tet_r[tet_n[i]][2];
+            tetr_norms[idx  ] =  tet_n[i][0];
+            tetr_norms[idx+1] =  tet_n[i][1];
+            tetr_norms[idx+2] =  tet_n[i][2];
         }
     }
 }
@@ -180,9 +248,9 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
                 vertices[idx+1] =  offset[1] + scale * tet_r[tet_i[i][j]][1];
                 vertices[idx+2] =  offset[2] + scale * tet_r[tet_i[i][j]][2];
 
-                normals[idx  ] = -tet_r[tet_n[i]][0];
-                normals[idx+1] = -tet_r[tet_n[i]][1];
-                normals[idx+2] = -tet_r[tet_n[i]][2];
+                normals [idx  ] = -tet_r[i][0];
+                normals [idx+1] = -tet_r[i][1];
+                normals [idx+2] = -tet_r[i][2];
             }
         }
     }
@@ -257,6 +325,20 @@ static void fghCircleTable(double **sint,double **cost,const int n)
 
 /* -- INTERNAL DRAWING functions to avoid code duplication ------------- */
 
+static void fghCube( GLdouble dSize, GLboolean useWireMode )
+{
+    if (!cubeCached)
+        fghCubeGenerate();
+
+    if (dSize!=1.)
+    {
+        /* Need to build new */
+        fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_TETR,useWireMode);
+    }
+    else
+        fghDrawGeometry(GL_QUADS,cube_verts,cube_norms,CUBE_VERT_PER_TETR,useWireMode);
+}
+
 static void fghTetrahedron( GLboolean useWireMode )
 {
     if (!tetrCached)
@@ -290,56 +372,6 @@ static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble sc
 
 
 /* -- INTERFACE FUNCTIONS ---------------------------------------------- */
-
-/*
- * Draws a wireframed cube. Code contributed by Andreas Umbach <marvin@dataway.ch>
- */
-void FGAPIENTRY glutWireCube( GLdouble dSize )
-{
-    double size = dSize * 0.5;
-
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCube" );
-
-#   define V(a,b,c) glVertex3d( a size, b size, c size );
-#   define N(a,b,c) glNormal3d( a, b, c );
-
-    /* PWO: I dared to convert the code to use macros... */
-    glBegin( GL_LINE_LOOP ); N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+); glEnd();
-    glBegin( GL_LINE_LOOP ); N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+); glEnd();
-    glBegin( GL_LINE_LOOP ); N( 0.0, 0.0, 1.0); V(+,+,+); V(-,+,+); V(-,-,+); V(+,-,+); glEnd();
-    glBegin( GL_LINE_LOOP ); N(-1.0, 0.0, 0.0); V(-,-,+); V(-,+,+); V(-,+,-); V(-,-,-); glEnd();
-    glBegin( GL_LINE_LOOP ); N( 0.0,-1.0, 0.0); V(-,-,+); V(-,-,-); V(+,-,-); V(+,-,+); glEnd();
-    glBegin( GL_LINE_LOOP ); N( 0.0, 0.0,-1.0); V(-,-,-); V(-,+,-); V(+,+,-); V(+,-,-); glEnd();
-
-#   undef V
-#   undef N
-}
-
-/*
- * Draws a solid cube. Code contributed by Andreas Umbach <marvin@dataway.ch>
- */
-void FGAPIENTRY glutSolidCube( GLdouble dSize )
-{
-    double size = dSize * 0.5;
-
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCube" );
-
-#   define V(a,b,c) glVertex3d( a size, b size, c size );
-#   define N(a,b,c) glNormal3d( a, b, c );
-
-    /* PWO: Again, I dared to convert the code to use macros... */
-    glBegin( GL_QUADS );
-        N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+);
-        N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+);
-        N( 0.0, 0.0, 1.0); V(+,+,+); V(-,+,+); V(-,-,+); V(+,-,+);
-        N(-1.0, 0.0, 0.0); V(-,-,+); V(-,+,+); V(-,+,-); V(-,-,-);
-        N( 0.0,-1.0, 0.0); V(-,-,+); V(-,-,-); V(+,-,-); V(+,-,+);
-        N( 0.0, 0.0,-1.0); V(-,-,-); V(-,+,-); V(+,+,-); V(+,-,-);
-    glEnd();
-
-#   undef V
-#   undef N
-}
 
 
 /*
@@ -1263,7 +1295,19 @@ void FGAPIENTRY glutSolidRhombicDodecahedron( void )
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
-
+/*
+ * Draws a wireframed cube.
+ */
+void FGAPIENTRY glutWireCube( GLdouble dSize )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCube" );
+    fghCube( dSize, TRUE );
+}
+void FGAPIENTRY glutSolidCube( GLdouble dSize )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCube" );
+    fghCube( dSize, FALSE );
+}
 
 void FGAPIENTRY glutWireTetrahedron( void )
 {
