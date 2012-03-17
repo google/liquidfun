@@ -41,7 +41,7 @@
  */
 static void fghDrawGeometry(GLdouble *vertices, GLdouble *normals, GLboolean *edgeFlags, GLsizei numVertices, GLsizei numFaces, GLsizei numEdgePerFace, GLboolean useWireMode)
 {
-#   ifdef FREEGLUT_GLES
+#   ifdef FREEGLUT_GLES1
     /* Solid drawing is the same for OpenGL 1.x and OpenGL ES 1.x, just
      * no edge flags for ES.
      * WireFrame drawing will have to be done per face though, using
@@ -113,14 +113,14 @@ static void fghDrawGeometry(GLdouble *vertices, GLdouble *normals, GLboolean *ed
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
-#   ifndef FREEGLUT_GLES
+#   ifndef FREEGLUT_GLES1
         if (edgeFlags)
             glEnableClientState(GL_EDGE_FLAG_ARRAY);
 #   endif
 
     glVertexPointer(3, GL_DOUBLE, 0, vertices);
     glNormalPointer(GL_DOUBLE, 0, normals);
-#       ifndef FREEGLUT_GLES
+#       ifndef FREEGLUT_GLES1
         if (edgeFlags)
             glEdgeFlagPointer(0,edgeFlags);
 #       endif
@@ -128,7 +128,7 @@ static void fghDrawGeometry(GLdouble *vertices, GLdouble *normals, GLboolean *ed
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
-#   ifndef FREEGLUT_GLES
+#   ifndef FREEGLUT_GLES1
         if (edgeFlags)
             glDisableClientState(GL_EDGE_FLAG_ARRAY);
 #   endif
