@@ -1,5 +1,5 @@
 /*
- * fg_structure_egl.c
+ * fg_structure_android.c
  *
  * Windows and menus need tree structure
  *
@@ -25,12 +25,12 @@
 
 #include <GL/freeglut.h>
 #include "fg_internal.h"
+#include "egl/fg_structure_egl.h"
 
 /**
  * Initialize default platform-specific fields in SFG_Window
  */
-void fghPlatformCreateWindowEGL ( SFG_Window *window )
+void fgPlatformCreateWindow ( SFG_Window *window )
 {
-  window->Window.pContext.egl.Surface = EGL_NO_SURFACE;
-  window->Window.pContext.egl.Config = NULL;
+  fghPlatformCreateWindowEGL(window);
 }

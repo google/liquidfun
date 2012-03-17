@@ -1,5 +1,5 @@
 /*
- * fg_structure_egl.c
+ * fg_structure_egl.h
  *
  * Windows and menus need tree structure
  *
@@ -23,14 +23,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/freeglut.h>
-#include "fg_internal.h"
+#ifndef __FG_STRUCTURE_EGL_H__
+#define __FG_STRUCTURE_EGL_H__
 
-/**
- * Initialize default platform-specific fields in SFG_Window
- */
-void fghPlatformCreateWindowEGL ( SFG_Window *window )
-{
-  window->Window.pContext.egl.Surface = EGL_NO_SURFACE;
-  window->Window.pContext.egl.Config = NULL;
-}
+extern void fghPlatformCreateWindowEGL ( SFG_Window *window );
+
+#endif
