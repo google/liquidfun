@@ -50,7 +50,7 @@ int fghChooseConfigEGL(EGLConfig* config) {
   EGLint num_config;
   if (!eglChooseConfig(fgDisplay.pDisplay.egl.Display,
 		       attribs, config, 1, &num_config)) {
-    fgWarn("eglChooseConfig: error %x\n", eglGetError());
+    fgWarning("eglChooseConfig: error %x\n", eglGetError());
     return 0;
   }
 
