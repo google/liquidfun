@@ -66,7 +66,7 @@ static int depth = 4;
 static double offset[ 3 ] = { 0, 0, 0 };
 static GLboolean show_info = GL_TRUE;
 static float ar;
-static int persProject = 1;
+static GLboolean persProject = GL_TRUE;
 
 /*
  * These one-liners draw particular objects, fetching appropriate
