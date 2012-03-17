@@ -29,38 +29,7 @@
 #include "fg_internal.h"
 
 /*
- *
  * Need more types of polyhedra? See CPolyhedron in MRPT
- * 
- * TODO BEFORE THE STABLE RELEASE:
- *
- * See fghTetrahedron
- *
- * Following functions have been contributed by Andreas Umbach.
- *
- *      glutWireCube()          -- looks OK
- *      glutSolidCube()         -- OK
- *
- * Those functions have been implemented by John Fay.
- *
- *      glutWireTorus()         -- looks OK
- *      glutSolidTorus()        -- looks OK
- *      glutWireDodecahedron()  -- looks OK
- *      glutSolidDodecahedron() -- looks OK
- *      glutWireOctahedron()    -- looks OK
- *      glutSolidOctahedron()   -- looks OK
- *      glutWireTetrahedron()   -- looks OK
- *      glutSolidTetrahedron()  -- looks OK
- *      glutWireIcosahedron()   -- looks OK
- *      glutSolidIcosahedron()  -- looks OK
- *
- *  The Following functions have been updated by Nigel Stewart, based
- *  on FreeGLUT 2.0.0 implementations:
- *
- *      glutWireSphere()        -- looks OK
- *      glutSolidSphere()       -- looks OK
- *      glutWireCone()          -- looks OK
- *      glutSolidCone()         -- looks OK
  */
 
 
@@ -70,8 +39,71 @@
  * useWireMode controls the drawing of solids (false) or wire frame
  * versions (TRUE) of the geometry you pass
  */
-static void fghDrawGeometry(GLenum vertexMode, GLdouble *vertices, GLdouble *normals, GLboolean *edgeFlags, GLsizei numVertices, GLboolean useWireMode)
+static void fghDrawGeometry(GLdouble *vertices, GLdouble *normals, GLboolean *edgeFlags, GLsizei numVertices, GLsizei numFaces, GLsizei numEdgePerFace, GLboolean useWireMode)
 {
+#   ifdef FREEGLUT_GLES
+    /* Solid drawing is the same for OpenGL 1.x and OpenGL ES 1.x, just
+     * no edge flags for ES.
+     * WireFrame drawing will have to be done per face though, using
+     * GL_LINE_LOOP and issuing one draw call per face. For triangles,
+     * we use glDrawArrays directly on the vertex data for each face,
+     * while for shapes that are composed of quads or pentagons, we use
+     * glDrawElements with index vector {0,1,2,5} or {0,1,2,8,5},
+     * respectively.
+     * We use the first parameter in glDrawArrays or glDrawElements to
+     * go from face to face.
+     */
+    if (useWireMode)
+    {
+        /* setup reading the right elements from vertex array */
+        GLubyte vertIdx4[4] = {0,1,2,5};
+        GLubyte vertIdx5[5] = {0,1,2,8,5};
+        GLubyte *indices = NULL;
+        int vertStride, i, j;
+        
+        switch (numEdgePerFace)
+        {
+        case 3:
+            vertStride = 3;             /* there are 3 vertices for each face in the array */
+            break;
+        case 4:
+            indices    = vertIdx4;
+            vertStride = 6;             /* there are 6 vertices for each face in the array */
+            break;
+        case 5:
+            indices    = vertIdx5;
+            vertStride = 9;             /* there are 9 vertices for each face in the array */
+            break;
+        }
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        glVertexPointer(3, GL_DOUBLE, 0, vertices);
+        glNormalPointer(GL_DOUBLE, 0, normals);
+
+        if (numEdgePerFace==3)
+            for (i=0; i<numFaces; i++)
+                glDrawArrays(GL_LINE_LOOP, i*vertStride, numEdgePerFace);
+        else
+        {
+            GLubyte *vertIndices = malloc(numEdgePerFace*sizeof(GLubyte));
+            for (i=0; i<numFaces; i++)
+            {
+                for (j=0; j< numEdgePerFace; j++)
+                    vertIndices[j] = indices[j]+i*vertStride;
+
+                glDrawElements(GL_LINE_LOOP, numEdgePerFace, GL_UNSIGNED_BYTE, vertIndices);
+            }
+            free(vertIndices);
+        }
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        return; /* done */
+    }
+#   endif
+
     if (useWireMode)
     {
         glPushAttrib(GL_POLYGON_BIT);
@@ -79,48 +111,46 @@ static void fghDrawGeometry(GLenum vertexMode, GLdouble *vertices, GLdouble *nor
         glDisable(GL_CULL_FACE);
     }
 
-    if (1)
-    {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+#   ifndef FREEGLUT_GLES
         if (edgeFlags)
             glEnableClientState(GL_EDGE_FLAG_ARRAY);
+#   endif
 
-        glVertexPointer(3, GL_DOUBLE, 0, vertices);
-        glNormalPointer(GL_DOUBLE, 0, normals);
+    glVertexPointer(3, GL_DOUBLE, 0, vertices);
+    glNormalPointer(GL_DOUBLE, 0, normals);
+#       ifndef FREEGLUT_GLES
         if (edgeFlags)
             glEdgeFlagPointer(0,edgeFlags);
-        glDrawArrays(vertexMode, 0, numVertices);
+#       endif
+    glDrawArrays(GL_TRIANGLES, 0, numVertices);
 
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+#   ifndef FREEGLUT_GLES
         if (edgeFlags)
             glDisableClientState(GL_EDGE_FLAG_ARRAY);
-    }
-    else
-    {
-        int i;
-        glBegin(vertexMode);
-            for(i=0; i<numVertices; i++)
-            {
-                glEdgeFlag(edgeFlags[i]);
-                glNormal3dv(normals+i*3);
-                printf("n(%i) = (%1.4f,%1.4f,%1.4f)\n",i,*(normals+i*3),*(normals+i*3+1),*(normals+i*3+2));
-                glVertex3dv(vertices+i*3);
-                printf("v(%i) = (%1.4f,%1.4f,%1.4f)\n",i,*(vertices+i*3),*(vertices+i*3+1),*(vertices+i*3+2));
-            }
-        glEnd();
-    }
+#   endif
 
     if (useWireMode)
     {
         glPopAttrib();
     }
+
+    /* Notes on OpenGL 3 and OpenGL ES2, drawing code for programmable pipeline:
+     * As above, we'll have to draw face-by-face for wireframes. On
+     * OpenGL 3 we can probably use glMultiDrawArrays do do this efficiently.
+     * other complications are VBOs and such...
+     */
 }
 
-/* triangle decomposition and associated edgeFlags
- * be careful to keep winding of all triangles counter-clockwise,
+/* Triangle decomposition and associated edgeFlags generation
+ * Be careful to keep winding of all triangles counter-clockwise,
  * assuming that input has correct winding...
+ * Could probably do something smarter using glDrawElements and generating
+ * an index vector here for all shapes that are not triangles, but this
+ * suffices for now. We're not talking many vertices in our objects anyway.
  */
 static GLubyte   vertSamp3[3] = {0,1,2};
 static GLubyte   vertSamp4[6] = {0,1,2, 0,2,3};             /* quad    : 4 input vertices, 6 output (2 triangles) */
@@ -675,7 +705,9 @@ static void fghCircleTable(double **sint,double **cost,const int n)
             fgh##nameICaps##Generate();\
             name##Cached = GL_TRUE;\
         }\
-        fghDrawGeometry(GL_TRIANGLES,name##_verts,name##_norms,edgeFlags,nameCaps##_VERT_PER_OBJ_TRI,useWireMode);\
+        fghDrawGeometry(name##_verts,name##_norms,edgeFlags,\
+                        nameCaps##_VERT_PER_OBJ_TRI,nameCaps##_NUM_FACES,nameCaps##_NUM_EDGE_PER_FACE,\
+                        useWireMode);\
     }
 #define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps) _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,NULL)
 #define DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(name,nameICaps,nameCaps) _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,name##_edgeFlags)
@@ -703,13 +735,13 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
         for (i=0; i<CUBE_VERT_ELEM_PER_OBJ; i++)
             vertices[i] = dSize*cube_verts[i];
 
-        fghDrawGeometry(GL_TRIANGLES,vertices  ,cube_norms,cube_edgeFlags,CUBE_VERT_PER_OBJ_TRI,useWireMode);
+        fghDrawGeometry(vertices  ,cube_norms,cube_edgeFlags,CUBE_VERT_PER_OBJ_TRI,CUBE_NUM_FACES,CUBE_NUM_EDGE_PER_FACE,useWireMode);
 
         /* cleanup allocated memory */
         free(vertices);
     }
     else
-        fghDrawGeometry(GL_TRIANGLES,cube_verts,cube_norms,cube_edgeFlags,CUBE_VERT_PER_OBJ_TRI,useWireMode);
+        fghDrawGeometry(cube_verts,cube_norms,cube_edgeFlags,CUBE_VERT_PER_OBJ_TRI,CUBE_NUM_FACES,CUBE_NUM_EDGE_PER_FACE,useWireMode);
 }
 
 DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(dodecahedron,Dodecahedron,DODECAHEDRON);
@@ -724,6 +756,7 @@ static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble sc
     GLdouble * normals;
     GLsizei    numTetr = numLevels<0? 0 : ipow(4,numLevels); /* No sponge for numLevels below 0 */
     GLsizei    numVert = numTetr*TETRAHEDRON_VERT_PER_OBJ;
+    GLsizei    numFace = numTetr*TETRAHEDRON_NUM_FACES;
 
     if (numTetr)
     {
@@ -742,7 +775,7 @@ static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble sc
         fghSierpinskiSpongeGenerate ( numLevels, offset, scale, vertices, normals );
 
         /* Draw and cleanup */
-        fghDrawGeometry(GL_TRIANGLES,vertices,normals,NULL,numVert,useWireMode);
+        fghDrawGeometry(vertices,normals,NULL,numVert,numFace,TETRAHEDRON_NUM_EDGE_PER_FACE,useWireMode);
         free(vertices);
         free(normals );
     }
