@@ -26,7 +26,7 @@
 #ifndef __FG_WINDOW_EGL_H__
 #define __FG_WINDOW_EGL_H__
 
-extern void fghChooseConfigEGL(EGLConfig* config);
+extern int fghChooseConfigEGL(EGLConfig* config);
 extern void fghPlatformOpenWindowEGL( SFG_Window* window );
 extern void fghCreateNewContextEGL( SFG_Window* window );
 extern void fghPlatformCloseWindowEGL( SFG_Window* window );

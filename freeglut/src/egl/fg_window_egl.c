@@ -26,7 +26,7 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 
-void fghChooseConfigEGL(EGLConfig* config) {
+int fghChooseConfigEGL(EGLConfig* config) {
   const EGLint attribs[] = {
     EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
 #ifdef GL_ES_VERSION_2_0
@@ -49,8 +49,12 @@ void fghChooseConfigEGL(EGLConfig* config) {
   
   EGLint num_config;
   if (!eglChooseConfig(fgDisplay.pDisplay.egl.Display,
-		       attribs, config, 1, &num_config))
-    fgError("eglChooseConfig: error %x\n", eglGetError());
+		       attribs, config, 1, &num_config)) {
+    fgWarn("eglChooseConfig: error %x\n", eglGetError());
+    return 0;
+  }
+
+  return 1;
 }
 
 /**
