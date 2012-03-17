@@ -50,13 +50,4 @@ struct tagSFG_PlatformContextEGL
   EGLConfig           Config;
 };
 
-
-/* Window's state description. This structure should be kept portable. */
-typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
-struct tagSFG_PlatformWindowState
-{
-    int             OldWidth;           /* Window width from before a resize */
-    int             OldHeight;          /*   "    height  "    "    "   "    */
-};
-
 #endif

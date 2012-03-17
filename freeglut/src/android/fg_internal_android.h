@@ -100,4 +100,10 @@ struct tagSFG_PlatformJoystick
     int          fd;
 };
 
+/* Window's state description. This structure should be kept portable. */
+typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
+struct tagSFG_PlatformWindowState
+{
+};
+
 #endif  /* FREEGLUT_INTERNAL_ANDROID_H */
