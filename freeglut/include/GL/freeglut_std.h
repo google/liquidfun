@@ -526,7 +526,7 @@ FGAPI int     FGAPIENTRY glutStrokeLength( void* font, const unsigned char* stri
  */
 #ifdef EGL_VERSION_1_0
 /* TODO: temporary work-around for missing GLdouble in GLES */
-#   define GLdouble     GLfloat  
+#   define GLdouble     GLfloat
 #endif
 
 FGAPI void    FGAPIENTRY glutWireCube( GLdouble size );
@@ -552,6 +552,11 @@ FGAPI void    FGAPIENTRY glutSolidIcosahedron( void );
  */
 FGAPI void    FGAPIENTRY glutWireTeapot( GLdouble size );
 FGAPI void    FGAPIENTRY glutSolidTeapot( GLdouble size );
+
+#ifdef EGL_VERSION_1_0
+/* TODO: temporary work-around for missing GLdouble in GLES */
+#   undef GLdouble
+#endif
 
 /*
  * Game mode functions, see freeglut_gamemode.c
