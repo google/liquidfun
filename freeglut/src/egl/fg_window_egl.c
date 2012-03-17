@@ -60,7 +60,7 @@ int fghChooseConfigEGL(EGLConfig* config) {
 /**
  * Initialize an EGL context for the current display.
  */
-void fghCreateNewContextEGL( SFG_Window* window ) {
+EGLContext fghCreateNewContextEGL( SFG_Window* window ) {
   EGLContext context;
 
   EGLDisplay eglDisplay = fgDisplay.pDisplay.egl.Display;
@@ -85,7 +85,7 @@ void fghCreateNewContextEGL( SFG_Window* window ) {
   if (ver != 2)
     fgError("Wrong GLES major version: %d\n", ver);
 
-  window->Window.Context = context;
+  return context;
 }
 
 /*

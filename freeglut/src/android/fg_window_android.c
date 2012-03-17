@@ -53,7 +53,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
   }
 
   fghChooseConfigEGL(&window->Window.pContext.egl.Config);
-  fghCreateNewContextEGL(window);
+  window->Window.Context = fghCreateNewContextEGL(window);
 
   /* Wait until window is available and OpenGL context is created */
   /* Normally events are processed through glutMainLoop(), but the
