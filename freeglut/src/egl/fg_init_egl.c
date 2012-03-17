@@ -47,6 +47,12 @@ void fgPlatformInitialize( const char* displayName )
   if (!eglInitialize(fgDisplay.pDisplay.egl.Display, NULL, NULL))
     fgError("eglInitialize: error %x\n", eglGetError());
 
+# ifdef GL_VERSION_1_1  /* or later */
+  eglBindAPI(EGL_OPENGL_API);
+# else
+  eglBindAPI(EGL_OPENGL_ES_API);
+# endif
+
   // fgDisplay.ScreenWidth = ...;
   // fgDisplay.ScreenHeight = ...;
   // fgDisplay.ScreenWidthMM = ...;

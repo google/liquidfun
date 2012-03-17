@@ -31,5 +31,5 @@ extern SFG_Structure fgStructure;
 void fgPlatformCreateWindow ( SFG_Window *window )
 {
   window->Window.pContext.egl.Surface = EGL_NO_SURFACE;
-  window->Window.pContext.egl.ContextConfig = NULL;
+  window->Window.pContext.egl.Config = NULL;
 }

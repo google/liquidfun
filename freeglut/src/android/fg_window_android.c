@@ -52,6 +52,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     return;
   }
 
+  fghChooseConfigEGL(&window->Window.pContext.egl.Config);
   fghCreateNewContextEGL(window);
 
   /* Wait until window is available and OpenGL context is created */
@@ -67,8 +68,16 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
   }
 
   EGLDisplay display = fgDisplay.pDisplay.egl.Display;
-  EGLint format = fgDisplay.pDisplay.single_window->Window.pContext.egl.ContextFormat;
-  ANativeWindow_setBuffersGeometry(window->Window.Handle, 0, 0, format);
+
+  /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
+   * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
+   * As soon as we picked a EGLConfig, we can safely reconfigure the
+   * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
+  EGLint vid;
+  eglGetConfigAttrib(display, window->Window.pContext.egl.Config,
+		     EGL_NATIVE_VISUAL_ID, &vid);
+
+  ANativeWindow_setBuffersGeometry(window->Window.Handle, 0, 0, vid);
   fghPlatformOpenWindowEGL(window);
 
   window->State.Visible = GL_TRUE;

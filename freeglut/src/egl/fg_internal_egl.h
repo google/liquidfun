@@ -47,8 +47,7 @@ typedef EGLContext SFG_WindowContextType ;
 struct tagSFG_PlatformContextEGL
 {
   EGLSurface          Surface;
-  EGLConfig           ContextConfig;
-  EGLint              ContextFormat;
+  EGLConfig           Config;
 };
 
 

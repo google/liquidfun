@@ -26,20 +26,16 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 
-/**
- * Initialize an EGL context for the current display.
- */
-void fghCreateNewContextEGL( SFG_Window* window ) {
-  /*
-   * Here specify the attributes of the desired configuration.
-   * Below, we select an EGLConfig with at least 8 bits per color
-   * component compatible with on-screen windows
-   */
-  /* Ensure OpenGLES 2.0 context */
-  printf("DisplayMode: %d (DEPTH %d)\n", fgState.DisplayMode, (fgState.DisplayMode & GLUT_DEPTH));
+void fghChooseConfigEGL(EGLConfig* config) {
   const EGLint attribs[] = {
     EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+#ifdef GL_ES_VERSION_2_0
     EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+#elif GL_VERSION_ES_CM_1_0 || GL_VERSION_ES_CL_1_0 || GL_VERSION_ES_CM_1_1 || GL_VERSION_ES_CL_1_1
+    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+#else
+    EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+#endif
     EGL_BLUE_SIZE, 1,
     EGL_GREEN_SIZE, 1,
     EGL_RED_SIZE, 1,
@@ -50,34 +46,32 @@ void fghCreateNewContextEGL( SFG_Window* window ) {
     EGL_SAMPLES, (fgState.DisplayMode & GLUT_MULTISAMPLE) ? fgState.SampleNumber : 0,
     EGL_NONE
   };
+  
+  EGLint num_config;
+  if (!eglChooseConfig(fgDisplay.pDisplay.egl.Display,
+		       attribs, config, 1, &num_config))
+    fgError("eglChooseConfig: error %x\n", eglGetError());
+}
 
-  EGLint format;
-  EGLint numConfigs;
-  EGLConfig config;
+/**
+ * Initialize an EGL context for the current display.
+ */
+void fghCreateNewContextEGL( SFG_Window* window ) {
   EGLContext context;
 
   EGLDisplay eglDisplay = fgDisplay.pDisplay.egl.Display;
-
-  /* Here, the application chooses the configuration it desires. In this
-   * sample, we have a very simplified selection process, where we pick
-   * the first EGLConfig that matches our criteria */
-  eglChooseConfig(eglDisplay, attribs, &config, 1, &numConfigs);
-
-  /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-   * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-   * As soon as we picked a EGLConfig, we can safely reconfigure the
-   * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
-  eglGetConfigAttrib(eglDisplay, config, EGL_NATIVE_VISUAL_ID, &format);
-
-  /* Default, but doesn't hurt */
-  eglBindAPI(EGL_OPENGL_ES_API);
+  EGLConfig eglConfig = window->Window.pContext.egl.Config;
 
   /* Ensure OpenGLES 2.0 context */
   static const EGLint ctx_attribs[] = {
+#ifdef GL_ES_VERSION_2_0
     EGL_CONTEXT_CLIENT_VERSION, 2,
+#elif GL_VERSION_ES_CM_1_0 || GL_VERSION_ES_CL_1_0 || GL_VERSION_ES_CM_1_1 || GL_VERSION_ES_CL_1_1
+    EGL_CONTEXT_CLIENT_VERSION, 1,
+#endif
     EGL_NONE
   };
-  context = eglCreateContext(eglDisplay, config, EGL_NO_CONTEXT, ctx_attribs);
+  context = eglCreateContext(eglDisplay, eglConfig, EGL_NO_CONTEXT, ctx_attribs);
   if (context == EGL_NO_CONTEXT) {
     fgWarning("Cannot initialize EGL context, err=%x\n", eglGetError());
     fghContextCreationError();
@@ -88,8 +82,6 @@ void fghCreateNewContextEGL( SFG_Window* window ) {
     fgError("Wrong GLES major version: %d\n", ver);
 
   window->Window.Context = context;
-  window->Window.pContext.egl.ContextConfig = config;
-  window->Window.pContext.egl.ContextFormat = format;
 }
 
 /*
@@ -98,7 +90,7 @@ void fghCreateNewContextEGL( SFG_Window* window ) {
 void fghPlatformOpenWindowEGL( SFG_Window* window )
 {
   EGLDisplay display = fgDisplay.pDisplay.egl.Display;
-  EGLConfig  config  = window->Window.pContext.egl.ContextConfig;
+  EGLConfig  config  = window->Window.pContext.egl.Config;
 
   EGLSurface surface = eglCreateWindowSurface(display, config, window->Window.Handle, NULL);
   if (surface == EGL_NO_SURFACE)
