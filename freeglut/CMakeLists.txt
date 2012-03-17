@@ -66,6 +66,10 @@ IF(NOT FREEGLUT_GLES2 AND NOT FREEGLUT_GLES1)
         src/fg_menu.c
         src/fg_teapot.c
     )
+ELSE()
+    LIST(APPEND FREEGLUT_SRCS
+        src/gles_stubs.c
+    )
 ENDIF()
 
 IF(WIN32)
@@ -112,7 +116,6 @@ ELSEIF(ANDROID)
         src/android/fg_spaceball_android.c
         src/android/fg_state_android.c
         src/android/fg_window_android.c
-        src/android/opengles_stubs.c
         src/android/fg_internal_android.h
     )
 ELSE()
