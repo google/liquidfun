@@ -694,6 +694,12 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
 
         /* Need to build new vertex list containing vertices for cube of different size */
         GLdouble *vertices = malloc(CUBE_VERT_ELEM_PER_OBJ * sizeof(GLdouble));
+        /* Bail out if memory allocation fails, fgError never returns */
+        if (!(*vertices))
+        {
+            free(*vertices);
+            fgError("Failed to allocate memory in fghCube");
+        }
         for (i=0; i<CUBE_VERT_ELEM_PER_OBJ; i++)
             vertices[i] = dSize*cube_verts[i];
 
@@ -721,6 +727,13 @@ static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble sc
         /* Allocate memory */
         vertices = malloc(numVert*3 * sizeof(GLdouble));
         normals  = malloc(numVert*3 * sizeof(GLdouble));
+        /* Bail out if memory allocation fails, fgError never returns */
+        if (!(*vertices) || !(*normals))
+        {
+            free(*vertices);
+            free(*normals);
+            fgError("Failed to allocate memory in fghSierpinskiSponge");
+        }
 
         /* Generate elements */
         fghSierpinskiSpongeGenerate ( numLevels, offset, scale, vertices, normals );
