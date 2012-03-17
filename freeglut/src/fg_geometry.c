@@ -165,7 +165,6 @@ static void fghGenerateGeometryWithEdgeFlag(int numFaces, int numEdgePerFaceIn, 
         {
             int outIdx  = i*numEdgePerFaceOut*3+j*3;
             int vertIdx = vertIndices[faceIdxVertIdx+vertSamps[j]]*3;
-            printf("%i,",outIdx);
 
             vertOut[outIdx  ] = vertices[vertIdx  ];
             vertOut[outIdx+1] = vertices[vertIdx+1];
@@ -178,9 +177,7 @@ static void fghGenerateGeometryWithEdgeFlag(int numFaces, int numEdgePerFaceIn, 
             if (edgeFlagsOut)
                 edgeFlagsOut[i*numEdgePerFaceOut+j] = edgeFlags[j];
         }
-        printf("\n");
     }
-    printf("\n");
 }
 
 static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLdouble *vertices, GLubyte *vertIndices, GLdouble *normals, GLdouble *vertOut, GLdouble *normOut)
