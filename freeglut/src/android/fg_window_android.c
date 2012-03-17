@@ -52,7 +52,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     return;
   }
 
-  fghChooseConfigEGL(&window->Window.pContext.egl.Config);
+  fghChooseConfig(&window->Window.pContext.egl.Config);
   window->Window.Context = fghCreateNewContextEGL(window);
 
   /* Wait until window is available and OpenGL context is created */

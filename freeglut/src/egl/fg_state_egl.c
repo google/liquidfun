@@ -76,9 +76,9 @@ int fghPlatformGlutGetEGL ( GLenum eWhat )
     /* I do not know yet if there will be a fgChooseVisual() function for Win32 */
     case GLUT_DISPLAY_MODE_POSSIBLE:
     {
-        /*  We should not have to call fgPlatformChooseFBConfig again here.  */
+        /*  We should not have to call fghChooseConfig again here.  */
         EGLConfig config;
-        return fghChooseConfigEGL(&config);
+        return fghChooseConfig(&config);
     }
 
     /* This is system-dependant */

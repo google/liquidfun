@@ -26,7 +26,7 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 
-int fghChooseConfigEGL(EGLConfig* config) {
+int fghChooseConfig(EGLConfig* config) {
   const EGLint attribs[] = {
     EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
 #ifdef GL_ES_VERSION_2_0
