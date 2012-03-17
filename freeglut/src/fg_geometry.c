@@ -263,7 +263,84 @@ static GLubyte cube_vi[CUBE_VERT_PER_OBJ] =
 };
 DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(cube,Cube,CUBE);
 
-/* Icosahedron */
+/* -- Dodecahedron -- */
+/* Magic Numbers:  It is possible to create a dodecahedron by attaching two
+ * pentagons to each face of of a cube. The coordinates of the points are:
+ *   (+-x,0, z); (+-1, 1, 1); (0, z, x )
+ * where x = (-1 + sqrt(5))/2, z = (1 + sqrt(5))/2 or
+ *       x = 0.61803398875 and z = 1.61803398875.
+ */
+#define DODECAHEDRON_NUM_VERT           20
+#define DODECAHEDRON_NUM_FACES          12
+#define DODECAHEDRON_NUM_EDGE_PER_FACE  5
+#define DODECAHEDRON_VERT_PER_OBJ       (DODECAHEDRON_NUM_FACES*DODECAHEDRON_NUM_EDGE_PER_FACE)
+#define DODECAHEDRON_VERT_PER_OBJ_TRI   (DODECAHEDRON_VERT_PER_OBJ+DODECAHEDRON_NUM_FACES*4)    /* 4 extra edges per face when drawing pentagons as triangles */
+#define DODECAHEDRON_VERT_ELEM_PER_OBJ  (DODECAHEDRON_VERT_PER_OBJ_TRI*3)
+/* Vertex Coordinates */
+static GLdouble dodecahedron_v[DODECAHEDRON_NUM_VERT*3] =
+{
+     0.0          ,  1.61803398875,  0.61803398875,
+    -1.0          ,  1.0          ,  1.0          ,
+    -0.61803398875,  0.0          ,  1.61803398875,
+     0.61803398875,  0.0          ,  1.61803398875,
+     1.0          ,  1.0          ,  1.0          ,
+     0.0          ,  1.61803398875, -0.61803398875,
+     1.0          ,  1.0          , -1.0          ,
+     0.61803398875,  0.0          , -1.61803398875,
+    -0.61803398875,  0.0          , -1.61803398875,
+    -1.0          ,  1.0          , -1.0          ,
+     0.0          , -1.61803398875,  0.61803398875,
+     1.0          , -1.0          ,  1.0          ,
+    -1.0          , -1.0          ,  1.0          ,
+     0.0          , -1.61803398875, -0.61803398875,
+    -1.0          , -1.0          , -1.0          ,
+     1.0          , -1.0          , -1.0          ,
+     1.61803398875, -0.61803398875,  0.0          ,
+     1.61803398875,  0.61803398875,  0.0          ,
+    -1.61803398875,  0.61803398875,  0.0          ,
+    -1.61803398875, -0.61803398875,  0.0
+};
+/* Normal Vectors */
+static GLdouble dodecahedron_n[DODECAHEDRON_NUM_FACES*3] =
+{
+     0.0           ,  0.525731112119,  0.850650808354,
+     0.0           ,  0.525731112119, -0.850650808354,
+     0.0           , -0.525731112119,  0.850650808354,
+     0.0           , -0.525731112119, -0.850650808354,
+
+     0.850650808354, 0.0            ,  0.525731112119,
+    -0.850650808354, 0.0            ,  0.525731112119,
+     0.850650808354, 0.0            , -0.525731112119,
+    -0.850650808354, 0.0            , -0.525731112119,
+
+     0.525731112119,  0.850650808354, 0.0            ,
+     0.525731112119, -0.850650808354, 0.0            ,
+    -0.525731112119,  0.850650808354, 0.0            , 
+    -0.525731112119, -0.850650808354, 0.0            ,
+};
+
+/* Vertex indices */
+static GLubyte dodecahedron_vi[DODECAHEDRON_VERT_PER_OBJ] =
+{
+     0,  1,  2,  3,  4, 
+     5,  6,  7,  8,  9, 
+    10, 11,  3,  2, 12, 
+    13, 14,  8,  7, 15, 
+
+     3, 11, 16, 17,  4, 
+     2,  1, 18, 19, 12, 
+     7,  6, 17, 16, 15, 
+     8, 14, 19, 18,  9, 
+
+    17,  6,  5,  0,  4, 
+    16, 11, 10, 13, 15, 
+    18,  1,  0,  5,  9, 
+    19, 14, 13, 10, 12
+};
+DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(dodecahedron,Dodecahedron,DODECAHEDRON);
+
+
+/* -- Icosahedron -- */
 #define ICOSAHEDRON_NUM_VERT           12
 #define ICOSAHEDRON_NUM_FACES          20
 #define ICOSAHEDRON_NUM_EDGE_PER_FACE  3
@@ -625,6 +702,7 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
         fghDrawGeometry(GL_TRIANGLES,cube_verts,cube_norms,cube_edgeFlags,CUBE_VERT_PER_OBJ_TRI,useWireMode);
 }
 
+DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(dodecahedron,Dodecahedron,DODECAHEDRON);
 DECLARE_INTERNAL_DRAW(icosahedron,Icosahedron,ICOSAHEDRON);
 DECLARE_INTERNAL_DRAW(octahedron,Octahedron,OCTAHEDRON);
 DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON);
@@ -1250,112 +1328,6 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
   glPopMatrix();
 }
 
-/*
- *
- */
-void FGAPIENTRY glutWireDodecahedron( void )
-{
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireDodecahedron" );
-
-  /* Magic Numbers:  It is possible to create a dodecahedron by attaching two pentagons to each face of
-   * of a cube.  The coordinates of the points are:
-   *   (+-x,0, z); (+-1, 1, 1); (0, z, x )
-   * where x = (-1 + sqrt(5))/2, z = (1 + sqrt(5))/2  or
-   *       x = 0.61803398875 and z = 1.61803398875.
-   */
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d (  0.0,  0.525731112119,  0.850650808354 ) ; glVertex3d (  0.0,  1.61803398875,  0.61803398875 ) ; glVertex3d ( -1.0,  1.0,  1.0 ) ; glVertex3d ( -0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d (  0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d (  1.0,  1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d (  0.0,  0.525731112119, -0.850650808354 ) ; glVertex3d (  0.0,  1.61803398875, -0.61803398875 ) ; glVertex3d (  1.0,  1.0, -1.0 ) ; glVertex3d (  0.61803398875, 0.0, -1.61803398875 ) ; glVertex3d ( -0.61803398875, 0.0, -1.61803398875 ) ; glVertex3d ( -1.0,  1.0, -1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d (  0.0, -0.525731112119,  0.850650808354 ) ; glVertex3d (  0.0, -1.61803398875,  0.61803398875 ) ; glVertex3d (  1.0, -1.0,  1.0 ) ; glVertex3d (  0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d ( -0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d ( -1.0, -1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d (  0.0, -0.525731112119, -0.850650808354 ) ; glVertex3d (  0.0, -1.61803398875, -0.61803398875 ) ; glVertex3d ( -1.0, -1.0, -1.0 ) ; glVertex3d ( -0.61803398875, 0.0, -1.61803398875 ) ; glVertex3d (  0.61803398875, 0.0, -1.61803398875 ) ; glVertex3d (  1.0, -1.0, -1.0 ) ;
-  glEnd () ;
-
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d (  0.850650808354,  0.0,  0.525731112119 ) ; glVertex3d (  0.61803398875,  0.0,  1.61803398875 ) ; glVertex3d (  1.0, -1.0,  1.0 ) ; glVertex3d (  1.61803398875, -0.61803398875, 0.0 ) ; glVertex3d (  1.61803398875,  0.61803398875, 0.0 ) ; glVertex3d (  1.0,  1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d ( -0.850650808354,  0.0,  0.525731112119 ) ; glVertex3d ( -0.61803398875,  0.0,  1.61803398875 ) ; glVertex3d ( -1.0,  1.0,  1.0 ) ; glVertex3d ( -1.61803398875,  0.61803398875, 0.0 ) ; glVertex3d ( -1.61803398875, -0.61803398875, 0.0 ) ; glVertex3d ( -1.0, -1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d (  0.850650808354,  0.0, -0.525731112119 ) ; glVertex3d (  0.61803398875,  0.0, -1.61803398875 ) ; glVertex3d (  1.0,  1.0, -1.0 ) ; glVertex3d (  1.61803398875,  0.61803398875, 0.0 ) ; glVertex3d (  1.61803398875, -0.61803398875, 0.0 ) ; glVertex3d (  1.0, -1.0, -1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d ( -0.850650808354,  0.0, -0.525731112119 ) ; glVertex3d ( -0.61803398875,  0.0, -1.61803398875 ) ; glVertex3d ( -1.0, -1.0, -1.0 ) ; glVertex3d ( -1.61803398875, -0.61803398875, 0.0 ) ; glVertex3d ( -1.61803398875,  0.61803398875, 0.0 ) ; glVertex3d ( -1.0,  1.0, -1.0 ) ;
-  glEnd () ;
-
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d (  0.525731112119,  0.850650808354,  0.0 ) ; glVertex3d (  1.61803398875,  0.61803398875,  0.0 ) ; glVertex3d (  1.0,  1.0, -1.0 ) ; glVertex3d ( 0.0,  1.61803398875, -0.61803398875 ) ; glVertex3d ( 0.0,  1.61803398875,  0.61803398875 ) ; glVertex3d (  1.0,  1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d (  0.525731112119, -0.850650808354,  0.0 ) ; glVertex3d (  1.61803398875, -0.61803398875,  0.0 ) ; glVertex3d (  1.0, -1.0,  1.0 ) ; glVertex3d ( 0.0, -1.61803398875,  0.61803398875 ) ; glVertex3d ( 0.0, -1.61803398875, -0.61803398875 ) ; glVertex3d (  1.0, -1.0, -1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d ( -0.525731112119,  0.850650808354,  0.0 ) ; glVertex3d ( -1.61803398875,  0.61803398875,  0.0 ) ; glVertex3d ( -1.0,  1.0,  1.0 ) ; glVertex3d ( 0.0,  1.61803398875,  0.61803398875 ) ; glVertex3d ( 0.0,  1.61803398875, -0.61803398875 ) ; glVertex3d ( -1.0,  1.0, -1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_LINE_LOOP ) ;
-  glNormal3d ( -0.525731112119, -0.850650808354,  0.0 ) ; glVertex3d ( -1.61803398875, -0.61803398875,  0.0 ) ; glVertex3d ( -1.0, -1.0, -1.0 ) ; glVertex3d ( 0.0, -1.61803398875, -0.61803398875 ) ; glVertex3d ( 0.0, -1.61803398875,  0.61803398875 ) ; glVertex3d ( -1.0, -1.0,  1.0 ) ;
-  glEnd () ;
-}
-
-/*
- *
- */
-void FGAPIENTRY glutSolidDodecahedron( void )
-{
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidDodecahedron" );
-
-  /* Magic Numbers:  It is possible to create a dodecahedron by attaching two pentagons to each face of
-   * of a cube.  The coordinates of the points are:
-   *   (+-x,0, z); (+-1, 1, 1); (0, z, x )
-   * where x = (-1 + sqrt(5))/2, z = (1 + sqrt(5))/2 or
-   *       x = 0.61803398875 and z = 1.61803398875.
-   */
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d (  0.0,  0.525731112119,  0.850650808354 ) ; glVertex3d (  0.0,  1.61803398875,  0.61803398875 ) ; glVertex3d ( -1.0,  1.0,  1.0 ) ; glVertex3d ( -0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d (  0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d (  1.0,  1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d (  0.0,  0.525731112119, -0.850650808354 ) ; glVertex3d (  0.0,  1.61803398875, -0.61803398875 ) ; glVertex3d (  1.0,  1.0, -1.0 ) ; glVertex3d (  0.61803398875, 0.0, -1.61803398875 ) ; glVertex3d ( -0.61803398875, 0.0, -1.61803398875 ) ; glVertex3d ( -1.0,  1.0, -1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d (  0.0, -0.525731112119,  0.850650808354 ) ; glVertex3d (  0.0, -1.61803398875,  0.61803398875 ) ; glVertex3d (  1.0, -1.0,  1.0 ) ; glVertex3d (  0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d ( -0.61803398875, 0.0,  1.61803398875 ) ; glVertex3d ( -1.0, -1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d (  0.0, -0.525731112119, -0.850650808354 ) ; glVertex3d (  0.0, -1.61803398875, -0.61803398875 ) ; glVertex3d ( -1.0, -1.0, -1.0 ) ; glVertex3d ( -0.61803398875, 0.0, -1.61803398875 ) ; glVertex3d (  0.61803398875, 0.0, -1.61803398875 ) ; glVertex3d (  1.0, -1.0, -1.0 ) ;
-  glEnd () ;
-
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d (  0.850650808354,  0.0,  0.525731112119 ) ; glVertex3d (  0.61803398875,  0.0,  1.61803398875 ) ; glVertex3d (  1.0, -1.0,  1.0 ) ; glVertex3d (  1.61803398875, -0.61803398875, 0.0 ) ; glVertex3d (  1.61803398875,  0.61803398875, 0.0 ) ; glVertex3d (  1.0,  1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d ( -0.850650808354,  0.0,  0.525731112119 ) ; glVertex3d ( -0.61803398875,  0.0,  1.61803398875 ) ; glVertex3d ( -1.0,  1.0,  1.0 ) ; glVertex3d ( -1.61803398875,  0.61803398875, 0.0 ) ; glVertex3d ( -1.61803398875, -0.61803398875, 0.0 ) ; glVertex3d ( -1.0, -1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d (  0.850650808354,  0.0, -0.525731112119 ) ; glVertex3d (  0.61803398875,  0.0, -1.61803398875 ) ; glVertex3d (  1.0,  1.0, -1.0 ) ; glVertex3d (  1.61803398875,  0.61803398875, 0.0 ) ; glVertex3d (  1.61803398875, -0.61803398875, 0.0 ) ; glVertex3d (  1.0, -1.0, -1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d ( -0.850650808354,  0.0, -0.525731112119 ) ; glVertex3d ( -0.61803398875,  0.0, -1.61803398875 ) ; glVertex3d ( -1.0, -1.0, -1.0 ) ; glVertex3d ( -1.61803398875, -0.61803398875, 0.0 ) ; glVertex3d ( -1.61803398875,  0.61803398875, 0.0 ) ; glVertex3d ( -1.0,  1.0, -1.0 ) ;
-  glEnd () ;
-
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d (  0.525731112119,  0.850650808354,  0.0 ) ; glVertex3d (  1.61803398875,  0.61803398875,  0.0 ) ; glVertex3d (  1.0,  1.0, -1.0 ) ; glVertex3d ( 0.0,  1.61803398875, -0.61803398875 ) ; glVertex3d ( 0.0,  1.61803398875,  0.61803398875 ) ; glVertex3d (  1.0,  1.0,  1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d (  0.525731112119, -0.850650808354,  0.0 ) ; glVertex3d (  1.61803398875, -0.61803398875,  0.0 ) ; glVertex3d (  1.0, -1.0,  1.0 ) ; glVertex3d ( 0.0, -1.61803398875,  0.61803398875 ) ; glVertex3d ( 0.0, -1.61803398875, -0.61803398875 ) ; glVertex3d (  1.0, -1.0, -1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d ( -0.525731112119,  0.850650808354,  0.0 ) ; glVertex3d ( -1.61803398875,  0.61803398875,  0.0 ) ; glVertex3d ( -1.0,  1.0,  1.0 ) ; glVertex3d ( 0.0,  1.61803398875,  0.61803398875 ) ; glVertex3d ( 0.0,  1.61803398875, -0.61803398875 ) ; glVertex3d ( -1.0,  1.0, -1.0 ) ;
-  glEnd () ;
-  glBegin ( GL_POLYGON ) ;
-  glNormal3d ( -0.525731112119, -0.850650808354,  0.0 ) ; glVertex3d ( -1.61803398875, -0.61803398875,  0.0 ) ; glVertex3d ( -1.0, -1.0, -1.0 ) ; glVertex3d ( 0.0, -1.61803398875, -0.61803398875 ) ; glVertex3d ( 0.0, -1.61803398875,  0.61803398875 ) ; glVertex3d ( -1.0, -1.0,  1.0 ) ;
-  glEnd () ;
-}
-
 
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
@@ -1383,6 +1355,7 @@ void FGAPIENTRY glutSolidCube( GLdouble dSize )
     fghCube( dSize, FALSE );
 }
 
+DECLARE_SHAPE_INTERFACE(Dodecahedron);
 DECLARE_SHAPE_INTERFACE(Icosahedron);
 DECLARE_SHAPE_INTERFACE(Octahedron);
 DECLARE_SHAPE_INTERFACE(RhombicDodecahedron);
