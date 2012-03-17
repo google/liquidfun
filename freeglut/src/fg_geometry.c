@@ -591,8 +591,8 @@ static void fghCircleTable(double **sint,double **cost,const int n)
 }
 
 
-/* -- INTERNAL DRAWING functions to avoid code duplication ------------- */
-#define DECLARE_INTERNAL_DRAW(vertexMode,name,nameICaps,nameCaps)\
+/* -- INTERNAL DRAWING functions --------------------------------------- */
+#define _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,edgeFlags)\
     static void fgh##nameICaps( GLboolean useWireMode )\
     {\
         if (!name##Cached)\
@@ -600,8 +600,10 @@ static void fghCircleTable(double **sint,double **cost,const int n)
             fgh##nameICaps##Generate();\
             name##Cached = GL_TRUE;\
         }\
-        fghDrawGeometry(vertexMode,name##_verts,name##_norms,NULL,nameCaps##_VERT_PER_OBJ_TRI,useWireMode);\
+        fghDrawGeometry(GL_TRIANGLES,name##_verts,name##_norms,edgeFlags,nameCaps##_VERT_PER_OBJ_TRI,useWireMode);\
     }
+#define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps) _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,NULL)
+#define DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(name,nameICaps,nameCaps) _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,name##_edgeFlags)
 
 static void fghCube( GLdouble dSize, GLboolean useWireMode )
 {
@@ -626,10 +628,10 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
         fghDrawGeometry(GL_TRIANGLES,cube_verts,cube_norms,cube_edgeFlags,CUBE_VERT_PER_OBJ_TRI,useWireMode);
 }
 
-DECLARE_INTERNAL_DRAW(GL_TRIANGLES,icosahedron,Icosahedron,ICOSAHEDRON);
-DECLARE_INTERNAL_DRAW(GL_TRIANGLES,octahedron,Octahedron,OCTAHEDRON);
-DECLARE_INTERNAL_DRAW(GL_QUADS,rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON);
-DECLARE_INTERNAL_DRAW(GL_TRIANGLES,tetrahedron,Tetrahedron,TETRAHEDRON);
+DECLARE_INTERNAL_DRAW(icosahedron,Icosahedron,ICOSAHEDRON);
+DECLARE_INTERNAL_DRAW(octahedron,Octahedron,OCTAHEDRON);
+DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON);
+DECLARE_INTERNAL_DRAW(tetrahedron,Tetrahedron,TETRAHEDRON);
 
 static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble scale, GLboolean useWireMode )
 {
