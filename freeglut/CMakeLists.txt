@@ -102,6 +102,7 @@ ELSEIF(ANDROID)
         src/egl/fg_internal_egl.h
         src/egl/fg_display_egl.c
         src/egl/fg_init_egl.c
+        src/egl/fg_state_egl.c
         src/egl/fg_structure_egl.c
         src/egl/fg_structure_egl.h
         src/egl/fg_window_egl.c

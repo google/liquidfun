@@ -30,38 +30,43 @@
 #include <android/native_window.h>
 #include "fg_internal.h"
 
-int fgPlatformGlutGet ( GLenum eWhat )
-{
-  fprintf(stderr, "fgPlatformGlutGet: STUB\n");
-
-  switch (eWhat) {
-    case GLUT_WINDOW_WIDTH:
-    case GLUT_WINDOW_HEIGHT:
-      {
-        if ( fgStructure.CurrentWindow == NULL )
-	  return 0;
-	int32_t width = ANativeWindow_getWidth(fgStructure.CurrentWindow->Window.Handle);
-	int32_t height = ANativeWindow_getHeight(fgStructure.CurrentWindow->Window.Handle);
-        switch ( eWhat )
-	  {
-	  case GLUT_WINDOW_WIDTH:
-	    return width;
-	  case GLUT_WINDOW_HEIGHT:
-	    return height;
-	  }
-      }
-  }
-  return -1;
-}
-
 int fgPlatformGlutDeviceGet ( GLenum eWhat )
 {
   fprintf(stderr, "fgPlatformGlutDeviceGet: STUB\n");
   return -1;
 }
 
+int fgPlatformGlutGet ( GLenum eWhat )
+{
+  fprintf(stderr, "fgPlatformGlutGet: STUB\n");
+
+  switch (eWhat) {
+  case GLUT_WINDOW_WIDTH:
+  case GLUT_WINDOW_HEIGHT:
+    {
+      if ( fgStructure.CurrentWindow == NULL )
+	return 0;
+      int32_t width = ANativeWindow_getWidth(fgStructure.CurrentWindow->Window.Handle);
+      int32_t height = ANativeWindow_getHeight(fgStructure.CurrentWindow->Window.Handle);
+      switch ( eWhat )
+	{
+	case GLUT_WINDOW_WIDTH:
+	  return width;
+	case GLUT_WINDOW_HEIGHT:
+	  return height;
+	}
+    }
+    
+  default:
+    return fghPlatformGlutGetEGL(eWhat);
+  }
+  return -1;
+}
+
 int fgPlatformGlutLayerGet( GLenum eWhat )
 {
+  fprintf(stderr, "fgPlatformGlutLayerGet: STUB\n");
+
   /*
    * This is easy as layers are not implemented ;-)
    *
@@ -102,12 +107,3 @@ int fgPlatformGlutLayerGet( GLenum eWhat )
   /* And fail. That's good. Programs do love failing. */
   return -1;
 }
-
-
-int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
-{
-  fprintf(stderr, "fgPlatformGlutGetModeValues: STUB\n");
-  return NULL;
-}
-
-
