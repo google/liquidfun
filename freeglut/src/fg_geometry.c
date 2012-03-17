@@ -76,6 +76,7 @@ static void fghDrawGeometry(GLenum vertexMode, GLdouble *vertices, GLdouble *nor
     {
         glPushAttrib(GL_POLYGON_BIT);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDisable(GL_CULL_FACE);
     }
 
     if (1)
@@ -187,11 +188,6 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLdouble *vert
 
 
 /* -- INTERNAL SETUP OF GEOMETRY --------------------------------------- */
-static unsigned int ipow (int x, unsigned int y)
-{
-    return y==0? 1: y==1? x: (y%2? x: 1) * ipow(x*x, y/2);
-}
-
 /* -- stuff that can be cached -- */
 /* Cache of input to glDrawArrays */
 #define DECLARE_SHAPE_CACHE(name,nameICaps,nameCaps)\
@@ -571,6 +567,11 @@ static GLubyte tetrahedron_vi[TETRAHEDRON_VERT_PER_OBJ] =
 DECLARE_SHAPE_CACHE(tetrahedron,Tetrahedron,TETRAHEDRON);
 
 /* -- Sierpinski Sponge -- */
+static unsigned int ipow (int x, unsigned int y)
+{
+    return y==0? 1: y==1? x: (y%2? x: 1) * ipow(x*x, y/2);
+}
+
 static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLdouble scale, GLdouble* vertices, GLdouble* normals )
 {
     int i, j;
