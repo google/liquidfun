@@ -1,5 +1,5 @@
 /*
- * freeglut_init_android.c
+ * freeglut_init_egl.c
  *
  * Various freeglut initialization functions.
  *
@@ -27,16 +27,11 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 
-#include <android/native_app_glue/android_native_app_glue.h>
-
 /*
  * A call to this function should initialize all the display stuff...
  */
-void fgPlatformInitialize( const char* displayName )
+void fghPlatformInitializeEGL()
 {
-  fprintf(stderr, "fgPlatformInitialize\n");
-  fgState.Initialised = GL_TRUE;
-
   /* CreateDisplay */
   /* Using EGL_DEFAULT_DISPLAY, or a specific native display */
   EGLNativeDisplayType nativeDisplay = EGL_DEFAULT_DISPLAY;
@@ -59,7 +54,7 @@ void fgPlatformInitialize( const char* displayName )
   // fgDisplay.ScreenHeightMM = ...;
 }
 
-void fgPlatformCloseDisplay ( void )
+void fghPlatformCloseDisplayEGL()
 {
   if (fgDisplay.pDisplay.egl.Display != EGL_NO_DISPLAY) {
     eglTerminate(fgDisplay.pDisplay.egl.Display);

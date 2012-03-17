@@ -1,7 +1,7 @@
 /*
- * freeglut_structure_egl.c
+ * freeglut_init_android.c
  *
- * Windows and menus need tree structure
+ * Various freeglut initialization functions.
  *
  * Copyright (C) 2012  Sylvain Beucler
  *
@@ -26,13 +26,13 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 
-extern SFG_Structure fgStructure;
-
-/**
- * Initialize default platform-specific fields in SFG_Window
- */
-void fgPlatformCreateWindow ( SFG_Window *window )
+void fgPlatformInitialize()
 {
-  window->Window.pContext.egl.Surface = EGL_NO_SURFACE;
-  window->Window.pContext.egl.Config = NULL;
+  fghPlatformInitializeEGL();
+  fgState.Initialised = GL_TRUE;
+}
+
+void fgPlatformCloseDisplay()
+{
+  fghPlatformCloseDisplayEGL();
 }

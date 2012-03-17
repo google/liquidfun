@@ -105,6 +105,7 @@ ELSEIF(ANDROID)
         src/android/native_app_glue/android_native_app_glue.h
         src/android/fg_runtime_android.c
         src/android/fg_gamemode_android.c
+        src/android/fg_init_android.c
         src/android/fg_input_devices_android.c
         src/android/fg_joystick_android.c
         src/android/fg_main_android.c
