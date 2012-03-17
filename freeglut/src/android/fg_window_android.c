@@ -92,11 +92,6 @@ void fgPlatformCloseWindow( SFG_Window* window )
   /* Window pre-created by Android, no way to delete it */
 }
 
-void fgPlatformSetWindow ( SFG_Window *window )
-{
-  /* TODO: only a single window possible? */
-}
-
 /*
  * This function makes the current window visible
  */

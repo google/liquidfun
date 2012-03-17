@@ -30,5 +30,6 @@ extern int fghChooseConfigEGL(EGLConfig* config);
 extern void fghPlatformOpenWindowEGL( SFG_Window* window );
 extern EGLConfig fghCreateNewContextEGL( SFG_Window* window );
 extern void fghPlatformCloseWindowEGL( SFG_Window* window );
+extern void fgPlatformSetWindow ( SFG_Window *window );
 
 #endif

@@ -125,3 +125,13 @@ void fghPlatformCloseWindowEGL( SFG_Window* window )
     window->Window.pContext.egl.Surface = EGL_NO_SURFACE;
   }
 }
+
+void fgPlatformSetWindow ( SFG_Window *window )
+{
+  if (!eglMakeCurrent(
+		      fgDisplay.pDisplay.egl.Display,
+		      window->Window.pContext.egl.Surface,
+		      window->Window.pContext.egl.Surface,
+		      window->Window.Context))
+    fgError("eglMakeCurrent: err=%x\n", eglGetError());
+}
