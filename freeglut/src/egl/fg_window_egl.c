@@ -82,7 +82,11 @@ EGLContext fghCreateNewContextEGL( SFG_Window* window ) {
   }
   EGLint ver = -1;
   eglQueryContext(fgDisplay.pDisplay.egl.Display, context, EGL_CONTEXT_CLIENT_VERSION, &ver);
+#ifdef GL_ES_VERSION_2_0
   if (ver != 2)
+#else
+  if (ver != 1)
+#endif
     fgError("Wrong GLES major version: %d\n", ver);
 
   return context;
