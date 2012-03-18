@@ -87,8 +87,6 @@ static void drawSolidIcosahedron(void)         { glutSolidIcosahedron ();       
 static void drawWireIcosahedron(void)          { glutWireIcosahedron ();                         }
 static void drawSolidSierpinskiSponge(void)    { glutSolidSierpinskiSponge (depth, offset, orad);}  /* orad doubles as size input */
 static void drawWireSierpinskiSponge(void)     { glutWireSierpinskiSponge (depth, offset, orad); }  /* orad doubles as size input */
-static void drawSolidTeapot(void)              { glutSolidTeapot(orad);                          }  /* orad doubles as size input */
-static void drawWireTeapot(void)               { glutWireTeapot(orad);                           }  /* orad doubles as size input */
 static void drawSolidTorus(void)               { glutSolidTorus(irad,orad,slices,stacks);        }
 static void drawWireTorus(void)                { glutWireTorus (irad,orad,slices,stacks);        }
 static void drawSolidSphere(void)              { glutSolidSphere(orad,slices,stacks);            }  /* orad doubles as size input */
@@ -97,6 +95,24 @@ static void drawSolidCone(void)                { glutSolidCone(orad,orad,slices,
 static void drawWireCone(void)                 { glutWireCone(orad,orad,slices,stacks);          }  /* orad doubles as size input */
 static void drawSolidCylinder(void)            { glutSolidCylinder(orad,orad,slices,stacks);     }  /* orad doubles as size input */
 static void drawWireCylinder(void)             { glutWireCylinder(orad,orad,slices,stacks);      }  /* orad doubles as size input */
+static void drawSolidTeapot(void)
+{
+    /* per Glut manpage, it should be noted that the teapot is rendered
+     * with clockwise winding for front facing polygons...
+     */
+    glFrontFace(GL_CW);
+    glutSolidTeapot(orad);  /* orad doubles as size input */
+    glFrontFace(GL_CCW);
+}
+static void drawWireTeapot(void)
+{
+    /* per Glut manpage, it should be noted that the teapot is rendered
+     * with clockwise winding for front facing polygons...
+     */
+    glFrontFace(GL_CW);
+    glutWireTeapot(orad);  /* orad doubles as size input */
+    glFrontFace(GL_CCW);
+}
 
 #define RADIUS    1.0f
 
