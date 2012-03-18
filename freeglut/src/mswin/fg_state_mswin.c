@@ -140,10 +140,10 @@ int fgPlatformGlutGet ( GLenum eWhat )
       return returnValue;
 
     case GLUT_WINDOW_BUFFER_SIZE:
-      returnValue = 1 ;                                      /* ????? */
+      returnValue = 1 ;                                      /* TODO????? */
       return returnValue;
     case GLUT_WINDOW_STENCIL_SIZE:
-      returnValue = 0 ;                                      /* ????? */
+      returnValue = 0 ;                                      /* TODO????? */
       return returnValue;
 
     case GLUT_WINDOW_X:
