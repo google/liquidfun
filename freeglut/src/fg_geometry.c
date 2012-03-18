@@ -566,6 +566,7 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
 /* -- Now the various shapes involving circles -- */
 /*
  * Compute lookup table of cos and sin values forming a circle
+ * (or half circle if halfCircle==TRUE)
  *
  * Notes:
  *    It is the responsibility of the caller to free these tables
@@ -573,25 +574,21 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
  *    The last entry is exactly the same as the first
  *    The sign of n can be flipped to get the reverse loop
  */
-static void fghCircleTable(double **sint,double **cost,const int n)
+static void fghCircleTable(GLdouble **sint, GLdouble **cost, const int n, const GLboolean halfCircle)
 {
     int i;
-
+    
     /* Table size, the sign of n flips the circle direction */
-
     const int size = abs(n);
 
     /* Determine the angle between samples */
-
-    const double angle = 2*M_PI/(double)( ( n == 0 ) ? 1 : n );
+    const GLdouble angle = (halfCircle?1:2)*M_PI/(GLdouble)( ( n == 0 ) ? 1 : n );
 
     /* Allocate memory for n samples, plus duplicate of first entry at the end */
-
-    *sint = (double *) calloc(sizeof(double), size+1);
-    *cost = (double *) calloc(sizeof(double), size+1);
+    *sint = malloc(sizeof(GLdouble) * (size+1));
+    *cost = malloc(sizeof(GLdouble) * (size+1));
 
     /* Bail out if memory allocation fails, fgError never returns */
-
     if (!(*sint) || !(*cost))
     {
         free(*sint);
@@ -600,7 +597,6 @@ static void fghCircleTable(double **sint,double **cost,const int n)
     }
 
     /* Compute cos and sin around the circle */
-
     (*sint)[0] = 0.0;
     (*cost)[0] = 1.0;
 
@@ -610,10 +606,18 @@ static void fghCircleTable(double **sint,double **cost,const int n)
         (*cost)[i] = cos(angle*i);
     }
 
-    /* Last sample is duplicate of the first */
-
-    (*sint)[size] = (*sint)[0];
-    (*cost)[size] = (*cost)[0];
+    
+    if (halfCircle)
+    {
+        (*sint)[size] =  0.0;   /* sin PI */
+        (*cost)[size] = -1.0;   /* cos PI */
+    }
+    else
+    {
+        /* Last sample is duplicate of the first (sin or cos of 2 PI) */
+        (*sint)[size] = (*sint)[0];
+        (*cost)[size] = (*cost)[0];
+    }
 }
 
 
@@ -672,9 +676,9 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
         vertices = cube_verts;
 
     if (useWireMode)
-        fghDrawGeometryWire (vertices  ,cube_norms,                                    CUBE_NUM_FACES,CUBE_NUM_EDGE_PER_FACE);
+        fghDrawGeometryWire (vertices,cube_norms,                                    CUBE_NUM_FACES,CUBE_NUM_EDGE_PER_FACE);
     else
-        fghDrawGeometrySolid(vertices  ,cube_norms,cube_vertIdxs,CUBE_VERT_PER_OBJ_TRI,               CUBE_NUM_EDGE_PER_FACE);
+        fghDrawGeometrySolid(vertices,cube_norms,cube_vertIdxs,CUBE_VERT_PER_OBJ_TRI,               CUBE_NUM_EDGE_PER_FACE);
 
     if (dSize!=1.)
         /* cleanup allocated memory */
@@ -735,18 +739,18 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 
     /* Adjust z and radius as stacks are drawn. */
 
-    double z0,z1;
-    double r0,r1;
+    GLdouble z0,z1;
+    GLdouble r0,r1;
 
     /* Pre-computed circle */
 
-    double *sint1,*cost1;
-    double *sint2,*cost2;
+    GLdouble *sint1,*cost1;
+    GLdouble *sint2,*cost2;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSphere" );
 
-    fghCircleTable(&sint1,&cost1,-slices);
-    fghCircleTable(&sint2,&cost2,stacks*2);
+    fghCircleTable(&sint1,&cost1,-slices,FALSE);
+    fghCircleTable(&sint2,&cost2, stacks,TRUE);
 
     /* The top stack is covered with a triangle fan */
 
@@ -823,18 +827,18 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
 
     /* Adjust z and radius as stacks and slices are drawn. */
 
-    double r;
-    double x,y,z;
+    GLdouble r;
+    GLdouble x,y,z;
 
     /* Pre-computed circle */
 
-    double *sint1,*cost1;
-    double *sint2,*cost2;
+    GLdouble *sint1,*cost1;
+    GLdouble *sint2,*cost2;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSphere" );
 
-    fghCircleTable(&sint1,&cost1,-slices  );
-    fghCircleTable(&sint2,&cost2, stacks*2);
+    fghCircleTable(&sint1,&cost1,-slices,FALSE);
+    fghCircleTable(&sint2,&cost2, stacks,TRUE);
 
     /* Draw a line loop for each stack */
 
@@ -868,6 +872,7 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
                 x = cost1[i]*sint2[j];
                 y = sint1[i]*sint2[j];
                 z = cost2[j];
+                printf("j(%i):%1.3f\n",j,z);
 
                 glNormal3d(x,y,z);
                 glVertex3d(x*radius,y*radius,z*radius);
@@ -893,24 +898,24 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
 
     /* Step in z and radius as stacks are drawn. */
 
-    double z0,z1;
-    double r0,r1;
+    GLdouble z0,z1;
+    GLdouble r0,r1;
 
-    const double zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
-    const double rStep = base / ( ( stacks > 0 ) ? stacks : 1 );
+    const GLdouble zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
+    const GLdouble rStep = base / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Scaling factors for vertex normals */
 
-    const double cosn = ( height / sqrt ( height * height + base * base ));
-    const double sinn = ( base   / sqrt ( height * height + base * base ));
+    const GLdouble cosn = ( height / sqrt ( height * height + base * base ));
+    const GLdouble sinn = ( base   / sqrt ( height * height + base * base ));
 
     /* Pre-computed circle */
 
-    double *sint,*cost;
+    GLdouble *sint,*cost;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCone" );
 
-    fghCircleTable(&sint,&cost,-slices);
+    fghCircleTable(&sint,&cost,-slices,FALSE);
 
     /* Cover the circular base with a triangle fan... */
 
@@ -980,24 +985,24 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
 
     /* Step in z and radius as stacks are drawn. */
 
-    double z = 0.0;
-    double r = base;
+    GLdouble z = 0.0;
+    GLdouble r = base;
 
-    const double zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
-    const double rStep = base / ( ( stacks > 0 ) ? stacks : 1 );
+    const GLdouble zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
+    const GLdouble rStep = base / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Scaling factors for vertex normals */
 
-    const double cosn = ( height / sqrt ( height * height + base * base ));
-    const double sinn = ( base   / sqrt ( height * height + base * base ));
+    const GLdouble cosn = ( height / sqrt ( height * height + base * base ));
+    const GLdouble sinn = ( base   / sqrt ( height * height + base * base ));
 
     /* Pre-computed circle */
 
-    double *sint,*cost;
+    GLdouble *sint,*cost;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCone" );
 
-    fghCircleTable(&sint,&cost,-slices);
+    fghCircleTable(&sint,&cost,-slices,FALSE);
 
     /* Draw the stacks... */
 
@@ -1048,16 +1053,16 @@ void FGAPIENTRY glutSolidCylinder(GLdouble radius, GLdouble height, GLint slices
 
     /* Step in z and radius as stacks are drawn. */
 
-    double z0,z1;
-    const double zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
+    GLdouble z0,z1;
+    const GLdouble zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Pre-computed circle */
 
-    double *sint,*cost;
+    GLdouble *sint,*cost;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCylinder" );
 
-    fghCircleTable(&sint,&cost,-slices);
+    fghCircleTable(&sint,&cost,-slices,FALSE);
 
     /* Cover the base and top */
 
@@ -1112,16 +1117,16 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
 
     /* Step in z and radius as stacks are drawn. */
 
-          double z = 0.0;
-    const double zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
+          GLdouble z = 0.0;
+    const GLdouble zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Pre-computed circle */
 
-    double *sint,*cost;
+    GLdouble *sint,*cost;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCylinder" );
 
-    fghCircleTable(&sint,&cost,-slices);
+    fghCircleTable(&sint,&cost,-slices,FALSE);
 
     /* Draw the stacks... */
 
@@ -1167,10 +1172,10 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
  */
 void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLint nSides, GLint nRings )
 {
-  double  iradius = dInnerRadius, oradius = dOuterRadius, phi, psi, dpsi, dphi;
-  double *vertex, *normal;
+  GLdouble  iradius = dInnerRadius, oradius = dOuterRadius, phi, psi, dpsi, dphi;
+  GLdouble *vertex, *normal;
   int    i, j;
-  double spsi, cpsi, sphi, cphi ;
+  GLdouble spsi, cpsi, sphi, cphi ;
 
   FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTorus" );
 
@@ -1178,13 +1183,13 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
   if ( nRings < 1 ) nRings = 1;
 
   /* Allocate the vertices array */
-  vertex = (double *)calloc( sizeof(double), 3 * nSides * nRings );
-  normal = (double *)calloc( sizeof(double), 3 * nSides * nRings );
+  vertex = (GLdouble *)calloc( sizeof(GLdouble), 3 * nSides * nRings );
+  normal = (GLdouble *)calloc( sizeof(GLdouble), 3 * nSides * nRings );
 
   glPushMatrix();
 
-  dpsi =  2.0 * M_PI / (double)nRings ;
-  dphi = -2.0 * M_PI / (double)nSides ;
+  dpsi =  2.0 * M_PI / (GLdouble)nRings ;
+  dphi = -2.0 * M_PI / (GLdouble)nSides ;
   psi  = 0.0;
 
   for( j=0; j<nRings; j++ )
@@ -1248,10 +1253,10 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
  */
 void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLint nSides, GLint nRings )
 {
-  double  iradius = dInnerRadius, oradius = dOuterRadius, phi, psi, dpsi, dphi;
-  double *vertex, *normal;
+  GLdouble  iradius = dInnerRadius, oradius = dOuterRadius, phi, psi, dpsi, dphi;
+  GLdouble *vertex, *normal;
   int    i, j;
-  double spsi, cpsi, sphi, cphi ;
+  GLdouble spsi, cpsi, sphi, cphi ;
 
   FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTorus" );
 
@@ -1263,13 +1268,13 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
   nRings ++ ;
 
   /* Allocate the vertices array */
-  vertex = (double *)calloc( sizeof(double), 3 * nSides * nRings );
-  normal = (double *)calloc( sizeof(double), 3 * nSides * nRings );
+  vertex = (GLdouble *)calloc( sizeof(GLdouble), 3 * nSides * nRings );
+  normal = (GLdouble *)calloc( sizeof(GLdouble), 3 * nSides * nRings );
 
   glPushMatrix();
 
-  dpsi =  2.0 * M_PI / (double)(nRings - 1) ;
-  dphi = -2.0 * M_PI / (double)(nSides - 1) ;
+  dpsi =  2.0 * M_PI / (GLdouble)(nRings - 1) ;
+  dphi = -2.0 * M_PI / (GLdouble)(nSides - 1) ;
   psi  = 0.0;
 
   for( j=0; j<nRings; j++ )
