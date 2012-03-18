@@ -65,6 +65,7 @@ IF(NOT FREEGLUT_GLES2 AND NOT FREEGLUT_GLES1)
         src/fg_geometry.c
         src/fg_menu.c
         src/fg_teapot.c
+        src/fg_teapot_data.h
     )
 ELSE()
     LIST(APPEND FREEGLUT_SRCS
