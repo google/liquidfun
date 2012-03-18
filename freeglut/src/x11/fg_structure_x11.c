@@ -33,7 +33,11 @@ extern SFG_Structure fgStructure;
 
 void fgPlatformCreateWindow ( SFG_Window *window )
 {
+#ifdef EGL_VERSION_1_0
+    fghPlatformCreateWindowEGL(window);
+#else
     window->Window.pContext.FBConfig = NULL;
+#endif
 
     window->State.pWState.OldHeight = window->State.pWState.OldWidth = -1;
 }

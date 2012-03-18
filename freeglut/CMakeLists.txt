@@ -125,7 +125,6 @@ ELSEIF(ANDROID)
 ELSE()
     LIST(APPEND FREEGLUT_SRCS
         src/x11/fg_cursor_x11.c
-        src/x11/fg_display_x11.c
         src/x11/fg_ext_x11.c
         src/x11/fg_gamemode_x11.c
         src/x11/fg_glutfont_definitions_x11.c
@@ -141,6 +140,24 @@ ELSE()
         src/x11/fg_window_x11.c
         src/x11/fg_xinput_x11.c
     )
+    IF(FREEGLUT_GLES2 OR FREEGLUT_GLES1)
+        LIST(APPEND FREEGLUT_SRCS
+            src/egl/fg_internal_egl.h
+            src/egl/fg_display_egl.c
+            src/egl/fg_init_egl.c
+            src/egl/fg_state_egl.c
+            src/egl/fg_structure_egl.c
+            src/egl/fg_window_egl.c
+        )
+    ELSE()
+        LIST(APPEND FREEGLUT_SRCS
+            src/x11/fg_internal_x11_glx.h
+            src/x11/fg_display_x11_glx.c
+            src/x11/fg_state_x11_glx.c
+            src/x11/fg_window_x11_glx.c
+            src/x11/fg_window_x11_glx.h
+        )
+    ENDIF()
 ENDIF()
 
 # For OpenGL ES (GLES):

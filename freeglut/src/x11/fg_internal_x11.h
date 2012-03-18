@@ -30,7 +30,12 @@
 
 
 /* -- PLATFORM-SPECIFIC INCLUDES ------------------------------------------- */
+#ifdef EGL_VERSION_1_0
+#include "egl/fg_internal_egl.h"
+#else
 #include <GL/glx.h>
+#include "x11/fg_internal_x11_glx.h"
+#endif
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
@@ -41,15 +46,6 @@
 #ifdef HAVE_X11_EXTENSIONS_XRANDR_H
 #    include <X11/extensions/Xrandr.h>
 #endif
-/* If GLX is too old, we will fail during runtime when multisampling
-   is requested, but at least freeglut compiles. */
-#ifndef GLX_SAMPLE_BUFFERS
-#    define GLX_SAMPLE_BUFFERS 0x80A8
-#endif
-#ifndef GLX_SAMPLES
-#    define GLX_SAMPLES 0x80A9
-#endif
-
 
 
 /* -- GLOBAL TYPE DEFINITIONS ---------------------------------------------- */
@@ -83,6 +79,10 @@ struct tagSFG_PlatformDisplay
     int             DisplayViewPortY;   /* saved Y location of the viewport  */
 #endif /* HAVE_X11_EXTENSIONS_XF86VMODE_H */
 
+#ifdef EGL_VERSION_1_0
+    struct tagSFG_PlatformDisplayEGL egl;
+#endif
+
     int             DisplayPointerX;    /* saved X location of the pointer   */
     int             DisplayPointerY;    /* saved Y location of the pointer   */
 };
@@ -93,11 +93,19 @@ struct tagSFG_PlatformDisplay
  * much conditionally-compiled code later in the library.
  */
 typedef Window     SFG_WindowHandleType ;
+#ifdef EGL_VERSION_1_0
+typedef EGLContext SFG_WindowContextType ;
+#else
 typedef GLXContext SFG_WindowContextType ;
+#endif
 typedef struct tagSFG_PlatformContext SFG_PlatformContext;
 struct tagSFG_PlatformContext
 {
-    GLXFBConfig*    FBConfig;        /* The window's FBConfig               */
+#ifdef EGL_VERSION_1_0
+    struct tagSFG_PlatformContextEGL egl;
+#else
+    GLXFBConfig    FBConfig;        /* The window's FBConfig               */
+#endif
 };
 
 

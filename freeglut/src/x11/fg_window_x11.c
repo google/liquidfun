@@ -32,313 +32,13 @@
 #include <unistd.h>  /* usleep */
 #include "../fg_internal.h"
 
-/* pushing attribute/value pairs into an array */
-#define ATTRIB(a) attributes[where++]=(a)
-#define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
-
-
-#ifndef GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB
-#define GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB 0x20B2
+#ifdef EGL_VERSION_1_0
+#include "egl/fg_window_egl.h"
+#define fghCreateNewContext fghCreateNewContextEGL
+#else
+#include "x11/fg_window_x11_glx.h"
 #endif
 
-#ifndef GLX_CONTEXT_MAJOR_VERSION_ARB
-#define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
-#endif
-
-#ifndef GLX_CONTEXT_MINOR_VERSION_ARB
-#define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
-#endif
-
-#ifndef GLX_CONTEXT_FLAGS_ARB
-#define GLX_CONTEXT_FLAGS_ARB 0x2094
-#endif
-
-#ifndef GLX_CONTEXT_PROFILE_MASK_ARB
-#define GLX_CONTEXT_PROFILE_MASK_ARB 0x9126
-#endif
-
-#ifndef GLX_CONTEXT_DEBUG_BIT_ARB
-#define GLX_CONTEXT_DEBUG_BIT_ARB 0x0001
-#endif
-
-#ifndef GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
-#define GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x0002
-#endif
-
-#ifndef GLX_CONTEXT_CORE_PROFILE_BIT_ARB
-#define GLX_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
-#endif
-
-#ifndef GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB
-#define GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
-#endif
-
-#ifndef GLX_RGBA_FLOAT_TYPE
-#define GLX_RGBA_FLOAT_TYPE 0x20B9
-#endif
-
-#ifndef GLX_RGBA_FLOAT_BIT
-#define GLX_RGBA_FLOAT_BIT 0x00000004
-#endif
-
-
-/*
- * Chooses a visual basing on the current display mode settings
- */
-
-GLXFBConfig* fgPlatformChooseFBConfig( int *numcfgs )
-{
-  GLboolean wantIndexedMode = GL_FALSE;
-  int attributes[ 100 ];
-  int where = 0, numAuxBuffers;
-
-  /* First we have to process the display mode settings... */
-  if( fgState.DisplayMode & GLUT_INDEX ) {
-    ATTRIB_VAL( GLX_BUFFER_SIZE, 8 );
-    /*  Buffer size is selected later.  */
-
-    ATTRIB_VAL( GLX_RENDER_TYPE, GLX_COLOR_INDEX_BIT );
-    wantIndexedMode = GL_TRUE;
-  } else {
-    ATTRIB_VAL( GLX_RED_SIZE,   1 );
-    ATTRIB_VAL( GLX_GREEN_SIZE, 1 );
-    ATTRIB_VAL( GLX_BLUE_SIZE,  1 );
-    if( fgState.DisplayMode & GLUT_ALPHA ) {
-      ATTRIB_VAL( GLX_ALPHA_SIZE, 1 );
-    }
-  }
-
-  if( fgState.DisplayMode & GLUT_DOUBLE ) {
-    ATTRIB_VAL( GLX_DOUBLEBUFFER, True );
-  }
-
-  if( fgState.DisplayMode & GLUT_STEREO ) {
-    ATTRIB_VAL( GLX_STEREO, True );
-  }
-
-  if( fgState.DisplayMode & GLUT_DEPTH ) {
-    ATTRIB_VAL( GLX_DEPTH_SIZE, 1 );
-  }
-
-  if( fgState.DisplayMode & GLUT_STENCIL ) {
-    ATTRIB_VAL( GLX_STENCIL_SIZE, 1 );
-  }
-
-  if( fgState.DisplayMode & GLUT_ACCUM ) {
-    ATTRIB_VAL( GLX_ACCUM_RED_SIZE, 1 );
-    ATTRIB_VAL( GLX_ACCUM_GREEN_SIZE, 1 );
-    ATTRIB_VAL( GLX_ACCUM_BLUE_SIZE, 1 );
-    if( fgState.DisplayMode & GLUT_ALPHA ) {
-      ATTRIB_VAL( GLX_ACCUM_ALPHA_SIZE, 1 );
-    }
-  }
-
-  numAuxBuffers = fghNumberOfAuxBuffersRequested();
-  if ( numAuxBuffers > 0 ) {
-    ATTRIB_VAL( GLX_AUX_BUFFERS, numAuxBuffers );
-  }
-
-  if( fgState.DisplayMode & GLUT_SRGB ) {
-    ATTRIB_VAL( GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, True );
-  }
-
-  if (fgState.DisplayMode & GLUT_MULTISAMPLE) {
-    ATTRIB_VAL(GLX_SAMPLE_BUFFERS, 1);
-    ATTRIB_VAL(GLX_SAMPLES, fgState.SampleNumber);
-  }
-
-  /* Push a terminator at the end of the list */
-  ATTRIB( None );
-
-    {
-        GLXFBConfig * fbconfigArray;  /*  Array of FBConfigs  */
-        GLXFBConfig * fbconfig;       /*  The FBConfig we want  */
-        int fbconfigArraySize;        /*  Number of FBConfigs in the array  */
-
-
-        /*  Get all FBConfigs that match "attributes".  */
-        fbconfigArray = glXChooseFBConfig( fgDisplay.pDisplay.Display,
-                                           fgDisplay.pDisplay.Screen,
-                                           attributes,
-                                           &fbconfigArraySize );
-
-        if (fbconfigArray != NULL)
-        {
-            int result;  /* Returned by glXGetFBConfigAttrib, not checked. */
-
-
-            if( wantIndexedMode )
-            {
-                /*
-                 * In index mode, we want the largest buffer size, i.e. visual
-                 * depth.  Here, FBConfigs are sorted by increasing buffer size
-                 * first, so FBConfigs with the largest size come last.
-                 */
-
-                int bufferSizeMin, bufferSizeMax;
-
-                /*  Get bufferSizeMin.  */
-                result =
-                  glXGetFBConfigAttrib( fgDisplay.pDisplay.Display,
-                                        fbconfigArray[0],
-                                        GLX_BUFFER_SIZE,
-                                        &bufferSizeMin );
-                /*  Get bufferSizeMax.  */
-                result =
-                  glXGetFBConfigAttrib( fgDisplay.pDisplay.Display,
-                                        fbconfigArray[fbconfigArraySize - 1],
-                                        GLX_BUFFER_SIZE,
-                                        &bufferSizeMax );
-
-                if (bufferSizeMax > bufferSizeMin)
-                {
-                    /* 
-                     * Free and reallocate fbconfigArray, keeping only FBConfigs
-                     * with the largest buffer size.
-                     */
-                    XFree(fbconfigArray);
-
-                    /*  Add buffer size token at the end of the list.  */
-                    where--;
-                    ATTRIB_VAL( GLX_BUFFER_SIZE, bufferSizeMax );
-                    ATTRIB( None );
-
-                    fbconfigArray = glXChooseFBConfig( fgDisplay.pDisplay.Display,
-                                                       fgDisplay.pDisplay.Screen,
-                                                       attributes,
-                                                       &fbconfigArraySize );
-                }
-            }
-
-            /*
-             * We now have an array of FBConfigs, the first one being the "best"
-             * one.  So we should return only this FBConfig:
-             *
-             * int fbconfigXID;
-             *
-             *  - pick the XID of the FBConfig we want
-             * result = glXGetFBConfigAttrib( fgDisplay.pDisplay.Display,
-             *                                fbconfigArray[0],
-             *                                GLX_FBCONFIG_ID,
-             *                                &fbconfigXID );
-             *
-             * - free the array
-             * XFree(fbconfigArray);
-             *
-             * - reset "attributes" with the XID
-             * where = 0;
-             * ATTRIB_VAL( GLX_FBCONFIG_ID, fbconfigXID );
-             * ATTRIB( None );
-             *
-             * - get our FBConfig only
-             * fbconfig = glXChooseFBConfig( fgDisplay.pDisplay.Display,
-             *                               fgDisplay.pDisplay.Screen,
-             *                               attributes,
-             *                               &fbconfigArraySize );
-             *
-             * However, for some configurations (for instance multisampling with
-             * Mesa 6.5.2 and ATI drivers), this does not work:
-             * glXChooseFBConfig returns NULL, whereas fbconfigXID is a valid
-             * XID.  Further investigation is needed.
-             *
-             * So, for now, we return the whole array of FBConfigs.  This should
-             * not produce any side effects elsewhere.
-             */
-            fbconfig = fbconfigArray;
-        }
-        else
-        {
-           fbconfig = NULL;
-        }
-
-	if (numcfgs)
-		*numcfgs = fbconfigArraySize;
-
-        return fbconfig;
-    }
-}
-
-
-static void fghFillContextAttributes( int *attributes ) {
-  int where = 0, contextFlags, contextProfile;
-
-  if ( !fghIsLegacyContextVersionRequested() ) {
-    ATTRIB_VAL( GLX_CONTEXT_MAJOR_VERSION_ARB, fgState.MajorVersion );
-    ATTRIB_VAL( GLX_CONTEXT_MINOR_VERSION_ARB, fgState.MinorVersion );
-  }
-
-  contextFlags =
-    fghMapBit( fgState.ContextFlags, GLUT_DEBUG, GLX_CONTEXT_DEBUG_BIT_ARB ) |
-    fghMapBit( fgState.ContextFlags, GLUT_FORWARD_COMPATIBLE, GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB );
-  if ( contextFlags != 0 ) {
-    ATTRIB_VAL( GLX_CONTEXT_FLAGS_ARB, contextFlags );
-  }
-
-  contextProfile =
-    fghMapBit( fgState.ContextProfile, GLUT_CORE_PROFILE, GLX_CONTEXT_CORE_PROFILE_BIT_ARB ) |
-    fghMapBit( fgState.ContextProfile, GLUT_COMPATIBILITY_PROFILE, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB );
-  if ( contextProfile != 0 ) {
-    ATTRIB_VAL( GLX_CONTEXT_PROFILE_MASK_ARB, contextProfile );
-  }
-
-  ATTRIB( 0 );
-}
-
-typedef GLXContext (*CreateContextAttribsProc)(Display *dpy, GLXFBConfig config,
-					       GLXContext share_list, Bool direct,
-					       const int *attrib_list);
-
-static GLXContext fghCreateNewContext( SFG_Window* window )
-{
-  /* for color model calculation */
-  int menu = ( window->IsMenu && !fgStructure.MenuContext );
-  int index_mode = ( fgState.DisplayMode & GLUT_INDEX );
-
-  /* "classic" context creation */
-  Display *dpy = fgDisplay.pDisplay.Display;
-  GLXFBConfig config = *(window->Window.pContext.FBConfig);
-  int render_type = ( !menu && index_mode ) ? GLX_COLOR_INDEX_TYPE : GLX_RGBA_TYPE;
-  GLXContext share_list = NULL;
-  Bool direct = ( fgState.DirectContext != GLUT_FORCE_INDIRECT_CONTEXT );
-  GLXContext context;
-
-  /* new context creation */
-  int attributes[9];
-  CreateContextAttribsProc createContextAttribs = (CreateContextAttribsProc) fgPlatformGetProcAddress( "glXCreateContextAttribsARB" );
- 
-  /* glXCreateContextAttribsARB not found, yet the user has requested the new context creation */
-  if ( !createContextAttribs && !fghIsLegacyContextRequested() ) {
-    fgWarning( "OpenGL >2.1 context requested but glXCreateContextAttribsARB is not available! Falling back to legacy context creation" );
-	fgState.MajorVersion = 2;
-	fgState.MinorVersion = 1;
-  }
-
-  /* If nothing fancy has been required, simply use the old context creation GLX API entry */
-  if ( fghIsLegacyContextRequested() || !createContextAttribs )
-  {
-    context = glXCreateNewContext( dpy, config, render_type, share_list, direct );
-    if ( context == NULL ) {
-      fghContextCreationError();
-    }
-    return context;
-  }
-
-  /* color index mode is not available anymore with OpenGL 3.0 */
-  if ( render_type == GLX_COLOR_INDEX_TYPE ) {
-    fgWarning( "color index mode is deprecated, using RGBA mode" );
-  }
-
-  fghFillContextAttributes( attributes );
-
-  context = createContextAttribs( dpy, config, share_list, direct, attributes );
-  if ( context == NULL ) {
-    fghContextCreationError();
-  }
-  return context;
-}
-
-
-#define _NET_WM_STATE_TOGGLE    2
 static int fghResizeFullscrToggle(void)
 {
     XWindowAttributes attributes;
@@ -370,6 +70,7 @@ static int fghResizeFullscrToggle(void)
     return 0;
 }
 
+#define _NET_WM_STATE_TOGGLE    2
 static int fghEwmhFullscrToggle(void)
 {
     XEvent xev;
@@ -409,19 +110,6 @@ static int fghToggleFullscreen(void)
     return -1;
 }
 
-void fgPlatformSetWindow ( SFG_Window *window )
-{
-    if ( window )
-    {
-        glXMakeContextCurrent(
-            fgDisplay.pDisplay.Display,
-            window->Window.Handle,
-            window->Window.Handle,
-            window->Window.Context
-        );
-    }
-}
-
 static Bool fghWindowIsVisible( Display *display, XEvent *event, XPointer arg)
 {
     Window window = (Window)arg;
@@ -451,43 +139,56 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = GLUT_DOUBLE | GLUT_RGB ;
 
-    window->Window.pContext.FBConfig = fgPlatformChooseFBConfig( &num_FBConfigs );
+#ifdef EGL_VERSION_1_0
+#define WINDOW_CONFIG window->Window.pContext.egl.Config
+#else
+#define WINDOW_CONFIG window->Window.pContext.FBConfig
+#endif
+    fghChooseConfig(&WINDOW_CONFIG);
 
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
         fgState.DisplayMode = current_DisplayMode ;
 
-    if( ! window->Window.pContext.FBConfig )
+    if( ! WINDOW_CONFIG )
     {
         /*
-         * The "fgPlatformChooseFBConfig" returned a null meaning that the visual
+         * The "fghChooseConfig" returned a null meaning that the visual
          * context is not available.
          * Try a couple of variations to see if they will work.
          */
+#ifndef EGL_VERSION_1_0
         if( !( fgState.DisplayMode & GLUT_DOUBLE ) )
         {
             fgState.DisplayMode |= GLUT_DOUBLE ;
-            window->Window.pContext.FBConfig = fgPlatformChooseFBConfig( &num_FBConfigs );
+            fghChooseConfig(&WINDOW_CONFIG);
             fgState.DisplayMode &= ~GLUT_DOUBLE;
         }
+#endif
 
         if( fgState.DisplayMode & GLUT_MULTISAMPLE )
         {
             fgState.DisplayMode &= ~GLUT_MULTISAMPLE ;
-            window->Window.pContext.FBConfig = fgPlatformChooseFBConfig( &num_FBConfigs );
+            fghChooseConfig(&WINDOW_CONFIG);
             fgState.DisplayMode |= GLUT_MULTISAMPLE;
         }
     }
 
-    FREEGLUT_INTERNAL_ERROR_EXIT( window->Window.pContext.FBConfig != NULL,
+    FREEGLUT_INTERNAL_ERROR_EXIT( WINDOW_CONFIG != NULL,
                                   "FBConfig with necessary capabilities not found", "fgOpenWindow" );
 
     /*  Get the X visual.  */
-    for (i = 0; i < num_FBConfigs; i++) {
-	    visualInfo = glXGetVisualFromFBConfig( fgDisplay.pDisplay.Display,
-						   window->Window.pContext.FBConfig[i] );
-	    if (visualInfo)
-		break;
-    }
+#ifdef EGL_VERSION_1_0
+    EGLint vid = 0;
+    XVisualInfo visualTemplate;
+    int num_visuals;
+    if (!eglGetConfigAttrib(fgDisplay.pDisplay.egl.Display, window->Window.pContext.egl.Config, EGL_NATIVE_VISUAL_ID, &vid))
+      fgError("eglGetConfigAttrib(EGL_NATIVE_VISUAL_ID) failed");
+    visualTemplate.visualid = vid;
+    visualInfo = XGetVisualInfo(fgDisplay.pDisplay.Display, VisualIDMask, &visualTemplate, &num_visuals);
+#else
+    visualInfo = glXGetVisualFromFBConfig( fgDisplay.pDisplay.Display,
+					   window->Window.pContext.FBConfig );
+#endif
 
     FREEGLUT_INTERNAL_ERROR_EXIT( visualInfo != NULL,
                                   "visualInfo could not be retrieved from FBConfig", "fgOpenWindow" );
@@ -562,7 +263,12 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     }
     else if( fgState.UseCurrentContext )
     {
+
+#ifdef EGL_VERSION_1_0
+        window->Window.Context = eglGetCurrentContext( );
+#else
         window->Window.Context = glXGetCurrentContext( );
+#endif
 
         if( ! window->Window.Context )
             window->Window.Context = fghCreateNewContext( window );
@@ -570,7 +276,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     else
         window->Window.Context = fghCreateNewContext( window );
 
-#if !defined( __FreeBSD__ ) && !defined( __NetBSD__ )
+#if !defined( __FreeBSD__ ) && !defined( __NetBSD__ ) && !defined(EGL_VERSION_1_0)
     if(  !glXIsDirect( fgDisplay.pDisplay.Display, window->Window.Context ) )
     {
       if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
@@ -625,12 +331,16 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     XSetWMProtocols( fgDisplay.pDisplay.Display, window->Window.Handle,
                      &fgDisplay.pDisplay.DeleteWindow, 1 );
 
+#ifdef EGL_VERSION_1_0
+    fghPlatformOpenWindowEGL(window);
+#else
     glXMakeContextCurrent(
         fgDisplay.pDisplay.Display,
         window->Window.Handle,
         window->Window.Handle,
         window->Window.Context
     );
+#endif
 
     /* register extension events _before_ window is mapped */
     #ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
@@ -643,6 +353,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
     if( !isSubWindow)
         XPeekIfEvent( fgDisplay.pDisplay.Display, &eventReturnBuffer, &fghWindowIsVisible, (XPointer)(window->Window.Handle) );
+#undef WINDOW_CONFIG
 }
 
 
@@ -651,9 +362,13 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
  */
 void fgPlatformCloseWindow( SFG_Window* window )
 {
+#ifdef EGL_VERSION_1_0
+    fghPlatformCloseWindowEGL(window);
+#else
     if( window->Window.Context )
         glXDestroyContext( fgDisplay.pDisplay.Display, window->Window.Context );
-    XFree( window->Window.pContext.FBConfig );
+    window->Window.pContext.FBConfig = NULL;
+#endif
 
     if( window->Window.Handle ) {
         XDestroyWindow( fgDisplay.pDisplay.Display, window->Window.Handle );

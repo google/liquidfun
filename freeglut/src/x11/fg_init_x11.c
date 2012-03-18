@@ -174,9 +174,13 @@ void fgPlatformInitialize( const char* displayName )
     if( fgDisplay.pDisplay.Display == NULL )
         fgError( "failed to open display '%s'", XDisplayName( displayName ) );
 
+#ifdef EGL_VERSION_1_0
+    fghPlatformInitializeEGL();
+#else
     if( !glXQueryExtension( fgDisplay.pDisplay.Display, NULL, NULL ) )
         fgError( "OpenGL GLX extension not supported by display '%s'",
             XDisplayName( displayName ) );
+#endif
 
     fgDisplay.pDisplay.Screen = DefaultScreen( fgDisplay.pDisplay.Display );
     fgDisplay.pDisplay.RootWindow = RootWindow(
@@ -266,8 +270,10 @@ void fgPlatformCloseDisplay ( void )
 }
 
 
+#ifndef EGL_VERSION_1_0
 void fgPlatformDestroyContext ( SFG_PlatformDisplay pDisplay, SFG_WindowContextType MContext )
 {
     /* Note that the MVisualInfo is not owned by the MenuContext! */
     glXDestroyContext( pDisplay.Display, MContext );
 }
+#endif
