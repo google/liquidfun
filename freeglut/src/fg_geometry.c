@@ -872,7 +872,6 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
                 x = cost1[i]*sint2[j];
                 y = sint1[i]*sint2[j];
                 z = cost2[j];
-                printf("j(%i):%1.3f\n",j,z);
 
                 glNormal3d(x,y,z);
                 glVertex3d(x*radius,y*radius,z*radius);
