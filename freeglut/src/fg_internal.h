@@ -956,7 +956,6 @@ SFG_Proc fgPlatformGetProcAddress( const char *procName );
 #define ATTRIB(a) attributes[where++]=(a)
 #define ATTRIB_VAL(a,v) {ATTRIB(a); ATTRIB(v);}
 
-int fghIsLegacyContextVersionRequested( void );
 int fghMapBit( int mask, int from, int to );
 int fghIsLegacyContextRequested( void );
 void fghContextCreationError( void );

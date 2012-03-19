@@ -113,10 +113,8 @@ static wchar_t* fghWstrFromStr(const char* str)
 static void fghFillContextAttributes( int *attributes ) {
   int where = 0, contextFlags, contextProfile;
 
-  if ( !fghIsLegacyContextVersionRequested() ) {
-    ATTRIB_VAL( WGL_CONTEXT_MAJOR_VERSION_ARB, fgState.MajorVersion );
-    ATTRIB_VAL( WGL_CONTEXT_MINOR_VERSION_ARB, fgState.MinorVersion );
-  }
+  ATTRIB_VAL( WGL_CONTEXT_MAJOR_VERSION_ARB, fgState.MajorVersion );
+  ATTRIB_VAL( WGL_CONTEXT_MINOR_VERSION_ARB, fgState.MinorVersion );
 
   contextFlags =
     fghMapBit( fgState.ContextFlags, GLUT_DEBUG, WGL_CONTEXT_DEBUG_BIT_ARB ) |

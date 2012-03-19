@@ -70,16 +70,9 @@ extern void fgPlatformGlutFullScreenToggle( SFG_Window *win );
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
-int fghIsLegacyContextVersionRequested( void )
-{
-  return fgState.MajorVersion < 2 || (fgState.MajorVersion == 2 && fgState.MinorVersion <= 1);
-}
-
 int fghIsLegacyContextRequested( void )
 {
-  return fghIsLegacyContextVersionRequested() &&
-         fgState.ContextFlags == 0 &&
-         fgState.ContextProfile == 0;
+    return fgState.MajorVersion < 2 || (fgState.MajorVersion == 2 && fgState.MinorVersion <= 1);
 }
 
 int fghNumberOfAuxBuffersRequested( void )
