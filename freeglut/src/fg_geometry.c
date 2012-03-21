@@ -42,15 +42,15 @@
  * decomposition needed. We use the "first" parameter in glDrawArrays to go
  * from face to face.
  */
-static void fghDrawGeometryWire(GLdouble *vertices, GLdouble *normals, GLsizei numFaces, GLsizei numEdgePerFace)
+static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei numFaces, GLsizei numEdgePerFace)
 {
     int i;
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    glVertexPointer(3, GL_DOUBLE, 0, vertices);
-    glNormalPointer(GL_DOUBLE, 0, normals);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glNormalPointer(GL_FLOAT, 0, normals);
 
     /* Draw per face (TODO: could use glMultiDrawArrays if available) */
     for (i=0; i<numFaces; i++)
@@ -59,13 +59,13 @@ static void fghDrawGeometryWire(GLdouble *vertices, GLdouble *normals, GLsizei n
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
 }
-static void fghDrawGeometrySolid(GLdouble *vertices, GLdouble *normals, GLubyte *vertIdxs, GLsizei numVertices, GLsizei numEdgePerFace)
+static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs, GLsizei numVertices, GLsizei numEdgePerFace)
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    glVertexPointer(3, GL_DOUBLE, 0, vertices);
-    glNormalPointer(GL_DOUBLE, 0, normals);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glNormalPointer(GL_FLOAT, 0, normals);
     if (numEdgePerFace==3)
         glDrawArrays(GL_TRIANGLES, 0, numVertices);
     else
@@ -84,7 +84,7 @@ static void fghDrawGeometrySolid(GLdouble *vertices, GLdouble *normals, GLubyte 
 static GLubyte   vert4Decomp[6] = {0,1,2, 0,2,3};             /* quad    : 4 input vertices, 6 output (2 triangles) */
 static GLubyte   vert5Decomp[9] = {0,1,2, 0,2,4, 4,2,3};      /* pentagon: 5 input vertices, 9 output (3 triangles) */
 
-static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, GLdouble *vertices, GLubyte *vertIndices, GLdouble *normals, GLdouble *vertOut, GLdouble *normOut, GLubyte *vertIdxOut)
+static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, GLfloat *vertices, GLubyte *vertIndices, GLfloat *normals, GLfloat *vertOut, GLfloat *normOut, GLubyte *vertIdxOut)
 {
     int i,j,numEdgeIdxPerFace;
     GLubyte   *vertSamps = NULL;
@@ -132,7 +132,7 @@ static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, 
     }
 }
 
-static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLdouble *vertices, GLubyte *vertIndices, GLdouble *normals, GLdouble *vertOut, GLdouble *normOut)
+static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLfloat *vertices, GLubyte *vertIndices, GLfloat *normals, GLfloat *vertOut, GLfloat *normOut)
 {
     /* This function does the same as fghGenerateGeometryWithIndexArray, just skipping the index array generation... */
     fghGenerateGeometryWithIndexArray(numFaces, numEdgePerFace, vertices, vertIndices, normals, vertOut, normOut, NULL);
@@ -148,8 +148,8 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLdouble *vert
  */
 #define DECLARE_SHAPE_CACHE(name,nameICaps,nameCaps)\
     static GLboolean name##Cached = FALSE;\
-    static GLdouble name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
-    static GLdouble name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLfloat name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLfloat name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
     static void fgh##nameICaps##Generate()\
     {\
         fghGenerateGeometry(nameCaps##_NUM_FACES, nameCaps##_NUM_EDGE_PER_FACE,\
@@ -158,8 +158,8 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLdouble *vert
     }
 #define DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(name,nameICaps,nameCaps)\
     static GLboolean name##Cached = FALSE;\
-    static GLdouble  name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
-    static GLdouble  name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLfloat  name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLfloat  name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
     static GLubyte   name##_vertIdxs[nameCaps##_VERT_PER_OBJ_TRI];\
     static void fgh##nameICaps##Generate()\
     {\
@@ -176,26 +176,26 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLdouble *vert
 #define CUBE_VERT_ELEM_PER_OBJ  (CUBE_VERT_PER_OBJ*3)
 #define CUBE_VERT_PER_OBJ_TRI   (CUBE_VERT_PER_OBJ+CUBE_NUM_FACES*2)    /* 2 extra edges per face when drawing quads as triangles */
 /* Vertex Coordinates */
-static GLdouble cube_v[CUBE_NUM_VERT*3] =
+static GLfloat cube_v[CUBE_NUM_VERT*3] =
 {
-     .5, .5, .5,
-    -.5, .5, .5,
-    -.5,-.5, .5,
-     .5,-.5, .5,
-     .5,-.5,-.5,
-     .5, .5,-.5,
-    -.5, .5,-.5,
-    -.5,-.5,-.5
+     .5f, .5f, .5f,
+    -.5f, .5f, .5f,
+    -.5f,-.5f, .5f,
+     .5f,-.5f, .5f,
+     .5f,-.5f,-.5f,
+     .5f, .5f,-.5f,
+    -.5f, .5f,-.5f,
+    -.5f,-.5f,-.5f
 };
 /* Normal Vectors */
-static GLdouble cube_n[CUBE_NUM_FACES*3] =
+static GLfloat cube_n[CUBE_NUM_FACES*3] =
 {
-     0.0, 0.0, 1.0,
-     1.0, 0.0, 0.0,
-     0.0, 1.0, 0.0,
-    -1.0, 0.0, 0.0,
-     0.0,-1.0, 0.0,
-     0.0, 0.0,-1.0
+     0.0f, 0.0f, 1.0f,
+     1.0f, 0.0f, 0.0f,
+     0.0f, 1.0f, 0.0f,
+    -1.0f, 0.0f, 0.0f,
+     0.0f,-1.0f, 0.0f,
+     0.0f, 0.0f,-1.0f
 };
 
 /* Vertex indices */
@@ -224,46 +224,46 @@ DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(cube,Cube,CUBE);
 #define DODECAHEDRON_VERT_ELEM_PER_OBJ  (DODECAHEDRON_VERT_PER_OBJ*3)
 #define DODECAHEDRON_VERT_PER_OBJ_TRI   (DODECAHEDRON_VERT_PER_OBJ+DODECAHEDRON_NUM_FACES*4)    /* 4 extra edges per face when drawing pentagons as triangles */
 /* Vertex Coordinates */
-static GLdouble dodecahedron_v[DODECAHEDRON_NUM_VERT*3] =
+static GLfloat dodecahedron_v[DODECAHEDRON_NUM_VERT*3] =
 {
-     0.0          ,  1.61803398875,  0.61803398875,
-    -1.0          ,  1.0          ,  1.0          ,
-    -0.61803398875,  0.0          ,  1.61803398875,
-     0.61803398875,  0.0          ,  1.61803398875,
-     1.0          ,  1.0          ,  1.0          ,
-     0.0          ,  1.61803398875, -0.61803398875,
-     1.0          ,  1.0          , -1.0          ,
-     0.61803398875,  0.0          , -1.61803398875,
-    -0.61803398875,  0.0          , -1.61803398875,
-    -1.0          ,  1.0          , -1.0          ,
-     0.0          , -1.61803398875,  0.61803398875,
-     1.0          , -1.0          ,  1.0          ,
-    -1.0          , -1.0          ,  1.0          ,
-     0.0          , -1.61803398875, -0.61803398875,
-    -1.0          , -1.0          , -1.0          ,
-     1.0          , -1.0          , -1.0          ,
-     1.61803398875, -0.61803398875,  0.0          ,
-     1.61803398875,  0.61803398875,  0.0          ,
-    -1.61803398875,  0.61803398875,  0.0          ,
-    -1.61803398875, -0.61803398875,  0.0
+               0.0f,  1.61803398875f,  0.61803398875f,
+    -          1.0f,            1.0f,            1.0f,
+    -0.61803398875f,            0.0f,  1.61803398875f,
+     0.61803398875f,            0.0f,  1.61803398875f,
+               1.0f,            1.0f,            1.0f,
+               0.0f,  1.61803398875f, -0.61803398875f,
+               1.0f,            1.0f, -          1.0f,
+     0.61803398875f,            0.0f, -1.61803398875f,
+    -0.61803398875f,            0.0f, -1.61803398875f,
+    -          1.0f,            1.0f, -          1.0f,
+               0.0f, -1.61803398875f,  0.61803398875f,
+               1.0f, -          1.0f,            1.0f,
+    -          1.0f, -          1.0f,            1.0f,
+               0.0f, -1.61803398875f, -0.61803398875f,
+    -          1.0f, -          1.0f, -          1.0f,
+               1.0f, -          1.0f, -          1.0f,
+     1.61803398875f, -0.61803398875f,            0.0f,
+     1.61803398875f,  0.61803398875f,            0.0f,
+    -1.61803398875f,  0.61803398875f,            0.0f,
+    -1.61803398875f, -0.61803398875f,            0.0f
 };
 /* Normal Vectors */
-static GLdouble dodecahedron_n[DODECAHEDRON_NUM_FACES*3] =
+static GLfloat dodecahedron_n[DODECAHEDRON_NUM_FACES*3] =
 {
-     0.0           ,  0.525731112119,  0.850650808354,
-     0.0           ,  0.525731112119, -0.850650808354,
-     0.0           , -0.525731112119,  0.850650808354,
-     0.0           , -0.525731112119, -0.850650808354,
+                0.0f,  0.525731112119f,  0.850650808354f,
+                0.0f,  0.525731112119f, -0.850650808354f,
+                0.0f, -0.525731112119f,  0.850650808354f,
+                0.0f, -0.525731112119f, -0.850650808354f,
 
-     0.850650808354, 0.0            ,  0.525731112119,
-    -0.850650808354, 0.0            ,  0.525731112119,
-     0.850650808354, 0.0            , -0.525731112119,
-    -0.850650808354, 0.0            , -0.525731112119,
+     0.850650808354f,             0.0f,  0.525731112119f,
+    -0.850650808354f,             0.0f,  0.525731112119f,
+     0.850650808354f,             0.0f, -0.525731112119f,
+    -0.850650808354f,             0.0f, -0.525731112119f,
 
-     0.525731112119,  0.850650808354, 0.0            ,
-     0.525731112119, -0.850650808354, 0.0            ,
-    -0.525731112119,  0.850650808354, 0.0            , 
-    -0.525731112119, -0.850650808354, 0.0            ,
+     0.525731112119f,  0.850650808354f,             0.0f,
+     0.525731112119f, -0.850650808354f,             0.0f,
+    -0.525731112119f,  0.850650808354f,             0.0f, 
+    -0.525731112119f, -0.850650808354f,             0.0f,
 };
 
 /* Vertex indices */
@@ -295,48 +295,48 @@ DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(dodecahedron,Dodecahedron,DODECAHEDRON
 #define ICOSAHEDRON_VERT_ELEM_PER_OBJ  (ICOSAHEDRON_VERT_PER_OBJ*3)
 #define ICOSAHEDRON_VERT_PER_OBJ_TRI   ICOSAHEDRON_VERT_PER_OBJ
 /* Vertex Coordinates */
-static GLdouble icosahedron_v[ICOSAHEDRON_NUM_VERT*3] =
+static GLfloat icosahedron_v[ICOSAHEDRON_NUM_VERT*3] =
 {
-     1.0,             0.0,             0.0           ,
-     0.447213595500,  0.894427191000,  0.0           ,
-     0.447213595500,  0.276393202252,  0.850650808354,
-     0.447213595500, -0.723606797748,  0.525731112119,
-     0.447213595500, -0.723606797748, -0.525731112119,
-     0.447213595500,  0.276393202252, -0.850650808354,
-    -0.447213595500, -0.894427191000,  0.0           ,
-    -0.447213595500, -0.276393202252,  0.850650808354,
-    -0.447213595500,  0.723606797748,  0.525731112119,
-    -0.447213595500,  0.723606797748, -0.525731112119,
-    -0.447213595500, -0.276393202252, -0.850650808354,
-    -1.0,             0.0,             0.0           
+                1.0f,             0.0f,             0.0f,
+     0.447213595500f,  0.894427191000f,             0.0f,
+     0.447213595500f,  0.276393202252f,  0.850650808354f,
+     0.447213595500f, -0.723606797748f,  0.525731112119f,
+     0.447213595500f, -0.723606797748f, -0.525731112119f,
+     0.447213595500f,  0.276393202252f, -0.850650808354f,
+    -0.447213595500f, -0.894427191000f,             0.0f,
+    -0.447213595500f, -0.276393202252f,  0.850650808354f,
+    -0.447213595500f,  0.723606797748f,  0.525731112119f,
+    -0.447213595500f,  0.723606797748f, -0.525731112119f,
+    -0.447213595500f, -0.276393202252f, -0.850650808354f,
+    -           1.0f,             0.0f,             0.0f
 };
 /* Normal Vectors:
  * icosahedron_n[i][0] = ( icosahedron_v[icosahedron_vi[i][1]][1] - icosahedron_v[icosahedron_vi[i][0]][1] ) * ( icosahedron_v[icosahedron_vi[i][2]][2] - icosahedron_v[icosahedron_vi[i][0]][2] ) - ( icosahedron_v[icosahedron_vi[i][1]][2] - icosahedron_v[icosahedron_vi[i][0]][2] ) * ( icosahedron_v[icosahedron_vi[i][2]][1] - icosahedron_v[icosahedron_vi[i][0]][1] ) ;
  * icosahedron_n[i][1] = ( icosahedron_v[icosahedron_vi[i][1]][2] - icosahedron_v[icosahedron_vi[i][0]][2] ) * ( icosahedron_v[icosahedron_vi[i][2]][0] - icosahedron_v[icosahedron_vi[i][0]][0] ) - ( icosahedron_v[icosahedron_vi[i][1]][0] - icosahedron_v[icosahedron_vi[i][0]][0] ) * ( icosahedron_v[icosahedron_vi[i][2]][2] - icosahedron_v[icosahedron_vi[i][0]][2] ) ;
  * icosahedron_n[i][2] = ( icosahedron_v[icosahedron_vi[i][1]][0] - icosahedron_v[icosahedron_vi[i][0]][0] ) * ( icosahedron_v[icosahedron_vi[i][2]][1] - icosahedron_v[icosahedron_vi[i][0]][1] ) - ( icosahedron_v[icosahedron_vi[i][1]][1] - icosahedron_v[icosahedron_vi[i][0]][1] ) * ( icosahedron_v[icosahedron_vi[i][2]][0] - icosahedron_v[icosahedron_vi[i][0]][0] ) ;
 */
-static GLdouble icosahedron_n[ICOSAHEDRON_NUM_FACES*3] =
+static GLfloat icosahedron_n[ICOSAHEDRON_NUM_FACES*3] =
 {
-     0.760845213037948,  0.470228201835026,  0.341640786498800,
-     0.760845213036861, -0.179611190632978,  0.552786404500000,
-     0.760845213033849, -0.581234022404097,                  0,
-     0.760845213036861, -0.179611190632978, -0.552786404500000,
-     0.760845213037948,  0.470228201835026, -0.341640786498800,
-     0.179611190628666,  0.760845213037948,  0.552786404498399,
-     0.179611190634277, -0.290617011204044,  0.894427191000000,
-     0.179611190633958, -0.940456403667806,                  0,
-     0.179611190634278, -0.290617011204044, -0.894427191000000,
-     0.179611190628666,  0.760845213037948, -0.552786404498399,
-    -0.179611190633958,  0.940456403667806,                  0,
-    -0.179611190634277,  0.290617011204044,  0.894427191000000,
-    -0.179611190628666, -0.760845213037948,  0.552786404498399,
-    -0.179611190628666, -0.760845213037948, -0.552786404498399,
-    -0.179611190634277,  0.290617011204044, -0.894427191000000,
-    -0.760845213036861,  0.179611190632978, -0.552786404500000,
-    -0.760845213033849,  0.581234022404097,                  0,
-    -0.760845213036861,  0.179611190632978,  0.552786404500000,
-    -0.760845213037948, -0.470228201835026,  0.341640786498800,
-    -0.760845213037948, -0.470228201835026, -0.341640786498800,
+     0.760845213037948f,  0.470228201835026f,  0.341640786498800f,
+     0.760845213036861f, -0.179611190632978f,  0.552786404500000f,
+     0.760845213033849f, -0.581234022404097f,                0.0f,
+     0.760845213036861f, -0.179611190632978f, -0.552786404500000f,
+     0.760845213037948f,  0.470228201835026f, -0.341640786498800f,
+     0.179611190628666f,  0.760845213037948f,  0.552786404498399f,
+     0.179611190634277f, -0.290617011204044f,  0.894427191000000f,
+     0.179611190633958f, -0.940456403667806f,                0.0f,
+     0.179611190634278f, -0.290617011204044f, -0.894427191000000f,
+     0.179611190628666f,  0.760845213037948f, -0.552786404498399f,
+    -0.179611190633958f,  0.940456403667806f,                0.0f,
+    -0.179611190634277f,  0.290617011204044f,  0.894427191000000f,
+    -0.179611190628666f, -0.760845213037948f,  0.552786404498399f,
+    -0.179611190628666f, -0.760845213037948f, -0.552786404498399f,
+    -0.179611190634277f,  0.290617011204044f, -0.894427191000000f,
+    -0.760845213036861f,  0.179611190632978f, -0.552786404500000f,
+    -0.760845213033849f,  0.581234022404097f,                0.0f,
+    -0.760845213036861f,  0.179611190632978f,  0.552786404500000f,
+    -0.760845213037948f, -0.470228201835026f,  0.341640786498800f,
+    -0.760845213037948f, -0.470228201835026f, -0.341640786498800f,
 };
 
 /* Vertex indices */
@@ -374,27 +374,27 @@ DECLARE_SHAPE_CACHE(icosahedron,Icosahedron,ICOSAHEDRON);
 #define OCTAHEDRON_VERT_PER_OBJ_TRI   OCTAHEDRON_VERT_PER_OBJ
 
 /* Vertex Coordinates */
-static GLdouble octahedron_v[OCTAHEDRON_NUM_VERT*3] =
+static GLfloat octahedron_v[OCTAHEDRON_NUM_VERT*3] =
 {
-     1.,  0.,  0.,
-     0.,  1.,  0.,
-     0.,  0.,  1.,
-    -1.,  0.,  0.,
-     0., -1.,  0.,
-     0.,  0., -1.,
+     1.f,  0.f,  0.f,
+     0.f,  1.f,  0.f,
+     0.f,  0.f,  1.f,
+    -1.f,  0.f,  0.f,
+     0.f, -1.f,  0.f,
+     0.f,  0.f, -1.f,
 
 };
 /* Normal Vectors */
-static GLdouble octahedron_n[OCTAHEDRON_NUM_FACES*3] =
+static GLfloat octahedron_n[OCTAHEDRON_NUM_FACES*3] =
 {
-     0.577350269189, 0.577350269189, 0.577350269189,    /* sqrt(1/3) */
-     0.577350269189, 0.577350269189,-0.577350269189,
-     0.577350269189,-0.577350269189, 0.577350269189,
-     0.577350269189,-0.577350269189,-0.577350269189,
-    -0.577350269189, 0.577350269189, 0.577350269189,
-    -0.577350269189, 0.577350269189,-0.577350269189,
-    -0.577350269189,-0.577350269189, 0.577350269189,
-    -0.577350269189,-0.577350269189,-0.577350269189
+     0.577350269189f, 0.577350269189f, 0.577350269189f,    /* sqrt(1/3) */
+     0.577350269189f, 0.577350269189f,-0.577350269189f,
+     0.577350269189f,-0.577350269189f, 0.577350269189f,
+     0.577350269189f,-0.577350269189f,-0.577350269189f,
+    -0.577350269189f, 0.577350269189f, 0.577350269189f,
+    -0.577350269189f, 0.577350269189f,-0.577350269189f,
+    -0.577350269189f,-0.577350269189f, 0.577350269189f,
+    -0.577350269189f,-0.577350269189f,-0.577350269189f
 
 };
 
@@ -421,38 +421,38 @@ DECLARE_SHAPE_CACHE(octahedron,Octahedron,OCTAHEDRON);
 #define RHOMBICDODECAHEDRON_VERT_PER_OBJ_TRI   (RHOMBICDODECAHEDRON_VERT_PER_OBJ+RHOMBICDODECAHEDRON_NUM_FACES*2)    /* 2 extra edges per face when drawing quads as triangles */
 
 /* Vertex Coordinates */
-static GLdouble rhombicdodecahedron_v[RHOMBICDODECAHEDRON_NUM_VERT*3] =
+static GLfloat rhombicdodecahedron_v[RHOMBICDODECAHEDRON_NUM_VERT*3] =
 {
-     0.0,             0.0,             1.0,
-     0.707106781187,  0.0           ,  0.5,
-     0.0           ,  0.707106781187,  0.5,
-    -0.707106781187,  0.0           ,  0.5,
-     0.0           , -0.707106781187,  0.5,
-     0.707106781187,  0.707106781187,  0.0,
-    -0.707106781187,  0.707106781187,  0.0,
-    -0.707106781187, -0.707106781187,  0.0,
-     0.707106781187, -0.707106781187,  0.0,
-     0.707106781187,  0.0           , -0.5,
-     0.0           ,  0.707106781187, -0.5,
-    -0.707106781187,  0.0           , -0.5,
-     0.0           , -0.707106781187, -0.5,
-     0.0,             0.0,            -1.0
+                0.0f,             0.0f,  1.0f,
+     0.707106781187f,             0.0f,  0.5f,
+                0.0f,  0.707106781187f,  0.5f,
+    -0.707106781187f,             0.0f,  0.5f,
+                0.0f, -0.707106781187f,  0.5f,
+     0.707106781187f,  0.707106781187f,  0.0f,
+    -0.707106781187f,  0.707106781187f,  0.0f,
+    -0.707106781187f, -0.707106781187f,  0.0f,
+     0.707106781187f, -0.707106781187f,  0.0f,
+     0.707106781187f,             0.0f, -0.5f,
+                0.0f,  0.707106781187f, -0.5f,
+    -0.707106781187f,             0.0f, -0.5f,
+                0.0f, -0.707106781187f, -0.5f,
+                0.0f,             0.0f, -1.0f
 };
 /* Normal Vectors */
-static GLdouble rhombicdodecahedron_n[RHOMBICDODECAHEDRON_NUM_FACES*3] =
+static GLfloat rhombicdodecahedron_n[RHOMBICDODECAHEDRON_NUM_FACES*3] =
 {
-     0.353553390594,  0.353553390594,  0.5,
-    -0.353553390594,  0.353553390594,  0.5,
-    -0.353553390594, -0.353553390594,  0.5,
-     0.353553390594, -0.353553390594,  0.5,
-     0.0           ,  1.0           ,  0.0,
-    -1.0           ,  0.0           ,  0.0,
-     0.0           , -1.0           ,  0.0,
-     1.0           ,  0.0           ,  0.0,
-     0.353553390594,  0.353553390594, -0.5,
-    -0.353553390594,  0.353553390594, -0.5,
-    -0.353553390594, -0.353553390594, -0.5,
-     0.353553390594, -0.353553390594, -0.5
+     0.353553390594f,  0.353553390594f,  0.5f,
+    -0.353553390594f,  0.353553390594f,  0.5f,
+    -0.353553390594f, -0.353553390594f,  0.5f,
+     0.353553390594f, -0.353553390594f,  0.5f,
+                0.0f,             1.0f,  0.0f,
+    -           1.0f,             0.0f,  0.0f,
+                0.0f, -           1.0f,  0.0f,
+                1.0f,             0.0f,  0.0f,
+     0.353553390594f,  0.353553390594f, -0.5f,
+    -0.353553390594f,  0.353553390594f, -0.5f,
+    -0.353553390594f, -0.353553390594f, -0.5f,
+     0.353553390594f, -0.353553390594f, -0.5f
 };
 
 /* Vertex indices */
@@ -491,20 +491,20 @@ DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(rhombicdodecahedron,RhombicDodecahedro
 #define TETRAHEDRON_VERT_PER_OBJ_TRI    TETRAHEDRON_VERT_PER_OBJ
 
 /* Vertex Coordinates */
-static GLdouble tetrahedron_v[TETRAHEDRON_NUM_VERT*3] =
+static GLfloat tetrahedron_v[TETRAHEDRON_NUM_VERT*3] =
 {
-                1.0,             0.0,             0.0,
-    -0.333333333333,  0.942809041582,             0.0,
-    -0.333333333333, -0.471404520791,  0.816496580928,
-    -0.333333333333, -0.471404520791, -0.816496580928
+                1.0f,             0.0f,             0.0f,
+    -0.333333333333f,  0.942809041582f,             0.0f,
+    -0.333333333333f, -0.471404520791f,  0.816496580928f,
+    -0.333333333333f, -0.471404520791f, -0.816496580928f
 };
 /* Normal Vectors */
-static GLdouble tetrahedron_n[TETRAHEDRON_NUM_FACES*3] =
+static GLfloat tetrahedron_n[TETRAHEDRON_NUM_FACES*3] =
 {
-    -           1.0,             0.0,             0.0,
-     0.333333333333, -0.942809041582,             0.0,
-     0.333333333333,  0.471404520791, -0.816496580928,
-     0.333333333333,  0.471404520791,  0.816496580928
+    -           1.0f,             0.0f,             0.0f,
+     0.333333333333f, -0.942809041582f,             0.0f,
+     0.333333333333f,  0.471404520791f, -0.816496580928f,
+     0.333333333333f,  0.471404520791f,  0.816496580928f
 };
 
 /* Vertex indices */
@@ -523,7 +523,7 @@ static unsigned int ipow (int x, unsigned int y)
     return y==0? 1: y==1? x: (y%2? x: 1) * ipow(x*x, y/2);
 }
 
-static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLdouble scale, GLdouble* vertices, GLdouble* normals )
+static void fghSierpinskiSpongeGenerate ( int numLevels, double offset[3], GLfloat scale, GLfloat* vertices, GLfloat* normals )
 {
     int i, j;
     if ( numLevels == 0 )
@@ -537,9 +537,9 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
                 int outIdx  = i*TETRAHEDRON_NUM_EDGE_PER_FACE*3+j*3;
                 int vertIdx = tetrahedron_vi[faceIdxVertIdx+j]*3;
 
-                vertices[outIdx  ] = offset[0] + scale * tetrahedron_v[vertIdx  ];
-                vertices[outIdx+1] = offset[1] + scale * tetrahedron_v[vertIdx+1];
-                vertices[outIdx+2] = offset[2] + scale * tetrahedron_v[vertIdx+2];
+                vertices[outIdx  ] = (GLfloat)offset[0] + scale * tetrahedron_v[vertIdx  ];
+                vertices[outIdx+1] = (GLfloat)offset[1] + scale * tetrahedron_v[vertIdx+1];
+                vertices[outIdx+2] = (GLfloat)offset[2] + scale * tetrahedron_v[vertIdx+2];
 
                 normals [outIdx  ] = tetrahedron_n[normIdx  ];
                 normals [outIdx+1] = tetrahedron_n[normIdx+1];
@@ -549,7 +549,7 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
     }
     else if ( numLevels > 0 )
     {
-        GLdouble local_offset[3] ;  /* Use a local variable to avoid buildup of roundoff errors */
+        double local_offset[3] ;    /* Use a local variable to avoid buildup of roundoff errors */
         unsigned int stride = ipow(4,--numLevels)*TETRAHEDRON_VERT_ELEM_PER_OBJ;
         scale /= 2.0 ;
         for ( i = 0 ; i < TETRAHEDRON_NUM_FACES ; i++ )
@@ -574,7 +574,7 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, GLdouble offset[3], GLd
  *    The last entry is exactly the same as the first
  *    The sign of n can be flipped to get the reverse loop
  */
-static void fghCircleTable(GLdouble **sint, GLdouble **cost, const int n, const GLboolean halfCircle)
+static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GLboolean halfCircle)
 {
     int i;
     
@@ -582,11 +582,11 @@ static void fghCircleTable(GLdouble **sint, GLdouble **cost, const int n, const 
     const int size = abs(n);
 
     /* Determine the angle between samples */
-    const GLdouble angle = (halfCircle?1:2)*M_PI/(GLdouble)( ( n == 0 ) ? 1 : n );
+    const GLfloat angle = (halfCircle?1:2)*(GLfloat)M_PI/(GLfloat)( ( n == 0 ) ? 1 : n );
 
     /* Allocate memory for n samples, plus duplicate of first entry at the end */
-    *sint = malloc(sizeof(GLdouble) * (size+1));
-    *cost = malloc(sizeof(GLdouble) * (size+1));
+    *sint = malloc(sizeof(GLfloat) * (size+1));
+    *cost = malloc(sizeof(GLfloat) * (size+1));
 
     /* Bail out if memory allocation fails, fgError never returns */
     if (!(*sint) || !(*cost))
@@ -602,15 +602,15 @@ static void fghCircleTable(GLdouble **sint, GLdouble **cost, const int n, const 
 
     for (i=1; i<size; i++)
     {
-        (*sint)[i] = sin(angle*i);
-        (*cost)[i] = cos(angle*i);
+        (*sint)[i] = sinf(angle*i);
+        (*cost)[i] = cosf(angle*i);
     }
 
     
     if (halfCircle)
     {
-        (*sint)[size] =  0.0;   /* sin PI */
-        (*cost)[size] = -1.0;   /* cos PI */
+        (*sint)[size] =  0.0f;  /* sin PI */
+        (*cost)[size] = -1.0f;  /* cos PI */
     }
     else
     {
@@ -645,9 +645,9 @@ static void fghCircleTable(GLdouble **sint, GLdouble **cost, const int n, const 
 #define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps)                        _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,NULL)
 #define DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(name,nameICaps,nameCaps) _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,name##_vertIdxs)
 
-static void fghCube( GLdouble dSize, GLboolean useWireMode )
+static void fghCube( GLfloat dSize, GLboolean useWireMode )
 {
-    GLdouble *vertices;
+    GLfloat *vertices;
 
     if (!cubeCached)
     {
@@ -655,12 +655,12 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
         cubeCached = GL_TRUE;
     }
 
-    if (dSize!=1.)
+    if (dSize!=1.f)
     {
         /* Need to build new vertex list containing vertices for cube of different size */
         int i;
 
-        vertices = malloc(CUBE_VERT_ELEM_PER_OBJ * sizeof(GLdouble));
+        vertices = malloc(CUBE_VERT_ELEM_PER_OBJ * sizeof(GLfloat));
 
         /* Bail out if memory allocation fails, fgError never returns */
         if (!vertices)
@@ -680,7 +680,7 @@ static void fghCube( GLdouble dSize, GLboolean useWireMode )
     else
         fghDrawGeometrySolid(vertices,cube_norms,cube_vertIdxs,CUBE_VERT_PER_OBJ_TRI,               CUBE_NUM_EDGE_PER_FACE);
 
-    if (dSize!=1.)
+    if (dSize!=1.f)
         /* cleanup allocated memory */
         free(vertices);
 }
@@ -691,10 +691,10 @@ DECLARE_INTERNAL_DRAW(octahedron,Octahedron,OCTAHEDRON);
 DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON);
 DECLARE_INTERNAL_DRAW(tetrahedron,Tetrahedron,TETRAHEDRON);
 
-static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble scale, GLboolean useWireMode )
+static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale, GLboolean useWireMode )
 {
-    GLdouble *vertices;
-    GLdouble * normals;
+    GLfloat *vertices;
+    GLfloat * normals;
     GLsizei    numTetr = numLevels<0? 0 : ipow(4,numLevels); /* No sponge for numLevels below 0 */
     GLsizei    numVert = numTetr*TETRAHEDRON_VERT_PER_OBJ;
     GLsizei    numFace = numTetr*TETRAHEDRON_NUM_FACES;
@@ -702,8 +702,8 @@ static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble sc
     if (numTetr)
     {
         /* Allocate memory */
-        vertices = malloc(numVert*3 * sizeof(GLdouble));
-        normals  = malloc(numVert*3 * sizeof(GLdouble));
+        vertices = malloc(numVert*3 * sizeof(GLfloat));
+        normals  = malloc(numVert*3 * sizeof(GLfloat));
         /* Bail out if memory allocation fails, fgError never returns */
         if (!vertices || !normals)
         {
@@ -733,19 +733,19 @@ static void fghSierpinskiSponge ( int numLevels, GLdouble offset[3], GLdouble sc
 /*
  * Draws a solid sphere
  */
-void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
+void FGAPIENTRY glutSolidSphere(double radius, GLint slices, GLint stacks)
 {
     int i,j;
 
     /* Adjust z and radius as stacks are drawn. */
-
-    GLdouble z0,z1;
-    GLdouble r0,r1;
+    GLfloat radf = (GLfloat)radius;
+    GLfloat z0,z1;
+    GLfloat r0,r1;
 
     /* Pre-computed circle */
 
-    GLdouble *sint1,*cost1;
-    GLdouble *sint2,*cost2;
+    GLfloat *sint1,*cost1;
+    GLfloat *sint2,*cost2;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSphere" );
 
@@ -754,20 +754,20 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 
     /* The top stack is covered with a triangle fan */
 
-    z0 = 1.0;
+    z0 = 1;
     z1 = cost2[(stacks>0)?1:0];
-    r0 = 0.0;
+    r0 = 0;
     r1 = sint2[(stacks>0)?1:0];
 
     glBegin(GL_TRIANGLE_FAN);
 
-        glNormal3d(0,0,1);
-        glVertex3d(0,0,radius);
+        glNormal3f(0,0,1);
+        glVertex3f(0,0,radf);
 
         for (j=slices; j>=0; j--)
         {
-            glNormal3d(cost1[j]*r1,        sint1[j]*r1,        z1       );
-            glVertex3d(cost1[j]*r1*radius, sint1[j]*r1*radius, z1*radius);
+            glNormal3f(cost1[j]*r1,      sint1[j]*r1,      z1     );
+            glVertex3f(cost1[j]*r1*radf, sint1[j]*r1*radf, z1*radf);
         }
 
     glEnd();
@@ -783,10 +783,10 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 
             for(j=0; j<=slices; j++)
             {
-                glNormal3d(cost1[j]*r1,        sint1[j]*r1,        z1       );
-                glVertex3d(cost1[j]*r1*radius, sint1[j]*r1*radius, z1*radius);
-                glNormal3d(cost1[j]*r0,        sint1[j]*r0,        z0       );
-                glVertex3d(cost1[j]*r0*radius, sint1[j]*r0*radius, z0*radius);
+                glNormal3d(cost1[j]*r1,      sint1[j]*r1,      z1     );
+                glVertex3d(cost1[j]*r1*radf, sint1[j]*r1*radf, z1*radf);
+                glNormal3d(cost1[j]*r0,      sint1[j]*r0,      z0     );
+                glVertex3d(cost1[j]*r0*radf, sint1[j]*r0*radf, z0*radf);
             }
 
         glEnd();
@@ -804,8 +804,8 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 
         for (j=0; j<=slices; j++)
         {
-            glNormal3d(cost1[j]*r0,        sint1[j]*r0,        z0       );
-            glVertex3d(cost1[j]*r0*radius, sint1[j]*r0*radius, z0*radius);
+            glNormal3d(cost1[j]*r0,      sint1[j]*r0,      z0     );
+            glVertex3d(cost1[j]*r0*radf, sint1[j]*r0*radf, z0*radf);
         }
 
     glEnd();
@@ -821,19 +821,19 @@ void FGAPIENTRY glutSolidSphere(GLdouble radius, GLint slices, GLint stacks)
 /*
  * Draws a wire sphere
  */
-void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
+void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
 {
     int i,j;
 
     /* Adjust z and radius as stacks and slices are drawn. */
-
-    GLdouble r;
-    GLdouble x,y,z;
+    GLfloat radf = (GLfloat)radius;
+    GLfloat r;
+    GLfloat x,y,z;
 
     /* Pre-computed circle */
 
-    GLdouble *sint1,*cost1;
-    GLdouble *sint2,*cost2;
+    GLfloat *sint1,*cost1;
+    GLfloat *sint2,*cost2;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSphere" );
 
@@ -854,8 +854,8 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
                 x = cost1[j];
                 y = sint1[j];
 
-                glNormal3d(x,y,z);
-                glVertex3d(x*r*radius,y*r*radius,z*radius);
+                glNormal3f(x,y,z);
+                glVertex3f(x*r*radf,y*r*radf,z*radf);
             }
 
         glEnd();
@@ -873,8 +873,8 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
                 y = sint1[i]*sint2[j];
                 z = cost2[j];
 
-                glNormal3d(x,y,z);
-                glVertex3d(x*radius,y*radius,z*radius);
+                glNormal3f(x,y,z);
+                glVertex3f(x*radf,y*radf,z*radf);
             }
 
         glEnd();
@@ -891,26 +891,26 @@ void FGAPIENTRY glutWireSphere(GLdouble radius, GLint slices, GLint stacks)
 /*
  * Draws a solid cone
  */
-void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLint stacks )
+void FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint stacks )
 {
     int i,j;
 
     /* Step in z and radius as stacks are drawn. */
 
-    GLdouble z0,z1;
-    GLdouble r0,r1;
+    GLfloat z0,z1;
+    GLfloat r0,r1;
 
-    const GLdouble zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
-    const GLdouble rStep = base / ( ( stacks > 0 ) ? stacks : 1 );
+    const GLfloat zStep = (GLfloat)height / ( ( stacks > 0 ) ? stacks : 1 );
+    const GLfloat rStep = (GLfloat)base / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Scaling factors for vertex normals */
 
-    const GLdouble cosn = ( height / sqrt ( height * height + base * base ));
-    const GLdouble sinn = ( base   / sqrt ( height * height + base * base ));
+    const GLfloat cosn = ( (GLfloat)height / sqrtf( height * height + base * base ));
+    const GLfloat sinn = ( (GLfloat)base   / sqrtf( height * height + base * base ));
 
     /* Pre-computed circle */
 
-    GLdouble *sint,*cost;
+    GLfloat *sint,*cost;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCone" );
 
@@ -918,19 +918,19 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
 
     /* Cover the circular base with a triangle fan... */
 
-    z0 = 0.0;
+    z0 = 0;
     z1 = zStep;
 
-    r0 = base;
+    r0 = (GLfloat)base;
     r1 = r0 - rStep;
 
     glBegin(GL_TRIANGLE_FAN);
 
-        glNormal3d(0.0,0.0,-1.0);
-        glVertex3d(0.0,0.0, z0 );
+        glNormal3f(0,0,-1);
+        glVertex3f(0,0, z0 );
 
         for (j=0; j<=slices; j++)
-            glVertex3d(cost[j]*r0, sint[j]*r0, z0);
+            glVertex3f(cost[j]*r0, sint[j]*r0, z0);
 
     glEnd();
 
@@ -942,9 +942,9 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
 
             for(j=0; j<=slices; j++)
             {
-                glNormal3d(cost[j]*cosn, sint[j]*cosn, sinn);
-                glVertex3d(cost[j]*r0,   sint[j]*r0,   z0  );
-                glVertex3d(cost[j]*r1,   sint[j]*r1,   z1  );
+                glNormal3f(cost[j]*cosn, sint[j]*cosn, sinn);
+                glVertex3f(cost[j]*r0,   sint[j]*r0,   z0  );
+                glVertex3f(cost[j]*r1,   sint[j]*r1,   z1  );
             }
 
             z0 = z1; z1 += zStep;
@@ -957,14 +957,14 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
 
     glBegin(GL_TRIANGLES);
 
-        glNormal3d(cost[0]*sinn, sint[0]*sinn, cosn);
+        glNormal3f(cost[0]*sinn, sint[0]*sinn, cosn);
 
         for (j=0; j<slices; j++)
         {
-            glVertex3d(cost[j+0]*r0,   sint[j+0]*r0,   z0    );
-            glVertex3d(0,              0,              height);
-            glNormal3d(cost[j+1]*sinn, sint[j+1]*sinn, cosn  );
-            glVertex3d(cost[j+1]*r0,   sint[j+1]*r0,   z0    );
+            glVertex3f(cost[j+0]*r0,   sint[j+0]*r0,            z0    );
+            glVertex3f(0,              0,              (GLfloat)height);
+            glNormal3f(cost[j+1]*sinn, sint[j+1]*sinn,          cosn  );
+            glVertex3f(cost[j+1]*r0,   sint[j+1]*r0,            z0    );
         }
 
     glEnd();
@@ -978,26 +978,26 @@ void FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLi
 /*
  * Draws a wire cone
  */
-void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLint stacks)
+void FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint stacks)
 {
     int i,j;
 
     /* Step in z and radius as stacks are drawn. */
 
-    GLdouble z = 0.0;
-    GLdouble r = base;
+    GLfloat z = 0;
+    GLfloat r = (GLfloat)base;
 
-    const GLdouble zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
-    const GLdouble rStep = base / ( ( stacks > 0 ) ? stacks : 1 );
+    const GLfloat zStep = (GLfloat)height / ( ( stacks > 0 ) ? stacks : 1 );
+    const GLfloat rStep = (GLfloat)base / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Scaling factors for vertex normals */
 
-    const GLdouble cosn = ( height / sqrt ( height * height + base * base ));
-    const GLdouble sinn = ( base   / sqrt ( height * height + base * base ));
+    const GLfloat cosn = ( (GLfloat)height / sqrtf( height * height + base * base ));
+    const GLfloat sinn = ( (GLfloat)base   / sqrtf( height * height + base * base ));
 
     /* Pre-computed circle */
 
-    GLdouble *sint,*cost;
+    GLfloat *sint,*cost;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCone" );
 
@@ -1011,8 +1011,8 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
 
             for( j=0; j<slices; j++ )
             {
-                glNormal3d(cost[j]*sinn, sint[j]*sinn, cosn);
-                glVertex3d(cost[j]*r,    sint[j]*r,    z   );
+                glNormal3f(cost[j]*sinn, sint[j]*sinn, cosn);
+                glVertex3f(cost[j]*r,    sint[j]*r,    z   );
             }
 
         glEnd();
@@ -1023,15 +1023,15 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
 
     /* Draw the slices */
 
-    r = base;
+    r = (GLfloat)base;
 
     glBegin(GL_LINES);
 
         for (j=0; j<slices; j++)
         {
-            glNormal3d(cost[j]*sinn, sint[j]*sinn, cosn  );
-            glVertex3d(cost[j]*r,    sint[j]*r,    0.0   );
-            glVertex3d(0.0,          0.0,          height);
+            glNormal3f(cost[j]*sinn, sint[j]*sinn,          cosn  );
+            glVertex3f(cost[j]*r,    sint[j]*r,             0     );
+            glVertex3f(0,            0,            (GLfloat)height);
         }
 
     glEnd();
@@ -1046,18 +1046,18 @@ void FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLin
 /*
  * Draws a solid cylinder
  */
-void FGAPIENTRY glutSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks)
+void FGAPIENTRY glutSolidCylinder(double radius, double height, GLint slices, GLint stacks)
 {
     int i,j;
 
     /* Step in z and radius as stacks are drawn. */
-
-    GLdouble z0,z1;
-    const GLdouble zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
+    GLfloat radf = (GLfloat)radius;
+    GLfloat z0,z1;
+    const GLfloat zStep = (GLfloat)height / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Pre-computed circle */
 
-    GLdouble *sint,*cost;
+    GLfloat *sint,*cost;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCylinder" );
 
@@ -1066,35 +1066,35 @@ void FGAPIENTRY glutSolidCylinder(GLdouble radius, GLdouble height, GLint slices
     /* Cover the base and top */
 
     glBegin(GL_TRIANGLE_FAN);
-        glNormal3d(0.0, 0.0, -1.0 );
-        glVertex3d(0.0, 0.0,  0.0 );
+        glNormal3f(0, 0, -1 );
+        glVertex3f(0, 0,  0 );
         for (j=0; j<=slices; j++)
-          glVertex3d(cost[j]*radius, sint[j]*radius, 0.0);
+          glVertex3f(cost[j]*radf, sint[j]*radf, 0);
     glEnd();
 
     glBegin(GL_TRIANGLE_FAN);
-        glNormal3d(0.0, 0.0, 1.0   );
-        glVertex3d(0.0, 0.0, height);
+        glNormal3f(0, 0,          1     );
+        glVertex3f(0, 0, (GLfloat)height);
         for (j=slices; j>=0; j--)
-          glVertex3d(cost[j]*radius, sint[j]*radius, height);
+          glVertex3f(cost[j]*radf, sint[j]*radf, (GLfloat)height);
     glEnd();
 
     /* Do the stacks */
 
-    z0 = 0.0;
+    z0 = 0;
     z1 = zStep;
 
     for (i=1; i<=stacks; i++)
     {
         if (i==stacks)
-            z1 = height;
+            z1 = (GLfloat)height;
 
         glBegin(GL_QUAD_STRIP);
             for (j=0; j<=slices; j++ )
             {
-                glNormal3d(cost[j],        sint[j],        0.0 );
-                glVertex3d(cost[j]*radius, sint[j]*radius, z0  );
-                glVertex3d(cost[j]*radius, sint[j]*radius, z1  );
+                glNormal3f(cost[j],      sint[j],      0  );
+                glVertex3f(cost[j]*radf, sint[j]*radf, z0 );
+                glVertex3f(cost[j]*radf, sint[j]*radf, z1 );
             }
         glEnd();
 
@@ -1110,18 +1110,18 @@ void FGAPIENTRY glutSolidCylinder(GLdouble radius, GLdouble height, GLint slices
 /*
  * Draws a wire cylinder
  */
-void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks)
+void FGAPIENTRY glutWireCylinder(double radius, double height, GLint slices, GLint stacks)
 {
     int i,j;
 
     /* Step in z and radius as stacks are drawn. */
-
-          GLdouble z = 0.0;
-    const GLdouble zStep = height / ( ( stacks > 0 ) ? stacks : 1 );
+    GLfloat radf = (GLfloat)radius;
+          GLfloat z = 0;
+    const GLfloat zStep = (GLfloat)height / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Pre-computed circle */
 
-    GLdouble *sint,*cost;
+    GLfloat *sint,*cost;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCylinder" );
 
@@ -1132,14 +1132,14 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
     for (i=0; i<=stacks; i++)
     {
         if (i==stacks)
-            z = height;
+            z = (GLfloat)height;
 
         glBegin(GL_LINE_LOOP);
 
             for( j=0; j<slices; j++ )
             {
-                glNormal3d(cost[j],        sint[j],        0.0);
-                glVertex3d(cost[j]*radius, sint[j]*radius, z  );
+                glNormal3f(cost[j],      sint[j],      0);
+                glVertex3f(cost[j]*radf, sint[j]*radf, z);
             }
 
         glEnd();
@@ -1153,9 +1153,9 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
 
         for (j=0; j<slices; j++)
         {
-            glNormal3d(cost[j],        sint[j],        0.0   );
-            glVertex3d(cost[j]*radius, sint[j]*radius, 0.0   );
-            glVertex3d(cost[j]*radius, sint[j]*radius, height);
+            glNormal3f(cost[j],      sint[j],               0     );
+            glVertex3f(cost[j]*radf, sint[j]*radf,          0     );
+            glVertex3f(cost[j]*radf, sint[j]*radf, (GLfloat)height);
         }
 
     glEnd();
@@ -1169,12 +1169,13 @@ void FGAPIENTRY glutWireCylinder(GLdouble radius, GLdouble height, GLint slices,
 /*
  * Draws a wire torus
  */
-void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLint nSides, GLint nRings )
+void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
-  GLdouble  iradius = dInnerRadius, oradius = dOuterRadius, phi, psi, dpsi, dphi;
-  GLdouble *vertex, *normal;
+  GLfloat  iradius = (float)dInnerRadius, oradius = (float)dOuterRadius;
+  GLfloat phi, psi, dpsi, dphi;
+  GLfloat *vertex, *normal;
   int    i, j;
-  GLdouble spsi, cpsi, sphi, cphi ;
+  GLfloat spsi, cpsi, sphi, cphi ;
 
   FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTorus" );
 
@@ -1182,26 +1183,26 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
   if ( nRings < 1 ) nRings = 1;
 
   /* Allocate the vertices array */
-  vertex = (GLdouble *)calloc( sizeof(GLdouble), 3 * nSides * nRings );
-  normal = (GLdouble *)calloc( sizeof(GLdouble), 3 * nSides * nRings );
+  vertex = (GLfloat *)calloc( sizeof(GLfloat), 3 * nSides * nRings );
+  normal = (GLfloat *)calloc( sizeof(GLfloat), 3 * nSides * nRings );
 
   glPushMatrix();
 
-  dpsi =  2.0 * M_PI / (GLdouble)nRings ;
-  dphi = -2.0 * M_PI / (GLdouble)nSides ;
-  psi  = 0.0;
+  dpsi =  2.0f * (GLfloat)M_PI / (GLfloat)(nRings) ;
+  dphi = -2.0f * (GLfloat)M_PI / (GLfloat)(nSides) ;
+  psi  = 0.0f;
 
   for( j=0; j<nRings; j++ )
   {
-    cpsi = cos ( psi ) ;
-    spsi = sin ( psi ) ;
-    phi = 0.0;
+    cpsi = cosf( psi ) ;
+    spsi = sinf( psi ) ;
+    phi = 0.0f;
 
     for( i=0; i<nSides; i++ )
     {
       int offset = 3 * ( j * nSides + i ) ;
-      cphi = cos ( phi ) ;
-      sphi = sin ( phi ) ;
+      cphi = cosf( phi ) ;
+      sphi = sinf( phi ) ;
       *(vertex + offset + 0) = cpsi * ( oradius + cphi * iradius ) ;
       *(vertex + offset + 1) = spsi * ( oradius + cphi * iradius ) ;
       *(vertex + offset + 2) =                    sphi * iradius  ;
@@ -1221,8 +1222,8 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
     for( j=0; j<nRings; j++ )
     {
       int offset = 3 * ( j * nSides + i ) ;
-      glNormal3dv( normal + offset );
-      glVertex3dv( vertex + offset );
+      glNormal3fv( normal + offset );
+      glVertex3fv( vertex + offset );
     }
 
     glEnd();
@@ -1235,8 +1236,8 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
     for( i=0; i<nSides; i++ )
     {
       int offset = 3 * ( j * nSides + i ) ;
-      glNormal3dv( normal + offset );
-      glVertex3dv( vertex + offset );
+      glNormal3fv( normal + offset );
+      glVertex3fv( vertex + offset );
     }
 
     glEnd();
@@ -1250,12 +1251,13 @@ void FGAPIENTRY glutWireTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLi
 /*
  * Draws a solid torus
  */
-void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GLint nSides, GLint nRings )
+void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
-  GLdouble  iradius = dInnerRadius, oradius = dOuterRadius, phi, psi, dpsi, dphi;
-  GLdouble *vertex, *normal;
+  GLfloat  iradius = (float)dInnerRadius, oradius = (float)dOuterRadius;
+  GLfloat phi, psi, dpsi, dphi;
+  GLfloat *vertex, *normal;
   int    i, j;
-  GLdouble spsi, cpsi, sphi, cphi ;
+  GLfloat spsi, cpsi, sphi, cphi ;
 
   FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTorus" );
 
@@ -1267,26 +1269,26 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
   nRings ++ ;
 
   /* Allocate the vertices array */
-  vertex = (GLdouble *)calloc( sizeof(GLdouble), 3 * nSides * nRings );
-  normal = (GLdouble *)calloc( sizeof(GLdouble), 3 * nSides * nRings );
+  vertex = (GLfloat *)calloc( sizeof(GLfloat), 3 * nSides * nRings );
+  normal = (GLfloat *)calloc( sizeof(GLfloat), 3 * nSides * nRings );
 
   glPushMatrix();
 
-  dpsi =  2.0 * M_PI / (GLdouble)(nRings - 1) ;
-  dphi = -2.0 * M_PI / (GLdouble)(nSides - 1) ;
-  psi  = 0.0;
+  dpsi =  2.0f * (GLfloat)M_PI / (GLfloat)(nRings - 1) ;
+  dphi = -2.0f * (GLfloat)M_PI / (GLfloat)(nSides - 1) ;
+  psi  = 0.0f;
 
   for( j=0; j<nRings; j++ )
   {
-    cpsi = cos ( psi ) ;
-    spsi = sin ( psi ) ;
-    phi = 0.0;
+    cpsi = cosf( psi ) ;
+    spsi = sinf( psi ) ;
+    phi = 0.0f;
 
     for( i=0; i<nSides; i++ )
     {
       int offset = 3 * ( j * nSides + i ) ;
-      cphi = cos ( phi ) ;
-      sphi = sin ( phi ) ;
+      cphi = cosf( phi ) ;
+      sphi = sinf( phi ) ;
       *(vertex + offset + 0) = cpsi * ( oradius + cphi * iradius ) ;
       *(vertex + offset + 1) = spsi * ( oradius + cphi * iradius ) ;
       *(vertex + offset + 2) =                    sphi * iradius  ;
@@ -1305,14 +1307,14 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
     for( j=0; j<nRings-1; j++ )
     {
       int offset = 3 * ( j * nSides + i ) ;
-      glNormal3dv( normal + offset );
-      glVertex3dv( vertex + offset );
-      glNormal3dv( normal + offset + 3 );
-      glVertex3dv( vertex + offset + 3 );
-      glNormal3dv( normal + offset + 3 * nSides + 3 );
-      glVertex3dv( vertex + offset + 3 * nSides + 3 );
-      glNormal3dv( normal + offset + 3 * nSides );
-      glVertex3dv( vertex + offset + 3 * nSides );
+      glNormal3fv( normal + offset );
+      glVertex3fv( vertex + offset );
+      glNormal3fv( normal + offset + 3 );
+      glVertex3fv( vertex + offset + 3 );
+      glNormal3fv( normal + offset + 3 * nSides + 3 );
+      glVertex3fv( vertex + offset + 3 * nSides + 3 );
+      glNormal3fv( normal + offset + 3 * nSides );
+      glVertex3fv( vertex + offset + 3 * nSides );
     }
   }
 
@@ -1339,15 +1341,15 @@ void FGAPIENTRY glutSolidTorus( GLdouble dInnerRadius, GLdouble dOuterRadius, GL
         fgh##nameICaps( FALSE );\
     }
 
-void FGAPIENTRY glutWireCube( GLdouble dSize )
+void FGAPIENTRY glutWireCube( double dSize )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCube" );
-    fghCube( dSize, TRUE );
+    fghCube( (GLfloat)dSize, TRUE );
 }
-void FGAPIENTRY glutSolidCube( GLdouble dSize )
+void FGAPIENTRY glutSolidCube( double dSize )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCube" );
-    fghCube( dSize, FALSE );
+    fghCube( (GLfloat)dSize, FALSE );
 }
 
 DECLARE_SHAPE_INTERFACE(Dodecahedron);
@@ -1355,15 +1357,15 @@ DECLARE_SHAPE_INTERFACE(Icosahedron);
 DECLARE_SHAPE_INTERFACE(Octahedron);
 DECLARE_SHAPE_INTERFACE(RhombicDodecahedron);
 
-void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
+void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, double offset[3], double scale )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSierpinskiSponge" );
-    fghSierpinskiSponge ( num_levels, offset, scale, TRUE );
+    fghSierpinskiSponge ( num_levels, offset, (GLfloat)scale, TRUE );
 }
-void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, GLdouble offset[3], GLdouble scale )
+void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, double offset[3], double scale )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSierpinskiSponge" );
-    fghSierpinskiSponge ( num_levels, offset, scale, FALSE );
+    fghSierpinskiSponge ( num_levels, offset, (GLfloat)scale, FALSE );
 }
 
 DECLARE_SHAPE_INTERFACE(Tetrahedron);
