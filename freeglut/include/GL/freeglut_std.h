@@ -524,20 +524,16 @@ FGAPI int     FGAPIENTRY glutStrokeLength( void* font, const unsigned char* stri
 /*
  * Geometry functions, see freeglut_geometry.c
  */
-#ifdef EGL_VERSION_1_0
-/* TODO: temporary work-around for missing GLdouble in GLES */
-#   define GLdouble     GLfloat
-#endif
 
-FGAPI void    FGAPIENTRY glutWireCube( GLdouble size );
-FGAPI void    FGAPIENTRY glutSolidCube( GLdouble size );
-FGAPI void    FGAPIENTRY glutWireSphere( GLdouble radius, GLint slices, GLint stacks );
-FGAPI void    FGAPIENTRY glutSolidSphere( GLdouble radius, GLint slices, GLint stacks );
-FGAPI void    FGAPIENTRY glutWireCone( GLdouble base, GLdouble height, GLint slices, GLint stacks );
-FGAPI void    FGAPIENTRY glutSolidCone( GLdouble base, GLdouble height, GLint slices, GLint stacks );
+FGAPI void    FGAPIENTRY glutWireCube( double size );
+FGAPI void    FGAPIENTRY glutSolidCube( double size );
+FGAPI void    FGAPIENTRY glutWireSphere( double radius, GLint slices, GLint stacks );
+FGAPI void    FGAPIENTRY glutSolidSphere( double radius, GLint slices, GLint stacks );
+FGAPI void    FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint stacks );
+FGAPI void    FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint stacks );
 
-FGAPI void    FGAPIENTRY glutWireTorus( GLdouble innerRadius, GLdouble outerRadius, GLint sides, GLint rings );
-FGAPI void    FGAPIENTRY glutSolidTorus( GLdouble innerRadius, GLdouble outerRadius, GLint sides, GLint rings );
+FGAPI void    FGAPIENTRY glutWireTorus( double innerRadius, double outerRadius, GLint sides, GLint rings );
+FGAPI void    FGAPIENTRY glutSolidTorus( double innerRadius, double outerRadius, GLint sides, GLint rings );
 FGAPI void    FGAPIENTRY glutWireDodecahedron( void );
 FGAPI void    FGAPIENTRY glutSolidDodecahedron( void );
 FGAPI void    FGAPIENTRY glutWireOctahedron( void );
@@ -550,13 +546,8 @@ FGAPI void    FGAPIENTRY glutSolidIcosahedron( void );
 /*
  * Teapot rendering functions, found in freeglut_teapot.c
  */
-FGAPI void    FGAPIENTRY glutWireTeapot( GLdouble size );
-FGAPI void    FGAPIENTRY glutSolidTeapot( GLdouble size );
-
-#ifdef EGL_VERSION_1_0
-/* TODO: temporary work-around for missing GLdouble in GLES */
-#   undef GLdouble
-#endif
+FGAPI void    FGAPIENTRY glutWireTeapot( double size );
+FGAPI void    FGAPIENTRY glutSolidTeapot( double size );
 
 /*
  * Game mode functions, see freeglut_gamemode.c
