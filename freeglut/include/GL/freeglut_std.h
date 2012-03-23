@@ -525,13 +525,18 @@ FGAPI int     FGAPIENTRY glutStrokeLength( void* font, const unsigned char* stri
  * Geometry functions, see freeglut_geometry.c
  */
 
+#ifndef GL_ES_VERSION_2_0
 FGAPI void    FGAPIENTRY glutWireCube( double size );
 FGAPI void    FGAPIENTRY glutSolidCube( double size );
+#endif
+#ifndef EGL_VERSION_1_0
 FGAPI void    FGAPIENTRY glutWireSphere( double radius, GLint slices, GLint stacks );
 FGAPI void    FGAPIENTRY glutSolidSphere( double radius, GLint slices, GLint stacks );
 FGAPI void    FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint stacks );
 FGAPI void    FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint stacks );
+#endif
 
+#ifndef GL_ES_VERSION_2_0
 FGAPI void    FGAPIENTRY glutWireTorus( double innerRadius, double outerRadius, GLint sides, GLint rings );
 FGAPI void    FGAPIENTRY glutSolidTorus( double innerRadius, double outerRadius, GLint sides, GLint rings );
 FGAPI void    FGAPIENTRY glutWireDodecahedron( void );
@@ -542,12 +547,16 @@ FGAPI void    FGAPIENTRY glutWireTetrahedron( void );
 FGAPI void    FGAPIENTRY glutSolidTetrahedron( void );
 FGAPI void    FGAPIENTRY glutWireIcosahedron( void );
 FGAPI void    FGAPIENTRY glutSolidIcosahedron( void );
+#endif
 
 /*
  * Teapot rendering functions, found in freeglut_teapot.c
  */
+/* TODO: doesn't work with GLES1 yet */
+#ifndef EGL_VERSION_1_0
 FGAPI void    FGAPIENTRY glutWireTeapot( double size );
 FGAPI void    FGAPIENTRY glutSolidTeapot( double size );
+#endif
 
 /*
  * Game mode functions, see freeglut_gamemode.c

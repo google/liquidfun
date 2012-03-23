@@ -33,6 +33,7 @@
  */
 
 
+#ifndef GL_ES_VERSION_2_0
 /* General functions for drawing geometry
  * Solids are drawn by glDrawArrays if composed of triangles, or by
  * glDrawElements if consisting of squares or pentagons that were
@@ -725,11 +726,13 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
         free(normals );
     }
 }
+#endif /* GL_ES_VERSION_2_0 */
 
 
 /* -- INTERFACE FUNCTIONS ---------------------------------------------- */
 
 
+#ifndef EGL_VERSION_1_0
 /*
  * Draws a solid sphere
  */
@@ -1324,6 +1327,7 @@ void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint 
   free ( normal ) ;
   glPopMatrix();
 }
+#endif /* EGL_VERSION_1_0 */
 
 
 

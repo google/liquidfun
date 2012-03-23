@@ -161,6 +161,7 @@ FGAPI void    FGAPIENTRY glutStrokeString( void* font, const unsigned char *stri
 /*
  * Geometry functions, see freeglut_geometry.c
  */
+#ifndef GL_ES_VERSION_2_0
 FGAPI void    FGAPIENTRY glutWireRhombicDodecahedron( void );
 FGAPI void    FGAPIENTRY glutSolidRhombicDodecahedron( void );
 
@@ -168,6 +169,7 @@ FGAPI void    FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, double offse
 FGAPI void    FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, double offset[3], double scale );
 FGAPI void    FGAPIENTRY glutWireCylinder( double radius, double height, GLint slices, GLint stacks);
 FGAPI void    FGAPIENTRY glutSolidCylinder( double radius, double height, GLint slices, GLint stacks);
+#endif
 
 /*
  * Extension functions, see freeglut_ext.c
