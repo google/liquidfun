@@ -554,8 +554,8 @@ FGAPI void    FGAPIENTRY glutSolidIcosahedron( void );
  */
 /* TODO: doesn't work with GLES1 yet */
 #ifndef EGL_VERSION_1_0
-FGAPI void    FGAPIENTRY glutWireTeapot( double size );
-FGAPI void    FGAPIENTRY glutSolidTeapot( double size );
+FGAPI void    FGAPIENTRY glutWireTeapot( GLdouble size );
+FGAPI void    FGAPIENTRY glutSolidTeapot( GLdouble size );
 #endif
 
 /*
