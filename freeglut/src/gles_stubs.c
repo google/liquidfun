@@ -43,6 +43,3 @@ int     glutBitmapHeight( void* font ) {}
 GLfloat glutStrokeHeight( void* font ) {}
 void    glutBitmapString( void* font, const unsigned char *string ) {}
 void    glutStrokeString( void* font, const unsigned char *string ) {}
-
-void glutWireTeapot( double size ){}
-void glutSolidTeapot( double size ){}
