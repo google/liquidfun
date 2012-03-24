@@ -70,6 +70,7 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *v
     if (numEdgePerFace==3)
         glDrawArrays(GL_TRIANGLES, 0, numVertices);
     else
+	/* The number of elements is passed as numVertices */
         glDrawElements(GL_TRIANGLES, numVertices, GL_UNSIGNED_BYTE, vertIdxs);
 
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -199,7 +200,7 @@ static GLfloat cube_n[CUBE_NUM_FACES*3] =
      0.0f, 0.0f,-1.0f
 };
 
-/* Vertex indices */
+/* Vertex indices, as quads, before triangulation */
 static GLubyte cube_vi[CUBE_VERT_PER_OBJ] =
 {
     0,1,2,3,
