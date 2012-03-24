@@ -60,7 +60,17 @@ static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei num
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
 }
-static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs, GLsizei numVertices, GLsizei numEdgePerFace)
+/**
+ * Draw the geometric shape with filled triangles
+ *
+ * - If the shape is naturally triangulated (numEdgePerFace==3), each
+ *   vertex+normal pair is used only once, so no vertex indices.
+ * 
+ * - If the shape was triangulated (DECOMPOSE_TO_TRIANGLE), some
+ *   vertex+normal pairs are reused, so use vertex indices.
+ */
+static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
+				 GLsizei numVertices, GLsizei numVertIdxs, GLsizei numEdgePerFace)
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -70,8 +80,7 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *v
     if (numEdgePerFace==3)
         glDrawArrays(GL_TRIANGLES, 0, numVertices);
     else
-	/* The number of elements is passed as numVertices */
-        glDrawElements(GL_TRIANGLES, numVertices, GL_UNSIGNED_BYTE, vertIdxs);
+        glDrawElements(GL_TRIANGLES, numVertIdxs, GL_UNSIGNED_BYTE, vertIdxs);
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
@@ -641,7 +650,7 @@ static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GL
         else\
         {\
             fghDrawGeometrySolid(name##_verts,name##_norms,vertIdxs,\
-                                 nameCaps##_VERT_PER_OBJ_TRI,                     nameCaps##_NUM_EDGE_PER_FACE);\
+                                 nameCaps##_VERT_PER_OBJ, nameCaps##_VERT_PER_OBJ_TRI, nameCaps##_NUM_EDGE_PER_FACE); \
         }\
     }
 #define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps)                        _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,NULL)
@@ -678,9 +687,11 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
         vertices = cube_verts;
 
     if (useWireMode)
-        fghDrawGeometryWire (vertices,cube_norms,                                    CUBE_NUM_FACES,CUBE_NUM_EDGE_PER_FACE);
+        fghDrawGeometryWire (vertices, cube_norms,
+			     CUBE_NUM_FACES, CUBE_NUM_EDGE_PER_FACE);
     else
-        fghDrawGeometrySolid(vertices,cube_norms,cube_vertIdxs,CUBE_VERT_PER_OBJ_TRI,               CUBE_NUM_EDGE_PER_FACE);
+        fghDrawGeometrySolid(vertices, cube_norms, cube_vertIdxs,
+			     CUBE_VERT_PER_OBJ, CUBE_VERT_PER_OBJ_TRI, CUBE_NUM_EDGE_PER_FACE);
 
     if (dSize!=1.f)
         /* cleanup allocated memory */
@@ -719,9 +730,9 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
 
         /* Draw and cleanup */
         if (useWireMode)
-            fghDrawGeometryWire (vertices,normals,             numFace,TETRAHEDRON_NUM_EDGE_PER_FACE);
+            fghDrawGeometryWire (vertices,normals,                     numFace,TETRAHEDRON_NUM_EDGE_PER_FACE);
         else
-            fghDrawGeometrySolid(vertices,normals,NULL,numVert,        TETRAHEDRON_NUM_EDGE_PER_FACE);
+            fghDrawGeometrySolid(vertices,normals,NULL,numVert,numVert,        TETRAHEDRON_NUM_EDGE_PER_FACE);
 
         free(vertices);
         free(normals );
