@@ -70,14 +70,14 @@ static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei num
  *   vertex+normal pairs are reused, so use vertex indices.
  */
 static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-				 GLsizei numVertices, GLsizei numVertIdxs, GLsizei numEdgePerFace)
+				 GLsizei numVertices, GLsizei numVertIdxs)
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glNormalPointer(GL_FLOAT, 0, normals);
-    if (numEdgePerFace==3)
+    if (vertIdxs == NULL)
         glDrawArrays(GL_TRIANGLES, 0, numVertices);
     else
         glDrawElements(GL_TRIANGLES, numVertIdxs, GL_UNSIGNED_BYTE, vertIdxs);
@@ -650,7 +650,7 @@ static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GL
         else\
         {\
             fghDrawGeometrySolid(name##_verts,name##_norms,vertIdxs,\
-                                 nameCaps##_VERT_PER_OBJ, nameCaps##_VERT_PER_OBJ_TRI, nameCaps##_NUM_EDGE_PER_FACE); \
+                                 nameCaps##_VERT_PER_OBJ, nameCaps##_VERT_PER_OBJ_TRI); \
         }\
     }
 #define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps)                        _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,NULL)
@@ -691,7 +691,7 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
 			     CUBE_NUM_FACES, CUBE_NUM_EDGE_PER_FACE);
     else
         fghDrawGeometrySolid(vertices, cube_norms, cube_vertIdxs,
-			     CUBE_VERT_PER_OBJ, CUBE_VERT_PER_OBJ_TRI, CUBE_NUM_EDGE_PER_FACE);
+			     CUBE_VERT_PER_OBJ, CUBE_VERT_PER_OBJ_TRI);
 
     if (dSize!=1.f)
         /* cleanup allocated memory */
@@ -730,9 +730,9 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
 
         /* Draw and cleanup */
         if (useWireMode)
-            fghDrawGeometryWire (vertices,normals,                     numFace,TETRAHEDRON_NUM_EDGE_PER_FACE);
+            fghDrawGeometryWire (vertices,normals,numFace,TETRAHEDRON_NUM_EDGE_PER_FACE);
         else
-            fghDrawGeometrySolid(vertices,normals,NULL,numVert,numVert,        TETRAHEDRON_NUM_EDGE_PER_FACE);
+            fghDrawGeometrySolid(vertices,normals,NULL,numVert,numVert);
 
         free(vertices);
         free(normals );
