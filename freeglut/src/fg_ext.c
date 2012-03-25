@@ -217,8 +217,8 @@ glutGetProcAddress( const char *procName )
     /* Try GLUT functions first, then core GL functions */
     p = fghGetGLUTProcAddress( procName );
 
-	/* Some GLUT functions are platform-specific: */
-	if ( !p )
+    /* Some GLUT functions are platform-specific: */
+    if ( !p )
       p = fgPlatformGetGLUTProcAddress( procName );
 
     return ( p != NULL ) ? p : fgPlatformGetProcAddress( procName );
