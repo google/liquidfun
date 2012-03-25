@@ -60,8 +60,8 @@ static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei num
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
 }
-/**
- * Draw the geometric shape with filled triangles
+
+/* Draw the geometric shape with filled triangles
  *
  * - If the shape is naturally triangulated (numEdgePerFace==3), each
  *   vertex+normal pair is used only once, so no vertex indices.
@@ -85,6 +85,8 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *v
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
 }
+
+
 
 /* Shape decomposition to triangles
  * We'll use glDrawElements to draw all shapes that are not naturally
@@ -632,6 +634,81 @@ static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GL
     }
 }
 
+static void fghGenerateSphere(GLfloat radius, GLint slices, GLint stacks, GLfloat **vertices, GLfloat **normals, int* nVert)
+{
+    int i,j;
+    int idx = 0;    /* idx into vertex/normal buffer */
+    GLfloat x,y,z;
+
+    /* Pre-computed circle */
+    GLfloat *sint1,*cost1;
+    GLfloat *sint2,*cost2;
+
+    /* number of unique vertices */
+    if (slices==0 || stacks<2)
+    {
+        /* nothing to generate */
+        *nVert = 0;
+        return;
+    }
+    *nVert = slices*(stacks-1)+2;
+
+    /* precompute values on unit circle */
+    fghCircleTable(&sint1,&cost1,-slices,FALSE);
+    fghCircleTable(&sint2,&cost2, stacks,TRUE);
+
+    /* Allocate vertex and normal buffers, bail out if memory allocation fails */
+    *vertices = malloc((*nVert)*3*sizeof(GLfloat));
+    *normals  = malloc((*nVert)*3*sizeof(GLfloat));
+    if (!(vertices) || !(normals))
+    {
+        free(*vertices);
+        free(*normals);
+        fgError("Failed to allocate memory in fghGenerateSphere");
+    }
+
+    /* top */
+    (*vertices)[0] = 0.f;
+    (*vertices)[1] = 0.f;
+    (*vertices)[2] = radius;
+    (*normals )[0] = 0.f;
+    (*normals )[1] = 0.f;
+    (*normals )[2] = 1.f;
+    idx = 3;
+
+    /* each stack */
+    for( i=1; i<stacks; i++ )
+    {
+        for(j=0; j<slices; j++, idx+=3)
+        {
+            x = cost1[j]*sint2[i];
+            y = sint1[j]*sint2[i];
+            z = cost2[i];
+
+            (*vertices)[idx  ] = x*radius;
+            (*vertices)[idx+1] = y*radius;
+            (*vertices)[idx+2] = z*radius;
+            (*normals )[idx  ] = x;
+            (*normals )[idx+1] = y;
+            (*normals )[idx+2] = z;
+        }
+    }
+
+    /* bottom */
+    (*vertices)[idx  ] =  0.f;
+    (*vertices)[idx+1] =  0.f;
+    (*vertices)[idx+2] = -radius;
+    (*normals )[idx  ] =  0.f;
+    (*normals )[idx+1] =  0.f;
+    (*normals )[idx+2] = -1.f;
+
+    /* Done creating vertices, release sin and cos tables */
+    free(sint1);
+    free(cost1);
+    free(sint2);
+    free(cost2);
+}
+
 
 /* -- INTERNAL DRAWING functions --------------------------------------- */
 #define _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,vertIdxs)\
@@ -739,6 +816,147 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
         free(normals );
     }
 }
+
+
+static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useWireMode )
+{
+    int i,j,idx, nVert;
+    GLfloat *vertices, *normals;
+
+    /* Generate vertices and normals */
+    fghGenerateSphere((GLfloat)radius,slices,stacks,&vertices,&normals,&nVert);
+    
+    if (nVert==0)
+        /* nothing to draw */
+        return;
+
+    if (useWireMode)
+    {
+        GLuint  *sliceIdx, *stackIdx;
+        /* First, generate vertex index arrays for drawing with glDrawElements
+         * We have a bunch of line_loops to draw for each stack, and a
+         * bunch for each slice.
+         */
+
+        sliceIdx = malloc(slices*(stacks+1)*sizeof(GLuint));
+        stackIdx = malloc(slices*(stacks-1)*sizeof(GLuint));
+
+        /* generate for each stack */
+        for (i=0,idx=0; i<slices; i++)
+        {
+            GLuint offset = 1+i;                    /* start at 1 (0 is top vertex), and we advance one slice as we go along */
+            sliceIdx[idx++] = 0;                    /* vertex on top */
+            for (j=0; j<stacks-1; j++, idx++)
+            {
+                sliceIdx[idx] = offset+j*slices;
+            }
+            sliceIdx[idx++] = nVert-1;              /* zero based index, last element in array... */
+        }
+
+        /* generate for each stack */
+        for (i=0,idx=0; i<stacks-1; i++)
+        {
+            GLuint offset = 1+i*slices;             /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            for (j=0; j<slices; j++, idx++)
+            {
+                stackIdx[idx] = offset+j;
+            }
+        }
+
+        /* draw */
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, vertices);
+        glNormalPointer(GL_FLOAT, 0, normals);
+        /*draw slices*/
+        for (i=0; i<slices; i++)
+            glDrawElements(GL_LINE_STRIP,stacks+1,GL_UNSIGNED_INT,sliceIdx+i*(stacks+1));
+        /*draw stacks*/
+        for (i=0; i<stacks-1; i++)
+            glDrawElements(GL_LINE_LOOP, slices,GL_UNSIGNED_INT,stackIdx+i*slices);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+
+        /* cleanup allocated memory */
+        free(sliceIdx);
+        free(stackIdx);
+    }
+    else
+    {
+        GLuint  *topIdx, *bottomIdx, *stripIdx;
+        /* First, generate vertex index arrays for drawing with glDrawElements
+         * Top and bottom are covered with a triangle fan
+         * Each other stack with triangle strip. Only need to generate on
+         * of those as we'll have to draw each stack separately, and can
+         * just use different offsets in glDrawElements.
+         */
+
+        /* Allocate buffers for indices, bail out if memory allocation fails */
+        topIdx = malloc((slices+2)*sizeof(GLuint));
+        bottomIdx = malloc((slices+2)*sizeof(GLuint));
+        stripIdx = malloc((slices+1)*2*(stacks-2)*sizeof(GLuint));
+        if (!(topIdx) || !(bottomIdx) || !(stripIdx))
+        {
+            free(topIdx);
+            free(bottomIdx);
+            free(stripIdx);
+            fgError("Failed to allocate memory in fghGenerateSphere");
+        }
+
+        topIdx[0]=0;
+        topIdx[1] = 1;                              /* repeat first slice's idx for closing off shape */
+        for (j=slices, idx=2; j>0; j--, idx++)
+            topIdx[idx] = j;
+
+        bottomIdx[0]=nVert-1;                       /* zero based index, last element in array... */
+        for (j=0, idx=1; j<slices; j++, idx++)
+            bottomIdx[idx] = nVert-(slices+1)+j;
+        bottomIdx[idx] = nVert-(slices+1);          /* repeat first slice's idx for closing off shape */
+
+        /* Strip indices are relative to first index belonging to strip, NOT relative to first vertex/normal pair in array */
+        for (i=0,idx=0; i<stacks-2; i++, idx+=2)
+        {
+            GLuint offset = 1+i*slices;             /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            for (j=0; j<slices; j++, idx+=2)
+            {
+                stripIdx[idx  ] = offset+j+slices;
+                stripIdx[idx+1] = offset+j;
+            }
+            stripIdx[idx  ] = offset+slices;        /* repeat first slice's idx for closing off shape */
+            stripIdx[idx+1] = offset+0;
+        }
+
+
+        /* draw */
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, vertices);
+        glNormalPointer(GL_FLOAT, 0, normals);
+        /*draw top*/
+        glDrawElements(GL_TRIANGLE_FAN,slices+2,GL_UNSIGNED_INT,topIdx);
+        /*draw stacks*/
+        for (i=0; i<stacks-2; i++)
+            glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_INT,stripIdx+i*(slices+1)*2);
+        /*draw bottom*/
+        glDrawElements(GL_TRIANGLE_FAN,slices+2,GL_UNSIGNED_INT,bottomIdx);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+
+        /* cleanup allocated memory */
+        free(topIdx);
+        free(bottomIdx);
+        free(stripIdx);
+    }
+    
+    /* cleanup allocated memory */
+    free(vertices);
+    free(normals);
+}
+
 #endif /* GL_ES_VERSION_2_0 */
 
 
@@ -751,87 +969,9 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
  */
 void FGAPIENTRY glutSolidSphere(double radius, GLint slices, GLint stacks)
 {
-    int i,j;
-
-    /* Adjust z and radius as stacks are drawn. */
-    GLfloat radf = (GLfloat)radius;
-    GLfloat z0,z1;
-    GLfloat r0,r1;
-
-    /* Pre-computed circle */
-
-    GLfloat *sint1,*cost1;
-    GLfloat *sint2,*cost2;
-
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSphere" );
 
-    fghCircleTable(&sint1,&cost1,-slices,FALSE);
-    fghCircleTable(&sint2,&cost2, stacks,TRUE);
-
-    /* The top stack is covered with a triangle fan */
-
-    z0 = 1;
-    z1 = cost2[(stacks>0)?1:0];
-    r0 = 0;
-    r1 = sint2[(stacks>0)?1:0];
-
-    glBegin(GL_TRIANGLE_FAN);
-
-        glNormal3f(0,0,1);
-        glVertex3f(0,0,radf);
-
-        for (j=slices; j>=0; j--)
-        {
-            glNormal3f(cost1[j]*r1,      sint1[j]*r1,      z1     );
-            glVertex3f(cost1[j]*r1*radf, sint1[j]*r1*radf, z1*radf);
-        }
-
-    glEnd();
-
-    /* Cover each stack with a quad strip, except the top and bottom stacks */
-
-    for( i=1; i<stacks-1; i++ )
-    {
-        z0 = z1; z1 = cost2[i+1];
-        r0 = r1; r1 = sint2[i+1];
-
-        glBegin(GL_QUAD_STRIP);
-
-            for(j=0; j<=slices; j++)
-            {
-                glNormal3d(cost1[j]*r1,      sint1[j]*r1,      z1     );
-                glVertex3d(cost1[j]*r1*radf, sint1[j]*r1*radf, z1*radf);
-                glNormal3d(cost1[j]*r0,      sint1[j]*r0,      z0     );
-                glVertex3d(cost1[j]*r0*radf, sint1[j]*r0*radf, z0*radf);
-            }
-
-        glEnd();
-    }
-
-    /* The bottom stack is covered with a triangle fan */
-
-    z0 = z1;
-    r0 = r1;
-
-    glBegin(GL_TRIANGLE_FAN);
-
-        glNormal3d(0,0,-1);
-        glVertex3d(0,0,-radius);
-
-        for (j=0; j<=slices; j++)
-        {
-            glNormal3d(cost1[j]*r0,      sint1[j]*r0,      z0     );
-            glVertex3d(cost1[j]*r0*radf, sint1[j]*r0*radf, z0*radf);
-        }
-
-    glEnd();
-
-    /* Release sin and cos tables */
-
-    free(sint1);
-    free(cost1);
-    free(sint2);
-    free(cost2);
+    fghSphere( radius, slices, stacks, FALSE );
 }
 
 /*
@@ -839,69 +979,10 @@ void FGAPIENTRY glutSolidSphere(double radius, GLint slices, GLint stacks)
  */
 void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
 {
-    int i,j;
-
-    /* Adjust z and radius as stacks and slices are drawn. */
-    GLfloat radf = (GLfloat)radius;
-    GLfloat r;
-    GLfloat x,y,z;
-
-    /* Pre-computed circle */
-
-    GLfloat *sint1,*cost1;
-    GLfloat *sint2,*cost2;
-
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSphere" );
 
-    fghCircleTable(&sint1,&cost1,-slices,FALSE);
-    fghCircleTable(&sint2,&cost2, stacks,TRUE);
-
-    /* Draw a line loop for each stack */
-
-    for (i=1; i<stacks; i++)
-    {
-        z = cost2[i];
-        r = sint2[i];
-
-        glBegin(GL_LINE_LOOP);
-
-            for(j=0; j<=slices; j++)
-            {
-                x = cost1[j];
-                y = sint1[j];
-
-                glNormal3f(x,y,z);
-                glVertex3f(x*r*radf,y*r*radf,z*radf);
-            }
-
-        glEnd();
-    }
-
-    /* Draw a line loop for each slice */
-
-    for (i=0; i<slices; i++)
-    {
-        glBegin(GL_LINE_STRIP);
-
-            for(j=0; j<=stacks; j++)
-            {
-                x = cost1[i]*sint2[j];
-                y = sint1[i]*sint2[j];
-                z = cost2[j];
-
-                glNormal3f(x,y,z);
-                glVertex3f(x*radf,y*radf,z*radf);
-            }
-
-        glEnd();
-    }
-
-    /* Release sin and cos tables */
-
-    free(sint1);
-    free(cost1);
-    free(sint2);
-    free(cost2);
+    fghSphere( radius, slices, stacks, TRUE );
+    
 }
 
 /*
