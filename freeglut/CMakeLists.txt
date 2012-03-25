@@ -103,6 +103,7 @@ ELSEIF(ANDROID)
     LIST(APPEND FREEGLUT_SRCS
         src/egl/fg_internal_egl.h
         src/egl/fg_display_egl.c
+        src/egl/fg_ext_egl.c
         src/egl/fg_init_egl.c
         src/egl/fg_state_egl.c
         src/egl/fg_structure_egl.c
@@ -145,6 +146,7 @@ ELSE()
         LIST(APPEND FREEGLUT_SRCS
             src/egl/fg_internal_egl.h
             src/egl/fg_display_egl.c
+            src/egl/fg_ext_egl.c
             src/egl/fg_init_egl.c
             src/egl/fg_state_egl.c
             src/egl/fg_structure_egl.c
