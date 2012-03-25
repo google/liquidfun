@@ -1031,11 +1031,10 @@ void FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint s
 
     glEnd();
 
-    /* Cover each stack with a quad strip, except the top stack */
-
-    for( i=0; i<stacks-1; i++ )
+    /* Cover each stack with a triangle strip */
+    for( i=0; i<stacks; i++ )
     {
-        glBegin(GL_QUAD_STRIP);
+        glBegin(GL_TRIANGLE_STRIP);
 
             for(j=0; j<=slices; j++)
             {
@@ -1049,22 +1048,6 @@ void FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint s
 
         glEnd();
     }
-
-    /* The top stack is covered with individual triangles */
-
-    glBegin(GL_TRIANGLES);
-
-        glNormal3f(cost[0]*sinn, sint[0]*sinn, cosn);
-
-        for (j=0; j<slices; j++)
-        {
-            glVertex3f(cost[j+0]*r0,   sint[j+0]*r0,            z0    );
-            glVertex3f(0,              0,              (GLfloat)height);
-            glNormal3f(cost[j+1]*sinn, sint[j+1]*sinn,          cosn  );
-            glVertex3f(cost[j+1]*r0,   sint[j+1]*r0,            z0    );
-        }
-
-    glEnd();
 
     /* Release sin and cos tables */
 
@@ -1186,7 +1169,7 @@ void FGAPIENTRY glutSolidCylinder(double radius, double height, GLint slices, GL
         if (i==stacks)
             z1 = (GLfloat)height;
 
-        glBegin(GL_QUAD_STRIP);
+        glBegin(GL_TRIANGLE_STRIP);
             for (j=0; j<=slices; j++ )
             {
                 glNormal3f(cost[j],      sint[j],      0  );
