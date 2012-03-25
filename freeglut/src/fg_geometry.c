@@ -87,8 +87,9 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *v
 }
 
 /* Shape decomposition to triangles
- * We'll use glDrawElements to draw all shapes that are not triangles, so
- * generate an index vector here, using the below sampling scheme.
+ * We'll use glDrawElements to draw all shapes that are not naturally
+ * composed of triangles, so generate an index vector here, using the
+ * below sampling scheme.
  * Be careful to keep winding of all triangles counter-clockwise,
  * assuming that input has correct winding...
  */
@@ -102,7 +103,7 @@ static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, 
     switch (numEdgePerFace)
     {
     case 3:
-        /* nothing to do here, we'll drawn with glDrawArrays */
+        /* nothing to do here, we'll draw with glDrawArrays */
         break;
     case 4:
         vertSamps = vert4Decomp;
@@ -155,7 +156,7 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLfloat *verti
 /* Cache of input to glDrawArrays or glDrawElements
  * In general, we build arrays with all vertices or normals.
  * We cant compress this and use glDrawElements as all combinations of
- * vertex and normals are unique.
+ * vertices and normals are unique.
  */
 #define DECLARE_SHAPE_CACHE(name,nameICaps,nameCaps)\
     static GLboolean name##Cached = FALSE;\
