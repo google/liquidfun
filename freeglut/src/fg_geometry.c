@@ -905,6 +905,12 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
             fgError("Failed to allocate memory in fghGenerateSphere");
         }
 
+        /* TODO: Can do top and bottom as Triangle strip as well
+           (just need to repeat top/btoom vertex a lot). Then we can draw
+           the whole thing with just one index array and one for-looped call
+           to glDrawElements.. That'll make it easier to reuse code with other
+           Circular objects too
+           */
         topIdx[0]=0;
         topIdx[1] = 1;                              /* repeat first slice's idx for closing off shape */
         for (j=slices, idx=2; j>0; j--, idx++)
