@@ -319,6 +319,7 @@ struct tagSFG_State
     int              MajorVersion;         /* Major OpenGL context version  */
     int              MinorVersion;         /* Minor OpenGL context version  */
     int              ContextFlags;         /* OpenGL context flags          */
+    int              HasOpenGL20;          /* fgInitGL2 could find all OpenGL 2.0 functions */
     int              ContextProfile;       /* OpenGL context profile        */
     FGError          ErrorFunc;            /* User defined error handler    */
     FGWarning        WarningFunc;          /* User defined warning handler  */

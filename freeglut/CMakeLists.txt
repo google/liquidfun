@@ -43,6 +43,8 @@ SET(FREEGLUT_SRCS
     src/fg_ext.c
     src/fg_font_data.c
     src/fg_gamemode.c
+    src/fg_gl2.c
+    src/fg_gl2.h
     src/fg_init.c
     src/fg_internal.h
     src/fg_input_devices.c

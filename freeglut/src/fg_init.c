@@ -90,6 +90,7 @@ SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
                       0,                      /* OpenGL context MinorVersion */
                       0,                      /* OpenGL ContextFlags */
                       0,                      /* OpenGL ContextProfile */
+                      0,                      /* HasOpenGL20 */
                       NULL,                   /* ErrorFunc */
                       NULL                    /* WarningFunc */
 };
@@ -380,6 +381,8 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         if( (mask & (XValue|YValue)) == (XValue|YValue) )
             fgState.Position.Use = GL_TRUE;
     }
+
+    fgInitGL2();
 }
 
 /*
