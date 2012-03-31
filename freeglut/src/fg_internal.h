@@ -319,8 +319,8 @@ struct tagSFG_State
     int              MajorVersion;         /* Major OpenGL context version  */
     int              MinorVersion;         /* Minor OpenGL context version  */
     int              ContextFlags;         /* OpenGL context flags          */
-    int              HasOpenGL20;          /* fgInitGL2 could find all OpenGL 2.0 functions */
     int              ContextProfile;       /* OpenGL context profile        */
+    int              HasOpenGL20;          /* fgInitGL2 could find all OpenGL 2.0 functions */
     FGError          ErrorFunc;            /* User defined error handler    */
     FGWarning        WarningFunc;          /* User defined warning handler  */
 };
@@ -361,6 +361,8 @@ struct tagSFG_Context
 	SFG_PlatformContext pContext;    /* The window's FBConfig (X11) or device context (Windows) */
 
     int             DoubleBuffered;  /* Treat the window as double-buffered */
+    GLint attribute_v_coord;
+    GLint attribute_v_normal;
 };
 
 

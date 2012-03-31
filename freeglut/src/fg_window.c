@@ -145,6 +145,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
         glReadBuffer ( GL_FRONT );
     }
 #endif
+    window->Window.attribute_v_coord = -1;
+    window->Window.attribute_v_normal = -1;
 }
 
 /*

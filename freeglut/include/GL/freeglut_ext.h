@@ -226,6 +226,11 @@ FGAPI void    FGAPIENTRY glutInitContextProfile( int profile );
 FGAPI void    FGAPIENTRY glutInitErrorFunc( void (* vError)( const char *fmt, va_list ap ) );
 FGAPI void    FGAPIENTRY glutInitWarningFunc( void (* vWarning)( const char *fmt, va_list ap ) );
 
+/* OpenGL >= 2.0 support */
+FGAPI void    FGAPIENTRY glutSetVertexAttribCoord3(GLint attrib);
+FGAPI void    FGAPIENTRY glutSetVertexAttribNormal(GLint attrib);
+
+
 /*
  * GLUT API macro definitions -- the display mode definitions
  */

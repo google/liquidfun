@@ -29,6 +29,7 @@
 #ifndef APIENTRY
 #    define APIENTRY
 #endif
+
 typedef ptrdiff_t fghGLsizeiptr;
 typedef void (APIENTRY *PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
 typedef void (APIENTRY *PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
