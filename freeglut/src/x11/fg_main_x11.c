@@ -55,6 +55,9 @@
 #    define MIN(a,b) (((a)<(b)) ? (a) : (b))
 #endif
 
+/* used in the event handling code to match and discard stale mouse motion events */
+static Bool match_motion(Display *dpy, XEvent *xev, XPointer arg);
+
 /*
  * TODO BEFORE THE STABLE RELEASE:
  *
@@ -788,6 +791,13 @@ void fgPlatformProcessSingleEvent ( void )
 
         case MotionNotify:
         {
+            /* if GLUT_SKIP_STALE_MOTION_EVENTS is true, then discard all but
+             * the last motion event from the queue
+             */
+            if(fgState.SkipStaleMotion) {
+                while(XCheckIfEvent(fgDisplay.pDisplay.Display, &event, match_motion, 0));
+            }
+
             GETWINDOW( xmotion );
             GETMOUSE( xmotion );
 
@@ -1076,6 +1086,11 @@ void fgPlatformProcessSingleEvent ( void )
     }
 }
 
+
+static Bool match_motion(Display *dpy, XEvent *xev, XPointer arg)
+{
+    return xev->type == MotionNotify;
+}
 
 void fgPlatformMainLoopPreliminaryWork ( void )
 {

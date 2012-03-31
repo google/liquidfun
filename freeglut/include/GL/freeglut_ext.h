@@ -83,6 +83,8 @@
 
 #define  GLUT_FULL_SCREEN                   0x01FF
 
+#define  GLUT_SKIP_STALE_MOTION_EVENTS      0x0204
+
 /*
  * New tokens for glutInitDisplayMode.
  * Only one GLUT_AUXn bit may be used at a time.

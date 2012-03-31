@@ -111,6 +111,10 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
       fgState.SampleNumber = value;
       break;
 
+    case GLUT_SKIP_STALE_MOTION_EVENTS:
+      fgState.SkipStaleMotion = value;
+      break;
+
     default:
         fgWarning( "glutSetOption(): missing enum handle %d", eWhat );
         break;
@@ -197,6 +201,9 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     case GLUT_MULTISAMPLE:
       return fgState.SampleNumber;
+
+    case GLUT_SKIP_STALE_MOTION_EVENTS:
+      return fgState.SkipStaleMotion;
 
     default:
         return fgPlatformGlutGet ( eWhat );
