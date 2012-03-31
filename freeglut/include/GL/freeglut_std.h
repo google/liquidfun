@@ -528,10 +528,10 @@ FGAPI int     FGAPIENTRY glutStrokeLength( void* font, const unsigned char* stri
 #ifndef GL_ES_VERSION_2_0
 FGAPI void    FGAPIENTRY glutWireCube( double size );
 FGAPI void    FGAPIENTRY glutSolidCube( double size );
-#endif
-#ifndef EGL_VERSION_1_0
 FGAPI void    FGAPIENTRY glutWireSphere( double radius, GLint slices, GLint stacks );
 FGAPI void    FGAPIENTRY glutSolidSphere( double radius, GLint slices, GLint stacks );
+#endif
+#ifndef EGL_VERSION_1_0
 FGAPI void    FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint stacks );
 FGAPI void    FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint stacks );
 #endif

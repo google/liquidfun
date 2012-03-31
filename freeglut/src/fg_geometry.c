@@ -823,6 +823,9 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
     int i,j,idx, nVert;
     GLfloat *vertices, *normals;
 
+    if (slices * stacks > 65535)
+	fgWarning("fghSphere: too many slices or stacks requested, indices will wrap");
+
     /* Generate vertices and normals */
     fghGenerateSphere((GLfloat)radius,slices,stacks,&vertices,&normals,&nVert);
     
@@ -832,19 +835,19 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
 
     if (useWireMode)
     {
-        GLuint  *sliceIdx, *stackIdx;
+        GLushort  *sliceIdx, *stackIdx;
         /* First, generate vertex index arrays for drawing with glDrawElements
          * We have a bunch of line_loops to draw for each stack, and a
          * bunch for each slice.
          */
 
-        sliceIdx = malloc(slices*(stacks+1)*sizeof(GLuint));
-        stackIdx = malloc(slices*(stacks-1)*sizeof(GLuint));
+        sliceIdx = malloc(slices*(stacks+1)*sizeof(GLushort));
+        stackIdx = malloc(slices*(stacks-1)*sizeof(GLushort));
 
         /* generate for each stack */
         for (i=0,idx=0; i<slices; i++)
         {
-            GLuint offset = 1+i;                    /* start at 1 (0 is top vertex), and we advance one slice as we go along */
+            GLushort offset = 1+i;                  /* start at 1 (0 is top vertex), and we advance one slice as we go along */
             sliceIdx[idx++] = 0;                    /* vertex on top */
             for (j=0; j<stacks-1; j++, idx++)
             {
@@ -856,7 +859,7 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
         /* generate for each stack */
         for (i=0,idx=0; i<stacks-1; i++)
         {
-            GLuint offset = 1+i*slices;             /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            GLushort offset = 1+i*slices;           /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx++)
             {
                 stackIdx[idx] = offset+j;
@@ -871,10 +874,10 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
         glNormalPointer(GL_FLOAT, 0, normals);
         /*draw slices*/
         for (i=0; i<slices; i++)
-            glDrawElements(GL_LINE_STRIP,stacks+1,GL_UNSIGNED_INT,sliceIdx+i*(stacks+1));
+            glDrawElements(GL_LINE_STRIP,stacks+1,GL_UNSIGNED_SHORT,sliceIdx+i*(stacks+1));
         /*draw stacks*/
         for (i=0; i<stacks-1; i++)
-            glDrawElements(GL_LINE_LOOP, slices,GL_UNSIGNED_INT,stackIdx+i*slices);
+            glDrawElements(GL_LINE_LOOP, slices,GL_UNSIGNED_SHORT,stackIdx+i*slices);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -885,7 +888,7 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
     }
     else
     {
-        GLuint  *topIdx, *bottomIdx, *stripIdx;
+        GLushort  *topIdx, *bottomIdx, *stripIdx;
         /* First, generate vertex index arrays for drawing with glDrawElements
          * Top and bottom are covered with a triangle fan
          * Each other stack with triangle strip. Only need to generate on
@@ -894,9 +897,9 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
          */
 
         /* Allocate buffers for indices, bail out if memory allocation fails */
-        topIdx = malloc((slices+2)*sizeof(GLuint));
-        bottomIdx = malloc((slices+2)*sizeof(GLuint));
-        stripIdx = malloc((slices+1)*2*(stacks-2)*sizeof(GLuint));
+        topIdx = malloc((slices+2)*sizeof(GLushort));
+        bottomIdx = malloc((slices+2)*sizeof(GLushort));
+        stripIdx = malloc((slices+1)*2*(stacks-2)*sizeof(GLushort));
         if (!(topIdx) || !(bottomIdx) || !(stripIdx))
         {
             free(topIdx);
@@ -924,7 +927,7 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
         /* Strip indices are relative to first index belonging to strip, NOT relative to first vertex/normal pair in array */
         for (i=0,idx=0; i<stacks-2; i++, idx+=2)
         {
-            GLuint offset = 1+i*slices;             /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            GLushort offset = 1+i*slices;             /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx+=2)
             {
                 stripIdx[idx  ] = offset+j+slices;
@@ -942,12 +945,12 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
         glVertexPointer(3, GL_FLOAT, 0, vertices);
         glNormalPointer(GL_FLOAT, 0, normals);
         /*draw top*/
-        glDrawElements(GL_TRIANGLE_FAN,slices+2,GL_UNSIGNED_INT,topIdx);
+        glDrawElements(GL_TRIANGLE_FAN,slices+2,GL_UNSIGNED_SHORT,topIdx);
         /*draw stacks*/
         for (i=0; i<stacks-2; i++)
-            glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_INT,stripIdx+i*(slices+1)*2);
+            glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(slices+1)*2);
         /*draw bottom*/
-        glDrawElements(GL_TRIANGLE_FAN,slices+2,GL_UNSIGNED_INT,bottomIdx);
+        glDrawElements(GL_TRIANGLE_FAN,slices+2,GL_UNSIGNED_SHORT,bottomIdx);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -969,7 +972,6 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
 /* -- INTERFACE FUNCTIONS ---------------------------------------------- */
 
 
-#ifndef EGL_VERSION_1_0
 /*
  * Draws a solid sphere
  */
@@ -991,6 +993,7 @@ void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
     
 }
 
+#ifndef EGL_VERSION_1_0
 /*
  * Draws a solid cone
  */
