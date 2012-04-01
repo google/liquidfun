@@ -1148,7 +1148,6 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
     free(normals);
 }
 
-#endif /* GL_ES_VERSION_2_0 */
 
 
 /* -- INTERFACE FUNCTIONS ---------------------------------------------- */
@@ -1174,6 +1173,7 @@ void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
     fghSphere( radius, slices, stacks, TRUE );
     
 }
+#endif /* GL_ES_VERSION_2_0 */
 
 #ifndef EGL_VERSION_1_0
 /*
