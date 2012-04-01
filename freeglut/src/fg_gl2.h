@@ -36,21 +36,21 @@
 #define FGH_STATIC_DRAW 0x88E4
 #define FGH_ELEMENT_ARRAY_BUFFER 0x8893
 
-typedef ptrdiff_t fghGLsizeiptr;
-typedef void (APIENTRY *PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
-typedef void (APIENTRY *PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
-typedef void (APIENTRY *PFNGLBUFFERDATAPROC) (GLenum target, fghGLsizeiptr size, const GLvoid *data, GLenum usage);
-typedef void (APIENTRY *PFNGLDELETEBUFFERSPROC) (GLsizei n, const GLuint* buffers);
-typedef void (APIENTRY *PFNGLENABLEVERTEXATTRIBARRAYPROC) (GLuint index);
-typedef void (APIENTRY *PFNGLDISABLEVERTEXATTRIBARRAYPROC) (GLuint);
-typedef void (APIENTRY *PFNGLVERTEXATTRIBPOINTERPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+typedef int fghGLsizeiptr;
+typedef void (APIENTRY *FGH_PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
+typedef void (APIENTRY *FGH_PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
+typedef void (APIENTRY *FGH_PFNGLBUFFERDATAPROC) (GLenum target, fghGLsizeiptr size, const GLvoid *data, GLenum usage);
+typedef void (APIENTRY *FGH_PFNGLDELETEBUFFERSPROC) (GLsizei n, const GLuint* buffers);
+typedef void (APIENTRY *FGH_PFNGLENABLEVERTEXATTRIBARRAYPROC) (GLuint index);
+typedef void (APIENTRY *FGH_PFNGLDISABLEVERTEXATTRIBARRAYPROC) (GLuint);
+typedef void (APIENTRY *FGH_PFNGLVERTEXATTRIBPOINTERPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 
-PFNGLGENBUFFERSPROC fghGenBuffers;
-PFNGLDELETEBUFFERSPROC fghDeleteBuffers;
-PFNGLBINDBUFFERPROC fghBindBuffer;
-PFNGLBUFFERDATAPROC fghBufferData;
-PFNGLENABLEVERTEXATTRIBARRAYPROC fghEnableVertexAttribArray;
-PFNGLDISABLEVERTEXATTRIBARRAYPROC fghDisableVertexAttribArray;
-PFNGLVERTEXATTRIBPOINTERPROC fghVertexAttribPointer;
+FGH_PFNGLGENBUFFERSPROC fghGenBuffers;
+FGH_PFNGLDELETEBUFFERSPROC fghDeleteBuffers;
+FGH_PFNGLBINDBUFFERPROC fghBindBuffer;
+FGH_PFNGLBUFFERDATAPROC fghBufferData;
+FGH_PFNGLENABLEVERTEXATTRIBARRAYPROC fghEnableVertexAttribArray;
+FGH_PFNGLDISABLEVERTEXATTRIBARRAYPROC fghDisableVertexAttribArray;
+FGH_PFNGLVERTEXATTRIBPOINTERPROC fghVertexAttribPointer;
 
 #endif

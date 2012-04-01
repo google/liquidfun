@@ -40,13 +40,13 @@ void FGAPIENTRY glutSetVertexAttribNormal(GLint attrib) {
 void fgInitGL2() {
     fgState.HasOpenGL20 = 0;
 #define CHECK(func, a) if ((a) == NULL) { fgWarning("fgInitGL2: " func " is NULL"); return; }
-    CHECK("fghGenBuffers", fghGenBuffers = (PFNGLGENBUFFERSPROC) glutGetProcAddress ("glGenBuffers"));
-    CHECK("fghDeleteBuffers", fghDeleteBuffers = (PFNGLDELETEBUFFERSPROC) glutGetProcAddress ("glDeleteBuffers"));
-    CHECK("fghBindBuffer", fghBindBuffer = (PFNGLBINDBUFFERPROC) glutGetProcAddress ("glBindBuffer"));
-    CHECK("fghBufferData", fghBufferData = (PFNGLBUFFERDATAPROC) glutGetProcAddress ("glBufferData"));
-    CHECK("fghVertexAttribPointer", fghVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC) glutGetProcAddress ("glVertexAttribPointer"));
-    CHECK("fghEnableVertexAttribArray", fghEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glEnableVertexAttribArray"));
-    CHECK("fghDisableVertexAttribArray", fghDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glDisnableVertexAttribArray"));
+    CHECK("fghGenBuffers", fghGenBuffers = (FGH_PFNGLGENBUFFERSPROC) glutGetProcAddress ("glGenBuffers"));
+    CHECK("fghDeleteBuffers", fghDeleteBuffers = (FGH_PFNGLDELETEBUFFERSPROC) glutGetProcAddress ("glDeleteBuffers"));
+    CHECK("fghBindBuffer", fghBindBuffer = (FGH_PFNGLBINDBUFFERPROC) glutGetProcAddress ("glBindBuffer"));
+    CHECK("fghBufferData", fghBufferData = (FGH_PFNGLBUFFERDATAPROC) glutGetProcAddress ("glBufferData"));
+    CHECK("fghVertexAttribPointer", fghVertexAttribPointer = (FGH_PFNGLVERTEXATTRIBPOINTERPROC) glutGetProcAddress ("glVertexAttribPointer"));
+    CHECK("fghEnableVertexAttribArray", fghEnableVertexAttribArray = (FGH_PFNGLENABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glEnableVertexAttribArray"));
+    CHECK("fghDisableVertexAttribArray", fghDisableVertexAttribArray = (FGH_PFNGLDISABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glDisnableVertexAttribArray"));
 #undef CHECK
     fgState.HasOpenGL20 = 1;
 }
