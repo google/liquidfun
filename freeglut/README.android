@@ -1,24 +1,7 @@
 Status
 ======
 
-Done:
-- Initialize context with EGL
-- Keyboard support
-- Mouse support
-- Virtual keypad (on touchscreen)
-- Extract assets in cache dir on start-up
-
-TODO:
-- Open new windows (if that's possible)
-- Joystick support (xperia play...)
-- Display translucent keys on virtual keypad
-- API to detect touchscreen presence
-- API to disable assets extract
-- GLES2 support for geometry and menus
-  (possibly also GLES1)
-- Generate freeglut_std.h with GLES1 or GLES2 or non-ES headers
-- Make EGL support reusable by Mesa X11
-- ...
+See http://freeglut.sourceforge.net/docs/android.php
 
 
 Create a module compatible with the NDK build-system
