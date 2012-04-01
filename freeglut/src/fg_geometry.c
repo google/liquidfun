@@ -72,7 +72,9 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
 {
     GLuint vbo_coords, vbo_normals;
     GLuint numVertices = numFaces * numEdgePerFace;
-    
+
+    int i;
+
     if (numVertices > 0 && attribute_v_coord != -1) {
 	    fghGenBuffers(1, &vbo_coords);
 	    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
@@ -113,9 +115,6 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
         );
     }
 
-
-    int i;
-    
     /* Draw per face (TODO: could use glMultiDrawArrays if available) */
     for (i=0; i<numFaces; i++)
 	glDrawArrays(GL_LINE_LOOP, i*numEdgePerFace, numEdgePerFace);

@@ -102,6 +102,7 @@ extern void fgPlatformInitialize( const char* displayName );
 extern void fgPlatformDeinitialiseInputDevices ( void );
 extern void fgPlatformCloseDisplay ( void );
 extern void fgPlatformDestroyContext ( SFG_PlatformDisplay pDisplay, SFG_WindowContextType MContext );
+extern void fgInitGL2();
 
 
 void fghParseCommandLineArguments ( int* pargc, char** argv, char **pDisplayName, char **pGeometry )
