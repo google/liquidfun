@@ -28,6 +28,7 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 #include "fg_gl2.h"
+#include <math.h>
 
 /*
  * Need more types of polyhedra? See CPolyhedron in MRPT
@@ -74,21 +75,21 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
     
     if (numVertices > 0 && attribute_v_coord != -1) {
 	    fghGenBuffers(1, &vbo_coords);
-	    fghBindBuffer(GL_ARRAY_BUFFER, vbo_coords);
-	    fghBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(vertices[0]),
-			  vertices, GL_STATIC_DRAW);
+	    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
+	    fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(vertices[0]),
+			  vertices, FGH_STATIC_DRAW);
     }
     
     if (numVertices > 0 && attribute_v_normal != -1) {
 	fghGenBuffers(1, &vbo_normals);
-	fghBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
-	fghBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
-		      normals, GL_STATIC_DRAW);
+	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
+	fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
+		      normals, FGH_STATIC_DRAW);
     }
     
     if (vbo_coords) {
         fghEnableVertexAttribArray(attribute_v_coord);
-        fghBindBuffer(GL_ARRAY_BUFFER, vbo_coords);
+        fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
         fghVertexAttribPointer(
             attribute_v_coord,  // attribute
             3,                  // number of elements per vertex, here (x,y,z)
@@ -101,7 +102,7 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
 
     if (vbo_normals) {
         fghEnableVertexAttribArray(attribute_v_normal);
-        fghBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
+        fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
         fghVertexAttribPointer(
             attribute_v_normal, // attribute
             3,                  // number of elements per vertex, here (x,y,z)
@@ -185,28 +186,28 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
     
     if (numVertices > 0 && attribute_v_coord != -1) {
 	fghGenBuffers(1, &vbo_coords);
-	fghBindBuffer(GL_ARRAY_BUFFER, vbo_coords);
-	fghBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(vertices[0]),
-		      vertices, GL_STATIC_DRAW);
+	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
+	fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(vertices[0]),
+		      vertices, FGH_STATIC_DRAW);
 	}
     
     if (numVertices > 0 && attribute_v_normal != -1) {
 	fghGenBuffers(1, &vbo_normals);
-	fghBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
-	fghBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
-		      normals, GL_STATIC_DRAW);
+	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
+	fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
+		      normals, FGH_STATIC_DRAW);
     }
     
     if (vertIdxs != NULL) {
 	fghGenBuffers(1, &ibo_elements);
-	fghBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_elements);
-	fghBufferData(GL_ELEMENT_ARRAY_BUFFER, numVertIdxs * sizeof(vertIdxs[0]),
-		      vertIdxs, GL_STATIC_DRAW);
+	fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
+	fghBufferData(FGH_ELEMENT_ARRAY_BUFFER, numVertIdxs * sizeof(vertIdxs[0]),
+		      vertIdxs, FGH_STATIC_DRAW);
     }
     
     if (vbo_coords) {
 	fghEnableVertexAttribArray(attribute_v_coord);
-	fghBindBuffer(GL_ARRAY_BUFFER, vbo_coords);
+	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
 	fghVertexAttribPointer(
             attribute_v_coord,  // attribute
             3,                  // number of elements per vertex, here (x,y,z)
@@ -219,7 +220,7 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
     
     if (vbo_normals) {
 	fghEnableVertexAttribArray(attribute_v_normal);
-	fghBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
+	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
 	fghVertexAttribPointer(
             attribute_v_normal, // attribute
             3,                  // number of elements per vertex, here (x,y,z)
@@ -233,7 +234,7 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
     if (vertIdxs == NULL) {
 	glDrawArrays(GL_TRIANGLES, 0, numVertices);
     } else {
-	fghBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_elements);
+	fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
 	glDrawElements(GL_TRIANGLES, numVertIdxs, GL_UNSIGNED_BYTE, 0);
     }
     

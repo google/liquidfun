@@ -27,31 +27,15 @@
 #include "fg_internal.h"
 #include "fg_gl2.h"
 
-void glutSetVertexAttribCoord3(GLint attrib) {
+void FGAPIENTRY glutSetVertexAttribCoord3(GLint attrib) {
   if (fgStructure.CurrentWindow != NULL)
     fgStructure.CurrentWindow->Window.attribute_v_coord = attrib;
 }
 
-void glutSetVertexAttribNormal(GLint attrib) {
+void FGAPIENTRY glutSetVertexAttribNormal(GLint attrib) {
   if (fgStructure.CurrentWindow != NULL)
     fgStructure.CurrentWindow->Window.attribute_v_normal = attrib;
 }
-
-typedef void (APIENTRY *PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
-typedef void (APIENTRY *PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
-typedef void (APIENTRY *PFNGLBUFFERDATAPROC) (GLenum target, fghGLsizeiptr size, const GLvoid *data, GLenum usage);
-typedef void (APIENTRY *PFNGLDELETEBUFFERSPROC) (GLsizei n, const GLuint* buffers);
-typedef void (APIENTRY *PFNGLENABLEVERTEXATTRIBARRAYPROC) (GLuint index);
-typedef void (APIENTRY *PFNGLDISABLEVERTEXATTRIBARRAYPROC) (GLuint);
-typedef void (APIENTRY *PFNGLVERTEXATTRIBPOINTERPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
-
-PFNGLGENBUFFERSPROC fghGenBuffers = NULL;
-PFNGLDELETEBUFFERSPROC fghDeleteBuffers = NULL;
-PFNGLBINDBUFFERPROC fghBindBuffer = NULL;
-PFNGLBUFFERDATAPROC fghBufferData = NULL;
-PFNGLENABLEVERTEXATTRIBARRAYPROC fghEnableVertexAttribArray = NULL;
-PFNGLDISABLEVERTEXATTRIBARRAYPROC fghDisableVertexAttribArray = NULL;
-PFNGLVERTEXATTRIBPOINTERPROC fghVertexAttribPointer = NULL;
 
 void fgInitGL2() {
     fgState.HasOpenGL20 = 0;

@@ -30,6 +30,12 @@
 #    define APIENTRY
 #endif
 
+/* extension #defines, types and entries, avoiding a dependency on additional
+   libraries like GLEW or the GL/glext.h header */
+#define FGH_ARRAY_BUFFER 0x8892
+#define FGH_STATIC_DRAW 0x88E4
+#define FGH_ELEMENT_ARRAY_BUFFER 0x8893
+
 typedef ptrdiff_t fghGLsizeiptr;
 typedef void (APIENTRY *PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
 typedef void (APIENTRY *PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
