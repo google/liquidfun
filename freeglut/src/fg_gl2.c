@@ -39,6 +39,8 @@ void FGAPIENTRY glutSetVertexAttribNormal(GLint attrib) {
 
 void fgInitGL2() {
     fgState.HasOpenGL20 = 0;
+    // TODO: Mesa returns a valid stub function, rather than NULL,
+    // when we request a non-existent function
 #define CHECK(func, a) if ((a) == NULL) { fgWarning("fgInitGL2: " func " is NULL"); return; }
     CHECK("fghGenBuffers", fghGenBuffers = (FGH_PFNGLGENBUFFERSPROC) glutGetProcAddress ("glGenBuffers"));
     CHECK("fghDeleteBuffers", fghDeleteBuffers = (FGH_PFNGLDELETEBUFFERSPROC) glutGetProcAddress ("glDeleteBuffers"));
@@ -46,7 +48,7 @@ void fgInitGL2() {
     CHECK("fghBufferData", fghBufferData = (FGH_PFNGLBUFFERDATAPROC) glutGetProcAddress ("glBufferData"));
     CHECK("fghVertexAttribPointer", fghVertexAttribPointer = (FGH_PFNGLVERTEXATTRIBPOINTERPROC) glutGetProcAddress ("glVertexAttribPointer"));
     CHECK("fghEnableVertexAttribArray", fghEnableVertexAttribArray = (FGH_PFNGLENABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glEnableVertexAttribArray"));
-    CHECK("fghDisableVertexAttribArray", fghDisableVertexAttribArray = (FGH_PFNGLDISABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glDisnableVertexAttribArray"));
+    CHECK("fghDisableVertexAttribArray", fghDisableVertexAttribArray = (FGH_PFNGLDISABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glDisableVertexAttribArray"));
 #undef CHECK
     fgState.HasOpenGL20 = 1;
 }
