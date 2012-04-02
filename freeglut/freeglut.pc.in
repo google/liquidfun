@@ -5,6 +5,6 @@ includedir=${prefix}/include
 Name: glut
 Description: A freely licensed and improved alternative to the GLUT library
 Version: @VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@
-Libs: -L${libdir} -lglut
+Libs: -L${libdir} -l@PC_LIBNAME@
 Libs.private: @PC_LIBS_PRIVATE@
 Cflags: -I${includedir} @PC_CFLAGS@

@@ -297,8 +297,16 @@ ELSE()
     # - the shared library should link to the dependency libraries so that the user
     #   won't have to link them explicitly (they shouldn't have to know that we depend
     #   on Xrandr or Xxf86vm)
-    SET_TARGET_PROPERTIES(freeglut PROPERTIES VERSION 3.9.0 SOVERSION 3 OUTPUT_NAME glut)
-    SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME glut)
+    IF(FREEGLUT_GLES2)
+      SET(LIBNAME freeglut-gles2)
+    ELSEIF(FREEGLUT_GLES1)
+      SET(LIBNAME freeglut-gles1)
+    ELSE()
+      SET(LIBNAME glut)
+    ENDIF()
+
+    SET_TARGET_PROPERTIES(freeglut PROPERTIES VERSION 3.9.0 SOVERSION 3 OUTPUT_NAME ${LIBNAME})
+    SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME ${LIBNAME})
     IF(ANDROID)
         # Not in CMake toolchain file, because the toolchain
         # file is called several times and generally doesn't
@@ -405,12 +413,18 @@ ELSE()
 ENDIF()
 # Client applications need to define FreeGLUT GLES version to
 # bootstrap headers inclusion in freeglut_std.h:
+SET(PC_LIBNAME "glut")
+SET(PC_FILENAME "freeglut.pc")
 IF(FREEGLUT_GLES2)
   SET(PC_CFLAGS "-DFREEGLUT_GLES2")
+  SET(PC_LIBNAME "freeglut-gles2")
+  SET(PC_FILENAME "freeglut-gles2.pc")
 ELSEIF(FREEGLUT_GLES1)
   SET(PC_CFLAGS "-DFREEGLUT_GLES1")
+  SET(PC_LIBNAME "freeglut-gles1")
+  SET(PC_FILENAME "freeglut-gles1.pc")
 ENDIF()
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/freeglut.pc.in ${CMAKE_BINARY_DIR}/freeglut.pc @ONLY)
-INSTALL(FILES ${CMAKE_BINARY_DIR}/freeglut.pc DESTINATION share/pkgconfig)
+INSTALL(FILES ${CMAKE_BINARY_DIR}/freeglut.pc DESTINATION share/pkgconfig/ RENAME ${PC_FILENAME})
 # TODO: change the library and .pc name when building for GLES,
 # e.g. -lglut-GLES2

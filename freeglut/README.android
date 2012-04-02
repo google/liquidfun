@@ -22,7 +22,7 @@ Create a module compatible with the NDK build-system
   cd cross-android-module/
   cmake \
     -D CMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake \
-    -D CMAKE_INSTALL_PREFIX=/freeglut \
+    -D CMAKE_INSTALL_PREFIX=/freeglut-gles2 \
     -D FREEGLUT_GLES2=ON \
     -D FREEGLUT_BUILD_DEMOS=NO \
     ..
@@ -31,17 +31,17 @@ Create a module compatible with the NDK build-system
 
 - Copy Android.mk in the new 'freeglut/' directory :
 
-  cp android/Android.mk freeglut/
+  cp ../android/gles2/Android.mk freeglut-gles2/
 
 - Reference this module in your jni/Android.mk:
 
-  LOCAL_STATIC_LIBRARIES := ... freeglut
+  LOCAL_STATIC_LIBRARIES := ... freeglut-gles2
   ...
-  $(call import-module,freeglut)
+  $(call import-module,freeglut-gles2)
 
 - You now can point your NDK_MODULE_PATH to this module!
 
-  ndk-build NDK_MODULE_PATH=/usr/src/freeglut-3.0.0/freeglut/
+  ndk-build NDK_MODULE_PATH=/usr/src/freeglut-3.0.0/cross-android-module/freeglut-gles2/
 
 
 Compile FreeGLUT for a traditional cross-compiler environment
