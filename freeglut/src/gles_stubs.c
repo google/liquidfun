@@ -15,11 +15,12 @@ void fgUpdateMenuHighlight ( SFG_Menu *menu ) {
 GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
                               int mouse_x, int mouse_y )  {
   fprintf(stderr, "fgCheckActiveMenu: STUB\n");
+  return GL_FALSE;
 }
 
 int  glutCreateMenu( void (* callback)( int menu ) ) {}
 void glutDestroyMenu( int menu ) {}
-int  glutGetMenu( void ) {}
+int  glutGetMenu( void ) { return 0; }
 void glutSetMenu( int menu ) {}
 void glutAddMenuEntry( const char* label, int value ) {}
 void glutAddSubMenu( const char* label, int subMenu ) {}
@@ -30,16 +31,16 @@ void glutAttachMenu( int button ) {}
 void glutDetachMenu( int button ) {}
 
 void glutBitmapCharacter( void* font, int character ) {}
-int  glutBitmapWidth( void* font, int character ) {}
+int  glutBitmapWidth( void* font, int character ) { return 0; }
 void glutStrokeCharacter( void* font, int character ) {}
-int  glutStrokeWidth( void* font, int character ) {}
-int  glutBitmapLength( void* font, const unsigned char* string ) {}
-int  glutStrokeLength( void* font, const unsigned char* string ) {}
+int  glutStrokeWidth( void* font, int character ) { return 0; }
+int  glutBitmapLength( void* font, const unsigned char* string ) { return 0; }
+int  glutStrokeLength( void* font, const unsigned char* string ) { return 0; }
 
 void *glutGetMenuData( void ) {}
 void  glutSetMenuData(void* data) {}
 
-int     glutBitmapHeight( void* font ) {}
-GLfloat glutStrokeHeight( void* font ) {}
+int     glutBitmapHeight( void* font ) { return 0; }
+GLfloat glutStrokeHeight( void* font ) { return 0; }
 void    glutBitmapString( void* font, const unsigned char *string ) {}
 void    glutStrokeString( void* font, const unsigned char *string ) {}
