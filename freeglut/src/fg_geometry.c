@@ -796,8 +796,13 @@ static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GL
 
     for (i=1; i<size; i++)
     {
+#ifdef __cplusplus
         (*sint)[i] = sinf(angle*i);
         (*cost)[i] = cosf(angle*i);
+#else
+        (*sint)[i] = (float)sin((double)(angle*i));
+        (*cost)[i] = (float)cos((double)(angle*i));
+#endif  /* __cplusplus */
     }
 
     
@@ -1192,8 +1197,13 @@ void FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint s
 
     /* Scaling factors for vertex normals */
 
+#ifdef __cplusplus
     const GLfloat cosn = ( (GLfloat)height / sqrtf( height * height + base * base ));
     const GLfloat sinn = ( (GLfloat)base   / sqrtf( height * height + base * base ));
+#else
+    const GLfloat cosn = ( (GLfloat)height / (GLfloat)sqrt( (double)(height * height + base * base) ));
+    const GLfloat sinn = ( (GLfloat)base   / (GLfloat)sqrt( (double)(height * height + base * base) ));
+#endif  /* __cplusplus */
 
     /* Pre-computed circle */
 
@@ -1262,8 +1272,13 @@ void FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint st
 
     /* Scaling factors for vertex normals */
 
+#ifdef __cplusplus
     const GLfloat cosn = ( (GLfloat)height / sqrtf( height * height + base * base ));
     const GLfloat sinn = ( (GLfloat)base   / sqrtf( height * height + base * base ));
+#else
+    const GLfloat cosn = ( (GLfloat)height / (GLfloat)sqrt( (double)(height * height + base * base) ));
+    const GLfloat sinn = ( (GLfloat)base   / (GLfloat)sqrt( (double)(height * height + base * base) ));
+#endif  /* __cplusplus */
 
     /* Pre-computed circle */
 
@@ -1464,15 +1479,25 @@ void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint n
 
   for( j=0; j<nRings; j++ )
   {
+#ifdef __cplusplus
     cpsi = cosf( psi ) ;
     spsi = sinf( psi ) ;
+#else
+    cpsi = (float)cos( (double)psi ) ;
+    spsi = (float)sin( (double)psi ) ;
+#endif  /* __cplusplus */
     phi = 0.0f;
 
     for( i=0; i<nSides; i++ )
     {
       int offset = 3 * ( j * nSides + i ) ;
+#ifdef __cplusplus
       cphi = cosf( phi ) ;
       sphi = sinf( phi ) ;
+#else
+      cphi = (float)cos( (double)phi ) ;
+      sphi = (float)sin( (double)phi ) ;
+#endif  /* __cplusplus */
       *(vertex + offset + 0) = cpsi * ( oradius + cphi * iradius ) ;
       *(vertex + offset + 1) = spsi * ( oradius + cphi * iradius ) ;
       *(vertex + offset + 2) =                    sphi * iradius  ;
@@ -1550,15 +1575,25 @@ void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint 
 
   for( j=0; j<nRings; j++ )
   {
+#ifdef __cplusplus
     cpsi = cosf( psi ) ;
     spsi = sinf( psi ) ;
+#else
+    cpsi = (float)cos( (double)psi ) ;
+    spsi = (float)sin( (double)psi ) ;
+#endif  /* __cplusplus */
     phi = 0.0f;
 
     for( i=0; i<nSides; i++ )
     {
       int offset = 3 * ( j * nSides + i ) ;
+#ifdef __cplusplus
       cphi = cosf( phi ) ;
       sphi = sinf( phi ) ;
+#else
+      cphi = (float)cos( (double)phi ) ;
+      sphi = (float)sin( (double)phi ) ;
+#endif  /* __cplusplus */
       *(vertex + offset + 0) = cpsi * ( oradius + cphi * iradius ) ;
       *(vertex + offset + 1) = spsi * ( oradius + cphi * iradius ) ;
       *(vertex + offset + 2) =                    sphi * iradius  ;
