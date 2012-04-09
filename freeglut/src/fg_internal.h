@@ -42,7 +42,7 @@
     || ( defined(__CYGWIN__) && defined(X_DISPLAY_MISSING) )
 #   define  TARGET_HOST_MS_WINDOWS 1
 
-#elif defined (ANDROID)
+#elif defined (__ANDROID__)
 #   define  TARGET_HOST_ANDROID  1
 
 #elif defined(__posix__) || defined(__unix__) || defined(__linux__) || defined(__sun)
