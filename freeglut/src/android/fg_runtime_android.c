@@ -23,7 +23,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* Parts taken from Android NDK's 'native-activity' sample : */
+/* Parts taken from Android NDK's 'native-activity' sample: */
 /*
  * Copyright (C) 2010 The Android Open Source Project
  * 

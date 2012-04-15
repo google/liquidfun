@@ -40,14 +40,14 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
                            GLboolean sizeUse, int w, int h,
                            GLboolean gameMode, GLboolean isSubWindow )
 {
-  printf("fgPlatformOpenWindow %p ID=%d\n", (void*)window, window->ID);
+  // printf("fgPlatformOpenWindow %p ID=%d\n", (void*)window, window->ID);
 
   /* TODO: only one full-screen window possible? */
   static int nb_windows = 0;
   if (nb_windows == 0) {
     nb_windows++;
     fgDisplay.pDisplay.single_window = window;
-    printf("=> %p ID=%d\n", (void*)fgDisplay.pDisplay.single_window, fgDisplay.pDisplay.single_window->ID);
+    // printf("=> %p ID=%d\n", (void*)fgDisplay.pDisplay.single_window, fgDisplay.pDisplay.single_window->ID);
   } else {
     return;
   }
@@ -76,8 +76,8 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
   EGLint vid;
   eglGetConfigAttrib(display, window->Window.pContext.egl.Config,
 		     EGL_NATIVE_VISUAL_ID, &vid);
-
   ANativeWindow_setBuffersGeometry(window->Window.Handle, 0, 0, vid);
+
   fghPlatformOpenWindowEGL(window);
 
   window->State.Visible = GL_TRUE;
