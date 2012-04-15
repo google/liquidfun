@@ -103,13 +103,14 @@ void fghPlatformOpenWindowEGL( SFG_Window* window )
   EGLSurface surface = eglCreateWindowSurface(display, config, window->Window.Handle, NULL);
   if (surface == EGL_NO_SURFACE)
     fgError("Cannot create EGL window surface, err=%x\n", eglGetError());
+  window->Window.pContext.egl.Surface = surface;
+
   fgPlatformSetWindow(window);
 
   //EGLint w, h;
   //eglQuerySurface(display, surface, EGL_WIDTH, &w);
   //eglQuerySurface(display, surface, EGL_HEIGHT, &h);
 
-  window->Window.pContext.egl.Surface = surface;
 }
 
 /*
@@ -131,10 +132,9 @@ void fghPlatformCloseWindowEGL( SFG_Window* window )
 
 void fgPlatformSetWindow ( SFG_Window *window )
 {
-  if (!eglMakeCurrent(
-		      fgDisplay.pDisplay.egl.Display,
-		      window->Window.pContext.egl.Surface,
-		      window->Window.pContext.egl.Surface,
-		      window->Window.Context))
+  if (eglMakeCurrent(fgDisplay.pDisplay.egl.Display,
+		     window->Window.pContext.egl.Surface,
+		     window->Window.pContext.egl.Surface,
+		     window->Window.Context) == EGL_FALSE)
     fgError("eglMakeCurrent: err=%x\n", eglGetError());
 }
