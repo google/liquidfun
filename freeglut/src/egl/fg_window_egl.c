@@ -92,6 +92,15 @@ EGLContext fghCreateNewContextEGL( SFG_Window* window ) {
   return context;
 }
 
+void fgPlatformSetWindow ( SFG_Window *window )
+{
+  if (eglMakeCurrent(fgDisplay.pDisplay.egl.Display,
+		     window->Window.pContext.egl.Surface,
+		     window->Window.pContext.egl.Surface,
+		     window->Window.Context) == EGL_FALSE)
+    fgError("eglMakeCurrent: err=%x\n", eglGetError());
+}
+
 /*
  * Really opens a window when handle is available
  */
@@ -128,13 +137,4 @@ void fghPlatformCloseWindowEGL( SFG_Window* window )
     eglDestroySurface(fgDisplay.pDisplay.egl.Display, window->Window.pContext.egl.Surface);
     window->Window.pContext.egl.Surface = EGL_NO_SURFACE;
   }
-}
-
-void fgPlatformSetWindow ( SFG_Window *window )
-{
-  if (eglMakeCurrent(fgDisplay.pDisplay.egl.Display,
-		     window->Window.pContext.egl.Surface,
-		     window->Window.pContext.egl.Surface,
-		     window->Window.Context) == EGL_FALSE)
-    fgError("eglMakeCurrent: err=%x\n", eglGetError());
 }
