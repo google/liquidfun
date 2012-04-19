@@ -18,11 +18,12 @@ Create a module compatible with the NDK build-system
 
   PATH=/usr/src/ndk-standalone-9/bin:$PATH
   cd /usr/src/freeglut-3.0.0/
-  mkdir cross-android-module/
-  cd cross-android-module/
+  mkdir cross-android-module-gles2/
+  cd cross-android-module-gles2/
   cmake \
     -D CMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake \
     -D CMAKE_INSTALL_PREFIX=/freeglut-gles2 \
+    -D CMAKE_BUILD_TYPE=Debug \
     -D FREEGLUT_GLES2=ON \
     -D FREEGLUT_BUILD_DEMOS=NO \
     ..
@@ -56,19 +57,21 @@ Compile FreeGLUT for a traditional cross-compiler environment
 
 - Compile FreeGLUT and install it in your Android cross-compiler path:
 
-
   PATH=/usr/src/ndk-standalone-9/bin:$PATH
   cd /usr/src/freeglut-3.0.0/
-  mkdir cross-android-toolchain/
-  cd cross-android-toolchain/
+  mkdir cross-android-toolchain-gles2/
+  cd cross-android-toolchain-gles2/
   cmake \
     -D CMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake \
     -D CMAKE_INSTALL_PREFIX=/usr/src/ndk-standalone-9/sysroot/usr \
+    -D CMAKE_BUILD_TYPE=Debug \
     -D FREEGLUT_GLES2=ON \
     -D FREEGLUT_BUILD_DEMOS=NO \
     ..
   make -j4
   make install
+  # Only static for now:
+  rm -f /usr/src/ndk-standalone-9/sysroot/usr/lib/libfreeglut-gles1.so*
 
 - Compile your own project.
 
@@ -91,6 +94,7 @@ If you use CMake, you may want to copy our Android toolchain
   cmake \
     -D CMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake \
     -D CMAKE_INSTALL_PREFIX=/somewhere \
+    -D CMAKE_BUILD_TYPE=Debug \
     -D MY_PROG_OPTION=something ... \
     ..
   make -j4
