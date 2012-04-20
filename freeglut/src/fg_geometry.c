@@ -1074,54 +1074,55 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
     }
     else
     {
-        GLushort  *topIdx, *bottomIdx, *stripIdx;
         /* First, generate vertex index arrays for drawing with glDrawElements
-         * Top and bottom are covered with a triangle fan
-         * Each other stack with triangle strip. Only need to generate on
-         * of those as we'll have to draw each stack separately, and can
-         * just use different offsets in glDrawElements.
+         * All stacks, including top and bottom are covered with a triangle
+         * strip.
          */
+        GLushort  *stripIdx;
+        /* Create index vector */
+        GLushort offset;
 
         /* Allocate buffers for indices, bail out if memory allocation fails */
-        topIdx = malloc((slices+2)*sizeof(GLushort));
-        bottomIdx = malloc((slices+2)*sizeof(GLushort));
-        stripIdx = malloc((slices+1)*2*(stacks-2)*sizeof(GLushort));
-        if (!(topIdx) || !(bottomIdx) || !(stripIdx))
+        stripIdx = malloc((slices+1)*2*(stacks)*sizeof(GLushort));
+        if (!(stripIdx))
         {
-            free(topIdx);
-            free(bottomIdx);
             free(stripIdx);
             fgError("Failed to allocate memory in fghGenerateSphere");
         }
 
-        /* TODO: Can do top and bottom as Triangle strip as well
-           (just need to repeat top/btoom vertex a lot). Then we can draw
-           the whole thing with just one index array and one for-looped call
-           to glDrawElements.. That'll make it easier to reuse code with other
-           Circular objects too
-           */
-        topIdx[0]=0;
-        topIdx[1] = 1;                              /* repeat first slice's idx for closing off shape */
-        for (j=slices, idx=2; j>0; j--, idx++)
-            topIdx[idx] = j;
-
-        bottomIdx[0]=nVert-1;                       /* zero based index, last element in array... */
-        for (j=0, idx=1; j<slices; j++, idx++)
-            bottomIdx[idx] = nVert-(slices+1)+j;
-        bottomIdx[idx] = nVert-(slices+1);          /* repeat first slice's idx for closing off shape */
-
-        /* Strip indices are relative to first index belonging to strip, NOT relative to first vertex/normal pair in array */
-        for (i=0,idx=0; i<stacks-2; i++, idx+=2)
+        /* top stack */
+        for (j=0, idx=0;  j<slices;  j++, idx+=2)
         {
-            GLushort offset = 1+i*slices;             /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            stripIdx[idx  ] = j+1;              /* 0 is top vertex, 1 is first for first stack */
+            stripIdx[idx+1] = 0;
+        }
+        stripIdx[idx  ] = 1;                    /* repeat first slice's idx for closing off shape */
+        stripIdx[idx+1] = 0;
+        idx+=2;
+
+        /* middle stacks: */
+        /* Strip indices are relative to first index belonging to strip, NOT relative to first vertex/normal pair in array */
+        for (i=0; i<stacks-2; i++, idx+=2)
+        {
+            offset = 1+i*slices;                    /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx+=2)
             {
                 stripIdx[idx  ] = offset+j+slices;
                 stripIdx[idx+1] = offset+j;
             }
             stripIdx[idx  ] = offset+slices;        /* repeat first slice's idx for closing off shape */
-            stripIdx[idx+1] = offset+0;
+            stripIdx[idx+1] = offset;
         }
+
+        /* bottom stack */
+        offset = 1+(stacks-2)*slices;               /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
+        for (j=0; j<slices; j++, idx+=2)
+        {
+            stripIdx[idx  ] = nVert-1;              /* zero based index, last element in array (bottom vertex)... */
+            stripIdx[idx+1] = offset+j;
+        }
+        stripIdx[idx  ] = nVert-1;                  /* repeat first slice's idx for closing off shape */
+        stripIdx[idx+1] = offset;
 
 
         /* draw */
@@ -1130,20 +1131,14 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
 
         glVertexPointer(3, GL_FLOAT, 0, vertices);
         glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw top*/
-        glDrawElements(GL_TRIANGLE_FAN,slices+2,GL_UNSIGNED_SHORT,topIdx);
         /*draw stacks*/
-        for (i=0; i<stacks-2; i++)
+        for (i=0; i<stacks; i++)
             glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(slices+1)*2);
-        /*draw bottom*/
-        glDrawElements(GL_TRIANGLE_FAN,slices+2,GL_UNSIGNED_SHORT,bottomIdx);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
 
         /* cleanup allocated memory */
-        free(topIdx);
-        free(bottomIdx);
         free(stripIdx);
     }
     
