@@ -68,7 +68,7 @@ static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals, GLsizei n
 
 /* Version for OpenGL (ES) >= 2.0 */
 static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei numFaces, GLsizei numEdgePerFace,
-				  GLint attribute_v_coord, GLint attribute_v_normal)
+                  GLint attribute_v_coord, GLint attribute_v_normal)
 {
     GLuint vbo_coords, vbo_normals;
     GLuint numVertices = numFaces * numEdgePerFace;
@@ -76,17 +76,17 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
     int i;
 
     if (numVertices > 0 && attribute_v_coord != -1) {
-	    fghGenBuffers(1, &vbo_coords);
-	    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
-	    fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(vertices[0]),
-			  vertices, FGH_STATIC_DRAW);
+        fghGenBuffers(1, &vbo_coords);
+        fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
+        fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(vertices[0]),
+              vertices, FGH_STATIC_DRAW);
     }
     
     if (numVertices > 0 && attribute_v_normal != -1) {
-	fghGenBuffers(1, &vbo_normals);
-	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
-	fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
-		      normals, FGH_STATIC_DRAW);
+    fghGenBuffers(1, &vbo_normals);
+    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
+    fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
+              normals, FGH_STATIC_DRAW);
     }
     
     if (vbo_coords) {
@@ -117,18 +117,18 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
 
     /* Draw per face (TODO: could use glMultiDrawArrays if available) */
     for (i=0; i<numFaces; i++)
-	glDrawArrays(GL_LINE_LOOP, i*numEdgePerFace, numEdgePerFace);
+    glDrawArrays(GL_LINE_LOOP, i*numEdgePerFace, numEdgePerFace);
     
     
     if (vbo_coords != 0)
-	fghDisableVertexAttribArray(attribute_v_coord);
+    fghDisableVertexAttribArray(attribute_v_coord);
     if (vbo_normals != 0)
-	fghDisableVertexAttribArray(attribute_v_normal);
+    fghDisableVertexAttribArray(attribute_v_normal);
     
     if (vbo_coords != 0)
-	fghDeleteBuffers(1, &vbo_coords);
+    fghDeleteBuffers(1, &vbo_coords);
     if (vbo_normals != 0)
-	fghDeleteBuffers(1, &vbo_normals);
+    fghDeleteBuffers(1, &vbo_normals);
 }
 
 static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei numFaces, GLsizei numEdgePerFace)
@@ -138,11 +138,11 @@ static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei num
 
     if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
         /* User requested a 2.0 draw */
-	fghDrawGeometryWire20(vertices, normals, numFaces, numEdgePerFace,
-			      attribute_v_coord, attribute_v_normal);
+    fghDrawGeometryWire20(vertices, normals, numFaces, numEdgePerFace,
+                  attribute_v_coord, attribute_v_normal);
 #ifndef GL_ES_VERSION_2_0
     else
-	fghDrawGeometryWire11(vertices, normals, numFaces, numEdgePerFace);
+    fghDrawGeometryWire11(vertices, normals, numFaces, numEdgePerFace);
 #endif
 }
 
@@ -159,7 +159,7 @@ static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei num
 /* Version for OpenGL (ES) 1.1 */
 #ifndef GL_ES_VERSION_2_0
 static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-				   GLsizei numVertices, GLsizei numVertIdxs)
+                   GLsizei numVertices, GLsizei numVertIdxs)
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -178,36 +178,36 @@ static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLubyte 
 
 /* Version for OpenGL (ES) >= 2.0 */
 static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-				   GLsizei numVertices, GLsizei numVertIdxs,
-				   GLint attribute_v_coord, GLint attribute_v_normal)
+                   GLsizei numVertices, GLsizei numVertIdxs,
+                   GLint attribute_v_coord, GLint attribute_v_normal)
 {
     GLuint vbo_coords, vbo_normals, ibo_elements;
     
     if (numVertices > 0 && attribute_v_coord != -1) {
-	fghGenBuffers(1, &vbo_coords);
-	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
-	fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(vertices[0]),
-		      vertices, FGH_STATIC_DRAW);
-	}
+    fghGenBuffers(1, &vbo_coords);
+    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
+    fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(vertices[0]),
+              vertices, FGH_STATIC_DRAW);
+    }
     
     if (numVertices > 0 && attribute_v_normal != -1) {
-	fghGenBuffers(1, &vbo_normals);
-	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
-	fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
-		      normals, FGH_STATIC_DRAW);
+    fghGenBuffers(1, &vbo_normals);
+    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
+    fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
+              normals, FGH_STATIC_DRAW);
     }
     
     if (vertIdxs != NULL) {
-	fghGenBuffers(1, &ibo_elements);
-	fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
-	fghBufferData(FGH_ELEMENT_ARRAY_BUFFER, numVertIdxs * sizeof(vertIdxs[0]),
-		      vertIdxs, FGH_STATIC_DRAW);
+    fghGenBuffers(1, &ibo_elements);
+    fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
+    fghBufferData(FGH_ELEMENT_ARRAY_BUFFER, numVertIdxs * sizeof(vertIdxs[0]),
+              vertIdxs, FGH_STATIC_DRAW);
     }
     
     if (vbo_coords) {
-	fghEnableVertexAttribArray(attribute_v_coord);
-	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
-	fghVertexAttribPointer(
+    fghEnableVertexAttribArray(attribute_v_coord);
+    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
+    fghVertexAttribPointer(
             attribute_v_coord,  // attribute
             3,                  // number of elements per vertex, here (x,y,z)
             GL_FLOAT,           // the type of each element
@@ -218,9 +218,9 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
     };
     
     if (vbo_normals) {
-	fghEnableVertexAttribArray(attribute_v_normal);
-	fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
-	fghVertexAttribPointer(
+    fghEnableVertexAttribArray(attribute_v_normal);
+    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
+    fghVertexAttribPointer(
             attribute_v_normal, // attribute
             3,                  // number of elements per vertex, here (x,y,z)
             GL_FLOAT,           // the type of each element
@@ -231,40 +231,40 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
     };
     
     if (vertIdxs == NULL) {
-	glDrawArrays(GL_TRIANGLES, 0, numVertices);
+    glDrawArrays(GL_TRIANGLES, 0, numVertices);
     } else {
-	fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
-	glDrawElements(GL_TRIANGLES, numVertIdxs, GL_UNSIGNED_BYTE, 0);
+    fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
+    glDrawElements(GL_TRIANGLES, numVertIdxs, GL_UNSIGNED_BYTE, 0);
     }
     
     if (vbo_coords != 0)
-	fghDisableVertexAttribArray(attribute_v_coord);
+    fghDisableVertexAttribArray(attribute_v_coord);
     if (vbo_normals != 0)
-	fghDisableVertexAttribArray(attribute_v_normal);
+    fghDisableVertexAttribArray(attribute_v_normal);
     
     if (vbo_coords != 0)
-	fghDeleteBuffers(1, &vbo_coords);
+    fghDeleteBuffers(1, &vbo_coords);
     if (vbo_normals != 0)
-	fghDeleteBuffers(1, &vbo_normals);
+    fghDeleteBuffers(1, &vbo_normals);
     if (ibo_elements != 0)
-	fghDeleteBuffers(1, &ibo_elements);
+    fghDeleteBuffers(1, &ibo_elements);
 }
 
 static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-				 GLsizei numVertices, GLsizei numVertIdxs)
+                 GLsizei numVertices, GLsizei numVertIdxs)
 {
     GLint attribute_v_coord = fgStructure.CurrentWindow->Window.attribute_v_coord;
     GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
 
     if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
         /* User requested a 2.0 draw */
-	fghDrawGeometrySolid20(vertices, normals, vertIdxs,
-			       numVertices, numVertIdxs,
-			       attribute_v_coord, attribute_v_normal);
+    fghDrawGeometrySolid20(vertices, normals, vertIdxs,
+                   numVertices, numVertIdxs,
+                   attribute_v_coord, attribute_v_normal);
 #ifndef GL_ES_VERSION_2_0
     else
-	fghDrawGeometrySolid11(vertices, normals, vertIdxs,
-			       numVertices, numVertIdxs);
+    fghDrawGeometrySolid11(vertices, normals, vertIdxs,
+                   numVertices, numVertIdxs);
 #endif
 }
 
@@ -951,10 +951,10 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
 
     if (useWireMode)
         fghDrawGeometryWire (vertices, cube_norms,
-			     CUBE_NUM_FACES, CUBE_NUM_EDGE_PER_FACE);
+                 CUBE_NUM_FACES, CUBE_NUM_EDGE_PER_FACE);
     else
         fghDrawGeometrySolid(vertices, cube_norms, cube_vertIdxs,
-			     CUBE_VERT_PER_OBJ, CUBE_VERT_PER_OBJ_TRI);
+                 CUBE_VERT_PER_OBJ, CUBE_VERT_PER_OBJ_TRI);
 
     if (dSize!=1.f)
         /* cleanup allocated memory */
@@ -1010,7 +1010,7 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
     GLfloat *vertices, *normals;
 
     if (slices * stacks > 65535)
-	fgWarning("fghSphere: too many slices or stacks requested, indices will wrap");
+    fgWarning("fghSphere: too many slices or stacks requested, indices will wrap");
 
     /* Generate vertices and normals */
     fghGenerateSphere((GLfloat)radius,slices,stacks,&vertices,&normals,&nVert);
