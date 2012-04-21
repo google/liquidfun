@@ -1,5 +1,5 @@
 /*
- * freeglut_display_android.c
+ * fg_window_egl.h
  *
  * Window management methods for EGL
  *

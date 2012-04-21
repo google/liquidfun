@@ -1,5 +1,5 @@
 /*
- * freeglut_spaceball_android.c
+ * fg_spaceball_android.c
  *
  * Spaceball support for Windows
  *

@@ -50,6 +50,7 @@ SET(FREEGLUT_SRCS
     src/fg_input_devices.c
     src/fg_joystick.c
     src/fg_main.c
+    src/fg_main.h
     src/fg_misc.c
     src/fg_overlay.c
     src/fg_spaceball.c
@@ -103,15 +104,6 @@ IF(WIN32)
 
 ELSEIF(ANDROID)
     LIST(APPEND FREEGLUT_SRCS
-        src/egl/fg_internal_egl.h
-        src/egl/fg_display_egl.c
-        src/egl/fg_ext_egl.c
-        src/egl/fg_init_egl.c
-        src/egl/fg_state_egl.c
-        src/egl/fg_structure_egl.c
-        src/egl/fg_structure_egl.h
-        src/egl/fg_window_egl.c
-        src/egl/fg_window_egl.h
         src/android/native_app_glue/android_native_app_glue.c
         src/android/native_app_glue/android_native_app_glue.h
         src/android/fg_internal_android.h
@@ -122,6 +114,7 @@ ELSEIF(ANDROID)
         src/android/fg_input_devices_android.c
         src/android/fg_joystick_android.c
         src/android/fg_main_android.c
+        src/android/fg_main_android.h
         src/android/fg_runtime_android.c
         src/android/fg_spaceball_android.c
         src/android/fg_state_android.c
@@ -146,17 +139,7 @@ ELSE()
         src/x11/fg_window_x11.c
         src/x11/fg_xinput_x11.c
     )
-    IF(FREEGLUT_GLES2 OR FREEGLUT_GLES1)
-        LIST(APPEND FREEGLUT_SRCS
-            src/egl/fg_internal_egl.h
-            src/egl/fg_display_egl.c
-            src/egl/fg_ext_egl.c
-            src/egl/fg_init_egl.c
-            src/egl/fg_state_egl.c
-            src/egl/fg_structure_egl.c
-            src/egl/fg_window_egl.c
-        )
-    ELSE()
+    IF(!(FREEGLUT_GLES2 OR FREEGLUT_GLES1))
         LIST(APPEND FREEGLUT_SRCS
             src/x11/fg_internal_x11_glx.h
             src/x11/fg_display_x11_glx.c
@@ -165,6 +148,21 @@ ELSE()
             src/x11/fg_window_x11_glx.h
         )
     ENDIF()
+ENDIF()
+IF(FREEGLUT_GLES2 OR FREEGLUT_GLES1)
+    LIST(APPEND FREEGLUT_SRCS
+        src/egl/fg_internal_egl.h
+        src/egl/fg_display_egl.c
+        src/egl/fg_ext_egl.c
+        src/egl/fg_init_egl.c
+        src/egl/fg_init_egl.h
+        src/egl/fg_state_egl.c
+        src/egl/fg_state_egl.h
+        src/egl/fg_structure_egl.c
+        src/egl/fg_structure_egl.h
+        src/egl/fg_window_egl.c
+        src/egl/fg_window_egl.h
+    )
 ENDIF()
 
 # For OpenGL ES (GLES):

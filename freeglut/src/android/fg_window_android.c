@@ -1,5 +1,5 @@
 /*
- * freeglut_window_android.c
+ * fg_window_android.c
  *
  * Window management methods for Android
  *
@@ -30,6 +30,7 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 #include "egl/fg_window_egl.h"
+#include "android/fg_main_android.h"
 
 /*
  * Opens a window. Requires a SFG_Window object created and attached
@@ -40,14 +41,11 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
                            GLboolean sizeUse, int w, int h,
                            GLboolean gameMode, GLboolean isSubWindow )
 {
-  // printf("fgPlatformOpenWindow %p ID=%d\n", (void*)window, window->ID);
-
   /* TODO: only one full-screen window possible? */
   static int nb_windows = 0;
   if (nb_windows == 0) {
     nb_windows++;
     fgDisplay.pDisplay.single_window = window;
-    // printf("=> %p ID=%d\n", (void*)fgDisplay.pDisplay.single_window, fgDisplay.pDisplay.single_window->ID);
   } else {
     return;
   }

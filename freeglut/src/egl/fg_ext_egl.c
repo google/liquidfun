@@ -28,5 +28,5 @@
 
 SFG_Proc fgPlatformGetProcAddress( const char *procName )
 {
-    return (SFG_Proc)eglGetProcAddress( ( const GLubyte * )procName );
+    return (SFG_Proc)eglGetProcAddress(procName);
 }

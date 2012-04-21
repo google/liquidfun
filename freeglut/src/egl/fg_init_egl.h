@@ -1,11 +1,8 @@
 /*
- * fg_joystick_android.c
+ * fg_init_egl.h
  *
- * Joystick handling code
+ * Various freeglut initialization functions.
  *
- * Copyright (c) 1999-2000 Pawel W. Olszta. All Rights Reserved.
- * Written by Steve Baker, <sjbaker1@airmail.net>
- * Copied for Platform code by Evan Felix <karcaw at gmail.com>
  * Copyright (C) 2012  Sylvain Beucler
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,25 +23,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/freeglut.h>
-#include "fg_internal.h"
+#ifndef __FG_INIT_EGL_H__
+#define __FG_INIT_EGL_H__
 
-void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
-{
-  fprintf(stderr, "fgPlatformJoystickRawRead: STUB\n");
-}
+extern void fghPlatformInitializeEGL();
+extern void fghPlatformCloseDisplayEGL();
+extern void fgPlatformDestroyContext();
 
-void fgPlatformJoystickOpen( SFG_Joystick* joy )
-{
-  fprintf(stderr, "fgPlatformJoystickOpen: STUB\n");
-}
-
-void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
-{
-  fprintf(stderr, "fgJoystick: STUB\n");
-}
-
-void fgPlatformJoystickClose ( int ident )
-{
-  fprintf(stderr, "fgPlatformJoystickClose: STUB\n");
-}
+#endif

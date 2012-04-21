@@ -1,5 +1,5 @@
 /*
- * freeglut_main_android.c
+ * fg_main_android.c
  *
  * The Android-specific windows message processing methods.
  *
@@ -28,6 +28,7 @@
 
 #include <GL/freeglut.h>
 #include "fg_internal.h"
+#include "fg_main.h"
 
 #include <android/log.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))
@@ -217,13 +218,13 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
     LOGI("motion %.01f,%.01f action=%d", x, y, AMotionEvent_getAction(event));
     
     /* Virtual arrows PAD */
-    // Don't interfere with existing mouse move event
+    /* Don't interfere with existing mouse move event */
     if (!touchscreen.in_mmotion) {
       struct vpad_state prev_vpad = touchscreen.vpad;
       touchscreen.vpad.left = touchscreen.vpad.right
 	= touchscreen.vpad.up = touchscreen.vpad.down = false;
 
-      int32_t width = ANativeWindow_getWidth(window->Window.Handle);
+      /* int32_t width = ANativeWindow_getWidth(window->Window.Handle); */
       int32_t height = ANativeWindow_getHeight(window->Window.Handle);
       if (action == AMOTION_EVENT_ACTION_DOWN || action == AMOTION_EVENT_ACTION_MOVE) {
 	if ((x > 0 && x < 100) && (y > (height - 100) && y < height))
@@ -273,7 +274,7 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
     if (!touchscreen.vpad.on) {
       window->State.MouseX = x;
       window->State.MouseY = y;
-      LOGI("Changed mouse position: %d,%d", x, y);
+      LOGI("Changed mouse position: %f,%f", x, y);
       if (action == AMOTION_EVENT_ACTION_DOWN && FETCH_WCB(*window, Mouse)) {
 	touchscreen.in_mmotion = true;
 	INVOKE_WCB(*window, Mouse, (GLUT_LEFT_BUTTON, GLUT_DOWN, x, y));

@@ -18,7 +18,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
   return GL_FALSE;
 }
 
-int  glutCreateMenu( void (* callback)( int menu ) ) {}
+int  glutCreateMenu( void (* callback)( int menu ) ) { return 0; }
 void glutDestroyMenu( int menu ) {}
 int  glutGetMenu( void ) { return 0; }
 void glutSetMenu( int menu ) {}
@@ -37,7 +37,7 @@ int  glutStrokeWidth( void* font, int character ) { return 0; }
 int  glutBitmapLength( void* font, const unsigned char* string ) { return 0; }
 int  glutStrokeLength( void* font, const unsigned char* string ) { return 0; }
 
-void *glutGetMenuData( void ) {}
+void *glutGetMenuData( void ) { return NULL; }
 void  glutSetMenuData(void* data) {}
 
 int     glutBitmapHeight( void* font ) { return 0; }

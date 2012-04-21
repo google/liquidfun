@@ -1,5 +1,5 @@
 /*
- * freeglut_input_devices_android.c
+ * fg_input_devices_android.c
  *
  * Handles miscellaneous input devices via direct serial-port access.
  *

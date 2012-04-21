@@ -342,6 +342,8 @@ void app_dummy();
  */
 extern void android_main(struct android_app* app);
 
+/* static  */void android_app_write_cmd(struct android_app* android_app, int8_t cmd);
+
 #ifdef __cplusplus
 }
 #endif

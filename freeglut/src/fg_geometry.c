@@ -93,12 +93,12 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
         fghEnableVertexAttribArray(attribute_v_coord);
         fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
         fghVertexAttribPointer(
-            attribute_v_coord,  // attribute
-            3,                  // number of elements per vertex, here (x,y,z)
-            GL_FLOAT,           // the type of each element
-            GL_FALSE,           // take our values as-is
-            0,                  // no extra data between each position
-            0                   // offset of first element
+            attribute_v_coord,  /* attribute */
+            3,                  /* number of elements per vertex, here (x,y,z) */
+            GL_FLOAT,           /* the type of each element */
+            GL_FALSE,           /* take our values as-is */
+            0,                  /* no extra data between each position */
+            0                   /* offset of first element */
         );
     }
 
@@ -106,12 +106,12 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
         fghEnableVertexAttribArray(attribute_v_normal);
         fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
         fghVertexAttribPointer(
-            attribute_v_normal, // attribute
-            3,                  // number of elements per vertex, here (x,y,z)
-            GL_FLOAT,           // the type of each element
-            GL_FALSE,           // take our values as-is
-            0,                  // no extra data between each position
-            0                   // offset of first element
+            attribute_v_normal, /* attribute */
+            3,                  /* number of elements per vertex, here (x,y,z) */
+            GL_FLOAT,           /* the type of each element */
+            GL_FALSE,           /* take our values as-is */
+            0,                  /* no extra data between each position */
+            0                   /* offset of first element */
         );
     }
 
@@ -208,12 +208,12 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
         fghEnableVertexAttribArray(attribute_v_coord);
         fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
         fghVertexAttribPointer(
-            attribute_v_coord,  // attribute
-            3,                  // number of elements per vertex, here (x,y,z)
-            GL_FLOAT,           // the type of each element
-            GL_FALSE,           // take our values as-is
-            0,                  // no extra data between each position
-            0                   // offset of first element
+            attribute_v_coord,  /* attribute */
+            3,                  /* number of elements per vertex, here (x,y,z) */
+            GL_FLOAT,           /* the type of each element */
+            GL_FALSE,           /* take our values as-is */
+            0,                  /* no extra data between each position */
+            0                   /* offset of first element */
         );
     };
     
@@ -221,12 +221,12 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
         fghEnableVertexAttribArray(attribute_v_normal);
         fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
         fghVertexAttribPointer(
-            attribute_v_normal, // attribute
-            3,                  // number of elements per vertex, here (x,y,z)
-            GL_FLOAT,           // the type of each element
-            GL_FALSE,           // take our values as-is
-            0,                  // no extra data between each position
-            0                   // offset of first element
+            attribute_v_normal, /* attribute */
+            3,                  /* number of elements per vertex, here (x,y,z) */
+            GL_FLOAT,           /* the type of each element */
+            GL_FALSE,           /* take our values as-is */
+            0,                  /* no extra data between each position */
+            0                   /* offset of first element */
         );
     };
     
@@ -304,7 +304,7 @@ static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, 
     for (i=0; i<numFaces; i++)
     {
         int normIdx         = i*3;
-        int faceIdxVertIdx  = i*numEdgePerFace; // index to first element of "row" in vertex indices
+        int faceIdxVertIdx  = i*numEdgePerFace; /* index to first element of "row" in vertex indices */
         for (j=0; j<numEdgePerFace; j++)
         {
             int outIdx  = i*numEdgePerFace*3+j*3;
@@ -402,7 +402,7 @@ static GLubyte cube_vi[CUBE_VERT_PER_OBJ] =
     7,4,3,2,
     4,7,6,5
 };
-DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(cube,Cube,CUBE);
+DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(cube,Cube,CUBE)
 
 /* -- Dodecahedron -- */
 /* Magic Numbers:  It is possible to create a dodecahedron by attaching two
@@ -478,7 +478,7 @@ static GLubyte dodecahedron_vi[DODECAHEDRON_VERT_PER_OBJ] =
     18,  1,  0,  5,  9, 
     19, 14, 13, 10, 12
 };
-DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(dodecahedron,Dodecahedron,DODECAHEDRON);
+DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(dodecahedron,Dodecahedron,DODECAHEDRON)
 
 
 /* -- Icosahedron -- */
@@ -557,7 +557,7 @@ static GLubyte icosahedron_vi[ICOSAHEDRON_VERT_PER_OBJ] =
     11,  6,  7 ,
     11, 10,  6 
 };
-DECLARE_SHAPE_CACHE(icosahedron,Icosahedron,ICOSAHEDRON);
+DECLARE_SHAPE_CACHE(icosahedron,Icosahedron,ICOSAHEDRON)
 
 /* -- Octahedron -- */
 #define OCTAHEDRON_NUM_VERT           6
@@ -604,7 +604,7 @@ static GLubyte octahedron_vi[OCTAHEDRON_VERT_PER_OBJ] =
     3, 4, 2,
     3, 5, 4
 };
-DECLARE_SHAPE_CACHE(octahedron,Octahedron,OCTAHEDRON);
+DECLARE_SHAPE_CACHE(octahedron,Octahedron,OCTAHEDRON)
 
 /* -- RhombicDodecahedron -- */
 #define RHOMBICDODECAHEDRON_NUM_VERT            14
@@ -665,7 +665,7 @@ static GLubyte rhombicdodecahedron_vi[RHOMBICDODECAHEDRON_VERT_PER_OBJ] =
     7, 11, 13, 12,
     8, 12, 13,  9
 };
-DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON);
+DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON)
 
 /* -- Tetrahedron -- */
 /* Magic Numbers:  r0 = ( 1, 0, 0 )
@@ -709,7 +709,7 @@ static GLubyte tetrahedron_vi[TETRAHEDRON_VERT_PER_OBJ] =
     0, 3, 1,
     0, 1, 2
 };
-DECLARE_SHAPE_CACHE(tetrahedron,Tetrahedron,TETRAHEDRON);
+DECLARE_SHAPE_CACHE(tetrahedron,Tetrahedron,TETRAHEDRON)
 
 /* -- Sierpinski Sponge -- */
 static unsigned int ipow (int x, unsigned int y)
@@ -757,6 +757,7 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, double offset[3], GLflo
     }
 }
 
+#ifndef GL_ES_VERSION_2_0
 /* -- Now the various shapes involving circles -- */
 /*
  * Compute lookup table of cos and sin values forming a circle
@@ -893,7 +894,7 @@ static void fghGenerateSphere(GLfloat radius, GLint slices, GLint stacks, GLfloa
     free(sint2);
     free(cost2);
 }
-
+#endif
 
 /* -- INTERNAL DRAWING functions --------------------------------------- */
 #define _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,vertIdxs)\
@@ -961,11 +962,11 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
         free(vertices);
 }
 
-DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(dodecahedron,Dodecahedron,DODECAHEDRON);
-DECLARE_INTERNAL_DRAW(icosahedron,Icosahedron,ICOSAHEDRON);
-DECLARE_INTERNAL_DRAW(octahedron,Octahedron,OCTAHEDRON);
-DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON);
-DECLARE_INTERNAL_DRAW(tetrahedron,Tetrahedron,TETRAHEDRON);
+DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(dodecahedron,Dodecahedron,DODECAHEDRON)
+DECLARE_INTERNAL_DRAW(icosahedron,Icosahedron,ICOSAHEDRON)
+DECLARE_INTERNAL_DRAW(octahedron,Octahedron,OCTAHEDRON)
+DECLARE_INTERNAL_DRAW_DECOMPOSED_TO_TRIANGLE(rhombicdodecahedron,RhombicDodecahedron,RHOMBICDODECAHEDRON)
+DECLARE_INTERNAL_DRAW(tetrahedron,Tetrahedron,TETRAHEDRON)
 
 static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale, GLboolean useWireMode )
 {
@@ -1653,10 +1654,10 @@ void FGAPIENTRY glutSolidCube( double dSize )
     fghCube( (GLfloat)dSize, FALSE );
 }
 
-DECLARE_SHAPE_INTERFACE(Dodecahedron);
-DECLARE_SHAPE_INTERFACE(Icosahedron);
-DECLARE_SHAPE_INTERFACE(Octahedron);
-DECLARE_SHAPE_INTERFACE(RhombicDodecahedron);
+DECLARE_SHAPE_INTERFACE(Dodecahedron)
+DECLARE_SHAPE_INTERFACE(Icosahedron)
+DECLARE_SHAPE_INTERFACE(Octahedron)
+DECLARE_SHAPE_INTERFACE(RhombicDodecahedron)
 
 void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, double offset[3], double scale )
 {
@@ -1669,7 +1670,7 @@ void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, double offset[3], do
     fghSierpinskiSponge ( num_levels, offset, (GLfloat)scale, FALSE );
 }
 
-DECLARE_SHAPE_INTERFACE(Tetrahedron);
+DECLARE_SHAPE_INTERFACE(Tetrahedron)
 
 
 /*** END OF FILE ***/

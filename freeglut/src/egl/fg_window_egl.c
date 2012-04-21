@@ -116,9 +116,9 @@ void fghPlatformOpenWindowEGL( SFG_Window* window )
 
   fgPlatformSetWindow(window);
 
-  //EGLint w, h;
-  //eglQuerySurface(display, surface, EGL_WIDTH, &w);
-  //eglQuerySurface(display, surface, EGL_HEIGHT, &h);
+  /* EGLint w, h; */
+  /* eglQuerySurface(display, surface, EGL_WIDTH, &w); */
+  /* eglQuerySurface(display, surface, EGL_HEIGHT, &h); */
 
 }
 

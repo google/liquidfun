@@ -1,5 +1,5 @@
 /*
- * freeglut_init_egl.c
+ * fg_init_egl.c
  *
  * Various freeglut initialization functions.
  *
@@ -48,10 +48,10 @@ void fghPlatformInitializeEGL()
   eglBindAPI(EGL_OPENGL_ES_API);
 # endif
 
-  // fgDisplay.ScreenWidth = ...;
-  // fgDisplay.ScreenHeight = ...;
-  // fgDisplay.ScreenWidthMM = ...;
-  // fgDisplay.ScreenHeightMM = ...;
+  /* fgDisplay.ScreenWidth = ...; */
+  /* fgDisplay.ScreenHeight = ...; */
+  /* fgDisplay.ScreenWidthMM = ...; */
+  /* fgDisplay.ScreenHeightMM = ...; */
 }
 
 void fghPlatformCloseDisplayEGL()

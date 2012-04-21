@@ -1,5 +1,5 @@
 /*
- * freeglut_init_android.c
+ * fg_init_android.c
  *
  * Various freeglut initialization functions.
  *
@@ -25,6 +25,7 @@
 
 #include <GL/freeglut.h>
 #include "fg_internal.h"
+#include "egl/fg_init_egl.h"
 
 void fgPlatformInitialize()
 {

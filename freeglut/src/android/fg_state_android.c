@@ -1,5 +1,5 @@
 /*
- * freeglut_state_android.c
+ * fg_state_android.c
  *
  * Android-specific freeglut state query methods.
  *
@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <android/native_window.h>
 #include "fg_internal.h"
+#include "egl/fg_state_egl.h"
 
 int fgPlatformGlutDeviceGet ( GLenum eWhat )
 {

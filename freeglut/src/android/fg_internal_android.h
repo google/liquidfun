@@ -1,5 +1,5 @@
 /*
- * freeglut_internal_android.h
+ * fg_internal_android.h
  *
  * The freeglut library private include file.
  *
@@ -104,6 +104,7 @@ struct tagSFG_PlatformJoystick
 typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
 struct tagSFG_PlatformWindowState
 {
+    int unused;
 };
 
 #endif  /* FREEGLUT_INTERNAL_ANDROID_H */

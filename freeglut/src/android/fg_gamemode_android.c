@@ -1,5 +1,5 @@
 /*
- * freeglut_gamemode_x11.c
+ * fg_gamemode_x11.c
  *
  * The game mode handling code.
  *

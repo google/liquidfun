@@ -1,11 +1,8 @@
 /*
- * fg_joystick_android.c
+ * fg_main.h
  *
- * Joystick handling code
+ * The windows message processing methods.
  *
- * Copyright (c) 1999-2000 Pawel W. Olszta. All Rights Reserved.
- * Written by Steve Baker, <sjbaker1@airmail.net>
- * Copied for Platform code by Evan Felix <karcaw at gmail.com>
  * Copyright (C) 2012  Sylvain Beucler
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -26,25 +23,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __FG_MAIN_H__
+#define __FG_MAIN_H__
+
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 
-void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
-{
-  fprintf(stderr, "fgPlatformJoystickRawRead: STUB\n");
-}
+extern void fghRedrawWindow(SFG_Window *window);
 
-void fgPlatformJoystickOpen( SFG_Joystick* joy )
-{
-  fprintf(stderr, "fgPlatformJoystickOpen: STUB\n");
-}
-
-void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
-{
-  fprintf(stderr, "fgJoystick: STUB\n");
-}
-
-void fgPlatformJoystickClose ( int ident )
-{
-  fprintf(stderr, "fgPlatformJoystickClose: STUB\n");
-}
+#endif

@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.6)
 project(test-shapes-gles1)
 
+IF(CMAKE_COMPILER_IS_GNUCC)
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+  IF(!ANDROID)
+    # not setting -ansi as EGL/KHR headers doesn't support it
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ansi")
+  ENDIF()
+ENDIF(CMAKE_COMPILER_IS_GNUCC)
+
 # FreeGLUT
 include(FindPkgConfig)
 pkg_check_modules(freeglut REQUIRED freeglut-gles1>=3.0.0)

@@ -1,5 +1,5 @@
 /*
- * freeglut_runtime_android.c
+ * fg_runtime_android.c
  *
  * Android runtime
  *
@@ -78,7 +78,6 @@ static void onNativeWindowResized(ANativeActivity* activity, ANativeWindow* wind
 static void onNativeWindowRedrawNeeded(ANativeActivity* activity, ANativeWindow* window) {
   LOGI("onNativeWindowRedrawNeeded: %p\n", (void*)activity);
   struct android_app* app = (struct android_app*)activity->instance;
-  //if (fgDisplay.pDisplay.single_window->Window.pContext.eglSurface != EGL_NO_SURFACE)
   android_app_write_cmd(app, APP_CMD_WINDOW_RESIZED);
 }
 
@@ -138,7 +137,7 @@ static void extract_assets(struct android_app* app) {
 void android_main(struct android_app* app) {
   LOGI("android_main");
 
-  // Register window resize callback
+  /* Register window resize callback */
   app->activity->callbacks->onNativeWindowResized = onNativeWindowResized;
   app->activity->callbacks->onContentRectChanged = onContentRectChanged;
   app->activity->callbacks->onNativeWindowRedrawNeeded = onNativeWindowRedrawNeeded;

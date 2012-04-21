@@ -92,10 +92,8 @@ struct tagSFG_PlatformDisplay
  * Make "freeglut" window handle and context types so that we don't need so
  * much conditionally-compiled code later in the library.
  */
+#ifndef EGL_VERSION_1_0
 typedef Window     SFG_WindowHandleType ;
-#ifdef EGL_VERSION_1_0
-typedef EGLContext SFG_WindowContextType ;
-#else
 typedef GLXContext SFG_WindowContextType ;
 #endif
 typedef struct tagSFG_PlatformContext SFG_PlatformContext;

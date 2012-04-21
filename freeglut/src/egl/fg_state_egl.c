@@ -25,6 +25,7 @@
 
 #include <GL/freeglut.h>
 #include "fg_internal.h"
+#include "egl/fg_window_egl.h"
 
 /*
  * Queries the GL context about some attributes
@@ -122,7 +123,6 @@ int* fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
       attribute_name = EGL_SAMPLES;
 
       EGLConfig* configArray;
-      EGLConfig* config;
       EGLint configArraySize = 0;
  
       /* Get number of available configs */
@@ -139,21 +139,19 @@ int* fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
       
       /* We get results in ascending order */
       {
-	int * temp_array;
-	int previous_value;
+	int previous_value = 0;
 	int i;
 	
 	array = malloc(sizeof(int) * configArraySize);
-	previous_value = 0;
 
 	for (i = 0; i < configArraySize; i++) {
-	  int value;
+	  int value = 0;
 	  eglGetConfigAttrib(fgDisplay.pDisplay.egl.Display,
 			     configArray[i], attribute_name, &value);
 	  if (value > previous_value)
 	    {
 	      previous_value = value;
-	      temp_array[*size] = value;
+	      array[*size] = value;
 	      (*size)++;
 	    }
 	}
