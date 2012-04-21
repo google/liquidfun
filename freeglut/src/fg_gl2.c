@@ -38,17 +38,19 @@ void FGAPIENTRY glutSetVertexAttribNormal(GLint attrib) {
 }
 
 void fgInitGL2() {
+#ifndef GL_ES_VERSION_2_0
     fgState.HasOpenGL20 = 0;
     // TODO: Mesa returns a valid stub function, rather than NULL,
     // when we request a non-existent function
 #define CHECK(func, a) if ((a) == NULL) { fgWarning("fgInitGL2: " func " is NULL"); return; }
-    CHECK("fghGenBuffers", fghGenBuffers = (FGH_PFNGLGENBUFFERSPROC) glutGetProcAddress ("glGenBuffers"));
-    CHECK("fghDeleteBuffers", fghDeleteBuffers = (FGH_PFNGLDELETEBUFFERSPROC) glutGetProcAddress ("glDeleteBuffers"));
-    CHECK("fghBindBuffer", fghBindBuffer = (FGH_PFNGLBINDBUFFERPROC) glutGetProcAddress ("glBindBuffer"));
-    CHECK("fghBufferData", fghBufferData = (FGH_PFNGLBUFFERDATAPROC) glutGetProcAddress ("glBufferData"));
-    CHECK("fghVertexAttribPointer", fghVertexAttribPointer = (FGH_PFNGLVERTEXATTRIBPOINTERPROC) glutGetProcAddress ("glVertexAttribPointer"));
-    CHECK("fghEnableVertexAttribArray", fghEnableVertexAttribArray = (FGH_PFNGLENABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glEnableVertexAttribArray"));
-    CHECK("fghDisableVertexAttribArray", fghDisableVertexAttribArray = (FGH_PFNGLDISABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glDisableVertexAttribArray"));
+    CHECK("fghGenBuffers", fghGenBuffers = (FGH_PFNGLGENBUFFERSPROC)glutGetProcAddress("glGenBuffers"));
+    CHECK("fghDeleteBuffers", fghDeleteBuffers = (FGH_PFNGLDELETEBUFFERSPROC)glutGetProcAddress("glDeleteBuffers"));
+    CHECK("fghBindBuffer", fghBindBuffer = (FGH_PFNGLBINDBUFFERPROC)glutGetProcAddress("glBindBuffer"));
+    CHECK("fghBufferData", fghBufferData = (FGH_PFNGLBUFFERDATAPROC)glutGetProcAddress("glBufferData"));
+    CHECK("fghVertexAttribPointer", fghVertexAttribPointer = (FGH_PFNGLVERTEXATTRIBPOINTERPROC)glutGetProcAddress("glVertexAttribPointer"));
+    CHECK("fghEnableVertexAttribArray", fghEnableVertexAttribArray = (FGH_PFNGLENABLEVERTEXATTRIBARRAYPROC)glutGetProcAddress("glEnableVertexAttribArray"));
+    CHECK("fghDisableVertexAttribArray", fghDisableVertexAttribArray = (FGH_PFNGLDISABLEVERTEXATTRIBARRAYPROC)glutGetProcAddress("glDisableVertexAttribArray"));
 #undef CHECK
+#endif
     fgState.HasOpenGL20 = 1;
 }

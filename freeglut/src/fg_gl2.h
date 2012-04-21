@@ -26,9 +26,31 @@
 #ifndef  FG_GL2_H
 #define  FG_GL2_H
 
-#ifndef APIENTRY
-#    define APIENTRY
-#endif
+#include <GL/freeglut.h>
+#include "fg_internal.h"
+
+#ifdef GL_ES_VERSION_2_0
+/* Use existing functions on GLES 2.0 */
+
+#define FGH_ARRAY_BUFFER GL_ARRAY_BUFFER
+#define FGH_STATIC_DRAW GL_STATIC_DRAW
+#define FGH_ELEMENT_ARRAY_BUFFER GL_ELEMENT_ARRAY_BUFFER
+
+#define fghGenBuffers glGenBuffers
+#define fghDeleteBuffers glDeleteBuffers
+#define fghBindBuffer glBindBuffer
+#define fghBufferData glBufferData
+#define fghEnableVertexAttribArray glEnableVertexAttribArray
+#define fghDisableVertexAttribArray glDisableVertexAttribArray
+#define fghVertexAttribPointer glVertexAttribPointer
+
+#else
+/* Load functions dynamically, they are not defined in e.g. win32's
+   OpenGL headers */
+
+#    ifndef APIENTRY
+#        define APIENTRY
+#    endif
 
 /* extension #defines, types and entries, avoiding a dependency on additional
    libraries like GLEW or the GL/glext.h header */
@@ -52,5 +74,7 @@ FGH_PFNGLBUFFERDATAPROC fghBufferData;
 FGH_PFNGLENABLEVERTEXATTRIBARRAYPROC fghEnableVertexAttribArray;
 FGH_PFNGLDISABLEVERTEXATTRIBARRAYPROC fghDisableVertexAttribArray;
 FGH_PFNGLVERTEXATTRIBPOINTERPROC fghVertexAttribPointer;
+
+#    endif
 
 #endif
