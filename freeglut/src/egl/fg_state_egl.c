@@ -33,7 +33,7 @@
 static int fgPlatformGetConfig( int attribute )
 {
   int returnValue = 0;
-  int result;  /*  Not checked  */
+  int result __fg_unused;  /*  Not checked  */
 
   if( fgStructure.CurrentWindow )
       result = eglGetConfigAttrib( fgDisplay.pDisplay.egl.Display,

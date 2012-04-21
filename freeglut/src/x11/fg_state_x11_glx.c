@@ -27,6 +27,7 @@
 
 #include <GL/freeglut.h>
 #include "fg_internal.h"
+#include "x11/fg_window_x11_glx.h"
 
 /*
  * Queries the GL context about some attributes
@@ -34,7 +35,7 @@
 int fgPlatformGetConfig( int attribute )
 {
   int returnValue = 0;
-  int result;  /*  Not checked  */
+  int result __fg_unused;  /*  Not checked  */
 
   if( fgStructure.CurrentWindow )
       result = glXGetFBConfigAttrib( fgDisplay.pDisplay.Display,
@@ -170,7 +171,7 @@ int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
       if (fbconfigArray != NULL)
         {
           int * temp_array;
-          int result;   /*  Returned by glXGetFBConfigAttrib. Not checked.  */
+          int result __fg_unused;   /*  Returned by glXGetFBConfigAttrib. Not checked.  */
           int previous_value;
           int i;
 

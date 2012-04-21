@@ -115,7 +115,7 @@ int fghChooseConfig(GLXFBConfig* fbconfig)
 
         if (fbconfigArray != NULL)
         {
-            int result;  /* Returned by glXGetFBConfigAttrib, not checked. */
+            int result __fg_unused;  /* Returned by glXGetFBConfigAttrib, not checked. */
 
 
             if( wantIndexedMode )

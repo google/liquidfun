@@ -145,6 +145,7 @@ ELSE()
             src/x11/fg_internal_x11_glx.h
             src/x11/fg_display_x11_glx.c
             src/x11/fg_state_x11_glx.c
+            src/x11/fg_state_x11_glx.h
             src/x11/fg_window_x11_glx.c
             src/x11/fg_window_x11_glx.h
         )
