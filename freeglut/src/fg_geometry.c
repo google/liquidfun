@@ -236,6 +236,11 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
         fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
         glDrawElements(GL_TRIANGLES, numVertIdxs, GL_UNSIGNED_BYTE, 0);
     }
+
+    /* Clean existing bindings before clean-up */
+    /* Android showed instability otherwise */
+    fghBindBuffer(FGH_ARRAY_BUFFER, 0);
+    fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, 0);
     
     if (vbo_coords != 0)
         fghDisableVertexAttribArray(attribute_v_coord);
