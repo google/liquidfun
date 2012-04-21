@@ -83,10 +83,10 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
     }
     
     if (numVertices > 0 && attribute_v_normal != -1) {
-    fghGenBuffers(1, &vbo_normals);
-    fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
-    fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
-                  normals, FGH_STATIC_DRAW);
+        fghGenBuffers(1, &vbo_normals);
+        fghBindBuffer(FGH_ARRAY_BUFFER, vbo_normals);
+        fghBufferData(FGH_ARRAY_BUFFER, numVertices * 3 * sizeof(normals[0]),
+                      normals, FGH_STATIC_DRAW);
     }
     
     if (vbo_coords) {
