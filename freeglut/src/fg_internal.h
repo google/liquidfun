@@ -166,7 +166,13 @@
     typedef unsigned long fg_time_t;
 #endif
 
-
+#ifndef __fg_unused
+# ifdef __GNUC__
+#  define __fg_unused __attribute__((unused))
+# else
+#  define __fg_unused
+# endif
+#endif
 
 /* Platform-specific includes */
 #if TARGET_HOST_POSIX_X11

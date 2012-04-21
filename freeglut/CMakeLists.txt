@@ -46,6 +46,7 @@ SET(FREEGLUT_SRCS
     src/fg_gl2.c
     src/fg_gl2.h
     src/fg_init.c
+    src/fg_init.h
     src/fg_internal.h
     src/fg_input_devices.c
     src/fg_joystick.c
@@ -139,7 +140,7 @@ ELSE()
         src/x11/fg_window_x11.c
         src/x11/fg_xinput_x11.c
     )
-    IF(!(FREEGLUT_GLES2 OR FREEGLUT_GLES1))
+    IF(NOT(FREEGLUT_GLES2 OR FREEGLUT_GLES1))
         LIST(APPEND FREEGLUT_SRCS
             src/x11/fg_internal_x11_glx.h
             src/x11/fg_display_x11_glx.c
@@ -194,7 +195,7 @@ IF(WIN32)
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCC)
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
   IF(!ANDROID)
     # not setting -ansi as EGL/KHR headers doesn't support it
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ansi")

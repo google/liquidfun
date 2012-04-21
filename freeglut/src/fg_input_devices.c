@@ -166,7 +166,6 @@ static void poll_dials ( int id )
     static int dial_state = DIAL_NEW;
     static int dial_which;
     static int dial_value;
-    static int dials[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
     if ( !dialbox_port ) return;
 
@@ -187,7 +186,6 @@ static void poll_dials ( int id )
             case DIAL_VALUE_LOW:
                 dial_value |= data;
                 if ( dial_value & 0x8000 ) dial_value -= 0x10000;
-                dials[dial_which] = dial_value;
                 send_dial_event ( dial_which + 1, dial_value * 360 / 256 );
                 dial_state = DIAL_WHICH_DEVICE;
                 break;

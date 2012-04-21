@@ -27,7 +27,10 @@
  */
 
 #include <GL/freeglut.h>
-#include "../fg_internal.h"
+#include "fg_internal.h"
+#ifdef EGL_VERSION_1_0
+#include "egl/fg_structure_egl.h"
+#endif
 
 extern SFG_Structure fgStructure;
 

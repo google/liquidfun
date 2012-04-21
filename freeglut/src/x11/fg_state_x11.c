@@ -26,7 +26,10 @@
  */
 
 #include <GL/freeglut.h>
-#include "../fg_internal.h"
+#include "fg_internal.h"
+#ifdef EGL_VERSION_1_0
+#include "egl/fg_state_egl.h"
+#endif
 
 int fgPlatformGlutDeviceGet ( GLenum eWhat )
 {

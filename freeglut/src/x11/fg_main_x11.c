@@ -40,6 +40,8 @@
 #    define VFPRINTF(s,f,a)
 #endif
 
+#include "fg_main.h"
+
 /*
  * Try to get the maximum value allowed for ints, falling back to the minimum
  * guaranteed by ISO C99 if there is no suitable header.
@@ -298,7 +300,7 @@ static const char* fghColormapStateToString( int state )
     }
 }
 
-static void fghPrintEvent( XEvent *event )
+__fg_unused static void fghPrintEvent( XEvent *event )
 {
     switch( event->type ) {
 

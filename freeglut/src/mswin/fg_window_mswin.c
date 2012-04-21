@@ -394,10 +394,12 @@ void fghComputeWindowRectFromClientArea_UseStyle( const DWORD windowStyle, RECT 
 
     /* If window has title bar, correct rect for it */
     if (windowStyle & WS_MAXIMIZEBOX) /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
+    {
         if (posIsOutside)
             clientRect->bottom += GetSystemMetrics( SM_CYCAPTION );
         else
             clientRect->top -= GetSystemMetrics( SM_CYCAPTION );
+    }
 
     /* get width of window's borders (frame), correct rect for it.
      * Note, borders can be of zero width if style does not specify borders
@@ -462,10 +464,12 @@ void fghComputeClientAreaFromWindowRect( const SFG_Window *window, RECT *windowR
 
     /* If window has title bar, correct rect for it */
     if (windowStyle & WS_MAXIMIZEBOX) /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
+    {
         if (wantPosOutside)
             windowRect->bottom -= GetSystemMetrics( SM_CYCAPTION );
         else
             windowRect->top    += GetSystemMetrics( SM_CYCAPTION );
+    }
 
     /* get width of window's borders (frame), correct rect for it.
      * Note, borders can be of zero width if style does not specify borders

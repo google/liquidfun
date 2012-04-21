@@ -56,9 +56,6 @@ typedef struct _serialport SERIALPORT;
 
 void serial_flush ( SERIALPORT *port );
 
-/* local variables */
-static SERIALPORT *dialbox_port=NULL;
-
 /*****************************************************************/
 
 /*

@@ -132,7 +132,6 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     XWMHints wmHints;
     XEvent eventReturnBuffer; /* return buffer required for a call */
     unsigned long mask;
-    int num_FBConfigs, i;
     unsigned int current_DisplayMode = fgState.DisplayMode ;
 
     /* Save the display mode if we are creating a menu window */

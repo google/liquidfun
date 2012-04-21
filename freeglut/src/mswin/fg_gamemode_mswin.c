@@ -137,7 +137,7 @@ GLboolean fgPlatformChangeDisplayMode( GLboolean haveToTest )
         /* magic happenings behind my back, its lib for devels at last ;) */
         
         /* append display mode to error to make things more informative */
-        sprintf(displayMode,"%s Problem with requested mode: %ix%i:%i@%i", fggmstr, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmBitsPerPel, devMode.dmDisplayFrequency);
+        sprintf(displayMode,"%s Problem with requested mode: %lux%lu:%lu@%lu", fggmstr, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmBitsPerPel, devMode.dmDisplayFrequency);
         fgWarning(displayMode);
     }
 
