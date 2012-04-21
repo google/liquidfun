@@ -71,7 +71,7 @@ Compile FreeGLUT for a traditional cross-compiler environment
   make -j4
   make install
   # Only static for now:
-  rm -f /usr/src/ndk-standalone-9/sysroot/usr/lib/libfreeglut-gles1.so*
+  rm -f /usr/src/ndk-standalone-9/sysroot/usr/lib/libfreeglut-gles?.so*
 
 - Compile your own project.
 
