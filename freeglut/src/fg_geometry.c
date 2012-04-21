@@ -70,7 +70,7 @@ static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals, GLsizei n
 static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei numFaces, GLsizei numEdgePerFace,
                                   GLint attribute_v_coord, GLint attribute_v_normal)
 {
-    GLuint vbo_coords, vbo_normals;
+    GLuint vbo_coords = 0, vbo_normals = 0;
     GLuint numVertices = numFaces * numEdgePerFace;
 
     int i;
@@ -159,7 +159,7 @@ static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei num
 /* Version for OpenGL (ES) 1.1 */
 #ifndef GL_ES_VERSION_2_0
 static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-                   GLsizei numVertices, GLsizei numVertIdxs)
+                                   GLsizei numVertices, GLsizei numVertIdxs)
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -178,10 +178,10 @@ static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLubyte 
 
 /* Version for OpenGL (ES) >= 2.0 */
 static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-                   GLsizei numVertices, GLsizei numVertIdxs,
-                   GLint attribute_v_coord, GLint attribute_v_normal)
+                                   GLsizei numVertices, GLsizei numVertIdxs,
+                                   GLint attribute_v_coord, GLint attribute_v_normal)
 {
-    GLuint vbo_coords, vbo_normals, ibo_elements;
+    GLuint vbo_coords = 0, vbo_normals = 0, ibo_elements = 0;
     
     if (numVertices > 0 && attribute_v_coord != -1) {
         fghGenBuffers(1, &vbo_coords);
@@ -251,7 +251,7 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
 }
 
 static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-                 GLsizei numVertices, GLsizei numVertIdxs)
+                                 GLsizei numVertices, GLsizei numVertIdxs)
 {
     GLint attribute_v_coord = fgStructure.CurrentWindow->Window.attribute_v_coord;
     GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
