@@ -1376,8 +1376,8 @@ static void fghCone( double base, double height, GLint slices, GLint stacks, GLb
          * bunch for each slice.
          */
 
-        stackIdx = malloc(slices*(stacks+1)*sizeof(GLushort));
-        sliceIdx = malloc(slices*2         *sizeof(GLushort));
+        stackIdx = malloc(slices*stacks*sizeof(GLushort));
+        sliceIdx = malloc(slices*2     *sizeof(GLushort));
         if (!(stackIdx) || !(sliceIdx))
         {
             free(stackIdx);
