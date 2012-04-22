@@ -14,6 +14,7 @@
       -    <tt>q Q &nbsp;</tt> Quit
       -    <tt>i I &nbsp;</tt> Show info
       -    <tt>p P &nbsp;</tt> Toggle perspective or orthographic projection
+      -    <tt>r R &nbsp;</tt> Toggle fixed or animated rotation around model X-axis
       -    <tt>= + &nbsp;</tt> Increase \a slices
       -    <tt>- _ &nbsp;</tt> Decreate \a slices
       -    <tt>, < &nbsp;</tt> Decreate \a stacks
@@ -67,6 +68,7 @@ static double offset[ 3 ] = { 0, 0, 0 };
 static GLboolean show_info = GL_TRUE;
 static float ar;
 static GLboolean persProject = GL_TRUE;
+static GLboolean animateXRot = GL_FALSE;
 
 /*
  * These one-liners draw particular objects, fetching appropriate
@@ -252,6 +254,7 @@ static void display(void)
 {
     const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
     const double a = t*90.0;
+    const double b = (animateXRot?t:1)*60.0;
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -270,14 +273,14 @@ static void display(void)
 
     glPushMatrix();
         glTranslated(0,1.2,-6);
-        glRotated(60,1,0,0);
+        glRotated(b,1,0,0);
         glRotated(a,0,0,1);
         table [function_index].solid ();
     glPopMatrix();
 
     glPushMatrix();
         glTranslated(0,-1.2,-6);
-        glRotated(60,1,0,0);
+        glRotated(b,1,0,0);
         glRotated(a,0,0,1);
         table [function_index].wire ();
     glPopMatrix();
@@ -332,6 +335,9 @@ key(unsigned char key, int x, int y)
 
     case 'P':
     case 'p': persProject=!persProject;   break;
+
+    case 'R':
+    case 'r': animateXRot=!animateXRot;   break;
 
     default:
         break;
