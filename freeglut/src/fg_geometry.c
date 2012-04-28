@@ -1883,27 +1883,29 @@ void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint 
 
     for( i=0; i<nSides; i++ )
     {
+        int offset;
+
         int ioff = 3;
         if (i==nSides-1)
             ioff = -i*3;
+
         glBegin( GL_TRIANGLE_STRIP );
         for( j=0; j<nRings; j++ )
         {
-            int offset = 3 * ( j * nSides + i ) ;
-            glNormal3fv( normal + offset );
-            glVertex3fv( vertex + offset );
-            glNormal3fv( normal + offset + ioff );
-            glVertex3fv( vertex + offset + ioff );
-
-            offset = 3 * ( ((j+1)%nRings) * nSides + i) ;
+            offset = 3 * ( j * nSides + i ) ;
             glNormal3fv( normal + offset );
             glVertex3fv( vertex + offset );
             glNormal3fv( normal + offset + ioff );
             glVertex3fv( vertex + offset + ioff );
         }
+        /* repeat first to close off shape */
+        offset = 3 * i;
+        glNormal3fv( normal + offset );
+        glVertex3fv( vertex + offset );
+        glNormal3fv( normal + offset + ioff );
+        glVertex3fv( vertex + offset + ioff );
         glEnd();
     }
-
 
     free ( vertex ) ;
     free ( normal ) ;
