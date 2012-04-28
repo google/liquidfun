@@ -1749,7 +1749,6 @@ static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GL
     }
     else
     {
-        /* clearly, this branch is TODO */
         /* First, generate vertex index arrays for drawing with glDrawElements
          * All stacks, including top and bottom are covered with a triangle
          * strip.
