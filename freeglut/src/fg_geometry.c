@@ -1757,11 +1757,29 @@ static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GL
         GLushort  *stripIdx;
 
         /* Allocate buffers for indices, bail out if memory allocation fails */
-        //stripIdx = malloc((slices+1)*2*(stacks+2)*sizeof(GLushort));
+        stripIdx = malloc((nRings+1)*2*nSides*sizeof(GLushort));
         if (!(stripIdx))
         {
             free(stripIdx);
             fgError("Failed to allocate memory in fghTorus");
+        }
+
+        for( i=0, idx=0; i<nSides; i++ )
+        {
+            int ioff = 1;
+            if (i==nSides-1)
+                ioff = -i;
+
+            for( j=0; j<nRings; j++, idx+=2 )
+            {
+                int offset = j * nSides + i;
+                stripIdx[idx  ] = offset;
+                stripIdx[idx+1] = offset + ioff;
+            }
+            /* repeat first to close off shape */
+            stripIdx[idx  ] = i;
+            stripIdx[idx+1] = i + ioff;
+            idx +=2;
         }
 
         /* draw */
@@ -1770,9 +1788,8 @@ static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GL
 
         glVertexPointer(3, GL_FLOAT, 0, vertices);
         glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw stacks*/
-        //for (i=0; i<stacks+2; i++)
-          //  glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(slices+1)*2);
+        for (i=0; i<nSides; i++)
+            glDrawElements(GL_TRIANGLE_STRIP,(nRings+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(nRings+1)*2);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -1869,46 +1886,9 @@ void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint n
  */
 void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
-    GLfloat *vertex, *normal;
-    int    i, j, nVert;
-
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTorus" );
 
-
-    fghGenerateTorus(
-        dInnerRadius, dOuterRadius, nSides, nRings,  /*  input */
-        &vertex, &normal, &nVert                     /* output */
-        );
-
-
-    for( i=0; i<nSides; i++ )
-    {
-        int offset;
-
-        int ioff = 3;
-        if (i==nSides-1)
-            ioff = -i*3;
-
-        glBegin( GL_TRIANGLE_STRIP );
-        for( j=0; j<nRings; j++ )
-        {
-            offset = 3 * ( j * nSides + i ) ;
-            glNormal3fv( normal + offset );
-            glVertex3fv( vertex + offset );
-            glNormal3fv( normal + offset + ioff );
-            glVertex3fv( vertex + offset + ioff );
-        }
-        /* repeat first to close off shape */
-        offset = 3 * i;
-        glNormal3fv( normal + offset );
-        glVertex3fv( vertex + offset );
-        glNormal3fv( normal + offset + ioff );
-        glVertex3fv( vertex + offset + ioff );
-        glEnd();
-    }
-
-    free ( vertex ) ;
-    free ( normal ) ;
+    fghTorus(dInnerRadius, dOuterRadius, nSides, nRings, FALSE);
 }
 #endif /* EGL_VERSION_1_0 */
 
