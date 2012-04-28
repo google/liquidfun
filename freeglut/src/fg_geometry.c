@@ -1296,7 +1296,7 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
         {
             free(stackIdx);
             free(sliceIdx);
-            fgError("Failed to allocate memory in fghGenerateSphere");
+            fgError("Failed to allocate memory in fghSphere");
         }
 
         /* generate for each stack */
@@ -1356,7 +1356,7 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
         if (!(stripIdx))
         {
             free(stripIdx);
-            fgError("Failed to allocate memory in fghGenerateSphere");
+            fgError("Failed to allocate memory in fghSphere");
         }
 
         /* top stack */
@@ -1443,7 +1443,7 @@ static void fghCone( double base, double height, GLint slices, GLint stacks, GLb
         {
             free(stackIdx);
             free(sliceIdx);
-            fgError("Failed to allocate memory in fghGenerateCone");
+            fgError("Failed to allocate memory in fghCone");
         }
 
         /* generate for each stack */
@@ -1498,7 +1498,7 @@ static void fghCone( double base, double height, GLint slices, GLint stacks, GLb
         if (!(stripIdx))
         {
             free(stripIdx);
-            fgError("Failed to allocate memory in fghGenerateCone");
+            fgError("Failed to allocate memory in fghCone");
         }
 
         /* top stack */
@@ -1574,7 +1574,7 @@ static void fghCylinder( double radius, double height, GLint slices, GLint stack
         {
             free(stackIdx);
             free(sliceIdx);
-            fgError("Failed to allocate memory in fghGenerateCylinder");
+            fgError("Failed to allocate memory in fghCylinder");
         }
 
         /* generate for each stack */
@@ -1629,7 +1629,7 @@ static void fghCylinder( double radius, double height, GLint slices, GLint stack
         if (!(stripIdx))
         {
             free(stripIdx);
-            fgError("Failed to allocate memory in fghGenerateCylinder");
+            fgError("Failed to allocate memory in fghCylinder");
         }
 
         /* top stack */
@@ -1675,6 +1675,104 @@ static void fghCylinder( double radius, double height, GLint slices, GLint stack
         /*draw stacks*/
         for (i=0; i<stacks+2; i++)
             glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(slices+1)*2);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+
+        /* cleanup allocated memory */
+        free(stripIdx);
+    }
+
+    /* cleanup allocated memory */
+    free(vertices);
+    free(normals);
+}
+
+static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings, GLboolean useWireMode )
+{
+    int i,j,idx, nVert;
+    GLfloat *vertices, *normals;
+
+    /* Generate vertices and normals */
+    fghGenerateTorus((GLfloat)dInnerRadius,(GLfloat)dOuterRadius,nSides,nRings, &vertices,&normals,&nVert);
+
+    if (nVert==0)
+        /* nothing to draw */
+        return;
+
+    if (useWireMode)
+    {
+        GLushort  *sideIdx, *ringIdx;
+        /* First, generate vertex index arrays for drawing with glDrawElements
+         * We have a bunch of line_loops to draw each side, and a
+         * bunch for each ring.
+         */
+
+        ringIdx = malloc(nRings*nSides*sizeof(GLushort));
+        sideIdx = malloc(nSides*nRings*sizeof(GLushort));
+        if (!(ringIdx) || !(sideIdx))
+        {
+            free(ringIdx);
+            free(sideIdx);
+            fgError("Failed to allocate memory in fghTorus");
+        }
+
+        /* generate for each ring */
+        for( j=0,idx=0; j<nRings; j++ )
+            for( i=0; i<nSides; i++, idx++ )
+                ringIdx[idx] = j * nSides + i;
+
+        /* generate for each side */
+        for( i=0,idx=0; i<nSides; i++ )
+            for( j=0; j<nRings; j++, idx++ )
+                sideIdx[idx] = j * nSides + i;
+
+        /* draw */
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, vertices);
+        glNormalPointer(GL_FLOAT, 0, normals);
+        /*draw rings*/
+        for( i=0; i<nSides; i++ )
+            glDrawElements(GL_LINE_LOOP,nRings,GL_UNSIGNED_SHORT,ringIdx+i*nRings);
+        /*draw sides*/
+        for (i=0; i<nRings; i++)
+            glDrawElements(GL_LINE_LOOP,nSides,GL_UNSIGNED_SHORT,sideIdx+i*nSides);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+
+        /* cleanup allocated memory */
+        free(sideIdx);
+        free(ringIdx);
+    }
+    else
+    {
+        /* clearly, this branch is TODO */
+        /* First, generate vertex index arrays for drawing with glDrawElements
+         * All stacks, including top and bottom are covered with a triangle
+         * strip.
+         */
+        GLushort  *stripIdx;
+
+        /* Allocate buffers for indices, bail out if memory allocation fails */
+        //stripIdx = malloc((slices+1)*2*(stacks+2)*sizeof(GLushort));
+        if (!(stripIdx))
+        {
+            free(stripIdx);
+            fgError("Failed to allocate memory in fghTorus");
+        }
+
+        /* draw */
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, vertices);
+        glNormalPointer(GL_FLOAT, 0, normals);
+        /*draw stacks*/
+        //for (i=0; i<stacks+2; i++)
+          //  glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(slices+1)*2);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -1761,47 +1859,9 @@ void FGAPIENTRY glutWireCylinder(double radius, double height, GLint slices, GLi
  */
 void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
-    GLfloat *vertex, *normal;
-    int    i, j, nVert;
-
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTorus" );
 
-
-    fghGenerateTorus(
-        dInnerRadius, dOuterRadius, nSides, nRings, /*  input */
-        &vertex, &normal, &nVert                     /* output */
-        );
-
-    for( i=0; i<nSides; i++ )
-    {
-        glBegin( GL_LINE_LOOP );
-
-        for( j=0; j<nRings; j++ )
-        {
-            int offset = 3 * ( j * nSides + i ) ;
-            glNormal3fv( normal + offset );
-            glVertex3fv( vertex + offset );
-        }
-
-        glEnd();
-    }
-
-    for( j=0; j<nRings; j++ )
-    {
-        glBegin(GL_LINE_LOOP);
-
-        for( i=0; i<nSides; i++ )
-        {
-            int offset = 3 * ( j * nSides + i ) ;
-            glNormal3fv( normal + offset );
-            glVertex3fv( vertex + offset );
-        }
-
-        glEnd();
-    }
-
-    free ( vertex ) ;
-    free ( normal ) ;
+    fghTorus(dInnerRadius, dOuterRadius, nSides, nRings, TRUE);
 }
 
 /*
@@ -1816,17 +1876,17 @@ void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint 
 
 
     fghGenerateTorus(
-        dInnerRadius, dOuterRadius, nSides, nRings, /*  input */
+        dInnerRadius, dOuterRadius, nSides, nRings,  /*  input */
         &vertex, &normal, &nVert                     /* output */
         );
 
-  
-    glBegin( GL_QUADS );
+
     for( i=0; i<nSides; i++ )
     {
         int ioff = 3;
         if (i==nSides-1)
             ioff = -i*3;
+        glBegin( GL_TRIANGLE_STRIP );
         for( j=0; j<nRings; j++ )
         {
             int offset = 3 * ( j * nSides + i ) ;
@@ -1836,14 +1896,14 @@ void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint 
             glVertex3fv( vertex + offset + ioff );
 
             offset = 3 * ( ((j+1)%nRings) * nSides + i) ;
-            glNormal3fv( normal + offset + ioff );
-            glVertex3fv( vertex + offset + ioff );
             glNormal3fv( normal + offset );
             glVertex3fv( vertex + offset );
+            glNormal3fv( normal + offset + ioff );
+            glVertex3fv( vertex + offset + ioff );
         }
+        glEnd();
     }
 
-    glEnd();
 
     free ( vertex ) ;
     free ( normal ) ;
