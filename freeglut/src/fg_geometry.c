@@ -853,7 +853,7 @@ static void fghGenerateSphere(GLfloat radius, GLint slices, GLint stacks, GLfloa
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
     *vertices = malloc((*nVert)*3*sizeof(GLfloat));
     *normals  = malloc((*nVert)*3*sizeof(GLfloat));
-    if (!(vertices) || !(normals))
+    if (!(*vertices) || !(*normals))
     {
         free(*vertices);
         free(*normals);
@@ -949,7 +949,7 @@ void fghGenerateCone(
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
     *vertices = malloc((*nVert)*3*sizeof(GLfloat));
     *normals  = malloc((*nVert)*3*sizeof(GLfloat));
-    if (!(vertices) || !(normals))
+    if (!(*vertices) || !(*normals))
     {
         free(*vertices);
         free(*normals);
@@ -1031,7 +1031,7 @@ void fghGenerateCylinder(
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
     *vertices = malloc((*nVert)*3*sizeof(GLfloat));
     *normals  = malloc((*nVert)*3*sizeof(GLfloat));
-    if (!(vertices) || !(normals))
+    if (!(*vertices) || !(*normals))
     {
         free(*vertices);
         free(*normals);
@@ -1097,6 +1097,67 @@ void fghGenerateCylinder(
     /* Release sin and cos tables */
     free(sint);
     free(cost);
+}
+
+void fghGenerateTorus(
+    double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings, /*  input */
+    GLfloat **vertices, GLfloat **normals, int* nVert                     /* output */
+    )
+{
+    GLfloat  iradius = (float)dInnerRadius;
+    GLfloat  oradius = (float)dOuterRadius;
+    int    i, j;
+
+    /* Pre-computed circle */
+    GLfloat *spsi, *cpsi;
+    GLfloat *sphi, *cphi;
+
+    /* number of unique vertices */
+    if (nSides<2 || nRings<2)
+    {
+        /* nothing to generate */
+        *nVert = 0;
+        return;
+    }
+    *nVert = nSides * nRings;
+
+    if ((*nVert) > 65535)
+        fgWarning("fghGenerateTorus: too many slices or stacks requested, indices will wrap");
+
+    /* precompute values on unit circle */
+    fghCircleTable(&spsi,&cpsi, nRings,FALSE);
+    fghCircleTable(&sphi,&cphi,-nSides,FALSE);
+
+    /* Allocate vertex and normal buffers, bail out if memory allocation fails */
+    *vertices = malloc((*nVert)*3*sizeof(GLfloat));
+    *normals  = malloc((*nVert)*3*sizeof(GLfloat));
+    if (!(*vertices) || !(*normals))
+    {
+        free(*vertices);
+        free(*normals);
+        fgError("Failed to allocate memory in fghGenerateTorus");
+    }
+
+    for( j=0; j<nRings; j++ )
+    {
+        for( i=0; i<nSides; i++ )
+        {
+            int offset = 3 * ( j * nSides + i ) ;
+
+            (*vertices)[offset  ] = cpsi[j] * ( oradius + cphi[i] * iradius ) ;
+            (*vertices)[offset+1] = spsi[j] * ( oradius + cphi[i] * iradius ) ;
+            (*vertices)[offset+2] =                       sphi[i] * iradius  ;
+            (*normals )[offset  ] = cpsi[j] * cphi[i] ;
+            (*normals )[offset+1] = spsi[j] * cphi[i] ;
+            (*normals )[offset+2] =           sphi[i] ;
+        }
+    }
+
+    /* Release sin and cos tables */
+    free(spsi);
+    free(cpsi);
+    free(sphi);
+    free(cphi);
 }
 #endif
 
@@ -1700,91 +1761,47 @@ void FGAPIENTRY glutWireCylinder(double radius, double height, GLint slices, GLi
  */
 void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
-  GLfloat  iradius = (float)dInnerRadius, oradius = (float)dOuterRadius;
-  GLfloat phi, psi, dpsi, dphi;
-  GLfloat *vertex, *normal;
-  int    i, j;
-  GLfloat spsi, cpsi, sphi, cphi ;
+    GLfloat *vertex, *normal;
+    int    i, j, nVert;
 
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTorus" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTorus" );
 
-  if ( nSides < 1 ) nSides = 1;
-  if ( nRings < 1 ) nRings = 1;
 
-  /* Allocate the vertices array */
-  vertex = (GLfloat *)calloc( sizeof(GLfloat), 3 * nSides * nRings );
-  normal = (GLfloat *)calloc( sizeof(GLfloat), 3 * nSides * nRings );
-
-  glPushMatrix();
-
-  dpsi =  2.0f * (GLfloat)M_PI / (GLfloat)(nRings) ;
-  dphi = -2.0f * (GLfloat)M_PI / (GLfloat)(nSides) ;
-  psi  = 0.0f;
-
-  for( j=0; j<nRings; j++ )
-  {
-#ifdef __cplusplus
-    cpsi = cosf( psi ) ;
-    spsi = sinf( psi ) ;
-#else
-    cpsi = (float)cos( (double)psi ) ;
-    spsi = (float)sin( (double)psi ) ;
-#endif  /* __cplusplus */
-    phi = 0.0f;
+    fghGenerateTorus(
+        dInnerRadius, dOuterRadius, nSides, nRings, /*  input */
+        &vertex, &normal, &nVert                     /* output */
+        );
 
     for( i=0; i<nSides; i++ )
     {
-      int offset = 3 * ( j * nSides + i ) ;
-#ifdef __cplusplus
-      cphi = cosf( phi ) ;
-      sphi = sinf( phi ) ;
-#else
-      cphi = (float)cos( (double)phi ) ;
-      sphi = (float)sin( (double)phi ) ;
-#endif  /* __cplusplus */
-      *(vertex + offset + 0) = cpsi * ( oradius + cphi * iradius ) ;
-      *(vertex + offset + 1) = spsi * ( oradius + cphi * iradius ) ;
-      *(vertex + offset + 2) =                    sphi * iradius  ;
-      *(normal + offset + 0) = cpsi * cphi ;
-      *(normal + offset + 1) = spsi * cphi ;
-      *(normal + offset + 2) =        sphi ;
-      phi += dphi;
+        glBegin( GL_LINE_LOOP );
+
+        for( j=0; j<nRings; j++ )
+        {
+            int offset = 3 * ( j * nSides + i ) ;
+            glNormal3fv( normal + offset );
+            glVertex3fv( vertex + offset );
+        }
+
+        glEnd();
     }
-
-    psi += dpsi;
-  }
-
-  for( i=0; i<nSides; i++ )
-  {
-    glBegin( GL_LINE_LOOP );
 
     for( j=0; j<nRings; j++ )
     {
-      int offset = 3 * ( j * nSides + i ) ;
-      glNormal3fv( normal + offset );
-      glVertex3fv( vertex + offset );
+        glBegin(GL_LINE_LOOP);
+
+        for( i=0; i<nSides; i++ )
+        {
+            int offset = 3 * ( j * nSides + i ) ;
+            glNormal3fv( normal + offset );
+            glVertex3fv( vertex + offset );
+        }
+
+        glEnd();
     }
 
-    glEnd();
-  }
-
-  for( j=0; j<nRings; j++ )
-  {
-    glBegin(GL_LINE_LOOP);
-
-    for( i=0; i<nSides; i++ )
-    {
-      int offset = 3 * ( j * nSides + i ) ;
-      glNormal3fv( normal + offset );
-      glVertex3fv( vertex + offset );
-    }
-
-    glEnd();
-  }
-
-  free ( vertex ) ;
-  free ( normal ) ;
-  glPopMatrix();
+    free ( vertex ) ;
+    free ( normal ) ;
 }
 
 /*
@@ -1792,86 +1809,44 @@ void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint n
  */
 void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
-  GLfloat  iradius = (float)dInnerRadius, oradius = (float)dOuterRadius;
-  GLfloat phi, psi, dpsi, dphi;
-  GLfloat *vertex, *normal;
-  int    i, j;
-  GLfloat spsi, cpsi, sphi, cphi ;
+    GLfloat *vertex, *normal;
+    int    i, j, nVert;
 
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTorus" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTorus" );
 
-  if ( nSides < 1 ) nSides = 1;
-  if ( nRings < 1 ) nRings = 1;
 
-  /* Increment the number of sides and rings to allow for one more point than surface */
-  nSides ++ ;
-  nRings ++ ;
+    fghGenerateTorus(
+        dInnerRadius, dOuterRadius, nSides, nRings, /*  input */
+        &vertex, &normal, &nVert                     /* output */
+        );
 
-  /* Allocate the vertices array */
-  vertex = (GLfloat *)calloc( sizeof(GLfloat), 3 * nSides * nRings );
-  normal = (GLfloat *)calloc( sizeof(GLfloat), 3 * nSides * nRings );
-
-  glPushMatrix();
-
-  dpsi =  2.0f * (GLfloat)M_PI / (GLfloat)(nRings - 1) ;
-  dphi = -2.0f * (GLfloat)M_PI / (GLfloat)(nSides - 1) ;
-  psi  = 0.0f;
-
-  for( j=0; j<nRings; j++ )
-  {
-#ifdef __cplusplus
-    cpsi = cosf( psi ) ;
-    spsi = sinf( psi ) ;
-#else
-    cpsi = (float)cos( (double)psi ) ;
-    spsi = (float)sin( (double)psi ) ;
-#endif  /* __cplusplus */
-    phi = 0.0f;
-
+  
+    glBegin( GL_QUADS );
     for( i=0; i<nSides; i++ )
     {
-      int offset = 3 * ( j * nSides + i ) ;
-#ifdef __cplusplus
-      cphi = cosf( phi ) ;
-      sphi = sinf( phi ) ;
-#else
-      cphi = (float)cos( (double)phi ) ;
-      sphi = (float)sin( (double)phi ) ;
-#endif  /* __cplusplus */
-      *(vertex + offset + 0) = cpsi * ( oradius + cphi * iradius ) ;
-      *(vertex + offset + 1) = spsi * ( oradius + cphi * iradius ) ;
-      *(vertex + offset + 2) =                    sphi * iradius  ;
-      *(normal + offset + 0) = cpsi * cphi ;
-      *(normal + offset + 1) = spsi * cphi ;
-      *(normal + offset + 2) =        sphi ;
-      phi += dphi;
+        int ioff = 3;
+        if (i==nSides-1)
+            ioff = -i*3;
+        for( j=0; j<nRings; j++ )
+        {
+            int offset = 3 * ( j * nSides + i ) ;
+            glNormal3fv( normal + offset );
+            glVertex3fv( vertex + offset );
+            glNormal3fv( normal + offset + ioff );
+            glVertex3fv( vertex + offset + ioff );
+
+            offset = 3 * ( ((j+1)%nRings) * nSides + i) ;
+            glNormal3fv( normal + offset + ioff );
+            glVertex3fv( vertex + offset + ioff );
+            glNormal3fv( normal + offset );
+            glVertex3fv( vertex + offset );
+        }
     }
 
-    psi += dpsi;
-  }
+    glEnd();
 
-    glBegin( GL_QUADS );
-  for( i=0; i<nSides-1; i++ )
-  {
-    for( j=0; j<nRings-1; j++ )
-    {
-      int offset = 3 * ( j * nSides + i ) ;
-      glNormal3fv( normal + offset );
-      glVertex3fv( vertex + offset );
-      glNormal3fv( normal + offset + 3 );
-      glVertex3fv( vertex + offset + 3 );
-      glNormal3fv( normal + offset + 3 * nSides + 3 );
-      glVertex3fv( vertex + offset + 3 * nSides + 3 );
-      glNormal3fv( normal + offset + 3 * nSides );
-      glVertex3fv( vertex + offset + 3 * nSides );
-    }
-  }
-
-  glEnd();
-
-  free ( vertex ) ;
-  free ( normal ) ;
-  glPopMatrix();
+    free ( vertex ) ;
+    free ( normal ) ;
 }
 #endif /* EGL_VERSION_1_0 */
 
