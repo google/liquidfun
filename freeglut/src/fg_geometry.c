@@ -47,7 +47,10 @@
 
 /* Version for OpenGL (ES) 1.1 */
 #ifndef GL_ES_VERSION_2_0
-static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals, GLsizei numFaces, GLsizei numEdgePerFace)
+static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
+    )
 {
     int i;
     
@@ -57,9 +60,18 @@ static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals, GLsizei n
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glNormalPointer(GL_FLOAT, 0, normals);
 
-    /* Draw per face (TODO: could use glMultiDrawArrays if available) */
-    for (i=0; i<numFaces; i++)
-        glDrawArrays(GL_LINE_LOOP, i*numEdgePerFace, numEdgePerFace);
+    
+    if (!vertIdxs)
+        /* Draw per face (TODO: could use glMultiDrawArrays if available) */
+        for (i=0; i<numParts; i++)
+            glDrawArrays(vertexMode, i*numVertPerPart, numVertPerPart);
+    else
+        for (i=0; i<numParts; i++)
+            glDrawElements(vertexMode,numVertPerPart,GL_UNSIGNED_SHORT,vertIdxs+i*numVertPerPart);
+
+    if (vertIdxs2)
+        for (i=0; i<numParts2; i++)
+            glDrawElements(GL_LINE_LOOP,numVertPerPart2,GL_UNSIGNED_SHORT,vertIdxs2+i*numVertPerPart2);
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
@@ -67,11 +79,14 @@ static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals, GLsizei n
 #endif
 
 /* Version for OpenGL (ES) >= 2.0 */
-static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei numFaces, GLsizei numEdgePerFace,
-                                  GLint attribute_v_coord, GLint attribute_v_normal)
+static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2,
+    GLint attribute_v_coord, GLint attribute_v_normal
+    )
 {
     GLuint vbo_coords = 0, vbo_normals = 0;
-    GLuint numVertices = numFaces * numEdgePerFace;
+    GLuint numVertices = numParts * numVertPerPart;
 
     int i;
 
@@ -116,8 +131,8 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
     }
 
     /* Draw per face (TODO: could use glMultiDrawArrays if available) */
-    for (i=0; i<numFaces; i++)
-        glDrawArrays(GL_LINE_LOOP, i*numEdgePerFace, numEdgePerFace);
+    for (i=0; i<numParts; i++)
+        glDrawArrays(vertexMode, i*numVertPerPart, numVertPerPart);
     
     
     if (vbo_coords != 0)
@@ -131,18 +146,25 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
         fghDeleteBuffers(1, &vbo_normals);
 }
 
-static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei numFaces, GLsizei numEdgePerFace)
+static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
+    )
 {
     GLint attribute_v_coord = fgStructure.CurrentWindow->Window.attribute_v_coord;
     GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
 
     if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
         /* User requested a 2.0 draw */
-        fghDrawGeometryWire20(vertices, normals, numFaces, numEdgePerFace,
-                          attribute_v_coord, attribute_v_normal);
+        fghDrawGeometryWire20(vertices, normals,
+                              vertIdxs, numParts, numVertPerPart, vertexMode,
+                              vertIdxs2, numParts2, numVertPerPart2,
+                              attribute_v_coord, attribute_v_normal);
 #ifndef GL_ES_VERSION_2_0
     else
-        fghDrawGeometryWire11(vertices, normals, numFaces, numEdgePerFace);
+        fghDrawGeometryWire11(vertices, normals,
+                              vertIdxs, numParts, numVertPerPart, vertexMode,
+                              vertIdxs2, numParts2, numVertPerPart2);
 #endif
 }
 
@@ -158,9 +180,11 @@ static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei num
 
 /* Version for OpenGL (ES) 1.1 */
 #ifndef GL_ES_VERSION_2_0
-static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-                                   GLsizei numVertices, GLsizei numVertIdxs)
+static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLushort *vertIdxs,
+                                   GLsizei numVertices, GLsizei numParts, GLsizei numVertIdxsPerPart)
 {
+    int i;
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
@@ -169,7 +193,11 @@ static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLubyte 
     if (vertIdxs == NULL)
         glDrawArrays(GL_TRIANGLES, 0, numVertices);
     else
-        glDrawElements(GL_TRIANGLES, numVertIdxs, GL_UNSIGNED_BYTE, vertIdxs);
+        if (numParts>1)
+            for (i=0; i<numParts; i++)
+                glDrawElements(GL_TRIANGLE_STRIP, numVertIdxsPerPart, GL_UNSIGNED_SHORT, vertIdxs+i*numVertIdxsPerPart);
+        else
+            glDrawElements(GL_TRIANGLES, numVertIdxsPerPart, GL_UNSIGNED_SHORT, vertIdxs);
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
@@ -177,8 +205,8 @@ static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLubyte 
 #endif
 
 /* Version for OpenGL (ES) >= 2.0 */
-static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-                                   GLsizei numVertices, GLsizei numVertIdxs,
+static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLushort *vertIdxs,
+                                   GLsizei numVertices, GLsizei numParts, GLsizei numVertIdxsPerPart,
                                    GLint attribute_v_coord, GLint attribute_v_normal)
 {
     GLuint vbo_coords = 0, vbo_normals = 0, ibo_elements = 0;
@@ -200,7 +228,7 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
     if (vertIdxs != NULL) {
         fghGenBuffers(1, &ibo_elements);
         fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
-        fghBufferData(FGH_ELEMENT_ARRAY_BUFFER, numVertIdxs * sizeof(vertIdxs[0]),
+        fghBufferData(FGH_ELEMENT_ARRAY_BUFFER, numVertIdxsPerPart * sizeof(vertIdxs[0]),
                       vertIdxs, FGH_STATIC_DRAW);
     }
     
@@ -234,7 +262,7 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
         glDrawArrays(GL_TRIANGLES, 0, numVertices);
     } else {
         fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements);
-        glDrawElements(GL_TRIANGLES, numVertIdxs, GL_UNSIGNED_BYTE, 0);
+        glDrawElements(GL_TRIANGLES, numVertIdxsPerPart, GL_UNSIGNED_SHORT, 0);
     }
 
     /* Clean existing bindings before clean-up */
@@ -255,8 +283,8 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLubyte 
         fghDeleteBuffers(1, &ibo_elements);
 }
 
-static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *vertIdxs,
-                                 GLsizei numVertices, GLsizei numVertIdxs)
+static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLushort *vertIdxs,
+                                 GLsizei numVertices, GLsizei numParts, GLsizei numVertIdxsPerPart)
 {
     GLint attribute_v_coord = fgStructure.CurrentWindow->Window.attribute_v_coord;
     GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
@@ -264,12 +292,12 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *v
     if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
         /* User requested a 2.0 draw */
         fghDrawGeometrySolid20(vertices, normals, vertIdxs,
-                               numVertices, numVertIdxs,
+                               numVertices, numParts, numVertIdxsPerPart,
                                attribute_v_coord, attribute_v_normal);
 #ifndef GL_ES_VERSION_2_0
     else
         fghDrawGeometrySolid11(vertices, normals, vertIdxs,
-                               numVertices, numVertIdxs);
+                               numVertices, numParts, numVertIdxsPerPart);
 #endif
 }
 
@@ -283,7 +311,7 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLubyte *v
 static GLubyte   vert4Decomp[6] = {0,1,2, 0,2,3};             /* quad    : 4 input vertices, 6 output (2 triangles) */
 static GLubyte   vert5Decomp[9] = {0,1,2, 0,2,4, 4,2,3};      /* pentagon: 5 input vertices, 9 output (3 triangles) */
 
-static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, GLfloat *vertices, GLubyte *vertIndices, GLfloat *normals, GLfloat *vertOut, GLfloat *normOut, GLubyte *vertIdxOut)
+static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, GLfloat *vertices, GLubyte *vertIndices, GLfloat *normals, GLfloat *vertOut, GLfloat *normOut, GLushort *vertIdxOut)
 {
     int i,j,numEdgeIdxPerFace;
     GLubyte   *vertSamps = NULL;
@@ -359,7 +387,7 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLfloat *verti
     static GLboolean name##Cached = FALSE;\
     static GLfloat  name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
     static GLfloat  name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
-    static GLubyte   name##_vertIdxs[nameCaps##_VERT_PER_OBJ_TRI];\
+    static GLushort name##_vertIdxs[nameCaps##_VERT_PER_OBJ_TRI];\
     static void fgh##nameICaps##Generate()\
     {\
         fghGenerateGeometryWithIndexArray(nameCaps##_NUM_FACES, nameCaps##_NUM_EDGE_PER_FACE,\
@@ -1174,12 +1202,13 @@ void fghGenerateTorus(
         if (useWireMode)\
         {\
             fghDrawGeometryWire (name##_verts,name##_norms,\
-                                                             nameCaps##_NUM_FACES,nameCaps##_NUM_EDGE_PER_FACE);\
+                                 NULL,nameCaps##_NUM_FACES,nameCaps##_NUM_EDGE_PER_FACE,GL_LINE_LOOP,\
+                                 NULL,0,0);\
         }\
         else\
         {\
             fghDrawGeometrySolid(name##_verts,name##_norms,vertIdxs,\
-                                 nameCaps##_VERT_PER_OBJ, nameCaps##_VERT_PER_OBJ_TRI); \
+                                 nameCaps##_VERT_PER_OBJ, 1, nameCaps##_VERT_PER_OBJ_TRI); \
         }\
     }
 #define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps)                        _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,NULL)
@@ -1217,10 +1246,11 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
 
     if (useWireMode)
         fghDrawGeometryWire(vertices, cube_norms,
-                            CUBE_NUM_FACES, CUBE_NUM_EDGE_PER_FACE);
+                            NULL,CUBE_NUM_FACES, CUBE_NUM_EDGE_PER_FACE,GL_LINE_LOOP,
+                            NULL,0,0);
     else
         fghDrawGeometrySolid(vertices, cube_norms, cube_vertIdxs,
-                             CUBE_VERT_PER_OBJ, CUBE_VERT_PER_OBJ_TRI);
+                             CUBE_VERT_PER_OBJ, 1, CUBE_VERT_PER_OBJ_TRI);
 
     if (dSize!=1.f)
         /* cleanup allocated memory */
@@ -1259,9 +1289,11 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
 
         /* Draw and cleanup */
         if (useWireMode)
-            fghDrawGeometryWire (vertices,normals,numFace,TETRAHEDRON_NUM_EDGE_PER_FACE);
+            fghDrawGeometryWire (vertices,normals,
+                                 NULL,numFace,TETRAHEDRON_NUM_EDGE_PER_FACE,GL_LINE_LOOP,
+                                 NULL,0,0);
         else
-            fghDrawGeometrySolid(vertices,normals,NULL,numVert,numVert);
+            fghDrawGeometrySolid(vertices,normals,NULL,numVert,1,0);
 
         free(vertices);
         free(normals );
@@ -1322,21 +1354,10 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
         }
 
         /* draw */
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw slices*/
-        for (i=0; i<slices; i++)
-            glDrawElements(GL_LINE_STRIP,stacks+1,GL_UNSIGNED_SHORT,sliceIdx+i*(stacks+1));
-        /*draw stacks*/
-        for (i=0; i<stacks-1; i++)
-            glDrawElements(GL_LINE_LOOP, slices,GL_UNSIGNED_SHORT,stackIdx+i*slices);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
-
+        fghDrawGeometryWire(vertices,normals,
+            sliceIdx,slices,stacks+1,GL_LINE_STRIP,
+            stackIdx,stacks-1,slices);
+        
         /* cleanup allocated memory */
         free(sliceIdx);
         free(stackIdx);
@@ -1395,17 +1416,7 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
 
 
         /* draw */
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw stacks*/
-        for (i=0; i<stacks; i++)
-            glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(slices+1)*2);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        fghDrawGeometrySolid(vertices,normals,stripIdx,nVert,stacks,(slices+1)*2);
 
         /* cleanup allocated memory */
         free(stripIdx);
@@ -1465,19 +1476,9 @@ static void fghCone( double base, double height, GLint slices, GLint stacks, GLb
         }
 
         /* draw */
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw slices*/
-        glDrawElements(GL_LINES,slices*2,GL_UNSIGNED_SHORT,sliceIdx);
-        /*draw stacks*/
-        for (i=0; i<stacks; i++)
-            glDrawElements(GL_LINE_LOOP, slices,GL_UNSIGNED_SHORT,stackIdx+i*slices);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        fghDrawGeometryWire(vertices,normals,
+            sliceIdx,1,slices*2,GL_LINES,
+            stackIdx,stacks,slices);
 
         /* cleanup allocated memory */
         free(sliceIdx);
@@ -1526,17 +1527,7 @@ static void fghCone( double base, double height, GLint slices, GLint stacks, GLb
         }
 
         /* draw */
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw stacks*/
-        for (i=0; i<stacks+1; i++)
-            glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(slices+1)*2);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        fghDrawGeometrySolid(vertices,normals,stripIdx,nVert,stacks+1,(slices+1)*2);
 
         /* cleanup allocated memory */
         free(stripIdx);
@@ -1596,19 +1587,9 @@ static void fghCylinder( double radius, double height, GLint slices, GLint stack
         }
 
         /* draw */
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw slices*/
-        glDrawElements(GL_LINES,slices*2,GL_UNSIGNED_SHORT,sliceIdx);
-        /*draw stacks*/
-        for (i=0; i<stacks+1; i++)
-            glDrawElements(GL_LINE_LOOP, slices,GL_UNSIGNED_SHORT,stackIdx+i*slices);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        fghDrawGeometryWire(vertices,normals,
+            sliceIdx,1,slices*2,GL_LINES,
+            stackIdx,stacks+1,slices);
 
         /* cleanup allocated memory */
         free(sliceIdx);
@@ -1667,17 +1648,7 @@ static void fghCylinder( double radius, double height, GLint slices, GLint stack
         stripIdx[idx+1] = nVert-1;                  /* repeat first slice's idx for closing off shape */
 
         /* draw */
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw stacks*/
-        for (i=0; i<stacks+2; i++)
-            glDrawElements(GL_TRIANGLE_STRIP,(slices+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(slices+1)*2);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        fghDrawGeometrySolid(vertices,normals,stripIdx,nVert,stacks+2,(slices+1)*2);
 
         /* cleanup allocated memory */
         free(stripIdx);
@@ -1728,21 +1699,10 @@ static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GL
                 sideIdx[idx] = j * nSides + i;
 
         /* draw */
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glNormalPointer(GL_FLOAT, 0, normals);
-        /*draw rings*/
-        for( i=0; i<nSides; i++ )
-            glDrawElements(GL_LINE_LOOP,nRings,GL_UNSIGNED_SHORT,ringIdx+i*nRings);
-        /*draw sides*/
-        for (i=0; i<nRings; i++)
-            glDrawElements(GL_LINE_LOOP,nSides,GL_UNSIGNED_SHORT,sideIdx+i*nSides);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
-
+        fghDrawGeometryWire(vertices,normals,
+            ringIdx,nRings,nSides,GL_LINE_LOOP,
+            sideIdx,nSides,nRings);
+        
         /* cleanup allocated memory */
         free(sideIdx);
         free(ringIdx);
@@ -1782,16 +1742,7 @@ static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GL
         }
 
         /* draw */
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT, 0, vertices);
-        glNormalPointer(GL_FLOAT, 0, normals);
-        for (i=0; i<nSides; i++)
-            glDrawElements(GL_TRIANGLE_STRIP,(nRings+1)*2,GL_UNSIGNED_SHORT,stripIdx+i*(nRings+1)*2);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        fghDrawGeometrySolid(vertices,normals,stripIdx,nVert,nSides,(nRings+1)*2);
 
         /* cleanup allocated memory */
         free(stripIdx);
