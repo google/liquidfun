@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#define FGH_PI       3.14159265358979323846
 
 typedef struct
 {
@@ -267,13 +268,20 @@ void readConfigFile ( char *fnme )
   else  /* No data file, set a default */
   {
     printf ( "ERROR opening file <%s>\n", fnme ) ;
-    strcpy ( window_title, "Cantor Dust" ) ;
-    num_trans = 2 ;
+    strcpy ( window_title, "Koch Snowflake" ) ;
+    num_trans = 4 ;
     affine = (AffineTrans *)malloc ( num_trans * sizeof(AffineTrans) ) ;
-    affine[0].a00 = 0.25 ;  affine[0].a01 = 0.00 ;  affine[0].a10 = 0.00 ;  affine[0].a11 = 0.25 ;
+    affine[0].a00 = 1/3. ;  affine[0].a01 = 0.00 ;  affine[0].a10 = 0.00 ;  affine[0].a11 = 1/3. ;
     affine[0].b0 = 0.0 ;    affine[0].b1 = 0.0 ;
-    affine[1].a00 = 0.25 ;  affine[1].a01 = 0.00 ;  affine[1].a10 = 0.00 ;  affine[1].a11 = 0.25 ;
-    affine[1].b0 = 0.5 ;    affine[1].b1 = 0.0 ;
+
+    affine[1].a00 = 1/6. ;  affine[1].a01 = -1/3.*sin(FGH_PI/3.) ;   affine[1].a10 = 1/3.*sin(FGH_PI/3.) ;   affine[1].a11 = 1/6. ;
+    affine[1].b0 = 1/3. ;   affine[1].b1 = 0.0 ;
+
+    affine[2].a00 = 1/6. ;  affine[2].a01 = -1/3.*sin(-FGH_PI/3.) ;  affine[2].a10 = 1/3.*sin(-FGH_PI/3.) ;  affine[2].a11 = 1/6. ;
+    affine[2].b0 = 0.5 ;    affine[2].b1 = sqrt(3)/6. ;
+
+    affine[3].a00 = 1/3. ;  affine[3].a01 = 0.00 ;  affine[3].a10 = 0.00 ;  affine[3].a11 = 1/3. ;
+    affine[3].b0 = 2/3. ;   affine[3].b1 = 0.0 ;
   }
 
   for ( i = 0; i < num_trans; i++ )

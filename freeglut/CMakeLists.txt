@@ -381,25 +381,6 @@ ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c
 ADD_DEMO(subwin          progs/demos/subwin/subwin.c)
 ADD_DEMO(timer           progs/demos/timer/timer.c)
 
-# finally, if any demos are built, copy needed files to output directory
-# (currently, thats just the input file for the Fractals demo)
-IF(FREEGLUT_BUILD_DEMOS)
-    # 1) copy fractals.dat from freeglut/progs/demos/Fractals
-    IF(BUILD_SHARED_LIBS)
-        SET(Frac_target Fractals)
-    ELSE()
-        SET(Frac_target Fractals_static)
-    ENDIF()
-    GET_TARGET_PROPERTY(DEMO_OUTPUT_DIRECTORY ${Frac_target} RUNTIME_OUTPUT_DIRECTORY)
-    ADD_CUSTOM_COMMAND(
-        TARGET ${Frac_target}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${PROJECT_SOURCE_DIR}/progs/demos/Fractals/fractals.dat
-        ${DEMO_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
-    )
-ENDIF()
-
 # pkg-config support, to install at $(libdir)/pkgconfig
 # Define static build dependencies
 IF(WIN32)
