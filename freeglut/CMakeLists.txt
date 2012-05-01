@@ -203,7 +203,7 @@ IF(CMAKE_COMPILER_IS_GNUCC)
   ENDIF()
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
-if(UNIX AND NOT ANDROID)
+IF(UNIX AND NOT ANDROID)
     FIND_PACKAGE(X11 REQUIRED)
     LIST(APPEND LIBS ${X11_LIBRARIES})
     IF(X11_Xrandr_FOUND)
@@ -218,6 +218,11 @@ if(UNIX AND NOT ANDROID)
         ENDIF()
         LIST(APPEND LIBS ${X11_Xxf86vm_LIB})
     ENDIF()
+ENDIF()
+IF(ANDROID)
+    # -landroid for ANativeWindow
+    # -llog for native Android logging
+    LIST(APPEND LIBS android log)
 ENDIF()
 
 INCLUDE(CheckIncludeFiles)
