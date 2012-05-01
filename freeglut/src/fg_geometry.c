@@ -34,6 +34,16 @@
  * Need more types of polyhedra? See CPolyhedron in MRPT
  */
 
+/* VC++6 in C mode doesn't have C99's sinf/cos/sqrtf */
+#ifndef HAVE_SINF
+#define sinf(x) (float)sin((double)(x))
+#endif
+#ifndef HAVE_COSF
+#define cosf(x) (float)cos((double)(x))
+#endif
+#ifndef HAVE_SQRTF
+#define sqrtf(x) (float)sqrt((double)(x))
+#endif
 
 /* General functions for drawing geometry
  * Solids are drawn by glDrawArrays if composed of triangles, or by
@@ -829,13 +839,8 @@ static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GL
 
     for (i=1; i<size; i++)
     {
-#ifdef __cplusplus
         (*sint)[i] = sinf(angle*i);
         (*cost)[i] = cosf(angle*i);
-#else
-        (*sint)[i] = (float)sin((double)(angle*i));
-        (*cost)[i] = (float)cos((double)(angle*i));
-#endif  /* __cplusplus */
     }
 
     
@@ -948,13 +953,8 @@ void fghGenerateCone(
     const GLfloat rStep = (GLfloat)base / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Scaling factors for vertex normals */
-#ifdef __cplusplus
     const GLfloat cosn = ( (GLfloat)height / sqrtf( height * height + base * base ));
     const GLfloat sinn = ( (GLfloat)base   / sqrtf( height * height + base * base ));
-#else
-    const GLfloat cosn = ( (GLfloat)height / (GLfloat)sqrt( (double)(height * height + base * base) ));
-    const GLfloat sinn = ( (GLfloat)base   / (GLfloat)sqrt( (double)(height * height + base * base) ));
-#endif  /* __cplusplus */
 
 
 

@@ -261,6 +261,27 @@ IF (NOT (HAVE_STDINT_H OR HAVE_INTTYPES_H))
     ENDIF()
 ENDIF()
 
+# Check for sinf/cosf/sqrtf
+# CHECK_FUNCTION_EXISTS doesn't work because check requires <math.h>
+#CHECK_FUNCTION_EXISTS(sinf      HAVE_SINF)
+#CHECK_FUNCTION_EXISTS(cosf      HAVE_COSF)
+#CHECK_FUNCTION_EXISTS(sqrtf     HAVE_SQRTF)
+INCLUDE(CheckCSourceCompiles)
+CHECK_C_SOURCE_COMPILES("
+    #include <math.h>
+    int main(){sinf(0); return 0;}
+    " HAVE_SINF
+)
+CHECK_C_SOURCE_COMPILES("
+    #include <math.h>
+    int main(){cosf(0); return 0;}
+    " HAVE_COSF
+)
+CHECK_C_SOURCE_COMPILES("
+    #include <math.h>
+    int main(){sqrtf(0); return 0;}
+    " HAVE_SQRTF
+)
 
 # The generated config.h is placed in the project's build directory, just to
 # ensure that all CMake-generated files are kept away from the main source tree.
