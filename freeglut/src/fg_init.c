@@ -28,7 +28,6 @@
 #define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "fg_internal.h"
-#include "fg_gl2.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -381,8 +380,6 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
         if( (mask & (XValue|YValue)) == (XValue|YValue) )
             fgState.Position.Use = GL_TRUE;
     }
-
-    fgInitGL2();
 }
 
 /*

@@ -28,6 +28,7 @@
 #define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
 #include "fg_internal.h"
+#include "fg_gl2.h"
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -147,6 +148,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 #endif
     window->Window.attribute_v_coord = -1;
     window->Window.attribute_v_normal = -1;
+
+    fgInitGL2();
 }
 
 /*
