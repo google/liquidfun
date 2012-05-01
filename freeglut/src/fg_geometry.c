@@ -790,7 +790,6 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, double offset[3], GLflo
     }
 }
 
-#ifndef GL_ES_VERSION_2_0
 /* -- Now the various shapes involving circles -- */
 /*
  * Compute lookup table of cos and sin values forming a circle
@@ -1187,7 +1186,6 @@ void fghGenerateTorus(
     free(sphi);
     free(cphi);
 }
-#endif
 
 /* -- INTERNAL DRAWING functions --------------------------------------- */
 #define _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,vertIdxs)\
@@ -1301,7 +1299,6 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
 }
 
 
-#ifndef GL_ES_VERSION_2_0
 static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useWireMode )
 {
     int i,j,idx, nVert;
@@ -1777,9 +1774,7 @@ void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
     fghSphere( radius, slices, stacks, TRUE );
     
 }
-#endif /* GL_ES_VERSION_2_0 */
 
-#ifndef EGL_VERSION_1_0
 /*
  * Draws a solid cone
  */
@@ -1840,7 +1835,6 @@ void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint 
 
     fghTorus(dInnerRadius, dOuterRadius, nSides, nRings, FALSE);
 }
-#endif /* EGL_VERSION_1_0 */
 
 
 

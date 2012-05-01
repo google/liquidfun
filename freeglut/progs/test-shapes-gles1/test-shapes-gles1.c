@@ -70,6 +70,7 @@ static double offset[ 3 ] = { 0, 0, 0 };
 static GLboolean show_info = GL_TRUE;
 static float ar;
 static GLboolean persProject = GL_TRUE;
+static GLboolean animateXRot = GL_FALSE;
 
 /*
  * These one-liners draw particular objects, fetching appropriate
@@ -90,16 +91,14 @@ static void drawSolidIcosahedron(void)         { glutSolidIcosahedron ();       
 static void drawWireIcosahedron(void)          { glutWireIcosahedron ();                         }
 static void drawSolidSierpinskiSponge(void)    { glutSolidSierpinskiSponge (depth, offset, orad);}  /* orad doubles as size input */
 static void drawWireSierpinskiSponge(void)     { glutWireSierpinskiSponge (depth, offset, orad); }  /* orad doubles as size input */
-static void drawSolidSphere(void)              { glutSolidSphere(orad,slices,stacks);            }  /* orad doubles as size input */
-static void drawWireSphere(void)               { glutWireSphere(orad,slices,stacks);             }  /* orad doubles as size input */
-#ifndef EGL_VERSION_1_0
 static void drawSolidTorus(void)               { glutSolidTorus(irad,orad,slices,stacks);        }
 static void drawWireTorus(void)                { glutWireTorus (irad,orad,slices,stacks);        }
+static void drawSolidSphere(void)              { glutSolidSphere(orad,slices,stacks);            }  /* orad doubles as size input */
+static void drawWireSphere(void)               { glutWireSphere(orad,slices,stacks);             }  /* orad doubles as size input */
 static void drawSolidCone(void)                { glutSolidCone(orad,orad,slices,stacks);         }  /* orad doubles as size input */
 static void drawWireCone(void)                 { glutWireCone(orad,orad,slices,stacks);          }  /* orad doubles as size input */
 static void drawSolidCylinder(void)            { glutSolidCylinder(orad,orad,slices,stacks);     }  /* orad doubles as size input */
 static void drawWireCylinder(void)             { glutWireCylinder(orad,orad,slices,stacks);      }  /* orad doubles as size input */
-#endif
 
 /*
  * This structure defines an entry in our function-table.
@@ -114,14 +113,19 @@ typedef struct
 #define ENTRY(e) {#e, drawSolid##e, drawWire##e}
 static const entry table [] =
 {
-    ENTRY (Cube),
     ENTRY (Tetrahedron),
+    ENTRY (Cube),
     ENTRY (Octahedron),
     ENTRY (Dodecahedron),
     ENTRY (RhombicDodecahedron),
     ENTRY (Icosahedron),
     ENTRY (SierpinskiSponge),
+    /* ENTRY (Teapot), */
+    ENTRY (Torus),
     ENTRY (Sphere),
+    ENTRY (Cone),
+    ENTRY (Cylinder),
+    /* ENTRY (Cuboctahedron) */
 };
 #undef ENTRY
 
@@ -151,6 +155,7 @@ static void display(void)
 {
     const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
     const double a = t*90.0;
+    const double b = (animateXRot?t:1)*60.0;
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -166,14 +171,14 @@ static void display(void)
 
     glPushMatrix();
         glTranslated(0,1.2,-6);
-        glRotated(60,1,0,0);
+        glRotated(b,1,0,0);
         glRotated(a,0,0,1);
         table [function_index].solid ();
     glPopMatrix();
 
     glPushMatrix();
         glTranslated(0,-1.2,-6);
-        glRotated(60,1,0,0);
+        glRotated(b,1,0,0);
         glRotated(a,0,0,1);
         table [function_index].wire ();
     glPopMatrix();
@@ -218,6 +223,9 @@ key(unsigned char key, int x, int y)
     case 'P':
     case 'p': persProject=!persProject;   break;
 
+    case 'R':
+    case 'r': animateXRot=!animateXRot;   break;
+
     default:
         break;
     }
@@ -258,7 +266,7 @@ idle(void)
 static void
 onMouseClick(int button, int state, int x, int y) {
   if (state == GLUT_DOWN)
-    special(GLUT_KEY_PAGE_DOWN, 0, 0);
+    special(GLUT_KEY_PAGE_UP, 0, 0);
 }
 
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };

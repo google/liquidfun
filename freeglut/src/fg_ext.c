@@ -126,17 +126,15 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutStrokeWidth);
     CHECK_NAME(glutBitmapLength);
     CHECK_NAME(glutStrokeLength);
-#ifndef GL_ES_VERSION_2_0
     CHECK_NAME(glutWireSphere);
     CHECK_NAME(glutSolidSphere);
-#endif
-#ifndef EGL_VERSION_1_0
     CHECK_NAME(glutWireCone);
     CHECK_NAME(glutSolidCone);
     CHECK_NAME(glutWireTorus);
     CHECK_NAME(glutSolidTorus);
     CHECK_NAME(glutWireCylinder);
     CHECK_NAME(glutSolidCylinder);
+#ifndef EGL_VERSION_1_0
     CHECK_NAME(glutWireTeapot);
     CHECK_NAME(glutSolidTeapot);
 #endif
@@ -150,10 +148,8 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutSolidTetrahedron);
     CHECK_NAME(glutWireIcosahedron);
     CHECK_NAME(glutSolidIcosahedron);
-#ifndef EGL_VERSION_1_0
     CHECK_NAME(glutWireRhombicDodecahedron);
     CHECK_NAME(glutSolidRhombicDodecahedron);
-#endif
     CHECK_NAME(glutWireSierpinskiSponge);
     CHECK_NAME(glutSolidSierpinskiSponge);
     CHECK_NAME(glutVideoResizeGet);
