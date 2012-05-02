@@ -33,15 +33,43 @@
 
 int fgPlatformGlutDeviceGet ( GLenum eWhat )
 {
-  fprintf(stderr, "fgPlatformGlutDeviceGet: STUB\n");
-  return -1;
+    switch( eWhat )
+    {
+    case GLUT_HAS_KEYBOARD:
+        /* Android has a keyboard, though it may be virtual. */
+        return 1;
+
+    case GLUT_HAS_MOUSE:
+        /* Android has a touchscreen; until we get proper touchscreen
+           support, consider it as a mouse. */
+        return 1 ;
+
+    case GLUT_NUM_MOUSE_BUTTONS:
+        /* Android has a touchscreen; until we get proper touchscreen
+           support, consider it as a 1-button mouse. */
+        return 1;
+
+    default:
+        fgWarning( "glutDeviceGet(): missing enum handle %d", eWhat );
+        break;
+    }
+
+    /* And now -- the failure. */
+    return -1;
 }
 
 int fgPlatformGlutGet ( GLenum eWhat )
 {
-  fprintf(stderr, "fgPlatformGlutGet: STUB\n");
-
   switch (eWhat) {
+  /* One full-screen window only */
+  case GLUT_WINDOW_X:
+  case GLUT_WINDOW_Y:
+      return 0;
+  case GLUT_WINDOW_BORDER_WIDTH:
+      return fgPlatformGlutGet(GLUT_WINDOW_WIDTH);
+  case GLUT_WINDOW_HEADER_HEIGHT:
+      return fgPlatformGlutGet(GLUT_WINDOW_HEIGHT);      
+
   case GLUT_WINDOW_WIDTH:
   case GLUT_WINDOW_HEIGHT:
     {
@@ -57,7 +85,12 @@ int fgPlatformGlutGet ( GLenum eWhat )
 	  return height;
 	}
     }
-    
+
+  case GLUT_WINDOW_COLORMAP_SIZE:
+      /* 0 for RGBA/non-indexed mode */
+      /* Under Android and GLES more generally, no indexed-mode */
+      return 0;
+  
   default:
     return fghPlatformGlutGetEGL(eWhat);
   }
