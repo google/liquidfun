@@ -28,11 +28,14 @@
 
 void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
 {
-  fprintf(stderr, "fgPlatformSetCursor: STUB\n");
+    // No-op: no visible cursor on touchscreens
 }
 
 void fgPlatformWarpPointer ( int x, int y )
 {
-  fprintf(stderr, "fgPlatformWarpPointer: STUB\n");
+    /* Even if there's no pointer on touchscreen, keep track of the
+       last position, e.g. for menus */
+    SFG_Window* window = fgStructure.CurrentWindow;
+    window->State.MouseX = x;
+    window->State.MouseY = y;
 }
-
