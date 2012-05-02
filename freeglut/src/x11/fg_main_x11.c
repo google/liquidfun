@@ -73,9 +73,7 @@ static Bool match_motion(Display *dpy, XEvent *xev, XPointer arg);
  
  
 /*
- * Handle a window configuration change. When no reshape
- * callback is hooked, the viewport size is updated to
- * match the new window size.
+ * Request a window resize
  */
 void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 {

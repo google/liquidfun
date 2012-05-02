@@ -138,9 +138,7 @@ static unsigned char key_ascii(struct android_app* app, AInputEvent* event) {
 }
 
 /*
- * Handle a window configuration change. When no reshape
- * callback is hooked, the viewport size is updated to
- * match the new window size.
+ * Request a window resize
  */
 void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 {
