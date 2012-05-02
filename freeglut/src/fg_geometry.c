@@ -175,10 +175,6 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
 
     if (vertIdxs2) {
         fghBindBuffer(FGH_ELEMENT_ARRAY_BUFFER, ibo_elements2);
-        static float t2 = 0;
-        t2 += 0.1;
-        if (t2 >= numParts2)
-            t2 = 0;
         for (i=0; i<numParts2; i++)
             glDrawElements(GL_LINE_LOOP, numVertPerPart2,
                            GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(vertIdxs2[0])*i*numVertPerPart2));
