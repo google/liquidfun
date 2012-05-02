@@ -168,7 +168,13 @@ unsigned long fgPlatformSystemTime ( void )
  */
 void fgPlatformSleepForEvents( long msec )
 {
-  /* fprintf(stderr, "fgPlatformSleepForEvents: STUB\n"); */
+    /* Android's NativeActivity relies on a Looper/ALooper object to
+       notify about events.  The Looper object is plugged on two
+       internal pipe(2)s to detect system and input events.  Sadly you
+       can only ask the Looper for an event, not just ask whether
+       there is a pending event (and process it later).  Consequently,
+       short of redesigning NativeActivity, we cannot
+       SleepForEvents. */
 }
 
 /**
