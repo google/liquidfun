@@ -31,20 +31,20 @@
 
 void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 {
-  fprintf(stderr, "fgPlatformJoystickRawRead: STUB\n");
+    fgWarning("fgPlatformJoystickRawRead: STUB\n");
 }
 
 void fgPlatformJoystickOpen( SFG_Joystick* joy )
 {
-  fprintf(stderr, "fgPlatformJoystickOpen: STUB\n");
+    fgWarning("fgPlatformJoystickOpen: STUB\n");
 }
 
 void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
 {
-  fprintf(stderr, "fgJoystick: STUB\n");
+    fgWarning("fgJoystick: STUB\n");
 }
 
 void fgPlatformJoystickClose ( int ident )
 {
-  fprintf(stderr, "fgPlatformJoystickClose: STUB\n");
+    fgWarning("fgPlatformJoystickClose: STUB\n");
 }
