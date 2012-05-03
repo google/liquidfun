@@ -49,6 +49,7 @@
 #include <android/asset_manager.h>
 #include <android/native_window.h>
 #include "android/native_app_glue/android_native_app_glue.h"
+#include "android/fg_main_android.h"
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "FreeGLUT", __VA_ARGS__))
@@ -159,6 +160,9 @@ void android_main(struct android_app* app) {
   }
 
   LOGI("android_main: end");
+
+  /* TODO: Pausing/resuming windows not ready yet, so exiting now */
+  exit(0);
 
   /* Finish processing all events (namely APP_CMD_DESTROY) before
      exiting thread */

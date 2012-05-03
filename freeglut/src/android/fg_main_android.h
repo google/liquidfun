@@ -26,6 +26,9 @@
 #ifndef __FG_MAIN_ANDROID_H__
 #define __FG_MAIN_ANDROID_H__
 
+#include <GL/freeglut.h>
+#include "fg_internal.h"
+
 extern void fgPlatformProcessSingleEvent(void);
 extern void fgPlatformReshapeWindow(SFG_Window *window, int width, int height);
 extern void fgPlatformDisplayWindow(SFG_Window *window);

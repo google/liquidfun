@@ -303,36 +303,26 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
  */
 void handle_cmd(struct android_app* app, int32_t cmd) {
   switch (cmd) {
-  case APP_CMD_SAVE_STATE:
-    /* The system has asked us to save our current state.  Do so. */
-    LOGI("handle_cmd: APP_CMD_SAVE_STATE");
+  /* App life cycle, in that order: */
+  case APP_CMD_START:
+    LOGI("handle_cmd: APP_CMD_START");
     break;
-  case APP_CMD_INIT_WINDOW:
+  case APP_CMD_RESUME:
+    LOGI("handle_cmd: APP_CMD_RESUME");
+    /* If coming back from a pause: */
+    /* - Recreate window context and surface */
+    /* - Call user-defined hook to restore resources (textures...) */
+    /* - Unpause GLUT callbacks */
+    break;
+  case APP_CMD_INIT_WINDOW: /* surfaceCreated */
     /* The window is being shown, get it ready. */
     LOGI("handle_cmd: APP_CMD_INIT_WINDOW");
     fgDisplay.pDisplay.single_window->Window.Handle = app->window;
     /* glPlatformOpenWindow was waiting for Handle to be defined and
        will now return from fgPlatformProcessSingleEvent() */
     break;
-  case APP_CMD_TERM_WINDOW:
-    /* The window is being hidden or closed, clean it up. */
-    LOGI("handle_cmd: APP_CMD_TERM_WINDOW");
-    fgDestroyWindow(fgDisplay.pDisplay.single_window);
-    fgDisplay.pDisplay.single_window = NULL;
-    break;
-  case APP_CMD_DESTROY:
-    LOGI("handle_cmd: APP_CMD_DESTROY");
-    /* glue has already set android_app->destroyRequested=1 */
-    break;
   case APP_CMD_GAINED_FOCUS:
     LOGI("handle_cmd: APP_CMD_GAINED_FOCUS");
-    break;
-  case APP_CMD_LOST_FOCUS:
-    LOGI("handle_cmd: APP_CMD_LOST_FOCUS");
-    break;
-  case APP_CMD_CONFIG_CHANGED:
-    /* Handle rotation / orientation change */
-    LOGI("handle_cmd: APP_CMD_CONFIG_CHANGED");
     break;
   case APP_CMD_WINDOW_RESIZED:
     LOGI("handle_cmd: APP_CMD_WINDOW_RESIZED");
@@ -340,6 +330,48 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
       /* Make ProcessSingleEvent detect the new size, only available
 	 after the next SwapBuffer */
       glutPostRedisplay();
+    break;
+
+  case APP_CMD_SAVE_STATE: /* onSaveInstanceState */
+    /* The system has asked us to save our current state, when it
+       pauses the application without destroying it right after. */
+    /* app->savedState = ... */
+    /* app->savedStateSize = ... */
+    LOGI("handle_cmd: APP_CMD_SAVE_STATE");
+    break;
+  case APP_CMD_PAUSE:
+    LOGI("handle_cmd: APP_CMD_PAUSE");
+    /* - Pause GLUT callbacks */
+    break;
+  case APP_CMD_LOST_FOCUS:
+    LOGI("handle_cmd: APP_CMD_LOST_FOCUS");
+    break;
+  case APP_CMD_TERM_WINDOW: /* surfaceDestroyed */
+    /* The application is being hidden, but may be restored */
+    /* TODO: Pausing/resuming windows not ready yet, so killing it now */
+    fgDestroyWindow(fgDisplay.pDisplay.single_window);
+    fgDisplay.pDisplay.single_window = NULL;
+    LOGI("handle_cmd: APP_CMD_TERM_WINDOW");
+    break;
+  case APP_CMD_STOP:
+    LOGI("handle_cmd: APP_CMD_STOP");
+    break;
+  case APP_CMD_DESTROY: /* Activity.onDestroy */
+    LOGI("handle_cmd: APP_CMD_DESTROY");
+    /* User closed the application for good, let's kill the window */
+    if (fgDisplay.pDisplay.single_window != NULL) {
+      fgDestroyWindow(fgDisplay.pDisplay.single_window);
+      fgDisplay.pDisplay.single_window = NULL;
+    }
+    /* glue has already set android_app->destroyRequested=1 */
+    break;
+
+  case APP_CMD_CONFIG_CHANGED:
+    /* Handle rotation / orientation change */
+    LOGI("handle_cmd: APP_CMD_CONFIG_CHANGED");
+    break;
+  case APP_CMD_LOW_MEMORY:
+    LOGI("handle_cmd: APP_CMD_LOW_MEMORY");
     break;
   default:
     LOGI("handle_cmd: unhandled cmd=%d", cmd);
