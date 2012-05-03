@@ -154,6 +154,8 @@ void android_main(struct android_app* app) {
     char progname[5] = "self";
     char* argv[] = {progname, NULL};
     main(1, argv);
+    /* FreeGLUT will exit() by itself if
+       GLUT_ACTION_ON_WINDOW_CLOSE == GLUT_ACTION_EXIT */
   }
 
   LOGI("android_main: end");
@@ -163,7 +165,8 @@ void android_main(struct android_app* app) {
   while (!app->destroyRequested)
       fgPlatformProcessSingleEvent();
 
-  /* In theory we should let NativeActivity restart us, however this
-     doesn't work well yet, so force exit */
-  exit(0);
+  /* Let NativeActivity restart us */
+  /* Users may want to forcibly exit() in their main() anyway because
+     NativeActivity doesn't dlclose() us, so all statically-assigned
+     variables keep their old values on restart.. */
 }

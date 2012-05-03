@@ -318,6 +318,7 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     /* The window is being hidden or closed, clean it up. */
     LOGI("handle_cmd: APP_CMD_TERM_WINDOW");
     fgDestroyWindow(fgDisplay.pDisplay.single_window);
+    fgDisplay.pDisplay.single_window = NULL;
     break;
   case APP_CMD_DESTROY:
     LOGI("handle_cmd: APP_CMD_DESTROY");
@@ -347,9 +348,6 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
 
 void fgPlatformProcessSingleEvent ( void )
 {
-  static int32_t last_width = -1;
-  static int32_t last_height = -1;
-
   /* When the screen is resized, the window handle still points to the
      old window until the next SwapBuffer, while it's crucial to set
      the size (onShape) correctly before the next onDisplay callback.
@@ -363,9 +361,9 @@ void fgPlatformProcessSingleEvent ( void )
   if (window != NULL && window->Window.Handle != NULL) {
     int32_t width = ANativeWindow_getWidth(window->Window.Handle);
     int32_t height = ANativeWindow_getHeight(window->Window.Handle);
-    if (width != last_width || height != last_height) {
-      last_width = width;
-      last_height = height;
+    if (width != window->State.pWState.LastWidth || height != window->State.pWState.LastHeight) {
+      window->State.pWState.LastWidth = width;
+      window->State.pWState.LastHeight = height;
       LOGI("width=%d, height=%d", width, height);
       if( FETCH_WCB( *window, Reshape ) )
 	INVOKE_WCB( *window, Reshape, ( width, height ) );

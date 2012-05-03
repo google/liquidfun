@@ -42,11 +42,10 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
                            GLboolean gameMode, GLboolean isSubWindow )
 {
   /* TODO: only one full-screen window possible? */
-  static int nb_windows = 0;
-  if (nb_windows == 0) {
-    nb_windows++;
+  if (fgDisplay.pDisplay.single_window == NULL) {
     fgDisplay.pDisplay.single_window = window;
   } else {
+    fgWarning("You can't have more than one window on Android");
     return;
   }
 
