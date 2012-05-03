@@ -28,8 +28,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdio.h>
+#include <GL/freeglut.h>
+#include "fg_internal.h"
 typedef struct _serialport SERIALPORT;
+#include <stdio.h>
 
 /*
  * This is only used if the user calls:
@@ -43,7 +45,7 @@ typedef struct _serialport SERIALPORT;
 void fgPlatformRegisterDialDevice ( const char *dial_device ) {
     fgWarning("GLUT_HAS_DIAL_AND_BUTTON_BOX: not implemented");
 }
-SERIALPORT *serial_open ( const char *device ) {}
+SERIALPORT *serial_open ( const char *device ) { return NULL; }
 void serial_close(SERIALPORT *port) {}
 int serial_getchar(SERIALPORT *port) { return EOF; }
 int serial_putchar(SERIALPORT *port, unsigned char ch) { return 0; }
