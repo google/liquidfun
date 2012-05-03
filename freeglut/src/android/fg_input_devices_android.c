@@ -32,37 +32,19 @@
 typedef struct _serialport SERIALPORT;
 
 /*
- * Try initializing the input device(s)
+ * This is only used if the user calls:
+ * glutDeviceGet(GLUT_HAS_DIAL_AND_BUTTON_BOX)
+ * and has old hardware called 'dials&buttons box'.
+ * http://www.reputable.com/sgipix/sgi-dialnbutton1.jpg
+ * 
+ * Not implemented on Android :)
+ * http://sourceforge.net/mailarchive/message.php?msg_id=29209505
  */
-void fgPlatformRegisterDialDevice ( const char *dial_device )
-{
-  fprintf(stderr, "fgPlatformRegisterDialDevice: STUB\n");
+void fgPlatformRegisterDialDevice ( const char *dial_device ) {
+    fgWarning("GLUT_HAS_DIAL_AND_BUTTON_BOX: not implemented");
 }
-
-SERIALPORT *serial_open ( const char *device )
-{
-  fprintf(stderr, "serial_open: STUB\n");
-  return NULL;
-}
-
-void serial_close(SERIALPORT *port)
-{
-  fprintf(stderr, "serial_close: STUB\n");
-}
-
-int serial_getchar(SERIALPORT *port)
-{
-  fprintf(stderr, "serial_getchar: STUB\n");
-  return EOF;
-}
-
-int serial_putchar(SERIALPORT *port, unsigned char ch)
-{
-  fprintf(stderr, "serial_putchar: STUB\n");
-  return 0;
-}
-
-void serial_flush ( SERIALPORT *port )
-{
-  fprintf(stderr, "serial_flush: STUB\n");
-}
+SERIALPORT *serial_open ( const char *device ) {}
+void serial_close(SERIALPORT *port) {}
+int serial_getchar(SERIALPORT *port) { return EOF; }
+int serial_putchar(SERIALPORT *port, unsigned char ch) { return 0; }
+void serial_flush ( SERIALPORT *port ) {}
