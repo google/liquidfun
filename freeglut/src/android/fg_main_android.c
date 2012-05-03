@@ -133,6 +133,7 @@ static unsigned char key_ascii(struct android_app* app, AInputEvent* event) {
   int ascii = (*env)->CallIntMethod(env, keyEvent, KeyEvent_getUnicodeChar, AKeyEvent_getMetaState(event));
 
   /* LOGI("getUnicodeChar(%d) = %d ('%c')", AKeyEvent_getKeyCode(event), ascii, ascii); */
+  (*vm)->DetachCurrentThread(vm);
 
   return ascii;
 }
@@ -319,8 +320,8 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     fgDestroyWindow(fgDisplay.pDisplay.single_window);
     break;
   case APP_CMD_DESTROY:
-    /* Not reached because GLUT exit()s when last window is closed */
     LOGI("handle_cmd: APP_CMD_DESTROY");
+    /* glue has already set android_app->destroyRequested=1 */
     break;
   case APP_CMD_GAINED_FOCUS:
     LOGI("handle_cmd: APP_CMD_GAINED_FOCUS");
@@ -393,7 +394,7 @@ void fgPlatformProcessSingleEvent ( void )
 
 void fgPlatformMainLoopPreliminaryWork ( void )
 {
-  printf("fgPlatformMainLoopPreliminaryWork\n");
+  LOGI("fgPlatformMainLoopPreliminaryWork\n");
 
   key_init();
 

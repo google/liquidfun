@@ -127,6 +127,8 @@ static void extract_assets(struct android_app* app) {
       AAssetDir_close(assetDir);
     }
   }
+
+  (*vm)->DetachCurrentThread(vm);
 }
 
 /**
@@ -155,5 +157,13 @@ void android_main(struct android_app* app) {
   }
 
   LOGI("android_main: end");
+
+  /* Finish processing all events (namely APP_CMD_DESTROY) before
+     exiting thread */
+  while (!app->destroyRequested)
+      fgPlatformProcessSingleEvent();
+
+  /* In theory we should let NativeActivity restart us, however this
+     doesn't work well yet, so force exit */
   exit(0);
 }
