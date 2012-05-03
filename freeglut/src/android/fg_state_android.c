@@ -64,11 +64,9 @@ int fgPlatformGlutGet ( GLenum eWhat )
   /* One full-screen window only */
   case GLUT_WINDOW_X:
   case GLUT_WINDOW_Y:
-      return 0;
   case GLUT_WINDOW_BORDER_WIDTH:
-      return fgPlatformGlutGet(GLUT_WINDOW_WIDTH);
   case GLUT_WINDOW_HEADER_HEIGHT:
-      return fgPlatformGlutGet(GLUT_WINDOW_HEIGHT);      
+      return 0;
 
   case GLUT_WINDOW_WIDTH:
   case GLUT_WINDOW_HEIGHT:
