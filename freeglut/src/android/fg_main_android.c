@@ -401,8 +401,3 @@ void fgPlatformMainLoopPreliminaryWork ( void )
   /* JNI entry points need to be bundled even when linking statically */
   app_dummy();
 }
-
-void fgPlatformDeinitialiseInputDevices ( void )
-{
-  fprintf(stderr, "fgPlatformDeinitialiseInputDevices: STUB\n");
-}

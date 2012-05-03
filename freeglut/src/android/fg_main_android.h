@@ -32,6 +32,5 @@ extern void fgPlatformDisplayWindow(SFG_Window *window);
 extern unsigned long fgPlatformSystemTime(void);
 extern void fgPlatformSleepForEvents(long msec);
 extern void fgPlatformMainLoopPreliminaryWork(void);
-extern void fgPlatformDeinitialiseInputDevices(void);
 
 #endif

@@ -37,3 +37,13 @@ void fgPlatformCloseDisplay()
 {
   fghPlatformCloseDisplayEGL();
 }
+
+/**
+ * Close joystick and serial input devices
+ */
+void fgPlatformDeinitialiseInputDevices ( void )
+{
+    fghCloseInputDevices ();
+    fgState.JoysticksInitialised = GL_FALSE;
+    fgState.InputDevsInitialised = GL_FALSE;
+}
