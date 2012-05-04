@@ -29,6 +29,11 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 
+/**
+ * TODO: Android has no joysticks at the moment (only touchscreens/touchpads),
+ * but we could expose the accelerometer as a 3-axis joystick.
+ */
+
 void fgPlatformJoystickRawRead( SFG_Joystick* joy, int* buttons, float* axes )
 {
     fgWarning("fgPlatformJoystickRawRead: STUB\n");

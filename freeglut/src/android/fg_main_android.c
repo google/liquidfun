@@ -222,12 +222,26 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
     }
   }
 
-  if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
-    int32_t action = AMotionEvent_getAction(event);
+  int32_t source = AInputEvent_getSource(event);
+  if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION
+      && source == AINPUT_SOURCE_TOUCHSCREEN) {
+    int32_t action = AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK;
+    /* Pointer ID for clicks */
+    int32_t pidx = AMotionEvent_getAction(event) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+    /* TODO: Handle multi-touch; also handle multiple sources */
+    if (0) {
+      LOGI("motion action=%d index=%d source=%d", action, pidx, source);
+      int count = AMotionEvent_getPointerCount(event);
+      int i;
+      for (i = 0; i < count; i++) {
+        LOGI("multi(%d): %.01f,%.01f",
+             AMotionEvent_getPointerId(event, i),
+             AMotionEvent_getX(event, i), AMotionEvent_getY(event, i));
+      }
+    }
     float x = AMotionEvent_getX(event, 0);
     float y = AMotionEvent_getY(event, 0);
-    LOGI("motion %.01f,%.01f action=%d", x, y, AMotionEvent_getAction(event));
-    
+
     /* Virtual arrows PAD */
     /* Don't interfere with existing mouse move event */
     if (!touchscreen.in_mmotion) {
@@ -285,7 +299,6 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
     if (!touchscreen.vpad.on) {
       window->State.MouseX = x;
       window->State.MouseY = y;
-      LOGI("Changed mouse position: %f,%f", x, y);
       if (action == AMOTION_EVENT_ACTION_DOWN && FETCH_WCB(*window, Mouse)) {
 	touchscreen.in_mmotion = true;
 	INVOKE_WCB(*window, Mouse, (GLUT_LEFT_BUTTON, GLUT_DOWN, x, y));

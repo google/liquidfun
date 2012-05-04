@@ -28,7 +28,7 @@
 
 void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
 {
-    // No-op: no visible cursor on touchscreens
+    /* No-op: no visible cursor on touchscreens */
 }
 
 void fgPlatformWarpPointer ( int x, int y )
@@ -38,4 +38,5 @@ void fgPlatformWarpPointer ( int x, int y )
     SFG_Window* window = fgStructure.CurrentWindow;
     window->State.MouseX = x;
     window->State.MouseY = y;
+    /* TODO: this should simulate a fake motion event */
 }
