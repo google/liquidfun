@@ -4,52 +4,11 @@ Status
 See http://freeglut.sourceforge.net/docs/android.php
 
 
-Create a module compatible with the NDK build-system
-====================================================
+Compile FreeGLUT
+================
 
 - Use your own cross-compiler for Android, or export the one from the
-  NDK:
-
-  /usr/src/android-ndk-r7c/build/tools/make-standalone-toolchain.sh \
-    --platform=android-9 \
-    --install-dir=/usr/src/ndk-standalone-9
-
-- Build FreeGLUT with a '/freeglut' prefix :
-
-  PATH=/usr/src/ndk-standalone-9/bin:$PATH
-  cd /usr/src/freeglut-3.0.0/
-  mkdir cross-android-module-gles2/
-  cd cross-android-module-gles2/
-  cmake \
-    -D CMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake \
-    -D CMAKE_INSTALL_PREFIX=/freeglut-gles2 \
-    -D CMAKE_BUILD_TYPE=Debug \
-    -D FREEGLUT_GLES2=ON \
-    -D FREEGLUT_BUILD_DEMOS=NO \
-    ..
-  make -j4
-  make install DESTDIR=$(pwd)
-
-- Copy Android.mk in the new 'freeglut/' directory :
-
-  cp ../android/gles2/Android.mk freeglut-gles2/
-
-- Reference this module in your jni/Android.mk:
-
-  LOCAL_STATIC_LIBRARIES := ... freeglut-gles2
-  ...
-  $(call import-module,freeglut-gles2)
-
-- You now can point your NDK_MODULE_PATH to this module!
-
-  ndk-build NDK_MODULE_PATH=/usr/src/freeglut-3.0.0/cross-android-module/freeglut-gles2/
-
-
-Compile FreeGLUT for a traditional cross-compiler environment
-=============================================================
-
-- Use your own cross-compiler for Android, or export the one from the
-  NDK:
+  Android NDK:
 
   /usr/src/android-ndk-r7c/build/tools/make-standalone-toolchain.sh \
     --platform=android-9 \
@@ -58,9 +17,9 @@ Compile FreeGLUT for a traditional cross-compiler environment
 - Compile FreeGLUT and install it in your Android cross-compiler path:
 
   PATH=/usr/src/ndk-standalone-9/bin:$PATH
-  cd /usr/src/freeglut-3.0.0/
-  mkdir cross-android-toolchain-gles2/
-  cd cross-android-toolchain-gles2/
+  cd /usr/src/freeglut-x.x/
+  mkdir cross-android-gles2/
+  cd cross-android-gles2/
   cmake \
     -D CMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake \
     -D CMAKE_INSTALL_PREFIX=/usr/src/ndk-standalone-9/sysroot/usr \
@@ -73,7 +32,9 @@ Compile FreeGLUT for a traditional cross-compiler environment
   # Only static for now:
   rm -f /usr/src/ndk-standalone-9/sysroot/usr/lib/libfreeglut-gles?.so*
 
-- Compile your own project.
+
+Compile your own project using common build systems
+===================================================
 
 For instance if you use the autotools:
 
@@ -88,7 +49,7 @@ If you use CMake, you may want to copy our Android toolchain
 
   PATH=/usr/src/ndk-standalone-9/bin:$PATH
   export PKG_CONFIG_PATH=/usr/src/ndk-standalone-9/sysroot/usr/share/pkgconfig
-  cp .../android_toolchain.cmake .
+  cp .../freeglut-x.x/android_toolchain.cmake .
   mkdir cross-android/
   cd cross-android/
   cmake \
@@ -99,3 +60,24 @@ If you use CMake, you may want to copy our Android toolchain
     ..
   make -j4
   make install
+
+
+Compile your own project using the NDK build-system
+===================================================
+
+- Create a module hierarchy pointing to FreeGLUT, with our Android.mk:
+
+  mkdir freeglut-gles2/
+  cp .../freeglut-x.x/android/gles2/Android.mk freeglut-gles2/
+  ln -s /usr/src/ndk-standalone-9/sysroot/usr/include freeglut-gles2/include
+  ln -s /usr/src/ndk-standalone-9/sysroot/usr/lib freeglut-gles2/lib
+
+- Reference this module in your jni/Android.mk:
+
+  LOCAL_STATIC_LIBRARIES := ... freeglut-gles2
+  ...
+  $(call import-module,freeglut-gles2)
+
+- You now can point your NDK_MODULE_PATH to the directory containing the module:
+
+  ndk-build NDK_MODULE_PATH=.
