@@ -55,6 +55,8 @@
  * from face to face.
  */
 
+/** See comment for fghDrawGeometryWire **/
+
 /* Version for OpenGL (ES) 1.1 */
 #ifndef GL_ES_VERSION_2_0
 static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals,
@@ -198,6 +200,20 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
         fghDeleteBuffers(1, &ibo_elements2);
 }
 
+/**
+ * Draw geometric shape in wire mode (only edges)
+ *
+ * Arguments: the sphere, in wire mode, consists of multiple line
+ * loops for the stacks, and for the slices. The vertex indices for
+ * all slices are thrown together. numParts is how many separate loops
+ * are in the array, numVertIdxsPerPart is how many vertices there are
+ * per loop.  For those suffixed with 2, its exactly the same
+ * principle, the number of stacks and slices is not the same.
+ *
+ * Feel free to contribute better naming ;)
+ *
+ * See comment for fghDrawGeometrySolid
+ */
 static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
     GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
     GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
@@ -220,15 +236,6 @@ static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei num
 #endif
 }
 
-
-/* Draw the geometric shape with filled triangles
- *
- * - If the shape is naturally triangulated (numEdgePerFace==3), each
- *   vertex+normal pair is used only once, so no vertex indices.
- * 
- * - If the shape was triangulated (DECOMPOSE_TO_TRIANGLE), some
- *   vertex+normal pairs are reused, so use vertex indices.
- */
 
 /* Version for OpenGL (ES) 1.1 */
 #ifndef GL_ES_VERSION_2_0
@@ -346,6 +353,14 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLushort
         fghDeleteBuffers(1, &ibo_elements);
 }
 
+/* Draw the geometric shape with filled triangles
+ *
+ * - If the shape is naturally triangulated (numEdgePerFace==3), each
+ *   vertex+normal pair is used only once, so no vertex indices.
+ * 
+ * - If the shape was triangulated (DECOMPOSE_TO_TRIANGLE), some
+ *   vertex+normal pairs are reused, so use vertex indices.
+ */
 static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLushort *vertIdxs,
                                  GLsizei numVertices, GLsizei numParts, GLsizei numVertIdxsPerPart)
 {
@@ -363,6 +378,8 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLushort *
                                numVertices, numParts, numVertIdxsPerPart);
 #endif
 }
+
+
 
 /* Shape decomposition to triangles
  * We'll use glDrawElements to draw all shapes that are not naturally

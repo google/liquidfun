@@ -185,10 +185,13 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
   if (window == NULL)
     return EVENT_NOT_HANDLED;
 
-  /* FIXME: in Android, when key is repeated, down and up events
-     happen most often at the exact same time.  This makes it
-     impossible to animate based on key press time. */
-  /* e.g. down/up/wait/down/up rather than down/wait/down/wait/up */
+  /* FIXME: in Android, when a key is repeated, down
+     and up events happen most often at the exact same time.  This
+     makes it impossible to animate based on key press time. */
+  /* e.g. down/up/wait/down/up rather than down/wait/down/wait/up */ 
+  /* This looks like a bug in the virtual keyboard system :/  Real
+     buttons such as the Back button appear to work correctly (series
+     of down events with proper getRepeatCount value */
   
   if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_KEY) {
     /* LOGI("action: %d", AKeyEvent_getAction(event)); */
@@ -317,10 +320,10 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     break;
   case APP_CMD_INIT_WINDOW: /* surfaceCreated */
     /* The window is being shown, get it ready. */
-    LOGI("handle_cmd: APP_CMD_INIT_WINDOW");
+    LOGI("handle_cmd: APP_CMD_INIT_WINDOW %p", app->window);
     fgDisplay.pDisplay.single_native_window = app->window;
-    /* glPlatformOpenWindow was waiting for Handle to be defined and
-       will now return from fgPlatformProcessSingleEvent() */
+    /* start|resume: glPlatformOpenWindow was waiting for Handle to be
+       defined and will now continue processing */
     break;
   case APP_CMD_GAINED_FOCUS:
     LOGI("handle_cmd: APP_CMD_GAINED_FOCUS");
@@ -450,6 +453,9 @@ void fgPlatformProcessSingleEvent ( void )
     if (app->destroyRequested != 1) {
       /* Android is full-screen only, simplified call.. */
       /* Ideally we'd have a fgPlatformReopenWindow() */
+      /* If we're hidden by a non-fullscreen or translucent activity,
+         we'll be paused but not stopped, and keep the current
+         surface; in which case fgPlatformOpenWindow will no-op. */
       fgPlatformOpenWindow(window, "", GL_FALSE, 0, 0, GL_FALSE, 0, 0, GL_FALSE, GL_FALSE);
       /* TODO: INVOKE_WCB(*window, Pause?); */
       /* TODO: INVOKE_WCB(*window, LoadResources/ContextLost/...?); */
