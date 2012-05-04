@@ -189,9 +189,9 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
      and up events happen most often at the exact same time.  This
      makes it impossible to animate based on key press time. */
   /* e.g. down/up/wait/down/up rather than down/wait/down/wait/up */ 
-  /* This looks like a bug in the virtual keyboard system :/  Real
-     buttons such as the Back button appear to work correctly (series
-     of down events with proper getRepeatCount value */
+  /* This looks like a bug in the Android virtual keyboard system :/
+     Real buttons such as the Back button appear to work correctly
+     (series of down events with proper getRepeatCount value). */
   
   if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_KEY) {
     /* LOGI("action: %d", AKeyEvent_getAction(event)); */
