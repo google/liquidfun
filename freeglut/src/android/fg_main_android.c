@@ -367,6 +367,7 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     /* The application is being hidden, but may be restored */
     LOGI("handle_cmd: APP_CMD_TERM_WINDOW");
     fghPlatformCloseWindowEGL(window);
+    window->State.NeedToFixMyNameInitContext = GL_TRUE;
     fgDisplay.pDisplay.single_native_window = NULL;
     break;
   case APP_CMD_STOP:
@@ -471,7 +472,6 @@ void fgPlatformProcessSingleEvent ( void )
          surface; in which case fgPlatformOpenWindow will no-op. */
       fgPlatformOpenWindow(window, "", GL_FALSE, 0, 0, GL_FALSE, 0, 0, GL_FALSE, GL_FALSE);
       /* TODO: INVOKE_WCB(*window, Pause?); */
-      /* TODO: INVOKE_WCB(*window, LoadResources/ContextLost/...?); */
       /* TODO: INVOKE_WCB(*window, Resume?); */
     }
   }

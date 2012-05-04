@@ -199,6 +199,9 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutInitContextProfile);
     CHECK_NAME(glutInitErrorFunc);
     CHECK_NAME(glutInitWarningFunc);
+    CHECK_NAME(glutFixMyNameInitContextFunc)
+    CHECK_NAME(glutFixMyNamePauseFunc)
+    CHECK_NAME(glutFixMyNameResumeFunc)
 #undef CHECK_NAME
 
     return NULL;

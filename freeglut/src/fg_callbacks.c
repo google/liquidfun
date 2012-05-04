@@ -409,4 +409,31 @@ void FGAPIENTRY glutMultiPassiveFunc( void (* callback)(int, int, int ) )
     SET_CALLBACK( MultiPassive );
 }
 
+/*
+ * Sets the context reload callback for the current window
+ */
+void FGAPIENTRY glutFixMyNameInitContextFunc( void (* callback)() )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFixMyNameInitContextFunc" );
+    SET_CALLBACK( FixMyNameInitContext );
+}
+
+/*
+ * Sets the pause callback for the current window
+ */
+void FGAPIENTRY glutFixMyNamePauseFunc( void (* callback)() )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFixMyNamePauseFunc" );
+    SET_CALLBACK( FixMyNamePause );
+}
+
+/*
+ * Sets the resume callback for the current window
+ */
+void FGAPIENTRY glutFixMyNameResumeFunc( void (* callback)() )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFixMyNameResumeFunc" );
+    SET_CALLBACK( FixMyNameResume );
+}
+
 /*** END OF FILE ***/

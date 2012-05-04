@@ -227,6 +227,10 @@ FGAPI void    FGAPIENTRY glutInitWarningFunc( void (* vWarning)( const char *fmt
 FGAPI void    FGAPIENTRY glutSetVertexAttribCoord3(GLint attrib);
 FGAPI void    FGAPIENTRY glutSetVertexAttribNormal(GLint attrib);
 
+/* Mobile platforms lifecycle */
+FGAPI void    FGAPIENTRY glutFixMyNameInitContextFunc(void (* callback)());
+FGAPI void    FGAPIENTRY glutFixMyNamePauseFunc(void (* callback)());
+FGAPI void    FGAPIENTRY glutFixMyNameResumeFunc(void (* callback)());
 
 /*
  * GLUT API macro definitions -- the display mode definitions

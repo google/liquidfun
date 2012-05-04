@@ -37,6 +37,7 @@
 */
 
 #include <GL/freeglut.h>
+#include <GL/freeglut_ext.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -281,7 +282,8 @@ const GLfloat high_shininess[] = { 100.0f };
 
 /* Program entry point */
 
-void init_resources() {
+void init_context() {
+    printf("init_context\n"); fflush(stdout);
     glClearColor(1,1,1,1);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -320,10 +322,10 @@ main(int argc, char *argv[])
     glutSpecialFunc(special);
     glutIdleFunc(idle);
     glutMouseFunc(onMouseClick);
+    glutFixMyNameInitContextFunc(init_context);
 
     glutSetOption ( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION ) ;
 
-    init_resources();
     glutMainLoop();
 
 #ifdef _MSC_VER

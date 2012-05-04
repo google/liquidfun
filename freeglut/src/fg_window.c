@@ -150,6 +150,8 @@ void fgOpenWindow( SFG_Window* window, const char* title,
     window->Window.attribute_v_normal = -1;
 
     fgInitGL2();
+
+    window->State.NeedToFixMyNameInitContext = GL_TRUE;
 }
 
 /*
