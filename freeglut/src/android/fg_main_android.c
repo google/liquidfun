@@ -29,6 +29,7 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 #include "fg_main.h"
+#include "egl/fg_window_egl.h"
 
 #include <android/log.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))
@@ -180,7 +181,9 @@ void fgPlatformSleepForEvents( long msec )
  * Process the next input event.
  */
 int32_t handle_input(struct android_app* app, AInputEvent* event) {
-  SFG_Window* window = fgStructure.CurrentWindow;
+  SFG_Window* window = fgWindowByHandle(app->window);
+  if (window == NULL)
+    return EVENT_NOT_HANDLED;
 
   /* FIXME: in Android, when key is repeated, down and up events
      happen most often at the exact same time.  This makes it
@@ -302,6 +305,7 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
  * Process the next main command.
  */
 void handle_cmd(struct android_app* app, int32_t cmd) {
+  SFG_Window* window = fgWindowByHandle(app->window);  /* may be NULL */
   switch (cmd) {
   /* App life cycle, in that order: */
   case APP_CMD_START:
@@ -309,15 +313,12 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     break;
   case APP_CMD_RESUME:
     LOGI("handle_cmd: APP_CMD_RESUME");
-    /* If coming back from a pause: */
-    /* - Recreate window context and surface */
-    /* - Call user-defined hook to restore resources (textures...) */
-    /* - Unpause GLUT callbacks */
+    /* Cf. fgPlatformProcessSingleEvent */
     break;
   case APP_CMD_INIT_WINDOW: /* surfaceCreated */
     /* The window is being shown, get it ready. */
     LOGI("handle_cmd: APP_CMD_INIT_WINDOW");
-    fgDisplay.pDisplay.single_window->Window.Handle = app->window;
+    fgDisplay.pDisplay.single_native_window = app->window;
     /* glPlatformOpenWindow was waiting for Handle to be defined and
        will now return from fgPlatformProcessSingleEvent() */
     break;
@@ -326,7 +327,7 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     break;
   case APP_CMD_WINDOW_RESIZED:
     LOGI("handle_cmd: APP_CMD_WINDOW_RESIZED");
-    if (fgDisplay.pDisplay.single_window->Window.pContext.egl.Surface != EGL_NO_SURFACE)
+    if (window->Window.pContext.egl.Surface != EGL_NO_SURFACE)
       /* Make ProcessSingleEvent detect the new size, only available
 	 after the next SwapBuffer */
       glutPostRedisplay();
@@ -335,23 +336,22 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
   case APP_CMD_SAVE_STATE: /* onSaveInstanceState */
     /* The system has asked us to save our current state, when it
        pauses the application without destroying it right after. */
-    /* app->savedState = ... */
-    /* app->savedStateSize = ... */
+    app->savedState = strdup("Detect me as non-NULL on next android_main");
+    app->savedStateSize = strlen(app->savedState) + 1;
     LOGI("handle_cmd: APP_CMD_SAVE_STATE");
     break;
   case APP_CMD_PAUSE:
     LOGI("handle_cmd: APP_CMD_PAUSE");
-    /* - Pause GLUT callbacks */
+    /* Cf. fgPlatformProcessSingleEvent */
     break;
   case APP_CMD_LOST_FOCUS:
     LOGI("handle_cmd: APP_CMD_LOST_FOCUS");
     break;
   case APP_CMD_TERM_WINDOW: /* surfaceDestroyed */
     /* The application is being hidden, but may be restored */
-    /* TODO: Pausing/resuming windows not ready yet, so killing it now */
-    fgDestroyWindow(fgDisplay.pDisplay.single_window);
-    fgDisplay.pDisplay.single_window = NULL;
     LOGI("handle_cmd: APP_CMD_TERM_WINDOW");
+    fghPlatformCloseWindowEGL(window);
+    fgDisplay.pDisplay.single_native_window = NULL;
     break;
   case APP_CMD_STOP:
     LOGI("handle_cmd: APP_CMD_STOP");
@@ -359,9 +359,14 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
   case APP_CMD_DESTROY: /* Activity.onDestroy */
     LOGI("handle_cmd: APP_CMD_DESTROY");
     /* User closed the application for good, let's kill the window */
-    if (fgDisplay.pDisplay.single_window != NULL) {
-      fgDestroyWindow(fgDisplay.pDisplay.single_window);
-      fgDisplay.pDisplay.single_window = NULL;
+    {
+      /* Can't use fgWindowByHandle as app->window is NULL */
+      SFG_Window* window = fgStructure.CurrentWindow;
+      if (window != NULL) {
+        fgDestroyWindow(window);
+      } else {
+        LOGI("APP_CMD_DESTROY: No current window");
+      }
     }
     /* glue has already set android_app->destroyRequested=1 */
     break;
@@ -378,6 +383,11 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
   }
 }
 
+void fgPlatformOpenWindow( SFG_Window* window, const char* title,
+                           GLboolean positionUse, int x, int y,
+                           GLboolean sizeUse, int w, int h,
+                           GLboolean gameMode, GLboolean isSubWindow );
+
 void fgPlatformProcessSingleEvent ( void )
 {
   /* When the screen is resized, the window handle still points to the
@@ -389,7 +399,7 @@ void fgPlatformProcessSingleEvent ( void )
   /* Interestingly, on a Samsung Galaxy S/PowerVR SGX540 GPU/Android
      2.3, that next SwapBuffer is fake (but still necessary to get the
      new size). */
-  SFG_Window* window = fgDisplay.pDisplay.single_window;
+  SFG_Window* window = fgStructure.CurrentWindow;
   if (window != NULL && window->Window.Handle != NULL) {
     int32_t width = ANativeWindow_getWidth(window->Window.Handle);
     int32_t height = ANativeWindow_getHeight(window->Window.Handle);
@@ -418,6 +428,32 @@ void fgPlatformProcessSingleEvent ( void )
     /* Process this event. */
     if (source != NULL) {
       source->process(source->app, source);
+    }
+  }
+
+  /* If we're not in RESUME state, Android paused us, so wait */
+  struct android_app* app = fgDisplay.pDisplay.app;
+  if (app->destroyRequested != 1 && app->activityState != APP_CMD_RESUME) {
+    int FOREVER = -1;
+    while (app->destroyRequested != 1 && (app->activityState != APP_CMD_RESUME)) {
+      if ((ident=ALooper_pollOnce(FOREVER, NULL, &events, (void**)&source)) >= 0) {
+        /* Process this event. */
+        if (source != NULL) {
+          source->process(source->app, source);
+        }
+      }
+    }
+    /* If coming back from a pause: */
+    /* - Recreate window context and surface */
+    /* - Call user-defined hook to restore resources (textures...) */
+    /* - Exit pause looop */
+    if (app->destroyRequested != 1) {
+      /* Android is full-screen only, simplified call.. */
+      /* Ideally we'd have a fgPlatformReopenWindow() */
+      fgPlatformOpenWindow(window, "", GL_FALSE, 0, 0, GL_FALSE, 0, 0, GL_FALSE, GL_FALSE);
+      /* TODO: INVOKE_WCB(*window, Pause?); */
+      /* TODO: INVOKE_WCB(*window, LoadResources/ContextLost/...?); */
+      /* TODO: INVOKE_WCB(*window, Resume?); */
     }
   }
 }

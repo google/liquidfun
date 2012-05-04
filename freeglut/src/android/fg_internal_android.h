@@ -34,10 +34,12 @@
 /* -- GLOBAL TYPE DEFINITIONS ---------------------------------------------- */
 /* The structure used by display initialization in freeglut_init.c */
 typedef struct tagSFG_PlatformDisplay SFG_PlatformDisplay;
+struct android_app;
 struct tagSFG_PlatformDisplay
 {
   struct tagSFG_PlatformDisplayEGL egl;
-  struct tagSFG_Window* single_window;
+  EGLNativeWindowType single_native_window;
+  struct android_app* app;
 };
 
 typedef struct tagSFG_PlatformContext SFG_PlatformContext;

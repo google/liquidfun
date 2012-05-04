@@ -138,7 +138,7 @@ static void extract_assets(struct android_app* app) {
  * event loop for receiving input events and doing other things.
  */
 void android_main(struct android_app* app) {
-  LOGI("android_main");
+  LOGI("android_main savedState=%p", app->savedState);
 
   /* Register window resize callback */
   app->activity->callbacks->onNativeWindowResized = onNativeWindowResized;
@@ -154,20 +154,13 @@ void android_main(struct android_app* app) {
   {
     char progname[5] = "self";
     char* argv[] = {progname, NULL};
+    fgDisplay.pDisplay.app = app;
     main(1, argv);
     /* FreeGLUT will exit() by itself if
        GLUT_ACTION_ON_WINDOW_CLOSE == GLUT_ACTION_EXIT */
   }
 
   LOGI("android_main: end");
-
-  /* TODO: Pausing/resuming windows not ready yet, so exiting now */
-  exit(0);
-
-  /* Finish processing all events (namely APP_CMD_DESTROY) before
-     exiting thread */
-  while (!app->destroyRequested)
-      fgPlatformProcessSingleEvent();
 
   /* Let NativeActivity restart us */
   /* Users may want to forcibly exit() in their main() anyway because

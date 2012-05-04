@@ -30,7 +30,7 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 #include "egl/fg_window_egl.h"
-#include "android/fg_main_android.h"
+#include <android/native_app_glue/android_native_app_glue.h>
 
 /*
  * Opens a window. Requires a SFG_Window object created and attached
@@ -42,27 +42,32 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
                            GLboolean gameMode, GLboolean isSubWindow )
 {
   /* TODO: only one full-screen window possible? */
-  if (fgDisplay.pDisplay.single_window == NULL) {
-    fgDisplay.pDisplay.single_window = window;
-  } else {
+  if (fgDisplay.pDisplay.single_native_window != NULL) {
     fgWarning("You can't have more than one window on Android");
     return;
   }
 
-  fghChooseConfig(&window->Window.pContext.egl.Config);
-  window->Window.Context = fghCreateNewContextEGL(window);
-
-  /* Wait until window is available and OpenGL context is created */
+  /* First, wait until Activity surface is available */
   /* Normally events are processed through glutMainLoop(), but the
      user didn't call it yet, and the Android may not have initialized
      the View yet.  So we need to wait for that to happen. */
   /* We can't return from this function before the OpenGL context is
      properly made current with a valid surface. So we wait for the
      surface. */
-  while (fgDisplay.pDisplay.single_window->Window.Handle == NULL) {
+  while (fgDisplay.pDisplay.single_native_window == NULL) {
     /* APP_CMD_INIT_WINDOW will do the job */
-    fgPlatformProcessSingleEvent();
+    int ident;
+    int events;
+    struct android_poll_source* source;
+    if ((ident=ALooper_pollOnce(0, NULL, &events, (void**)&source)) >= 0)
+      if (source != NULL) source->process(source->app, source);
+    /* fgPlatformProcessSingleEvent(); */
   }
+  window->Window.Handle = fgDisplay.pDisplay.single_native_window;
+
+  /* Create context */
+  fghChooseConfig(&window->Window.pContext.egl.Config);
+  window->Window.Context = fghCreateNewContextEGL(window);
 
   EGLDisplay display = fgDisplay.pDisplay.egl.Display;
 

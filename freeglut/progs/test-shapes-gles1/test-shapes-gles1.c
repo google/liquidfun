@@ -281,25 +281,7 @@ const GLfloat high_shininess[] = { 100.0f };
 
 /* Program entry point */
 
-int
-main(int argc, char *argv[])
-{
-    glutInitWindowSize(640,480);
-    glutInitWindowPosition(40,40);
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
-
-    glutCreateWindow("FreeGLUT Shapes");
-
-    glutReshapeFunc(resize);
-    glutDisplayFunc(display);
-    glutKeyboardFunc(key);
-    glutSpecialFunc(special);
-    glutIdleFunc(idle);
-    glutMouseFunc(onMouseClick);
-
-    glutSetOption ( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION ) ;
-
+void init_resources() {
     glClearColor(1,1,1,1);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -320,7 +302,28 @@ main(int argc, char *argv[])
     glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+}
 
+int
+main(int argc, char *argv[])
+{
+    glutInitWindowSize(640,480);
+    glutInitWindowPosition(40,40);
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
+
+    glutCreateWindow("FreeGLUT Shapes");
+
+    glutReshapeFunc(resize);
+    glutDisplayFunc(display);
+    glutKeyboardFunc(key);
+    glutSpecialFunc(special);
+    glutIdleFunc(idle);
+    glutMouseFunc(onMouseClick);
+
+    glutSetOption ( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION ) ;
+
+    init_resources();
     glutMainLoop();
 
 #ifdef _MSC_VER
