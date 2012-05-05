@@ -7,7 +7,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 # platforms, such as Linux, the shared libraries are put in
 # CMAKE_ARCHIVE_OUTPUT_DIRECTORY instead.
 # Static libraries end up in CMAKE_ARCHIVE_OUTPUT_DIRECTORY on all
-# platforms (unless 
+# platforms.
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
@@ -97,7 +97,8 @@ IF(WIN32)
         ${CMAKE_BINARY_DIR}/freeglut.rc # generated below from freeglut.rc.in
     )
     IF (MSVC AND NOT CMAKE_CL_64)
-        # .def file only for 32bit Windows builds
+        # .def file only for 32bit Windows builds (TODO: MSVC only right
+        # now, needed for any other Windows platform?)
         LIST(APPEND FREEGLUT_SRCS
             ${CMAKE_BINARY_DIR}/freeglutdll.def # generated below from src/freeglutdll.def.in
         )
@@ -170,7 +171,7 @@ ENDIF()
 # For OpenGL ES (GLES):
 # - compile with -DFREEGLUT_GLES1 and -DFREEGLUT_GLES2 to cleanly
 #   bootstrap headers inclusion in freeglut_std.h; these constants
-#   also need to be defined in client applications (e.g through
+#   also need to be defined in client applications (e.g. through
 #   pkg-config), but use GLES constants directly for all other needs
 # - define GLES version-specific library
 IF(FREEGLUT_GLES2)
@@ -240,6 +241,9 @@ CHECK_INCLUDE_FILES(sys/ioctl.h HAVE_SYS_IOCTL_H)
 CHECK_INCLUDE_FILES(fcntl.h 	HAVE_FCNTL_H)
 CHECK_INCLUDE_FILES(errno.h 	HAVE_ERRNO_H)
 CHECK_INCLUDE_FILES(usbhid.h 	HAVE_USBHID_H)
+CHECK_FUNCTION_EXISTS(sinf      HAVE_SINF)
+CHECK_FUNCTION_EXISTS(cosf      HAVE_COSF)
+CHECK_FUNCTION_EXISTS(sqrtf     HAVE_SQRTF)
 CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
 CHECK_FUNCTION_EXISTS(vfprintf  HAVE_VFPRINTF)
 CHECK_FUNCTION_EXISTS(_doprnt   HAVE_DOPRNT)
@@ -255,19 +259,14 @@ CHECK_INCLUDE_FILES(stdint.h    HAVE_STDINT_H)
 CHECK_INCLUDE_FILES(inttypes.h  HAVE_INTTYPES_H)
 IF (NOT (HAVE_STDINT_H OR HAVE_INTTYPES_H))
     IF (MSVC)
-        # Some old Microsoft VC don't support unsigned long long, but all we
-        # care about support unsigned __int64, so test for presence of that
-        # type
+        # Some old Microsoft VC releases don't support unsigned long
+        # long, but all we care about is support for unsigned __int64 on
+        # MSVC, so test for presence of that type
         CHECK_TYPE_SIZE("unsigned __int64" U__INT64 BUILTIN_TYPES_ONLY)
     ELSEIF()
         CHECK_TYPE_SIZE("unsigned long long" ULONG_LONG BUILTIN_TYPES_ONLY)
     ENDIF()
 ENDIF()
-
-# Check for sinf/cosf/sqrtf
-CHECK_FUNCTION_EXISTS(sinf      HAVE_SINF)
-CHECK_FUNCTION_EXISTS(cosf      HAVE_COSF)
-CHECK_FUNCTION_EXISTS(sqrtf     HAVE_SQRTF)
 
 # The generated config.h is placed in the project's build directory, just to
 # ensure that all CMake-generated files are kept away from the main source tree.
@@ -392,6 +391,8 @@ ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c
                          progs/demos/spaceball/vmath.h)
 ADD_DEMO(subwin          progs/demos/subwin/subwin.c)
 ADD_DEMO(timer           progs/demos/timer/timer.c)
+
+
 
 # pkg-config support, to install at $(libdir)/pkgconfig
 # Define static build dependencies
