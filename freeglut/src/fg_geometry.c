@@ -30,10 +30,6 @@
 #include "fg_gl2.h"
 #include <math.h>
 
-/*
- * Need more types of polyhedra? See CPolyhedron in MRPT
- */
-
 /* VC++6 in C mode doesn't have C99's sinf/cos/sqrtf */
 #ifndef HAVE_SINF
 #define sinf(x) (float)sin((double)(x))
@@ -45,17 +41,158 @@
 #define sqrtf(x) (float)sqrt((double)(x))
 #endif
 
-/* General functions for drawing geometry
- * Solids are drawn by glDrawArrays if composed of triangles, or by
- * glDrawElements if consisting of squares or pentagons that were
- * decomposed into triangles (some vertices are repeated in that case).
- * WireFrame drawing will have to be done per face, using GL_LINE_LOOP and
- * issuing one draw call per face. Always use glDrawArrays as no triangle
- * decomposition needed. We use the "first" parameter in glDrawArrays to go
- * from face to face.
+/* declare for drawing using the different OpenGL versions here so we can
+   have a nice code order below */
+#ifndef GL_ES_VERSION_2_0
+static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
+    );
+static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart);
+#endif
+static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2,
+    GLint attribute_v_coord, GLint attribute_v_normal
+    );
+static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart,
+    GLint attribute_v_coord, GLint attribute_v_normal);
+
+/* Drawing geometry:
+ * Explanation of the functions has to be separate for the polyhedra and
+ * the non-polyhedra (objects with a circular cross-section).
+ * Polyhedra:
+ *   - We have only implemented the five platonic solids and the rhomboid
+ *     dodecahedron. If you need more types of polyhedra, please see
+ *     CPolyhedron in MRPT
+ *   - Solids are drawn by glDrawArrays if composed of triangular faces
+ *     (the tetrahedron, octahedron, and icosahedron), or are first
+ *     decomposed into triangles and then drawn by glDrawElements if its
+ *     faces are squares or pentagons (cube, dodecahedron and rhombic
+ *     dodecahedron) as some vertices are repeated in that case.
+ *   - WireFrame drawing is done using a GL_LINE_LOOP per face, and thus
+ *     issuing one draw call per face. glDrawArrays is always used as no
+ *     triangle decomposition is needed to draw faces. We use the "first"
+ *     parameter in glDrawArrays to go from face to face.
+ * 
+ * Non-polyhedra:
+ *   - We have implemented the sphere, cylinder, cone and torus.
+ *   - All shapes are characterized by two parameters: the number of
+ *     subdivisions along two axes used to construct the shape's vertices 
+ *     (e.g. stacks and slices for the sphere).
+ *     As different subdivisions are most suitable for different shapes,
+ *     and are thus also named differently, I wont provide general comments
+ *     on them here.
+ *   - Solids are drawn using glDrawArrays and GL_TRIANGLE_STRIP. Each
+ *     strip covers one revolution around one of the two subdivision axes
+ *     of the shape.
+ *   - WireFrame drawing is done for the subdivisions along the two axes 
+ *     separately, usually using GL_LINE_LOOP. Vertex index arrays are
+ *     built containing the vertices to be drawn for each loop, which are
+ *     then drawn using multiple calls to glDrawElements. As the number of
+ *     subdivisions along the two axes is not guaranteed to be equal, the
+ *     vertex indices for e.g. stacks and slices are stored in separate
+ *     arrays, which makes the input to the drawing function a bit clunky,
+ *     but allows for the same drawing function to be used for all shapes.
  */
 
-/** See comment for fghDrawGeometryWire **/
+
+/**
+ * Draw geometric shape in wire mode (only edges)
+ *
+ * Arguments:
+ * GLfloat *vertices, GLfloat *normals, GLsizei numVertices
+ *   The vertex coordinate and normal buffers, and the number of entries in
+ *   those
+ * GLushort *vertIdxs
+ *   a vertex indices buffer, optional (never passed for the polyhedra)
+ * GLsizei numParts, GLsizei numVertPerPart
+ *   polyhedra: number of faces, and the number of vertices for drawing
+ *     each face
+ *   non-polyhedra: number of edges to draw for first subdivision (not
+ *     necessarily equal to number of subdivisions requested by user, e.g.
+ *     as each subdivision is enclosed by two edges), and number of
+ *     vertices for drawing each
+ *   numParts * numVertPerPart gives the number of entries in the vertex
+ *     array vertIdxs
+ * GLenum vertexMode
+ *   vertex drawing mode (e.g. always GL_LINE_LOOP for polyhedra, varies
+ *   for others)
+ * GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
+ *   non-polyhedra only: same as the above, but now for subdivisions along
+ *   the other axis. Always drawn as GL_LINE_LOOP.
+ *
+ * Feel free to contribute better naming ;)
+ */
+static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
+    )
+{
+    GLint attribute_v_coord  = fgStructure.CurrentWindow->Window.attribute_v_coord;
+    GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
+
+    if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
+        /* User requested a 2.0 draw */
+        fghDrawGeometryWire20(vertices, normals, numVertices,
+                              vertIdxs, numParts, numVertPerPart, vertexMode,
+                              vertIdxs2, numParts2, numVertPerPart2,
+                              attribute_v_coord, attribute_v_normal);
+#ifndef GL_ES_VERSION_2_0
+    else
+        fghDrawGeometryWire11(vertices, normals,
+                              vertIdxs, numParts, numVertPerPart, vertexMode,
+                              vertIdxs2, numParts2, numVertPerPart2);
+#endif
+}
+
+/* Draw the geometric shape with filled triangles
+ *
+ * Arguments:
+ * GLfloat *vertices, GLfloat *normals, GLsizei numVertices
+ *   The vertex coordinate and normal buffers, and the number of entries in
+ *   those
+ * GLushort *vertIdxs
+ *   a vertex indices buffer, optional (not passed for the polyhedra with
+ *   triangular faces)
+ * GLsizei numParts, GLsizei numVertPerPart
+ *   polyhedra: not used for polyhedra with triangular faces
+       (numEdgePerFace==3), as each vertex+normal pair is drawn only once,
+       so no vertex indices are used.
+       Else, the shape was triangulated (DECOMPOSE_TO_TRIANGLE), leading to
+       reuse of some vertex+normal pairs, and thus the need to draw with
+       glDrawElements. numParts is always 1 in this case (we can draw the
+       whole object with one call to glDrawElements as the vertex index
+       array contains separate triangles), and numVertPerPart indicates
+       the number of vertex indices in the vertex array.
+ *   non-polyhedra: number of parts (GL_TRIANGLE_STRIPs) to be drawn
+       separately (numParts calls to glDrawElements) to create the object.
+       numVertPerPart indicates the number of vertex indices to be
+       processed at each draw call.
+ *   numParts * numVertPerPart gives the number of entries in the vertex
+ *     array vertIdxs
+ */
+static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+                                 GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart)
+{
+    GLint attribute_v_coord  = fgStructure.CurrentWindow->Window.attribute_v_coord;
+    GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
+
+    if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
+        /* User requested a 2.0 draw */
+        fghDrawGeometrySolid20(vertices, normals, numVertices,
+                               vertIdxs, numParts, numVertIdxsPerPart,
+                               attribute_v_coord, attribute_v_normal);
+#ifndef GL_ES_VERSION_2_0
+    else
+        fghDrawGeometrySolid11(vertices, normals, numVertices,
+                               vertIdxs, numParts, numVertIdxsPerPart);
+#endif
+}
+
+
 
 /* Version for OpenGL (ES) 1.1 */
 #ifndef GL_ES_VERSION_2_0
@@ -84,6 +221,31 @@ static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals,
     if (vertIdxs2)
         for (i=0; i<numParts2; i++)
             glDrawElements(GL_LINE_LOOP,numVertPerPart2,GL_UNSIGNED_SHORT,vertIdxs2+i*numVertPerPart2);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+}
+
+
+static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart)
+{
+    int i;
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glNormalPointer(GL_FLOAT, 0, normals);
+
+    if (!vertIdxs)
+        glDrawArrays(GL_TRIANGLES, 0, numVertices);
+    else
+        if (numParts>1)
+            for (i=0; i<numParts; i++)
+                glDrawElements(GL_TRIANGLE_STRIP, numVertIdxsPerPart, GL_UNSIGNED_SHORT, vertIdxs+i*numVertIdxsPerPart);
+        else
+            glDrawElements(GL_TRIANGLES, numVertIdxsPerPart, GL_UNSIGNED_SHORT, vertIdxs);
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
@@ -200,72 +362,12 @@ static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei n
         fghDeleteBuffers(1, &ibo_elements2);
 }
 
-/**
- * Draw geometric shape in wire mode (only edges)
- *
- * Arguments: the sphere, in wire mode, consists of multiple line
- * loops for the stacks, and for the slices. The vertex indices for
- * all slices are thrown together. numParts is how many separate loops
- * are in the array, numVertIdxsPerPart is how many vertices there are
- * per loop.  For those suffixed with 2, its exactly the same
- * principle, the number of stacks and slices is not the same.
- *
- * Feel free to contribute better naming ;)
- *
- * See comment for fghDrawGeometrySolid
- */
-static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
-    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
-    )
-{
-    GLint attribute_v_coord = fgStructure.CurrentWindow->Window.attribute_v_coord;
-    GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
-
-    if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
-        /* User requested a 2.0 draw */
-        fghDrawGeometryWire20(vertices, normals, numVertices,
-                              vertIdxs, numParts, numVertPerPart, vertexMode,
-                              vertIdxs2, numParts2, numVertPerPart2,
-                              attribute_v_coord, attribute_v_normal);
-#ifndef GL_ES_VERSION_2_0
-    else
-        fghDrawGeometryWire11(vertices, normals,
-                              vertIdxs, numParts, numVertPerPart, vertexMode,
-                              vertIdxs2, numParts2, numVertPerPart2);
-#endif
-}
 
 
-/* Version for OpenGL (ES) 1.1 */
-#ifndef GL_ES_VERSION_2_0
-static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLushort *vertIdxs,
-                                   GLsizei numVertices, GLsizei numParts, GLsizei numVertIdxsPerPart)
-{
-    int i;
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-
-    glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glNormalPointer(GL_FLOAT, 0, normals);
-    if (vertIdxs == NULL)
-        glDrawArrays(GL_TRIANGLES, 0, numVertices);
-    else
-        if (numParts>1)
-            for (i=0; i<numParts; i++)
-                glDrawElements(GL_TRIANGLE_STRIP, numVertIdxsPerPart, GL_UNSIGNED_SHORT, vertIdxs+i*numVertIdxsPerPart);
-        else
-            glDrawElements(GL_TRIANGLES, numVertIdxsPerPart, GL_UNSIGNED_SHORT, vertIdxs);
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-}
-#endif
 
 /* Version for OpenGL (ES) >= 2.0 */
-static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLushort *vertIdxs,
-                                   GLsizei numVertices, GLsizei numParts, GLsizei numVertIdxsPerPart,
+static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+                                   GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart,
                                    GLint attribute_v_coord, GLint attribute_v_normal)
 {
     GLuint vbo_coords = 0, vbo_normals = 0, ibo_elements = 0;
@@ -353,35 +455,11 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLushort
         fghDeleteBuffers(1, &ibo_elements);
 }
 
-/* Draw the geometric shape with filled triangles
- *
- * - If the shape is naturally triangulated (numEdgePerFace==3), each
- *   vertex+normal pair is used only once, so no vertex indices.
- * 
- * - If the shape was triangulated (DECOMPOSE_TO_TRIANGLE), some
- *   vertex+normal pairs are reused, so use vertex indices.
- */
-static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLushort *vertIdxs,
-                                 GLsizei numVertices, GLsizei numParts, GLsizei numVertIdxsPerPart)
-{
-    GLint attribute_v_coord = fgStructure.CurrentWindow->Window.attribute_v_coord;
-    GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
-
-    if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
-        /* User requested a 2.0 draw */
-        fghDrawGeometrySolid20(vertices, normals, vertIdxs,
-                               numVertices, numParts, numVertIdxsPerPart,
-                               attribute_v_coord, attribute_v_normal);
-#ifndef GL_ES_VERSION_2_0
-    else
-        fghDrawGeometrySolid11(vertices, normals, vertIdxs,
-                               numVertices, numParts, numVertIdxsPerPart);
-#endif
-}
 
 
-
-/* Shape decomposition to triangles
+/**
+ * Generate all combinations of vertices and normals needed to draw object.
+ * Optional shape decomposition to triangles:
  * We'll use glDrawElements to draw all shapes that are not naturally
  * composed of triangles, so generate an index vector here, using the
  * below sampling scheme.
@@ -455,8 +533,8 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLfloat *verti
  */
 #define DECLARE_SHAPE_CACHE(name,nameICaps,nameCaps)\
     static GLboolean name##Cached = FALSE;\
-    static GLfloat name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
-    static GLfloat name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLfloat   name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLfloat   name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
     static void fgh##nameICaps##Generate()\
     {\
         fghGenerateGeometry(nameCaps##_NUM_FACES, nameCaps##_NUM_EDGE_PER_FACE,\
@@ -465,9 +543,9 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLfloat *verti
     }
 #define DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(name,nameICaps,nameCaps)\
     static GLboolean name##Cached = FALSE;\
-    static GLfloat  name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
-    static GLfloat  name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
-    static GLushort name##_vertIdxs[nameCaps##_VERT_PER_OBJ_TRI];\
+    static GLfloat   name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLfloat   name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
+    static GLushort  name##_vertIdxs[nameCaps##_VERT_PER_OBJ_TRI];\
     static void fgh##nameICaps##Generate()\
     {\
         fghGenerateGeometryWithIndexArray(nameCaps##_NUM_FACES, nameCaps##_NUM_EDGE_PER_FACE,\
@@ -870,7 +948,7 @@ static void fghSierpinskiSpongeGenerate ( int numLevels, double offset[3], GLflo
     }
 }
 
-/* -- Now the various shapes involving circles -- */
+/* -- Now the various non-polyhedra (shapes involving circles) -- */
 /*
  * Compute lookup table of cos and sin values forming a circle
  * (or half circle if halfCircle==TRUE)
@@ -945,7 +1023,12 @@ static void fghGenerateSphere(GLfloat radius, GLint slices, GLint stacks, GLfloa
         return;
     }
     *nVert = slices*(stacks-1)+2;
-    if ((*nVert) > 65535)       /* TODO: must have a better solution than this low limit, at least for architectures where gluint is available */
+    if ((*nVert) > 65535)
+        /*
+         * limit of glushort, thats 256*256 subdivisions, should be enough in practice.
+         * But still:
+         * TODO: must have a better solution than this low limit, at least for architectures where gluint is available
+         */
         fgWarning("fghGenerateSphere: too many slices or stacks requested, indices will wrap");
 
     /* precompute values on unit circle */
@@ -1038,6 +1121,11 @@ void fghGenerateCone(
     *nVert = slices*(stacks+2)+1;   /* need an extra stack for closing off bottom with correct normals */
 
     if ((*nVert) > 65535)
+        /*
+         * limit of glushort, thats 256*256 subdivisions, should be enough in practice.
+         * But still:
+         * TODO: must have a better solution than this low limit, at least for architectures where gluint is available
+         */
         fgWarning("fghGenerateCone: too many slices or stacks requested, indices will wrap");
 
     /* Pre-computed circle */
@@ -1050,7 +1138,7 @@ void fghGenerateCone(
     {
         free(*vertices);
         free(*normals);
-        fgError("Failed to allocate memory in fghGenerateSphere");
+        fgError("Failed to allocate memory in fghGenerateCone");
     }
 
     /* bottom */
@@ -1120,6 +1208,11 @@ void fghGenerateCylinder(
     *nVert = slices*(stacks+3)+2;   /* need two extra stacks for closing off top and bottom with correct normals */
 
     if ((*nVert) > 65535)
+        /*
+         * limit of glushort, thats 256*256 subdivisions, should be enough in practice.
+         * But still:
+         * TODO: must have a better solution than this low limit, at least for architectures where gluint is available
+         */
         fgWarning("fghGenerateCylinder: too many slices or stacks requested, indices will wrap");
 
     /* Pre-computed circle */
@@ -1219,6 +1312,11 @@ void fghGenerateTorus(
     *nVert = nSides * nRings;
 
     if ((*nVert) > 65535)
+        /*
+         * limit of glushort, thats 256*256 subdivisions, should be enough in practice.
+         * But still:
+         * TODO: must have a better solution than this low limit, at least for architectures where gluint is available
+         */
         fgWarning("fghGenerateTorus: too many slices or stacks requested, indices will wrap");
 
     /* precompute values on unit circle */
@@ -1275,8 +1373,8 @@ void fghGenerateTorus(
         }\
         else\
         {\
-            fghDrawGeometrySolid(name##_verts,name##_norms,vertIdxs,\
-                                 nameCaps##_VERT_PER_OBJ, 1, nameCaps##_VERT_PER_OBJ_TRI); \
+            fghDrawGeometrySolid(name##_verts,name##_norms,nameCaps##_VERT_PER_OBJ,\
+                                 vertIdxs, 1, nameCaps##_VERT_PER_OBJ_TRI); \
         }\
     }
 #define DECLARE_INTERNAL_DRAW(name,nameICaps,nameCaps)                        _DECLARE_INTERNAL_DRAW_DO_DECLARE(name,nameICaps,nameCaps,NULL)
@@ -1317,8 +1415,8 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
                             NULL,CUBE_NUM_FACES, CUBE_NUM_EDGE_PER_FACE,GL_LINE_LOOP,
                             NULL,0,0);
     else
-        fghDrawGeometrySolid(vertices, cube_norms, cube_vertIdxs,
-                             CUBE_VERT_PER_OBJ, 1, CUBE_VERT_PER_OBJ_TRI);
+        fghDrawGeometrySolid(vertices, cube_norms, CUBE_VERT_PER_OBJ,
+                             cube_vertIdxs, 1, CUBE_VERT_PER_OBJ_TRI);
 
     if (dSize!=1.f)
         /* cleanup allocated memory */
@@ -1361,7 +1459,7 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
                                  NULL,numFace,TETRAHEDRON_NUM_EDGE_PER_FACE,GL_LINE_LOOP,
                                  NULL,0,0);
         else
-            fghDrawGeometrySolid(vertices,normals,NULL,numVert,1,0);
+            fghDrawGeometrySolid(vertices,normals,numVert,NULL,1,0);
 
         free(vertices);
         free(normals );
@@ -1369,13 +1467,13 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
 }
 
 
-static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useWireMode )
+static void fghSphere( GLfloat radius, GLint slices, GLint stacks, GLboolean useWireMode )
 {
     int i,j,idx, nVert;
     GLfloat *vertices, *normals;
 
     /* Generate vertices and normals */
-    fghGenerateSphere((GLfloat)radius,slices,stacks,&vertices,&normals,&nVert);
+    fghGenerateSphere(radius,slices,stacks,&vertices,&normals,&nVert);
     
     if (nVert==0)
         /* nothing to draw */
@@ -1483,7 +1581,7 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
 
 
         /* draw */
-        fghDrawGeometrySolid(vertices,normals,stripIdx,nVert,stacks,(slices+1)*2);
+        fghDrawGeometrySolid(vertices,normals,nVert,stripIdx,stacks,(slices+1)*2);
 
         /* cleanup allocated memory */
         free(stripIdx);
@@ -1494,14 +1592,14 @@ static void fghSphere( double radius, GLint slices, GLint stacks, GLboolean useW
     free(normals);
 }
 
-static void fghCone( double base, double height, GLint slices, GLint stacks, GLboolean useWireMode )
+static void fghCone( GLfloat base, GLfloat height, GLint slices, GLint stacks, GLboolean useWireMode )
 {
     int i,j,idx, nVert;
     GLfloat *vertices, *normals;
 
     /* Generate vertices and normals */
     /* Note, (stacks+1)*slices vertices for side of object, slices+1 for top and bottom closures */
-    fghGenerateCone((GLfloat)base,(GLfloat)height,slices,stacks,&vertices,&normals,&nVert);
+    fghGenerateCone(base,height,slices,stacks,&vertices,&normals,&nVert);
 
     if (nVert==0)
         /* nothing to draw */
@@ -1594,7 +1692,7 @@ static void fghCone( double base, double height, GLint slices, GLint stacks, GLb
         }
 
         /* draw */
-        fghDrawGeometrySolid(vertices,normals,stripIdx,nVert,stacks+1,(slices+1)*2);
+        fghDrawGeometrySolid(vertices,normals,nVert,stripIdx,stacks+1,(slices+1)*2);
 
         /* cleanup allocated memory */
         free(stripIdx);
@@ -1605,14 +1703,14 @@ static void fghCone( double base, double height, GLint slices, GLint stacks, GLb
     free(normals);
 }
 
-static void fghCylinder( double radius, double height, GLint slices, GLint stacks, GLboolean useWireMode )
+static void fghCylinder( GLfloat radius, GLfloat height, GLint slices, GLint stacks, GLboolean useWireMode )
 {
     int i,j,idx, nVert;
     GLfloat *vertices, *normals;
 
     /* Generate vertices and normals */
     /* Note, (stacks+1)*slices vertices for side of object, 2*slices+2 for top and bottom closures */
-    fghGenerateCylinder((GLfloat)radius,(GLfloat)height,slices,stacks,&vertices,&normals,&nVert);
+    fghGenerateCylinder(radius,height,slices,stacks,&vertices,&normals,&nVert);
 
     if (nVert==0)
         /* nothing to draw */
@@ -1715,7 +1813,7 @@ static void fghCylinder( double radius, double height, GLint slices, GLint stack
         stripIdx[idx+1] = nVert-1;                  /* repeat first slice's idx for closing off shape */
 
         /* draw */
-        fghDrawGeometrySolid(vertices,normals,stripIdx,nVert,stacks+2,(slices+1)*2);
+        fghDrawGeometrySolid(vertices,normals,nVert,stripIdx,stacks+2,(slices+1)*2);
 
         /* cleanup allocated memory */
         free(stripIdx);
@@ -1726,13 +1824,13 @@ static void fghCylinder( double radius, double height, GLint slices, GLint stack
     free(normals);
 }
 
-static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings, GLboolean useWireMode )
+static void fghTorus( GLfloat dInnerRadius, GLfloat dOuterRadius, GLint nSides, GLint nRings, GLboolean useWireMode )
 {
     int i,j,idx, nVert;
     GLfloat *vertices, *normals;
 
     /* Generate vertices and normals */
-    fghGenerateTorus((GLfloat)dInnerRadius,(GLfloat)dOuterRadius,nSides,nRings, &vertices,&normals,&nVert);
+    fghGenerateTorus(dInnerRadius,dOuterRadius,nSides,nRings, &vertices,&normals,&nVert);
 
     if (nVert==0)
         /* nothing to draw */
@@ -1809,7 +1907,7 @@ static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GL
         }
 
         /* draw */
-        fghDrawGeometrySolid(vertices,normals,stripIdx,nVert,nSides,(nRings+1)*2);
+        fghDrawGeometrySolid(vertices,normals,nVert,stripIdx,nSides,(nRings+1)*2);
 
         /* cleanup allocated memory */
         free(stripIdx);
@@ -1830,8 +1928,7 @@ static void fghTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GL
 void FGAPIENTRY glutSolidSphere(double radius, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSphere" );
-
-    fghSphere( radius, slices, stacks, FALSE );
+    fghSphere((GLfloat)radius, slices, stacks, FALSE );
 }
 
 /*
@@ -1840,8 +1937,7 @@ void FGAPIENTRY glutSolidSphere(double radius, GLint slices, GLint stacks)
 void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSphere" );
-
-    fghSphere( radius, slices, stacks, TRUE );
+    fghSphere((GLfloat)radius, slices, stacks, TRUE );
     
 }
 
@@ -1851,8 +1947,7 @@ void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
 void FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint stacks )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCone" );
-
-    fghCone( base, height, slices, stacks, FALSE );
+    fghCone((GLfloat)base, (GLfloat)height, slices, stacks, FALSE );
 }
 
 /*
@@ -1861,8 +1956,7 @@ void FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint s
 void FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCone" );
-
-    fghCone( base, height, slices, stacks, TRUE );
+    fghCone((GLfloat)base, (GLfloat)height, slices, stacks, TRUE );
 }
 
 
@@ -1872,8 +1966,7 @@ void FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint st
 void FGAPIENTRY glutSolidCylinder(double radius, double height, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCylinder" );
-
-    fghCylinder( radius, height, slices, stacks, FALSE );
+    fghCylinder((GLfloat)radius, (GLfloat)height, slices, stacks, FALSE );
 }
 
 /*
@@ -1882,8 +1975,7 @@ void FGAPIENTRY glutSolidCylinder(double radius, double height, GLint slices, GL
 void FGAPIENTRY glutWireCylinder(double radius, double height, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCylinder" );
-
-    fghCylinder( radius, height, slices, stacks, TRUE );
+    fghCylinder((GLfloat)radius, (GLfloat)height, slices, stacks, TRUE );
 }
 
 /*
@@ -1892,8 +1984,7 @@ void FGAPIENTRY glutWireCylinder(double radius, double height, GLint slices, GLi
 void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTorus" );
-
-    fghTorus(dInnerRadius, dOuterRadius, nSides, nRings, TRUE);
+    fghTorus((GLfloat)dInnerRadius, (GLfloat)dOuterRadius, nSides, nRings, TRUE);
 }
 
 /*
@@ -1902,8 +1993,7 @@ void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint n
 void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTorus" );
-
-    fghTorus(dInnerRadius, dOuterRadius, nSides, nRings, FALSE);
+    fghTorus((GLfloat)dInnerRadius, (GLfloat)dOuterRadius, nSides, nRings, FALSE);
 }
 
 
