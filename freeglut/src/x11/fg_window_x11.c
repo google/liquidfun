@@ -133,6 +133,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     XEvent eventReturnBuffer; /* return buffer required for a call */
     unsigned long mask;
     unsigned int current_DisplayMode = fgState.DisplayMode ;
+    XConfigureEvent fakeEvent = {0};
 
     /* Save the display mode if we are creating a menu window */
     if( window->IsMenu && ( ! fgStructure.MenuContext ) )
@@ -238,6 +239,18 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
         visualInfo->visual, mask,
         &winAttr
     );
+
+    /* Fake configure event to force viewport setup
+     * even with no window manager.
+     */
+    fakeEvent.type = ConfigureNotify;
+    fakeEvent.display = fgDisplay.pDisplay.Display;
+    fakeEvent.window = window->Window.Handle;
+    fakeEvent.x = x;
+    fakeEvent.y = y;
+    fakeEvent.width = w;
+    fakeEvent.height = h;
+    XPutBackEvent(fgDisplay.pDisplay.Display, (XEvent*)&fakeEvent);
 
     /*
      * The GLX context creation, possibly trying the direct context rendering
