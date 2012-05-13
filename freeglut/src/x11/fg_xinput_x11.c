@@ -5,7 +5,7 @@
 
 #include "../fg_internal.h"
 
-#if HAVE_X11_EXTENSIONS_XINPUT2_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
 
 #include <errno.h>
 #include <stdarg.h>

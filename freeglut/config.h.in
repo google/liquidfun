@@ -1,5 +1,6 @@
 #cmakedefine HAVE_X11_EXTENSIONS_XF86VMODE_H
 #cmakedefine HAVE_X11_EXTENSIONS_XRANDR_H
+#cmakedefine HAVE_X11_EXTENSIONS_XINPUT2_H
 #cmakedefine HAVE_SYS_TYPES_H
 #cmakedefine HAVE_UNISTD_H
 #cmakedefine HAVE_SYS_TIME_H
