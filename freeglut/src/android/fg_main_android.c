@@ -460,7 +460,7 @@ void fgPlatformProcessSingleEvent ( void )
         }
       }
     }
-    /* If coming back from a pause: */
+    /* Coming back from a pause: */
     /* - Recreate window context and surface */
     /* - Call user-defined hook to restore resources (textures...) */
     /* - Exit pause looop */
@@ -473,6 +473,8 @@ void fgPlatformProcessSingleEvent ( void )
       fgPlatformOpenWindow(window, "", GL_FALSE, 0, 0, GL_FALSE, 0, 0, GL_FALSE, GL_FALSE);
       /* TODO: INVOKE_WCB(*window, Pause?); */
       /* TODO: INVOKE_WCB(*window, Resume?); */
+      if (!FETCH_WCB(*window, FixMyNameInitContext)
+          fgWarning("Resuming application, but no callback to reload context resources (glutFixMyNameInitContextFunc)");
     }
   }
 }
