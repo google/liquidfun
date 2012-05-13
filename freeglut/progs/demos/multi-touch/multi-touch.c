@@ -105,7 +105,9 @@ void onMotion(int x, int y) {
     cursors[0][0].y = y;
 }
 
-void onMultiButton(int cursor_id, int button, int state, int x, int y) {
+/* Using FG2.8 (reversed) prototype for now */
+/* void onMultiButton(int cursor_id, int button, int state, int x, int y) { */
+void onMultiButton(int cursor_id, int x, int y, int button, int state) {
     if (cursor_id > NUM_CURSORS) {
         fprintf(stderr, "cursor_id(%d) > NUM_CURSORS(%d)\n", cursor_id, NUM_CURSORS);
         return;
