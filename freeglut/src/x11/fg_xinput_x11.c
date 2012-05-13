@@ -216,4 +216,3 @@ void fgHandleExtensionEvents( XEvent* base_ev ) {
 }
 
 #endif
-
