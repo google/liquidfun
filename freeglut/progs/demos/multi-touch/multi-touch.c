@@ -41,20 +41,21 @@ typedef struct cursor {
 } *Cursor;
 struct cursor cursors[NUM_DEVICES][NUM_CURSORS];
 
-void onDisplay() {
-    glClearColor(0,0,0,1);
-    glClear(GL_COLOR_BUFFER_BIT);
 
-    float square[] = {
+static float square[] = {
         -.5, -.5,
          .5, -.5,
         -.5,  .5,
          .5,  .5,
     };
 
+void onDisplay() {
+    int d;
+    glClearColor(0,0,0,1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 0, square);
-    int d;
     for (d = 0; d < NUM_DEVICES; d++) {
         int c;
         for (c = 0; d < NUM_DEVICES; d++) {
