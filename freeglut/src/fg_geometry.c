@@ -30,17 +30,6 @@
 #include "fg_gl2.h"
 #include <math.h>
 
-/* VC++6 in C mode doesn't have C99's sinf/cos/sqrtf */
-#ifndef HAVE_SINF
-#define sinf(x) (float)sin((double)(x))
-#endif
-#ifndef HAVE_COSF
-#define cosf(x) (float)cos((double)(x))
-#endif
-#ifndef HAVE_SQRTF
-#define sqrtf(x) (float)sqrt((double)(x))
-#endif
-
 /* declare for drawing using the different OpenGL versions here so we can
    have a nice code order below */
 #ifndef GL_ES_VERSION_2_0
@@ -987,8 +976,8 @@ static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GL
 
     for (i=1; i<size; i++)
     {
-        (*sint)[i] = sinf(angle*i);
-        (*cost)[i] = cosf(angle*i);
+        (*sint)[i] = (GLfloat)sin(angle*i);
+        (*cost)[i] = (GLfloat)cos(angle*i);
     }
 
     
@@ -1106,8 +1095,8 @@ void fghGenerateCone(
     const GLfloat rStep = (GLfloat)base / ( ( stacks > 0 ) ? stacks : 1 );
 
     /* Scaling factors for vertex normals */
-    const GLfloat cosn = ( (GLfloat)height / sqrtf( height * height + base * base ));
-    const GLfloat sinn = ( (GLfloat)base   / sqrtf( height * height + base * base ));
+    const GLfloat cosn = (GLfloat) (height / sqrt( height * height + base * base ));
+    const GLfloat sinn = (GLfloat) (base   / sqrt( height * height + base * base ));
 
 
 

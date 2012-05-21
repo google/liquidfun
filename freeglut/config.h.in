@@ -13,9 +13,6 @@
 #cmakedefine HAVE_GETTIMEOFDAY
 #cmakedefine HAVE_VFPRINTF
 #cmakedefine HAVE_DOPRNT
-#cmakedefine HAVE_SINF
-#cmakedefine HAVE_COSF
-#cmakedefine HAVE_SQRTF
 #cmakedefine NEED_XPARSEGEOMETRY_IMPL
 #cmakedefine HAVE_STDINT_H
 #cmakedefine HAVE_INTTYPES_H
