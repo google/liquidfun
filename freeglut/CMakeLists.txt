@@ -397,9 +397,11 @@ ADD_DEMO(Resizer         progs/demos/Resizer/Resizer.cpp)
 ADD_DEMO(multi-touch     progs/demos/multi-touch/multi-touch.c)
 ADD_DEMO(shapes          progs/demos/shapes/shapes.c)
 ADD_DEMO(smooth_opengl3  progs/demos/smooth_opengl3/smooth_opengl3.c)
-ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c
-                         progs/demos/spaceball/vmath.c
-                         progs/demos/spaceball/vmath.h)
+IF(UNIX)
+    ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c
+                             progs/demos/spaceball/vmath.c
+                             progs/demos/spaceball/vmath.h)
+ENDIF()
 ADD_DEMO(subwin          progs/demos/subwin/subwin.c)
 ADD_DEMO(timer           progs/demos/timer/timer.c)
 
