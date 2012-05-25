@@ -70,7 +70,11 @@
 
         /* Link with Win32 static freeglut lib */
 #       if FREEGLUT_LIB_PRAGMAS
-#           pragma comment (lib, "freeglut_static.lib")
+#           ifdef NDEBUG
+#              pragma comment (lib, "freeglut_static.lib")
+#           else
+#              pragma comment (lib, "freeglut_staticd.lib")
+#           endif
 #       endif
 
 /* Windows shared library (DLL) */
@@ -84,7 +88,11 @@
 
             /* Link with Win32 shared freeglut lib */
 #           if FREEGLUT_LIB_PRAGMAS
-#               pragma comment (lib, "freeglut.lib")
+#               ifdef NDEBUG
+#                   pragma comment (lib, "freeglut.lib")
+#               else
+#                   pragma comment (lib, "freeglutd.lib")
+#               endif
 #           endif
 
 #       endif

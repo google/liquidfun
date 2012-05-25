@@ -197,6 +197,10 @@ ENDIF()
 IF(WIN32)
     # hide insecure CRT warnings, common practice
     ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+    IF(MSVC)
+        SET( CMAKE_DEBUG_POSTFIX "d" )
+    ENDIF(MSVC)
+    
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCC)
