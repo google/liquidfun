@@ -228,6 +228,7 @@ IF(UNIX AND NOT ANDROID)
         LIST(APPEND LIBS ${X11_Xxf86vm_LIB})
     ENDIF()
     IF(X11_Xinput_FOUND)
+        # Needed for multi-touch:
         CHECK_INCLUDE_FILES("${X11_Xinput_INCLUDE_PATH}/X11/extensions/XInput2.h" HAVE_X11_EXTENSIONS_XINPUT2_H)
         LIST(APPEND LIBS ${X11_Xinput_LIB})
     ENDIF()
