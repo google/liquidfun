@@ -31,15 +31,16 @@ and compile as usual
 
 How to build freeglut on UNIX
 -----------------------------
-1.  Make sure you have cmake installed. Examples:
-    - Debian/Ubuntu: apt-get install cmake
-    - Fedora: yum install cmake
-    - FreeBSD: cd /usr/ports/devel/cmake && make install
-    Or directly from their website:
-    http://www.cmake.org/cmake/resources/software.html
-2.  Run cmake . in the freeglut directory to generate the makefile.
-3.  Run make to build, and make install to install, freeglut.
-4.  If you wish to change any build options run ccmake .
+- Make sure you have cmake installed. Examples:
+  - Debian/Ubuntu: apt-get install cmake
+  - Fedora: yum install cmake
+  - FreeBSD: cd /usr/ports/devel/cmake && make install
+  Or directly from their website:
+  http://www.cmake.org/cmake/resources/software.html
+- Install XInput: libxi-dev / libXi-devel
+- Run 'cmake .' in the freeglut directory to generate the makefile.
+- Run 'make' to build, and 'make install' to install freeglut.
+- If you wish to change any build options run 'ccmake .'
 
 
 Breakdown of CMake configuration options
