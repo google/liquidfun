@@ -49,7 +49,7 @@ static float square[] = {
          .5,  .5,
     };
 
-void onDisplay() {
+void onDisplay(void) {
     int d;
     glClearColor(0,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -95,15 +95,15 @@ void onDisplay() {
 void onMouse(int button, int state, int x, int y) {
     if (button == 0) {
         cursors[0][0].on = (state == GLUT_DOWN);
-        cursors[0][0].x = x;
-        cursors[0][0].y = y;
+        cursors[0][0].x = (float)x;
+        cursors[0][0].y = (float)y;
         printf("normal click\n");
     }
 }
 
 void onMotion(int x, int y) {
-    cursors[0][0].x = x;
-    cursors[0][0].y = y;
+    cursors[0][0].x = (float)x;
+    cursors[0][0].y = (float)y;
 }
 
 /* Using FG2.8 (reversed) prototype for now */
@@ -115,8 +115,8 @@ void onMultiButton(int cursor_id, int x, int y, int button, int state) {
     }
     if (button == 0) {
         cursors[0][cursor_id].on = (state == GLUT_DOWN);
-        cursors[0][cursor_id].x = x;
-        cursors[0][cursor_id].y = y;
+        cursors[0][cursor_id].x = (float)x;
+        cursors[0][cursor_id].y = (float)y;
         printf("multi-touch %d click\n", cursor_id);
     }
 }
@@ -126,8 +126,8 @@ void onMultiMotion(int cursor_id, int x, int y) {
         fprintf(stderr, "cursor_id(%d) > NUM_CURSORS(%d)\n", cursor_id, NUM_CURSORS);
         return;
     }
-    cursors[0][cursor_id].x = x;
-    cursors[0][cursor_id].y = y;
+    cursors[0][cursor_id].x = (float)x;
+    cursors[0][cursor_id].y = (float)y;
 }
 
 void onReshape(int width, int height) {
@@ -137,7 +137,7 @@ void onReshape(int width, int height) {
     glOrtho(0, width, height, 0, -1, 1);
 }
 
-void onIdle() {
+void onIdle(void) {
     glutPostRedisplay();
 }
 
