@@ -357,11 +357,11 @@ void initShader(void)
 
     gl_UseProgram (program);
 
-    attribute_fg_coord      = getAttribOrUniformLocation("fg_coord"         , program, TRUE);
-    attribute_fg_normal     = getAttribOrUniformLocation("fg_normal"        , program, TRUE);
-    uniform_m               = getAttribOrUniformLocation("m"                , program, FALSE);
-    uniform_p               = getAttribOrUniformLocation("p"                , program, FALSE);
-    uniform_m_3x3_inv_transp= getAttribOrUniformLocation("m_3x3_inv_transp" , program, FALSE);
+    attribute_fg_coord      = getAttribOrUniformLocation("fg_coord"         , program, GL_TRUE);
+    attribute_fg_normal     = getAttribOrUniformLocation("fg_normal"        , program, GL_TRUE);
+    uniform_m               = getAttribOrUniformLocation("m"                , program, GL_FALSE);
+    uniform_p               = getAttribOrUniformLocation("p"                , program, GL_FALSE);
+    uniform_m_3x3_inv_transp= getAttribOrUniformLocation("m_3x3_inv_transp" , program, GL_FALSE);
 
     gl_UseProgram (0);
 

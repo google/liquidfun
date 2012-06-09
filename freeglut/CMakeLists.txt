@@ -402,7 +402,9 @@ ADD_DEMO(Lorenz          progs/demos/Lorenz/lorenz.c)
 ADD_DEMO(One             progs/demos/One/one.c)
 ADD_DEMO(Resizer         progs/demos/Resizer/Resizer.cpp)
 ADD_DEMO(multi-touch     progs/demos/multi-touch/multi-touch.c)
-ADD_DEMO(shapes          progs/demos/shapes/shapes.c)
+ADD_DEMO(shapes          progs/demos/shapes/shapes.c
+                         progs/demos/shapes/glmatrix.h
+                         progs/demos/shapes/glmatrix.c)
 ADD_DEMO(smooth_opengl3  progs/demos/smooth_opengl3/smooth_opengl3.c)
 IF(UNIX)
     ADD_DEMO(spaceball       progs/demos/spaceball/spaceball.c
