@@ -219,9 +219,9 @@ typedef void (* FGCBMultiButton  )( int, int, int, int, int );
 typedef void (* FGCBMultiMotion  )( int, int, int );
 typedef void (* FGCBMultiPassive )( int, int, int );
 
-typedef void (* FGCBFixMyNameInitContext)();
-typedef void (* FGCBFixMyNamePause)();
-typedef void (* FGCBFixMyNameResume)();
+typedef void (* FGCBInitContext)();
+typedef void (* FGCBPause)();
+typedef void (* FGCBResume)();
 
 /* The global callbacks type definitions */
 typedef void (* FGCBIdle          )( void );
@@ -402,7 +402,7 @@ struct tagSFG_WindowState
 
     GLboolean       IsFullscreen;       /* is the window fullscreen? */
 
-    GLboolean       NeedToFixMyNameInitContext; /* are OpenGL context/resources loaded? */
+    GLboolean       NeedToInitContext; /* are OpenGL context/resources loaded? */
 };
 
 
@@ -535,9 +535,9 @@ enum
     CB_MultiPassive,
 
     /* Mobile platforms LifeCycle */
-    CB_FixMyNameInitContext,
-    CB_FixMyNamePause,
-    CB_FixMyNameResume,
+    CB_InitContext,
+    CB_Pause,
+    CB_Resume,
 
     /* Presently ignored */
     CB_Select,

@@ -322,7 +322,7 @@ main(int argc, char *argv[])
     glutSpecialFunc(special);
     glutIdleFunc(idle);
     glutMouseFunc(onMouseClick);
-    glutFixMyNameInitContextFunc(init_context);
+    glutInitContextFunc(init_context);
 
     glutSetOption ( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION ) ;
 

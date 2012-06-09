@@ -368,7 +368,7 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     /* The application is being hidden, but may be restored */
     LOGI("handle_cmd: APP_CMD_TERM_WINDOW");
     fghPlatformCloseWindowEGL(window);
-    window->State.NeedToFixMyNameInitContext = GL_TRUE;
+    window->State.NeedToInitContext = GL_TRUE;
     fgDisplay.pDisplay.single_native_window = NULL;
     break;
   case APP_CMD_STOP:
@@ -474,8 +474,8 @@ void fgPlatformProcessSingleEvent ( void )
       fgPlatformOpenWindow(window, "", GL_FALSE, 0, 0, GL_FALSE, 0, 0, GL_FALSE, GL_FALSE);
       /* TODO: INVOKE_WCB(*window, Pause?); */
       /* TODO: INVOKE_WCB(*window, Resume?); */
-      if (!FETCH_WCB(*window, FixMyNameInitContext)
-          fgWarning("Resuming application, but no callback to reload context resources (glutFixMyNameInitContextFunc)");
+      if (!FETCH_WCB(*window, InitContext))
+          fgWarning("Resuming application, but no callback to reload context resources (glutInitContextFunc)");
     }
   }
 }

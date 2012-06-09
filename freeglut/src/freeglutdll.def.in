@@ -152,3 +152,6 @@ EXPORTS
 	glutMultiEntryFunc
 	glutMultiMotionFunc
 	glutMultiPassiveFunc
+        glutInitContextFunc
+        glutPauseFunc
+        glutResumeFunc

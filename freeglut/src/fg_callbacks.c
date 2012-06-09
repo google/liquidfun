@@ -412,28 +412,28 @@ void FGAPIENTRY glutMultiPassiveFunc( void (* callback)(int, int, int ) )
 /*
  * Sets the context reload callback for the current window
  */
-void FGAPIENTRY glutFixMyNameInitContextFunc( void (* callback)() )
+void FGAPIENTRY glutInitContextFunc( void (* callback)() )
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFixMyNameInitContextFunc" );
-    SET_CALLBACK( FixMyNameInitContext );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutInitContextFunc" );
+    SET_CALLBACK( InitContext );
 }
 
 /*
  * Sets the pause callback for the current window
  */
-void FGAPIENTRY glutFixMyNamePauseFunc( void (* callback)() )
+void FGAPIENTRY glutPauseFunc( void (* callback)() )
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFixMyNamePauseFunc" );
-    SET_CALLBACK( FixMyNamePause );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPauseFunc" );
+    SET_CALLBACK( Pause );
 }
 
 /*
  * Sets the resume callback for the current window
  */
-void FGAPIENTRY glutFixMyNameResumeFunc( void (* callback)() )
+void FGAPIENTRY glutResumeFunc( void (* callback)() )
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFixMyNameResumeFunc" );
-    SET_CALLBACK( FixMyNameResume );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutResumeFunc" );
+    SET_CALLBACK( Resume );
 }
 
 /*** END OF FILE ***/

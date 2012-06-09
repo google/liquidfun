@@ -105,9 +105,9 @@ void fghRedrawWindow ( SFG_Window *window )
 
     freeglut_return_if_fail( window );
 
-    if( window->State.NeedToFixMyNameInitContext ) {
-        INVOKE_WCB( *window, FixMyNameInitContext, ());
-        window->State.NeedToFixMyNameInitContext = GL_FALSE;
+    if( window->State.NeedToInitContext ) {
+        INVOKE_WCB( *window, InitContext, ());
+        window->State.NeedToInitContext = GL_FALSE;
     }
 
     freeglut_return_if_fail( FETCH_WCB ( *window, Display ) );

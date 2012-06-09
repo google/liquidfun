@@ -230,9 +230,9 @@ FGAPI void    FGAPIENTRY glutSetVertexAttribCoord3(GLint attrib);
 FGAPI void    FGAPIENTRY glutSetVertexAttribNormal(GLint attrib);
 
 /* Mobile platforms lifecycle */
-FGAPI void    FGAPIENTRY glutFixMyNameInitContextFunc(void (* callback)());
-FGAPI void    FGAPIENTRY glutFixMyNamePauseFunc(void (* callback)());
-FGAPI void    FGAPIENTRY glutFixMyNameResumeFunc(void (* callback)());
+FGAPI void    FGAPIENTRY glutInitContextFunc(void (* callback)());
+FGAPI void    FGAPIENTRY glutPauseFunc(void (* callback)());
+FGAPI void    FGAPIENTRY glutResumeFunc(void (* callback)());
 
 /*
  * GLUT API macro definitions -- the display mode definitions
