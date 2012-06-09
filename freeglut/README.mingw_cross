@@ -3,15 +3,15 @@ Cross-compilation from GNU/Linux (static and shared DLL)
 
 Install MinGW, and specify which MinGW you're using:
 
-- on Debian/Ubuntu, mingw-w64, 32-bit executables:
-
-  apt-get install mingw-w64
-  GNU_HOST=i686-w64-mingw32
-
 - on Debian/Ubuntu, mingw-w64, 64-bit executables:
 
   apt-get install mingw-w64
   GNU_HOST=x86_64-w64-mingw32
+
+- on Debian/Ubuntu, mingw-w64, 32-bit executables:
+
+  apt-get install mingw-w64
+  GNU_HOST=i686-w64-mingw32
 
 - on Fedora, mingw32, 32-bit executables:
 
@@ -24,29 +24,17 @@ Install MinGW, and specify which MinGW you're using:
   GNU_HOST=i586-mingw32msvc
 
 
-With the GNU Autotools
-----------------------
-
-Cross-compile with:
-
-  ./configure --host=$GNU_HOST --prefix=/freeglut
-  make -j4
-  make install DESTDIR=$(pwd)
-
-Everything is now in the new 'freeglut/' directory.
-The .dll is in 'freeglut/bin/'.
-
-
 With CMake
 ----------
 
 Cross-compile with:
 
+  mkdir cross-woe/ && cd cross-woe/
   cmake \
     -D GNU_HOST=$GNU_HOST \
     -D CMAKE_TOOLCHAIN_FILE=mingw_cross_toolchain.cmake \
     -D CMAKE_INSTALL_PREFIX=/freeglut \
-    .
+    ..
   make -j4
   make install DESTDIR=$(pwd)
 
