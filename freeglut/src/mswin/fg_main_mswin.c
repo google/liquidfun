@@ -241,6 +241,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     if ( window )
     {
+      fgState.Modifiers = fgPlatformGetModifiers( );
+
       /* Checking for CTRL, ALT, and SHIFT key positions:  Key Down! */
       if ( !lControl && GetAsyncKeyState ( VK_LCONTROL ) )
       {
@@ -350,6 +352,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
           rAlt = 0;
       }
+
+      fgState.Modifiers = INVALID_MODIFIERS;
     }
 
     switch( uMsg )
@@ -789,12 +793,6 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_RIGHT,  GLUT_KEY_RIGHT     );
             KEY( VK_DOWN,   GLUT_KEY_DOWN      );
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
-            KEY( VK_LCONTROL, GLUT_KEY_CTRL_L  );
-            KEY( VK_RCONTROL, GLUT_KEY_CTRL_R  );
-            KEY( VK_LSHIFT, GLUT_KEY_SHIFT_L   );
-            KEY( VK_RSHIFT, GLUT_KEY_SHIFT_R   );
-            KEY( VK_LMENU,  GLUT_KEY_ALT_L     );
-            KEY( VK_RMENU,  GLUT_KEY_ALT_R     );
 
         case VK_DELETE:
             /* The delete key should be treated as an ASCII keypress: */
@@ -881,12 +879,6 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_RIGHT,  GLUT_KEY_RIGHT     );
             KEY( VK_DOWN,   GLUT_KEY_DOWN      );
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
-            KEY( VK_LCONTROL, GLUT_KEY_CTRL_L  );
-            KEY( VK_RCONTROL, GLUT_KEY_CTRL_R  );
-            KEY( VK_LSHIFT, GLUT_KEY_SHIFT_L   );
-            KEY( VK_RSHIFT, GLUT_KEY_SHIFT_R   );
-            KEY( VK_LMENU,  GLUT_KEY_ALT_L     );
-            KEY( VK_RMENU,  GLUT_KEY_ALT_R     );
 
           case VK_DELETE:
               /* The delete key should be treated as an ASCII keypress: */
