@@ -452,6 +452,8 @@ void fgPlatformProcessSingleEvent ( void )
   /* If we're not in RESUME state, Android paused us, so wait */
   struct android_app* app = fgDisplay.pDisplay.app;
   if (app->destroyRequested != 1 && app->activityState != APP_CMD_RESUME) {
+      INVOKE_WCB(*window, Pause, ());
+
     int FOREVER = -1;
     while (app->destroyRequested != 1 && (app->activityState != APP_CMD_RESUME)) {
       if ((ident=ALooper_pollOnce(FOREVER, NULL, &events, (void**)&source)) >= 0) {
@@ -472,11 +474,12 @@ void fgPlatformProcessSingleEvent ( void )
          we'll be paused but not stopped, and keep the current
          surface; in which case fgPlatformOpenWindow will no-op. */
       fgPlatformOpenWindow(window, "", GL_FALSE, 0, 0, GL_FALSE, 0, 0, GL_FALSE, GL_FALSE);
-      /* TODO: INVOKE_WCB(*window, Pause?); */
-      /* TODO: INVOKE_WCB(*window, Resume?); */
+
       if (!FETCH_WCB(*window, InitContext))
           fgWarning("Resuming application, but no callback to reload context resources (glutInitContextFunc)");
     }
+
+    INVOKE_WCB(*window, Resume, ());
   }
 }
 
