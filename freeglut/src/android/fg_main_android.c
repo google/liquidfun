@@ -228,7 +228,8 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
     int32_t action = AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK;
     /* Pointer ID for clicks */
     int32_t pidx = AMotionEvent_getAction(event) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-    /* TODO: Handle multi-touch; also handle multiple sources */
+    /* TODO: Handle multi-touch; also handle multiple sources/devices */
+    /* cf. http://sourceforge.net/mailarchive/forum.php?thread_name=20120518071314.GA28061%40perso.beuc.net&forum_name=freeglut-developer */
     if (0) {
       LOGI("motion action=%d index=%d source=%d", action, pidx, source);
       int count = AMotionEvent_getPointerCount(event);
