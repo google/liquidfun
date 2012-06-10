@@ -794,6 +794,12 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_DOWN,   GLUT_KEY_DOWN      );
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
 
+        case VK_LCONTROL:  case VK_RCONTROL:  case VK_CONTROL:
+        case VK_LSHIFT:    case VK_RSHIFT:    case VK_SHIFT:
+        case VK_LMENU:     case VK_RMENU:     case VK_MENU:
+            /* These keypresses and releases are handled earlier in the function */
+            break;
+
         case VK_DELETE:
             /* The delete key should be treated as an ASCII keypress: */
             INVOKE_WCB( *window, Keyboard,
@@ -879,6 +885,12 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             KEY( VK_RIGHT,  GLUT_KEY_RIGHT     );
             KEY( VK_DOWN,   GLUT_KEY_DOWN      );
             KEY( VK_INSERT, GLUT_KEY_INSERT    );
+
+          case VK_LCONTROL:  case VK_RCONTROL:  case VK_CONTROL:
+          case VK_LSHIFT:    case VK_RSHIFT:    case VK_SHIFT:
+          case VK_LMENU:     case VK_RMENU:     case VK_MENU:
+              /* These keypresses and releases are handled earlier in the function */
+              break;
 
           case VK_DELETE:
               /* The delete key should be treated as an ASCII keypress: */
