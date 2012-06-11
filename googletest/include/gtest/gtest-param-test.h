@@ -190,7 +190,6 @@ TEST_P(DerivedTest, DoesBlah) {
 // inside #if GTEST_HAS_PARAM_TEST.
 #include "gtest/internal/gtest-internal.h"
 #include "gtest/internal/gtest-param-util.h"
-#include "gtest/internal/gtest-param-util-generated.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -324,6 +323,10 @@ internal::ParamGenerator<typename Container::value_type> ValuesIn(
     const Container& container) {
   return ValuesIn(container.begin(), container.end());
 }
+
+} // namespace testing
+#include <gtest/internal/gtest-param-util-generated.h> // Must be included after ValuesIn and friends are defined
+namespace testing { // And back in...
 
 // Values() allows generating tests from explicitly specified list of
 // parameters.
