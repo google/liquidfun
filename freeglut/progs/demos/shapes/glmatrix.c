@@ -171,6 +171,7 @@ void glu_perspective(float vfov, float aspect, float near, float far)
     gl_frustum(-aspect * x, aspect * x, -x, x, near, far);
 }
 
+/* return the matrix (16 elements, 4x4 matrix, row-major order */
 float* get_matrix(int mm)
 {
     int idx = MMODE_IDX(mm);
@@ -182,6 +183,10 @@ float* get_matrix(int mm)
 #define M3(i, j)	((i * 3) + j)
 static float inv_transpose_result[9];
 
+/* return the inverse transpose of the left-upper 3x3 of a matrix
+   The returned pointer is only valid until the next time this function is
+   called, so make a deep copy when you want to keep it around.
+ */
 float* get_inv_transpose_3x3(int mm)
 {
     int idx = MMODE_IDX(mm);
@@ -207,48 +212,3 @@ float* get_inv_transpose_3x3(int mm)
 
     return inv_transpose_result;
 }
-
-
-#if 0
-void gl_apply_xform(unsigned int prog)
-{
-    int loc, mvidx, pidx, tidx, mvtop, ptop, ttop;
-
-    mvidx = MMODE_IDX(GL_MODELVIEW);
-    pidx = MMODE_IDX(GL_PROJECTION);
-    tidx = MMODE_IDX(GL_TEXTURE);
-
-    mvtop = stack_top[mvidx];
-    ptop = stack_top[pidx];
-    ttop = stack_top[tidx];
-
-    assert(prog);
-
-    if((loc = glGetUniformLocation(prog, "matrix_modelview")) != -1) {
-        glUniformMatrix4fv(loc, 1, 0, mat_stack[mvidx][mvtop]);
-    }
-
-    if((loc = glGetUniformLocation(prog, "matrix_projection")) != -1) {
-        glUniformMatrix4fv(loc, 1, 0, mat_stack[pidx][ptop]);
-    }
-
-    if((loc = glGetUniformLocation(prog, "matrix_texture")) != -1) {
-        glUniformMatrix4fv(loc, 1, 0, mat_stack[tidx][ttop]);
-    }
-
-    if((loc = glGetUniformLocation(prog, "matrix_normal")) != -1) {
-        float nmat[9];
-
-        nmat[0] = mat_stack[mvidx][mvtop][0];
-        nmat[1] = mat_stack[mvidx][mvtop][1];
-        nmat[2] = mat_stack[mvidx][mvtop][2];
-        nmat[3] = mat_stack[mvidx][mvtop][4];
-        nmat[4] = mat_stack[mvidx][mvtop][5];
-        nmat[5] = mat_stack[mvidx][mvtop][6];
-        nmat[6] = mat_stack[mvidx][mvtop][8];
-        nmat[7] = mat_stack[mvidx][mvtop][9];
-        nmat[8] = mat_stack[mvidx][mvtop][10];
-        glUniformMatrix3fv(loc, 1, 0, nmat);
-    }
-}
-#endif

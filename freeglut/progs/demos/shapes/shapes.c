@@ -606,7 +606,7 @@ static void display(void)
         gl_load_identity();
 
         gl_push_matrix();
-            /* Not in reverse order like normal OpenGL, matrices are multiplied in in order specified in our util library */
+            /* Not in reverse order like normal OpenGL, our util library multiplies the matrices in the order they are specified in */
             gl_rotatef((float)a,0,0,1);
             gl_rotatef((float)b,1,0,0);
             gl_translatef(0,1.2f,-6);
