@@ -50,6 +50,15 @@
 #include <crtdbg.h>
 #endif
 
+/* report GL errors, if any, to stderr */
+void checkError(const char *functionName)
+{
+    GLenum error;
+    while (( error = glGetError() ) != GL_NO_ERROR) {
+        fprintf (stderr, "GL error 0x%X detected in %s\n", error, functionName);
+    }
+}
+
 /*
  * OpenGL 2+ shader mode needs some function and macro definitions, 
  * avoiding a dependency on additional libraries like GLEW or the
@@ -282,6 +291,7 @@ GLint getAttribOrUniformLocation(const char* name, GLuint program, GLboolean isA
 
         return uniform;
     }
+    checkError ("getAttribOrUniformLocation");
 }
 
 GLuint program;
@@ -305,12 +315,16 @@ void compileAndCheck(GLuint shader)
         fprintf (stderr, "compile log: %s\n", infoLog);
         free (infoLog);
     }
+    checkError ("compileAndCheck");
 }
 
 GLuint compileShaderSource(GLenum type, GLsizei count, const ourGLchar **string)
 {
     GLuint shader = gl_CreateShader (type);
     gl_ShaderSource (shader, count, string, NULL);
+
+    checkError ("compileShaderSource");
+
     compileAndCheck (shader);
     return shader;
 }
@@ -329,6 +343,7 @@ void linkAndCheck(GLuint program)
         fprintf (stderr, "link log: %s\n", infoLog);
         free (infoLog);
     }
+    checkError ("linkAndCheck");
 }
 
 void createProgram(GLuint vertexShader, GLuint fragmentShader)
@@ -340,6 +355,9 @@ void createProgram(GLuint vertexShader, GLuint fragmentShader)
     if (fragmentShader != 0) {
         gl_AttachShader (program, fragmentShader);
     }
+
+    checkError ("createProgram");
+
     linkAndCheck (program);
 }
 
@@ -352,6 +370,8 @@ void initShader(void)
     const GLsizei fragmentShaderLines = sizeof(fragmentShaderSource) / sizeof(ourGLchar*);
     GLuint fragmentShader =
         compileShaderSource (GL_FRAGMENT_SHADER, fragmentShaderLines, fragmentShaderSource);
+
+    checkError ("initShader - 1");
 
     createProgram (vertexShader, fragmentShader);
 
@@ -370,6 +390,8 @@ void initShader(void)
         shaderReady = -1;
     else
         shaderReady = 1;
+
+    checkError ("initShader - 2");
 }
 
 /*
@@ -627,6 +649,8 @@ static void display(void)
         gl_UseProgram (0);
         glutSetVertexAttribCoord3(-1);
         glutSetVertexAttribNormal(-1);
+
+        checkError ("display");
     }
     else
     {
