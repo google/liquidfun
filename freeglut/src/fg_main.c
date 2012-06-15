@@ -88,6 +88,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
      * the already-drawn part does not get drawn again and things look funny.
      * But without this we get this bad behaviour whenever we resize the
      * window.
+     * DN: Hmm.. the above sounds like a concern only in single buffered mode...
      */
     window->State.Redisplay = GL_TRUE;
 
@@ -120,13 +121,17 @@ void fghRedrawWindow ( SFG_Window *window )
 
     if( window->State.NeedToResize )
     {
+        /* Set need to resize to false before calling fghReshapeWindow, otherwise
+           in the case the user's reshape callback calls glutReshapeWindow,
+           his request would get canceled after fghReshapeWindow gets called.
+         */
+        window->State.NeedToResize = GL_FALSE;
+
         fghReshapeWindow(
             window,
             window->State.Width,
             window->State.Height
         );
-
-        window->State.NeedToResize = GL_FALSE;
     }
 
     INVOKE_WCB( *window, Display, ( ) );
