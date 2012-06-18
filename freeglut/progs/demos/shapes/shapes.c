@@ -153,9 +153,9 @@ const ourGLchar *vertexShaderSource[] = {
     " */",
     "attribute vec3 fg_coord;",
     "attribute vec3 fg_normal;",
-    "varying vec4 position;  // position of the vertex (and fragment) in world space",
-    "varying vec3 varyingNormalDirection;  // surface normal vector in world space",
-    "uniform mat4 m, p;      // don't need v, as always identity in our demo",
+    "varying vec4 position;  /* position of the vertex (and fragment) in world space */",
+    "varying vec3 varyingNormalDirection;  /* surface normal vector in world space */",
+    "uniform mat4 m, p;      /* don't need v, as always identity in our demo */",
     "uniform mat3 m_3x3_inv_transp;",
     " ",
     "void main()",
@@ -164,7 +164,7 @@ const ourGLchar *vertexShaderSource[] = {
     "  position = m * fg_coord4;",
     "  varyingNormalDirection = normalize(m_3x3_inv_transp * fg_normal);",
     " ",
-    "  mat4 mvp = p*m;   // normally p*v*m",
+    "  mat4 mvp = p*m;   /* normally p*v*m */",
     "  gl_Position = mvp * fg_coord4;",
     "}"
 };
@@ -175,9 +175,9 @@ const ourGLchar *fragmentShaderSource[] = {
     " * This file is in the public domain.",
     " * Contributors: Martin Kraus, Sylvain Beucler",
     " */",
-    "varying vec4 position;  // position of the vertex (and fragment) in world space",
-    "varying vec3 varyingNormalDirection;  // surface normal vector in world space",
-    "//uniform mat4 v_inv;   // in this demo, the view matrix is always an identity matrix",
+    "varying vec4 position;  /* position of the vertex (and fragment) in world space */",
+    "varying vec3 varyingNormalDirection;  /* surface normal vector in world space */",
+    "/* uniform mat4 v_inv;   // in this demo, the view matrix is always an identity matrix */",
     " ",
     "struct lightSource",
     "{",
@@ -215,17 +215,17 @@ const ourGLchar *fragmentShaderSource[] = {
     "void main()",
     "{",
     "  vec3 normalDirection = normalize(varyingNormalDirection);",
-    "  //vec3 viewDirection = normalize(vec3(v_inv * vec4(0.0, 0.0, 0.0, 1.0) - position));",
-    "  vec3 viewDirection = normalize(vec3(vec4(0.0, 0.0, 0.0, 1.0) - position));    // in this demo, the view matrix is always an identity matrix",
+    "  /* vec3 viewDirection = normalize(vec3(v_inv * vec4(0.0, 0.0, 0.0, 1.0) - position)); */",
+    "  vec3 viewDirection = normalize(vec3(vec4(0.0, 0.0, 0.0, 1.0) - position));    /* in this demo, the view matrix is always an identity matrix */",
     "  vec3 lightDirection;",
     "  float attenuation;",
     " ",
-    "  if (0.0 == light0.position.w) // directional light?",
+    "  if (0.0 == light0.position.w) /* directional light? */",
     "    {",
-    "      attenuation = 1.0; // no attenuation",
+    "      attenuation = 1.0; /* no attenuation */",
     "      lightDirection = normalize(vec3(light0.position));",
     "    } ",
-    "  else // point light or spotlight (or other kind of light) ",
+    "  else /* point light or spotlight (or other kind of light) */",
     "    {",
     "      vec3 positionToLightSource = vec3(light0.position - position);",
     "      float distance = length(positionToLightSource);",
@@ -234,10 +234,10 @@ const ourGLchar *fragmentShaderSource[] = {
     "                           + light0.linearAttenuation * distance",
     "                           + light0.quadraticAttenuation * distance * distance);",
     " ",
-    "      if (light0.spotCutoff <= 90.0) // spotlight?",
+    "      if (light0.spotCutoff <= 90.0) /* spotlight? */",
     "        {",
     "          float clampedCosine = max(0.0, dot(-lightDirection, light0.spotDirection));",
-    "          if (clampedCosine < cos(radians(light0.spotCutoff))) // outside of spotlight cone?",
+    "          if (clampedCosine < cos(radians(light0.spotCutoff))) /* outside of spotlight cone? */",
     "            {",
     "              attenuation = 0.0;",
     "            }",
@@ -255,11 +255,11 @@ const ourGLchar *fragmentShaderSource[] = {
     "    * max(0.0, dot(normalDirection, lightDirection));",
     " ",
     "  vec3 specularReflection;",
-    "  if (dot(normalDirection, lightDirection) < 0.0) // light source on the wrong side?",
+    "  if (dot(normalDirection, lightDirection) < 0.0) /* light source on the wrong side? */",
     "    {",
-    "      specularReflection = vec3(0.0, 0.0, 0.0); // no specular reflection",
+    "      specularReflection = vec3(0.0, 0.0, 0.0); /* no specular reflection */",
     "    }",
-    "  else // light source on the right side",
+    "  else /* light source on the right side */",
     "    {",
     "      specularReflection = attenuation * vec3(light0.specular) * vec3(frontMaterial.specular) ",
     "        * pow(max(0.0, dot(reflect(-lightDirection, normalDirection), viewDirection)), frontMaterial.shininess);",
@@ -297,7 +297,7 @@ GLint getAttribOrUniformLocation(const char* name, GLuint program, GLboolean isA
 GLuint program;
 GLint attribute_fg_coord = -1, attribute_fg_normal = -1;  
 GLint uniform_m = -1, uniform_p = -1, uniform_m_3x3_inv_transp = -1;
-GLint shaderReady = 0;  // Set to 1 when all initialization went well, to -1 when somehow unusable.
+GLint shaderReady = 0;  /* Set to 1 when all initialization went well, to -1 when shader somehow unusable. */
 
 
 
@@ -610,7 +610,7 @@ static void display(void)
 
     if (useShader && shaderReady)
     {
-        // setup use of shader (and vertex buffer by FreeGLUT)
+        /* setup use of shader (and vertex buffer by FreeGLUT) */
         gl_UseProgram (program);
         glutSetVertexAttribCoord3(attribute_fg_coord);
         glutSetVertexAttribNormal(attribute_fg_normal);
