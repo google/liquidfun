@@ -679,8 +679,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     }
     break;
 
-    case 0x020a:
-        /* Should be WM_MOUSEWHEEL but my compiler doesn't recognize it */
+    case WM_MOUSEWHEEL:
     {
         int wheel_number = LOWORD( wParam );
         short ticks = ( short )HIWORD( wParam );
