@@ -493,7 +493,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 
     case WM_KILLFOCUS:
-/*        printf("WM_KILLFOCUS: %p\n", window ); */
+/*        printf("WM_KILLFOCUS (ismenu: %i): %p\n", window->IsMenu, window ); */
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
 
