@@ -296,6 +296,8 @@ int main( int argc, char** argv )
     glutSpecialFunc( SampleSpecial );
     glutIdleFunc( SampleIdle );
     glutAttachMenu( GLUT_LEFT_BUTTON );
+    glutSetMenu(subMenuA);
+    glutAttachMenu( GLUT_RIGHT_BUTTON);
 
     printf( "Testing game mode string parsing, don't panic!\n" );
     glutGameModeString( "320x240:32@100" );
@@ -316,7 +318,6 @@ int main( int argc, char** argv )
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleGameModeKeyboard );
     glutIdleFunc( SampleIdle );
-    glutAttachMenu( GLUT_LEFT_BUTTON );
 
     printf( "current window is %ix%i at (%i,%i)\n",
         glutGet( GLUT_WINDOW_WIDTH ), glutGet( GLUT_WINDOW_HEIGHT ),
