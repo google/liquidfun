@@ -495,7 +495,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_KILLFOCUS:
         {
             SFG_Menu* menu = NULL;
-            printf("WM_KILLFOCUS: %p\n", window ); 
+/*            printf("WM_KILLFOCUS: %p\n", window ); */
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
             INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
 
@@ -511,34 +511,16 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             {
                 SFG_Window* wnd = NULL;
                 HWND hwnd = GetFocus();  /* Get window with current focus - NULL for non freeglut windows */
-                printf("  hwnd: %p\n",hwnd);
                 if (hwnd)
                     /* See which of our windows it is */
                     wnd = fgWindowByHandle(hwnd);
 
-                //printf("  got menu: %p\n",menu);
-
-                printf("  wnd: %p, wnd->AM->PW: %p, menu->PW: %p\n",wnd,wnd&&wnd->ActiveMenu?wnd->ActiveMenu->ParentWindow:0,menu->ParentWindow);
-                if (wnd)
-                    printf("  wnd menu: %i, wnd->ActiveMenu: %p, wnd->Parent: %p\n",wnd->IsMenu,wnd->ActiveMenu,wnd->Parent);
-
                 if (!hwnd || !wnd)
-                {
                     /* User switched to another application*/
                     fgDeactivateMenu(menu->ParentWindow);
-                    printf("  -> kill1\n");
-                }
                 else if (!wnd->IsMenu && wnd!=menu->ParentWindow)
-                {
                     /* User switched to another FreeGLUT window */
                     fgDeactivateMenu(menu->ParentWindow);
-                    printf("  -> kill2\n");
-
-                }
-                else
-                {
-                    printf("  -> survive\n");
-                }
             }
         }
         break;
