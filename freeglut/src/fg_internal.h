@@ -661,7 +661,8 @@ struct tagSFG_Enumerator
     GLboolean   found;                          /* Used to terminate search  */
     void*       data;                           /* Custom data pointer       */
 };
-typedef void (* FGCBenumerator  )( SFG_Window *, SFG_Enumerator * );
+typedef void (* FGCBWindowEnumerator  )( SFG_Window *, SFG_Enumerator * );
+typedef void (* FGCBMenuEnumerator  )( SFG_Menu *, SFG_Enumerator * );
 
 /* The bitmap font structure */
 typedef struct tagSFG_Font SFG_Font;
@@ -915,8 +916,8 @@ void fgSetCursor ( SFG_Window *window, int cursorID );
  * and userData is the a custom user-supplied pointer. Functions
  * are defined and exported from freeglut_structure.c file.
  */
-void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator );
-void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback,
+void fgEnumWindows( FGCBWindowEnumerator enumCallback, SFG_Enumerator* enumerator );
+void fgEnumSubWindows( SFG_Window* window, FGCBWindowEnumerator enumCallback,
                        SFG_Enumerator* enumerator );
 
 /*
@@ -938,6 +939,12 @@ SFG_Window* fgWindowByID( int windowID );
  * as all menus are placed in a single doubly linked list...
  */
 SFG_Menu* fgMenuByID( int menuID );
+
+/*
+ * Returns active menu, if any. Assumption: only one menu active throughout application at any one time.
+ * This is easier than fgWindowByXXX as all menus are placed in one doubly linked list...
+ */
+SFG_Menu* fgGetActiveMenu( );
 
 /*
  * The menu activation and deactivation the code. This is the meat

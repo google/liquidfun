@@ -378,7 +378,7 @@ void fgDestroyStructure( void )
 /*
  * Helper function to enumerate through all registered top-level windows
  */
-void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
+void fgEnumWindows( FGCBWindowEnumerator enumCallback, SFG_Enumerator* enumerator )
 {
     SFG_Window *window;
 
@@ -398,10 +398,32 @@ void fgEnumWindows( FGCBenumerator enumCallback, SFG_Enumerator* enumerator )
 }
 
 /*
+* Helper function to enumerate through all registered top-level windows
+*/
+void fgEnumMenus( FGCBMenuEnumerator enumCallback, SFG_Enumerator* enumerator )
+{
+    SFG_Menu *menu;
+
+    FREEGLUT_INTERNAL_ERROR_EXIT ( enumCallback && enumerator,
+        "Enumerator or callback missing from window enumerator call",
+        "fgEnumWindows" );
+
+    /* It's enough to check all entries in fgStructure.Menus... */
+    for( menu = (SFG_Menu *)fgStructure.Menus.First;
+        menu;
+        menu = (SFG_Menu *)menu->Node.Next )
+    {
+        enumCallback( menu, enumerator );
+        if( enumerator->found )
+            return;
+    }
+}
+
+/*
  * Helper function to enumerate through all a window's subwindows
  * (single level descent)
  */
-void fgEnumSubWindows( SFG_Window* window, FGCBenumerator enumCallback,
+void fgEnumSubWindows( SFG_Window* window, FGCBWindowEnumerator enumCallback,
                        SFG_Enumerator* enumerator )
 {
     SFG_Window *child;
@@ -485,7 +507,7 @@ static void fghcbWindowByID( SFG_Window *window, SFG_Enumerator *enumerator )
 }
 
 /*
- * This function is similiar to the previous one, except it is
+ * This function is similar to the previous one, except it is
  * looking for a specified (sub)window identifier. The function
  * is defined in freeglut_structure.c file.
  */
@@ -493,7 +515,7 @@ SFG_Window* fgWindowByID( int windowID )
 {
     SFG_Enumerator enumerator;
 
-    /* Uses a method very similiar for fgWindowByHandle... */
+    /* Uses a method very similar for fgWindowByHandle... */
     enumerator.found = GL_FALSE;
     enumerator.data = ( void * )&windowID;
     fgEnumWindows( fghcbWindowByID, &enumerator );
@@ -503,19 +525,77 @@ SFG_Window* fgWindowByID( int windowID )
 }
 
 /*
- * Looks up a menu given its ID. This is easier that fgWindowByXXX
+ * A static helper function to look for a menu given its ID
+ */
+static void fghcbMenuByID( SFG_Menu *menu,
+    SFG_Enumerator *enumerator )
+{
+    if ( enumerator->found )
+        return;
+
+    /* Check the menu's ID. */
+    if( menu->ID == (int)(enumerator->data) )
+    {
+        enumerator->found = GL_TRUE;
+        enumerator->data = menu;
+
+        return;
+    }
+}
+
+/*
+ * Looks up a menu given its ID. This is easier than fgWindowByXXX
  * as all menus are placed in one doubly linked list...
  */
 SFG_Menu* fgMenuByID( int menuID )
 {
-    SFG_Menu *menu = NULL;
+    SFG_Enumerator enumerator;
 
-    /* It's enough to check all entries in fgStructure.Menus... */
-    for( menu = (SFG_Menu *)fgStructure.Menus.First;
-         menu;
-         menu = (SFG_Menu *)menu->Node.Next )
-        if( menu->ID == menuID )
-            return menu;
+    /* This is easy and makes use of the menus enumeration defined above */
+    enumerator.found = GL_FALSE;
+    enumerator.data = (void *)menuID;
+    fgEnumMenus( fghcbMenuByID, &enumerator );
+
+    if( enumerator.found )
+        return( SFG_Menu *) enumerator.data;
+
+    return NULL;
+}
+
+/*
+ * A static helper function to look for an active menu
+ */
+static void fghcbGetActiveMenu( SFG_Menu *menu,
+    SFG_Enumerator *enumerator )
+{
+    if ( enumerator->found )
+        return;
+
+    /* Check the menu's ID. */
+    if( menu->IsActive )
+    {
+        enumerator->found = GL_TRUE;
+        enumerator->data = menu;
+
+        return;
+    }
+}
+
+/*
+ * Returns active menu, if any. Assumption: only one menu active throughout application at any one time.
+ * This is easier than fgWindowByXXX as all menus are placed in one doubly linked list...
+ */
+SFG_Menu* fgGetActiveMenu( )
+{
+    SFG_Enumerator enumerator;
+
+    /* This is easy and makes use of the menus enumeration defined above */
+    enumerator.found = GL_FALSE;
+    fgEnumMenus( fghcbGetActiveMenu, &enumerator );
+
+    if( enumerator.found )
+        return( SFG_Menu *) enumerator.data;
+
     return NULL;
 }
 

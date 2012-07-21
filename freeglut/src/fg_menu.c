@@ -512,7 +512,7 @@ static void fghActivateMenu( SFG_Window* window, int button )
     SFG_Menu* menu = window->Menu[ button ];
     SFG_Window* current_window = fgStructure.CurrentWindow;
 
-    /* If the menu is already active in another window, deactivate it (and any submenu's) there */
+    /* If the menu is already active in another window, deactivate it (and any submenus) there */
     if ( menu->ParentWindow )
       fgDeactivateMenu(menu->ParentWindow);
 

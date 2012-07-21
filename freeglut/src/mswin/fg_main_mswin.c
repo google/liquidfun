@@ -493,34 +493,39 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         break;
 
     case WM_KILLFOCUS:
-/*        printf("WM_KILLFOCUS (ismenu: %i): %p\n", window->IsMenu, window ); */
-        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
-        INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
-
-        /* If this is a menu that lost focus, see if user either switched
-           application or FreeGLUT window (if one is running multiple
-           windows). If so, close menu that lost focus.
-         */
-        if( window->IsMenu &&
-            window->ActiveMenu && window->ActiveMenu->IsActive )
         {
-            SFG_Window* wnd = NULL;
-            HWND hwnd = GetForegroundWindow();  /* Get window with current focus */
-            if (hwnd)
-                /* See if its one of our windows */
-                wnd = fgWindowByHandle(hwnd);
+            SFG_Menu* menu = NULL;
+/*            printf("WM_KILLFOCUS (ismenu: %i): %p\n", window->IsMenu, window ); */
+            lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+            INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
 
-            if (!hwnd || !wnd)
-                /* User switched to another application*/
-                fgDeactivateMenu(window->ActiveMenu->ParentWindow);
-            else if (
-                ( wnd->IsMenu && wnd->ActiveMenu->ParentWindow!=window->ActiveMenu->ParentWindow) ||    /* Make sure we don't kill the menu when trying to enter a submenu */
-                (!wnd->IsMenu && wnd!=window->ActiveMenu->ParentWindow)
-                )
-                /* User switched to another FreeGLUT window */
-                fgDeactivateMenu(window->ActiveMenu->ParentWindow);
+            /* If we have an open menu, see if the open menu should be closed
+               when focus was lost because user either switched
+               application or FreeGLUT window (if one is running multiple
+               windows). If so, close menu the active menu.
+             */
+            if ( fgStructure.CurrentMenu )
+                menu = fgGetActiveMenu();
+            
+            if ( menu )
+            {
+                SFG_Window* wnd = NULL;
+                HWND hwnd = GetForegroundWindow();  /* Get window with current focus */
+                if (hwnd)
+                    /* See if its one of our windows */
+                    wnd = fgWindowByHandle(hwnd);
+
+                if (!hwnd || !wnd)
+                    /* User switched to another application*/
+                    fgDeactivateMenu(menu->ParentWindow);
+                else if (
+                    ( wnd->IsMenu && wnd->ActiveMenu && wnd->ActiveMenu->ParentWindow!=menu->ParentWindow) ||    /* Make sure we don't kill the menu when trying to enter a submenu */
+                    (!wnd->IsMenu && wnd!=menu->ParentWindow)
+                    )
+                    /* User switched to another FreeGLUT window */
+                    fgDeactivateMenu(menu->ParentWindow);
+            }
         }
-
         break;
 
 #if 0
