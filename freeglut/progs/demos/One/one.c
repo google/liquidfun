@@ -23,6 +23,7 @@
 
 int g_LeaveGameMode = 0;
 int g_InGameMode = 0;
+int g_mainwin, g_sw1;
 
 /*
  * Call this function to have some text drawn at given coordinates
@@ -97,50 +98,65 @@ static float g_fTime = 0.0f;
 
 void SampleDisplay( void )
 {
-    /*
-     * Clear the screen
-     */
-    glClearColor( 0, 0.5, 1, 1 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    int win = glutGetWindow();
 
-    /*
-     * Have the cube rotated
-     */
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glRotatef( g_fTime, 0, 0, 1 );
-    glRotatef( g_fTime, 0, 1, 0 );
-    glRotatef( g_fTime, 1, 0, 0 );
-
-    /*
-     * And then drawn...
-     */
-    glColor3f( 1, 1, 0 );
-    /* glutWireCube( 20.0 ); */
-    glutWireTeapot( 20.0 );
-    /* glutWireSpher( 15.0, 15, 15 ); */
-    /* glColor3f( 0, 1, 0 ); */
-    /* glutWireCube( 30.0 ); */
-    /* glutSolidCone( 10, 20, 10, 2 ); */
-
-    /*
-     * Don't forget about the model-view matrix
-     */
-    glPopMatrix( );
-
-    /*
-     * Draw a silly text
-     */
-    if( g_InGameMode == 0 )
-        PrintText( 20, 20, "Hello there cruel world!" );
+    if (win==g_sw1)
+    {
+        /*
+         * Clear the screen
+         */
+        glClearColor(0.7f,0.7f,0.7f,1);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        glutPostWindowRedisplay(g_mainwin);
+    }
     else
-        PrintText( 20, 20, "Press ESC to leave the game mode!" );
+    {
+        /*
+         * Clear the screen
+         */
+        glClearColor( 0, 0.5, 1, 1 );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        /*
+         * Have the cube rotated
+         */
+        glMatrixMode( GL_MODELVIEW );
+        glPushMatrix();
+
+        glRotatef( g_fTime, 0, 0, 1 );
+        glRotatef( g_fTime, 0, 1, 0 );
+        glRotatef( g_fTime, 1, 0, 0 );
+
+        /*
+         * And then drawn...
+         */
+        glColor3f( 1, 1, 0 );
+        /* glutWireCube( 20.0 ); */
+        glutWireTeapot( 20.0 );
+        /* glutWireSpher( 15.0, 15, 15 ); */
+        /* glColor3f( 0, 1, 0 ); */
+        /* glutWireCube( 30.0 ); */
+        /* glutSolidCone( 10, 20, 10, 2 ); */
+
+        /*
+         * Don't forget about the model-view matrix
+         */
+        glPopMatrix( );
+
+        /*
+         * Draw a silly text
+         */
+        if( g_InGameMode == 0 )
+            PrintText( 20, 20, "Hello there cruel world!" );
+        else
+            PrintText( 20, 20, "Press ESC to leave the game mode!" );
+    }
 
     /*
      * And swap this context's buffers
      */
     glutSwapBuffers( );
+    glutPostWindowRedisplay(win);
 }
 
 /*
@@ -289,7 +305,7 @@ int main( int argc, char** argv )
     glutAttachMenu( GLUT_LEFT_BUTTON );
 
     glutInitWindowPosition( 200, 200 );
-    glutCreateWindow( "I am not Jan B." );
+    g_mainwin = glutCreateWindow( "I am not Jan B." );
     glutDisplayFunc( SampleDisplay );
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleKeyboard );
@@ -298,6 +314,11 @@ int main( int argc, char** argv )
     glutAttachMenu( GLUT_LEFT_BUTTON );
     glutSetMenu(subMenuA);
     glutAttachMenu( GLUT_RIGHT_BUTTON);
+
+    g_sw1=glutCreateSubWindow(g_mainwin,200,0,100,100);
+    glutDisplayFunc( SampleDisplay );
+    glutSetMenu(subMenuB);
+    glutAttachMenu( GLUT_LEFT_BUTTON);
 
     printf( "Testing game mode string parsing, don't panic!\n" );
     glutGameModeString( "320x240:32@100" );
