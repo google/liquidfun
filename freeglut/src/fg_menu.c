@@ -620,11 +620,32 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
             /*
              * Outside the menu, deactivate if it's a downclick
              *
-             * XXX This isn't enough.  A downclick outside of
-             * XXX the interior of our freeglut windows should also
-             * XXX deactivate the menu.  This is more complicated.
+             * A downclick outside of the interior of our freeglut windows
+             * is dealt with in the WM_KILLFOCUS handler of fgPlatformWindowProc
              */
-            fgDeactivateMenu( window->ActiveMenu->ParentWindow );
+        {
+            if (window->ActiveMenu->ParentWindow)
+                fgDeactivateMenu( window->ActiveMenu->ParentWindow );
+            else
+            {
+                /* 
+                 * Its a rare occasion that a window has an ActiveMenu but
+                 * that menus does not have a parent window. It happens
+                 * however in the corner case bug when one opens a menu in
+                 * a main window, then opens a different menu in this main
+                 * window's child (you now have two menus open
+                 * simultaneously, thats the bug) and then click somewhere
+                 * else that causes both menus to close. One of them is
+                 * then not properly cleaned up. This finishes the cleaning
+                 * and minimizes the impact on the user, he only needs one
+                 * extra mouse click.
+                 */
+                fghSetMenuParentWindow ( NULL, window->ActiveMenu );
+                window->ActiveMenu->IsActive = GL_FALSE;
+                window->ActiveMenu->ActiveEntry = NULL;
+                window->ActiveMenu = NULL;
+            }
+        }
 
         /*
          * XXX Why does an active menu require a redisplay at
@@ -659,11 +680,12 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
 void fgDeactivateMenu( SFG_Window *window )
 {
     SFG_Window *parent_window = NULL;
-
-    /* Check if there is an active menu attached to this window... */
-    SFG_Menu* menu = window->ActiveMenu;
+    SFG_Menu* menu;
     SFG_MenuEntry *menuEntry;
 
+    /* Check if there is an active menu attached to this window... */
+    freeglut_return_if_fail( window );
+    menu = window->ActiveMenu;
     /* Did we find an active window? */
     freeglut_return_if_fail( menu );
 

@@ -518,7 +518,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 if (!hwnd || !wnd)
                     /* User switched to another application*/
                     fgDeactivateMenu(menu->ParentWindow);
-                else if (!wnd->IsMenu && wnd!=menu->ParentWindow)
+                else if (!wnd->IsMenu && wnd!=menu->ParentWindow)   /* Make sure we don't kill the menu when trying to enter a submenu */
                     /* User switched to another FreeGLUT window */
                     fgDeactivateMenu(menu->ParentWindow);
             }
