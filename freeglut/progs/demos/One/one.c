@@ -174,6 +174,13 @@ void SampleIdle( void )
     }
 }
 
+void SampleEntry(int state)
+{
+    int window = glutGetWindow () ;
+    printf ( "Window %d Entry Callback: %d\n", window, state ) ;
+    glutPostRedisplay () ;
+}
+
 /*
  * The reshape function
  */
@@ -302,6 +309,7 @@ int main( int argc, char** argv )
     glutKeyboardFunc( SampleKeyboard );
     glutSpecialFunc( SampleSpecial );
     glutIdleFunc( SampleIdle );
+    glutEntryFunc( SampleEntry );
     glutAttachMenu( GLUT_LEFT_BUTTON );
 
     glutInitWindowPosition( 200, 200 );
