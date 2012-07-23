@@ -23,7 +23,7 @@
 
 int g_LeaveGameMode = 0;
 int g_InGameMode = 0;
-int g_mainwin, g_sw1;
+int g_mainwin, g_sw1, g_sw2;
 
 /*
  * Call this function to have some text drawn at given coordinates
@@ -106,6 +106,15 @@ void SampleDisplay( void )
          * Clear the screen
          */
         glClearColor(0.7f,0.7f,0.7f,1);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        glutPostWindowRedisplay(g_mainwin);
+    }
+    else if (win==g_sw2)
+    {
+        /*
+        * Clear the screen
+        */
+        glClearColor(0.3f,0.3f,0.3f,1);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         glutPostWindowRedisplay(g_mainwin);
     }
@@ -321,12 +330,17 @@ int main( int argc, char** argv )
     glutIdleFunc( SampleIdle );
     glutAttachMenu( GLUT_LEFT_BUTTON );
     glutSetMenu(subMenuA);
-    glutAttachMenu( GLUT_RIGHT_BUTTON);
+    glutAttachMenu( GLUT_RIGHT_BUTTON );
 
     g_sw1=glutCreateSubWindow(g_mainwin,200,0,100,100);
     glutDisplayFunc( SampleDisplay );
     glutSetMenu(subMenuB);
     glutAttachMenu( GLUT_LEFT_BUTTON);
+
+    g_sw2=glutCreateSubWindow(g_sw1,50,0,50,50);
+    glutDisplayFunc( SampleDisplay );
+    glutSetMenu(menuID);
+    glutAttachMenu( GLUT_RIGHT_BUTTON );
 
     printf( "Testing game mode string parsing, don't panic!\n" );
     glutGameModeString( "320x240:32@100" );
