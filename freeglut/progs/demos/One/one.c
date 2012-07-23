@@ -187,7 +187,6 @@ void SampleEntry(int state)
 {
     int window = glutGetWindow () ;
     printf ( "Window %d Entry Callback: %d\n", window, state ) ;
-    glutPostRedisplay () ;
 }
 
 /*

@@ -225,10 +225,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     static unsigned char lControl = 0, rControl = 0, lShift = 0,
                          rShift = 0, lAlt = 0, rAlt = 0;
 
-    SFG_Window* window;
+    SFG_Window *window, *child_window = NULL;
     PAINTSTRUCT ps;
     LRESULT lRet = 1;
-    GLboolean gotChild = GL_FALSE;
 
     FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Event Handler" ) ;
 
@@ -240,35 +239,39 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     /* printf ( "Window %3d message <%04x> %12d %12d\n", window?window->ID:0,
              uMsg, wParam, lParam ); */
 
-    /* events only sent to main window. Check if the current window that the mouse
-       is over is a child window and if so, make sure we call the callback on that
-       child instead.
-    */
+    /* Some events only sent to main window. Check if the current window that
+     * the mouse is over is a child window. Below whn handling some messages,
+     * we make sure that we process callbacks on the child window instead.
+     * This mirrors how GLUT does things.
+     */
     if (window && window->Children.First)
     {
         POINT mouse_pos;
         SFG_WindowHandleType hwnd;
+        SFG_Window* temp_window;
 
         GetCursorPos( &mouse_pos );
         ScreenToClient( window->Window.Handle, &mouse_pos );
         hwnd = ChildWindowFromPoint(window->Window.Handle, mouse_pos);
         if (hwnd)   /* can be NULL if mouse outside parent by the time we get here */
         {
-            window = fgWindowByHandle(hwnd);
-            if (window->Parent)
-                gotChild = GL_TRUE;
+            temp_window = fgWindowByHandle(hwnd);
+            if (temp_window->Parent)    /* Verify we got a child window */
+                child_window = temp_window;
         }
     }
 
     if ( window )
     {
+      SFG_Window* temp_window = child_window?child_window:window;
+
       fgState.Modifiers = fgPlatformGetModifiers( );
 
       /* Checking for CTRL, ALT, and SHIFT key positions:  Key Down! */
       if ( !lControl && GetAsyncKeyState ( VK_LCONTROL ) )
       {
-          INVOKE_WCB	( *window, Special,
-                        ( GLUT_KEY_CTRL_L, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB  ( *temp_window, Special,
+                        ( GLUT_KEY_CTRL_L, temp_window->State.MouseX, temp_window->State.MouseY )
                       );
 
           lControl = 1;
@@ -276,8 +279,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( !rControl && GetAsyncKeyState ( VK_RCONTROL ) )
       {
-          INVOKE_WCB ( *window, Special,
-                       ( GLUT_KEY_CTRL_R, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, Special,
+                       ( GLUT_KEY_CTRL_R, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           rControl = 1;
@@ -285,8 +288,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( !lShift && GetAsyncKeyState ( VK_LSHIFT ) )
       {
-          INVOKE_WCB ( *window, Special,
-                       ( GLUT_KEY_SHIFT_L, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, Special,
+                       ( GLUT_KEY_SHIFT_L, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           lShift = 1;
@@ -294,8 +297,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( !rShift && GetAsyncKeyState ( VK_RSHIFT ) )
       {
-          INVOKE_WCB ( *window, Special,
-                       ( GLUT_KEY_SHIFT_R, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, Special,
+                       ( GLUT_KEY_SHIFT_R, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           rShift = 1;
@@ -303,8 +306,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( !lAlt && GetAsyncKeyState ( VK_LMENU ) )
       {
-          INVOKE_WCB ( *window, Special,
-                       ( GLUT_KEY_ALT_L, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, Special,
+                       ( GLUT_KEY_ALT_L, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           lAlt = 1;
@@ -312,8 +315,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( !rAlt && GetAsyncKeyState ( VK_RMENU ) )
       {
-          INVOKE_WCB ( *window, Special,
-                       ( GLUT_KEY_ALT_R, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, Special,
+                       ( GLUT_KEY_ALT_R, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           rAlt = 1;
@@ -322,8 +325,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
       /* Checking for CTRL, ALT, and SHIFT key positions:  Key Up! */
       if ( lControl && !GetAsyncKeyState ( VK_LCONTROL ) )
       {
-          INVOKE_WCB ( *window, SpecialUp,
-                       ( GLUT_KEY_CTRL_L, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, SpecialUp,
+                       ( GLUT_KEY_CTRL_L, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           lControl = 0;
@@ -331,8 +334,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( rControl && !GetAsyncKeyState ( VK_RCONTROL ) )
       {
-          INVOKE_WCB ( *window, SpecialUp,
-                       ( GLUT_KEY_CTRL_R, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, SpecialUp,
+                       ( GLUT_KEY_CTRL_R, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           rControl = 0;
@@ -340,8 +343,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( lShift && !GetAsyncKeyState ( VK_LSHIFT ) )
       {
-          INVOKE_WCB ( *window, SpecialUp,
-                       ( GLUT_KEY_SHIFT_L, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, SpecialUp,
+                       ( GLUT_KEY_SHIFT_L, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           lShift = 0;
@@ -349,8 +352,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( rShift && !GetAsyncKeyState ( VK_RSHIFT ) )
       {
-          INVOKE_WCB ( *window, SpecialUp,
-                       ( GLUT_KEY_SHIFT_R, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, SpecialUp,
+                       ( GLUT_KEY_SHIFT_R, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           rShift = 0;
@@ -358,8 +361,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( lAlt && !GetAsyncKeyState ( VK_LMENU ) )
       {
-          INVOKE_WCB ( *window, SpecialUp,
-                       ( GLUT_KEY_ALT_L, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, SpecialUp,
+                       ( GLUT_KEY_ALT_L, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           lAlt = 0;
@@ -367,8 +370,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
       if ( rAlt && !GetAsyncKeyState ( VK_RMENU ) )
       {
-          INVOKE_WCB ( *window, SpecialUp,
-                       ( GLUT_KEY_ALT_R, window->State.MouseX, window->State.MouseY )
+          INVOKE_WCB ( *temp_window, SpecialUp,
+                       ( GLUT_KEY_ALT_R, temp_window->State.MouseX, temp_window->State.MouseY )
                      );
 
           rAlt = 0;
@@ -491,16 +494,25 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_SETFOCUS:
 /*        printf("WM_SETFOCUS: %p\n", window ); */
-        if (gotChild)
-            /* If child should have focus instead, set it here. */
-            SetFocus(window->Window.Handle);
 
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
-        INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
 
+        if (child_window)
+        {
+            /* If child should have focus instead, set it here. */
+            SetFocus(child_window->Window.Handle);
+            SetActiveWindow( child_window->Window.Handle );
+            INVOKE_WCB( *child_window, Entry, ( GLUT_ENTERED ) );
+            UpdateWindow ( child_window->Window.Handle );
+        }
+        else
+        {
+            SetActiveWindow( window->Window.Handle );
+            INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
+        }
+        /* Always request update on main window to be safe */
         UpdateWindow ( hWnd );
-        if (gotChild)
-            UpdateWindow ( window->Window.Handle );
+
         break;
 
     case WM_KILLFOCUS:
@@ -811,6 +823,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         int keypress = -1;
         POINT mouse_pos ;
 
+        if (child_window)
+            window = child_window;
 
         if( ( fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE ) && (HIWORD(lParam) & KF_REPEAT) )
             break;
@@ -905,6 +919,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         int keypress = -1;
         POINT mouse_pos;
 
+        if (child_window)
+            window = child_window;
+
         /*
          * Remember the current modifiers state. This is done here in order
          * to make sure the VK_DELETE keyboard callback is executed properly.
@@ -991,6 +1008,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_SYSCHAR:
     case WM_CHAR:
     {
+      if (child_window)
+        window = child_window;
+
       if( (fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE) && (HIWORD(lParam) & KF_REPEAT) )
             break;
 
