@@ -228,6 +228,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     SFG_Window* window;
     PAINTSTRUCT ps;
     LRESULT lRet = 1;
+    GLboolean gotChild = GL_FALSE;
 
     FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Event Handler" ) ;
 
@@ -252,7 +253,11 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         ScreenToClient( window->Window.Handle, &mouse_pos );
         hwnd = ChildWindowFromPoint(window->Window.Handle, mouse_pos);
         if (hwnd)   /* can be NULL if mouse outside parent by the time we get here */
+        {
             window = fgWindowByHandle(hwnd);
+            if (window->Parent)
+                gotChild = GL_TRUE;
+        }
     }
 
     if ( window )
@@ -486,10 +491,16 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_SETFOCUS:
 /*        printf("WM_SETFOCUS: %p\n", window ); */
+        if (gotChild)
+            /* If child should have focus instead, set it here. */
+            SetFocus(window->Window.Handle);
+
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
 
-		UpdateWindow ( hWnd );
+        UpdateWindow ( hWnd );
+        if (gotChild)
+            UpdateWindow ( window->Window.Handle );
         break;
 
     case WM_KILLFOCUS:
@@ -500,13 +511,13 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
 
             /* If we have an open menu, see if the open menu should be closed
-               when focus was lost because user either switched
-               application or FreeGLUT window (if one is running multiple
-               windows). If so, close menu the active menu.
+             * when focus was lost because user either switched
+             * application or FreeGLUT window (if one is running multiple
+             * windows). If so, close menu the active menu.
              */
             if ( fgStructure.Menus.First )
                 menu = fgGetActiveMenu();
-            
+
             if ( menu )
             {
                 SFG_Window* wnd = NULL;

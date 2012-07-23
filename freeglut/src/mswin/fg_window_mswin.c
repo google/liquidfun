@@ -808,7 +808,6 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
     UpdateWindow( window->Window.Handle );
     ShowCursor( TRUE );  /* XXX Old comments say "hide cursor"! */
-
 }
 
 
