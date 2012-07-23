@@ -532,6 +532,18 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 else if (!wnd->IsMenu && wnd!=menu->ParentWindow)   /* Make sure we don't kill the menu when trying to enter a submenu */
                     /* User switched to another FreeGLUT window */
                     fgDeactivateMenu(menu->ParentWindow);
+                else
+                {
+                    /* Check if focus lost because non-client area of
+                     * window was pressed (pressing on client area is
+                     * handled in fgCheckActiveMenu)
+                     */
+                    POINT mouse_pos;
+                    RECT clientArea = fghGetClientArea(menu->ParentWindow, GL_FALSE);
+                    GetCursorPos(&mouse_pos);
+                    if ( !PtInRect( &clientArea, mouse_pos ) )
+                        fgDeactivateMenu(menu->ParentWindow);
+                }
             }
         }
         break;
