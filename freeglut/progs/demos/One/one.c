@@ -23,7 +23,7 @@
 
 int g_LeaveGameMode = 0;
 int g_InGameMode = 0;
-int g_mainwin, g_sw1, g_sw2;
+int g_mainwin, g_sw1, g_sw2, g_gamemodewin;
 
 /*
  * Call this function to have some text drawn at given coordinates
@@ -94,11 +94,17 @@ void PrintText( int nX, int nY, char* pszText )
 /*
  * This is the display routine for our sample FreeGLUT windows
  */
-static float g_fTime = 0.0f;
-
 void SampleDisplay( void )
 {
     int win = glutGetWindow();
+
+    if (g_InGameMode && win!=g_gamemodewin)
+        /* Dont draw other windows when in gamemode, those aren't visible
+         * anyway. Drawing them continuously anyway can cause flicker trouble
+         * on my machine. This only seems to occur when there are child windows
+         * among the non-visible windows 
+         */
+        return;
 
     if (win==g_sw1)
     {
@@ -120,6 +126,8 @@ void SampleDisplay( void )
     }
     else
     {
+        const GLfloat time = glutGet(GLUT_ELAPSED_TIME) / 1000.f * 40;
+
         /*
          * Clear the screen
          */
@@ -132,9 +140,9 @@ void SampleDisplay( void )
         glMatrixMode( GL_MODELVIEW );
         glPushMatrix();
 
-        glRotatef( g_fTime, 0, 0, 1 );
-        glRotatef( g_fTime, 0, 1, 0 );
-        glRotatef( g_fTime, 1, 0, 0 );
+        glRotatef( time, 0, 0, 1 );
+        glRotatef( time, 0, 1, 0 );
+        glRotatef( time, 1, 0, 0 );
 
         /*
          * And then drawn...
@@ -142,7 +150,7 @@ void SampleDisplay( void )
         glColor3f( 1, 1, 0 );
         /* glutWireCube( 20.0 ); */
         glutWireTeapot( 20.0 );
-        /* glutWireSpher( 15.0, 15, 15 ); */
+        /* glutWireSphere( 15.0, 15, 15 ); */
         /* glColor3f( 0, 1, 0 ); */
         /* glutWireCube( 30.0 ); */
         /* glutSolidCone( 10, 20, 10, 2 ); */
@@ -173,10 +181,9 @@ void SampleDisplay( void )
  */
 void SampleIdle( void )
 {
-    g_fTime += 0.5f;
-
     if( g_LeaveGameMode == 1 )
     {
+        /* One could do all this just as well in SampleGameModeKeyboard... */
         glutLeaveGameMode( );
         g_LeaveGameMode = 0;
         g_InGameMode = 0;
@@ -334,7 +341,7 @@ int main( int argc, char** argv )
     g_sw1=glutCreateSubWindow(g_mainwin,200,0,100,100);
     glutDisplayFunc( SampleDisplay );
     glutSetMenu(subMenuB);
-    glutAttachMenu( GLUT_LEFT_BUTTON);
+    glutAttachMenu( GLUT_LEFT_BUTTON );
 
     g_sw2=glutCreateSubWindow(g_sw1,50,0,50,50);
     glutDisplayFunc( SampleDisplay );
@@ -352,7 +359,7 @@ int main( int argc, char** argv )
     glutEnterGameMode();
 
     glutGameModeString( "800x600" );    /* this one is likely to succeed */
-    glutEnterGameMode();
+    g_gamemodewin = glutEnterGameMode();
 
     if (glutGameModeGet(GLUT_GAME_MODE_ACTIVE))
         g_InGameMode = 1;
@@ -360,6 +367,8 @@ int main( int argc, char** argv )
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleGameModeKeyboard );
     glutIdleFunc( SampleIdle );
+    glutSetMenu(menuID);
+    glutAttachMenu( GLUT_LEFT_BUTTON );
 
     printf( "current window is %ix%i at (%i,%i)\n",
         glutGet( GLUT_WINDOW_WIDTH ), glutGet( GLUT_WINDOW_HEIGHT ),
@@ -371,11 +380,12 @@ int main( int argc, char** argv )
      */
     glutMainLoop();
 
+    /*
+     * returned from mainloop after window closed
+     * see glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS); above
+     */
     printf( "glutMainLoop() termination works fine!\n" );
 
-    /*
-     * This is never reached in FreeGLUT. Is that good?
-     */
     return EXIT_SUCCESS;
 }
 

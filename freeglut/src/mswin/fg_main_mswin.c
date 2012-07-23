@@ -240,7 +240,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
              uMsg, wParam, lParam ); */
 
     /* Some events only sent to main window. Check if the current window that
-     * the mouse is over is a child window. Below whn handling some messages,
+     * the mouse is over is a child window. Below when handling some messages,
      * we make sure that we process callbacks on the child window instead.
      * This mirrors how GLUT does things.
      */
