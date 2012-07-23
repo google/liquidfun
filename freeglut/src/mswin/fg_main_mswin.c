@@ -518,9 +518,11 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_KILLFOCUS:
         {
             SFG_Menu* menu = NULL;
+            SFG_Window* saved_window = fgStructure.CurrentWindow;
 /*            printf("WM_KILLFOCUS: %p\n", window ); */
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
             INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
+            fgSetWindow(saved_window);
 
             /* If we have an open menu, see if the open menu should be closed
              * when focus was lost because user either switched
