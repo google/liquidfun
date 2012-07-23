@@ -2,21 +2,26 @@
 
 #include <GL/freeglut.h>
 
-int nWindow;
+int nWindow, nChildWindow = -1;
 int nLoopMain = 0;
 
 int nPosX,  nPosY;
 int nWidth, nHeight;
 
+GLboolean bChildPosDone = GL_FALSE, bChildSizeDone = GL_FALSE;
+
 void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY );
 void Redisplay();
-
+void Reshape(int x, int y);
 
 
 
 
 void DrawQuad()
 {
+    nWidth  = glutGet(GLUT_WINDOW_WIDTH);
+    nHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
     glBegin(GL_QUADS);
         glVertex2d(nWidth*.25, nHeight*.75);
         glVertex2d(nWidth*.75, nHeight*.75);
@@ -27,36 +32,107 @@ void DrawQuad()
 
 void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
 {
-    if (cChar == 27)
+    switch (cChar)
+    {
+    case 27:
         glutLeaveMainLoop();
 
-    else if (cChar=='f')
-    {
+        break;
+
+
+    case 'f':
+    case 'F':
         printf("main window toggle fullscreen\n");
-
         glutFullScreenToggle();
-    }
-    else if (cChar=='r')
-    {
-        printf("main window resize\n");
 
-        if (nWidth<400)
-            glutReshapeWindow(600,300);
-        else
-            glutReshapeWindow(300,300);
-    }
-    else if (cChar=='m')
-    {
-        printf("main window position\n");
+        break;
 
-        /* The window position you request is the outer top-left of the window,
-         * the client area is at a different position if the window has borders
-         * and/or a title bar.
-         */
-        if (nPosX<400)
-            glutPositionWindow(600,300);
+
+    case 'r':
+    case 'R':
+        if (nChildWindow!=-1)
+        {
+            glutSetWindow(nChildWindow);
+            printf("child window resize\n");
+            if (!bChildSizeDone)
+                glutReshapeWindow(glutGet(GLUT_WINDOW_WIDTH)+50,glutGet(GLUT_WINDOW_HEIGHT)+50);
+            else
+                glutReshapeWindow(glutGet(GLUT_WINDOW_WIDTH)-50,glutGet(GLUT_WINDOW_HEIGHT)-50);
+            bChildSizeDone = !bChildSizeDone;
+        }
         else
-            glutPositionWindow(300,300);
+        {
+            printf("main window resize\n");
+            if (nWidth<400)
+                glutReshapeWindow(600,300);
+            else
+                glutReshapeWindow(300,300);
+        }
+
+        break;
+
+
+    case 'm':
+    case 'M':
+        if (nChildWindow!=-1)
+        {
+            glutSetWindow(nChildWindow);
+
+            /* The window position you request is relative to the top-left
+             * corner of the client area of the parent window.
+             */
+            if (!bChildPosDone)
+                glutPositionWindow(glutGet(GLUT_WINDOW_X)+50,glutGet(GLUT_WINDOW_Y)+50);
+            else
+                glutPositionWindow(glutGet(GLUT_WINDOW_X)-50,glutGet(GLUT_WINDOW_Y)-50);
+            bChildPosDone = !bChildPosDone;
+        }
+        else
+        {
+            printf("main window position\n");
+
+            /* The window position you request is the outer top-left of the window,
+             * the client area is at a different position if the window has borders
+             * and/or a title bar.
+             */
+            if (nPosX<400)
+                glutPositionWindow(600,300);
+            else
+                glutPositionWindow(300,300);
+        }
+
+        break;
+
+
+    case 'c':
+    case 'C':
+        if (nChildWindow==-1)
+        {
+            /* open child window */
+            printf("open child window\n");
+            nWidth  = glutGet(GLUT_WINDOW_WIDTH);
+            nHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+            nChildWindow = glutCreateSubWindow(nWindow,(int)(nWidth*.35),(int)(nHeight*.35),(int)(nWidth*.3),(int)(nHeight*.3));
+            glutKeyboardFunc( SampleKeyboard );
+            glutDisplayFunc( Redisplay );
+            glutReshapeFunc( Reshape );
+        }
+        else
+        {
+            /* close child window */
+            printf("close child window\n");
+            glutSetWindow(nWindow);
+            glutDestroyWindow(nChildWindow);
+            nChildWindow = -1;
+            bChildSizeDone = GL_FALSE;
+            bChildPosDone  = GL_FALSE;
+        }
+        break;
+
+
+    default:
+        break;
     }
 }
 
@@ -67,18 +143,32 @@ void Idle(void)
 
 void Reshape(int x, int y)
 {
+    int win = glutGetWindow();
+
     nWidth  = glutGet(GLUT_WINDOW_WIDTH);
     nHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    printf("reshape %s, %dx%d\n",win==nWindow?"main":"child",
+        nWidth, nHeight);
 
     glViewport(0,0,nWidth,nHeight);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0,nWidth,0,nHeight);
+
+    if (win==nWindow && nChildWindow!=-1)
+    {
+        glutSetWindow(nChildWindow);
+        glutPositionWindow((int)(nWidth*.35),(int)(nHeight*.35));
+        glutReshapeWindow((int)(nWidth*.3),(int)(nHeight*.3));
+        glutSetWindow(nWindow);
+    }
 }
 
 void Redisplay(void)
 {
-    if (nLoopMain++%6==0)
+    int win = glutGetWindow();
+
+    if (nLoopMain++%20==0)
     {
         int border, caption;
 
@@ -96,20 +186,35 @@ void Redisplay(void)
          * or simply when maximized--try pressing the maximize button).
          * the returned size is the size of the client area
          */
-        printf("window now %dx%d, top-left of client at: (%d,%d), of window at: (%d,%d)\n",
+        if (win==nWindow)
+            printf("main  window %dx%d, top-left of client at: (%d,%d), of window at: (%d,%d)\n",
+                nWidth, nHeight,
+                nPosX ,nPosY,
+                nPosX-border,
+                nPosY-border-caption);
+        else
+            printf("child window %dx%d, top-left of client at: (%d,%d), relative to parent\n",
             nWidth, nHeight,
-            nPosX ,nPosY,
-            nPosX-border,
-            nPosY-border-caption);
+            nPosX ,nPosY);
     }
 
-    glClearColor(.2f,0.f,0.f,0.f);
+    if (win==nWindow)
+    {
+        glClearColor(.2f,0.f,0.f,0.f);
+        glColor3f(1,1,1);
+    }
+    else
+    {
+        /* child window */
+        glClearColor(.0f,.2f,0.f,0.f);
+        glColor3f(.5,.5,.5);
+        glutPostWindowRedisplay(nWindow);
+    }
     glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(1,1,1);
     DrawQuad();
 
     glutSwapBuffers();
-    glutPostRedisplay();
+    glutPostWindowRedisplay(win);
 }
 
 
@@ -136,5 +241,5 @@ int main(int argc, char* argv[])
     glutMainLoop();
     printf("glutMainLoop returned\n");
 
-    return 1;
+    return EXIT_SUCCESS;
 }

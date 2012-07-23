@@ -183,6 +183,19 @@ int fgPlatformGlutGet ( GLenum eWhat )
         GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect );
 #else
         winRect = fghGetClientArea(fgStructure.CurrentWindow, FALSE);
+        if (fgStructure.CurrentWindow->Parent && (eWhat==GLUT_WINDOW_X || eWhat==GLUT_WINDOW_Y))
+        {
+            /* For child window, we should return relative to upper-left
+             *  of parent's client area.
+             */
+            POINT topleft;
+            topleft.x = winRect.left;
+            topleft.y = winRect.top;
+
+            ScreenToClient(fgStructure.CurrentWindow->Parent->Window.Handle,&topleft);
+            winRect.left = topleft.x;
+            winRect.top  = topleft.y;
+        }
 #endif /* defined(_WIN32_WCE) */
 
         switch( eWhat )
