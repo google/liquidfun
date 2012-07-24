@@ -476,6 +476,7 @@ main(int argc, char *argv[])
   glutInitWindowPosition ( 140, 140 );
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE );
   glutInit(&argc, argv);
+  glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_CONTINUE_EXECUTION);
 
   freeglut_window = glutCreateWindow( "Callback Demo" );
   printf ( "Creating window %d as 'Callback Demo'\n", freeglut_window ) ;
