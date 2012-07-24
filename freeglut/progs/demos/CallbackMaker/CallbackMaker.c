@@ -131,6 +131,40 @@ Display(void)
   glutSwapBuffers();
 }
 
+static void
+Warning(const char *fmt, va_list ap)
+{
+    printf("%6d Warning callback:\n");
+
+    /* print warning message */
+    vprintf(fmt, ap);
+}
+
+static void
+Error(const char *fmt, va_list ap)
+{
+#define STRING_LENGTH   10
+    char dummy_string[STRING_LENGTH];
+    printf("%6d Error callback:\n");
+
+    /* print warning message */
+    vprintf(fmt, ap);
+
+    /* deInitialize the freeglut state */
+    /* This all goes haywire of course when the error occurs during deinitialize,
+     * one might want to call exit directly as its possible freeglut is messed
+     * up internally when error is called. 
+     */
+    printf("Error callback: calling glutExit() to prepare for clean exit\n");
+    glutExit();
+
+    /* terminate program */
+    printf ( "Please enter something to exit: " );
+    fgets ( dummy_string, STRING_LENGTH, stdin );
+
+    exit(1);
+}
+
 static void 
 Reshape(int width, int height)
 {
@@ -407,7 +441,9 @@ MenuDestroy( void )
   menudestroy_called = 1 ;
   printf ( "%6d Window %d MenuDestroy Callback\n",
             ++sequence_number, window ) ;
-  glutPostRedisplay () ;
+
+  if (window)   /* When destroyed when shutting down, not always a window defined... */
+    glutPostRedisplay () ;
 }
 
 static void 
@@ -434,6 +470,8 @@ main(int argc, char *argv[])
 
   int menuID, subMenuA, subMenuB;
 
+  glutInitWarningFunc(Warning);
+  glutInitErrorFunc(Error);
   glutInitWindowSize(500, 250);
   glutInitWindowPosition ( 140, 140 );
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE );

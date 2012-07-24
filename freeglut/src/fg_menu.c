@@ -545,7 +545,6 @@ static void fghActivateMenu( SFG_Window* window, int button )
         window->State.MouseY + glutGet( GLUT_WINDOW_Y ) - menu->Y;
 
     /* Menu status callback */
-    printf("Menu status callback: %p\n",fgState.MenuStatusCallback);
     if (fgState.MenuStateCallback || fgState.MenuStatusCallback)
     {
         fgStructure.CurrentMenu = menu;
