@@ -24,9 +24,18 @@ set(VERSION_PATCH 0)
 OPTION(BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
 OPTION(BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
 
+# option to also copy .pdb files to install directory when executing
+# INSTALL target
+IF(MSVC)
+    OPTION(INSTALL_PDB "Also install .pdb files" ON)
+ELSE()
+    SET(INSTALL_PDB OFF)
+ENDIF()
+
 # OpenGL ES support
 OPTION(FREEGLUT_GLES1 "Use OpenGL ES 1.x (requires EGL)" OFF)
 OPTION(FREEGLUT_GLES2 "Use OpenGL ES 2.x (requires EGL) (overrides BUILD_GLES1)" OFF)
+
 
 
 SET(FREEGLUT_HEADERS
@@ -356,11 +365,22 @@ IF(BUILD_STATIC_LIBS)
     TARGET_LINK_LIBRARIES(freeglut_static ${LIBS})
 ENDIF()
 
+
 IF(BUILD_SHARED_LIBS)
     INSTALL(TARGETS freeglut DESTINATION lib)
+    IF(INSTALL_PDB)
+        INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/freeglut${CMAKE_DEBUG_POSTFIX}.pdb
+            DESTINATION lib
+			CONFIGURATIONS Debug)
+    ENDIF()
 ENDIF()
 IF(BUILD_STATIC_LIBS)
     INSTALL(TARGETS freeglut_static DESTINATION lib)
+    IF(INSTALL_PDB)
+        INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/freeglut_static${CMAKE_DEBUG_POSTFIX}.pdb
+            DESTINATION lib
+			CONFIGURATIONS Debug)
+    ENDIF()
 ENDIF()
 INSTALL(FILES ${FREEGLUT_HEADERS} DESTINATION include/GL)
 
