@@ -544,6 +544,18 @@ static void fghActivateMenu( SFG_Window* window, int button )
     menu->Window->State.MouseY =
         window->State.MouseY + glutGet( GLUT_WINDOW_Y ) - menu->Y;
 
+    /* Menu status callback */
+    printf("Menu status callback: %p\n",fgState.MenuStatusCallback);
+    if (fgState.MenuStateCallback || fgState.MenuStatusCallback)
+    {
+        fgStructure.CurrentMenu = menu;
+        fgStructure.CurrentWindow = window;
+        if (fgState.MenuStateCallback)
+            fgState.MenuStateCallback(GLUT_MENU_IN_USE);
+        if (fgState.MenuStatusCallback)
+            fgState.MenuStatusCallback(GLUT_MENU_IN_USE, window->State.MouseX, window->State.MouseY);
+    }
+
     fgSetWindow( menu->Window );
     glutPositionWindow( menu->X, menu->Y );
     glutReshapeWindow( menu->Width, menu->Height );
@@ -698,6 +710,25 @@ void fgDeactivateMenu( SFG_Window *window )
     }
 
     fgSetWindow ( parent_window ) ;
+
+    /* Menu status callback */
+    if (fgState.MenuStateCallback || fgState.MenuStatusCallback)
+    {
+        fgStructure.CurrentMenu = menu;
+        fgStructure.CurrentWindow = parent_window;
+        if (fgState.MenuStateCallback)
+            fgState.MenuStateCallback(GLUT_MENU_NOT_IN_USE);
+        if (fgState.MenuStatusCallback)
+        {
+            /* Get cursor position on screen and convert to relative to parent_window's client area */
+            POINT mouse_pos;
+            GetCursorPos(&mouse_pos);
+            mouse_pos.x -= glutGet( GLUT_WINDOW_X );
+            mouse_pos.y -= glutGet( GLUT_WINDOW_Y );
+
+            fgState.MenuStatusCallback(GLUT_MENU_NOT_IN_USE, mouse_pos.x, mouse_pos.y);
+        }
+    }
 }
 
 /*
@@ -754,6 +785,9 @@ int FGAPIENTRY glutCreateMenu( void(* callback)( int ) )
 {
     /* The menu object creation code resides in freeglut_structure.c */
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateMenu" );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
+
     return fgCreateMenu( callback )->ID;
 }
 
@@ -768,6 +802,8 @@ void FGAPIENTRY glutDestroyMenu( int menuID )
     menu = fgMenuByID( menuID );
 
     freeglut_return_if_fail( menu );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
 
     /* The menu object destruction code resides in freeglut_structure.c */
     fgDestroyMenu( menu );
@@ -809,7 +845,10 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
     SFG_MenuEntry* menuEntry;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAddMenuEntry" );
     menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
+
     freeglut_return_if_fail( fgStructure.CurrentMenu );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
 
     menuEntry->Text = strdup( label );
     menuEntry->ID   = value;
@@ -833,6 +872,9 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
     subMenu = fgMenuByID( subMenuID );
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
+
     freeglut_return_if_fail( subMenu );
 
     menuEntry->Text    = strdup( label );
@@ -851,7 +893,10 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
     SFG_MenuEntry* menuEntry = NULL;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutChangeToMenuEntry" );
+
     freeglut_return_if_fail( fgStructure.CurrentMenu );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
 
     /* Get n-th menu entry in the current menu, starting from one: */
     menuEntry = fghFindMenuEntry( fgStructure.CurrentMenu, item );
@@ -878,10 +923,14 @@ void FGAPIENTRY glutChangeToSubMenu( int item, const char* label,
     SFG_MenuEntry* menuEntry;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutChangeToSubMenu" );
-    subMenu = fgMenuByID( subMenuID );
-    menuEntry = NULL;
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
+
+    /* Get handle to sub menu */
+    subMenu = fgMenuByID( subMenuID );
+    menuEntry = NULL;
     freeglut_return_if_fail( subMenu );
 
     /* Get n-th menu entry in the current menu, starting from one: */
@@ -907,7 +956,10 @@ void FGAPIENTRY glutRemoveMenuItem( int item )
     SFG_MenuEntry* menuEntry;
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutRemoveMenuItem" );
+
     freeglut_return_if_fail( fgStructure.CurrentMenu );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
 
     /* Get n-th menu entry in the current menu, starting from one: */
     menuEntry = fghFindMenuEntry( fgStructure.CurrentMenu, item );
@@ -930,7 +982,10 @@ void FGAPIENTRY glutAttachMenu( int button )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAttachMenu" );
 
     freeglut_return_if_fail( fgStructure.CurrentWindow );
+
     freeglut_return_if_fail( fgStructure.CurrentMenu );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
 
     freeglut_return_if_fail( button >= 0 );
     freeglut_return_if_fail( button < FREEGLUT_MAX_MENUS );
@@ -946,7 +1001,10 @@ void FGAPIENTRY glutDetachMenu( int button )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDetachMenu" );
 
     freeglut_return_if_fail( fgStructure.CurrentWindow );
+
     freeglut_return_if_fail( fgStructure.CurrentMenu );
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
 
     freeglut_return_if_fail( button >= 0 );
     freeglut_return_if_fail( button < FREEGLUT_MAX_MENUS );

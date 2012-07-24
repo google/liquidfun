@@ -467,7 +467,6 @@ main(int argc, char *argv[])
   glutDialsFunc ( Dials ) ;
   glutTabletMotionFunc ( TabletMotion ) ;
   glutTabletButtonFunc ( TabletButton ) ;
-  glutMenuDestroyFunc ( MenuDestroy );
   glutMenuStatusFunc ( MenuStatus );
   glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF) ;
 
@@ -475,12 +474,14 @@ main(int argc, char *argv[])
   glutAddMenuEntry( "Sub menu A1 (01)", 1 );
   glutAddMenuEntry( "Sub menu A2 (02)", 2 );
   glutAddMenuEntry( "Sub menu A3 (03)", 3 );
+  glutMenuDestroyFunc ( MenuDestroy );
 
   subMenuB = glutCreateMenu( MenuCallback );
   glutAddMenuEntry( "Sub menu B1 (04)", 4 );
   glutAddMenuEntry( "Sub menu B2 (05)", 5 );
   glutAddMenuEntry( "Sub menu B3 (06)", 6 );
   glutAddSubMenu( "Going to sub menu A", subMenuA );
+  glutMenuDestroyFunc ( MenuDestroy );
 
   menuID = glutCreateMenu( MenuCallback );
   glutAddMenuEntry( "Entry one",   1 );
@@ -490,6 +491,7 @@ main(int argc, char *argv[])
   glutAddMenuEntry( "Entry five",  5 );
   glutAddSubMenu( "Enter sub menu A", subMenuA );
   glutAddSubMenu( "Enter sub menu B", subMenuB );
+  glutMenuDestroyFunc ( MenuDestroy );
 
   glutAttachMenu( GLUT_LEFT_BUTTON );
 
