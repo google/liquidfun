@@ -13,14 +13,18 @@ you will need to copy various files to various locations.
       files "gl.h", "glaux.h", and "glu.h".
     - The library file "freeglut.lib" or "freeglut_static.lib" (from the
       corresponding debug or release directory) needs to be copied into the
-      MSVC library directory.  This usually has a path similar to
-              "C:\Program Files\Microsoft Visual Studio\VC98\Lib"
+      MSVC library directory.  This usually has a path similar to:
+              "%ProgramFiles%\Microsoft SDKs\Windows\v7.0A\Lib" - x86 32 bits LIB's
+              "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.0A\Lib" - x64 32 bits LIB's
+			  "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.0A\Lib\x64" - x64 64 bits LIB's
       Note that there is no "GL" subdirectory here.  This directory should
       already have the files "opengl32.lib", "glu32.lib", and "glaux.lib".
     - If you are using the DLL version of "freeglut", the file "freeglut.dll"
       needs to be copied from the Debug or the Release directory into the
       DLL directory.  This usually has a path similar to
-              "C:\Windows\System32"
+              "%SystemRoot%\System32\" - x86 32 bits DLL's
+			  "%SystemRoot%\SysWOW64\" - x64 32 bits DLL's
+			  "%SystemRoot%\System32\" - x64 64 bits DLL's
       and will probably already have the files "opengl32.dll" and "glu32.dll".
 
 
