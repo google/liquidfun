@@ -98,6 +98,8 @@ typedef char ourGLchar;
 #define APIENTRY
 #endif
 
+typedef void (APIENTRY *PFNGLGENVERTEXARRAYSPROC) (GLsizei n, GLuint *arrays);
+typedef void (APIENTRY *PFNGLBINDVERTEXARRAYPROC) (GLuint array);
 typedef void (APIENTRY *PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
 typedef void (APIENTRY *PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
 typedef void (APIENTRY *PFNGLBUFFERDATAPROC) (GLenum target, ourGLsizeiptr size, const GLvoid *data, GLenum usage);
@@ -118,6 +120,8 @@ typedef void (APIENTRY *PFNGLENABLEVERTEXATTRIBARRAYPROC) (GLuint index);
 typedef GLint (APIENTRY *PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const ourGLchar *name);
 typedef void (APIENTRY *PFNGLUNIFORMMATRIX4FVPROC) (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 
+PFNGLGENVERTEXARRAYSPROC gl_GenVertexArrays;
+PFNGLBINDVERTEXARRAYPROC gl_BindVertexArray;
 PFNGLGENBUFFERSPROC gl_GenBuffers;
 PFNGLBINDBUFFERPROC gl_BindBuffer;
 PFNGLBUFFERDATAPROC gl_BufferData;
@@ -140,6 +144,8 @@ PFNGLUNIFORMMATRIX4FVPROC gl_UniformMatrix4fv;
 
 void initExtensionEntries(void) 
 {
+   gl_GenVertexArrays = (PFNGLGENVERTEXARRAYSPROC) glutGetProcAddress ("glGenVertexArrays");
+   gl_BindVertexArray = (PFNGLBINDVERTEXARRAYPROC) glutGetProcAddress ("glBindVertexArray");
    gl_GenBuffers = (PFNGLGENBUFFERSPROC) glutGetProcAddress ("glGenBuffers");
    gl_BindBuffer = (PFNGLBINDBUFFERPROC) glutGetProcAddress ("glBindBuffer");
    gl_BufferData = (PFNGLBUFFERDATAPROC) glutGetProcAddress ("glBufferData");
@@ -184,9 +190,17 @@ enum {
 
 /* the name of the vertex buffer object */
 GLuint vertexBufferName;
+GLuint vertexArrayName;
 
 void initBuffer(void)
 {
+   /* Need to setup a vertex array as otherwise invalid operation errors can
+    * occur when accessing vertex buffer (OpenGL 3.3 has no default zero named
+    * vertex array) 
+    */
+   gl_GenVertexArrays(1, &vertexArrayName);
+   gl_BindVertexArray(vertexArrayName);
+
    gl_GenBuffers (1, &vertexBufferName);
    gl_BindBuffer (GL_ARRAY_BUFFER, vertexBufferName);
    gl_BufferData (GL_ARRAY_BUFFER, sizeof(varray), varray, GL_STATIC_DRAW);
