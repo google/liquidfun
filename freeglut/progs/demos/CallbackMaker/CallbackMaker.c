@@ -30,6 +30,8 @@ int mousewheel_number = -1, mousewheel_direction = -1, mousewheel_x = -1, mousew
 int motion_x = -1, motion_y = -1, motion_seq = -1 ;
 int passivemotion_x = -1, passivemotion_y = -1, passivemotion_seq = -1 ;
 
+#define STRING_LENGTH   10
+
 static void
 bitmapPrintf (const char *fmt, ...)
 {
@@ -143,7 +145,6 @@ Warning(const char *fmt, va_list ap)
 static void
 Error(const char *fmt, va_list ap)
 {
-#define STRING_LENGTH   10
     char dummy_string[STRING_LENGTH];
     printf("%6d Error callback:\n");
 
@@ -464,7 +465,6 @@ static void Idle ( void )
 int 
 main(int argc, char *argv[])
 {
-#define STRING_LENGTH   10
   int freeglut_window, aux_window ;
   char dummy_string[STRING_LENGTH];
 

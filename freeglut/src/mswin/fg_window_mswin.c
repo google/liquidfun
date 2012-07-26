@@ -888,6 +888,8 @@ void fgPlatformGlutSetWindowTitle( const char* title )
 
 /*
  * Set the current window's iconified title
+ * There really isn't a way to set the icon name separate from the
+ * windows name in Win32, so, just set the windows name.
  */
 void fgPlatformGlutSetIconTitle( const char* title )
 {
