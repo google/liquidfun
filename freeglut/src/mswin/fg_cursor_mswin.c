@@ -113,3 +113,12 @@ void fgPlatformWarpPointer ( int x, int y )
 }
 
 
+void fghPlatformGetCursorPos(SFG_XYUse *mouse_pos)
+{
+    POINT pos;
+    GetCursorPos(&pos);
+
+    mouse_pos->X = pos.x;
+    mouse_pos->Y = pos.y;
+    mouse_pos->Use = GL_TRUE;
+}

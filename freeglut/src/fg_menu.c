@@ -76,6 +76,7 @@ static float menu_pen_hback [4] = FREEGLUT_MENU_PEN_HBACK_COLORS;
 
 
 extern GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y );
+extern void fghPlatformGetCursorPos(SFG_XYUse *mouse_pos);
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
@@ -721,7 +722,7 @@ void fgDeactivateMenu( SFG_Window *window )
         {
             /* Get cursor position on screen and convert to relative to parent_window's client area */
             SFG_XYUse mouse_pos;
-            fghPlatformGetMousePos(&mouse_pos);
+            fghPlatformGetCursorPos(&mouse_pos);
             
             mouse_pos.X -= glutGet( GLUT_WINDOW_X );
             mouse_pos.Y -= glutGet( GLUT_WINDOW_Y );

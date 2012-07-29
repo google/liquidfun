@@ -371,16 +371,6 @@ void fgPlatformSetWindow ( SFG_Window *window )
 }
 
 
-void fghPlatformGetMousePos(SFG_XYUse *mouse_pos)
-{
-    POINT pos;
-    GetCursorPos(&pos);
-
-    mouse_pos->X = pos.x;
-    mouse_pos->Y = pos.y;
-    mouse_pos->Use = GL_TRUE;
-}
-
 /* Returns the width of the window borders based on the window's style.
 */
 void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth)
