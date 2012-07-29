@@ -115,6 +115,8 @@ void fgPlatformWarpPointer ( int x, int y )
 
 void fghPlatformGetCursorPos(SFG_XYUse *mouse_pos)
 {
+    /* Get current pointer location in screen coordinates
+     */
     POINT pos;
     GetCursorPos(&pos);
 

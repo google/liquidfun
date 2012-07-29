@@ -149,3 +149,16 @@ void fgPlatformWarpPointer ( int x, int y )
     XFlush( fgDisplay.pDisplay.Display );
 }
 
+void fghPlatformGetCursorPos(SFG_XYUse *mouse_pos)
+{
+    /* Get current pointer location in screen coordinates
+     */
+    Window junk_window;
+    unsigned int junk_mask;
+    int junk_pos;
+
+    XQueryPointer(fgDisplay.pDisplay.Display, fgDisplay.pDisplay.RootWindow,
+            &junk_window, &junk_window,
+            &mouse_pos->X, &mouse_pos->Y,
+            &junk_pos, &junk_pos, &junk_mask);
+}
