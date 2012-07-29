@@ -85,13 +85,6 @@ typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
 static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
 #endif
 
-/* 
- * Helper functions for getting client area from the window rect
- * and the window rect from the client area given the style of the window
- * (or a valid window pointer from which the style can be queried).
- */
-extern void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth);
-
 
 /*
  * Setup the pixel format for a Win32 window
@@ -378,6 +371,38 @@ void fgPlatformSetWindow ( SFG_Window *window )
 }
 
 
+void fghPlatformGetMousePos(SFG_XYUse *mouse_pos)
+{
+    POINT pos;
+    GetCursorPos(&pos);
+
+    mouse_pos->X = pos.x;
+    mouse_pos->Y = pos.y;
+    mouse_pos->Use = GL_TRUE;
+}
+
+/* Returns the width of the window borders based on the window's style.
+*/
+void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth)
+{
+    if (windowStyle & WS_THICKFRAME)
+    {
+        *xBorderWidth = GetSystemMetrics(SM_CXSIZEFRAME);
+        *yBorderWidth = GetSystemMetrics(SM_CYSIZEFRAME);
+    }
+    else if (windowStyle & WS_DLGFRAME)
+    {
+        *xBorderWidth = GetSystemMetrics(SM_CXFIXEDFRAME);
+        *yBorderWidth = GetSystemMetrics(SM_CYFIXEDFRAME);
+    }
+    else
+    {
+        *xBorderWidth = 0;
+        *yBorderWidth = 0;
+    }
+}
+
+
 
 /* Computes position of corners of window Rect (outer position including
  * decorations) based on the provided client rect and based on the style
@@ -514,27 +539,6 @@ RECT fghGetClientArea( const SFG_Window *window, BOOL wantPosOutside )
     fghComputeClientAreaFromWindowRect(window, &windowRect, wantPosOutside);
 
     return windowRect;
-}
-
-/* Returns the width of the window borders based on the window's style.
- */
-void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth)
-{
-    if (windowStyle & WS_THICKFRAME)
-    {
-        *xBorderWidth = GetSystemMetrics(SM_CXSIZEFRAME);
-        *yBorderWidth = GetSystemMetrics(SM_CYSIZEFRAME);
-    }
-    else if (windowStyle & WS_DLGFRAME)
-    {
-        *xBorderWidth = GetSystemMetrics(SM_CXFIXEDFRAME);
-        *yBorderWidth = GetSystemMetrics(SM_CYFIXEDFRAME);
-    }
-    else
-    {
-        *xBorderWidth = 0;
-        *yBorderWidth = 0;
-    }
 }
 
 #if(WINVER >= 0x500)

@@ -371,8 +371,8 @@ struct tagSFG_Context
 	SFG_PlatformContext pContext;    /* The window's FBConfig (X11) or device context (Windows) */
 
     int             DoubleBuffered;  /* Treat the window as double-buffered */
-    GLint attribute_v_coord;
-    GLint attribute_v_normal;
+    GLint           attribute_v_coord;
+    GLint           attribute_v_normal;
 };
 
 

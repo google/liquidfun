@@ -720,12 +720,13 @@ void fgDeactivateMenu( SFG_Window *window )
         if (fgState.MenuStatusCallback)
         {
             /* Get cursor position on screen and convert to relative to parent_window's client area */
-            POINT mouse_pos;
-            GetCursorPos(&mouse_pos);
-            mouse_pos.x -= glutGet( GLUT_WINDOW_X );
-            mouse_pos.y -= glutGet( GLUT_WINDOW_Y );
+            SFG_XYUse mouse_pos;
+            fghPlatformGetMousePos(&mouse_pos);
+            
+            mouse_pos.X -= glutGet( GLUT_WINDOW_X );
+            mouse_pos.Y -= glutGet( GLUT_WINDOW_Y );
 
-            fgState.MenuStatusCallback(GLUT_MENU_NOT_IN_USE, mouse_pos.x, mouse_pos.y);
+            fgState.MenuStatusCallback(GLUT_MENU_NOT_IN_USE, mouse_pos.X, mouse_pos.Y);
         }
     }
 }
