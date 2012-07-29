@@ -161,4 +161,6 @@ void fghPlatformGetCursorPos(SFG_XYUse *mouse_pos)
             &junk_window, &junk_window,
             &mouse_pos->X, &mouse_pos->Y,
             &junk_pos, &junk_pos, &junk_mask);
+
+    mouse_pos->Use = GL_TRUE;
 }
