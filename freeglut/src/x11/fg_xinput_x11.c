@@ -138,77 +138,124 @@ void fgPrintXIDeviceEvent(XIDeviceEvent* event)
 
 }
 
-
 /**
  * \brief This function is called when an Extension Event is received
  * and calls the corresponding callback functions for these events.
  */
-void fgHandleExtensionEvents( XEvent* base_ev ) {
-
+void fgHandleExtensionEvents( XEvent* base_ev )
+{
+	XEvent std_ev;	/* standard single-pointer event to be added to the event queue */
 	int i, button = 0;
 	XGenericEventCookie* cookie = (XGenericEventCookie*)&(base_ev->xcookie);
+
+	/* initialize the generic fields from base_ev */
+	std_ev.xany = base_ev->xany;
 
 	if ( XGetEventData( fgDisplay.pDisplay.Display, cookie ) && (cookie->type == GenericEvent) && (cookie->extension == xi_opcode) ) {
 
 		XIDeviceEvent* event = (XIDeviceEvent*)(cookie->data);
+		XIEnterEvent *evcross;
 		/*printf("XI2 event type: %d - %d\n", cookie->evtype, event->type );*/
 
 		SFG_Window* window = fgWindowByHandle( event->event );
 		if (!window) return;
 
 		switch (cookie->evtype) {
+		case XI_Enter:
+		case XI_Leave:
+			evcross = (XIEnterEvent*)event;
 
-			case XI_Enter:
-			case XI_Leave:
-				fgState.Modifiers = fgPlatformGetModifiers( ((XIEnterEvent*)event)->mods.base );
-				INVOKE_WCB( *window, MultiEntry, (
-					event->deviceid, 
-					(event->evtype == XI_Enter ? GLUT_ENTERED : GLUT_LEFT)
-				));
-				#if _DEBUG
-					fgPrintXILeaveEvent((XILeaveEvent*)event);
-				#endif
-				break;
+			fgState.Modifiers = fgPlatformGetModifiers( evcross->mods.base );
+			INVOKE_WCB( *window, MultiEntry, (
+				event->deviceid,
+				(event->evtype == XI_Enter ? GLUT_ENTERED : GLUT_LEFT)
+			));
+			#if _DEBUG
+			fgPrintXILeaveEvent((XILeaveEvent*)event);
+			#endif
 
-			case XI_ButtonPress:
-			case XI_ButtonRelease:
-				fgState.Modifiers = fgPlatformGetModifiers( event->mods.base );
-				INVOKE_WCB( *window, MultiButton, (
-					event->deviceid, 
-					event->event_x,
-					event->event_y,
-					(event->detail)-1, 
-					(event->evtype == XI_ButtonPress ? GLUT_DOWN : GLUT_UP)
-				));
-				INVOKE_WCB( *window, Mouse, (
-					(event->detail)-1, 
-					(event->evtype == XI_ButtonPress ? GLUT_DOWN : GLUT_UP),
-					event->event_x,
-					event->event_y
-				));
-				break;
+			/* Also process the standard crossing event */
+			std_ev.type = evcross->evtype == XI_Enter ? EnterNotify : LeaveNotify;
+			std_ev.xcrossing.window = evcross->event;
+			std_ev.xcrossing.root = evcross->root;
+			std_ev.xcrossing.subwindow = evcross->child;
+			std_ev.xcrossing.x = evcross->event_x;
+			std_ev.xcrossing.y = evcross->event_y;
+			std_ev.xcrossing.x_root = evcross->root_x;
+			std_ev.xcrossing.y_root = evcross->root_y;
+			std_ev.xcrossing.mode = evcross->mode;
+			std_ev.xcrossing.detail = evcross->detail;
+			std_ev.xcrossing.same_screen = evcross->same_screen;
+			std_ev.xcrossing.focus = evcross->focus;
+			std_ev.xcrossing.state = *(unsigned int*)evcross->buttons.mask;
 
-			case XI_Motion:
-				fgState.Modifiers = fgPlatformGetModifiers( event->mods.base );
-				for (i = 0; i < event->buttons.mask_len; i++) if (event->buttons.mask[i]) button = 1;
-				if (button) {
-					INVOKE_WCB( *window, MultiMotion,  ( event->deviceid, event->event_x, event->event_y ) );
-					INVOKE_WCB( *window,           Motion,  (                  event->event_x, event->event_y ) );
-				} else {
-					INVOKE_WCB( *window, MultiPassive, ( event->deviceid, event->event_x, event->event_y ) );
-					INVOKE_WCB( *window,           Passive, (                  event->event_x, event->event_y ) );
+			XPutBackEvent(fgDisplay.pDisplay.Display, &std_ev);
+			break;
+
+		case XI_ButtonPress:
+		case XI_ButtonRelease:
+			fgState.Modifiers = fgPlatformGetModifiers( event->mods.base );
+			INVOKE_WCB( *window, MultiButton, (
+				event->deviceid,
+				event->event_x,
+				event->event_y,
+				event->detail-1,
+				(event->evtype == XI_ButtonPress ? GLUT_DOWN : GLUT_UP)
+			));
+
+			/* Also process the standard button event */
+			std_ev.type = event->evtype == XI_ButtonPress ? ButtonPress : ButtonRelease;
+			std_ev.xbutton.window = event->event;
+			std_ev.xbutton.root = event->root;
+			std_ev.xbutton.subwindow = event->child;
+			std_ev.xbutton.x = event->event_x;
+			std_ev.xbutton.y = event->event_y;
+			std_ev.xbutton.x_root = event->root_x;
+			std_ev.xbutton.y_root = event->root_y;
+			std_ev.xbutton.state = *(unsigned int*)event->buttons.mask;
+			std_ev.xbutton.button = event->detail;
+
+			XPutBackEvent(fgDisplay.pDisplay.Display, &std_ev);
+			break;
+
+		case XI_Motion:
+			fgState.Modifiers = fgPlatformGetModifiers( event->mods.base );
+			for (i = 0; i < event->buttons.mask_len; i++) {
+				if (event->buttons.mask[i]) {
+					button = 1;
 				}
-				#if _DEBUG
-					fgPrintXIDeviceEvent(event);
-				#endif
-				break;
+			}
+			if (button) {
+				INVOKE_WCB( *window, MultiMotion,  ( event->deviceid, event->event_x, event->event_y ) );
+			} else {
+				INVOKE_WCB( *window, MultiPassive, ( event->deviceid, event->event_x, event->event_y ) );
+			}
+			#if _DEBUG
+			fgPrintXIDeviceEvent(event);
+			#endif
 
-			default:
-				#if _DEBUG
-					fgWarning( "Unknown XI2 device event:" );
-					fgPrintXIDeviceEvent( event );
-				#endif
-				break;
+			/* Also process the standard motion event */
+			std_ev.type = MotionNotify;
+			std_ev.xmotion.window = event->event;
+			std_ev.xmotion.root = event->root;
+			std_ev.xmotion.subwindow = event->child;
+			std_ev.xmotion.time = event->time;
+			std_ev.xmotion.x = event->event_x;
+			std_ev.xmotion.y = event->event_y;
+			std_ev.xmotion.x_root = event->root_x;
+			std_ev.xmotion.y_root = event->root_y;
+			std_ev.xmotion.state = *(unsigned int*)event->buttons.mask;
+			std_ev.xmotion.is_hint = NotifyNormal;
+
+			XPutBackEvent(fgDisplay.pDisplay.Display, &std_ev);
+			break;
+
+		default:
+			#if _DEBUG
+			fgWarning( "Unknown XI2 device event:" );
+			fgPrintXIDeviceEvent( event );
+			#endif
+			break;
 		}
 		fgState.Modifiers = INVALID_MODIFIERS;
 	}
