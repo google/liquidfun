@@ -46,7 +46,7 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
     /* we only heed the rate if we CAN actually use it (Xrandr >= 1.1) and
      * the user actually cares about it (rate > 0)
      */
-    use_rate = ( rate > 0 ) && ( ( ver_major >= 1 ) ||
+    use_rate = ( rate > 0 ) && ( ( ver_major > 1 ) ||
 		                         ( ( ver_major == 1 ) && ( ver_minor >= 1 ) ) );
 
     /* this loop is only so that the whole thing will be repeated if someone
@@ -93,7 +93,7 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
         if(res_idx == -1)
             break;  /* no matching resolution */
 
-#if ( RANDR_MAJOR >= 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
+#if ( RANDR_MAJOR > 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
         if(use_rate) {
             rate = fgState.GameModeRefresh;
 
@@ -118,7 +118,7 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
             break;
         }
 
-#if ( RANDR_MAJOR >= 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
+#if ( RANDR_MAJOR > 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
         if(use_rate)
             result = XRRSetScreenConfigAndRate(fgDisplay.pDisplay.Display, xrr_config,
                     fgDisplay.pDisplay.RootWindow, res_idx, rot, rate, timestamp);
@@ -176,7 +176,7 @@ void fgPlatformRememberState( void )
             fgDisplay.pDisplay.prev_ysz = ssizes[curr].height;
             fgDisplay.pDisplay.prev_refresh = -1;
 
-#       if ( RANDR_MAJOR >= 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
+#       if ( RANDR_MAJOR > 1 ) || ( ( RANDR_MAJOR == 1 ) && ( RANDR_MINOR >= 1 ) )
             if(fgState.GameModeRefresh != -1) {
                 fgDisplay.pDisplay.prev_refresh = XRRConfigCurrentRate(xrr_config);
             }
