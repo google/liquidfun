@@ -151,18 +151,13 @@ Error(const char *fmt, va_list ap)
     /* print warning message */
     vprintf(fmt, ap);
 
-    /* deInitialize the freeglut state */
-    /* This all goes haywire of course when the error occurs during deinitialize,
-     * one might want to call exit directly as its possible freeglut is messed
-     * up internally when error is called. 
-     */
-    printf("Error callback: calling glutExit() to prepare for clean exit\n");
-    glutExit();
-
-    /* terminate program */
+    /* terminate program, after pause for input so user can see */
     printf ( "Please enter something to exit: " );
     fgets ( dummy_string, STRING_LENGTH, stdin );
 
+    /* Call exit directly as freeglut is messed
+     * up internally when an error is called. 
+     */
     exit(1);
 }
 
