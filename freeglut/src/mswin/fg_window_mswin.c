@@ -522,6 +522,8 @@ RECT fghGetClientArea( const SFG_Window *window, BOOL wantPosOutside )
     /*
      * call GetWindowRect()
      * (this returns the pixel coordinates of the outside of the window)
+     * cannot use GetClientRect as it seems to return a rect relative to
+     * the top-left point of the client area (.top and .left are thus always 0)
      */
     GetWindowRect( window->Window.Handle, &windowRect );
 
