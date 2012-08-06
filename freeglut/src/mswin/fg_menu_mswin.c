@@ -29,12 +29,58 @@
 #include <GL/freeglut.h>
 #include "../fg_internal.h"
 
+extern RECT fghGetClientArea( const SFG_Window *window, BOOL wantPosOutside );
+
 
 GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
 {
     *x = glutGet ( GLUT_SCREEN_WIDTH );
     *y = glutGet ( GLUT_SCREEN_HEIGHT );
 }
+
+void fgPlatformCheckMenuDeactivate()
+{
+    /* If we have an open menu, see if the open menu should be closed
+     * when focus was lost because user either switched
+     * application or FreeGLUT window (if one is running multiple
+     * windows). If so, close menu the active menu.
+     */
+    SFG_Menu* menu = NULL;
+
+    if ( fgStructure.Menus.First )
+        menu = fgGetActiveMenu();
+
+    if ( menu )
+    {
+        SFG_Window* wnd = NULL;
+        HWND hwnd = GetFocus();  /* Get window with current focus - NULL for non freeglut windows */
+        if (hwnd)
+            /* See which of our windows it is */
+            wnd = fgWindowByHandle(hwnd);
+
+        if (!hwnd || !wnd)
+            /* User switched to another application*/
+            fgDeactivateMenu(menu->ParentWindow);
+        else if (!wnd->IsMenu)      /* Make sure we don't kill the menu when trying to enter a submenu */
+        {
+            if (wnd!=menu->ParentWindow)
+                /* User switched to another FreeGLUT window */
+                fgDeactivateMenu(menu->ParentWindow);
+            else
+            {
+                /* Check if focus lost because non-client area of
+                * window was pressed (pressing on client area is
+                * handled in fgCheckActiveMenu)
+                */
+                POINT mouse_pos;
+                RECT clientArea = fghGetClientArea(menu->ParentWindow, GL_FALSE);
+                GetCursorPos(&mouse_pos);
+                if ( !PtInRect( &clientArea, mouse_pos ) )
+                    fgDeactivateMenu(menu->ParentWindow);
+            }
+        }
+    }
+};
 
 
 

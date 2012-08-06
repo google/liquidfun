@@ -35,6 +35,8 @@ extern void fgNewWGLCreateContext( SFG_Window* window );
 extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                                      unsigned char layer_type );
 
+extern void fgPlatformCheckMenuDeactivate();
+
 #ifdef WM_TOUCH
 typedef BOOL (WINAPI *pGetTouchInputInfo)(HTOUCHINPUT,UINT,PTOUCHINPUT,int);
 typedef BOOL (WINAPI *pCloseTouchInputHandle)(HTOUCHINPUT);
@@ -517,51 +519,14 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_KILLFOCUS:
         {
-            SFG_Menu* menu = NULL;
             SFG_Window* saved_window = fgStructure.CurrentWindow;
 /*            printf("WM_KILLFOCUS: %p\n", window ); */
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
             INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
             fgSetWindow(saved_window);
 
-            /* If we have an open menu, see if the open menu should be closed
-             * when focus was lost because user either switched
-             * application or FreeGLUT window (if one is running multiple
-             * windows). If so, close menu the active menu.
-             */
-            if ( fgStructure.Menus.First )
-                menu = fgGetActiveMenu();
-
-            if ( menu )
-            {
-                SFG_Window* wnd = NULL;
-                HWND hwnd = GetFocus();  /* Get window with current focus - NULL for non freeglut windows */
-                if (hwnd)
-                    /* See which of our windows it is */
-                    wnd = fgWindowByHandle(hwnd);
-
-                if (!hwnd || !wnd)
-                    /* User switched to another application*/
-                    fgDeactivateMenu(menu->ParentWindow);
-                else if (!wnd->IsMenu)      /* Make sure we don't kill the menu when trying to enter a submenu */
-                {
-                    if (wnd!=menu->ParentWindow)
-                        /* User switched to another FreeGLUT window */
-                        fgDeactivateMenu(menu->ParentWindow);
-                    else
-                    {
-                        /* Check if focus lost because non-client area of
-                         * window was pressed (pressing on client area is
-                         * handled in fgCheckActiveMenu)
-                         */
-                        POINT mouse_pos;
-                        RECT clientArea = fghGetClientArea(menu->ParentWindow, GL_FALSE);
-                        GetCursorPos(&mouse_pos);
-                        if ( !PtInRect( &clientArea, mouse_pos ) )
-                            fgDeactivateMenu(menu->ParentWindow);
-                    }
-                }
-            }
+            /* Check if there are any open menus that need to be closed */
+            fgPlatformCheckMenuDeactivate();
         }
         break;
 
@@ -594,6 +559,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_PAINT:
         /* Turn on the visibility in case it was turned off somehow */
         window->State.Visible = GL_TRUE;
+        InvalidateRect( hWnd, NULL, GL_FALSE ); /* Make sure whole window is repainted. Bt of a hack, but a safe on from what google turns up... */
         BeginPaint( hWnd, &ps );
         fghRedrawWindow( window );
         EndPaint( hWnd, &ps );
