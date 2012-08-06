@@ -559,7 +559,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_PAINT:
         /* Turn on the visibility in case it was turned off somehow */
         window->State.Visible = GL_TRUE;
-        InvalidateRect( hWnd, NULL, GL_FALSE ); /* Make sure whole window is repainted. Bt of a hack, but a safe on from what google turns up... */
+        InvalidateRect( hWnd, NULL, GL_FALSE ); /* Make sure whole window is repainted. Bit of a hack, but a safe on from what google turns up... */
         BeginPaint( hWnd, &ps );
         fghRedrawWindow( window );
         EndPaint( hWnd, &ps );
