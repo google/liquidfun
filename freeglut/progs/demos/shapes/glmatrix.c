@@ -160,6 +160,7 @@ void gl_frustum(float left, float right, float bottom, float top, float near, fl
     mat[10] = c;
     mat[11] = -1.f;
     mat[14] = d;
+    mat[15] = 0;
 
     gl_mult_matrixf(mat);
 }
