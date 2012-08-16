@@ -56,7 +56,7 @@ $(foreach file,$(1), \
   $(eval LOCAL_CFLAGS += $(3)) \
   $(eval LOCAL_STATIC_LIBRARIES := $(libgtest_test$(4)_static_lib)) \
   $(eval LOCAL_SHARED_LIBRARIES := $(libgtest_test$(4)_shared_lib)) \
-  $(eval LOCAL_MODULE_TAGS := tests) \
+  $(if $(2),,$(eval LOCAL_MODULE_TAGS := tests)) \
   $(eval LOCAL_MODULE_PATH := $($(5))) \
   $(eval include $(BUILD_$(2)EXECUTABLE)) \
 )
