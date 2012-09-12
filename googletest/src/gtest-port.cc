@@ -507,9 +507,20 @@ class CapturedStream {
     filename_ = temp_file_path;
 // ANDROID
 #elif GTEST_OS_LINUX_ANDROID
-    char name_template[] = "/sdcard/captured_stderr.XXXXXX";
+    // Get $EXTERNAL_STORAGE from the environment, since this can change
+    // for shell users (fallback is still /sdcard, but this probably will
+    // never work properly again).
+    ::std::string external_storage = "/sdcard";
+    char *sdcard_path = getenv("EXTERNAL_STORAGE");
+    if (sdcard_path) {
+      external_storage = sdcard_path;
+    }
+    external_storage += "/captured_stderr.XXXXXX";
+    char *name_template = strdup(external_storage.c_str());
     const int captured_fd = mkstemp(name_template);
     filename_ = name_template;
+    free(name_template);
+    name_template = NULL;
 // END ANDROID
 # else
     // There's no guarantee that a test has write access to the
