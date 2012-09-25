@@ -91,9 +91,12 @@ typedef char ourGLchar;
 #define APIENTRY
 #endif
 
+#ifndef GL_VERSION_1_5
 typedef void (APIENTRY *PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
 typedef void (APIENTRY *PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
 typedef void (APIENTRY *PFNGLBUFFERDATAPROC) (GLenum target, ourGLsizeiptr size, const GLvoid *data, GLenum usage);
+#endif
+#ifndef GL_VERSION_2_0
 typedef GLuint (APIENTRY *PFNGLCREATESHADERPROC) (GLenum type);
 typedef void (APIENTRY *PFNGLSHADERSOURCEPROC) (GLuint shader, GLsizei count, const ourGLchar **string, const GLint *length);
 typedef void (APIENTRY *PFNGLCOMPILESHADERPROC) (GLuint shader);
@@ -109,6 +112,7 @@ typedef GLint (APIENTRY *PFNGLGETATTRIBLOCATIONPROC) (GLuint program, const ourG
 typedef GLint (APIENTRY *PFNGLGETUNIFORMLOCATIONPROC) (GLuint program, const ourGLchar *name);
 typedef void (APIENTRY *PFNGLUNIFORMMATRIX4FVPROC) (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 typedef void (APIENTRY *PFNGLUNIFORMMATRIX3FVPROC) (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+#endif
 
 PFNGLCREATESHADERPROC gl_CreateShader;
 PFNGLSHADERSOURCEPROC gl_ShaderSource;
