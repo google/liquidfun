@@ -74,7 +74,8 @@
 #define  GLUT_ACTION_ON_WINDOW_CLOSE        0x01F9
 
 #define  GLUT_WINDOW_BORDER_WIDTH           0x01FA
-#define  GLUT_WINDOW_HEADER_HEIGHT          0x01FB
+#define  GLUT_WINDOW_BORDER_HEIGHT          0x01FB
+#define  GLUT_WINDOW_HEADER_HEIGHT          0x01FB  /* Docs say it should always have been GLUT_WINDOW_BORDER_HEIGHT, keep this for backward compatibility */
 
 #define  GLUT_VERSION                       0x01FC
 
