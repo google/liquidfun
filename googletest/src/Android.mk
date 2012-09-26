@@ -29,8 +29,6 @@
 LOCAL_PATH := $(call my-dir)
 
 libgtest_target_includes := \
-    bionic/libstdc++/include \
-    external/stlport/stlport \
     $(LOCAL_PATH)/.. \
     $(LOCAL_PATH)/../include
 
@@ -77,15 +75,20 @@ include $(BUILD_HOST_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
+ifeq ($(TARGET_ARCH), arm)
+   LOCAL_SDK_VERSION := 8
+else
+# NDK support of other archs (ie. x86 and mips) are only available after android-9
+   LOCAL_SDK_VERSION := 9
+endif
+
+LOCAL_NDK_STL_VARIANT := stlport_static
+
 LOCAL_CPP_EXTENSION := .cc
 
 LOCAL_SRC_FILES := gtest-all.cc
 
 LOCAL_C_INCLUDES := $(libgtest_target_includes)
-
-ifneq ($(BUILD_WITH_ASTL),true)
-include external/stlport/libstlport.mk
-endif
 
 LOCAL_MODULE := libgtest
 
@@ -96,15 +99,20 @@ include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
+ifeq ($(TARGET_ARCH), arm)
+   LOCAL_SDK_VERSION := 8
+else
+# NDK support of other archs (ie. x86 and mips) are only available after android-9
+   LOCAL_SDK_VERSION := 9
+endif
+
+LOCAL_NDK_STL_VARIANT := stlport_static
+
 LOCAL_CPP_EXTENSION := .cc
 
 LOCAL_SRC_FILES := gtest_main.cc
 
 LOCAL_C_INCLUDES := $(libgtest_target_includes)
-
-ifneq ($(BUILD_WITH_ASTL),true)
-include external/stlport/libstlport.mk
-endif
 
 LOCAL_MODULE := libgtest_main
 
