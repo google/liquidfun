@@ -138,6 +138,9 @@
 #elif FREEGLUT_GLES1
 #   include <EGL/egl.h>
 #   include <GLES/gl.h>
+#elif __APPLE__
+#   include <OpenGL/gl.h>
+#   include <OpenGL/glu.h>
 #else
 #   include <GL/gl.h>
 #   include <GL/glu.h>
