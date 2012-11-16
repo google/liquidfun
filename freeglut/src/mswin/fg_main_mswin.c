@@ -75,6 +75,16 @@ void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
      * For windowed mode, get the current position of the
      * window and resize taking the size of the frame
      * decorations into account.
+     *
+     * Note on maximizing behavior of Windows: the resize borders are off
+     * the screen such that the client area extends all the way from the
+     * leftmost corner to the rightmost corner to maximize screen real
+     * estate. A caption is still shown however to allow interaction with
+     * the window controls. This is default behavior of Windows that
+     * FreeGLUT sticks with. To alter, one would have to check if
+     * WS_MAXIMIZE style is set when a resize event is triggered, and
+     * then manually correct the windowRect to put the borders back on
+     * screen.
      */
 
     /* "GetWindowRect" returns the pixel coordinates of the outside of the window */
