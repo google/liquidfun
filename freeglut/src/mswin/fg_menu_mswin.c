@@ -29,7 +29,7 @@
 #include <GL/freeglut.h>
 #include "../fg_internal.h"
 
-extern RECT fghGetClientArea( const SFG_Window *window, BOOL wantPosOutside );
+extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL wantPosOutside );
 
 
 GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
@@ -69,11 +69,12 @@ void fgPlatformCheckMenuDeactivate()
             else
             {
                 /* Check if focus lost because non-client area of
-                * window was pressed (pressing on client area is
-                * handled in fgCheckActiveMenu)
-                */
+                 * window was pressed (pressing on client area is
+                 * handled in fgCheckActiveMenu)
+                 */
                 POINT mouse_pos;
-                RECT clientArea = fghGetClientArea(menu->ParentWindow, GL_FALSE);
+                RECT clientArea;
+                fghGetClientArea(&clientArea,menu->ParentWindow, GL_FALSE);
                 GetCursorPos(&mouse_pos);
                 if ( !PtInRect( &clientArea, mouse_pos ) )
                     fgDeactivateMenu(menu->ParentWindow);

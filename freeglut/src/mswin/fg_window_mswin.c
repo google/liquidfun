@@ -371,27 +371,24 @@ void fgPlatformSetWindow ( SFG_Window *window )
 }
 
 
-/* Returns the width of the window borders based on the window's style.
-*/
-void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth)
+/* Get window style and extended window style of a FreeGLUT window
+ * If the window pointer or the window handle is NULL, a fully
+ * decorated window (caption and border) is assumed.
+ */
+void fghGetStyleFromWindow( const SFG_Window *window, DWORD *windowStyle, DWORD *windowExStyle )
 {
-    if (windowStyle & WS_THICKFRAME)
+    if (window && window->Window.Handle)
     {
-        *xBorderWidth = GetSystemMetrics(SM_CXSIZEFRAME);
-        *yBorderWidth = GetSystemMetrics(SM_CYSIZEFRAME);
-    }
-    else if (windowStyle & WS_DLGFRAME)
-    {
-        *xBorderWidth = GetSystemMetrics(SM_CXFIXEDFRAME);
-        *yBorderWidth = GetSystemMetrics(SM_CYFIXEDFRAME);
+        *windowStyle   = GetWindowLong(window->Window.Handle, GWL_STYLE);
+        *windowExStyle = GetWindowLong(window->Window.Handle, GWL_EXSTYLE);
     }
     else
     {
-        *xBorderWidth = 0;
-        *yBorderWidth = 0;
+        /* WindowExStyle==0 is fine/default, exStyle is currently only used for menu windows */
+        *windowStyle   = WS_OVERLAPPEDWINDOW;
+        *windowExStyle = 0;
     }
 }
-
 
 
 /* Computes position of corners of window Rect (outer position including
@@ -403,35 +400,25 @@ void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderW
  * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
  * area.
  */
-void fghComputeWindowRectFromClientArea_UseStyle( const DWORD windowStyle, RECT *clientRect, BOOL posIsOutside )
+void fghComputeWindowRectFromClientArea_UseStyle( RECT *clientRect, const DWORD windowStyle, const DWORD windowExStyle, BOOL posIsOutside )
 {
-    int xBorderWidth = 0, yBorderWidth = 0;
+    RECT windowRect   = {0,0,0,0};
+    CopyRect(&windowRect,clientRect);
 
-    /* If window has title bar, correct rect for it */
-    if (windowStyle & WS_MAXIMIZEBOX) /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
-    {
-        if (posIsOutside)
-            clientRect->bottom += GetSystemMetrics( SM_CYCAPTION );
-        else
-            clientRect->top -= GetSystemMetrics( SM_CYCAPTION );
-    }
+    /* Get rect including non-client area */
+    AdjustWindowRectEx(&windowRect,windowStyle,FALSE,windowExStyle);
 
-    /* get width of window's borders (frame), correct rect for it.
-     * Note, borders can be of zero width if style does not specify borders
-     */
-    fghGetBorderWidth(windowStyle, &xBorderWidth, &yBorderWidth);
+    /* Move window right and down by non-client area extent on left and top, if wanted */
     if (posIsOutside)
     {
-        clientRect->right  += xBorderWidth * 2;
-        clientRect->bottom += yBorderWidth * 2;
+        windowRect.right   += clientRect->left-windowRect.left;
+        windowRect.bottom  += clientRect->top -windowRect.top;
+        windowRect.left     = clientRect->left;
+        windowRect.top      = clientRect->top;
     }
-    else
-    {
-        clientRect->left   -= xBorderWidth;
-        clientRect->right  += xBorderWidth;
-        clientRect->top    -= yBorderWidth;
-        clientRect->bottom += yBorderWidth;
-    }
+    
+    /* done, copy windowRect to output */
+    CopyRect(clientRect,&windowRect);
 }
 
 /* Computes position of corners of window Rect (outer position including
@@ -444,68 +431,17 @@ void fghComputeWindowRectFromClientArea_UseStyle( const DWORD windowStyle, RECT 
  * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
  * area.
 */
-void fghComputeWindowRectFromClientArea_QueryWindow( const SFG_Window *window, RECT *clientRect, BOOL posIsOutside )
+void fghComputeWindowRectFromClientArea_QueryWindow( RECT *clientRect, const SFG_Window *window, BOOL posIsOutside )
 {
-    DWORD windowStyle = 0;
+    DWORD windowStyle = 0, windowExStyle = 0;
+    fghGetStyleFromWindow(window,&windowStyle,&windowExStyle);
 
-    if (window && window->Window.Handle)
-        windowStyle = GetWindowLong(window->Window.Handle, GWL_STYLE);
-    else
-        windowStyle = WS_OVERLAPPEDWINDOW;
-
-    fghComputeWindowRectFromClientArea_UseStyle(windowStyle, clientRect, posIsOutside);
+    fghComputeWindowRectFromClientArea_UseStyle(clientRect, windowStyle, windowExStyle, posIsOutside);
 }
 
-/* Computes position of corners of client area (drawable area) of a window
- * based on the provided window Rect (outer position including decorations)
- * and based on the style of the window in question. If the window pointer
- * or the window handle is NULL, a fully decorated window (caption and
- * border) is assumed.
- * Furthermore, if wantPosOutside is set to true, the output client Rect
- * will follow freeGLUT's window specification convention in which the
- * top-left corner is at the outside of the window, the size
- * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
- * area.
- */
-void fghComputeClientAreaFromWindowRect( const SFG_Window *window, RECT *windowRect, BOOL wantPosOutside )
-{
-    DWORD windowStyle = 0;
-    int xBorderWidth = 0, yBorderWidth = 0;
-
-    if (window && window->Window.Handle)
-        windowStyle = GetWindowLong(window->Window.Handle, GWL_STYLE);
-    else
-        windowStyle = WS_OVERLAPPEDWINDOW;
-
-    /* If window has title bar, correct rect for it */
-    if (windowStyle & WS_MAXIMIZEBOX) /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
-    {
-        if (wantPosOutside)
-            windowRect->bottom -= GetSystemMetrics( SM_CYCAPTION );
-        else
-            windowRect->top    += GetSystemMetrics( SM_CYCAPTION );
-    }
-
-    /* get width of window's borders (frame), correct rect for it.
-     * Note, borders can be of zero width if style does not specify borders
-     */
-    fghGetBorderWidth(windowStyle, &xBorderWidth, &yBorderWidth);
-    if (wantPosOutside)
-    {
-        windowRect->right  -= xBorderWidth * 2;
-        windowRect->bottom -= yBorderWidth * 2;
-    }
-    else
-    {
-        windowRect->left   += xBorderWidth;
-        windowRect->right  -= xBorderWidth;
-        windowRect->top    += yBorderWidth;
-        windowRect->bottom -= yBorderWidth;
-    }
-}
 
 /* Gets the rect describing the client area (drawable area) of the
- * specified window.
+ * specified window. Output is position of corners of client area (drawable area) on the screen.
  * Returns an empty rect if window pointer or window handle is NULL.
  * If wantPosOutside is set to true, the output client Rect
  * will follow freeGLUT's window specification convention in which the
@@ -513,24 +449,38 @@ void fghComputeClientAreaFromWindowRect( const SFG_Window *window, RECT *windowR
  * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
  * area.
  */
-RECT fghGetClientArea( const SFG_Window *window, BOOL wantPosOutside )
+void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL wantPosOutside )
 {
-    RECT windowRect = {0,0,0,0};
+    POINT topLeftClient = {0,0};
+    POINT topLeftWindow = {0,0};
 
-    freeglut_return_val_if_fail((window && window->Window.Handle),windowRect);
+    freeglut_return_if_fail((window && window->Window.Handle));
     
     /*
      * call GetWindowRect()
      * (this returns the pixel coordinates of the outside of the window)
-     * cannot use GetClientRect as it seems to return a rect relative to
+     * cannot use GetClientRect as it returns a rect relative to
      * the top-left point of the client area (.top and .left are thus always 0)
+     * and is thus only useful for querying the size of the client area, not
+     * its position.
      */
-    GetWindowRect( window->Window.Handle, &windowRect );
+    GetWindowRect( window->Window.Handle, clientRect );
+    topLeftWindow.x = clientRect->top;
+    topLeftWindow.y = clientRect->left;
+    
+    /* Get size of client rect */
+    GetClientRect(window->Window.Handle, clientRect);
+    /* Get position of top-left of client area on the screen */
+    ClientToScreen(window->Window.Handle,&topLeftClient);
+    /* Add top-left offset */
+    OffsetRect(clientRect,topLeftClient.x,topLeftClient.y);
 
-    /* Then correct the results */
-    fghComputeClientAreaFromWindowRect(window, &windowRect, wantPosOutside);
-
-    return windowRect;
+    /* replace top and left with top and left of window, if wanted */
+    if (wantPosOutside)
+    {
+        clientRect->left = topLeftWindow.x;
+        clientRect->top  = topLeftWindow.y;
+    }
 }
 
 #if(WINVER >= 0x500)
@@ -724,8 +674,9 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
         windowRect.right    = x+w;
         windowRect.bottom   = y+h;
 
-        fghComputeWindowRectFromClientArea_UseStyle(flags,&windowRect,TRUE);
+        fghComputeWindowRectFromClientArea_UseStyle(&windowRect,flags,exFlags,TRUE);
 
+        /* NB: w and h are now width and height of window including non-client area! */
         w = windowRect.right - windowRect.left;
         h = windowRect.bottom- windowRect.top;
     }

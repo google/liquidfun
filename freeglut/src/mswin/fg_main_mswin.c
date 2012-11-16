@@ -63,8 +63,8 @@ struct GXKeyList gxKeyList;
  * and the window rect from the client area given the style of the window
  * (or a valid window pointer from which the style can be queried).
  */
-extern void fghComputeWindowRectFromClientArea_QueryWindow( const SFG_Window *window, RECT *clientRect, BOOL posIsOutside );
-extern RECT fghGetClientArea                              ( const SFG_Window *window,                   BOOL wantPosOutside );
+extern void fghComputeWindowRectFromClientArea_QueryWindow( RECT *clientRect, const SFG_Window *window, BOOL posIsOutside );
+extern void fghGetClientArea                              ( RECT *clientRect, const SFG_Window *window, BOOL wantPosOutside );
 
 
 void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
@@ -86,7 +86,7 @@ void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 
     if (window->Parent == NULL)
         /* get the window rect from this to feed to SetWindowPos, correct for window decorations */
-        fghComputeWindowRectFromClientArea_QueryWindow(window,&windowRect,TRUE);
+        fghComputeWindowRectFromClientArea_QueryWindow(&windowRect,window,TRUE);
     else
     {
         /* correct rect for position client area of parent window
@@ -96,11 +96,8 @@ void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
          * for them.
          */
         RECT parentRect;
-        parentRect = fghGetClientArea( window->Parent, FALSE );
-        windowRect.left   -= parentRect.left;
-        windowRect.right  -= parentRect.left;
-        windowRect.top    -= parentRect.top;
-        windowRect.bottom -= parentRect.top;
+        fghGetClientArea( &parentRect, window->Parent, FALSE );
+        OffsetRect(&windowRect,-parentRect.left,-parentRect.top);
     }
     
     /* Do the actual resizing */

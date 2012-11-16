@@ -37,8 +37,9 @@ extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
  * and the window rect from the client area given the style of the window
  * (or a valid window pointer from which the style can be queried).
  */
-extern RECT fghGetClientArea( const SFG_Window *window, BOOL wantPosOutside );
-extern void fghGetBorderWidth(const DWORD windowStyle, int* xBorderWidth, int* yBorderWidth);
+extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL wantPosOutside );
+extern void fghGetStyleFromWindow( const SFG_Window *window, DWORD *windowStyle, DWORD *windowExStyle );
+extern void fghComputeWindowRectFromClientArea_UseStyle( RECT *clientRect, const DWORD windowStyle, const DWORD windowExStyle, BOOL posIsOutside );
 
 
 /* The following include file is available from SGI but is not standard:
@@ -165,7 +166,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
          *  behaviour, both under Windows and under UNIX/X11:
          *  - When you create a window with position (x,y) and size
          *    (w,h), the upper left hand corner of the outside of the
-         *    window is at (x,y) and the size of the drawable area  is
+         *    window is at (x,y) and the size of the drawable area is
          *    (w,h).
          *  - When you query the size and position of the window--as
          *    is happening here for Windows--"freeglut" will return
@@ -182,7 +183,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
 #if defined(_WIN32_WCE)
         GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect );
 #else
-        winRect = fghGetClientArea(fgStructure.CurrentWindow, FALSE);
+        fghGetClientArea(&winRect,fgStructure.CurrentWindow, FALSE);
         if (fgStructure.CurrentWindow->Parent && (eWhat==GLUT_WINDOW_X || eWhat==GLUT_WINDOW_Y))
         {
             /* For child window, we should return relative to upper-left
@@ -214,25 +215,45 @@ int fgPlatformGlutGet ( GLenum eWhat )
         return 0;
 #else
         {
-            DWORD windowStyle;
+            /* We can't get the border width or header height in the simple way
+             * with some calls to GetSystemMetrics. We'd then have to assume which
+             * elements are present for a given decoration, and such calculations
+             * wouldn't be valid for every version of Windows. The below should be
+             * robust. */
+            int borderWidth, captionHeight;
+            DWORD windowStyle, windowExStyle;
+            RECT clientRect, winRect;
 
+            /* Get style of window, or default style */
+            fghGetStyleFromWindow( fgStructure.CurrentWindow, &windowStyle, &windowExStyle );
+            /* Get client area if any window */
             if (fgStructure.CurrentWindow && fgStructure.CurrentWindow->Window.Handle)
-                windowStyle = GetWindowLong(fgStructure.CurrentWindow->Window.Handle, GWL_STYLE);
+                fghGetClientArea(&clientRect,fgStructure.CurrentWindow,FALSE);
             else
-                /* If no window, return sizes for a default window with title bar and border */
-                windowStyle = WS_OVERLAPPEDWINDOW;
+                SetRect(&clientRect,0,0,200,200);
+
+            /* Compute window rect (including non-client area) */
+            CopyRect(&winRect,&clientRect);
+            fghComputeWindowRectFromClientArea_UseStyle(&winRect,windowStyle,windowExStyle,FALSE);
+
+            /* Calculate border width by taking width of whole window minus width of client area and divide by two
+             * NB: we assume horizontal and vertical borders have the same size, which should always be the case
+             * unless the user bypassed FreeGLUT and messed with the windowstyle himself.
+             * Once borderwidth is known, account for it when comparing height of window to height of client area.
+             * all other extra pixels are assumed to be atop the window, forming the caption.
+             */
+            borderWidth   = ((winRect.right-winRect.left)-(clientRect.right-clientRect.left))/2;
+            captionHeight = (winRect.bottom-winRect.top)-(clientRect.bottom-clientRect.top)-borderWidth*2;
             
             switch( eWhat )
             {
             case GLUT_WINDOW_BORDER_WIDTH:
                 {
-                    int xBorderWidth, yBorderWidth;
-                    fghGetBorderWidth(windowStyle, &xBorderWidth, &yBorderWidth);
-                    return xBorderWidth;
+                    return borderWidth;
                 }
             case GLUT_WINDOW_HEADER_HEIGHT:
                 /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
-                return (windowStyle & WS_MAXIMIZEBOX)? GetSystemMetrics( SM_CYCAPTION ) : 0;
+                return captionHeight;
             }
         }
 #endif /* defined(_WIN32_WCE) */

@@ -220,13 +220,19 @@ void Redisplay(void)
 
 int main(int argc, char* argv[])
 {
+    int border, caption;
     glutInit( &argc, argv );
     glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE /*| GLUT_BORDERLESS*/); // do try as well with GLUT_BORDERLESS and GLUT_CAPTIONLESS
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+    
+    /* Get border and caption size of default window style */
+    border  = glutGet(GLUT_WINDOW_BORDER_WIDTH);
+    caption = glutGet(GLUT_WINDOW_HEADER_HEIGHT);
+    printf("default window style border: %dpx, caption: %dpx\n",border,caption);
 
-    /* The window position you request is the outer top-left of the window,
-     * the client area is at a different position if the window has borders
-     * and/or a title bar.
+    /* NB: The window position you request is the outer top-left of the
+     * window, the client area is at a different position if the window has
+     * borders and/or a title bar.
      */
     glutInitWindowPosition(150,250);
     glutInitWindowSize(200,200);
