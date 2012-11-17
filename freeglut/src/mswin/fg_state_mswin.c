@@ -248,9 +248,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
             switch( eWhat )
             {
             case GLUT_WINDOW_BORDER_WIDTH:
-                {
-                    return borderWidth;
-                }
+                return borderWidth;
             case GLUT_WINDOW_HEADER_HEIGHT:
                 /* Need to query for WS_MAXIMIZEBOX to see if we have a title bar, the WS_CAPTION query is also true for a WS_DLGFRAME only... */
                 return captionHeight;
