@@ -277,10 +277,15 @@ void SampleSpecial( int nSpecial, int nMouseX, int nMouseY )
  */
 void SampleMenu( int menuID )
 {
-    /*
-     * Just print something funny
-     */
     printf( "SampleMenu() callback executed, menuID is %i\n", menuID );
+}
+
+/*
+ * A sample menu status callback
+ */
+void SampleMenuStatus( int status, int x, int y )
+{
+    printf ( "SampleMenu() callback executed, MenuStatus is %i at (%i,%i)\n", status, x, y );
 }
 
 /*
@@ -325,6 +330,7 @@ int main( int argc, char** argv )
     glutSpecialFunc( SampleSpecial );
     glutIdleFunc( SampleIdle );
     glutEntryFunc( SampleEntry );
+    glutMenuStatusFunc( SampleMenuStatus );
     glutAttachMenu( GLUT_LEFT_BUTTON );
 
     glutInitWindowPosition( 200, 200 );
@@ -334,6 +340,8 @@ int main( int argc, char** argv )
     glutKeyboardFunc( SampleKeyboard );
     glutSpecialFunc( SampleSpecial );
     glutIdleFunc( SampleIdle );
+    glutEntryFunc( SampleEntry );
+    glutMenuStatusFunc( SampleMenuStatus );
     glutAttachMenu( GLUT_LEFT_BUTTON );
     glutSetMenu(subMenuA);
     glutAttachMenu( GLUT_RIGHT_BUTTON );
@@ -367,6 +375,8 @@ int main( int argc, char** argv )
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleGameModeKeyboard );
     glutIdleFunc( SampleIdle );
+    glutEntryFunc( SampleEntry );
+    glutMenuStatusFunc( SampleMenuStatus );
     glutSetMenu(menuID);
     glutAttachMenu( GLUT_LEFT_BUTTON );
 

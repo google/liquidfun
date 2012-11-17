@@ -509,6 +509,7 @@ void fgDisplayMenu( void )
 static void fghActivateMenu( SFG_Window* window, int button )
 {
     int max_x, max_y;
+    SFG_XYUse mouse_pos;
 
     /* We'll be referencing this menu a lot, so remember its address: */
     SFG_Menu* menu = window->Menu[ button ];
@@ -527,9 +528,17 @@ static void fghActivateMenu( SFG_Window* window, int button )
     /* Set up the initial menu position now: */
     fghGetVMaxExtent(menu->ParentWindow, &max_x, &max_y);
     fgSetWindow( window );
-    menu->X = window->State.MouseX + glutGet( GLUT_WINDOW_X );
-    menu->Y = window->State.MouseY + glutGet( GLUT_WINDOW_Y );
+    /* get mouse position on screen (window->State.MouseX and window->State.MouseY
+     * are relative to client area origin), and not easy to correct given that
+     * glutGet( GLUT_WINDOW_X ) and glutGet( GLUT_WINDOW_Y ) return relative to parent
+     * origin when looking at a child window
+     * for parent windows: window->State.MouseX + glutGet( GLUT_WINDOW_X ) == mouse_pos.X
+     */
+    fghPlatformGetCursorPos(&mouse_pos);
+    menu->X = mouse_pos.X;
+    menu->Y = mouse_pos.Y;
 
+    /* Make sure the whole menu is on the screen */
     if( menu->X + menu->Width > max_x )
         menu->X -=menu->Width;
 
@@ -540,10 +549,9 @@ static void fghActivateMenu( SFG_Window* window, int button )
             menu->Y = 0;
     }
 
-    menu->Window->State.MouseX =
-        window->State.MouseX + glutGet( GLUT_WINDOW_X ) - menu->X;
-    menu->Window->State.MouseY =
-        window->State.MouseY + glutGet( GLUT_WINDOW_Y ) - menu->Y;
+    /* Set position of mouse relative to top-left menu in menu's window state (could as well set 0 at creation time...) */
+    menu->Window->State.MouseX = mouse_pos.X - menu->X;
+    menu->Window->State.MouseY = mouse_pos.Y - menu->Y;
 
     /* Menu status callback */
     if (fgState.MenuStateCallback || fgState.MenuStatusCallback)
@@ -553,6 +561,7 @@ static void fghActivateMenu( SFG_Window* window, int button )
         if (fgState.MenuStateCallback)
             fgState.MenuStateCallback(GLUT_MENU_IN_USE);
         if (fgState.MenuStatusCallback)
+            /* window->State.MouseX and window->State.MouseY are relative to client area origin, as needed */
             fgState.MenuStatusCallback(GLUT_MENU_IN_USE, window->State.MouseX, window->State.MouseY);
     }
 
