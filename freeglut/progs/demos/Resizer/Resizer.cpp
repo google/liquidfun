@@ -185,7 +185,10 @@ void Redisplay(void)
          * when the window is on a monitor to the left of the primary monitor
          * or simply when maximized--try pressing the maximize button).
          * the returned size is the size of the client area
+         * Note that the top-left of a child window is relative to the
+         * top-left of the client area of the parent.
          */
+        /* printf("window border: %dpx, caption: %dpx\n",border,caption); */
         if (win==nWindow)
             printf("main  window %dx%d, top-left of client at: (%d,%d), of window at: (%d,%d)\n",
                 nWidth, nHeight,

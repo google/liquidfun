@@ -371,6 +371,20 @@ void fgPlatformSetWindow ( SFG_Window *window )
 }
 
 
+void fghGetDefaultWindowStyle(DWORD *flags)
+{
+    if ( fgState.DisplayMode & GLUT_BORDERLESS )
+    {
+        /* no window decorations needed, no-op */
+    }
+    else if ( fgState.DisplayMode & GLUT_CAPTIONLESS )
+        /* only window decoration is a border, no title bar or buttons */
+        (*flags) |= WS_DLGFRAME;
+    else
+        /* window decoration are a border, title bar and buttons. */
+        (*flags) |= WS_OVERLAPPEDWINDOW;
+}
+
 /* Get window style and extended window style of a FreeGLUT window
  * If the window pointer or the window handle is NULL, a fully
  * decorated window (caption and border) is assumed.
@@ -384,8 +398,9 @@ void fghGetStyleFromWindow( const SFG_Window *window, DWORD *windowStyle, DWORD 
     }
     else
     {
+        *windowStyle   = 0;
+        fghGetDefaultWindowStyle(windowStyle);
         /* WindowExStyle==0 is fine/default, exStyle is currently only used for menu windows */
-        *windowStyle   = WS_OVERLAPPEDWINDOW;
         *windowExStyle = 0;
     }
 }
@@ -601,23 +616,9 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 #if defined(_WIN32_WCE)
         /* no decorations for windows CE */
 #else
-        /* if this is not a subwindow (child), set its style based on the requested display mode */
+        /* if this is not a subwindow (child), set its style based on the requested window decorations */
         else if( window->Parent == NULL )
-            if ( fgState.DisplayMode & GLUT_BORDERLESS )
-            {
-                /* no window decorations needed */
-            }
-            else if ( fgState.DisplayMode & GLUT_CAPTIONLESS )
-                /* only window decoration is a border, no title bar or buttons */
-                flags |= WS_DLGFRAME;
-            else
-                /* window decoration are a border, title bar and buttons.
-                 * NB: we later query whether the window has a title bar or
-                 * not by testing for the maximize button, as the test for
-                 * WS_CAPTION can be true without the window having a title
-                 * bar. This style WS_OVERLAPPEDWINDOW gives you a maximize
-                 * button. */
-                flags |= WS_OVERLAPPEDWINDOW;
+            fghGetDefaultWindowStyle(&flags);
 #endif
         else
             /* subwindows always have no decoration, but are marked as a child window to the OS */
