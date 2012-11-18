@@ -468,54 +468,56 @@ static void drawWireTeapot(void)
     glFrontFace(GL_CCW);
 }
 
-#define RADIUS    1.0f
+#define RADIUSFAC    0.70710678118654752440084436210485f
 
 static void drawSolidCuboctahedron(void)
 {
+  GLfloat radius = RADIUSFAC*(GLfloat)orad; /* orad doubles as size */
   glBegin( GL_TRIANGLES );
-    glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS, RADIUS ); glVertex3d( RADIUS, 0.0, RADIUS );
-    glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS,-RADIUS );
-    glNormal3d( 0.577350269189,-0.577350269189, 0.577350269189); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, RADIUS );
-    glNormal3d( 0.577350269189,-0.577350269189,-0.577350269189); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS,-RADIUS ); glVertex3d( RADIUS, 0.0,-RADIUS );
-    glNormal3d(-0.577350269189, 0.577350269189, 0.577350269189); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, RADIUS );
-    glNormal3d(-0.577350269189, 0.577350269189,-0.577350269189); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS,-RADIUS ); glVertex3d(-RADIUS, 0.0,-RADIUS );
-    glNormal3d(-0.577350269189,-0.577350269189, 0.577350269189); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS, RADIUS ); glVertex3d(-RADIUS, 0.0, RADIUS );
-    glNormal3d(-0.577350269189,-0.577350269189,-0.577350269189); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS,-RADIUS );
+    glNormal3d( 0.577350269189, 0.577350269189, 0.577350269189); glVertex3d( radius, radius, 0.0 ); glVertex3d( 0.0, radius, radius ); glVertex3d( radius, 0.0, radius );
+    glNormal3d( 0.577350269189, 0.577350269189,-0.577350269189); glVertex3d( radius, radius, 0.0 ); glVertex3d( radius, 0.0,-radius ); glVertex3d( 0.0, radius,-radius );
+    glNormal3d( 0.577350269189,-0.577350269189, 0.577350269189); glVertex3d( radius,-radius, 0.0 ); glVertex3d( radius, 0.0, radius ); glVertex3d( 0.0,-radius, radius );
+    glNormal3d( 0.577350269189,-0.577350269189,-0.577350269189); glVertex3d( radius,-radius, 0.0 ); glVertex3d( 0.0,-radius,-radius ); glVertex3d( radius, 0.0,-radius );
+    glNormal3d(-0.577350269189, 0.577350269189, 0.577350269189); glVertex3d(-radius, radius, 0.0 ); glVertex3d(-radius, 0.0, radius ); glVertex3d( 0.0, radius, radius );
+    glNormal3d(-0.577350269189, 0.577350269189,-0.577350269189); glVertex3d(-radius, radius, 0.0 ); glVertex3d( 0.0, radius,-radius ); glVertex3d(-radius, 0.0,-radius );
+    glNormal3d(-0.577350269189,-0.577350269189, 0.577350269189); glVertex3d(-radius,-radius, 0.0 ); glVertex3d( 0.0,-radius, radius ); glVertex3d(-radius, 0.0, radius );
+    glNormal3d(-0.577350269189,-0.577350269189,-0.577350269189); glVertex3d(-radius,-radius, 0.0 ); glVertex3d(-radius, 0.0,-radius ); glVertex3d( 0.0,-radius,-radius );
   glEnd();
 
   glBegin( GL_QUADS );
-    glNormal3d( 1.0, 0.0, 0.0 ); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0,-RADIUS );
-    glNormal3d(-1.0, 0.0, 0.0 ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0, RADIUS );
-    glNormal3d( 0.0, 1.0, 0.0 ); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS,-RADIUS ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS, RADIUS );
-    glNormal3d( 0.0,-1.0, 0.0 ); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS, RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS,-RADIUS );
-    glNormal3d( 0.0, 0.0, 1.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, RADIUS ); glVertex3d(-RADIUS, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, RADIUS );
-    glNormal3d( 0.0, 0.0,-1.0 ); glVertex3d( RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS,-RADIUS ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS,-RADIUS );
+    glNormal3d( 1.0, 0.0, 0.0 ); glVertex3d( radius, radius, 0.0 ); glVertex3d( radius, 0.0, radius ); glVertex3d( radius,-radius, 0.0 ); glVertex3d( radius, 0.0,-radius );
+    glNormal3d(-1.0, 0.0, 0.0 ); glVertex3d(-radius, radius, 0.0 ); glVertex3d(-radius, 0.0,-radius ); glVertex3d(-radius,-radius, 0.0 ); glVertex3d(-radius, 0.0, radius );
+    glNormal3d( 0.0, 1.0, 0.0 ); glVertex3d( radius, radius, 0.0 ); glVertex3d( 0.0, radius,-radius ); glVertex3d(-radius, radius, 0.0 ); glVertex3d( 0.0, radius, radius );
+    glNormal3d( 0.0,-1.0, 0.0 ); glVertex3d( radius,-radius, 0.0 ); glVertex3d( 0.0,-radius, radius ); glVertex3d(-radius,-radius, 0.0 ); glVertex3d( 0.0,-radius,-radius );
+    glNormal3d( 0.0, 0.0, 1.0 ); glVertex3d( radius, 0.0, radius ); glVertex3d( 0.0, radius, radius ); glVertex3d(-radius, 0.0, radius ); glVertex3d( 0.0,-radius, radius );
+    glNormal3d( 0.0, 0.0,-1.0 ); glVertex3d( radius, 0.0,-radius ); glVertex3d( 0.0,-radius,-radius ); glVertex3d(-radius, 0.0,-radius ); glVertex3d( 0.0, radius,-radius );
   glEnd();
 }
 
 static void drawWireCuboctahedron(void)
 {
+  GLfloat radius = RADIUSFAC*(GLfloat)orad; /* orad doubles as size */
   glBegin( GL_LINE_LOOP );
-    glNormal3d( 1.0, 0.0, 0.0 ); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( RADIUS, 0.0,-RADIUS );
+    glNormal3d( 1.0, 0.0, 0.0 ); glVertex3d( radius, radius, 0.0 ); glVertex3d( radius, 0.0, radius ); glVertex3d( radius,-radius, 0.0 ); glVertex3d( radius, 0.0,-radius );
   glEnd();
   glBegin( GL_LINE_LOOP );
-    glNormal3d(-1.0, 0.0, 0.0 ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d(-RADIUS, 0.0, RADIUS );
+    glNormal3d(-1.0, 0.0, 0.0 ); glVertex3d(-radius, radius, 0.0 ); glVertex3d(-radius, 0.0,-radius ); glVertex3d(-radius,-radius, 0.0 ); glVertex3d(-radius, 0.0, radius );
   glEnd();
   glBegin( GL_LINE_LOOP );
-    glNormal3d( 0.0, 1.0, 0.0 ); glVertex3d( RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS,-RADIUS ); glVertex3d(-RADIUS, RADIUS, 0.0 ); glVertex3d( 0.0, RADIUS, RADIUS );
+    glNormal3d( 0.0, 1.0, 0.0 ); glVertex3d( radius, radius, 0.0 ); glVertex3d( 0.0, radius,-radius ); glVertex3d(-radius, radius, 0.0 ); glVertex3d( 0.0, radius, radius );
   glEnd();
   glBegin( GL_LINE_LOOP );
-    glNormal3d( 0.0,-1.0, 0.0 ); glVertex3d( RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS, RADIUS ); glVertex3d(-RADIUS,-RADIUS, 0.0 ); glVertex3d( 0.0,-RADIUS,-RADIUS );
+    glNormal3d( 0.0,-1.0, 0.0 ); glVertex3d( radius,-radius, 0.0 ); glVertex3d( 0.0,-radius, radius ); glVertex3d(-radius,-radius, 0.0 ); glVertex3d( 0.0,-radius,-radius );
   glEnd();
   glBegin( GL_LINE_LOOP );
-    glNormal3d( 0.0, 0.0, 1.0 ); glVertex3d( RADIUS, 0.0, RADIUS ); glVertex3d( 0.0, RADIUS, RADIUS ); glVertex3d(-RADIUS, 0.0, RADIUS ); glVertex3d( 0.0,-RADIUS, RADIUS );
+    glNormal3d( 0.0, 0.0, 1.0 ); glVertex3d( radius, 0.0, radius ); glVertex3d( 0.0, radius, radius ); glVertex3d(-radius, 0.0, radius ); glVertex3d( 0.0,-radius, radius );
   glEnd();
   glBegin( GL_LINE_LOOP );
-    glNormal3d( 0.0, 0.0,-1.0 ); glVertex3d( RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0,-RADIUS,-RADIUS ); glVertex3d(-RADIUS, 0.0,-RADIUS ); glVertex3d( 0.0, RADIUS,-RADIUS );
+    glNormal3d( 0.0, 0.0,-1.0 ); glVertex3d( radius, 0.0,-radius ); glVertex3d( 0.0,-radius,-radius ); glVertex3d(-radius, 0.0,-radius ); glVertex3d( 0.0, radius,-radius );
   glEnd();
 }
 
-#undef RADIUS
+#undef RADIUSFAC
 
 /*
  * This structure defines an entry in our function-table.
