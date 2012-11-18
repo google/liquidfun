@@ -894,7 +894,18 @@ DECLARE_SHAPE_CACHE(tetrahedron,Tetrahedron,TETRAHEDRON)
 /* -- Sierpinski Sponge -- */
 static unsigned int ipow (int x, unsigned int y)
 {
-    return y==0? 1: y==1? x: (y%2? x: 1) * ipow(x*x, y/2);
+    /* return y==0? 1: y==1? x: (y%2? x: 1) * ipow(x*x, y/2); */
+    if (y==0)
+        return 1;
+    else
+    {
+        if (y==1)
+            return x;
+        else
+        {
+            return (y%2? x: 1) * ipow(x*x, y/2);
+        }
+    }
 }
 
 static void fghSierpinskiSpongeGenerate ( int numLevels, double offset[3], GLfloat scale, GLfloat* vertices, GLfloat* normals )
