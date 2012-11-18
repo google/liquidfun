@@ -34,20 +34,24 @@
    have a nice code order below */
 #ifndef GL_ES_VERSION_2_0
 static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
-    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
+                                  GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+                                  GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
     );
 static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart);
+                                   GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart);
 #endif
 static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
-    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2,
-    GLint attribute_v_coord, GLint attribute_v_normal
+                                  GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+                                  GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2,
+                                  GLint attribute_v_coord, GLint attribute_v_normal
     );
 static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart,
-    GLint attribute_v_coord, GLint attribute_v_normal);
+                                   GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart,
+                                   GLint attribute_v_coord, GLint attribute_v_normal);
+/* declare function for generating visualization of normals */
+static void fghGenerateNormalVisualization(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+                                           GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart);
+static void fghDrawNormalVisualization();
 
 /* Drawing geometry:
  * Explanation of the functions has to be separate for the polyhedra and
@@ -116,8 +120,8 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLsizei 
  * Feel free to contribute better naming ;)
  */
 static void fghDrawGeometryWire(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
-    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
+                                GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+                                GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
     )
 {
     GLint attribute_v_coord  = fgStructure.CurrentWindow->Window.attribute_v_coord;
@@ -176,8 +180,19 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLsizei nu
                                attribute_v_coord, attribute_v_normal);
 #ifndef GL_ES_VERSION_2_0
     else
+    {
         fghDrawGeometrySolid11(vertices, normals, numVertices,
                                vertIdxs, numParts, numVertIdxsPerPart);
+
+        if (fgStructure.CurrentWindow->State.VisualizeNormals)
+        {
+            /* generate normals for each vertex to be drawn as well */
+            fghGenerateNormalVisualization(vertices, normals, numVertices,
+                                           vertIdxs, numParts, numVertIdxsPerPart);
+            /* draw normals for each vertex as well */
+            fghDrawNormalVisualization();
+        }
+    }
 #endif
 }
 
@@ -186,8 +201,8 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLsizei nu
 /* Version for OpenGL (ES) 1.1 */
 #ifndef GL_ES_VERSION_2_0
 static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
-    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
+                                  GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+                                  GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2
     )
 {
     int i;
@@ -217,7 +232,7 @@ static void fghDrawGeometryWire11(GLfloat *vertices, GLfloat *normals,
 
 
 static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart)
+                                   GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart)
 {
     int i;
 
@@ -243,10 +258,9 @@ static void fghDrawGeometrySolid11(GLfloat *vertices, GLfloat *normals, GLsizei 
 
 /* Version for OpenGL (ES) >= 2.0 */
 static void fghDrawGeometryWire20(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
-    GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
-    GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2,
-    GLint attribute_v_coord, GLint attribute_v_normal
-    )
+                                  GLushort *vertIdxs, GLsizei numParts, GLsizei numVertPerPart, GLenum vertexMode,
+                                  GLushort *vertIdxs2, GLsizei numParts2, GLsizei numVertPerPart2,
+                                  GLint attribute_v_coord, GLint attribute_v_normal)
 {
     GLuint vbo_coords = 0, vbo_normals = 0,
         ibo_elements = 0, ibo_elements2 = 0;
@@ -445,6 +459,71 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLsizei 
 }
 
 
+
+/**
+ * Generate vertex indices for visualizing the normals.
+ */
+static GLfloat *verticesForNormalVisualization;
+static GLushort numNormalVertices = 0;
+static void fghGenerateNormalVisualization(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
+                                           GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart)
+{
+    GLushort i,j;
+    /* calc number of vertices to generate, allocate. TODO: FREE again after draw!
+     * two for each vertex in the input shape
+     */
+    if (!vertIdxs)
+        numNormalVertices = numVertices * 2;
+    else
+        numNormalVertices = numParts * numVertIdxsPerPart * 2;
+    verticesForNormalVisualization = malloc(numNormalVertices*3 * sizeof(GLfloat));
+
+    /* Now generate vertices for lines to draw the normals */
+    if (!vertIdxs)
+    {
+        for (i=0,j=0; i<numNormalVertices*3/2; i+=3, j+=6)
+        {
+            verticesForNormalVisualization[j+0] = vertices[i+0];
+            verticesForNormalVisualization[j+1] = vertices[i+1];
+            verticesForNormalVisualization[j+2] = vertices[i+2];
+            verticesForNormalVisualization[j+3] = vertices[i+0] + normals[i+0]/4.f;
+            verticesForNormalVisualization[j+4] = vertices[i+1] + normals[i+1]/4.f;
+            verticesForNormalVisualization[j+5] = vertices[i+2] + normals[i+2]/4.f;
+        }
+    }
+    else
+    {
+        for (i=0,j=0; i<numNormalVertices/2; i++, j+=6)
+        {
+            GLushort idx = vertIdxs[i]*3;
+            verticesForNormalVisualization[j+0] = vertices[idx+0];
+            verticesForNormalVisualization[j+1] = vertices[idx+1];
+            verticesForNormalVisualization[j+2] = vertices[idx+2];
+            verticesForNormalVisualization[j+3] = vertices[idx+0] + normals[idx+0]/4.f;
+            verticesForNormalVisualization[j+4] = vertices[idx+1] + normals[idx+1]/4.f;
+            verticesForNormalVisualization[j+5] = vertices[idx+2] + normals[idx+2]/4.f;
+        }
+    }
+}
+
+static void fghDrawNormalVisualization()
+{
+    GLfloat currentColor[4];
+    /* Setup draw color: (1,1,1)-shape's color */
+    glGetFloatv(GL_CURRENT_COLOR,currentColor);
+    glColor4f(1-currentColor[0],1-currentColor[1],1-currentColor[2],currentColor[3]);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+
+    glVertexPointer(3, GL_FLOAT, 0, verticesForNormalVisualization);
+    glDrawArrays(GL_LINES, 0, numNormalVertices);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+    /* Done, free memory, reset color */
+    free(verticesForNormalVisualization);
+    glColor4fv(currentColor);
+}
 
 /**
  * Generate all combinations of vertices and normals needed to draw object.

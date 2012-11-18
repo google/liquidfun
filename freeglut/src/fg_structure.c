@@ -98,6 +98,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
     window->State.IgnoreKeyRepeat = GL_FALSE;
     window->State.KeyRepeating    = GL_FALSE;
     window->State.IsFullscreen    = GL_FALSE;
+    window->State.VisualizeNormals= GL_FALSE;
 
     /*
      * Open the window now. The fgOpenWindow() function is system

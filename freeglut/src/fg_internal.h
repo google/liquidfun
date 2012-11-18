@@ -402,7 +402,9 @@ struct tagSFG_WindowState
 
     GLboolean       IsFullscreen;       /* is the window fullscreen? */
 
-    GLboolean       NeedToInitContext; /* are OpenGL context/resources loaded? */
+    GLboolean       NeedToInitContext;  /* are OpenGL context/resources loaded? */
+
+    GLboolean       VisualizeNormals;   /* When drawing objects, draw vectors representing the normals as well? */
 };
 
 

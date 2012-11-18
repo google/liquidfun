@@ -420,6 +420,7 @@ static float ar;
 static GLboolean persProject = GL_TRUE;
 static GLboolean animateXRot = GL_FALSE;
 static GLboolean useShader   = GL_FALSE;
+static GLboolean visNormals  = GL_FALSE;
 
 /*
  * These one-liners draw particular objects, fetching appropriate
@@ -541,7 +542,7 @@ static const entry table [] =
     ENTRY (Sphere),
     ENTRY (Cone),
     ENTRY (Cylinder),
-    ENTRY (Cuboctahedron)
+    ENTRY (Cuboctahedron)   /* This one doesn't work when in shader mode and is then skipped */
 };
 #undef ENTRY
 
@@ -659,6 +660,7 @@ static void display(void)
     else
     {
         /* fixed function pipeline */
+        glutSetOption(GLUT_OBJECTS_VISUALIZE_NORMALS,visNormals);   /* Normals visualized or not? */
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         if (persProject)
@@ -709,6 +711,8 @@ static void display(void)
             shapesPrintf (9, 1, "2D rotation (r)");
         else
             shapesPrintf (9, 1, "1D rotation (r)");
+        if (!useShader)
+            shapesPrintf (10, 1, "visualizing normals: %i (n)",visNormals);
     } else {
         /* print to command line instead */
         printf ( "Shape %d slides %d stacks %d\n", function_index, slices, stacks ) ;
@@ -756,6 +760,9 @@ key(unsigned char key, int x, int y)
 
     case 'S':
     case 's': useShader=!useShader;       break;
+
+    case 'N':
+    case 'n': visNormals=!visNormals;     break;
 
     default:
         break;

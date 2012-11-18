@@ -115,6 +115,11 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
       fgState.SkipStaleMotion = value;
       break;
 
+    case GLUT_OBJECTS_VISUALIZE_NORMALS:
+      if( fgStructure.CurrentWindow != NULL )
+        fgStructure.CurrentWindow->State.VisualizeNormals = value;
+      break;
+
     default:
         fgWarning( "glutSetOption(): missing enum handle %d", eWhat );
         break;
@@ -204,6 +209,11 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     case GLUT_SKIP_STALE_MOTION_EVENTS:
       return fgState.SkipStaleMotion;
+
+    case GLUT_OBJECTS_VISUALIZE_NORMALS:
+      if( fgStructure.CurrentWindow == NULL )
+        return GL_FALSE;
+      return fgStructure.CurrentWindow->State.VisualizeNormals;
 
     default:
         return fgPlatformGlutGet ( eWhat );

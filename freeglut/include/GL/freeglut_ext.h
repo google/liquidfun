@@ -86,6 +86,8 @@
 
 #define  GLUT_SKIP_STALE_MOTION_EVENTS      0x0204
 
+#define  GLUT_OBJECTS_VISUALIZE_NORMALS     0x0205
+
 /*
  * New tokens for glutInitDisplayMode.
  * Only one GLUT_AUXn bit may be used at a time.
