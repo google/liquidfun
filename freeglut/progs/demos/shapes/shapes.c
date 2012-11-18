@@ -604,8 +604,8 @@ resize(int width, int height)
 static void display(void)
 {
     const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
-    const double a = t*90.0;
-    const double b = (animateXRot?t:1)*60.0;
+    const double a = t*89.0;
+    const double b = (animateXRot?t:1)*67.0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -698,14 +698,19 @@ static void display(void)
         shapesPrintf (5, 1, "Outer radius  Up  Down : %f", orad);
         shapesPrintf (6, 1, "Inner radius Left Right: %f", irad);
         if (persProject)
-            shapesPrintf (7, 1, "Perspective projection");
+            shapesPrintf (7, 1, "Perspective projection (p)");
         else
-            shapesPrintf (7, 1, "Orthographic projection");
+            shapesPrintf (7, 1, "Orthographic projection (p)");
         if (useShader)
-            shapesPrintf (8, 1, "Using shader");
+            shapesPrintf (8, 1, "Using shader (s)");
         else
-            shapesPrintf (8, 1, "Using fixed function pipeline");
+            shapesPrintf (8, 1, "Using fixed function pipeline (s)");
+        if (animateXRot)
+            shapesPrintf (9, 1, "2D rotation (r)");
+        else
+            shapesPrintf (9, 1, "1D rotation (r)");
     } else {
+        /* print to command line instead */
         printf ( "Shape %d slides %d stacks %d\n", function_index, slices, stacks ) ;
     }
 
@@ -804,7 +809,7 @@ const GLfloat high_shininess[] = { 100.0f };
 int
 main(int argc, char *argv[])
 {
-    glutInitWindowSize(640,480);
+    glutInitWindowSize(800,600);
     glutInitWindowPosition(40,40);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
