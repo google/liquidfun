@@ -759,7 +759,12 @@ key(unsigned char key, int x, int y)
     case 'r': animateXRot=!animateXRot;   break;
 
     case 'S':
-    case 's': useShader=!useShader;       break;
+    case 's':
+        useShader=!useShader;
+        /* Cuboctahedron can't be shown when in shader mode, move to next */
+        if (useShader && NUMBEROF (table)-1 == ( unsigned )function_index)
+                function_index = 0;
+        break;
 
     case 'N':
     case 'n': visNormals=!visNormals;     break;
@@ -792,6 +797,13 @@ static void special (int key, int x, int y)
 
     if (NUMBEROF (table) <= ( unsigned )function_index)
         function_index = 0;
+
+    /* Cuboctahedron can't be shown when in shader mode, skip it */
+    if (useShader && NUMBEROF (table)-1 == ( unsigned )function_index)
+        if (key==GLUT_KEY_PAGE_UP)
+            function_index = 0;
+        else
+            function_index -= 1;
 }
 
 
