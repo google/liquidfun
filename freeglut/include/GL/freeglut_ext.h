@@ -86,7 +86,7 @@
 
 #define  GLUT_SKIP_STALE_MOTION_EVENTS      0x0204
 
-#define  GLUT_OBJECTS_VISUALIZE_NORMALS     0x0205
+#define  GLUT_GEOMETRY_VISUALIZE_NORMALS    0x0205
 
 /*
  * New tokens for glutInitDisplayMode.

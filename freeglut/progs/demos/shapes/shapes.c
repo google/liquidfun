@@ -612,7 +612,7 @@ static void display(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glutSetOption(GLUT_OBJECTS_VISUALIZE_NORMALS,visNormals);   /* Normals visualized or not? */
+    glutSetOption(GLUT_GEOMETRY_VISUALIZE_NORMALS,visNormals);  /* Normals visualized or not? */
 
     if (useShader && !shaderReady)
         initShader();

@@ -115,7 +115,7 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
       fgState.SkipStaleMotion = value;
       break;
 
-    case GLUT_OBJECTS_VISUALIZE_NORMALS:
+    case GLUT_GEOMETRY_VISUALIZE_NORMALS:
       if( fgStructure.CurrentWindow != NULL )
         fgStructure.CurrentWindow->State.VisualizeNormals = value;
       break;
@@ -210,7 +210,7 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_SKIP_STALE_MOTION_EVENTS:
       return fgState.SkipStaleMotion;
 
-    case GLUT_OBJECTS_VISUALIZE_NORMALS:
+    case GLUT_GEOMETRY_VISUALIZE_NORMALS:
       if( fgStructure.CurrentWindow == NULL )
         return GL_FALSE;
       return fgStructure.CurrentWindow->State.VisualizeNormals;
