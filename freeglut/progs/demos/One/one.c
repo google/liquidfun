@@ -118,8 +118,8 @@ void SampleDisplay( void )
     else if (win==g_sw2)
     {
         /*
-        * Clear the screen
-        */
+         * Clear the screen
+         */
         glClearColor(0.3f,0.3f,0.3f,1);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         glutPostWindowRedisplay(g_mainwin);
