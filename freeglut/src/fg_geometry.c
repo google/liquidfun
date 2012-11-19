@@ -51,7 +51,10 @@ static void fghDrawGeometrySolid20(GLfloat *vertices, GLfloat *normals, GLsizei 
 /* declare function for generating visualization of normals */
 static void fghGenerateNormalVisualization(GLfloat *vertices, GLfloat *normals, GLsizei numVertices,
                                            GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart);
-static void fghDrawNormalVisualization();
+#ifndef GL_ES_VERSION_2_0
+static void fghDrawNormalVisualization11();
+#endif
+static void fghDrawNormalVisualization20(GLint attribute_v_coord);
 
 /* Drawing geometry:
  * Explanation of the functions has to be separate for the polyhedra and
@@ -173,11 +176,22 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLsizei nu
     GLint attribute_v_coord  = fgStructure.CurrentWindow->Window.attribute_v_coord;
     GLint attribute_v_normal = fgStructure.CurrentWindow->Window.attribute_v_normal;
 
+    if (fgStructure.CurrentWindow->State.VisualizeNormals)
+        /* generate normals for each vertex to be drawn as well */
+        fghGenerateNormalVisualization(vertices, normals, numVertices,
+                                       vertIdxs, numParts, numVertIdxsPerPart);
+
     if (fgState.HasOpenGL20 && (attribute_v_coord != -1 || attribute_v_normal != -1))
+    {
         /* User requested a 2.0 draw */
         fghDrawGeometrySolid20(vertices, normals, numVertices,
                                vertIdxs, numParts, numVertIdxsPerPart,
                                attribute_v_coord, attribute_v_normal);
+
+        if (fgStructure.CurrentWindow->State.VisualizeNormals)
+            /* draw normals for each vertex as well */
+            fghDrawNormalVisualization20(attribute_v_coord);
+    }
 #ifndef GL_ES_VERSION_2_0
     else
     {
@@ -185,13 +199,8 @@ static void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLsizei nu
                                vertIdxs, numParts, numVertIdxsPerPart);
 
         if (fgStructure.CurrentWindow->State.VisualizeNormals)
-        {
-            /* generate normals for each vertex to be drawn as well */
-            fghGenerateNormalVisualization(vertices, normals, numVertices,
-                                           vertIdxs, numParts, numVertIdxsPerPart);
             /* draw normals for each vertex as well */
-            fghDrawNormalVisualization();
-        }
+            fghDrawNormalVisualization11();
     }
 #endif
 }
@@ -506,7 +515,9 @@ static void fghGenerateNormalVisualization(GLfloat *vertices, GLfloat *normals, 
     }
 }
 
-static void fghDrawNormalVisualization()
+/* Version for OpenGL (ES) 1.1 */
+#ifndef GL_ES_VERSION_2_0
+static void fghDrawNormalVisualization11()
 {
     GLfloat currentColor[4];
     /* Setup draw color: (1,1,1)-shape's color */
@@ -523,6 +534,46 @@ static void fghDrawNormalVisualization()
     /* Done, free memory, reset color */
     free(verticesForNormalVisualization);
     glColor4fv(currentColor);
+}
+#endif
+
+/* Version for OpenGL (ES) >= 2.0 */
+static void fghDrawNormalVisualization20(GLint attribute_v_coord)
+{
+    GLuint vbo_coords = 0;
+
+    if (attribute_v_coord != -1) {
+        fghGenBuffers(1, &vbo_coords);
+        fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
+        fghBufferData(FGH_ARRAY_BUFFER, numNormalVertices * 3 * sizeof(verticesForNormalVisualization[0]),
+            verticesForNormalVisualization, FGH_STATIC_DRAW);
+    }
+
+
+    if (vbo_coords) {
+        fghEnableVertexAttribArray(attribute_v_coord);
+        fghBindBuffer(FGH_ARRAY_BUFFER, vbo_coords);
+        fghVertexAttribPointer(
+            attribute_v_coord,  /* attribute */
+            3,                  /* number of elements per vertex, here (x,y,z) */
+            GL_FLOAT,           /* the type of each element */
+            GL_FALSE,           /* take our values as-is */
+            0,                  /* no extra data between each position */
+            0                   /* offset of first element */
+            );
+        fghBindBuffer(FGH_ARRAY_BUFFER, 0);
+    }
+
+    glDrawArrays(GL_LINES, 0, numNormalVertices);
+
+    if (vbo_coords != 0)
+        fghDisableVertexAttribArray(attribute_v_coord);
+
+    if (vbo_coords != 0)
+        fghDeleteBuffers(1, &vbo_coords);
+
+    /* Done, free memory */
+    free(verticesForNormalVisualization);
 }
 
 /**

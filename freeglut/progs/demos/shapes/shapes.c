@@ -612,6 +612,8 @@ static void display(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glutSetOption(GLUT_OBJECTS_VISUALIZE_NORMALS,visNormals);   /* Normals visualized or not? */
+
     if (useShader && !shaderReady)
         initShader();
 
@@ -662,7 +664,6 @@ static void display(void)
     else
     {
         /* fixed function pipeline */
-        glutSetOption(GLUT_OBJECTS_VISUALIZE_NORMALS,visNormals);   /* Normals visualized or not? */
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         if (persProject)
@@ -713,8 +714,7 @@ static void display(void)
             shapesPrintf (9, 1, "2D rotation (r)");
         else
             shapesPrintf (9, 1, "1D rotation (r)");
-        if (!useShader)
-            shapesPrintf (10, 1, "visualizing normals: %i (n)",visNormals);
+        shapesPrintf (10, 1, "visualizing normals: %i (n)",visNormals);
     } else {
         /* print to command line instead */
         printf ( "Shape %d slides %d stacks %d\n", function_index, slices, stacks ) ;
