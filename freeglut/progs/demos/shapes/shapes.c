@@ -423,6 +423,17 @@ static GLboolean useShader   = GL_FALSE;
 static GLboolean visNormals  = GL_FALSE;
 
 /*
+ * Enum to tell drawSizeInfo what to draw for each object
+ */
+#define GEO_NO_SIZE 0
+#define GEO_SIZE 1
+#define GEO_SCALE 2
+#define GEO_INNER_OUTER_RAD 4
+#define GEO_RAD 8
+#define GEO_BASE_HEIGHT 16
+#define GEO_RAD_HEIGHT 32
+
+/*
  * These one-liners draw particular objects, fetching appropriate
  * information from the above globals.  They are just thin wrappers
  * for the FreeGLUT objects.
@@ -527,24 +538,25 @@ typedef struct
     const char * const name;
     void (*solid) (void);
     void (*wire)  (void);
+    int drawSizeInfoFlag;
 } entry;
 
-#define ENTRY(e) {#e, drawSolid##e, drawWire##e}
+#define ENTRY(e,f) {#e, drawSolid##e, drawWire##e,f}
 static const entry table [] =
 {
-    ENTRY (Tetrahedron),
-    ENTRY (Cube),
-    ENTRY (Octahedron),
-    ENTRY (Dodecahedron),
-    ENTRY (RhombicDodecahedron),
-    ENTRY (Icosahedron),
-    ENTRY (SierpinskiSponge),
-    ENTRY (Teapot),
-    ENTRY (Torus),
-    ENTRY (Sphere),
-    ENTRY (Cone),
-    ENTRY (Cylinder),
-    ENTRY (Cuboctahedron)   /* This one doesn't work when in shader mode and is then skipped */
+    ENTRY (Tetrahedron,GEO_NO_SIZE),
+    ENTRY (Cube,GEO_SIZE),
+    ENTRY (Octahedron,GEO_NO_SIZE),
+    ENTRY (Dodecahedron,GEO_NO_SIZE),
+    ENTRY (RhombicDodecahedron,GEO_NO_SIZE),
+    ENTRY (Icosahedron,GEO_NO_SIZE),
+    ENTRY (SierpinskiSponge,GEO_SCALE),
+    ENTRY (Teapot,GEO_SIZE),
+    ENTRY (Torus,GEO_INNER_OUTER_RAD),
+    ENTRY (Sphere,GEO_RAD),
+    ENTRY (Cone,GEO_BASE_HEIGHT),
+    ENTRY (Cylinder,GEO_RAD_HEIGHT),
+    ENTRY (Cuboctahedron,GEO_SIZE)   /* This one doesn't work when in shader mode and is then skipped */
 };
 #undef ENTRY
 
@@ -594,8 +606,61 @@ static void shapesPrintf (int row, int col, const char *fmt, ...)
     glPopMatrix();
 }
 
-/* GLUT callback Handlers */
+/* Print info about the about the current shape and render state on the screen */
+static void DrawSizeInfo(int *row)
+{
+    switch (table [function_index].drawSizeInfoFlag)
+    {
+    case GEO_NO_SIZE:
+        break;
+    case GEO_SIZE:
+        shapesPrintf ((*row)++, 1, "Size  Up  Down : %f", orad);
+        break;
+    case GEO_SCALE:
+        shapesPrintf ((*row)++, 1, "Scale  Up  Down : %f", orad);
+        break;
+    case GEO_INNER_OUTER_RAD:
+        shapesPrintf ((*row)++, 1, "Inner radius Left Right: %f", irad);
+        shapesPrintf ((*row)++, 1, "Outer radius  Up  Down : %f", orad);
+        break;
+    case GEO_RAD:
+        shapesPrintf ((*row)++, 1, "Radius  Up  Down : %f", orad);
+        break;
+    case GEO_BASE_HEIGHT:
+        shapesPrintf ((*row)++, 1, "Base   Left Right: %f", irad);
+        shapesPrintf ((*row)++, 1, "Height  Up  Down : %f", orad);
+        break;
+    case GEO_RAD_HEIGHT:
+        shapesPrintf ((*row)++, 1, "Radius Left Right: %f", irad);
+        shapesPrintf ((*row)++, 1, "Height  Up  Down : %f", orad);
+        break;
+    }
+}
 
+static void drawInfo()
+{
+    int row = 1;
+    shapesPrintf (row++, 1, "Shape PgUp PgDn: %s", table [function_index].name);
+    shapesPrintf (row++, 1, "Slices +-: %d   Stacks <>: %d", slices, stacks);
+    shapesPrintf (row++, 1, "nSides +-: %d   nRings <>: %d", slices, stacks);
+    shapesPrintf (row++, 1, "Depth  (): %d", depth);
+    DrawSizeInfo(&row);
+    if (persProject)
+        shapesPrintf (row++, 1, "Perspective projection (p)");
+    else
+        shapesPrintf (row++, 1, "Orthographic projection (p)");
+    if (useShader)
+        shapesPrintf (row++, 1, "Using shader (s)");
+    else
+        shapesPrintf (row++, 1, "Using fixed function pipeline (s)");
+    if (animateXRot)
+        shapesPrintf (row++, 1, "2D rotation (r)");
+    else
+        shapesPrintf (row++, 1, "1D rotation (r)");
+    shapesPrintf (row++, 1, "visualizing normals: %i (n)",visNormals);
+}
+
+/* GLUT callback Handlers */
 static void
 resize(int width, int height)
 {
@@ -695,30 +760,12 @@ static void display(void)
         glColor3d(0.1,0.1,0.4);
     }
 
-    if( show_info ) {
-        shapesPrintf (1, 1, "Shape PgUp PgDn: %s", table [function_index].name);
-        shapesPrintf (2, 1, "Slices +-: %d   Stacks <>: %d", slices, stacks);
-        shapesPrintf (3, 1, "nSides +-: %d   nRings <>: %d", slices, stacks);
-        shapesPrintf (4, 1, "Depth  (): %d", depth);
-        shapesPrintf (5, 1, "Outer radius  Up  Down : %f", orad);
-        shapesPrintf (6, 1, "Inner radius Left Right: %f", irad);
-        if (persProject)
-            shapesPrintf (7, 1, "Perspective projection (p)");
-        else
-            shapesPrintf (7, 1, "Orthographic projection (p)");
-        if (useShader)
-            shapesPrintf (8, 1, "Using shader (s)");
-        else
-            shapesPrintf (8, 1, "Using fixed function pipeline (s)");
-        if (animateXRot)
-            shapesPrintf (9, 1, "2D rotation (r)");
-        else
-            shapesPrintf (9, 1, "1D rotation (r)");
-        shapesPrintf (10, 1, "visualizing normals: %i (n)",visNormals);
-    } else {
+    if( show_info )
+        /* print info to screen */
+        drawInfo();
+    else
         /* print to command line instead */
         printf ( "Shape %d slides %d stacks %d\n", function_index, slices, stacks ) ;
-    }
 
     glutSwapBuffers();
 }
