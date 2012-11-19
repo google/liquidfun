@@ -445,10 +445,10 @@ static void drawSolidTorus(void)               { glutSolidTorus(irad,orad,slices
 static void drawWireTorus(void)                { glutWireTorus (irad,orad,slices,stacks);        }
 static void drawSolidSphere(void)              { glutSolidSphere(orad,slices,stacks);            }  /* orad doubles as size input */
 static void drawWireSphere(void)               { glutWireSphere(orad,slices,stacks);             }  /* orad doubles as size input */
-static void drawSolidCone(void)                { glutSolidCone(orad,orad,slices,stacks);         }  /* orad doubles as size input */
-static void drawWireCone(void)                 { glutWireCone(orad,orad,slices,stacks);          }  /* orad doubles as size input */
-static void drawSolidCylinder(void)            { glutSolidCylinder(orad,orad,slices,stacks);     }  /* orad doubles as size input */
-static void drawWireCylinder(void)             { glutWireCylinder(orad,orad,slices,stacks);      }  /* orad doubles as size input */
+static void drawSolidCone(void)                { glutSolidCone(irad,orad,slices,stacks);         }  /* irad doubles as base input, and orad as height input */
+static void drawWireCone(void)                 { glutWireCone(irad,orad,slices,stacks);          }  /* irad doubles as base input, and orad as height input */
+static void drawSolidCylinder(void)            { glutSolidCylinder(irad,orad,slices,stacks);     }  /* irad doubles as radius input, and orad as height input */
+static void drawWireCylinder(void)             { glutWireCylinder(irad,orad,slices,stacks);      }  /* irad doubles as radius input, and orad as height input */
 static void drawSolidTeapot(void)
 {
     /* per Glut manpage, it should be noted that the teapot is rendered

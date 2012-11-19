@@ -1298,9 +1298,9 @@ void fghGenerateCone(
             (*vertices)[idx  ] = cost[j]*r;
             (*vertices)[idx+1] = sint[j]*r;
             (*vertices)[idx+2] = z;
-            (*normals )[idx  ] = cost[j]*sinn;
-            (*normals )[idx+1] = sint[j]*sinn;
-            (*normals )[idx+2] = cosn;
+            (*normals )[idx  ] = cost[j]*cosn;
+            (*normals )[idx+1] = sint[j]*cosn;
+            (*normals )[idx+2] = sinn;
         }
 
         z += zStep;
