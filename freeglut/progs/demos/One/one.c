@@ -23,7 +23,7 @@
 
 int g_LeaveGameMode = 0;
 int g_InGameMode = 0;
-int g_mainwin, g_sw1, g_sw2, g_gamemodewin;
+int g_mainwin1, g_mainwin2, g_sw1, g_sw2, g_gamemodewin;
 
 /*
  * Call this function to have some text drawn at given coordinates
@@ -99,9 +99,9 @@ void SampleDisplay( void )
     int win = glutGetWindow();
 
     if (g_InGameMode && win!=g_gamemodewin)
-        /* Dont draw other windows when in gamemode, those aren't visible
-         * anyway. Drawing them continuously anyway can cause flicker trouble
-         * on my machine. This only seems to occur when there are child windows
+        /* Don't draw other windows when in gamemode, those aren't visible
+         * anyway. Drawing them continuously nonetheless can cause flicker trouble
+         * on my machine. This only seems to occur only when there are child windows
          * among the non-visible windows 
          */
         return;
@@ -113,7 +113,7 @@ void SampleDisplay( void )
          */
         glClearColor(0.7f,0.7f,0.7f,1);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-        glutPostWindowRedisplay(g_mainwin);
+        glutPostWindowRedisplay(g_mainwin2);
     }
     else if (win==g_sw2)
     {
@@ -122,7 +122,7 @@ void SampleDisplay( void )
          */
         glClearColor(0.3f,0.3f,0.3f,1);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-        glutPostWindowRedisplay(g_mainwin);
+        glutPostWindowRedisplay(g_mainwin2);
     }
     else
     {
@@ -184,9 +184,14 @@ void SampleIdle( void )
     if( g_LeaveGameMode == 1 )
     {
         /* One could do all this just as well in SampleGameModeKeyboard... */
+        printf("leaving gamemode...\n");
         glutLeaveGameMode( );
         g_LeaveGameMode = 0;
         g_InGameMode = 0;
+        glutPostWindowRedisplay(g_mainwin1);
+        glutPostWindowRedisplay(g_mainwin2);
+        glutPostWindowRedisplay(g_sw1);
+        glutPostWindowRedisplay(g_sw2);
     }
 }
 
@@ -323,7 +328,7 @@ int main( int argc, char** argv )
     glutAddSubMenu( "Enter sub menu A", subMenuA );
     glutAddSubMenu( "Enter sub menu B", subMenuB );
 
-    glutCreateWindow( "Hello world!" );
+    g_mainwin1 = glutCreateWindow( "Hello world!" );
     glutDisplayFunc( SampleDisplay );
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleKeyboard );
@@ -334,7 +339,7 @@ int main( int argc, char** argv )
     glutAttachMenu( GLUT_LEFT_BUTTON );
 
     glutInitWindowPosition( 200, 200 );
-    g_mainwin = glutCreateWindow( "I am not Jan B." );
+    g_mainwin2 = glutCreateWindow( "I am not Jan B." );
     glutDisplayFunc( SampleDisplay );
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleKeyboard );
@@ -346,7 +351,7 @@ int main( int argc, char** argv )
     glutSetMenu(subMenuA);
     glutAttachMenu( GLUT_RIGHT_BUTTON );
 
-    g_sw1=glutCreateSubWindow(g_mainwin,200,0,100,100);
+    g_sw1=glutCreateSubWindow(g_mainwin2,200,0,100,100);
     glutDisplayFunc( SampleDisplay );
     glutSetMenu(subMenuB);
     glutAttachMenu( GLUT_LEFT_BUTTON );

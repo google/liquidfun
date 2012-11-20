@@ -212,7 +212,7 @@ void fgPlatformMainLoopPreliminaryWork ( void )
 
 
 /*
- * Determine a GLUT modifer mask based on MS-WINDOWS system info.
+ * Determine a GLUT modifier mask based on MS-WINDOWS system info.
  */
 static int fgPlatformGetModifiers (void)
 {
@@ -508,7 +508,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         if (child_window)
         {
-            /* If child should have focus instead, set it here. */
+            /* If we're dealing with a child window, make sure it has input focus instead, set it here. */
             SetFocus(child_window->Window.Handle);
             SetActiveWindow( child_window->Window.Handle );
             INVOKE_WCB( *child_window, Entry, ( GLUT_ENTERED ) );
