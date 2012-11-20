@@ -15,6 +15,8 @@
       -    <tt>i I &nbsp;</tt> Show info
       -    <tt>p P &nbsp;</tt> Toggle perspective or orthographic projection
       -    <tt>r R &nbsp;</tt> Toggle fixed or animated rotation around model X-axis
+      -    <tt>s S &nbsp;</tt> Toggle toggle fixed function or shader render path
+      -    <tt>n N &nbsp;</tt> Toggle visualization of object's normal vectors
       -    <tt>= + &nbsp;</tt> Increase \a slices
       -    <tt>- _ &nbsp;</tt> Decreate \a slices
       -    <tt>, < &nbsp;</tt> Decreate \a stacks
