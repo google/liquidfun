@@ -29,8 +29,7 @@
 #include "../fg_internal.h"
 
 /*
- *
- *
+ * Changes to requested devmode, if it doesn't match current mode
  */
 GLboolean fghPlatformChangeDisplayMode(GLboolean haveToTest, DEVMODE *devModeRequested)
 {
