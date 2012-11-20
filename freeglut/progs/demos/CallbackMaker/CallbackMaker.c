@@ -65,7 +65,7 @@ Display(void)
   glPushMatrix ();
   glLoadIdentity ();
   glColor3ub ( 0, 0, 0 );
-  glRasterPos2i ( 10, glutGet ( GLUT_WINDOW_HEIGHT ) - 10 );
+  glRasterPos2i ( 10, glutGet ( GLUT_WINDOW_HEIGHT ) - 20 );	/* 10pt margin above 10pt letters */
 
   if ( reshape_called )
   {
@@ -171,6 +171,7 @@ Reshape(int width, int height)
   reshape_width = width ;
   reshape_height = height ;
   reshape_seq = sequence_number ;
+  glViewport(0,0,width,height);
   glutPostRedisplay () ;
 }
 
