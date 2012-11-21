@@ -11,6 +11,8 @@
 
 static int sequence_number = 0 ;
 
+int windows[2] = {0};
+
 int reshape_called = 0, key_called = 0, special_called = 0, visibility_called = 0,
     keyup_called = 0, specialup_called = 0, joystick_called = 0, mouse_called = 0,
     mousewheel_called = 0, motion_called = 0, passivemotion_called = 0, entry_called = 0,
@@ -461,7 +463,6 @@ static void Idle ( void )
 int 
 main(int argc, char *argv[])
 {
-  int freeglut_window, aux_window ;
   char dummy_string[STRING_LENGTH];
 
   int menuID, subMenuA, subMenuB;
@@ -474,8 +475,8 @@ main(int argc, char *argv[])
   glutInit(&argc, argv);
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_CONTINUE_EXECUTION);
 
-  freeglut_window = glutCreateWindow( "Callback Demo" );
-  printf ( "Creating window %d as 'Callback Demo'\n", freeglut_window ) ;
+  windows[0] = glutCreateWindow( "Callback Demo" );
+  printf ( "Creating window %d as 'Callback Demo'\n", windows[0] ) ;
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
@@ -530,8 +531,10 @@ main(int argc, char *argv[])
 
   glutAttachMenu( GLUT_LEFT_BUTTON );
 
-  aux_window = glutCreateWindow( "Second Window" );
-  printf ( "Creating window %d as 'Second Window'\n", aux_window ) ;
+  glutInitWindowPosition ( 140+500+2*glutGet(GLUT_WINDOW_BORDER_WIDTH), 140 );
+  /* Position second window right next to the first */
+  windows[1] = glutCreateWindow( "Second Window" );
+  printf ( "Creating window %d as 'Second Window'\n", windows[1] ) ;
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
