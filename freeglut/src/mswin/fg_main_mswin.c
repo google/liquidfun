@@ -661,10 +661,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         short ticks = ( short )HIWORD( wParam );
 		fgState.MouseWheelTicks += ticks;
 
-        /*
-         * XXX Should use WHEEL_DELTA instead of 120
-         */
-		if ( abs ( fgState.MouseWheelTicks ) >= 120 )
+        if ( abs ( fgState.MouseWheelTicks ) >= WHEEL_DELTA )
 		{
 			int direction = ( fgState.MouseWheelTicks > 0 ) ? 1 : -1;
 
@@ -675,10 +672,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             fgSetWindow( window );
             fgState.Modifiers = fgPlatformGetModifiers( );
 
-            /*
-             * XXX Should use WHEEL_DELTA instead of 120
-             */
-            while( abs ( fgState.MouseWheelTicks ) >= 120 )
+            while( abs ( fgState.MouseWheelTicks ) >= WHEEL_DELTA )
 			{
                 if( FETCH_WCB( *window, MouseWheel ) )
                     INVOKE_WCB( *window, MouseWheel,
@@ -710,10 +704,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                     );
 				}
 
-                /*
-                 * XXX Should use WHEEL_DELTA instead of 120
-                 */
-				fgState.MouseWheelTicks -= 120 * direction;
+				fgState.MouseWheelTicks -= WHEEL_DELTA * direction;
 			}
 
             fgState.Modifiers = INVALID_MODIFIERS;
