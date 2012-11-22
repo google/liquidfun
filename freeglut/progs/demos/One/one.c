@@ -307,6 +307,8 @@ int main( int argc, char** argv )
     glutInit( &argc, argv );
 
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+    glutMenuStatusFunc( SampleMenuStatus );
+    glutIdleFunc( SampleIdle );
 
     subMenuA = glutCreateMenu( SampleMenu );
     glutAddMenuEntry( "Sub menu A1 (01)", 1 );
@@ -333,9 +335,7 @@ int main( int argc, char** argv )
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleKeyboard );
     glutSpecialFunc( SampleSpecial );
-    glutIdleFunc( SampleIdle );
     glutEntryFunc( SampleEntry );
-    glutMenuStatusFunc( SampleMenuStatus );
     glutAttachMenu( GLUT_LEFT_BUTTON );
 
     glutInitWindowPosition( 200, 200 );
@@ -344,9 +344,7 @@ int main( int argc, char** argv )
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleKeyboard );
     glutSpecialFunc( SampleSpecial );
-    glutIdleFunc( SampleIdle );
     glutEntryFunc( SampleEntry );
-    glutMenuStatusFunc( SampleMenuStatus );
     glutAttachMenu( GLUT_LEFT_BUTTON );
     glutSetMenu(subMenuA);
     glutAttachMenu( GLUT_RIGHT_BUTTON );
@@ -379,9 +377,7 @@ int main( int argc, char** argv )
     glutDisplayFunc( SampleDisplay );
     glutReshapeFunc( SampleReshape );
     glutKeyboardFunc( SampleGameModeKeyboard );
-    glutIdleFunc( SampleIdle );
     glutEntryFunc( SampleEntry );
-    glutMenuStatusFunc( SampleMenuStatus );
     glutSetMenu(menuID);
     glutAttachMenu( GLUT_LEFT_BUTTON );
 
