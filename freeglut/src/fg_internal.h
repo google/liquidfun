@@ -437,7 +437,7 @@ typedef void (*SFG_Proc)();
 do                                                             \
 {                                                              \
     if( FETCH_WCB( window, cbname ) != (SFG_Proc)(func) )      \
-        (((window).CallBacks[CB_ ## cbname]) = (SFG_Proc)(func)); \
+        (((window).CallBacks[WCB_ ## cbname]) = (SFG_Proc)(func)); \
 } while( 0 )
 
 /*
@@ -452,7 +452,7 @@ do                                                             \
  * type.
  */
 #define FETCH_WCB(window,cbname) \
-    ((window).CallBacks[CB_ ## cbname])
+    ((window).CallBacks[WCB_ ## cbname])
 
 /*
  * INVOKE_WCB() is used as:
@@ -507,50 +507,46 @@ do                                            \
  * side with the old callback code.  The old callback code used
  * the bare callback's name as a structure member, so I used a
  * prefix for the array index name.)
- *
- * XXX For consistancy, perhaps the prefix should match the
- * XXX FETCH* and INVOKE* macro suffices.  I.e., WCB_, rather than
- * XXX CB_.
  */
 enum
 {
-    CB_Display,
-    CB_Reshape,
-    CB_Keyboard,
-    CB_KeyboardUp,
-    CB_Special,
-    CB_SpecialUp,
-    CB_Mouse,
-    CB_MouseWheel,
-    CB_Motion,
-    CB_Passive,
-    CB_Entry,
-    CB_Visibility,
-    CB_WindowStatus,
-    CB_Joystick,
-    CB_Destroy,
+    WCB_Display,
+    WCB_Reshape,
+    WCB_Keyboard,
+    WCB_KeyboardUp,
+    WCB_Special,
+    WCB_SpecialUp,
+    WCB_Mouse,
+    WCB_MouseWheel,
+    WCB_Motion,
+    WCB_Passive,
+    WCB_Entry,
+    WCB_Visibility,
+    WCB_WindowStatus,
+    WCB_Joystick,
+    WCB_Destroy,
 
-    /* MPX-related */
-    CB_MultiEntry,
-    CB_MultiButton,
-    CB_MultiMotion,
-    CB_MultiPassive,
+    /* Multi-Pointer X and touch related */
+    WCB_MultiEntry,
+    WCB_MultiButton,
+    WCB_MultiMotion,
+    WCB_MultiPassive,
 
     /* Mobile platforms LifeCycle */
-    CB_InitContext,
-    CB_Pause,
-    CB_Resume,
+    WCB_InitContext,
+    WCB_Pause,
+    WCB_Resume,
 
     /* Presently ignored */
-    CB_Select,
-    CB_OverlayDisplay,
-    CB_SpaceMotion,     /* presently implemented only on UNIX/X11 */
-    CB_SpaceRotation,   /* presently implemented only on UNIX/X11 */
-    CB_SpaceButton,     /* presently implemented only on UNIX/X11 */
-    CB_Dials,
-    CB_ButtonBox,
-    CB_TabletMotion,
-    CB_TabletButton,
+    WCB_Select,
+    WCB_OverlayDisplay,
+    WCB_SpaceMotion,     /* presently implemented only on UNIX/X11 */
+    WCB_SpaceRotation,   /* presently implemented only on UNIX/X11 */
+    WCB_SpaceButton,     /* presently implemented only on UNIX/X11 */
+    WCB_Dials,
+    WCB_ButtonBox,
+    WCB_TabletMotion,
+    WCB_TabletButton,
 
     /* Always make this the LAST one */
     TOTAL_CALLBACKS
