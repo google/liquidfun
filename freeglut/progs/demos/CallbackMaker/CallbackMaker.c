@@ -53,7 +53,11 @@ CALLBACK_CALLED_VAR(dials);
 CALLBACK_CALLED_VAR(tabletmotion);
 CALLBACK_CALLED_VAR(tabletbutton);
 CALLBACK_CALLED_VAR(menustatus);*/
-int menudestroy_called = 0 ;    /* menudestroy is registered on menu, so don't use above */
+/* menudestroy is registered on each menu, not a window */
+int menudestroy_called = 0 ;
+/* menustatus and menustate are global callbacks, set for all menus at the same time */
+int menustatus_called = 0;
+int menustate_called = 0;
 
 #define STRING_LENGTH   10
 
@@ -460,32 +464,45 @@ TabletButton(int button, int updown, int x, int y)
 }
 
 static void
-MenuCallback ( int menuID )
+MenuCallback ( int value )
 {
+  int menu = glutGetMenu();
   int window = getWindowAndIdx(NULL);
-  printf( "%6d Window %d MenuCallback - menuID is %d\n",
-          ++sequence_number, window, menuID );
+  printf( "%6d Menu %d MenuCallback for menu opened in Window %d - value is %d\n",
+          ++sequence_number, menu, window, value );
 }
 
 static void 
 MenuDestroy( void )
 {
-  int window = getWindowAndIdx(NULL);
+  int menu = glutGetMenu();
   menudestroy_called = 1 ;
-  printf ( "%6d Window %d MenuDestroy Callback\n",
-            ++sequence_number, window ) ;
-
-  if (window)   /* When destroyed when shutting down, not always a window defined... */
-    glutPostRedisplay () ;
+  printf ( "%6d Menu %d MenuDestroy Callback\n",
+            ++sequence_number, menu ) ;
 }
 
 static void 
 MenuStatus( int status, int x, int y )
 {
+  /* Menu and window for which this event is triggered are current when the callback is called */
+  int menu = glutGetMenu();
   int window = getWindowAndIdx(NULL);
-  menudestroy_called = 1 ;
-  printf ( "%6d Window %d MenuStatus Callback:  %d %d %d\n",
-            ++sequence_number, window, status, x, y ) ;
+  menustatus_called = 1 ;
+  printf ( "%6d Menu %d MenuStatus Callback in Window %d:  %d %d %d\n",
+            ++sequence_number, menu, window, status, x, y ) ;
+  glutPostRedisplay () ;
+}
+
+
+static void 
+MenuState( int status )
+{
+  /* Menu and window for which this event is triggered are current when the callback is called */
+  int menu = glutGetMenu();
+  int window = getWindowAndIdx(NULL);
+  menustate_called = 1 ;
+  printf ( "%6d Menu %d MenuState Callback in Window %d:  %d\n",
+            ++sequence_number, menu, window, status) ;
   glutPostRedisplay () ;
 }
 
@@ -509,11 +526,17 @@ main(int argc, char *argv[])
   glutInit(&argc, argv);
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_CONTINUE_EXECUTION);
 
+  /* Set other global callback (global as in not associated with any specific menu or window) */
+  glutIdleFunc ( Idle );
+  glutMenuStatusFunc ( MenuStatus );
+  glutMenuStateFunc  ( MenuState ); /* Note that glutMenuStatusFunc is an enhanced version of the deprecated glutMenuStateFunc. */
+
   windows[0] = glutCreateWindow( "Callback Demo" );
   printf ( "Creating window %d as 'Callback Demo'\n", windows[0] ) ;
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
+  /* callbacks and settings specific to this window */
   glutDisplayFunc( Display );
   glutReshapeFunc( Reshape );
   glutKeyboardFunc( Key );
@@ -537,31 +560,30 @@ main(int argc, char *argv[])
   glutDialsFunc ( Dials ) ;
   glutTabletMotionFunc ( TabletMotion ) ;
   glutTabletButtonFunc ( TabletButton ) ;
-  glutMenuStatusFunc ( MenuStatus );
   glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF) ;
 
   subMenuA = glutCreateMenu( MenuCallback );
-  glutAddMenuEntry( "Sub menu A1 (01)", 1 );
-  glutAddMenuEntry( "Sub menu A2 (02)", 2 );
-  glutAddMenuEntry( "Sub menu A3 (03)", 3 );
-  glutMenuDestroyFunc ( MenuDestroy );
+  glutAddMenuEntry( "Sub menu A1 (01)", 11 );
+  glutAddMenuEntry( "Sub menu A2 (02)", 12 );
+  glutAddMenuEntry( "Sub menu A3 (03)", 13 );
+  glutMenuDestroyFunc ( MenuDestroy );  /* callback specific to this menu */
 
   subMenuB = glutCreateMenu( MenuCallback );
-  glutAddMenuEntry( "Sub menu B1 (04)", 4 );
-  glutAddMenuEntry( "Sub menu B2 (05)", 5 );
-  glutAddMenuEntry( "Sub menu B3 (06)", 6 );
+  glutAddMenuEntry( "Sub menu B1 (04)", 14 );
+  glutAddMenuEntry( "Sub menu B2 (05)", 15 );
+  glutAddMenuEntry( "Sub menu B3 (06)", 16 );
   glutAddSubMenu( "Going to sub menu A", subMenuA );
-  glutMenuDestroyFunc ( MenuDestroy );
+  glutMenuDestroyFunc ( MenuDestroy );  /* callback specific to this menu */
 
   menuID = glutCreateMenu( MenuCallback );
-  glutAddMenuEntry( "Entry one",   1 );
-  glutAddMenuEntry( "Entry two",   2 );
-  glutAddMenuEntry( "Entry three", 3 );
-  glutAddMenuEntry( "Entry four",  4 );
-  glutAddMenuEntry( "Entry five",  5 );
+  glutAddMenuEntry( "Entry one",   21 );
+  glutAddMenuEntry( "Entry two",   22 );
+  glutAddMenuEntry( "Entry three", 23 );
+  glutAddMenuEntry( "Entry four",  24 );
+  glutAddMenuEntry( "Entry five",  25 );
   glutAddSubMenu( "Enter sub menu A", subMenuA );
   glutAddSubMenu( "Enter sub menu B", subMenuB );
-  glutMenuDestroyFunc ( MenuDestroy );
+  glutMenuDestroyFunc ( MenuDestroy );  /* callback specific to this menu */
 
   glutAttachMenu( GLUT_LEFT_BUTTON );
 
@@ -572,6 +594,7 @@ main(int argc, char *argv[])
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
+  /* callbacks and settings specific to this window */
   glutDisplayFunc( Display );
   glutReshapeFunc( Reshape );
   glutKeyboardFunc( Key );
@@ -597,7 +620,9 @@ main(int argc, char *argv[])
   glutTabletButtonFunc ( TabletButton ) ;
   glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF) ;
 
-  glutIdleFunc ( Idle );
+  glutSetMenu(subMenuB);
+  glutAttachMenu( GLUT_RIGHT_BUTTON );
+
 
   printf ( "Please enter something to continue: " );
   fgets ( dummy_string, STRING_LENGTH, stdin );
@@ -606,5 +631,5 @@ main(int argc, char *argv[])
 
   printf ( "Back from the 'freeglut' main loop\n" ) ;
 
-  return 0;             /* ANSI C requires main to return int. */
+  return EXIT_SUCCESS;
 }
