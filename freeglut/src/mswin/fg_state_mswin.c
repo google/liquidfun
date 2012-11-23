@@ -177,7 +177,6 @@ int fgPlatformGlutGet ( GLenum eWhat )
         RECT winRect;
         POINT topLeft = {0,0};
 
-        freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
 
 #if defined(_WIN32_WCE)
         GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect);
@@ -203,8 +202,10 @@ int fgPlatformGlutGet ( GLenum eWhat )
     break;
 
     case GLUT_WINDOW_WIDTH:
+        freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
         return fgStructure.CurrentWindow->State.Width;
     case GLUT_WINDOW_HEIGHT:
+        freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
         return fgStructure.CurrentWindow->State.Height;
 
     case GLUT_WINDOW_BORDER_WIDTH :
