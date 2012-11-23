@@ -512,6 +512,7 @@ enum
 {
     WCB_Display,
     WCB_Reshape,
+    WCB_Position,
     WCB_Keyboard,
     WCB_KeyboardUp,
     WCB_Special,
@@ -643,8 +644,8 @@ struct tagSFG_Structure
 
     SFG_Window*      GameModeWindow; /* The game mode window               */
 
-    int              WindowID;       /* The new current window ID          */
-    int              MenuID;         /* The new current menu ID            */
+    int              WindowID;       /* The window ID for the next window to be created */
+    int              MenuID;         /* The menu ID for the next menu to be created */
 };
 
 /*
