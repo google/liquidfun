@@ -149,8 +149,6 @@ int fgPlatformGlutGet ( GLenum eWhat )
 
     case GLUT_WINDOW_X:
     case GLUT_WINDOW_Y:
-    case GLUT_WINDOW_WIDTH:
-    case GLUT_WINDOW_HEIGHT:
     {
         /*
          *  There is considerable confusion about the "right thing to
@@ -172,40 +170,42 @@ int fgPlatformGlutGet ( GLenum eWhat )
          *    is happening here for Windows--"freeglut" will return
          *    the size of the drawable area--the (w,h) that you
          *    specified when you created the window--and the coordinates
-         *    of the upper left hand corner of the drawable
-         *    area--which is NOT the (x,y) you specified.
+         *    of the upper left hand corner of the drawable area, i.e.
+         *    of the client rect--which is NOT the (x,y) you specified.
          */
 
         RECT winRect;
+        POINT topLeft = {0,0};
 
         freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
 
 #if defined(_WIN32_WCE)
-        GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect );
+        GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect);
 #else
-        fghGetClientArea(&winRect,fgStructure.CurrentWindow, FALSE);
-        if (fgStructure.CurrentWindow->Parent && (eWhat==GLUT_WINDOW_X || eWhat==GLUT_WINDOW_Y))
-        {
+        ClientToScreen(fgStructure.CurrentWindow->Window.Handle, &topLeft);
+        
+        if (fgStructure.CurrentWindow->Parent)
             /* For child window, we should return relative to upper-left
              * of parent's client area.
              */
-            POINT topleft = {winRect.left,winRect.top};
+            ScreenToClient(fgStructure.CurrentWindow->Parent->Window.Handle,&topLeft);
 
-            ScreenToClient(fgStructure.CurrentWindow->Parent->Window.Handle,&topleft);
-            winRect.left = topleft.x;
-            winRect.top  = topleft.y;
-        }
+        winRect.left = topLeft.x;
+        winRect.top  = topLeft.y;
 #endif /* defined(_WIN32_WCE) */
 
         switch( eWhat )
         {
-        case GLUT_WINDOW_X:      return winRect.left                ;
-        case GLUT_WINDOW_Y:      return winRect.top                 ;
-        case GLUT_WINDOW_WIDTH:  return winRect.right - winRect.left;
-        case GLUT_WINDOW_HEIGHT: return winRect.bottom - winRect.top;
+        case GLUT_WINDOW_X:      return winRect.left;
+        case GLUT_WINDOW_Y:      return winRect.top ;
         }
     }
     break;
+
+    case GLUT_WINDOW_WIDTH:
+        return fgStructure.CurrentWindow->State.Width;
+    case GLUT_WINDOW_HEIGHT:
+        return fgStructure.CurrentWindow->State.Height;
 
     case GLUT_WINDOW_BORDER_WIDTH :
     case GLUT_WINDOW_BORDER_HEIGHT :
