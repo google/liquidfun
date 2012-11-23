@@ -141,27 +141,33 @@ void Idle(void)
     glutPostRedisplay();
 }
 
-void Reshape(int x, int y)
+void Reshape(int width, int height)
 {
     int win = glutGetWindow();
 
-    nWidth  = glutGet(GLUT_WINDOW_WIDTH);
-    nHeight = glutGet(GLUT_WINDOW_HEIGHT);
     printf("reshape %s, %dx%d\n",win==nWindow?"main":"child",
-        nWidth, nHeight);
+        width, height);
 
-    glViewport(0,0,nWidth,nHeight);
+    glViewport(0,0,width,height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0,nWidth,0,nHeight);
+    gluOrtho2D(0,width,0,height);
 
     if (win==nWindow && nChildWindow!=-1)
     {
         glutSetWindow(nChildWindow);
-        glutPositionWindow((int)(nWidth*.35),(int)(nHeight*.35));
-        glutReshapeWindow((int)(nWidth*.3),(int)(nHeight*.3));
+        glutPositionWindow((int)(width*.35),(int)(height*.35));
+        glutReshapeWindow((int)(width*.3),(int)(height*.3));
         glutSetWindow(nWindow);
     }
+}
+
+void Position(int x, int y)
+{
+    int win = glutGetWindow();
+
+    printf("position %s, %dx%d\n",win==nWindow?"main":"child",
+        x, y);
 }
 
 void Redisplay(void)
@@ -246,6 +252,7 @@ int main(int argc, char* argv[])
     glutKeyboardFunc( SampleKeyboard );
     glutDisplayFunc( Redisplay );
     glutReshapeFunc( Reshape );
+    glutPositionFunc( Position );
 
     glutMainLoop();
     printf("glutMainLoop returned\n");

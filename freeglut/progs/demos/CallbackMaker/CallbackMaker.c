@@ -207,7 +207,7 @@ Position(int left, int top)
 {
   int winIdx;
   int window = getWindowAndIdx(&winIdx);
-  printf ( "%6d Window %d Reshape Callback:  %d %d\n",
+  printf ( "%6d Window %d Position Callback:  %d %d\n",
             ++sequence_number, window, left, top ) ;
   position_called[winIdx] = 1 ;
   position_left[winIdx] = left ;

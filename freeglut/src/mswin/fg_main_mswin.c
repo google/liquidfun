@@ -427,6 +427,17 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
         break;
 
+    case WM_MOVE:
+        {
+            SFG_Window* saved_window = fgStructure.CurrentWindow;
+            RECT windowRect;
+            GetWindowRect( window->Window.Handle, &windowRect );
+
+            INVOKE_WCB( *window, Position, ( windowRect.left, windowRect.top ) );
+            fgSetWindow(saved_window);
+        }
+        break;
+
     case WM_SETFOCUS:
 /*        printf("WM_SETFOCUS: %p\n", window ); */
 
