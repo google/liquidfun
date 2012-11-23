@@ -177,6 +177,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
         RECT winRect;
         POINT topLeft = {0,0};
 
+        freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
 
 #if defined(_WIN32_WCE)
         GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect);
