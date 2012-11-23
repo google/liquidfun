@@ -168,7 +168,7 @@ void Position(int x, int y)
 {
     int win = glutGetWindow();
 
-    printf("position %s, %dx%d\n",win==nWindow?"main":"child",
+    printf("position, %s: %dx%d\n",win==nWindow?"top-left of main":"top-left of child relative to parent",
         x, y);
 }
 
