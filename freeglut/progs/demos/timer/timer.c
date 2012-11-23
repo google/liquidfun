@@ -12,7 +12,8 @@ void disp(void);
 void timer_func(int unused);
 
 /* color index will be advanced every time the timer expires */
-int cidx;
+int cidx = 0;
+int pcidx = 2;
 float color[][3] = {
 	{1, 0, 0},
 	{0, 1, 0},
@@ -32,7 +33,8 @@ int main(int argc, char **argv)
 	glutDisplayFunc(disp);
 
     /* get timer started, its reset in the timer function itself */
-    glutTimerFunc(1000, timer_func, 0);
+    glutTimerFunc(1000, timer_func, 1);
+    glutTimerFunc(500, timer_func, 2);
 
 	glutMainLoop();
 	return 0;
@@ -43,15 +45,30 @@ void disp(void)
 	glClearColor(color[cidx][0], color[cidx][1], color[cidx][2], 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+    glPointSize(10.f);
+    glColor3f(color[pcidx][0], color[pcidx][1], color[pcidx][2]);
+    glBegin(GL_POINTS);
+        glVertex2i(0,0);
+    glEnd();
+
 	glutSwapBuffers();
 }
 
-void timer_func(int unused)
+void timer_func(int which)
 {
 	/* advance the color index and trigger a redisplay */
-	cidx = (cidx + 1) % (sizeof color / sizeof *color);
+    switch (which)
+    {
+    case 1:
+        cidx = (cidx + 1) % (sizeof color / sizeof *color);
+        break;
+    case 2:
+        pcidx = (pcidx + 1) % (sizeof color / sizeof *color);
+        break;
+    }
+    
 	glutPostRedisplay();
 
 	/* (re)set the timer callback and ask glut to call it in 1 second */
-	glutTimerFunc(1000, timer_func, 0);
+	glutTimerFunc(1000, timer_func, which);
 }
