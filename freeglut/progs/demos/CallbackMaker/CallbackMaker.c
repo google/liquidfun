@@ -14,45 +14,26 @@ static int sequence_number = 0 ;
 int windows[2] = {0};
 
 /* define status vars showing whether given callback has been called for given window */
-#define CALLBACK_CALLED_VAR(name) int name##_called[2] = {0};
-#define CALLBACK_1_VAR(name,field) int name##_##field[2], name##_seq[2] = {-1};
-#define CALLBACK_2_VARS(name,field1,field2) int name##_##field1[2], name##_##field2[2], name##_seq[2] = {-1};
-#define CALLBACK_3_VARS(name,field1,field2,field3) int name##_##field1[2], name##_##field2[2], name##_##field3[2], name##_seq[2] = {-1};
-#define CALLBACK_4_VARS(name,field1,field2,field3,field4) int name##_##field1[2], name##_##field2[2], name##_##field3[2], name##_##field4[2], name##_seq[2] = {-1};
-CALLBACK_CALLED_VAR(reshape);
-CALLBACK_2_VARS(reshape,width,height);
-CALLBACK_CALLED_VAR(key);
-CALLBACK_3_VARS(key,key,x,y);
-CALLBACK_CALLED_VAR(keyup);
-CALLBACK_3_VARS(keyup,key,x,y);
-CALLBACK_CALLED_VAR(special);
-CALLBACK_3_VARS(special,key,x,y);
-CALLBACK_CALLED_VAR(specialup);
-CALLBACK_3_VARS(specialup,key,x,y);
-CALLBACK_CALLED_VAR(visibility);
-CALLBACK_1_VAR(visibility,vis);
-CALLBACK_CALLED_VAR(joystick);
-CALLBACK_4_VARS(joystick,a,b,c,d);
-CALLBACK_CALLED_VAR(mouse);
-CALLBACK_4_VARS(mouse,button,updown,x,y);
-CALLBACK_CALLED_VAR(mousewheel);
-CALLBACK_4_VARS(mousewheel,number,direction,x,y);
-CALLBACK_CALLED_VAR(motion);
-CALLBACK_2_VARS(motion,x,y);
-CALLBACK_CALLED_VAR(passivemotion);
-CALLBACK_2_VARS(passivemotion,x,y);
-CALLBACK_CALLED_VAR(entry);
-CALLBACK_CALLED_VAR(close);
-/*CALLBACK_CALLED_VAR(overlaydisplay);
-CALLBACK_CALLED_VAR(windowstatus);
-CALLBACK_CALLED_VAR(spacemotion);
-CALLBACK_CALLED_VAR(spacerotation);
-CALLBACK_CALLED_VAR(spacebutton);
-CALLBACK_CALLED_VAR(buttonbox);
-CALLBACK_CALLED_VAR(dials);
-CALLBACK_CALLED_VAR(tabletmotion);
-CALLBACK_CALLED_VAR(tabletbutton);
-CALLBACK_CALLED_VAR(menustatus);*/
+#define CALLBACK_CALLED_VAR(name)                     int name##_called[2]   = {0};
+#define CALLBACK_0V(name)                             int name##_seq[2]      = {-1}; CALLBACK_CALLED_VAR(name); 
+#define CALLBACK_1V(name,field)                       int name##_##field[2]  = {-1}; CALLBACK_0V(name);
+#define CALLBACK_2V(name,field1,field2)               int name##_##field2[2] = {-1}; CALLBACK_1V(name,field1);
+#define CALLBACK_3V(name,field1,field2,field3)        int name##_##field3[2] = {-1}; CALLBACK_2V(name,field1,field2);
+#define CALLBACK_4V(name,field1,field2,field3,field4) int name##_##field4[2] = {-1}; CALLBACK_3V(name,field1,field2,field3);
+CALLBACK_2V(reshape,width,height);
+CALLBACK_2V(position,top,left);
+CALLBACK_3V(key,key,x,y);
+CALLBACK_3V(keyup,key,x,y);
+CALLBACK_3V(special,key,x,y);
+CALLBACK_3V(specialup,key,x,y);
+CALLBACK_1V(visibility,vis);
+CALLBACK_4V(joystick,a,b,c,d);
+CALLBACK_4V(mouse,button,updown,x,y);
+CALLBACK_4V(mousewheel,number,direction,x,y);
+CALLBACK_2V(motion,x,y);
+CALLBACK_2V(passivemotion,x,y);
+CALLBACK_0V(entry);
+CALLBACK_0V(close);
 /* menudestroy is registered on each menu, not a window */
 int menudestroy_called = 0 ;
 /* menustatus and menustate are global callbacks, set for all menus at the same time */
@@ -110,6 +91,11 @@ Display(void)
   if ( reshape_called[winIdx] )
   {
     bitmapPrintf ( "Reshape %d:  %d %d\n", reshape_seq[winIdx], reshape_width[winIdx], reshape_height[winIdx] );
+  }
+
+  if ( position_called[winIdx] )
+  {
+    bitmapPrintf ( "Position %d:  %d %d\n", position_seq[winIdx], position_left[winIdx], position_top[winIdx] );
   }
 
   if ( key_called[winIdx] )
@@ -213,6 +199,20 @@ Reshape(int width, int height)
   reshape_height[winIdx] = height ;
   reshape_seq[winIdx] = sequence_number ;
   glViewport(0,0,width,height);
+  glutPostRedisplay () ;
+}
+
+static void 
+Position(int left, int top)
+{
+  int winIdx;
+  int window = getWindowAndIdx(&winIdx);
+  printf ( "%6d Window %d Reshape Callback:  %d %d\n",
+            ++sequence_number, window, left, top ) ;
+  position_called[winIdx] = 1 ;
+  position_left[winIdx] = left ;
+  position_top[winIdx] = top ;
+  position_seq[winIdx] = sequence_number ;
   glutPostRedisplay () ;
 }
 
@@ -539,6 +539,7 @@ main(int argc, char *argv[])
   /* callbacks and settings specific to this window */
   glutDisplayFunc( Display );
   glutReshapeFunc( Reshape );
+  glutPositionFunc( Position );
   glutKeyboardFunc( Key );
   glutSpecialFunc( Special );
   glutVisibilityFunc( Visibility );
@@ -597,6 +598,7 @@ main(int argc, char *argv[])
   /* callbacks and settings specific to this window */
   glutDisplayFunc( Display );
   glutReshapeFunc( Reshape );
+  glutPositionFunc( Position );
   glutKeyboardFunc( Key );
   glutSpecialFunc( Special );
   glutVisibilityFunc( Visibility );
