@@ -934,7 +934,6 @@ void fgPlatformGlutFullScreen( SFG_Window *win )
         s &= ~WS_OVERLAPPEDWINDOW;
         s |= WS_POPUP;
         SetWindowLong(win->Window.Handle, GWL_STYLE, s);
-        SetWindowPos(win->Window.Handle, HWND_TOP, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
         /* For fullscreen mode, find the monitor that is covered the most
          * by the window and get its rect as the resize target.
@@ -996,7 +995,6 @@ void fgPlatformGlutLeaveFullScreen( SFG_Window *win )
 
     /* restore style of window before making it fullscreen */
     SetWindowLong(win->Window.Handle, GWL_STYLE, win->State.pWState.OldStyle);
-    SetWindowPos(win->Window.Handle, HWND_TOP, 0,0,0,0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
     /* Then resize */
     SetWindowPos(win->Window.Handle,
