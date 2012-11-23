@@ -119,6 +119,10 @@ void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
                   SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
                   SWP_NOZORDER
     );
+
+    /* Set new width and height so we can test for that in WM_SIZE message handler and don't do anything if not needed */
+    window->State.Width  = width;
+    window->State.Height = height;
 }
 
 
@@ -415,7 +419,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
          */
         if( window->State.Visible )
         {
-            window->State.NeedToResize = GL_TRUE;
+            /* get old values first to compare to below */
+            int width = window->State.Width, height=window->State.Height;
 #if defined(_WIN32_WCE)
             window->State.Width  = HIWORD(lParam);
             window->State.Height = LOWORD(lParam);
@@ -423,6 +428,10 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             window->State.Width  = LOWORD(lParam);
             window->State.Height = HIWORD(lParam);
 #endif /* defined(_WIN32_WCE) */
+            
+            if (width!=window->State.Width || height!=window->State.Height)
+                /* Something changed, need to resize */
+                window->State.NeedToResize = GL_TRUE;
         }
 
         break;
