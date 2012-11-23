@@ -50,7 +50,7 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
 
     case 'r':
     case 'R':
-        if (nChildWindow!=-1)
+        if (nChildWindow!=-1 && cChar=='r') /* Capital R always resizes the main window*/
         {
             glutSetWindow(nChildWindow);
             printf("child window resize\n");
@@ -62,6 +62,7 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
         }
         else
         {
+            glutSetWindow(nWindow);
             printf("main window resize\n");
             if (nWidth<400)
                 glutReshapeWindow(600,300);
@@ -74,10 +75,9 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
 
     case 'm':
     case 'M':
-        if (nChildWindow!=-1)
+        if (nChildWindow!=-1 && cChar=='m') /* Capital M always moves the main window*/
         {
             glutSetWindow(nChildWindow);
-
             /* The window position you request is relative to the top-left
              * corner of the client area of the parent window.
              */
@@ -89,8 +89,8 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
         }
         else
         {
+            glutSetWindow(nWindow);
             printf("main window position\n");
-
             /* The window position you request is the outer top-left of the window,
              * the client area is at a different position if the window has borders
              * and/or a title bar.
@@ -174,39 +174,6 @@ void Redisplay(void)
 {
     int win = glutGetWindow();
 
-    if (nLoopMain++%20==0)
-    {
-        int border, caption;
-
-        nPosX   = glutGet(GLUT_WINDOW_X);
-        nPosY   = glutGet(GLUT_WINDOW_Y);
-        nWidth  = glutGet(GLUT_WINDOW_WIDTH);
-        nHeight = glutGet(GLUT_WINDOW_HEIGHT);
-        border  = glutGet(GLUT_WINDOW_BORDER_WIDTH);
-        caption = glutGet(GLUT_WINDOW_HEADER_HEIGHT);
-        /* returned position is top-left of client area, to get top-left of
-         * of window you'll need to add the size of the border and caption
-         * of the current window (can be 0).
-         * Note that the window position is not necessarily positive (e.g.
-         * when the window is on a monitor to the left of the primary monitor
-         * or simply when maximized--try pressing the maximize button).
-         * the returned size is the size of the client area
-         * Note that the top-left of a child window is relative to the
-         * top-left of the client area of the parent.
-         */
-        /* printf("window border: %dpx, caption: %dpx\n",border,caption); */
-        if (win==nWindow)
-            printf("main  window %dx%d, top-left of client at: (%d,%d), of window at: (%d,%d)\n",
-                nWidth, nHeight,
-                nPosX ,nPosY,
-                nPosX-border,
-                nPosY-border-caption);
-        else
-            printf("child window %dx%d, top-left of client at: (%d,%d), relative to parent\n",
-            nWidth, nHeight,
-            nPosX ,nPosY);
-    }
-
     if (win==nWindow)
     {
         glClearColor(.2f,0.f,0.f,0.f);
@@ -224,6 +191,43 @@ void Redisplay(void)
 
     glutSwapBuffers();
     glutPostWindowRedisplay(win);
+}
+
+void Timer(int unused)
+{
+    int win = glutGetWindow();
+    int border, caption;
+
+    nPosX   = glutGet(GLUT_WINDOW_X);
+    nPosY   = glutGet(GLUT_WINDOW_Y);
+    nWidth  = glutGet(GLUT_WINDOW_WIDTH);
+    nHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    border  = glutGet(GLUT_WINDOW_BORDER_WIDTH);
+    caption = glutGet(GLUT_WINDOW_HEADER_HEIGHT);
+    /* returned position is top-left of client area, to get top-left of
+     * of window you'll need to add the size of the border and caption
+     * of the current window (can be 0).
+     * Note that the window position is not necessarily positive (e.g.
+     * when the window is on a monitor to the left of the primary monitor
+     * or simply when maximized--try pressing the maximize button).
+     * the returned size is the size of the client area
+     * Note that the top-left of a child window is relative to the
+     * top-left of the client area of the parent.
+     */
+    /* printf("window border: %dpx, caption: %dpx\n",border,caption); */
+    if (win==nWindow)
+        printf("main  window %dx%d, top-left of client at: (%d,%d), of window at: (%d,%d)\n",
+            nWidth, nHeight,
+            nPosX ,nPosY,
+            nPosX-border,
+            nPosY-border-caption);
+    else
+        printf("child window %dx%d, top-left of client at: (%d,%d), relative to parent\n",
+        nWidth, nHeight,
+        nPosX ,nPosY);
+
+    /* (re)set the timer callback and ask glut to call it in 1 second */
+    glutTimerFunc(300, Timer, 0);
 }
 
 
@@ -253,6 +257,8 @@ int main(int argc, char* argv[])
     glutDisplayFunc( Redisplay );
     glutReshapeFunc( Reshape );
     glutPositionFunc( Position );
+
+    glutTimerFunc(300, Timer, 0);
 
     glutMainLoop();
     printf("glutMainLoop returned\n");
