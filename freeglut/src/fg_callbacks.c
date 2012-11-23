@@ -109,6 +109,47 @@ do                                                              \
         return;                                                 \
     SET_WCB( ( *( fgStructure.CurrentWindow ) ), a, callback ); \
 } while( 0 )
+/*
+ * And almost every time the callback setter function can be implemented like this:
+ */
+#define IMPLEMENT_CALLBACK_FUNC_2NAME(a,b)                      \
+void FGAPIENTRY glut##a##Func( FGCB##b callback )               \
+{                                                               \
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glut"###a##"Func" );    \
+    SET_CALLBACK( b );                                          \
+}
+#define IMPLEMENT_CALLBACK_FUNC(a) IMPLEMENT_CALLBACK_FUNC_2NAME(a,a)
+
+/* Implement all these callback setter functions... */
+IMPLEMENT_CALLBACK_FUNC(Reshape);
+IMPLEMENT_CALLBACK_FUNC(Position);
+IMPLEMENT_CALLBACK_FUNC(Keyboard);
+IMPLEMENT_CALLBACK_FUNC(KeyboardUp);
+IMPLEMENT_CALLBACK_FUNC(Special);
+IMPLEMENT_CALLBACK_FUNC(SpecialUp);
+IMPLEMENT_CALLBACK_FUNC(Mouse);
+IMPLEMENT_CALLBACK_FUNC(MouseWheel);
+IMPLEMENT_CALLBACK_FUNC(Motion);
+IMPLEMENT_CALLBACK_FUNC_2NAME(PassiveMotion,Passive);
+IMPLEMENT_CALLBACK_FUNC(Entry);
+/* glutWMCloseFunc is an alias for glutCloseFunc; both set the window's Destroy callback */
+IMPLEMENT_CALLBACK_FUNC_2NAME(Close,Destroy);
+IMPLEMENT_CALLBACK_FUNC_2NAME(WMClose,Destroy);
+IMPLEMENT_CALLBACK_FUNC(OverlayDisplay);
+IMPLEMENT_CALLBACK_FUNC(WindowStatus);
+IMPLEMENT_CALLBACK_FUNC(ButtonBox);
+IMPLEMENT_CALLBACK_FUNC(Dials);
+IMPLEMENT_CALLBACK_FUNC(TabletMotion);
+IMPLEMENT_CALLBACK_FUNC(TabletButton);
+IMPLEMENT_CALLBACK_FUNC(MultiEntry);
+IMPLEMENT_CALLBACK_FUNC(MultiButton);
+IMPLEMENT_CALLBACK_FUNC(MultiMotion);
+IMPLEMENT_CALLBACK_FUNC(MultiPassive);
+IMPLEMENT_CALLBACK_FUNC(InitContext);
+IMPLEMENT_CALLBACK_FUNC(Pause);
+IMPLEMENT_CALLBACK_FUNC(Resume);
+
+
 
 /*
  * Sets the Display callback for the current window
@@ -120,51 +161,6 @@ void FGAPIENTRY glutDisplayFunc( FGCBDisplay callback )
         fgError( "Fatal error in program.  NULL display callback not "
                  "permitted in GLUT 3.0+ or freeglut 2.0.1+" );
     SET_CALLBACK( Display );
-}
-
-/*
- * Sets the Reshape callback for the current window
- */
-void FGAPIENTRY glutReshapeFunc( FGCBReshape callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutReshapeFunc" );
-    SET_CALLBACK( Reshape );
-}
-
-/*
- * Sets the Keyboard callback for the current window
- */
-void FGAPIENTRY glutKeyboardFunc( FGCBKeyboard callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutKeyboardFunc" );
-    SET_CALLBACK( Keyboard );
-}
-
-/*
- * Sets the keyboard key release callback for the current window
- */
-void FGAPIENTRY glutKeyboardUpFunc( FGCBKeyboardUp callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutKeyboardUpFunc" );
-    SET_CALLBACK( KeyboardUp );
-}
-
-/*
- * Sets the Special callback for the current window
- */
-void FGAPIENTRY glutSpecialFunc( FGCBSpecial callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSpecialFunc" );
-    SET_CALLBACK( Special );
-}
-
-/*
- * Sets the special key release callback for the current window
- */
-void FGAPIENTRY glutSpecialUpFunc( FGCBSpecialUp callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSpecialUpFunc" );
-    SET_CALLBACK( SpecialUp );
 }
 
 /*
@@ -220,85 +216,7 @@ void FGAPIENTRY glutJoystickFunc( FGCBJoystick callback, int pollInterval )
         fgStructure.CurrentWindow->State.JoystickLastPoll = 0;
 }
 
-/*
- * Sets the mouse callback for the current window
- */
-void FGAPIENTRY glutMouseFunc( FGCBMouse callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMouseFunc" );
-    SET_CALLBACK( Mouse );
-}
 
-/*
- * Sets the mouse wheel callback for the current window
- */
-void FGAPIENTRY glutMouseWheelFunc( FGCBMouseWheel callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMouseWheelFunc" );
-    SET_CALLBACK( MouseWheel );
-}
-
-/*
- * Sets the mouse motion callback for the current window (one or more buttons
- * are pressed)
- */
-void FGAPIENTRY glutMotionFunc( FGCBMotion callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMotionFunc" );
-    SET_CALLBACK( Motion );
-}
-
-/*
- * Sets the passive mouse motion callback for the current window (no mouse
- * buttons are pressed)
- */
-void FGAPIENTRY glutPassiveMotionFunc( FGCBPassive callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPassiveMotionFunc" );
-    SET_CALLBACK( Passive );
-}
-
-/*
- * Window mouse entry/leave callback
- */
-void FGAPIENTRY glutEntryFunc( FGCBEntry callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutEntryFunc" );
-    SET_CALLBACK( Entry );
-}
-
-/*
- * Window destruction callbacks
- */
-void FGAPIENTRY glutCloseFunc( FGCBDestroy callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCloseFunc" );
-    SET_CALLBACK( Destroy );
-}
-
-void FGAPIENTRY glutWMCloseFunc( FGCBDestroy callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWMCloseFunc" );
-    glutCloseFunc( callback );
-}
-
-/*
- * Sets the overlay display callback for the current window
- */
-void FGAPIENTRY glutOverlayDisplayFunc( FGCBOverlayDisplay callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutOverlayDisplayFunc" );
-    SET_CALLBACK( OverlayDisplay );
-}
-
-/*
- * Sets the window status callback for the current window
- */
-void FGAPIENTRY glutWindowStatusFunc( FGCBWindowStatus callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWindowStatusFunc" );
-    SET_CALLBACK( WindowStatus );
-}
 
 /*
  * Sets the spaceball motion callback for the current window
@@ -331,105 +249,6 @@ void FGAPIENTRY glutSpaceballButtonFunc( FGCBSpaceButton callback )
     fgInitialiseSpaceball();
 
     SET_CALLBACK( SpaceButton );
-}
-
-/*
- * Sets the button box callback for the current window
- */
-void FGAPIENTRY glutButtonBoxFunc( FGCBButtonBox callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutButtonBoxFunc" );
-    SET_CALLBACK( ButtonBox );
-}
-
-/*
- * Sets the dials box callback for the current window
- */
-void FGAPIENTRY glutDialsFunc( FGCBDials callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutDialsFunc" );
-    SET_CALLBACK( Dials );
-}
-
-/*
- * Sets the tablet motion callback for the current window
- */
-void FGAPIENTRY glutTabletMotionFunc( FGCBTabletMotion callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutTabletMotionFunc" );
-    SET_CALLBACK( TabletMotion );
-}
-
-/*
- * Sets the tablet buttons callback for the current window
- */
-void FGAPIENTRY glutTabletButtonFunc( FGCBTabletButton callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutTabletButtonFunc" );
-    SET_CALLBACK( TabletButton );
-}
-
-/*
- * Sets the multi-pointer entry callback for the current window
- */
-void FGAPIENTRY glutMultiEntryFunc( FGCBMultiEntry callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMultiEntryFunc" );
-    SET_CALLBACK( MultiEntry );
-}
-
-/*
- * Sets the multi-pointer button callback for the current window
- */
-void FGAPIENTRY glutMultiButtonFunc( FGCBMultiButton callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMultiButtonFunc" );
-    SET_CALLBACK( MultiButton );
-}
-
-/*
- * Sets the multi-pointer motion callback for the current window
- */
-void FGAPIENTRY glutMultiMotionFunc( FGCBMultiMotion callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMultiMotionFunc" );
-    SET_CALLBACK( MultiMotion );
-}
-
-/*
- * Sets the multi-pointer passive motion callback for the current window
- */
-void FGAPIENTRY glutMultiPassiveFunc( FGCBMultiPassive callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMultiPassiveFunc" );
-    SET_CALLBACK( MultiPassive );
-}
-
-/*
- * Sets the context reload callback for the current window
- */
-void FGAPIENTRY glutInitContextFunc( FGCBInitContext callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutInitContextFunc" );
-    SET_CALLBACK( InitContext );
-}
-
-/*
- * Sets the pause callback for the current window
- */
-void FGAPIENTRY glutPauseFunc( FGCBPause callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPauseFunc" );
-    SET_CALLBACK( Pause );
-}
-
-/*
- * Sets the resume callback for the current window
- */
-void FGAPIENTRY glutResumeFunc( FGCBResume callback )
-{
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutResumeFunc" );
-    SET_CALLBACK( Resume );
 }
 
 /*** END OF FILE ***/
