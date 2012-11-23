@@ -791,7 +791,7 @@ void fghCalculateMenuBoxSize( void )
 /*
  * Creates a new menu object, adding it to the freeglut structure
  */
-int FGAPIENTRY glutCreateMenu( void(* callback)( int ) )
+int FGAPIENTRY glutCreateMenu( FGCBMenu callback )
 {
     /* The menu object creation code resides in freeglut_structure.c */
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateMenu" );

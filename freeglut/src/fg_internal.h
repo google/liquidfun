@@ -191,9 +191,12 @@
 /* Freeglut callbacks type definitions */
 typedef void (* FGCBDisplay       )( void );
 typedef void (* FGCBReshape       )( int, int );
+typedef void (* FGCBPosition      )( int, int );
 typedef void (* FGCBVisibility    )( int );
 typedef void (* FGCBKeyboard      )( unsigned char, int, int );
+typedef void (* FGCBKeyboardUp    )( unsigned char, int, int );
 typedef void (* FGCBSpecial       )( int, int, int );
+typedef void (* FGCBSpecialUp     )( int, int, int );
 typedef void (* FGCBMouse         )( int, int, int, int );
 typedef void (* FGCBMouseWheel    )( int, int, int, int );
 typedef void (* FGCBMotion        )( int, int );
@@ -202,8 +205,6 @@ typedef void (* FGCBEntry         )( int );
 typedef void (* FGCBWindowStatus  )( int );
 typedef void (* FGCBSelect        )( int, int, int );
 typedef void (* FGCBJoystick      )( unsigned int, int, int, int );
-typedef void (* FGCBKeyboardUp    )( unsigned char, int, int );
-typedef void (* FGCBSpecialUp     )( int, int, int );
 typedef void (* FGCBOverlayDisplay)( void );
 typedef void (* FGCBSpaceMotion   )( int, int, int );
 typedef void (* FGCBSpaceRotation )( int, int, int );
@@ -212,7 +213,7 @@ typedef void (* FGCBDials         )( int, int );
 typedef void (* FGCBButtonBox     )( int, int );
 typedef void (* FGCBTabletMotion  )( int, int );
 typedef void (* FGCBTabletButton  )( int, int, int, int );
-typedef void (* FGCBDestroy       )( void );
+typedef void (* FGCBDestroy       )( void );    /* Used for both window and menu destroy callbacks */
 
 typedef void (* FGCBMultiEntry   )( int, int );
 typedef void (* FGCBMultiButton  )( int, int, int, int, int );

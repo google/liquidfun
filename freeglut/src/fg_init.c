@@ -668,19 +668,19 @@ void FGAPIENTRY glutInitContextProfile( int profile )
 /*
  * Sets the user error handler (note the use of va_list for the args to the fmt)
  */
-void FGAPIENTRY glutInitErrorFunc( void (* vfgError) ( const char *fmt, va_list ap ) )
+void FGAPIENTRY glutInitErrorFunc( FGError callback )
 {
     /* This allows user programs to handle freeglut errors */
-    fgState.ErrorFunc = vfgError;
+    fgState.ErrorFunc = callback;
 }
 
 /*
  * Sets the user warning handler (note the use of va_list for the args to the fmt)
  */
-void FGAPIENTRY glutInitWarningFunc( void (* vfgWarning) ( const char *fmt, va_list ap ) )
+void FGAPIENTRY glutInitWarningFunc( FGWarning callback )
 {
     /* This allows user programs to handle freeglut warnings */
-    fgState.WarningFunc = vfgWarning;
+    fgState.WarningFunc = callback;
 }
 
 /*** END OF FILE ***/

@@ -139,9 +139,10 @@ FGAPI void    FGAPIENTRY glutLeaveFullScreen( void );
  * Window-specific callback functions, see freeglut_callbacks.c
  */
 FGAPI void    FGAPIENTRY glutMouseWheelFunc( void (* callback)( int, int, int, int ) );
+FGAPI void    FGAPIENTRY glutPositionFunc( void (* callback)( int, int ) );
 FGAPI void    FGAPIENTRY glutCloseFunc( void (* callback)( void ) );
 FGAPI void    FGAPIENTRY glutWMCloseFunc( void (* callback)( void ) );
-/* A. Donev: Also a destruction callback for menus */
+/* And also a destruction callback for menus */
 FGAPI void    FGAPIENTRY glutMenuDestroyFunc( void (* callback)( void ) );
 
 /*
@@ -218,15 +219,13 @@ void    glutJoystickGetCenter( int ident, float *axes );
 /*
  * Initialization functions, see freeglut_init.c
  */
+/* to get the typedef for va_list */
+#include <stdarg.h>
 FGAPI void    FGAPIENTRY glutInitContextVersion( int majorVersion, int minorVersion );
 FGAPI void    FGAPIENTRY glutInitContextFlags( int flags );
 FGAPI void    FGAPIENTRY glutInitContextProfile( int profile );
-
-/* to get the typedef for va_list */
-#include <stdarg.h>
-
-FGAPI void    FGAPIENTRY glutInitErrorFunc( void (* vError)( const char *fmt, va_list ap ) );
-FGAPI void    FGAPIENTRY glutInitWarningFunc( void (* vWarning)( const char *fmt, va_list ap ) );
+FGAPI void    FGAPIENTRY glutInitErrorFunc( void (* callback)( const char *fmt, va_list ap ) );
+FGAPI void    FGAPIENTRY glutInitWarningFunc( void (* callback)( const char *fmt, va_list ap ) );
 
 /* OpenGL >= 2.0 support */
 FGAPI void    FGAPIENTRY glutSetVertexAttribCoord3(GLint attrib);

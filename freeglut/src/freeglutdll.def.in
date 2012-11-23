@@ -55,6 +55,7 @@ EXPORTS
 	glutKeyboardFunc
 	glutSpecialFunc
 	glutReshapeFunc
+    glutPositionFunc
 	glutVisibilityFunc
 	glutDisplayFunc
 	glutMouseFunc
