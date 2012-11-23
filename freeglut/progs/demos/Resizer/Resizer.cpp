@@ -12,7 +12,8 @@ GLboolean bChildPosDone = GL_FALSE, bChildSizeDone = GL_FALSE;
 
 void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY );
 void Redisplay();
-void Reshape(int x, int y);
+void Reshape(int width, int height);
+void Position(int x, int y);
 
 
 
@@ -117,6 +118,7 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
             glutKeyboardFunc( SampleKeyboard );
             glutDisplayFunc( Redisplay );
             glutReshapeFunc( Reshape );
+            glutPositionFunc( Position );
         }
         else
         {

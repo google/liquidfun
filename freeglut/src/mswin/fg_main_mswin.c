@@ -432,6 +432,18 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
             SFG_Window* saved_window = fgStructure.CurrentWindow;
             RECT windowRect;
             GetWindowRect( window->Window.Handle, &windowRect );
+            
+            if (window->Parent)
+            {
+                /* For child window, we should return relative to upper-left
+                * of parent's client area.
+                */
+                POINT topleft = {windowRect.left,windowRect.top};
+
+                ScreenToClient(window->Parent->Window.Handle,&topleft);
+                windowRect.left = topleft.x;
+                windowRect.top  = topleft.y;
+            }
 
             INVOKE_WCB( *window, Position, ( windowRect.left, windowRect.top ) );
             fgSetWindow(saved_window);
