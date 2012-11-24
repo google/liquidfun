@@ -203,7 +203,6 @@ typedef void (* FGCBMotion        )( int, int );
 typedef void (* FGCBPassive       )( int, int );
 typedef void (* FGCBEntry         )( int );
 typedef void (* FGCBWindowStatus  )( int );
-typedef void (* FGCBSelect        )( int, int, int );
 typedef void (* FGCBJoystick      )( unsigned int, int, int, int );
 typedef void (* FGCBOverlayDisplay)( void );
 typedef void (* FGCBSpaceMotion   )( int, int, int );
