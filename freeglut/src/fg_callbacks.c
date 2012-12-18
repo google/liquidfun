@@ -115,7 +115,7 @@ do                                                              \
 #define IMPLEMENT_CALLBACK_FUNC_2NAME(a,b)                      \
 void FGAPIENTRY glut##a##Func( FGCB##b callback )               \
 {                                                               \
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glut"###a##"Func" );    \
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glut"#a"Func" );    \
     SET_CALLBACK( b );                                          \
 }
 #define IMPLEMENT_CALLBACK_FUNC(a) IMPLEMENT_CALLBACK_FUNC_2NAME(a,a)
