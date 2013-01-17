@@ -215,7 +215,7 @@ void fgHandleExtensionEvents( XEvent* base_ev )
             std_ev.xbutton.y = event->event_y;
             std_ev.xbutton.x_root = event->root_x;
             std_ev.xbutton.y_root = event->root_y;
-            std_ev.xbutton.state = BUTTON_MASK(*(unsigned int*)event->buttons.mask);
+            std_ev.xbutton.state = event->mods.base;
             std_ev.xbutton.button = event->detail;
 
             XPutBackEvent(fgDisplay.pDisplay.Display, &std_ev);
