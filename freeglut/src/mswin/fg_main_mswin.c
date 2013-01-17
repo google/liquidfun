@@ -128,10 +128,12 @@ void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 
 void fgPlatformDisplayWindow ( SFG_Window *window )
 {
-    RedrawWindow(
+    int success = RedrawWindow(
         window->Window.Handle, NULL, NULL,
         RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
     );
+
+    printf("RedrawWindow (window %p): %i\n",window,success);
 }
 
 
@@ -409,6 +411,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
         }
 
 #endif /* defined(_WIN32_WCE) */
+
+        window->State.Redisplay = GL_TRUE;
+        printf("create set redisplay\n");
         break;
 
     case WM_SIZE:
@@ -523,6 +528,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_PAINT:
         /* Turn on the visibility in case it was turned off somehow */
+        printf("WM_PAINT received\n");
         window->State.Visible = GL_TRUE;
         InvalidateRect( hWnd, NULL, GL_FALSE ); /* Make sure whole window is repainted. Bit of a hack, but a safe one from what google turns up... */
         BeginPaint( hWnd, &ps );

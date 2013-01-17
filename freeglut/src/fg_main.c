@@ -103,8 +103,10 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 void fghRedrawWindow ( SFG_Window *window )
 {
     SFG_Window *current_window = fgStructure.CurrentWindow;
+    printf("fghRedrawWindow\n");
 
     freeglut_return_if_fail( window );
+    printf("got window\n");
 
     if( window->State.NeedToInitContext ) {
         INVOKE_WCB( *window, InitContext, ());
@@ -112,10 +114,12 @@ void fghRedrawWindow ( SFG_Window *window )
     }
 
     freeglut_return_if_fail( FETCH_WCB ( *window, Display ) );
+    printf("got displayCB\n");
 
     window->State.Redisplay = GL_FALSE;
 
     freeglut_return_if_fail( window->State.Visible );
+    printf("we're visible\n");
 
     fgSetWindow( window );
 
@@ -134,6 +138,7 @@ void fghRedrawWindow ( SFG_Window *window )
         );
     }
 
+    printf("invoking displayCB\n");
     INVOKE_WCB( *window, Display, ( ) );
 
     fgSetWindow( current_window );
@@ -143,10 +148,12 @@ void fghRedrawWindow ( SFG_Window *window )
 static void fghcbDisplayWindow( SFG_Window *window,
                                 SFG_Enumerator *enumerator )
 {
+    printf("window %p, %i\n",window,window->State.Redisplay);
     if( window->State.Redisplay &&
         window->State.Visible )
     {
         window->State.Redisplay = GL_FALSE;
+        printf("redisplaying...\n");
 		fgPlatformDisplayWindow ( window );
     }
 
