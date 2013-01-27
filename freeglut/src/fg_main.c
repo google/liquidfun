@@ -261,7 +261,7 @@ void fgError( const char *fmt, ... )
         va_end( ap );
 
     } else {
-
+#if FREEGLUT_ERRORS
         va_start( ap, fmt );
 
         fprintf( stderr, "freeglut ");
@@ -271,6 +271,7 @@ void fgError( const char *fmt, ... )
         fprintf( stderr, "\n" );
 
         va_end( ap );
+#endif
 
         if ( fgState.Initialised )
             fgDeinitialize ();
@@ -293,7 +294,7 @@ void fgWarning( const char *fmt, ... )
         va_end( ap );
 
     } else {
-
+#if FREEGLUT_WARNINGS
         va_start( ap, fmt );
 
         fprintf( stderr, "freeglut ");
@@ -303,6 +304,7 @@ void fgWarning( const char *fmt, ... )
         fprintf( stderr, "\n" );
 
         va_end( ap );
+#endif
     }
 }
 
