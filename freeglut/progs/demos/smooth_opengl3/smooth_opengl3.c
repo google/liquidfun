@@ -153,9 +153,19 @@ void initExtensionEntries(void)
 {
    gl_GenVertexArrays = (PFNGLGENVERTEXARRAYSPROC) glutGetProcAddress ("glGenVertexArrays");
    gl_BindVertexArray = (PFNGLBINDVERTEXARRAYPROC) glutGetProcAddress ("glBindVertexArray");
+   if (!gl_GenVertexArrays || !gl_BindVertexArray)
+   {
+       fprintf (stderr, "glGenVertexArrays or glBindVertexArray not found");
+       exit(1);
+   }
    gl_GenBuffers = (PFNGLGENBUFFERSPROC) glutGetProcAddress ("glGenBuffers");
    gl_BindBuffer = (PFNGLBINDBUFFERPROC) glutGetProcAddress ("glBindBuffer");
    gl_BufferData = (PFNGLBUFFERDATAPROC) glutGetProcAddress ("glBufferData");
+   if (!gl_GenBuffers || !gl_BindBuffer || !gl_BufferData)
+   {
+       fprintf (stderr, "glGenBuffers, glBindBuffer or glBufferData not found");
+       exit(1);
+   }
    gl_CreateShader = (PFNGLCREATESHADERPROC) glutGetProcAddress ("glCreateShader");
    gl_ShaderSource = (PFNGLSHADERSOURCEPROC) glutGetProcAddress ("glShaderSource");
    gl_CompileShader = (PFNGLCOMPILESHADERPROC) glutGetProcAddress ("glCompileShader");
@@ -172,6 +182,11 @@ void initExtensionEntries(void)
    gl_EnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC) glutGetProcAddress ("glEnableVertexAttribArray");
    gl_GetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) glutGetProcAddress ("glGetUniformLocation");
    gl_UniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC) glutGetProcAddress ("glUniformMatrix4fv");
+   if (!gl_CreateShader || !gl_ShaderSource || !gl_CompileShader || !gl_CreateProgram || !gl_AttachShader || !gl_LinkProgram || !gl_UseProgram || !gl_GetShaderiv || !gl_GetShaderInfoLog || !gl_GetProgramiv || !gl_GetProgramInfoLog || !gl_GetAttribLocation || !gl_VertexAttribPointer || !gl_EnableVertexAttribArray || !gl_GetUniformLocation || !gl_UniformMatrix4fv)
+   {
+       fprintf (stderr, "glCreateShader, glShaderSource, glCompileShader, glCreateProgram, glAttachShader, glLinkProgram, glUseProgram, glGetShaderiv, glGetShaderInfoLog, glGetProgramiv, glGetProgramInfoLog, glGetAttribLocation, glVertexAttribPointer, glEnableVertexAttribArray, glGetUniformLocation or glUniformMatrix4fv not found");
+       exit(1);
+   }
 }
 
 /* vertex array data for a colored 2D triangle, consisting of RGB color values
