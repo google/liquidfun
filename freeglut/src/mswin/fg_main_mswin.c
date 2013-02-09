@@ -135,21 +135,38 @@ void fgPlatformDisplayWindow ( SFG_Window *window )
 }
 
 
-fg_time_t fgPlatformSystemTime ( void )
+/* Get system time, taking special precautions against 32bit timer wrap.
+   We use timeGetTime and not GetTickCount because of its better stability,
+   and because we can increase its granularity (to 1 ms in
+   fgPlatformInitialize). For that reason we can't use GetTickCount64 which
+   wouldn't have the wrap issue.
+   Credit: this is based on code in glibc (https://mail.gnome.org/archives/commits-list/2011-November/msg04588.html)
+   */
+static fg_time_t lastTime32 = 0;
+static fg_time_t timeEpoch = 0;
+void fgPlatformInitSystemTime()
 {
 #if defined(_WIN32_WCE)
-    return GetTickCount();
+    lastTime32 = GetTickCount();
 #else
-    /* TODO: do this with QueryPerformanceCounter as timeGetTime has
-     * insufficient resolution (only about 5 ms on system under low load).
-     * See:
-     * http://msdn.microsoft.com/en-us/library/windows/desktop/dd757629(v=vs.85).aspx
-     * Or maybe QueryPerformanceCounter is not a good idea either, see
-     * http://old.nabble.com/Re%3A-glutTimerFunc-does-not-detect-if-system-time-moved-backward-p33479674.html
-     * for some other ideas (at bottom)...
-     */
-    return timeGetTime();
+    lastTime32 = timeGetTime();
 #endif
+}
+fg_time_t fgPlatformSystemTime ( void )
+{
+    fg_time_t currTime32;
+#if defined(_WIN32_WCE)
+    currTime32 = GetTickCount();
+#else
+    currTime32 = timeGetTime();
+#endif
+    /* Check if we just wrapped */
+    if (currTime32 < lastTime32)
+        timeEpoch++;
+    
+    lastTime32 = currTime32;
+
+    return currTime32 | timeEpoch << 32;
 }
 
 

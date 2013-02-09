@@ -341,9 +341,6 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
 
     fgCreateStructure( );
 
-    /* Get start time */
-    fgState.Time = fgSystemTime();
-
 	fghParseCommandLineArguments ( pargc, argv, &displayName, &geometry );
 
     /*

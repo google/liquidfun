@@ -136,6 +136,12 @@ int FGAPIENTRY glutGet( GLenum eWhat )
     case GLUT_INIT_STATE:
         return fgState.Initialised;
 
+    /* Although internally the time store is 64bits wide, the return value
+     * here still wraps every 49.7 days. Integer overflows cancel however
+     * when subtracting an initial start time, unless the total time exceeds
+     * 32-bit, so you can still work with this.
+     * XXX: a glutGet64 to return the time might be an idea...
+     */
     case GLUT_ELAPSED_TIME:
         return (int) fgElapsedTime();
     }

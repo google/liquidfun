@@ -224,12 +224,8 @@ static void fghCheckTimers( void )
 /* Platform-dependent time in milliseconds, as an unsigned 64-bit integer.
  * This doesn't overflow in any reasonable time, so no need to worry about
  * that. The GLUT API return value will however overflow after 49.7 days,
- * and on Windows we (currently) do not have access to a 64-bit timestamp,
- * which means internal time will still get in trouble when running the
+ * which means you will still get in trouble when running the
  * application for more than 49.7 days.
- * This value wraps every 49.7 days, but integer overflows cancel
- * when subtracting an initial start time, unless the total time exceeds
- * 32-bit, where the GLUT API return value is also overflowed.
  */  
 fg_time_t fgSystemTime(void)
 {

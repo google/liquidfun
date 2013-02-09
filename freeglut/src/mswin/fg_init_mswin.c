@@ -33,6 +33,7 @@
 
 extern LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg,
                                WPARAM wParam, LPARAM lParam );
+extern void fgPlatformInitSystemTime();
 
 
 /*
@@ -117,6 +118,10 @@ void fgPlatformInitialize( const char* displayName )
     }
     /* Set the timer granularity to 1 ms */
     timeBeginPeriod ( 1 );
+    /* Init setup to deal with timer wrap, can't query system time before this is done */
+    fgPlatformInitSystemTime();
+    /* Get start time */
+    fgState.Time = fgSystemTime();
 
 
     fgState.Initialised = GL_TRUE;
