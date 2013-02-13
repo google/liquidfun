@@ -32,6 +32,8 @@
 #include "egl/fg_window_egl.h"
 #include <android/native_app_glue/android_native_app_glue.h>
 
+extern void fghRedrawWindow(SFG_Window *window);
+
 /*
  * Opens a window. Requires a SFG_Window object created and attached
  * to the freeglut structure. OpenGL context is created here.
@@ -83,6 +85,22 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
   fghPlatformOpenWindowEGL(window);
 
   window->State.Visible = GL_TRUE;
+}
+
+/*
+ * Request a window resize
+ */
+void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
+{
+  fprintf(stderr, "fgPlatformReshapeWindow: STUB\n");
+}
+
+/*
+ * A static helper function to execute display callback for a window
+ */
+void fgPlatformDisplayWindow ( SFG_Window *window )
+{
+  fghRedrawWindow ( window ) ;
 }
 
 /*

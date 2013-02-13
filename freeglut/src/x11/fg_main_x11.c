@@ -40,7 +40,6 @@
 #    define VFPRINTF(s,f,a)
 #endif
 
-#include "fg_main.h"
 
 /*
  * Try to get the maximum value allowed for ints, falling back to the minimum
@@ -72,25 +71,6 @@ static Bool match_motion(Display *dpy, XEvent *xev, XPointer arg);
  */
  
  
-/*
- * Request a window resize
- */
-void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
-{
-    XResizeWindow( fgDisplay.pDisplay.Display, window->Window.Handle,
-                   width, height );
-    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
-}
-
-
-/*
- * A static helper function to execute display callback for a window
- */
-void fgPlatformDisplayWindow ( SFG_Window *window )
-{
-        fghRedrawWindow ( window ) ;
-}
-
 
 fg_time_t fgPlatformSystemTime ( void )
 {

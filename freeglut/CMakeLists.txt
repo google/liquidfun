@@ -67,7 +67,6 @@ SET(FREEGLUT_SRCS
     src/fg_input_devices.c
     src/fg_joystick.c
     src/fg_main.c
-    src/fg_main.h
     src/fg_misc.c
     src/fg_overlay.c
     src/fg_spaceball.c

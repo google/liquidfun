@@ -28,7 +28,6 @@
 
 #include <GL/freeglut.h>
 #include "fg_internal.h"
-#include "fg_main.h"
 #include "egl/fg_window_egl.h"
 
 #include <android/log.h>
@@ -137,22 +136,6 @@ static unsigned char key_ascii(struct android_app* app, AInputEvent* event) {
   (*vm)->DetachCurrentThread(vm);
 
   return ascii;
-}
-
-/*
- * Request a window resize
- */
-void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
-{
-  fprintf(stderr, "fgPlatformReshapeWindow: STUB\n");
-}
-
-/*
- * A static helper function to execute display callback for a window
- */
-void fgPlatformDisplayWindow ( SFG_Window *window )
-{
-  fghRedrawWindow ( window ) ;
 }
 
 unsigned long fgPlatformSystemTime ( void )

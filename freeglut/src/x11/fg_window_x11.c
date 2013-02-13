@@ -32,6 +32,8 @@
 #include <unistd.h>  /* usleep */
 #include "../fg_internal.h"
 
+extern void fghRedrawWindow(SFG_Window *window);
+
 #ifdef EGL_VERSION_1_0
 #include "egl/fg_window_egl.h"
 #define fghCreateNewContext fghCreateNewContextEGL
@@ -366,6 +368,26 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     if( !isSubWindow)
         XPeekIfEvent( fgDisplay.pDisplay.Display, &eventReturnBuffer, &fghWindowIsVisible, (XPointer)(window->Window.Handle) );
 #undef WINDOW_CONFIG
+}
+
+
+/*
+ * Request a window resize
+ */
+void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
+{
+    XResizeWindow( fgDisplay.pDisplay.Display, window->Window.Handle,
+                   width, height );
+    XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
+}
+
+
+/*
+ * A static helper function to execute display callback for a window
+ */
+void fgPlatformDisplayWindow ( SFG_Window *window )
+{
+        fghRedrawWindow ( window ) ;
 }
 
 

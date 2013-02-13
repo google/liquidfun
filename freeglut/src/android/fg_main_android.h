@@ -30,8 +30,6 @@
 #include "fg_internal.h"
 
 extern void fgPlatformProcessSingleEvent(void);
-extern void fgPlatformReshapeWindow(SFG_Window *window, int width, int height);
-extern void fgPlatformDisplayWindow(SFG_Window *window);
 extern unsigned long fgPlatformSystemTime(void);
 extern void fgPlatformSleepForEvents(long msec);
 extern void fgPlatformMainLoopPreliminaryWork(void);
