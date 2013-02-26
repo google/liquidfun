@@ -103,12 +103,18 @@ static void display(void)
     glDisable(GL_LIGHTING);
     glColor3d(0.1,0.1,0.4);
 
-	if (win == mainwin) {
+	if (win == mainwin)
+    {
 	    shapesPrintf (2, 3, "Move The mouse into different windows");
 	    shapesPrintf (3, 3, "pressing keys will add to the string");
+        shapesPrintf (5, 3, "Window: %d", win);
+        shapesPrintf (6, 3, "String: %s", strings[win]);
     }
-    shapesPrintf (5, 3, "Window: %d", win);
-    shapesPrintf (6, 3, "String: %s", strings[win]);
+    else
+    {
+        shapesPrintf (1, 3, "Window: %d", win);
+        shapesPrintf (2, 3, "String: %s", strings[win]);
+    }
 
     glutSwapBuffers();
 }
@@ -163,7 +169,7 @@ entry(int state)
 int
 main(int argc, char *argv[])
 {
-	int winmax,sw1,sw2,i;
+	int winmax,sw1,sw2,sw2sw,i;
 	
     glutInitWindowSize(640,480);
     glutInitWindowPosition(40,40);
@@ -201,7 +207,16 @@ main(int argc, char *argv[])
     glutSpecialFunc(special);
     glutEntryFunc(entry);
     glClearColor(0.7f,0.7f,0.7f,1);
-	winmax = sw2 > winmax ? sw2 : winmax;
+    winmax = sw2 > winmax ? sw2 : winmax;
+
+    sw2sw=glutCreateSubWindow(sw2,10,128,294,98);
+    glutReshapeFunc(resize);
+    glutDisplayFunc(display);
+    glutKeyboardFunc(key);
+    glutSpecialFunc(special);
+    glutEntryFunc(entry);
+    glClearColor(0.4f,0.4f,0.4f,1);
+    winmax = sw2sw > winmax ? sw2sw : winmax;
 
 	strings = malloc(sizeof(char *)*(winmax+1));
 	for (i=0;i<winmax+1;i++) {
