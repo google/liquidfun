@@ -170,7 +170,7 @@ static int fgPlatformGetModifiers (void)
             ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 }
 
-static void fghKeyPress(SFG_Window *window, GLboolean keydown, WPARAM wParam, LPARAM lParam)
+static LRESULT fghKeyPress(SFG_Window *window, UINT uMsg, GLboolean keydown, WPARAM wParam, LPARAM lParam)
 {
     static unsigned char lControl = 0, lShift = 0, lAlt = 0,
                          rControl = 0, rShift = 0, rAlt = 0;
@@ -180,7 +180,7 @@ static void fghKeyPress(SFG_Window *window, GLboolean keydown, WPARAM wParam, LP
     
     /* if keydown, check for repeat */
     if( keydown && ( fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE ) && (HIWORD(lParam) & KF_REPEAT) )
-        return;
+        return 1;
     
     /* Remember the current modifiers state so user can query it from their callback */
     fgState.Modifiers = fgPlatformGetModifiers( );
@@ -315,6 +315,12 @@ static void fghKeyPress(SFG_Window *window, GLboolean keydown, WPARAM wParam, LP
             );
 
     fgState.Modifiers = INVALID_MODIFIERS;
+
+    /* SYSKEY events should be sent to default window proc for system to handle them */
+    if (uMsg==WM_SYSKEYDOWN || uMsg==WM_SYSKEYUP)
+        return DefWindowProc( window->Window.Handle, uMsg, wParam, lParam );
+    else
+        return 1;
 }
 
 /*
@@ -787,14 +793,14 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_KEYDOWN:
         if (child_window)
             window = child_window;
-        fghKeyPress(window,GL_TRUE,wParam,lParam);
+        lRet = fghKeyPress(window,uMsg,GL_TRUE,wParam,lParam);
     break;
 
     case WM_SYSKEYUP:
     case WM_KEYUP:
         if (child_window)
             window = child_window;
-        fghKeyPress(window,GL_FALSE,wParam,lParam);
+        lRet = fghKeyPress(window,uMsg,GL_FALSE,wParam,lParam);
     break;
 
     case WM_SYSCHAR:
