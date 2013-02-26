@@ -980,7 +980,6 @@ void fgPlatformGlutFullScreen( SFG_Window *win )
 
     {
 #if(WINVER >= 0x0500) /* Windows 2000 or later */
-        DWORD s;
         RECT rect;
         HMONITOR hMonitor;
         MONITORINFO mi;
@@ -992,16 +991,25 @@ void fgPlatformGlutFullScreen( SFG_Window *win )
          */
 
         
-        /* store current window rect */
+        /* save current window rect, style, exstyle and maximized state */
+        win->State.pWState.OldMaximized = !!IsZoomed(win->Window.Handle);
+        if (win->State.pWState.OldMaximized)
+            /* We force the window into restored mode before going
+             * fullscreen because Windows doesn't seem to hide the
+             * taskbar if the window is in the maximized state.
+             */
+            SendMessage(win->Window.Handle, WM_SYSCOMMAND, SC_RESTORE, 0);
+
         GetWindowRect( win->Window.Handle, &win->State.pWState.OldRect );
+        win->State.pWState.OldStyle   = GetWindowLong(win->Window.Handle, GWL_STYLE);
+        win->State.pWState.OldStyleEx = GetWindowLong(win->Window.Handle, GWL_EXSTYLE);
 
-        /* store current window style */
-        win->State.pWState.OldStyle = s = GetWindowLong(win->Window.Handle, GWL_STYLE);
-
-        /* remove decorations from style and add popup style*/
-        s &= ~WS_OVERLAPPEDWINDOW;
-        s |= WS_POPUP;
-        SetWindowLong(win->Window.Handle, GWL_STYLE, s);
+        /* remove decorations from style */
+        SetWindowLong(win->Window.Handle, GWL_STYLE,
+                      win->State.pWState.OldStyle & ~(WS_CAPTION | WS_THICKFRAME));
+        SetWindowLong(win->Window.Handle, GWL_EXSTYLE,
+                      win->State.pWState.OldStyleEx & ~(WS_EX_DLGMODALFRAME |
+                      WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
 
         /* For fullscreen mode, find the monitor that is covered the most
          * by the window and get its rect as the resize target.
@@ -1063,6 +1071,7 @@ void fgPlatformGlutLeaveFullScreen( SFG_Window *win )
 
     /* restore style of window before making it fullscreen */
     SetWindowLong(win->Window.Handle, GWL_STYLE, win->State.pWState.OldStyle);
+    SetWindowLong(win->Window.Handle, GWL_EXSTYLE, win->State.pWState.OldStyleEx);
 
     /* Then resize */
     SetWindowPos(win->Window.Handle,
@@ -1074,6 +1083,9 @@ void fgPlatformGlutLeaveFullScreen( SFG_Window *win )
         SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
         SWP_NOZORDER
         );
+
+    if (win->State.pWState.OldMaximized)
+        SendMessage(win->Window.Handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
     win->State.IsFullscreen = GL_FALSE;
 #endif

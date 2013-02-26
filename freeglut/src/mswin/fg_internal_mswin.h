@@ -91,8 +91,10 @@ struct tagSFG_PlatformContext
 typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
 struct tagSFG_PlatformWindowState
 {
-    RECT            OldRect;            /* window rect  - stored before the window is made fullscreen */
-    DWORD           OldStyle;           /* window style - stored before the window is made fullscreen */
+    RECT            OldRect;            /* window rect     - stored before the window is made fullscreen */
+    DWORD           OldStyle;           /* window style    - stored before the window is made fullscreen */
+    DWORD           OldStyleEx;         /* window Ex style - stored before the window is made fullscreen */
+    BOOL            OldMaximized;       /* window maximized state - stored before the window is made fullscreen */
 };
 
 
