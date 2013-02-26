@@ -170,7 +170,7 @@ static int fgPlatformGetModifiers (void)
             ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 }
 
-static LRESULT fghKeyPress(SFG_Window *window, UINT uMsg, GLboolean keydown, WPARAM wParam, LPARAM lParam)
+static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean keydown, WPARAM wParam, LPARAM lParam)
 {
     static unsigned char lControl = 0, lShift = 0, lAlt = 0,
                          rControl = 0, rShift = 0, rAlt = 0;
@@ -793,14 +793,14 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_KEYDOWN:
         if (child_window)
             window = child_window;
-        lRet = fghKeyPress(window,uMsg,GL_TRUE,wParam,lParam);
+        lRet = fghWindowProcKeyPress(window,uMsg,GL_TRUE,wParam,lParam);
     break;
 
     case WM_SYSKEYUP:
     case WM_KEYUP:
         if (child_window)
             window = child_window;
-        lRet = fghKeyPress(window,uMsg,GL_FALSE,wParam,lParam);
+        lRet = fghWindowProcKeyPress(window,uMsg,GL_FALSE,wParam,lParam);
     break;
 
     case WM_SYSCHAR:
