@@ -170,15 +170,158 @@ static int fgPlatformGetModifiers (void)
             ( GetKeyState( VK_RMENU    ) < 0 )) ? GLUT_ACTIVE_ALT   : 0 );
 }
 
+static void fghKeyPress(SFG_Window *window, GLboolean keydown, WPARAM wParam, LPARAM lParam)
+{
+    static unsigned char lControl = 0, lShift = 0, lAlt = 0,
+                         rControl = 0, rShift = 0, rAlt = 0;
+
+    int keypress = -1;
+    POINT mouse_pos ;
+    
+    /* if keydown, check for repeat */
+    if( keydown && ( fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE ) && (HIWORD(lParam) & KF_REPEAT) )
+        return;
+    
+    /* Remember the current modifiers state so user can query it from their callback */
+    fgState.Modifiers = fgPlatformGetModifiers( );
+
+    /* Get mouse position roughly at time of keypress */
+    GetCursorPos( &mouse_pos );
+    ScreenToClient( window->Window.Handle, &mouse_pos );
+    window->State.MouseX = mouse_pos.x;
+    window->State.MouseY = mouse_pos.y;
+
+    /* Convert the Win32 keystroke codes to GLUTtish way */
+#   define KEY(a,b) case a: keypress = b; break;
+
+    switch( wParam )
+    {
+        KEY( VK_F1,     GLUT_KEY_F1        );
+        KEY( VK_F2,     GLUT_KEY_F2        );
+        KEY( VK_F3,     GLUT_KEY_F3        );
+        KEY( VK_F4,     GLUT_KEY_F4        );
+        KEY( VK_F5,     GLUT_KEY_F5        );
+        KEY( VK_F6,     GLUT_KEY_F6        );
+        KEY( VK_F7,     GLUT_KEY_F7        );
+        KEY( VK_F8,     GLUT_KEY_F8        );
+        KEY( VK_F9,     GLUT_KEY_F9        );
+        KEY( VK_F10,    GLUT_KEY_F10       );
+        KEY( VK_F11,    GLUT_KEY_F11       );
+        KEY( VK_F12,    GLUT_KEY_F12       );
+        KEY( VK_PRIOR,  GLUT_KEY_PAGE_UP   );
+        KEY( VK_NEXT,   GLUT_KEY_PAGE_DOWN );
+        KEY( VK_HOME,   GLUT_KEY_HOME      );
+        KEY( VK_END,    GLUT_KEY_END       );
+        KEY( VK_LEFT,   GLUT_KEY_LEFT      );
+        KEY( VK_UP,     GLUT_KEY_UP        );
+        KEY( VK_RIGHT,  GLUT_KEY_RIGHT     );
+        KEY( VK_DOWN,   GLUT_KEY_DOWN      );
+        KEY( VK_INSERT, GLUT_KEY_INSERT    );
+
+    /* handle control, alt and shift. For GLUT, we want to distinguish between left and right presses.
+     * The VK_L* & VK_R* left and right Alt, Ctrl and Shift virtual keys are however only used as parameters to GetAsyncKeyState() and GetKeyState()
+     * so when we get an alt, shift or control keypress here, we manually check whether it was the left or the right
+     */
+#define ASYNC_KEY_EVENT(winKey,glutKey,keyStateVar)\
+    if (!keyStateVar && GetAsyncKeyState ( winKey ))\
+    {\
+        keypress   = glutKey;\
+        keyStateVar = 1;\
+    }\
+    else if (keyStateVar && !GetAsyncKeyState ( winKey ))\
+    {\
+        keypress   = glutKey;\
+        keyStateVar = 0;\
+    }
+    case VK_CONTROL:
+        ASYNC_KEY_EVENT(VK_LCONTROL,GLUT_KEY_CTRL_L,lControl);
+        ASYNC_KEY_EVENT(VK_RCONTROL,GLUT_KEY_CTRL_R,rControl);
+        break;
+    case VK_SHIFT:
+        ASYNC_KEY_EVENT(VK_LSHIFT,GLUT_KEY_SHIFT_L,lShift);
+        ASYNC_KEY_EVENT(VK_RSHIFT,GLUT_KEY_SHIFT_R,rShift);
+        break;
+    case VK_MENU:
+        ASYNC_KEY_EVENT(VK_LMENU,GLUT_KEY_ALT_L,lAlt);
+        ASYNC_KEY_EVENT(VK_RMENU,GLUT_KEY_ALT_R,rAlt);
+        break;
+#undef ASYNC_KEY_EVENT
+
+    case VK_DELETE:
+        /* The delete key should be treated as an ASCII keypress: */
+        if (keydown)
+            INVOKE_WCB( *window, Keyboard,
+                        ( 127, window->State.MouseX, window->State.MouseY )
+            );
+        else
+            INVOKE_WCB( *window, KeyboardUp,
+                        ( 127, window->State.MouseX, window->State.MouseY )
+            );
+        break;
+
+#if !defined(_WIN32_WCE)
+    default:
+        /* keydown displayable characters are handled with WM_CHAR message, but no corresponding up is generated. So get that here. */
+        if (!keydown)
+        {
+            BYTE state[ 256 ];
+            WORD code[ 2 ];
+
+            GetKeyboardState( state );
+
+            if( ToAscii( (UINT)wParam, 0, state, code, 0 ) == 1 )
+                wParam=code[ 0 ];
+
+            INVOKE_WCB( *window, KeyboardUp,
+                   ( (char)wParam,
+                        window->State.MouseX, window->State.MouseY )
+            );
+        }
+#endif
+    }
+
+#if defined(_WIN32_WCE)
+    if(keydown && !(lParam & 0x40000000)) /* Prevent auto-repeat */
+    {
+        if(wParam==(unsigned)gxKeyList.vkRight)
+            keypress = GLUT_KEY_RIGHT;
+        else if(wParam==(unsigned)gxKeyList.vkLeft)
+            keypress = GLUT_KEY_LEFT;
+        else if(wParam==(unsigned)gxKeyList.vkUp)
+            keypress = GLUT_KEY_UP;
+        else if(wParam==(unsigned)gxKeyList.vkDown)
+            keypress = GLUT_KEY_DOWN;
+        else if(wParam==(unsigned)gxKeyList.vkA)
+            keypress = GLUT_KEY_F1;
+        else if(wParam==(unsigned)gxKeyList.vkB)
+            keypress = GLUT_KEY_F2;
+        else if(wParam==(unsigned)gxKeyList.vkC)
+            keypress = GLUT_KEY_F3;
+        else if(wParam==(unsigned)gxKeyList.vkStart)
+            keypress = GLUT_KEY_F4;
+    }
+#endif
+    
+    if( keypress != -1 )
+        if (keydown)
+            INVOKE_WCB( *window, Special,
+                        ( keypress,
+                            window->State.MouseX, window->State.MouseY )
+            );
+        else
+            INVOKE_WCB( *window, SpecialUp,
+                        ( keypress,
+                            window->State.MouseX, window->State.MouseY )
+            );
+
+    fgState.Modifiers = INVALID_MODIFIERS;
+}
+
 /*
  * The window procedure for handling Win32 events
  */
-LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
-                                       LPARAM lParam )
+LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-    static unsigned char lControl = 0, rControl = 0, lShift = 0,
-                         rShift = 0, lAlt = 0, rAlt = 0;
-
     SFG_Window *window, *child_window = NULL;
     PAINTSTRUCT ps;
     LRESULT lRet = 1;
@@ -214,52 +357,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 child_window = temp_window;
         }
     }
-
-    if ( window )
-    {
-      SFG_Window* temp_window = child_window?child_window:window;
-
-      fgState.Modifiers = fgPlatformGetModifiers( );
-
-      /* Checking for CTRL, ALT, and SHIFT key positions:  Key Down! */
-#define SPECIAL_KEY_DOWN(winKey,glutKey,winProcVar)\
-      if ( !winProcVar && GetAsyncKeyState ( winKey ) )\
-      {\
-          INVOKE_WCB  ( *temp_window, Special,\
-              ( glutKey, temp_window->State.MouseX, temp_window->State.MouseY )\
-              );\
-          winProcVar = 1;\
-      }
-
-      SPECIAL_KEY_DOWN(VK_LCONTROL,GLUT_KEY_CTRL_L ,lControl);
-      SPECIAL_KEY_DOWN(VK_RCONTROL,GLUT_KEY_CTRL_R ,rControl);
-      SPECIAL_KEY_DOWN(VK_LSHIFT  ,GLUT_KEY_SHIFT_L,lShift);
-      SPECIAL_KEY_DOWN(VK_RSHIFT  ,GLUT_KEY_SHIFT_R,rShift);
-      SPECIAL_KEY_DOWN(VK_LMENU   ,GLUT_KEY_ALT_L  ,lAlt);
-      SPECIAL_KEY_DOWN(VK_RMENU   ,GLUT_KEY_ALT_R  ,rAlt);
-#undef SPECIAL_KEY_DOWN
-
-      /* Checking for CTRL, ALT, and SHIFT key positions:  Key Up! */
-#define SPECIAL_KEY_UP(winKey,glutKey,winProcVar)\
-      if ( winProcVar && !GetAsyncKeyState ( winKey ) )\
-      {\
-          INVOKE_WCB  ( *temp_window, SpecialUp,\
-              ( glutKey, temp_window->State.MouseX, temp_window->State.MouseY )\
-              );\
-          winProcVar = 0;\
-      }
-
-      SPECIAL_KEY_UP(VK_LCONTROL,GLUT_KEY_CTRL_L ,lControl);
-      SPECIAL_KEY_UP(VK_RCONTROL,GLUT_KEY_CTRL_R ,rControl);
-      SPECIAL_KEY_UP(VK_LSHIFT  ,GLUT_KEY_SHIFT_L,lShift);
-      SPECIAL_KEY_UP(VK_RSHIFT  ,GLUT_KEY_SHIFT_R,rShift);
-      SPECIAL_KEY_UP(VK_LMENU   ,GLUT_KEY_ALT_L  ,lAlt);
-      SPECIAL_KEY_UP(VK_RMENU   ,GLUT_KEY_ALT_R  ,rAlt);
-#undef SPECIAL_KEY_UP
-
-      fgState.Modifiers = INVALID_MODIFIERS;
-    }
-
+    
     switch( uMsg )
     {
     case WM_CREATE:
@@ -687,190 +785,16 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
-    {
-        int keypress = -1;
-        POINT mouse_pos ;
-
         if (child_window)
             window = child_window;
-
-        if( ( fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE ) && (HIWORD(lParam) & KF_REPEAT) )
-            break;
-
-        /*
-         * Remember the current modifiers state. This is done here in order
-         * to make sure the VK_DELETE keyboard callback is executed properly.
-         */
-        fgState.Modifiers = fgPlatformGetModifiers( );
-
-        GetCursorPos( &mouse_pos );
-        ScreenToClient( window->Window.Handle, &mouse_pos );
-
-        window->State.MouseX = mouse_pos.x;
-        window->State.MouseY = mouse_pos.y;
-
-        /* Convert the Win32 keystroke codes to GLUTtish way */
-#       define KEY(a,b) case a: keypress = b; break;
-
-        switch( wParam )
-        {
-            KEY( VK_F1,     GLUT_KEY_F1        );
-            KEY( VK_F2,     GLUT_KEY_F2        );
-            KEY( VK_F3,     GLUT_KEY_F3        );
-            KEY( VK_F4,     GLUT_KEY_F4        );
-            KEY( VK_F5,     GLUT_KEY_F5        );
-            KEY( VK_F6,     GLUT_KEY_F6        );
-            KEY( VK_F7,     GLUT_KEY_F7        );
-            KEY( VK_F8,     GLUT_KEY_F8        );
-            KEY( VK_F9,     GLUT_KEY_F9        );
-            KEY( VK_F10,    GLUT_KEY_F10       );
-            KEY( VK_F11,    GLUT_KEY_F11       );
-            KEY( VK_F12,    GLUT_KEY_F12       );
-            KEY( VK_PRIOR,  GLUT_KEY_PAGE_UP   );
-            KEY( VK_NEXT,   GLUT_KEY_PAGE_DOWN );
-            KEY( VK_HOME,   GLUT_KEY_HOME      );
-            KEY( VK_END,    GLUT_KEY_END       );
-            KEY( VK_LEFT,   GLUT_KEY_LEFT      );
-            KEY( VK_UP,     GLUT_KEY_UP        );
-            KEY( VK_RIGHT,  GLUT_KEY_RIGHT     );
-            KEY( VK_DOWN,   GLUT_KEY_DOWN      );
-            KEY( VK_INSERT, GLUT_KEY_INSERT    );
-
-        case VK_LCONTROL:  case VK_RCONTROL:  case VK_CONTROL:
-        case VK_LSHIFT:    case VK_RSHIFT:    case VK_SHIFT:
-        case VK_LMENU:     case VK_RMENU:     case VK_MENU:
-            /* These keypresses and releases are handled earlier in the function */
-            break;
-
-        case VK_DELETE:
-            /* The delete key should be treated as an ASCII keypress: */
-            INVOKE_WCB( *window, Keyboard,
-                        ( 127, window->State.MouseX, window->State.MouseY )
-            );
-        }
-
-#if defined(_WIN32_WCE)
-        if(!(lParam & 0x40000000)) /* Prevent auto-repeat */
-        {
-            if(wParam==(unsigned)gxKeyList.vkRight)
-                keypress = GLUT_KEY_RIGHT;
-            else if(wParam==(unsigned)gxKeyList.vkLeft)
-                keypress = GLUT_KEY_LEFT;
-            else if(wParam==(unsigned)gxKeyList.vkUp)
-                keypress = GLUT_KEY_UP;
-            else if(wParam==(unsigned)gxKeyList.vkDown)
-                keypress = GLUT_KEY_DOWN;
-            else if(wParam==(unsigned)gxKeyList.vkA)
-                keypress = GLUT_KEY_F1;
-            else if(wParam==(unsigned)gxKeyList.vkB)
-                keypress = GLUT_KEY_F2;
-            else if(wParam==(unsigned)gxKeyList.vkC)
-                keypress = GLUT_KEY_F3;
-            else if(wParam==(unsigned)gxKeyList.vkStart)
-                keypress = GLUT_KEY_F4;
-        }
-#endif
-
-        if( keypress != -1 )
-            INVOKE_WCB( *window, Special,
-                        ( keypress,
-                          window->State.MouseX, window->State.MouseY )
-            );
-
-        fgState.Modifiers = INVALID_MODIFIERS;
-    }
+        fghKeyPress(window,GL_TRUE,wParam,lParam);
     break;
 
     case WM_SYSKEYUP:
     case WM_KEYUP:
-    {
-        int keypress = -1;
-        POINT mouse_pos;
-
         if (child_window)
             window = child_window;
-
-        /*
-         * Remember the current modifiers state. This is done here in order
-         * to make sure the VK_DELETE keyboard callback is executed properly.
-         */
-        fgState.Modifiers = fgPlatformGetModifiers( );
-
-        GetCursorPos( &mouse_pos );
-        ScreenToClient( window->Window.Handle, &mouse_pos );
-
-        window->State.MouseX = mouse_pos.x;
-        window->State.MouseY = mouse_pos.y;
-
-        /*
-         * Convert the Win32 keystroke codes to GLUTtish way.
-         * "KEY(a,b)" was defined under "WM_KEYDOWN"
-         */
-
-        switch( wParam )
-        {
-            KEY( VK_F1,     GLUT_KEY_F1        );
-            KEY( VK_F2,     GLUT_KEY_F2        );
-            KEY( VK_F3,     GLUT_KEY_F3        );
-            KEY( VK_F4,     GLUT_KEY_F4        );
-            KEY( VK_F5,     GLUT_KEY_F5        );
-            KEY( VK_F6,     GLUT_KEY_F6        );
-            KEY( VK_F7,     GLUT_KEY_F7        );
-            KEY( VK_F8,     GLUT_KEY_F8        );
-            KEY( VK_F9,     GLUT_KEY_F9        );
-            KEY( VK_F10,    GLUT_KEY_F10       );
-            KEY( VK_F11,    GLUT_KEY_F11       );
-            KEY( VK_F12,    GLUT_KEY_F12       );
-            KEY( VK_PRIOR,  GLUT_KEY_PAGE_UP   );
-            KEY( VK_NEXT,   GLUT_KEY_PAGE_DOWN );
-            KEY( VK_HOME,   GLUT_KEY_HOME      );
-            KEY( VK_END,    GLUT_KEY_END       );
-            KEY( VK_LEFT,   GLUT_KEY_LEFT      );
-            KEY( VK_UP,     GLUT_KEY_UP        );
-            KEY( VK_RIGHT,  GLUT_KEY_RIGHT     );
-            KEY( VK_DOWN,   GLUT_KEY_DOWN      );
-            KEY( VK_INSERT, GLUT_KEY_INSERT    );
-
-          case VK_LCONTROL:  case VK_RCONTROL:  case VK_CONTROL:
-          case VK_LSHIFT:    case VK_RSHIFT:    case VK_SHIFT:
-          case VK_LMENU:     case VK_RMENU:     case VK_MENU:
-              /* These keypresses and releases are handled earlier in the function */
-              break;
-
-          case VK_DELETE:
-              /* The delete key should be treated as an ASCII keypress: */
-              INVOKE_WCB( *window, KeyboardUp,
-                          ( 127, window->State.MouseX, window->State.MouseY )
-              );
-              break;
-
-        default:
-        {
-#if !defined(_WIN32_WCE)
-            BYTE state[ 256 ];
-            WORD code[ 2 ];
-
-            GetKeyboardState( state );
-
-            if( ToAscii( (UINT)wParam, 0, state, code, 0 ) == 1 )
-                wParam=code[ 0 ];
-
-            INVOKE_WCB( *window, KeyboardUp,
-                        ( (char)wParam,
-                          window->State.MouseX, window->State.MouseY )
-            );
-#endif /* !defined(_WIN32_WCE) */
-        }
-        }
-
-        if( keypress != -1 )
-            INVOKE_WCB( *window, SpecialUp,
-                        ( keypress,
-                          window->State.MouseX, window->State.MouseY )
-            );
-
-        fgState.Modifiers = INVALID_MODIFIERS;
-    }
+        fghKeyPress(window,GL_FALSE,wParam,lParam);
     break;
 
     case WM_SYSCHAR:
