@@ -323,6 +323,33 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
         return 1;
 }
 
+void fghWindowUnderCursor(SFG_Window *window, SFG_Window **child_window)
+{
+    /* Check if the current window that the mouse is over is a child window
+     * of the window the message was sent to.
+     */
+    if (window && window->Children.First)
+    {
+        POINT mouse_pos;
+        SFG_WindowHandleType hwnd;
+        SFG_Window* temp_window;
+
+        GetCursorPos( &mouse_pos );
+        ScreenToClient( window->Window.Handle, &mouse_pos );
+        hwnd = ChildWindowFromPoint(window->Window.Handle, mouse_pos);
+        if (hwnd && hwnd!=window->Window.Handle)   /* can be NULL if mouse outside parent by the time we get here, or can be same as parent if we didn't find a child */
+        {
+            temp_window = fgWindowByHandle(hwnd);
+            if (temp_window)    /* Verify we got a FreeGLUT window */
+            {
+                *child_window = temp_window;
+                /* ChildWindowFromPoint only searches immediate children, so search again to see if actually in grandchild or further descendant */
+                fghWindowUnderCursor(temp_window,child_window);
+            }
+        }
+    }
+}
+
 /*
  * The window procedure for handling Win32 events
  */
@@ -347,22 +374,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
      * we make sure that we process callbacks on the child window instead.
      * This mirrors how GLUT does things.
      */
-    if (window && window->Children.First)
-    {
-        POINT mouse_pos;
-        SFG_WindowHandleType hwnd;
-        SFG_Window* temp_window;
-
-        GetCursorPos( &mouse_pos );
-        ScreenToClient( window->Window.Handle, &mouse_pos );
-        hwnd = ChildWindowFromPoint(window->Window.Handle, mouse_pos);
-        if (hwnd)   /* can be NULL if mouse outside parent by the time we get here */
-        {
-            temp_window = fgWindowByHandle(hwnd);
-            if (temp_window && temp_window->Parent)    /* Verify we got a child window */
-                child_window = temp_window;
-        }
-    }
+    fghWindowUnderCursor(window, &child_window);
     
     switch( uMsg )
     {
