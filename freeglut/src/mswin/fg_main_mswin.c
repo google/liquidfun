@@ -324,7 +324,9 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
 void fghWindowUnderCursor(SFG_Window *window, SFG_Window **child_window)
 {
     /* Check if the current window that the mouse is over is a child window
-     * of the window the message was sent to.
+     * of the window the message was sent to. Some events only sent to main window,
+     * and when handling some messages, we need to make sure that we process
+     * callbacks on the child window instead. This mirrors how GLUT does things.
      */
     if (window && window->Children.First)
     {
@@ -357,8 +359,7 @@ void fghWindowUnderCursor(SFG_Window *window, SFG_Window **child_window)
  */
 LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-    SFG_Window *window, *child_window = NULL;
-    PAINTSTRUCT ps;
+    SFG_Window *window;
     LRESULT lRet = 1;
 
     FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Event Handler" ) ;
@@ -371,13 +372,6 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     /* printf ( "Window %3d message <%04x> %12d %12d\n", window?window->ID:0,
              uMsg, wParam, lParam ); */
 
-    /* Some events only sent to main window. Check if the current window that
-     * the mouse is over is a child window. Below when handling some messages,
-     * we make sure that we process callbacks on the child window instead.
-     * This mirrors how GLUT does things.
-     */
-    fghWindowUnderCursor(window, &child_window);
-    
     switch( uMsg )
     {
     case WM_CREATE:
@@ -570,13 +564,16 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         break;
 
     case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
         /* Turn on the visibility in case it was turned off somehow */
         window->State.Visible = GL_TRUE;
         InvalidateRect( hWnd, NULL, GL_FALSE ); /* Make sure whole window is repainted. Bit of a hack, but a safe one from what google turns up... */
         BeginPaint( hWnd, &ps );
         fghRedrawWindow( window );
         EndPaint( hWnd, &ps );
-        break;
+    }
+    break;
 
     case WM_CLOSE:
         fgDestroyWindow ( window );
@@ -737,9 +734,11 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
     case WM_MOUSEWHEEL:
     {
+        SFG_Window *child_window = NULL;
         int wheel_number = LOWORD( wParam );
         short ticks = ( short )HIWORD( wParam );
 
+        fghWindowUnderCursor(window, &child_window);
         if (child_window)
             window = child_window;
 
@@ -797,17 +796,27 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
+    {
+        SFG_Window *child_window = NULL;
+        fghWindowUnderCursor(window, &child_window);
         lRet = fghWindowProcKeyPress(child_window?child_window:window,uMsg,GL_TRUE,wParam,lParam);
+    }
     break;
 
     case WM_SYSKEYUP:
     case WM_KEYUP:
+    {
+        SFG_Window *child_window = NULL;
+        fghWindowUnderCursor(window, &child_window);
         lRet = fghWindowProcKeyPress(child_window?child_window:window,uMsg,GL_FALSE,wParam,lParam);
+    }
     break;
 
     case WM_SYSCHAR:
     case WM_CHAR:
     {
+      SFG_Window *child_window = NULL;
+      fghWindowUnderCursor(window, &child_window);
       if (child_window)
         window = child_window;
 
