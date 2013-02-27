@@ -14,25 +14,26 @@ static int sequence_number = 0 ;
 int windows[2] = {0};
 
 /* define status vars showing whether given callback has been called for given window */
-#define CALLBACK_CALLED_VAR(name)                     int name##_called[2]   = {0};
-#define CALLBACK_0V(name)                             int name##_seq[2]      = {-1}; CALLBACK_CALLED_VAR(name); 
-#define CALLBACK_1V(name,field)                       int name##_##field[2]  = {-1}; CALLBACK_0V(name);
-#define CALLBACK_2V(name,field1,field2)               int name##_##field2[2] = {-1}; CALLBACK_1V(name,field1);
-#define CALLBACK_3V(name,field1,field2,field3)        int name##_##field3[2] = {-1}; CALLBACK_2V(name,field1,field2);
-#define CALLBACK_4V(name,field1,field2,field3,field4) int name##_##field4[2] = {-1}; CALLBACK_3V(name,field1,field2,field3);
+#define CALLBACK_CALLED_VAR(name)                            int name##_called[2]   = {0};
+#define CALLBACK_0V(name)                                    int name##_seq[2]      = {-1}; CALLBACK_CALLED_VAR(name); 
+#define CALLBACK_1V(name,field)                              int name##_##field[2]  = {-1}; CALLBACK_0V(name);
+#define CALLBACK_2V(name,field1,field2)                      int name##_##field2[2] = {-1}; CALLBACK_1V(name,field1);
+#define CALLBACK_3V(name,field1,field2,field3)               int name##_##field3[2] = {-1}; CALLBACK_2V(name,field1,field2);
+#define CALLBACK_4V(name,field1,field2,field3,field4)        int name##_##field4[2] = {-1}; CALLBACK_3V(name,field1,field2,field3);
+#define CALLBACK_5V(name,field1,field2,field3,field4,field5) int name##_##field5[2] = {-1}; CALLBACK_4V(name,field1,field2,field3,field4);
 CALLBACK_2V(reshape,width,height);
 CALLBACK_2V(position,top,left);
-CALLBACK_3V(key,key,x,y);
-CALLBACK_3V(keyup,key,x,y);
-CALLBACK_3V(special,key,x,y);
-CALLBACK_3V(specialup,key,x,y);
 CALLBACK_1V(visibility,vis);
+CALLBACK_4V(key,key,x,y,mod);
+CALLBACK_4V(keyup,key,x,y,mod);
+CALLBACK_4V(special,key,x,y,mod);
+CALLBACK_4V(specialup,key,x,y,mod);
 CALLBACK_4V(joystick,a,b,c,d);
-CALLBACK_4V(mouse,button,updown,x,y);
-CALLBACK_4V(mousewheel,number,direction,x,y);
-CALLBACK_2V(motion,x,y);
-CALLBACK_2V(passivemotion,x,y);
-CALLBACK_0V(entry);
+CALLBACK_5V(mouse,button,updown,x,y,mod);
+CALLBACK_5V(mousewheel,number,direction,x,y,mod);
+CALLBACK_3V(motion,x,y,mod);
+CALLBACK_3V(passivemotion,x,y,mod);
+CALLBACK_1V(entry,state);
 CALLBACK_0V(close);
 /* menudestroy is registered on each menu, not a window */
 int menudestroy_called = 0 ;
@@ -69,6 +70,26 @@ getWindowAndIdx(int *winIdx)
     return window;
 }
 
+static void
+Mod2Text(int mods, char *text)
+{
+    if (mods&GLUT_ACTIVE_CTRL)
+        strcat(text,"CTRL");
+    if (mods&GLUT_ACTIVE_SHIFT)
+        if (text[0])
+            strcat(text,"+SHIFT");
+        else
+            strcat(text,"SHIFT");
+    if (mods&GLUT_ACTIVE_ALT)
+        if (text[0])
+            strcat(text,"+ALT");
+        else
+            strcat(text,"ALT");
+
+    if (!text[0])
+        strcat(text,"none");
+}
+
 static void 
 Display(void)
 {
@@ -88,6 +109,16 @@ Display(void)
   glColor3ub ( 0, 0, 0 );
   glRasterPos2i ( 10, glutGet ( GLUT_WINDOW_HEIGHT ) - 20 );	/* 10pt margin above 10pt letters */
 
+  if ( entry_called[winIdx] )
+  {
+    bitmapPrintf ( "Entry %d:  %d\n", entry_seq[winIdx], entry_state[winIdx] );
+  }
+  
+  if ( visibility_called[winIdx] )
+  {
+    bitmapPrintf ( "Visibility %d:  %d\n", visibility_seq[winIdx], visibility_vis[winIdx] );
+  }
+
   if ( reshape_called[winIdx] )
   {
     bitmapPrintf ( "Reshape %d:  %d %d\n", reshape_seq[winIdx], reshape_width[winIdx], reshape_height[winIdx] );
@@ -100,27 +131,30 @@ Display(void)
 
   if ( key_called[winIdx] )
   {
-    bitmapPrintf ( "Key %d:  %d(%c) %d %d\n", key_seq[winIdx], key_key[winIdx], key_key[winIdx], key_x[winIdx], key_y[winIdx] );
-  }
-
-  if ( special_called[winIdx] )
-  {
-    bitmapPrintf ( "Special %d:  %d(%c) %d %d\n", special_seq[winIdx], special_key[winIdx], special_key[winIdx], special_x[winIdx], special_y[winIdx] );
-  }
-
-  if ( visibility_called[winIdx] )
-  {
-    bitmapPrintf ( "Visibility %d:  %d\n", visibility_seq[winIdx], visibility_vis[winIdx] );
+    char mods[50] = {0};
+    Mod2Text(key_mod[winIdx],mods);
+    bitmapPrintf ( "Key %d:  %d(%c) %d %d (mod: %s)\n", key_seq[winIdx], key_key[winIdx], key_key[winIdx], key_x[winIdx], key_y[winIdx], mods );
   }
 
   if ( keyup_called[winIdx] )
   {
-    bitmapPrintf ( "Key Up %d:  %d(%c) %d %d\n", keyup_seq[winIdx], keyup_key[winIdx], keyup_key[winIdx], keyup_x[winIdx], keyup_y[winIdx] );
+    char mods[50] = {0};
+    Mod2Text(keyup_mod[winIdx],mods);
+    bitmapPrintf ( "Key Up %d:  %d(%c) %d %d (mod: %s)\n", keyup_seq[winIdx], keyup_key[winIdx], keyup_key[winIdx], keyup_x[winIdx], keyup_y[winIdx], mods );
+  }
+
+  if ( special_called[winIdx] )
+  {
+    char mods[50] = {0};
+    Mod2Text(special_mod[winIdx],mods);
+    bitmapPrintf ( "Special %d:  %d(%c) %d %d (mod: %s)\n", special_seq[winIdx], special_key[winIdx], special_key[winIdx], special_x[winIdx], special_y[winIdx], mods );
   }
 
   if ( specialup_called[winIdx] )
   {
-    bitmapPrintf ( "Special Up %d:  %d(%c) %d %d\n", specialup_seq[winIdx], specialup_key[winIdx], specialup_key[winIdx], specialup_x[winIdx], specialup_y[winIdx] );
+    char mods[50] = {0};
+    Mod2Text(specialup_mod[winIdx],mods);
+    bitmapPrintf ( "Special Up %d:  %d(%c) %d %d (mod: %s)\n", specialup_seq[winIdx], specialup_key[winIdx], specialup_key[winIdx], specialup_x[winIdx], specialup_y[winIdx], mods );
   }
 
   if ( joystick_called[winIdx] )
@@ -130,22 +164,30 @@ Display(void)
 
   if ( mouse_called[winIdx] )
   {
-    bitmapPrintf ( "Mouse %d:  %d %d %d %d\n", mouse_seq[winIdx], mouse_button[winIdx], mouse_updown[winIdx], mouse_x[winIdx], mouse_y[winIdx] );
+    char mods[50] = {0};
+    Mod2Text(mouse_mod[winIdx],mods);
+    bitmapPrintf ( "Mouse %d:  %d %d %d %d (mod: %s)\n", mouse_seq[winIdx], mouse_button[winIdx], mouse_updown[winIdx], mouse_x[winIdx], mouse_y[winIdx], mods );
   }
 
   if ( mousewheel_called[winIdx] )
   {
-    bitmapPrintf ( "Mouse Wheel %d:  %d %d %d %d\n", mousewheel_seq[winIdx], mousewheel_number[winIdx], mousewheel_direction[winIdx], mousewheel_x[winIdx], mousewheel_y[winIdx] );
+    char mods[50] = {0};
+    Mod2Text(mousewheel_mod[winIdx],mods);
+    bitmapPrintf ( "Mouse Wheel %d:  %d %d %d %d (mod: %s)\n", mousewheel_seq[winIdx], mousewheel_number[winIdx], mousewheel_direction[winIdx], mousewheel_x[winIdx], mousewheel_y[winIdx], mods );
   }
 
   if ( motion_called[winIdx] )
   {
-    bitmapPrintf ( "Motion %d:  %d %d\n", motion_seq[winIdx], motion_x[winIdx], motion_y[winIdx] );
+    char mods[50] = {0};
+    Mod2Text(motion_mod[winIdx],mods);
+    bitmapPrintf ( "Motion %d:  %d %d (mod: %s)\n", motion_seq[winIdx], motion_x[winIdx], motion_y[winIdx], mods );
   }
 
   if ( passivemotion_called[winIdx] )
   {
-    bitmapPrintf ( "Passive Motion %d:  %d %d\n", passivemotion_seq[winIdx], passivemotion_x[winIdx], passivemotion_y[winIdx] );
+    char mods[50] = {0};
+    Mod2Text(passivemotion_mod[winIdx],mods);
+    bitmapPrintf ( "Passive Motion %d:  %d %d (mod: %s)\n", passivemotion_seq[winIdx], passivemotion_x[winIdx], passivemotion_y[winIdx], mods );
   }
 
   glMatrixMode ( GL_PROJECTION );
@@ -185,6 +227,19 @@ Error(const char *fmt, va_list ap)
      * up internally when an error is called. 
      */
     exit(1);
+}
+
+static void 
+Visibility(int vis)
+{
+  int winIdx;
+  int window = getWindowAndIdx(&winIdx);
+  printf ( "%6d Window %d Visibility Callback:  %d\n",
+            ++sequence_number, window, vis ) ;
+  visibility_called[winIdx] = 1 ;
+  visibility_vis[winIdx] = vis ;
+  visibility_seq[winIdx] = sequence_number ;
+  glutPostRedisplay () ;
 }
 
 static void 
@@ -228,34 +283,7 @@ Key(unsigned char key, int x, int y)
   key_x[winIdx] = x ;
   key_y[winIdx] = y ;
   key_seq[winIdx] = sequence_number ;
-  glutPostRedisplay () ;
-}
-
-static void 
-Special(int key, int x, int y)
-{
-  int winIdx;
-  int window = getWindowAndIdx(&winIdx);
-  printf ( "%6d Window %d Special Key Callback:  %d %d %d\n",
-            ++sequence_number, window, key, x, y ) ;
-  special_called[winIdx] = 1 ;
-  special_key[winIdx] = key ;
-  special_x[winIdx] = x ;
-  special_y[winIdx] = y ;
-  special_seq[winIdx] = sequence_number ;
-  glutPostRedisplay () ;
-}
-
-static void 
-Visibility(int vis)
-{
-  int winIdx;
-  int window = getWindowAndIdx(&winIdx);
-  printf ( "%6d Window %d Visibility Callback:  %d\n",
-            ++sequence_number, window, vis ) ;
-  visibility_called[winIdx] = 1 ;
-  visibility_vis[winIdx] = vis ;
-  visibility_seq[winIdx] = sequence_number ;
+  key_mod[winIdx] = glutGetModifiers() ;
   glutPostRedisplay () ;
 }
 
@@ -271,6 +299,23 @@ KeyUp(unsigned char key, int x, int y)
   keyup_x[winIdx] = x ;
   keyup_y[winIdx] = y ;
   keyup_seq[winIdx] = sequence_number ;
+  keyup_mod[winIdx] = glutGetModifiers() ;
+  glutPostRedisplay () ;
+}
+
+static void 
+Special(int key, int x, int y)
+{
+  int winIdx;
+  int window = getWindowAndIdx(&winIdx);
+  printf ( "%6d Window %d Special Key Callback:  %d %d %d\n",
+            ++sequence_number, window, key, x, y ) ;
+  special_called[winIdx] = 1 ;
+  special_key[winIdx] = key ;
+  special_x[winIdx] = x ;
+  special_y[winIdx] = y ;
+  special_seq[winIdx] = sequence_number ;
+  special_mod[winIdx] = glutGetModifiers() ;
   glutPostRedisplay () ;
 }
 
@@ -286,6 +331,7 @@ SpecialUp(int key, int x, int y)
   specialup_x[winIdx] = x ;
   specialup_y[winIdx] = y ;
   specialup_seq[winIdx] = sequence_number ;
+  specialup_mod[winIdx] = glutGetModifiers() ;
   glutPostRedisplay () ;
 }
 
@@ -318,6 +364,7 @@ Mouse(int button, int updown, int x, int y)
   mouse_x[winIdx] = x ;
   mouse_y[winIdx] = y ;
   mouse_seq[winIdx] = sequence_number ;
+  mouse_mod[winIdx] = glutGetModifiers() ;
   glutPostRedisplay () ;
 }
 
@@ -334,6 +381,7 @@ MouseWheel(int wheel_number, int direction, int x, int y)
   mousewheel_x[winIdx] = x ;
   mousewheel_y[winIdx] = y ;
   mousewheel_seq[winIdx] = sequence_number ;
+  mousewheel_mod[winIdx] = glutGetModifiers() ;
   glutPostRedisplay () ;
 }
 
@@ -348,6 +396,7 @@ Motion(int x, int y)
   motion_x[winIdx] = x ;
   motion_y[winIdx] = y ;
   motion_seq[winIdx] = sequence_number ;
+  motion_mod[winIdx] = glutGetModifiers() ;
   glutPostRedisplay () ;
 }
 
@@ -362,15 +411,20 @@ PassiveMotion(int x, int y)
   passivemotion_x[winIdx] = x ;
   passivemotion_y[winIdx] = y ;
   passivemotion_seq[winIdx] = sequence_number ;
+  passivemotion_mod[winIdx] = glutGetModifiers() ;
   glutPostRedisplay () ;
 }
 
 static void 
 Entry(int state)
 {
-  int window = getWindowAndIdx(NULL);
+  int winIdx;
+  int window = getWindowAndIdx(&winIdx);
   printf ( "%6d Window %d Entry Callback:  %d\n",
             ++sequence_number, window, state ) ;
+  entry_called[winIdx] = 1 ;
+  entry_seq[winIdx] = sequence_number;
+  entry_state[winIdx] = state;
   glutPostRedisplay () ;
 }
 
