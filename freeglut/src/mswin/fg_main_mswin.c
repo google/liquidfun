@@ -765,6 +765,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         );
 
         fgState.Modifiers = INVALID_MODIFIERS;
+
+        /* As per docs, should return zero */
+        lRet = 0;
     }
     break;
 
