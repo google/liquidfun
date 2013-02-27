@@ -679,6 +679,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
 /*
  * Deactivates a menu pointed by the function argument.
  */
+static SFG_Menu* menuDeactivating = NULL;
 void fgDeactivateMenu( SFG_Window *window )
 {
     SFG_Window *parent_window = NULL;
@@ -690,6 +691,10 @@ void fgDeactivateMenu( SFG_Window *window )
     /* Check if there is an active menu attached to this window... */
     menu = window->ActiveMenu;
     freeglut_return_if_fail( menu );
+    /* Check if we are already deactivating this menu, abort in that case (glutHideWindow below can cause this function to be called again on the same menu..) */
+    if (menu==menuDeactivating)
+        return;
+    menuDeactivating = menu;
 
     parent_window = menu->ParentWindow;
 
@@ -717,6 +722,8 @@ void fgDeactivateMenu( SFG_Window *window )
         if( menuEntry->SubMenu )
             fghDeactivateSubMenu( menuEntry );
     }
+    /* Done deactivating menu */
+    menuDeactivating = NULL;
 
     fgSetWindow ( parent_window ) ;
 
