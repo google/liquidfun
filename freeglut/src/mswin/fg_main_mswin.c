@@ -518,18 +518,14 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
 
         SetActiveWindow( window->Window.Handle );
-        INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
         UpdateWindow ( hWnd );
 
         break;
 
     case WM_KILLFOCUS:
         {
-            SFG_Window* saved_window = fgStructure.CurrentWindow;
 /*            printf("WM_KILLFOCUS: %p\n", window ); */
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
-            INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
-            fgSetWindow(saved_window);
 
             /* Check if there are any open menus that need to be closed */
             fgPlatformCheckMenuDeactivate();
@@ -553,9 +549,37 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_SETCURSOR:
 /*      printf ( "Cursor event %x %x %x %x\n", window, window->State.Cursor, lParam, wParam ) ; */
         if( LOWORD( lParam ) == HTCLIENT )
-            fgSetCursor ( window, window->State.Cursor ) ;
+        {
+            if (!window->State.pWState.MouseTracking)
+            {
+                TRACKMOUSEEVENT tme;
+
+                /* Cursor just entered window, set cursor look, invoke callback and start tracking so that we get a WM_MOUSELEAVE message */
+                fgSetCursor ( window, window->State.Cursor ) ;
+                INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
+
+                tme.cbSize = sizeof(TRACKMOUSEEVENT);
+                tme.dwFlags = TME_LEAVE;
+                tme.hwndTrack = window->Window.Handle;
+                TrackMouseEvent(&tme);
+
+                window->State.pWState.MouseTracking = GL_TRUE;
+            }
+        }
         else
+            /* Only pass non-client WM_SETCURSOR to DefWindowProc, or we get WM_SETCURSOR on parents of children as well */
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        break;
+
+    case WM_MOUSELEAVE:
+        {
+            SFG_Window* saved_window = fgStructure.CurrentWindow;
+            INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
+            fgSetWindow(saved_window);
+
+            window->State.pWState.MouseTracking = GL_FALSE;
+            lRet = 0;   /* As per docs, must return zero */
+        }
         break;
 
     case WM_SHOWWINDOW:
@@ -828,8 +852,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_CAPTURECHANGED:
         /* User has finished resizing the window, force a redraw */
         INVOKE_WCB( *window, Display, ( ) );
-
-        /*lRet = DefWindowProc( hWnd, uMsg, wParam, lParam ); */
+        lRet = 0;   /* Per docs, should return zero */
         break;
 
         /* Other messages that I have seen and which are not handled already */

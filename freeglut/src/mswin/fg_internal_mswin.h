@@ -95,6 +95,8 @@ struct tagSFG_PlatformWindowState
     DWORD           OldStyle;           /* window style    - stored before the window is made fullscreen */
     DWORD           OldStyleEx;         /* window Ex style - stored before the window is made fullscreen */
     BOOL            OldMaximized;       /* window maximized state - stored before the window is made fullscreen */
+
+    GLboolean       MouseTracking;      /* Needed for generating GLUT_ENTERED and GLUT_LEFT entry func callbacks on windows */
 };
 
 

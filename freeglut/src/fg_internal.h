@@ -383,7 +383,7 @@ struct tagSFG_WindowState
     int             Width;              /* Window's width in pixels          */
     int             Height;             /* The same about the height         */
 
-	SFG_PlatformWindowState pWState;    /* Window width/height (X11) or rectangle/style (Windows) from before a resize */
+	SFG_PlatformWindowState pWState;    /* Window width/height (X11) or rectangle/style (Windows) from before a resize, and other stuff only needed on specific platforms */
 
     GLboolean       Redisplay;          /* Do we have to redisplay?          */
     GLboolean       Visible;            /* Is the window visible now         */
