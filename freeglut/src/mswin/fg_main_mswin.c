@@ -736,17 +736,16 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                                window->State.MouseX, window->State.MouseY ) )
             break;
 
-        /* Set capture so that the window captures all the mouse messages */
-        /*
-         * XXX - Multiple button support:  Under X11, the mouse is not released
-         * XXX - from the window until all buttons have been released, even if the
-         * XXX - user presses a button in another window.  This will take more
-         * XXX - code changes than I am up to at the moment (10/5/04).  The present
-         * XXX - is a 90 percent solution.
+        /* Set capture so that the window captures all the mouse messages
+         *
+         * The mouse is not released from the window until all buttons have
+         * been released, even if the user presses a button in another window.
+         * This is consistent with the behavior on X11.
          */
         if ( pressed == GL_TRUE )
           SetCapture ( window->Window.Handle ) ;
-        else
+        else if (!GetAsyncKeyState(VK_LBUTTON) && !GetAsyncKeyState(VK_MBUTTON) && !GetAsyncKeyState(VK_RBUTTON))
+          /* Make sure all mouse buttons are released before releasing capture */
           ReleaseCapture () ;
 
         if( ! FETCH_WCB( *window, Mouse ) )
