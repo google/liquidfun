@@ -523,20 +523,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
 
-        if (child_window)
-        {
-            /* If we're dealing with a child window, make sure it has input focus instead, set it here. */
-            SetFocus(child_window->Window.Handle);
-            SetActiveWindow( child_window->Window.Handle );
-            INVOKE_WCB( *child_window, Entry, ( GLUT_ENTERED ) );
-            UpdateWindow ( child_window->Window.Handle );
-        }
-        else
-        {
-            SetActiveWindow( window->Window.Handle );
-            INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
-        }
-        /* Always request update on main window to be safe */
+        SetActiveWindow( window->Window.Handle );
+        INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
         UpdateWindow ( hWnd );
 
         break;
@@ -751,8 +739,11 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     {
         int wheel_number = LOWORD( wParam );
         short ticks = ( short )HIWORD( wParam );
-		fgState.MouseWheelTicks += ticks;
 
+        if (child_window)
+            window = child_window;
+
+		fgState.MouseWheelTicks += ticks;
         if ( abs ( fgState.MouseWheelTicks ) >= WHEEL_DELTA )
 		{
 			int direction = ( fgState.MouseWheelTicks > 0 ) ? 1 : -1;
@@ -806,16 +797,12 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
-        if (child_window)
-            window = child_window;
-        lRet = fghWindowProcKeyPress(window,uMsg,GL_TRUE,wParam,lParam);
+        lRet = fghWindowProcKeyPress(child_window?child_window:window,uMsg,GL_TRUE,wParam,lParam);
     break;
 
     case WM_SYSKEYUP:
     case WM_KEYUP:
-        if (child_window)
-            window = child_window;
-        lRet = fghWindowProcKeyPress(window,uMsg,GL_FALSE,wParam,lParam);
+        lRet = fghWindowProcKeyPress(child_window?child_window:window,uMsg,GL_FALSE,wParam,lParam);
     break;
 
     case WM_SYSCHAR:
