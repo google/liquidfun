@@ -146,7 +146,7 @@ void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
 /*
  * Set global auto-repeat of keystrokes
  *
- * RepeatMode should be either:
+ * RepeatMode should be any of:
  *    GLUT_KEY_REPEAT_OFF
  *    GLUT_KEY_REPEAT_ON
  *    GLUT_KEY_REPEAT_DEFAULT
@@ -158,10 +158,10 @@ void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
     switch( repeatMode )
     {
     case GLUT_KEY_REPEAT_OFF:
-    case GLUT_KEY_REPEAT_ON:
-     fgState.KeyRepeat = repeatMode;
+     fgState.KeyRepeat = GLUT_KEY_REPEAT_OFF;
      break;
 
+    case GLUT_KEY_REPEAT_ON:
     case GLUT_KEY_REPEAT_DEFAULT:
      fgState.KeyRepeat = GLUT_KEY_REPEAT_ON;
      break;
