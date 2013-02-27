@@ -554,16 +554,24 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             {
                 TRACKMOUSEEVENT tme;
 
-                /* Cursor just entered window, set cursor look, invoke callback and start tracking so that we get a WM_MOUSELEAVE message */
+                /* Cursor just entered window, set cursor look */ 
                 fgSetCursor ( window, window->State.Cursor ) ;
-                INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
 
-                tme.cbSize = sizeof(TRACKMOUSEEVENT);
-                tme.dwFlags = TME_LEAVE;
-                tme.hwndTrack = window->Window.Handle;
-                TrackMouseEvent(&tme);
+                /* If an EntryFunc callback is specified by the user, also
+                 * invoke that callback and start mouse tracking so that
+                 * we get a WM_MOUSELEAVE message
+                 */
+                if (FETCH_WCB( *window, Entry ))
+                {
+                    INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
 
-                window->State.pWState.MouseTracking = GL_TRUE;
+                    tme.cbSize = sizeof(TRACKMOUSEEVENT);
+                    tme.dwFlags = TME_LEAVE;
+                    tme.hwndTrack = window->Window.Handle;
+                    TrackMouseEvent(&tme);
+
+                    window->State.pWState.MouseTracking = GL_TRUE;
+                }
             }
         }
         else
@@ -573,6 +581,10 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
     case WM_MOUSELEAVE:
         {
+            /* NB: This message is only received when a EntryFunc callback
+             * is specified by the user, as that is the only condition under
+             * which mouse tracking is setup in WM_SETCURSOR handler above
+             */
             SFG_Window* saved_window = fgStructure.CurrentWindow;
             INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
             fgSetWindow(saved_window);
