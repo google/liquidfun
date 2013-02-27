@@ -686,8 +686,9 @@ main(int argc, char *argv[])
 
   glClearColor(0.7f, 0.7f, 0.7f, 1.0);
 
-  /* callbacks and menus for this window */
+  /* callbacks, settings and menus for this window */
   SetWindowCallbacks( 0 );
+  glutSetCursor(GLUT_CURSOR_CROSSHAIR); /* Cursors are per window */
 
   glutSetMenu(subMenuA);
   glutAttachMenu( GLUT_RIGHT_BUTTON );
