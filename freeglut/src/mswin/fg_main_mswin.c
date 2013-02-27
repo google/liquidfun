@@ -321,37 +321,37 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
         return 1;
 }
 
-void fghWindowUnderCursor(SFG_Window *window, SFG_Window **child_window)
+static SFG_Window* fghWindowUnderCursor(SFG_Window *window)
 {
     /* Check if the current window that the mouse is over is a child window
      * of the window the message was sent to. Some events only sent to main window,
      * and when handling some messages, we need to make sure that we process
      * callbacks on the child window instead. This mirrors how GLUT does things.
+     * returns either the original window or the found child.
      */
-    if (window && window->Children.First)
+    if (window && window->Children.First)   /* This window has childs */
     {
-        POINT mouse_pos;
         SFG_WindowHandleType hwnd;
-        SFG_Window* temp_window;
+        SFG_Window* child_window;
 
         /* Get mouse position at time of message */
-        DWORD mouse_pos_Dword = GetMessagePos();
-        mouse_pos.x = GET_X_LPARAM(mouse_pos_Dword);
-        mouse_pos.y = GET_Y_LPARAM(mouse_pos_Dword);
+        DWORD mouse_pos_dw = GetMessagePos();
+        POINT mouse_pos = {GET_X_LPARAM(mouse_pos_dw), GET_Y_LPARAM(mouse_pos_dw)};
         ScreenToClient( window->Window.Handle, &mouse_pos );
         
         hwnd = ChildWindowFromPoint(window->Window.Handle, mouse_pos);
         if (hwnd && hwnd!=window->Window.Handle)   /* can be NULL if mouse outside parent by the time we get here, or can be same as parent if we didn't find a child */
         {
-            temp_window = fgWindowByHandle(hwnd);
-            if (temp_window)    /* Verify we got a FreeGLUT window */
+            child_window = fgWindowByHandle(hwnd);
+            if (child_window)    /* Verify we got a FreeGLUT window */
             {
-                *child_window = temp_window;
                 /* ChildWindowFromPoint only searches immediate children, so search again to see if actually in grandchild or further descendant */
-                fghWindowUnderCursor(temp_window,child_window);
+                window = fghWindowUnderCursor(child_window);
             }
         }
     }
+
+    return window;
 }
 
 /*
@@ -738,9 +738,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         int wheel_number = LOWORD( wParam );
         short ticks = ( short )HIWORD( wParam );
 
-        fghWindowUnderCursor(window, &child_window);
-        if (child_window)
-            window = child_window;
+        window = fghWindowUnderCursor(window);
 
 		fgState.MouseWheelTicks += ticks;
         if ( abs ( fgState.MouseWheelTicks ) >= WHEEL_DELTA )
@@ -797,28 +795,23 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
     {
-        SFG_Window *child_window = NULL;
-        fghWindowUnderCursor(window, &child_window);
-        lRet = fghWindowProcKeyPress(child_window?child_window:window,uMsg,GL_TRUE,wParam,lParam);
+        window = fghWindowUnderCursor(window);
+        lRet = fghWindowProcKeyPress(window,uMsg,GL_TRUE,wParam,lParam);
     }
     break;
 
     case WM_SYSKEYUP:
     case WM_KEYUP:
     {
-        SFG_Window *child_window = NULL;
-        fghWindowUnderCursor(window, &child_window);
-        lRet = fghWindowProcKeyPress(child_window?child_window:window,uMsg,GL_FALSE,wParam,lParam);
+        window = fghWindowUnderCursor(window);
+        lRet = fghWindowProcKeyPress(window,uMsg,GL_FALSE,wParam,lParam);
     }
     break;
 
     case WM_SYSCHAR:
     case WM_CHAR:
     {
-      SFG_Window *child_window = NULL;
-      fghWindowUnderCursor(window, &child_window);
-      if (child_window)
-        window = child_window;
+      window = fghWindowUnderCursor(window);
 
       if( (fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE) && (HIWORD(lParam) & KF_REPEAT) )
             break;
