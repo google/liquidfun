@@ -11,16 +11,17 @@
 
 static int sequence_number = 0 ;
 
-int windows[2] = {0};
+#define CALLBACKMAKER_N_WINDOWS 4
+int windows[CALLBACKMAKER_N_WINDOWS] = {0};
 
 /* define status vars showing whether given callback has been called for given window */
-#define CALLBACK_CALLED_VAR(name)                            int name##_called[2]   = {0};
-#define CALLBACK_0V(name)                                    int name##_seq[2]      = {-1}; CALLBACK_CALLED_VAR(name); 
-#define CALLBACK_1V(name,field)                              int name##_##field[2]  = {-1}; CALLBACK_0V(name);
-#define CALLBACK_2V(name,field1,field2)                      int name##_##field2[2] = {-1}; CALLBACK_1V(name,field1);
-#define CALLBACK_3V(name,field1,field2,field3)               int name##_##field3[2] = {-1}; CALLBACK_2V(name,field1,field2);
-#define CALLBACK_4V(name,field1,field2,field3,field4)        int name##_##field4[2] = {-1}; CALLBACK_3V(name,field1,field2,field3);
-#define CALLBACK_5V(name,field1,field2,field3,field4,field5) int name##_##field5[2] = {-1}; CALLBACK_4V(name,field1,field2,field3,field4);
+#define CALLBACK_CALLED_VAR(name)                            int name##_called[CALLBACKMAKER_N_WINDOWS]   = {0};
+#define CALLBACK_0V(name)                                    int name##_seq[CALLBACKMAKER_N_WINDOWS]      = {-1}; CALLBACK_CALLED_VAR(name); 
+#define CALLBACK_1V(name,field)                              int name##_##field[CALLBACKMAKER_N_WINDOWS]  = {-1}; CALLBACK_0V(name);
+#define CALLBACK_2V(name,field1,field2)                      int name##_##field2[CALLBACKMAKER_N_WINDOWS] = {-1}; CALLBACK_1V(name,field1);
+#define CALLBACK_3V(name,field1,field2,field3)               int name##_##field3[CALLBACKMAKER_N_WINDOWS] = {-1}; CALLBACK_2V(name,field1,field2);
+#define CALLBACK_4V(name,field1,field2,field3,field4)        int name##_##field4[CALLBACKMAKER_N_WINDOWS] = {-1}; CALLBACK_3V(name,field1,field2,field3);
+#define CALLBACK_5V(name,field1,field2,field3,field4,field5) int name##_##field5[CALLBACKMAKER_N_WINDOWS] = {-1}; CALLBACK_4V(name,field1,field2,field3,field4);
 CALLBACK_2V(reshape,width,height);
 CALLBACK_2V(position,top,left);
 CALLBACK_1V(visibility,vis);
@@ -65,7 +66,9 @@ getWindowAndIdx(int *winIdx)
     int window = glutGetWindow();
 
     if (winIdx)
-        (*winIdx) = window==windows[0]?0:1;
+        (*winIdx) = window==windows[0] ? 0 :
+                    window==windows[1] ? 1 :
+                    window==windows[2] ? 2 : 3;
 
     return window;
 }
@@ -565,6 +568,36 @@ static void Idle ( void )
   ++sequence_number ;
 }
 
+static void SetWindowCallbacks( int first )
+{
+    /* All these callbacks are set for only the current window */
+    glutDisplayFunc( Display );
+    glutReshapeFunc( Reshape );
+    glutPositionFunc( Position );
+    glutKeyboardFunc( Key );
+    glutSpecialFunc( Special );
+    glutVisibilityFunc( Visibility );
+    glutKeyboardUpFunc( KeyUp );
+    glutSpecialUpFunc( SpecialUp );
+    if (first)
+        glutJoystickFunc( Joystick, 100 );
+    glutMouseFunc ( Mouse ) ;
+    glutMouseWheelFunc ( MouseWheel ) ;
+    glutMotionFunc ( Motion ) ;
+    glutPassiveMotionFunc ( PassiveMotion ) ;
+    glutEntryFunc ( Entry ) ;
+    glutCloseFunc ( Close ) ;
+    glutOverlayDisplayFunc ( OverlayDisplay ) ;
+    glutWindowStatusFunc ( WindowStatus ) ;
+    glutSpaceballMotionFunc ( SpaceMotion ) ;
+    glutSpaceballRotateFunc ( SpaceRotation ) ;
+    glutSpaceballButtonFunc ( SpaceButton ) ;
+    glutButtonBoxFunc ( ButtonBox ) ;
+    glutDialsFunc ( Dials ) ;
+    glutTabletMotionFunc ( TabletMotion ) ;
+    glutTabletButtonFunc ( TabletButton ) ;
+}
+
 int 
 main(int argc, char *argv[])
 {
@@ -578,44 +611,32 @@ main(int argc, char *argv[])
   glutInitWindowPosition ( 140, 140 );
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE );
   glutInit(&argc, argv);
+  /* global setting: mainloop does not return when a window is closed, only returns when all windows are closed */
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_CONTINUE_EXECUTION);
+  /* global setting: repeated keys generating by keeping the key pressed down are passed on to the keyboard callback */
+  /* There are two functions to control this behavior, glutSetKeyRepeat to set it globally, and glutIgnoreKeyRepeat to set it per window.
+   * These two interact however. If key repeat is globally switched off (glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF)), it cannot be overridden
+   * (switched back on) for a specific window with glutIgnoreKeyRepeat. However, if key repeat is globally switched on
+   * (glutSetKeyRepeat(GLUT_KEY_REPEAT_ON)), it can be overridden (switched off) with glutIgnoreKeyRepeat on a per-window basis. That is
+   * what we demonstrate here.
+   */
+  glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
 
   /* Set other global callback (global as in not associated with any specific menu or window) */
   glutIdleFunc ( Idle );
   glutMenuStatusFunc ( MenuStatus );
   glutMenuStateFunc  ( MenuState ); /* Note that glutMenuStatusFunc is an enhanced version of the deprecated glutMenuStateFunc. */
 
+
+  /* Open first window */
   windows[0] = glutCreateWindow( "Callback Demo" );
   printf ( "Creating window %d as 'Callback Demo'\n", windows[0] ) ;
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
-  /* callbacks and settings specific to this window */
-  glutDisplayFunc( Display );
-  glutReshapeFunc( Reshape );
-  glutPositionFunc( Position );
-  glutKeyboardFunc( Key );
-  glutSpecialFunc( Special );
-  glutVisibilityFunc( Visibility );
-  glutKeyboardUpFunc( KeyUp );
-  glutSpecialUpFunc( SpecialUp );
-  glutJoystickFunc( Joystick, 100 );
-  glutMouseFunc ( Mouse ) ;
-  glutMouseWheelFunc ( MouseWheel ) ;
-  glutMotionFunc ( Motion ) ;
-  glutPassiveMotionFunc ( PassiveMotion ) ;
-  glutEntryFunc ( Entry ) ;
-  glutCloseFunc ( Close ) ;
-  glutOverlayDisplayFunc ( OverlayDisplay ) ;
-  glutWindowStatusFunc ( WindowStatus ) ;
-  glutSpaceballMotionFunc ( SpaceMotion ) ;
-  glutSpaceballRotateFunc ( SpaceRotation ) ;
-  glutSpaceballButtonFunc ( SpaceButton ) ;
-  glutButtonBoxFunc ( ButtonBox ) ;
-  glutDialsFunc ( Dials ) ;
-  glutTabletMotionFunc ( TabletMotion ) ;
-  glutTabletButtonFunc ( TabletButton ) ;
-  glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF) ;
+  /* callbacks, settings and menus for this window */
+  SetWindowCallbacks( 1 );
+  glutIgnoreKeyRepeat(GL_TRUE);
 
   subMenuA = glutCreateMenu( MenuCallback );
   glutAddMenuEntry( "Sub menu A1 (01)", 11 );
@@ -642,42 +663,44 @@ main(int argc, char *argv[])
 
   glutAttachMenu( GLUT_LEFT_BUTTON );
 
-  glutInitWindowPosition ( 140+500+2*glutGet(GLUT_WINDOW_BORDER_WIDTH), 140 );
+
   /* Position second window right next to the first */
+  glutInitWindowPosition ( 140+500+2*glutGet(GLUT_WINDOW_BORDER_WIDTH), 140 );
+  glutInitWindowSize(600, 600);
   windows[1] = glutCreateWindow( "Second Window" );
   printf ( "Creating window %d as 'Second Window'\n", windows[1] ) ;
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
 
-  /* callbacks and settings specific to this window */
-  glutDisplayFunc( Display );
-  glutReshapeFunc( Reshape );
-  glutPositionFunc( Position );
-  glutKeyboardFunc( Key );
-  glutSpecialFunc( Special );
-  glutVisibilityFunc( Visibility );
-  glutKeyboardUpFunc( KeyUp );
-  glutSpecialUpFunc( SpecialUp );
-  /*  glutJoystickFunc( Joystick, 100 ); */
-  glutMouseFunc ( Mouse ) ;
-  glutMouseWheelFunc ( MouseWheel ) ;
-  glutMotionFunc ( Motion ) ;
-  glutPassiveMotionFunc ( PassiveMotion ) ;
-  glutEntryFunc ( Entry ) ;
-  glutCloseFunc ( Close ) ;
-  glutOverlayDisplayFunc ( OverlayDisplay ) ;
-  glutWindowStatusFunc ( WindowStatus ) ;
-  glutSpaceballMotionFunc ( SpaceMotion ) ;
-  glutSpaceballRotateFunc ( SpaceRotation ) ;
-  glutSpaceballButtonFunc ( SpaceButton ) ;
-  glutButtonBoxFunc ( ButtonBox ) ;
-  glutDialsFunc ( Dials ) ;
-  glutTabletMotionFunc ( TabletMotion ) ;
-  glutTabletButtonFunc ( TabletButton ) ;
-  glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF) ;
+  /* callbacks, settings and menus for this window */
+  SetWindowCallbacks( 0 );
+  glutIgnoreKeyRepeat(GL_TRUE);
 
   glutSetMenu(subMenuB);
   glutAttachMenu( GLUT_RIGHT_BUTTON );
+
+
+  /* position a third window as a subwindow of the second */
+  windows[2] = glutCreateSubWindow(windows[1],0,300,600,300);
+  printf ( "Creating window %d as subwindow to 'Second Window'\n", windows[2] ) ;
+
+  glClearColor(0.7f, 0.7f, 0.7f, 1.0);
+
+  /* callbacks and menus for this window */
+  SetWindowCallbacks( 0 );
+
+  glutSetMenu(subMenuA);
+  glutAttachMenu( GLUT_RIGHT_BUTTON );
+
+
+  /* position a fourth window as a subsubwindow (grandchild) of the second */
+  windows[3] = glutCreateSubWindow(windows[2],300,0,300,300);
+  printf ( "Creating window %d as subsubwindow to 'Second Window'\n", windows[3] ) ;
+
+  glClearColor(0.4f, 0.4f, 0.4f, 1.0);
+
+  /* callbacks and menus for this window */
+  SetWindowCallbacks( 0 );
 
 
   printf ( "Please enter something to continue: " );

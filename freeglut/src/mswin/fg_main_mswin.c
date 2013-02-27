@@ -179,6 +179,11 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
     POINT mouse_pos ;
     
     /* if keydown, check for repeat */
+    /* If repeat is globally switched off, it cannot be switched back on per window.
+     * But if it is globally switched on, it can be switched off per window. This matches
+     * GLUT's behavior on X11, but not Nate Robbins' win32 GLUT, as he didn't implement the
+     * global state switch.
+     */
     if( keydown && ( fgState.KeyRepeat==GLUT_KEY_REPEAT_OFF || window->State.IgnoreKeyRepeat==GL_TRUE ) && (HIWORD(lParam) & KF_REPEAT) )
         return 1;
     
