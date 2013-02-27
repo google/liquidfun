@@ -71,7 +71,7 @@ void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
     switch( cursorID )
     {
         MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW,         IDC_ARROW     );
-        MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,          IDC_ARROW     );
+        MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,          IDC_ARROW     ); /* XXX ToDo */
         MAP_CURSOR( GLUT_CURSOR_INFO,                IDC_HELP      );
         MAP_CURSOR( GLUT_CURSOR_DESTROY,             IDC_CROSS     );
         MAP_CURSOR( GLUT_CURSOR_HELP,                IDC_HELP      );
@@ -82,7 +82,7 @@ void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
         MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,           IDC_CROSS     );
         MAP_CURSOR( GLUT_CURSOR_UP_DOWN,             IDC_SIZENS    );
         MAP_CURSOR( GLUT_CURSOR_LEFT_RIGHT,          IDC_SIZEWE    );
-        MAP_CURSOR( GLUT_CURSOR_TOP_SIDE,            IDC_ARROW     ); /* XXX ToDo */
+        MAP_CURSOR( GLUT_CURSOR_TOP_SIDE,            IDC_UPARROW   );
         MAP_CURSOR( GLUT_CURSOR_BOTTOM_SIDE,         IDC_ARROW     ); /* XXX ToDo */
         MAP_CURSOR( GLUT_CURSOR_LEFT_SIDE,           IDC_ARROW     ); /* XXX ToDo */
         MAP_CURSOR( GLUT_CURSOR_RIGHT_SIDE,          IDC_ARROW     ); /* XXX ToDo */
@@ -90,9 +90,24 @@ void fgPlatformSetCursor ( SFG_Window *window, int cursorID )
         MAP_CURSOR( GLUT_CURSOR_TOP_RIGHT_CORNER,    IDC_SIZENESW  );
         MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, IDC_SIZENWSE  );
         MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER,  IDC_SIZENESW  );
-        MAP_CURSOR( GLUT_CURSOR_INHERIT,             IDC_ARROW     ); /* XXX ToDo */
         ZAP_CURSOR( GLUT_CURSOR_NONE,                NULL          );
         MAP_CURSOR( GLUT_CURSOR_FULL_CROSSHAIR,      IDC_CROSS     ); /* XXX ToDo */
+    case GLUT_CURSOR_INHERIT:
+        {
+            SFG_Window *temp_window = window;
+            while (temp_window->Parent)
+            {
+                temp_window = temp_window->Parent;
+                if (temp_window->State.Cursor != GLUT_CURSOR_INHERIT)
+                {
+                    fgPlatformSetCursor(window,temp_window->State.Cursor);
+                    return;
+                }
+            }
+            /* No parent, or no parent with cursor type set. Fall back to default */
+            fgPlatformSetCursor(window,GLUT_CURSOR_LEFT_ARROW);
+        }
+        break;
 
     default:
         fgError( "Unknown cursor type: %d", cursorID );

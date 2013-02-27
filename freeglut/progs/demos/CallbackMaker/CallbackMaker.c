@@ -702,6 +702,8 @@ main(int argc, char *argv[])
 
   /* callbacks and menus for this window */
   SetWindowCallbacks( 0 );
+  glutSetCursor(GLUT_CURSOR_INHERIT);   /* Inherit cursor look from parent (this is default on window creation) - comment the below to see in action */
+  glutSetCursor(GLUT_CURSOR_CYCLE);
 
 
   printf ( "Please enter something to continue: " );
