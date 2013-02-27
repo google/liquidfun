@@ -624,17 +624,6 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
          */
         return 0;
 
-    case WM_CANCELMODE:
-        /*
-         * The window manager sends this message when it detects a change
-         * that requires that an application cancel any modal state it has
-         * entered. If we've called SetCapture in the mouse button handler,
-         * call ReleaseCapture.
-         */
-        if (setCaptureActive)
-            ReleaseCapture();
-        break;
-
     case WM_MOUSEMOVE:
     {
 #if defined(_WIN32_WCE)
