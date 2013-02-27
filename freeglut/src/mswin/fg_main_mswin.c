@@ -176,7 +176,6 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
                          rControl = 0, rShift = 0, rAlt = 0;
 
     int keypress = -1;
-    POINT mouse_pos ;
     
     /* if keydown, check for repeat */
     /* If repeat is globally switched off, it cannot be switched back on per window.
@@ -189,12 +188,6 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
     
     /* Remember the current modifiers state so user can query it from their callback */
     fgState.Modifiers = fgPlatformGetModifiers( );
-
-    /* Get mouse position roughly at time of keypress */
-    GetCursorPos( &mouse_pos );
-    ScreenToClient( window->Window.Handle, &mouse_pos );
-    window->State.MouseX = mouse_pos.x;
-    window->State.MouseY = mouse_pos.y;
 
     /* Convert the Win32 keystroke codes to GLUTtish way */
 #   define KEY(a,b) case a: keypress = b; break;
@@ -339,8 +332,12 @@ void fghWindowUnderCursor(SFG_Window *window, SFG_Window **child_window)
         SFG_WindowHandleType hwnd;
         SFG_Window* temp_window;
 
-        GetCursorPos( &mouse_pos );
+        /* Get mouse position at time of message */
+        DWORD mouse_pos_Dword = GetMessagePos();
+        mouse_pos.x = GET_X_LPARAM(mouse_pos_Dword);
+        mouse_pos.y = GET_Y_LPARAM(mouse_pos_Dword);
         ScreenToClient( window->Window.Handle, &mouse_pos );
+        
         hwnd = ChildWindowFromPoint(window->Window.Handle, mouse_pos);
         if (hwnd && hwnd!=window->Window.Handle)   /* can be NULL if mouse outside parent by the time we get here, or can be same as parent if we didn't find a child */
         {
@@ -559,6 +556,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 #if 0
     case WM_ACTIVATE:
+        //printf("WM_ACTIVATE: %x %d %d\n",lParam, HIWORD(wParam), LOWORD(wParam));
         if (LOWORD(wParam) != WA_INACTIVE)
         {
 /*            printf("WM_ACTIVATE: fgSetCursor( %p, %d)\n", window,
