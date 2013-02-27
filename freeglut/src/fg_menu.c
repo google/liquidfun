@@ -667,10 +667,18 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
         ( window->Menu[ button ] ) &&
         pressed )
     {
-        /* XXX Posting a requisite Redisplay seems bogus. */
-        window->State.Redisplay = GL_TRUE;
-        fghActivateMenu( window, button );
-        return GL_TRUE;
+        /* If mouseclick was outside the parent window, ignore. This can
+         * happen when another mouse button is already depressed and the
+         * window thus has mouse capture
+         */
+        if (window->State.MouseX>0 && window->State.MouseY>0 &&
+            window->State.MouseX<window->State.Width && window->State.MouseX<window->State.Height)
+        {
+            /* XXX Posting a requisite Redisplay seems bogus. */
+            window->State.Redisplay = GL_TRUE;
+            fghActivateMenu( window, button );
+            return GL_TRUE;
+        }
     }
 
     return GL_FALSE;

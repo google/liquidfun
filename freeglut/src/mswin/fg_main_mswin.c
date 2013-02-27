@@ -361,6 +361,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 {
     SFG_Window *window;
     LRESULT lRet = 1;
+    static int setCaptureActive = 0;
 
     FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Event Handler" ) ;
 
@@ -623,6 +624,17 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
          */
         return 0;
 
+    case WM_CANCELMODE:
+        /*
+         * The window manager sends this message when it detects a change
+         * that requires that an application cancel any modal state it has
+         * entered. If we've called SetCapture in the mouse button handler,
+         * call ReleaseCapture.
+         */
+        if (setCaptureActive)
+            ReleaseCapture();
+        break;
+
     case WM_MOUSEMOVE:
     {
 #if defined(_WIN32_WCE)
@@ -743,7 +755,11 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
          * This is consistent with the behavior on X11.
          */
         if ( pressed == GL_TRUE )
-          SetCapture ( window->Window.Handle ) ;
+        {
+            if (!setCaptureActive)
+                SetCapture ( window->Window.Handle ) ;
+            setCaptureActive = 1; /* Set to false in WM_CAPTURECHANGED handler */
+        }
         else if (!GetAsyncKeyState(VK_LBUTTON) && !GetAsyncKeyState(VK_MBUTTON) && !GetAsyncKeyState(VK_RBUTTON))
           /* Make sure all mouse buttons are released before releasing capture */
           ReleaseCapture () ;
@@ -864,6 +880,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     break;
 
     case WM_CAPTURECHANGED:
+        if (!lParam || !fgWindowByHandle((HWND)lParam))
+            /* Capture released or capture taken by non-FreeGLUT window */
+            setCaptureActive = 0;
         /* User has finished resizing the window, force a redraw */
         INVOKE_WCB( *window, Display, ( ) );
         lRet = 0;   /* Per docs, should return zero */
