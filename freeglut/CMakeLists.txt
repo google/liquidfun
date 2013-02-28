@@ -432,7 +432,12 @@ ADD_DEMO(CallbackMaker   progs/demos/CallbackMaker/CallbackMaker.c)
 ADD_DEMO(Fractals        progs/demos/Fractals/fractals.c)
 ADD_DEMO(Fractals_random progs/demos/Fractals_random/fractals_random.c)
 ADD_DEMO(Lorenz          progs/demos/Lorenz/lorenz.c)
-ADD_DEMO(One             progs/demos/One/one.c)
+IF (NOT WIN32)
+    ADD_DEMO(One             progs/demos/One/one.c)
+ELSE()
+    ADD_DEMO(One             progs/demos/One/one.c
+                             progs/demos/One/one.rc)
+ENDIF()
 ADD_DEMO(Resizer         progs/demos/Resizer/Resizer.cpp)
 ADD_DEMO(multi-touch     progs/demos/multi-touch/multi-touch.c)
 ADD_DEMO(shapes          progs/demos/shapes/shapes.c
