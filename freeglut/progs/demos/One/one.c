@@ -387,6 +387,12 @@ int main( int argc, char** argv )
     );
 
     /*
+     * Describe pixel format
+     */
+    printf("The current window has %i red bits, %i green bits, %i blue bits and %i alpha bits for a total buffer size of %i bits\n",glutGet(GLUT_WINDOW_RED_SIZE),glutGet(GLUT_WINDOW_GREEN_SIZE),glutGet(GLUT_WINDOW_BLUE_SIZE),glutGet(GLUT_WINDOW_ALPHA_SIZE),glutGet(GLUT_WINDOW_BUFFER_SIZE));
+    printf("It furthermore has %i depth bits and %i stencil bits\n",glutGet(GLUT_WINDOW_DEPTH_SIZE),glutGet(GLUT_WINDOW_STENCIL_SIZE));
+
+    /*
      * Enter the main FreeGLUT processing loop
      */
     glutMainLoop();

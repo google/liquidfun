@@ -141,10 +141,20 @@ int fgPlatformGlutGet ( GLenum eWhat )
       return returnValue;
 
     case GLUT_WINDOW_BUFFER_SIZE:
-      returnValue = 1 ;                                      /* TODO????? */
-      return returnValue;
+    {
+        PIXELFORMATDESCRIPTOR  pfd;
+        HDC hdc = fgStructure.CurrentWindow->Window.pContext.Device;
+        int iPixelFormat = GetPixelFormat( hdc );
+        DescribePixelFormat(hdc, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+        
+        returnValue = pfd.cColorBits;
+        if (pfd.iPixelType==PFD_TYPE_RGBA)
+            returnValue += pfd.cAlphaBits;
+
+        return returnValue;
+    }
     case GLUT_WINDOW_STENCIL_SIZE:
-      returnValue = 0 ;                                      /* TODO????? */
+      glGetIntegerv ( GL_STENCIL_BITS, &returnValue );
       return returnValue;
 
     case GLUT_WINDOW_X:
