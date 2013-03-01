@@ -536,6 +536,11 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             /* Check window visible, we don't want to call the position callback when the user minimized the window */
             if (window->State.Visible)
             {
+                /* Get top-left of non-client area of window, matching coordinates of
+                 * glutInitPosition and glutPositionWindow, but not those of 
+                 * glutGet(GLUT_WINDOW_X) and glutGet(GLUT_WINDOW_Y), which return
+                 * top-left of client area.
+                 */
                 GetWindowRect( window->Window.Handle, &windowRect );
             
                 if (window->Parent)
