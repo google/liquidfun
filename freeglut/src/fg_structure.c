@@ -92,13 +92,16 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 
     /* Set the default mouse cursor and reset the modifiers value */
     window->State.Cursor    = GLUT_CURSOR_INHERIT;
-
-    window->IsMenu = isMenu;
-
+    
     window->State.IgnoreKeyRepeat = GL_FALSE;
     window->State.KeyRepeating    = GL_FALSE;
     window->State.IsFullscreen    = GL_FALSE;
     window->State.VisualizeNormals= GL_FALSE;
+
+    window->State.pWState.WindowTitle   = NULL;
+    window->State.pWState.IconTitle     = NULL;
+
+    window->IsMenu = isMenu;
 
     /*
      * Open the window now. The fgOpenWindow() function is system

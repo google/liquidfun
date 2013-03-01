@@ -650,6 +650,7 @@ main(int argc, char *argv[])
   /* callbacks, settings and menus for this window */
   SetWindowCallbacks( 1 );
   glutIgnoreKeyRepeat(GL_TRUE);
+  glutSetIconTitle("Icon Test - Callback Demo");
 
   subMenuA = glutCreateMenu( MenuCallback );
   glutAddMenuEntry( "Sub menu A1 (01)", 11 );

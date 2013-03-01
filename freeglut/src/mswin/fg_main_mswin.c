@@ -135,7 +135,21 @@ static void fghUpdateWindowStatus(SFG_Window *window, GLboolean visState)
     if (window->State.Visible != visState)
     {
         window->State.Visible = visState;
+        /* On win32 we only have two states, window displayed and window not displayed (iconified) 
+         * We map these to GLUT_FULLY_RETAINED and GLUT_HIDDEN respectively.
+         */
         INVOKE_WCB( *window, WindowStatus, ( visState ? GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
+
+        /* If top level window (not a subwindow/child), and icon title text available, switch titles based on visibility state */
+        if (!window->Parent && window->State.pWState.IconTitle)
+        {
+            if (visState)
+                /* visible, set window title */
+                SetWindowText( window->Window.Handle, window->State.pWState.WindowTitle );
+            else
+                /* not visible, set icon title */
+                SetWindowText( window->Window.Handle, window->State.pWState.IconTitle );
+        }
     }
 
     /* Also set visibility state for children */

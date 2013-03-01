@@ -702,6 +702,12 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     if( !( window->Window.Handle ) )
         fgError( "Failed to create a window (%s)!", title );
 
+    /* Store title */
+    {
+        window->State.pWState.WindowTitle = malloc (strlen(title) + 1);
+        strcpy(window->State.pWState.WindowTitle, title);
+    }
+
 #if !defined(_WIN32_WCE)
     /* Need to set requested style again, apparently Windows doesn't listen when requesting windows without title bar or borders */
     SetWindowLong(window->Window.Handle, GWL_STYLE, flags);
@@ -859,6 +865,12 @@ void fgPlatformCloseWindow( SFG_Window* window )
     }
 
     DestroyWindow( window->Window.Handle );
+
+    /* clean up copied title text(s) */
+    if (window->State.pWState.WindowTitle)
+        free(window->State.pWState.WindowTitle);
+    if (window->State.pWState.IconTitle)
+        free(window->State.pWState.IconTitle);
 }
 
 
@@ -908,24 +920,24 @@ void fgPlatformGlutSetWindowTitle( const char* title )
 #else
     SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
 #endif
+
+    /* Make copy of string to refer to later */
+    if (fgStructure.CurrentWindow->State.pWState.WindowTitle)
+        free(fgStructure.CurrentWindow->State.pWState.WindowTitle);
+    fgStructure.CurrentWindow->State.pWState.WindowTitle = malloc (strlen(title) + 1);
+    strcpy(fgStructure.CurrentWindow->State.pWState.WindowTitle, title);
 }
 
 /*
  * Set the current window's iconified title
- * There really isn't a way to set the icon name separate from the
- * windows name in Win32, so, just set the windows name.
  */
 void fgPlatformGlutSetIconTitle( const char* title )
 {
-#ifdef _WIN32_WCE
-    {
-        wchar_t* wstr = fghWstrFromStr(title);
-        SetWindowText( fgStructure.CurrentWindow->Window.Handle, wstr );
-        free(wstr);
-    }
-#else
-    SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
-#endif
+    /* Make copy of string to refer to later */
+    if (fgStructure.CurrentWindow->State.pWState.IconTitle)
+        free(fgStructure.CurrentWindow->State.pWState.IconTitle);
+    fgStructure.CurrentWindow->State.pWState.IconTitle = malloc (strlen(title) + 1);
+    strcpy(fgStructure.CurrentWindow->State.pWState.IconTitle, title);
 }
 
 /*

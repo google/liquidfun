@@ -98,6 +98,14 @@ struct tagSFG_PlatformWindowState
 
     GLboolean       MouseTracking;      /* Needed for generating GLUT_ENTERED and GLUT_LEFT entry func callbacks on windows */
     GLboolean       WindowFuncCalled;   /* Indicate whether windowStatus/visibility func was notified that this window was created */
+
+    /* Need to store window titles to emulate
+     * glutSetIconTitle/glutSetWindowTitle as Windows has only
+     * one title associated with a window and we need to swap
+     * them out based on the window's iconic state
+     */
+    char*           WindowTitle;
+    char*           IconTitle;
 };
 
 
