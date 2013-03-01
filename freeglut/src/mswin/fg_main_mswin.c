@@ -648,14 +648,21 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
     case WM_PAINT:
     {
-        PAINTSTRUCT ps;
-        /* Turn on the visibility in case it was turned off somehow */
-        window->State.Visible = GL_TRUE;
+        RECT rect;
 
-        InvalidateRect( hWnd, NULL, GL_FALSE ); /* Make sure whole window is repainted. Bit of a hack, but a safe one from what google turns up... */
-        BeginPaint( hWnd, &ps );
-        fghRedrawWindow( window );
-        EndPaint( hWnd, &ps );
+        if (GetUpdateRect(hWnd,&rect,FALSE))
+        {
+            /* As per docs, upon receiving WM_PAINT, first check if the update region is not empty before you call BeginPaint */
+            PAINTSTRUCT ps;
+
+            /* Turn on the visibility in case it was turned off somehow */
+            window->State.Visible = GL_TRUE;
+
+            InvalidateRect( hWnd, NULL, GL_FALSE );
+            BeginPaint( hWnd, &ps );
+            fghRedrawWindow( window );
+            EndPaint( hWnd, &ps );
+        }
     }
     break;
 
