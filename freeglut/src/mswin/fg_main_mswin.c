@@ -811,8 +811,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_MOUSEWHEEL:
     {
         SFG_Window *child_window = NULL;
-        int wheel_number = LOWORD( wParam );
-        short ticks = ( short )HIWORD( wParam );
+        int wheel_number = 0;   /* Only one scroll wheel on windows */
+        /* int GET_KEYSTATE_WPARAM( wParam ); */
+        short ticks = GET_WHEEL_DELTA_WPARAM( wParam );
 
         window = fghWindowUnderCursor(window);
 
@@ -865,6 +866,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
             fgState.Modifiers = INVALID_MODIFIERS;
 		}
+        /* Per docs, should return zero */
+        lRet = 0;
     }
     break ;
 
