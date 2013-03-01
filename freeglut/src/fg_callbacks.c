@@ -172,6 +172,11 @@ void FGAPIENTRY glutDisplayFunc( FGCBDisplay callback )
  * DEVELOPER NOTE: in the library, only invoke the window status func, this
  * gets automatically translated to the visibility func if thats what the
  * user has set.
+ * window status is kind of anemic on win32 as there are no window messages
+ * to notify us that the window is covered by other windows or not.
+ * Should one want to query this, see
+ * http://stackoverflow.com/questions/5445889/get-which-process-window-is-actually-visible-in-c-sharp
+ * for an implementation outline (but it would be polling based, not push based).
  */
 static void fghVisibility( int status )
 {
