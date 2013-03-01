@@ -128,6 +128,40 @@ void fgPlatformProcessSingleEvent ( void )
 
 
 
+static void fghUpdateWindowStatus(SFG_Window *window, GLboolean visState)
+{
+    SFG_Window* child;
+
+    if (window->State.Visible != visState)
+    {
+        window->State.Visible = visState;
+        INVOKE_WCB( *window, WindowStatus, ( visState ? GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
+    }
+
+    /* Also notify children */
+    for( child = ( SFG_Window * )window->Children.First;
+         child;
+         child = ( SFG_Window * )child->Node.Next )
+    {
+        fghUpdateWindowStatus(child, visState);
+    }
+}
+
+static void fghNotifyWindowStatus(SFG_Window *window)
+{
+    SFG_Window* child;
+
+    INVOKE_WCB( *window, WindowStatus, ( window->State.Visible?GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
+
+    /* Also notify children */
+    for( child = ( SFG_Window * )window->Children.First;
+         child;
+         child = ( SFG_Window * )child->Node.Next )
+    {
+        fghNotifyWindowStatus(child);
+    }
+}
+
 void fgPlatformMainLoopPreliminaryWork ( void )
 {
     SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
@@ -147,7 +181,7 @@ void fgPlatformMainLoopPreliminaryWork ( void )
         {
             SFG_Window *current_window = fgStructure.CurrentWindow ;
 
-            INVOKE_WCB( *window, WindowStatus, ( window->State.Visible?GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
+            fghNotifyWindowStatus(window);
             fgSetWindow( current_window );
         }
 
@@ -466,6 +500,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         break;
 
     case WM_SIZE:
+        //printf("WM_SIZE (ID: %i): wParam: %i, new size: %ix%i \n",window->ID,wParam,LOWORD(lParam),HIWORD(lParam));
         /*
          * If the window is visible, then it is the user manually resizing it.
          * If it is not, then it is the system sending us a dummy resize with
@@ -488,28 +523,35 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                 window->State.NeedToResize = GL_TRUE;
         }
 
+        /* according to docs, should return 0 */
+        lRet = 0;
         break;
 
     case WM_MOVE:
         {
             SFG_Window* saved_window = fgStructure.CurrentWindow;
             RECT windowRect;
-            GetWindowRect( window->Window.Handle, &windowRect );
-            
-            if (window->Parent)
+
+            /* Check window visible, we don't want to call the position callback when the user minimized the window */
+            if (window->State.Visible)
             {
-                /* For child window, we should return relative to upper-left
-                * of parent's client area.
-                */
-                POINT topleft = {windowRect.left,windowRect.top};
+                GetWindowRect( window->Window.Handle, &windowRect );
+            
+                if (window->Parent)
+                {
+                    /* For child window, we should return relative to upper-left
+                     * of parent's client area.
+                     */
+                    POINT topleft = {windowRect.left,windowRect.top};
 
-                ScreenToClient(window->Parent->Window.Handle,&topleft);
-                windowRect.left = topleft.x;
-                windowRect.top  = topleft.y;
+                    ScreenToClient(window->Parent->Window.Handle,&topleft);
+                    windowRect.left = topleft.x;
+                    windowRect.top  = topleft.y;
+                }
+
+                INVOKE_WCB( *window, Position, ( windowRect.left, windowRect.top ) );
+                fgSetWindow(saved_window);
             }
-
-            INVOKE_WCB( *window, Position, ( windowRect.left, windowRect.top ) );
-            fgSetWindow(saved_window);
         }
         break;
 
@@ -535,7 +577,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 #if 0
     case WM_ACTIVATE:
-        //printf("WM_ACTIVATE: %x %d %d\n",lParam, HIWORD(wParam), LOWORD(wParam));
+        //printf("WM_ACTIVATE: %x (ID: %i) %d %d\n",lParam, window->ID, HIWORD(wParam), LOWORD(wParam));
         if (LOWORD(wParam) != WA_INACTIVE)
         {
 /*            printf("WM_ACTIVATE: fgSetCursor( %p, %d)\n", window,
@@ -596,7 +638,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         break;
 
     case WM_SHOWWINDOW:
-        window->State.Visible = GL_TRUE;
+        //printf("WM_SHOWWINDOW\n");
+        fghUpdateWindowStatus(window, GL_TRUE);
         window->State.Redisplay = GL_TRUE;
         break;
 
@@ -605,6 +648,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         PAINTSTRUCT ps;
         /* Turn on the visibility in case it was turned off somehow */
         window->State.Visible = GL_TRUE;
+
         InvalidateRect( hWnd, NULL, GL_FALSE ); /* Make sure whole window is repainted. Bit of a hack, but a safe one from what google turns up... */
         BeginPaint( hWnd, &ps );
         fghRedrawWindow( window );
@@ -939,7 +983,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             case SC_MINIMIZE   :
                 /* User has clicked on the "-" to minimize the window */
                 /* Turn off the visibility */
-                window->State.Visible = GL_FALSE ;
+                fghUpdateWindowStatus(window, GL_FALSE);
 
                 break ;
 
@@ -972,6 +1016,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                 break ;
 
             case SC_RESTORE    :
+                fghUpdateWindowStatus(window, GL_TRUE);
                 break ;
 
             case SC_TASKLIST   :

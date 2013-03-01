@@ -25,6 +25,7 @@ int windows[CALLBACKMAKER_N_WINDOWS] = {0};
 CALLBACK_2V(reshape,width,height);
 CALLBACK_2V(position,top,left);
 CALLBACK_1V(visibility,vis);
+CALLBACK_1V(windowStatus,state);
 CALLBACK_4V(key,key,x,y,mod);
 CALLBACK_4V(keyup,key,x,y,mod);
 CALLBACK_4V(special,key,x,y,mod);
@@ -120,6 +121,11 @@ Display(void)
   if ( visibility_called[winIdx] )
   {
     bitmapPrintf ( "Visibility %d:  %d\n", visibility_seq[winIdx], visibility_vis[winIdx] );
+  }
+
+  if ( windowStatus_called[winIdx] )
+  {
+    bitmapPrintf ( "WindowStatus %d:  %d\n", windowStatus_seq[winIdx], windowStatus_state[winIdx] );
   }
 
   if ( reshape_called[winIdx] )
@@ -230,19 +236,6 @@ Error(const char *fmt, va_list ap)
      * up internally when an error is called. 
      */
     exit(1);
-}
-
-static void 
-Visibility(int vis)
-{
-  int winIdx;
-  int window = getWindowAndIdx(&winIdx);
-  printf ( "%6d Window %d Visibility Callback:  %d\n",
-            ++sequence_number, window, vis ) ;
-  visibility_called[winIdx] = 1 ;
-  visibility_vis[winIdx] = vis ;
-  visibility_seq[winIdx] = sequence_number ;
-  glutPostRedisplay () ;
 }
 
 static void 
@@ -449,11 +442,28 @@ OverlayDisplay(void)
 }
 
 static void 
+Visibility(int vis)
+{
+  int winIdx;
+  int window = getWindowAndIdx(&winIdx);
+  printf ( "%6d Window %d Visibility Callback:  %d\n",
+            ++sequence_number, window, vis ) ;
+  visibility_called[winIdx] = 1 ;
+  visibility_vis[winIdx] = vis ;
+  visibility_seq[winIdx] = sequence_number ;
+  glutPostRedisplay () ;
+}
+
+static void 
 WindowStatus(int state)
 {
-  int window = getWindowAndIdx(NULL);
+  int winIdx;
+  int window = getWindowAndIdx(&winIdx);
   printf ( "%6d Window %d WindowStatus Callback:  %d\n",
             ++sequence_number, window, state ) ;
+  windowStatus_called[winIdx] = 1 ;
+  windowStatus_state[winIdx] = state ;
+  windowStatus_seq[winIdx] = sequence_number ;
   glutPostRedisplay () ;
 }
 

@@ -751,7 +751,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     ShowWindow( window->Window.Handle, SW_SHOW );
 #else
     ShowWindow( window->Window.Handle,
-                fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOW );
+                fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOWNORMAL );
 #endif /* defined(_WIN32_WCE) */
 
     UpdateWindow( window->Window.Handle );
