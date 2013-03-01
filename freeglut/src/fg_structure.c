@@ -72,7 +72,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
                             GLboolean gameMode, GLboolean isMenu )
 {
     /* Have the window object created */
-    SFG_Window *window = (SFG_Window *)calloc( sizeof(SFG_Window), 1 );
+    SFG_Window *window = (SFG_Window *)calloc( 1, sizeof(SFG_Window) );
 
 	fgPlatformCreateWindow ( window );
 
@@ -90,17 +90,10 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
     else
         fgListAppend( &fgStructure.Windows, &window->Node );
 
-    /* Set the default mouse cursor and reset the modifiers value */
+    /* Set the default mouse cursor */
     window->State.Cursor    = GLUT_CURSOR_INHERIT;
-    
-    window->State.IgnoreKeyRepeat = GL_FALSE;
-    window->State.KeyRepeating    = GL_FALSE;
-    window->State.IsFullscreen    = GL_FALSE;
-    window->State.VisualizeNormals= GL_FALSE;
 
-    window->State.pWState.WindowTitle   = NULL;
-    window->State.pWState.IconTitle     = NULL;
-
+    /* Mark window as menu if a menu is to be created */
     window->IsMenu = isMenu;
 
     /*

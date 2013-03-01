@@ -928,42 +928,12 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         lRet = 0;   /* Per docs, should return zero */
         break;
 
-        /* Other messages that I have seen and which are not handled already */
-    case WM_SETTEXT:  /* 0x000c */
-        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
-        /* Pass it on to "DefWindowProc" to set the window text */
-        break;
-
-    case WM_GETTEXT:  /* 0x000d */
-        /* Ideally we would copy the title of the window into "lParam" */
-        /* strncpy ( (char *)lParam, "Window Title", wParam );
-           lRet = ( wParam > 12 ) ? 12 : wParam;  */
-        /* the number of characters copied */
-        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
-        break;
-
-    case WM_GETTEXTLENGTH:  /* 0x000e */
-        /* Ideally we would get the length of the title of the window */
-        lRet = 12;
-        /* the number of characters in "Window Title\0" (see above) */
-        break;
-
-    case WM_ERASEBKGND:  /* 0x0014 */
-        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
-        break;
-
 #if !defined(_WIN32_WCE)
     case WM_SYNCPAINT:  /* 0x0088 */
         /* Another window has moved, need to update this one */
         window->State.Redisplay = GL_TRUE;
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         /* Help screen says this message must be passed to "DefWindowProc" */
-        break;
-
-    case WM_NCPAINT:  /* 0x0085 */
-      /* Need to update the border of this window */
-        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
-        /* Pass it on to "DefWindowProc" to repaint a standard border */
         break;
 
     case WM_SYSCOMMAND :  /* 0x0112 */
