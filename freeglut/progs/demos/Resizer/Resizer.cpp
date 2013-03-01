@@ -14,6 +14,7 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY );
 void Redisplay();
 void Reshape(int width, int height);
 void Position(int x, int y);
+void WindowStatus(int state);
 
 
 
@@ -29,6 +30,12 @@ void DrawQuad()
         glVertex2d(nWidth*.75, nHeight*.25);
         glVertex2d(nWidth*.25, nHeight*.25);
     glEnd();
+}
+
+void UnhideTimer(int window)
+{
+    glutSetWindow(window);
+    glutShowWindow();
 }
 
 void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
@@ -119,6 +126,7 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
             glutDisplayFunc( Redisplay );
             glutReshapeFunc( Reshape );
             glutPositionFunc( Position );
+            glutWindowStatusFunc( WindowStatus );
         }
         else
         {
@@ -132,6 +140,26 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
         }
         break;
 
+
+    case 'i':
+    case 'I':
+        glutIconifyWindow();
+        break;
+
+
+    case 'h':
+    case 'H':
+        if (nChildWindow!=-1 && cChar=='h') /* Capital H always hides the main window*/
+        {
+            glutSetWindow(nChildWindow);
+            glutTimerFunc(2000, UnhideTimer, nChildWindow);
+        }
+        else
+        {
+            glutSetWindow(nWindow);
+            glutTimerFunc(2000, UnhideTimer, nWindow);
+        }
+        glutHideWindow();
 
     default:
         break;
@@ -170,6 +198,12 @@ void Position(int x, int y)
 
     printf("position, %s: (%d,%d)\n",win==nWindow?"top-left of main":"top-left of child relative to parent",
         x, y);
+}
+
+void WindowStatus(int state)
+{
+    int win = glutGetWindow();
+    printf("windowstatus (win %i): %i\n",win,state);
 }
 
 void Redisplay(void)
@@ -228,8 +262,8 @@ void Timer(int unused)
         nWidth, nHeight,
         nPosX ,nPosY);
 
-    /* (re)set the timer callback and ask glut to call it in 1 second */
-    glutTimerFunc(300, Timer, 0);
+    /* (re)set the timer callback and ask glut to call it in 500 ms */
+    glutTimerFunc(500, Timer, 0);
 }
 
 
@@ -259,6 +293,7 @@ int main(int argc, char* argv[])
     glutDisplayFunc( Redisplay );
     glutReshapeFunc( Reshape );
     glutPositionFunc( Position );
+    glutWindowStatusFunc( WindowStatus );
 
     glutTimerFunc(300, Timer, 0);
 

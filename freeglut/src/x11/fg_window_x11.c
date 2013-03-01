@@ -443,6 +443,8 @@ void fgPlatformGlutIconifyWindow( void )
     XIconifyWindow( fgDisplay.pDisplay.Display, fgStructure.CurrentWindow->Window.Handle,
                     fgDisplay.pDisplay.Screen );
     XFlush( fgDisplay.pDisplay.Display ); /* XXX Shouldn't need this */
+
+    fgStructure.CurrentWindow->State.Visible   = GL_FALSE;
 }
 
 /*

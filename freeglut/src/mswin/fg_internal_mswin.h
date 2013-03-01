@@ -97,6 +97,7 @@ struct tagSFG_PlatformWindowState
     BOOL            OldMaximized;       /* window maximized state - stored before the window is made fullscreen */
 
     GLboolean       MouseTracking;      /* Needed for generating GLUT_ENTERED and GLUT_LEFT entry func callbacks on windows */
+    GLboolean       WindowFuncCalled;   /* Indicate whether windowStatus/visibility func was notified that this window was created */
 };
 
 

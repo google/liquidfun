@@ -147,47 +147,16 @@ static void fghUpdateWindowStatus(SFG_Window *window, GLboolean visState)
     }
 }
 
-static void fghNotifyWindowStatus(SFG_Window *window)
+void fghNotifyWindowStatus(SFG_Window *window)
 {
-    SFG_Window* child;
-
     INVOKE_WCB( *window, WindowStatus, ( window->State.Visible?GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
 
-    /* Also notify children */
-    for( child = ( SFG_Window * )window->Children.First;
-         child;
-         child = ( SFG_Window * )child->Node.Next )
-    {
-        fghNotifyWindowStatus(child);
-    }
+    /* Don't notify children, they get their own just before first time they're drawn */
 }
 
 void fgPlatformMainLoopPreliminaryWork ( void )
 {
-    SFG_Window *window = (SFG_Window *)fgStructure.Windows.First ;
-
-    /*
-     * Processing before the main loop:  If there is a window which is open and
-     * which has a visibility/windowStatus callback, call it to inform the client
-     * code that the window is visible.  I know this is an ugly hack,
-     * but I'm not sure what else to do about it.  Depending on WM_ACTIVATE would
-     * not work as not all windows get this when you are opening multiple before
-     * the mainloop starts. WM_SHOWWINDOW looked like an interesting candidate, but
-     * it is generated and processed before glutCreate(Sub)Window returns, so no
-     * callback can yet be set on the window.
-     */
-    while( window )
-    {
-        if ( FETCH_WCB( *window, WindowStatus ) )
-        {
-            SFG_Window *current_window = fgStructure.CurrentWindow ;
-
-            fghNotifyWindowStatus(window);
-            fgSetWindow( current_window );
-        }
-
-        window = (SFG_Window *)window->Node.Next ;
-    }
+    /* no-op */
 }
 
 
@@ -501,12 +470,15 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         break;
 
     case WM_SIZE:
-        //printf("WM_SIZE (ID: %i): wParam: %i, new size: %ix%i \n",window->ID,wParam,LOWORD(lParam),HIWORD(lParam));
-        /*
-         * If the window is visible, then it is the user manually resizing it.
-         * If it is not, then it is the system sending us a dummy resize with
-         * zero dimensions on a "glutIconifyWindow" call.
-         */
+        /* printf("WM_SIZE (ID: %i): wParam: %i, new size: %ix%i \n",window->ID,wParam,LOWORD(lParam),HIWORD(lParam)); */
+
+        /* Update visibility state of the window */
+        if (wParam==SIZE_MINIMIZED)
+            fghUpdateWindowStatus(window,GL_FALSE);
+        else if (wParam==SIZE_RESTORED && !window->State.Visible)
+            fghUpdateWindowStatus(window,GL_TRUE);
+
+        /* Check window visible, we don't want to resize when the user or glutIconifyWindow minimized the window */
         if( window->State.Visible )
         {
             /* get old values first to compare to below */
@@ -533,8 +505,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             SFG_Window* saved_window = fgStructure.CurrentWindow;
             RECT windowRect;
 
-            /* Check window visible, we don't want to call the position callback when the user minimized the window */
-            if (window->State.Visible)
+            /* Check window is minimized, we don't want to call the position callback when the user or glutIconifyWindow minimized the window */
+            if (!IsIconic(window->Window.Handle))
             {
                 /* Get top-left of non-client area of window, matching coordinates of
                  * glutInitPosition and glutPositionWindow, but not those of 
@@ -559,6 +531,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                 fgSetWindow(saved_window);
             }
         }
+
+        /* according to docs, should return 0 */
+        lRet = 0;
         break;
 
     case WM_SETFOCUS:
@@ -644,9 +619,17 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         break;
 
     case WM_SHOWWINDOW:
-        //printf("WM_SHOWWINDOW\n");
-        fghUpdateWindowStatus(window, GL_TRUE);
-        window->State.Redisplay = GL_TRUE;
+        /* printf("WM_SHOWWINDOW, shown? %i, source: %i\n",wParam,lParam); */
+        if (wParam)
+        {
+            fghUpdateWindowStatus(window, GL_TRUE);
+            window->State.Redisplay = GL_TRUE;
+        }
+        else
+        {
+            fghUpdateWindowStatus(window, GL_FALSE);
+            window->State.Redisplay = GL_FALSE;
+        }
         break;
 
     case WM_PAINT:
@@ -988,8 +971,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
             case SC_MINIMIZE   :
                 /* User has clicked on the "-" to minimize the window */
-                /* Turn off the visibility */
-                fghUpdateWindowStatus(window, GL_FALSE);
+                /* Turning off the visibility is handled in WM_SIZE handler */
 
                 break ;
 
@@ -1022,7 +1004,6 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                 break ;
 
             case SC_RESTORE    :
-                fghUpdateWindowStatus(window, GL_TRUE);
                 break ;
 
             case SC_TASKLIST   :

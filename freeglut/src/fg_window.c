@@ -326,8 +326,6 @@ void FGAPIENTRY glutIconifyWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutIconifyWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIconifyWindow" );
 
-    fgStructure.CurrentWindow->State.Visible   = GL_FALSE;
-
 	fgPlatformGlutIconifyWindow ();
 
     fgStructure.CurrentWindow->State.Redisplay = GL_FALSE;

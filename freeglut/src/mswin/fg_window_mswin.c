@@ -84,6 +84,7 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
 static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
 #endif
+extern void fghNotifyWindowStatus(SFG_Window *window);
 
 
 /*
@@ -731,8 +732,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
                 fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOWNORMAL );
 #endif /* defined(_WIN32_WCE) */
 
-    UpdateWindow( window->Window.Handle );
-    ShowCursor( TRUE );  /* XXX Old comments say "hide cursor"! */
+    ShowCursor( TRUE );
 }
 
 
@@ -748,6 +748,30 @@ void fgPlatformDisplayWindow ( SFG_Window *window )
 void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 {
     RECT windowRect;
+
+    /*
+     * HACK HACK HACK:
+     * Before we do anything else, check if this is a newly created window
+     * that did not have its windowStatus/visibility func called yet
+     * we do that on first paint, but because I want to keep the paint
+     * operation as lean as possible, we do it here. The first paint
+     * goes together with a first resize call before the display callback
+     * is called, so this is just in time. Shitty place to do it, but this
+     * is the only reliable way I can think of to call the callback upon
+     * first draw of the window.
+     * More broadly speaking, I know this is an ugly hack, but I'm not sure
+     * what else to do about it.  Depending on WM_ACTIVATE would not work
+     * as not all windows get this when you are opening multiple before the
+     * mainloop starts. WM_SHOWWINDOW looked like an interesting candidate,
+     * but it is generated and processed before glutCreate(Sub)Window
+     * returns, so no callback can yet be set on the window.
+     */
+    /* Check windowStatus/visibility func has been notified that window is visible (deferred from creation time to give user opportunity to register callbacks) */
+    if (!window->State.pWState.WindowFuncCalled)
+    {
+        fghNotifyWindowStatus(window);
+        window->State.pWState.WindowFuncCalled = GL_TRUE;
+    }
 
     /*
      * For windowed mode, get the current position of the
@@ -860,7 +884,14 @@ void fgPlatformGlutHideWindow( void )
  */
 void fgPlatformGlutIconifyWindow( void )
 {
-    ShowWindow( fgStructure.CurrentWindow->Window.Handle, SW_MINIMIZE );
+    SFG_Window *win = fgStructure.CurrentWindow;
+
+    /* Call on parent window */
+    while (win->Parent)
+        win = win->Parent;
+
+    /* Visibility status of window gets updated in the WM_SHOWWINDOW handler */
+    ShowWindow(win->Window.Handle, SW_MINIMIZE);
 }
 
 /*
