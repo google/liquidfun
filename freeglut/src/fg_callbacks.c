@@ -168,14 +168,18 @@ void FGAPIENTRY glutDisplayFunc( FGCBDisplay callback )
  */
 static void fghVisibility( int status )
 {
-    int glut_status = GLUT_VISIBLE;
+    int vis_status;
 
     FREEGLUT_INTERNAL_ERROR_EXIT_IF_NOT_INITIALISED ( "Visibility Callback" );
     freeglut_return_if_fail( fgStructure.CurrentWindow );
 
+    /* Translate window status func states to visibility states */
     if( ( GLUT_HIDDEN == status )  || ( GLUT_FULLY_COVERED == status ) )
-        glut_status = GLUT_NOT_VISIBLE;
-    INVOKE_WCB( *( fgStructure.CurrentWindow ), Visibility, ( glut_status ) );
+        vis_status = GLUT_NOT_VISIBLE;
+    else    /* GLUT_FULLY_RETAINED, GLUT_PARTIALLY_RETAINED */
+        vis_status = GLUT_VISIBLE;
+
+    INVOKE_WCB( *( fgStructure.CurrentWindow ), Visibility, ( vis_status ) );
 }
 
 void FGAPIENTRY glutVisibilityFunc( FGCBVisibility callback )
