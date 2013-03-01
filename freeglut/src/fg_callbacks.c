@@ -165,6 +165,13 @@ void FGAPIENTRY glutDisplayFunc( FGCBDisplay callback )
 
 /*
  * Sets the Visibility callback for the current window.
+ * NB: the Visibility func is deprecated in favor of the WindowStatus func,
+ * which provides more detail. The visibility func callback is implemented
+ * as a translation step from the windowStatus func. When the user sets the
+ * windowStatus func, any visibility func is overwritten.
+ * DEVELOPER NOTE: in the library, only invoke the window status func, this
+ * gets automatically translated to the visibility func if thats what the
+ * user has set.
  */
 static void fghVisibility( int status )
 {

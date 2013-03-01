@@ -576,7 +576,6 @@ static void SetWindowCallbacks( int first )
     glutPositionFunc( Position );
     glutKeyboardFunc( Key );
     glutSpecialFunc( Special );
-    glutVisibilityFunc( Visibility );
     glutKeyboardUpFunc( KeyUp );
     glutSpecialUpFunc( SpecialUp );
     if (first)
@@ -588,7 +587,6 @@ static void SetWindowCallbacks( int first )
     glutEntryFunc ( Entry ) ;
     glutCloseFunc ( Close ) ;
     glutOverlayDisplayFunc ( OverlayDisplay ) ;
-    glutWindowStatusFunc ( WindowStatus ) ;
     glutSpaceballMotionFunc ( SpaceMotion ) ;
     glutSpaceballRotateFunc ( SpaceRotation ) ;
     glutSpaceballButtonFunc ( SpaceButton ) ;
@@ -596,6 +594,11 @@ static void SetWindowCallbacks( int first )
     glutDialsFunc ( Dials ) ;
     glutTabletMotionFunc ( TabletMotion ) ;
     glutTabletButtonFunc ( TabletButton ) ;
+    /* glutVisibilityFunc is deprecated in favor of glutWindowStatusFunc, which provides more detail.
+     * Setting one of these overwrites the other (see docs).
+     */
+    glutVisibilityFunc ( Visibility );  /* This will thus never be called, as glutWindowStatusFunc is set afterwards */
+    glutWindowStatusFunc ( WindowStatus ) ;
 }
 
 int 

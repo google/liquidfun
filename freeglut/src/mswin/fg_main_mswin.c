@@ -143,11 +143,11 @@ void fgPlatformMainLoopPreliminaryWork ( void )
      */
     while( window )
     {
-        if ( FETCH_WCB( *window, Visibility ) )
+        if ( FETCH_WCB( *window, WindowStatus ) )
         {
             SFG_Window *current_window = fgStructure.CurrentWindow ;
 
-            INVOKE_WCB( *window, Visibility, ( window->State.Visible ) );
+            INVOKE_WCB( *window, WindowStatus, ( window->State.Visible?GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
             fgSetWindow( current_window );
         }
 
@@ -872,8 +872,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         if (!lParam || !fgWindowByHandle((HWND)lParam))
             /* Capture released or capture taken by non-FreeGLUT window */
             setCaptureActive = 0;
-        /* User has finished resizing the window, force a redraw */
-        INVOKE_WCB( *window, Display, ( ) );
+        /* Docs advise a redraw */
+        InvalidateRect( hWnd, NULL, GL_FALSE );
+        UpdateWindow(hWnd);
         lRet = 0;   /* Per docs, should return zero */
         break;
 
