@@ -663,6 +663,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             fghRedrawWindow( window );
             EndPaint( hWnd, &ps );
         }
+        lRet = 0;   /* As per docs, should return 0 */
     }
     break;
 
