@@ -457,31 +457,15 @@ void fghComputeWindowRectFromClientArea_QueryWindow( RECT *clientRect, const SFG
 
 /* Gets the rect describing the client area (drawable area) of the
  * specified window. Output is position of corners of client area (drawable area) on the screen.
- * Returns an empty rect if window pointer or window handle is NULL.
- * If wantPosOutside is set to true, the output client Rect
- * will follow freeGLUT's window specification convention in which the
- * top-left corner is at the outside of the window, while the size
- * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable
- * area.
+ * Does not touch clientRect if window pointer or window handle is NULL.
+ * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable area.
  */
-void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL wantPosOutside )
+void fghGetClientArea( RECT *clientRect, const SFG_Window *window )
 {
     POINT topLeftClient = {0,0};
     POINT topLeftWindow = {0,0};
 
     freeglut_return_if_fail((window && window->Window.Handle));
-    
-    /*
-     * call GetWindowRect()
-     * (this returns the pixel coordinates of the outside of the window)
-     * cannot use GetClientRect as it returns a rect relative to
-     * the top-left point of the client area (.top and .left are thus always 0)
-     * and is thus only useful for querying the size of the client area, not
-     * its position.
-     */
-    GetWindowRect( window->Window.Handle, clientRect );
-    topLeftWindow.x = clientRect->top;
-    topLeftWindow.y = clientRect->left;
     
     /* Get size of client rect */
     GetClientRect(window->Window.Handle, clientRect);
@@ -489,13 +473,6 @@ void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL wantPosO
     ClientToScreen(window->Window.Handle,&topLeftClient);
     /* Add top-left offset */
     OffsetRect(clientRect,topLeftClient.x,topLeftClient.y);
-
-    /* replace top and left with top and left of window, if wanted */
-    if (wantPosOutside)
-    {
-        clientRect->left = topLeftWindow.x;
-        clientRect->top  = topLeftWindow.y;
-    }
 }
 
 #if(WINVER >= 0x500)
@@ -807,7 +784,7 @@ void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
          * for them.
          */
         RECT parentRect;
-        fghGetClientArea( &parentRect, window->Parent, FALSE );
+        fghGetClientArea( &parentRect, window->Parent );
         OffsetRect(&windowRect,-parentRect.left,-parentRect.top);
     }
     

@@ -37,7 +37,7 @@ extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
  * and the window rect from the client area given the style of the window
  * (or a valid window pointer from which the style can be queried).
  */
-extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL wantPosOutside );
+extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window );
 extern void fghGetStyleFromWindow( const SFG_Window *window, DWORD *windowStyle, DWORD *windowExStyle );
 extern void fghComputeWindowRectFromClientArea_UseStyle( RECT *clientRect, const DWORD windowStyle, const DWORD windowExStyle, BOOL posIsOutside );
 
@@ -236,15 +236,19 @@ int fgPlatformGlutGet ( GLenum eWhat )
 
             /* Get style of window, or default style */
             fghGetStyleFromWindow( fgStructure.CurrentWindow, &windowStyle, &windowExStyle );
-            /* Get client area if any window */
+            /* Get client area if we have a current window, else use dummy rect */
+            /* Also get window rect (including non-client area) */
             if (fgStructure.CurrentWindow && fgStructure.CurrentWindow->Window.Handle)
-                fghGetClientArea(&clientRect,fgStructure.CurrentWindow,FALSE);
+            {
+                fghGetClientArea(&clientRect,fgStructure.CurrentWindow);
+                GetWindowRect(fgStructure.CurrentWindow->Window.Handle,&winRect);
+            }
             else
+            {
                 SetRect(&clientRect,0,0,200,200);
-
-            /* Compute window rect (including non-client area) */
-            CopyRect(&winRect,&clientRect);
-            fghComputeWindowRectFromClientArea_UseStyle(&winRect,windowStyle,windowExStyle,FALSE);
+                CopyRect(&winRect,&clientRect);
+                fghComputeWindowRectFromClientArea_UseStyle(&winRect,windowStyle,windowExStyle,FALSE);
+            }
 
             /* Calculate border width by taking width of whole window minus width of client area and divide by two
              * NB: we assume horizontal and vertical borders have the same size, which should always be the case
