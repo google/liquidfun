@@ -138,7 +138,7 @@ static void fghUpdateWindowStatus(SFG_Window *window, GLboolean visState)
         INVOKE_WCB( *window, WindowStatus, ( visState ? GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
     }
 
-    /* Also notify children */
+    /* Also set visibility state for children */
     for( child = ( SFG_Window * )window->Children.First;
          child;
          child = ( SFG_Window * )child->Node.Next )
@@ -168,12 +168,13 @@ void fgPlatformMainLoopPreliminaryWork ( void )
 
     /*
      * Processing before the main loop:  If there is a window which is open and
-     * which has a visibility callback, call it.  I know this is an ugly hack,
-     * but I'm not sure what else to do about it.  Ideally we should leave
-     * something uninitialized in the create window code and initialize it in
-     * the main loop, and have that initialization create a "WM_ACTIVATE"
-     * message.  Then we would put the visibility callback code in the
-     * "case WM_ACTIVATE" block below.         - John Fay -- 10/24/02
+     * which has a visibility/windowStatus callback, call it to inform the client
+     * code that the window is visible.  I know this is an ugly hack,
+     * but I'm not sure what else to do about it.  Depending on WM_ACTIVATE would
+     * not work as not all windows get this when you are opening multiple before
+     * the mainloop starts. WM_SHOWWINDOW looked like an interesting candidate, but
+     * it is generated and processed before glutCreate(Sub)Window returns, so no
+     * callback can yet be set on the window.
      */
     while( window )
     {
