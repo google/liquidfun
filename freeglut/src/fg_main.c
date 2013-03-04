@@ -414,6 +414,9 @@ void FGAPIENTRY glutMainLoop( void )
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutMainLoop" );
 
+    if (!fgStructure.Windows.First)
+        fgError(" ERROR:  glutMainLoop called with no windows created.");
+
 	fgPlatformMainLoopPreliminaryWork ();
 
     fgState.ExecState = GLUT_EXEC_STATE_RUNNING ;

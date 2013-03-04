@@ -227,6 +227,7 @@ Error(const char *fmt, va_list ap)
 
     /* print warning message */
     vprintf(fmt, ap);
+    printf("\n");
 
     /* terminate program, after pause for input so user can see */
     printf ( "Please enter something to exit: " );
