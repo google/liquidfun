@@ -406,7 +406,6 @@ void fghGetStyleFromWindow( const SFG_Window *window, DWORD *windowStyle, DWORD 
     }
 }
 
-
 /* Computes position of corners of window Rect (outer position including
  * decorations) based on the provided client rect and based on the style
  * of the window in question.
@@ -455,7 +454,6 @@ void fghComputeWindowRectFromClientArea_QueryWindow( RECT *clientRect, const SFG
     fghComputeWindowRectFromClientArea_UseStyle(clientRect, windowStyle, windowExStyle, posIsOutside);
 }
 
-
 /* Gets the rect describing the client area (drawable area) of the
  * specified window. Output is position of corners of client area (drawable area) on the screen.
  * Does not touch clientRect if window pointer or window handle is NULL.
@@ -464,7 +462,6 @@ void fghComputeWindowRectFromClientArea_QueryWindow( RECT *clientRect, const SFG
 void fghGetClientArea( RECT *clientRect, const SFG_Window *window )
 {
     POINT topLeftClient = {0,0};
-    POINT topLeftWindow = {0,0};
 
     freeglut_return_if_fail((window && window->Window.Handle));
     
@@ -475,6 +472,7 @@ void fghGetClientArea( RECT *clientRect, const SFG_Window *window )
     /* Add top-left offset */
     OffsetRect(clientRect,topLeftClient.x,topLeftClient.y);
 }
+
 
 #if(WINVER >= 0x500)
 typedef struct

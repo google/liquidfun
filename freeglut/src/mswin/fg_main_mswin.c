@@ -681,12 +681,13 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
     case WM_MOUSEMOVE:
     {
+        /* Per docs, use LOWORD/HIWORD for WinCE and GET_X_LPARAM/GET_Y_LPARAM for desktop windows */
 #if defined(_WIN32_WCE)
-        window->State.MouseX = 320-HIWORD( lParam );
+        window->State.MouseX = 320-HIWORD( lParam );    /* XXX: Docs say x should be loword and y hiword? */
         window->State.MouseY = LOWORD( lParam );
 #else
-        window->State.MouseX = LOWORD( lParam );
-        window->State.MouseY = HIWORD( lParam );
+        window->State.MouseX = GET_X_LPARAM( lParam );
+        window->State.MouseY = GET_Y_LPARAM( lParam );
 #endif /* defined(_WIN32_WCE) */
         /* Restrict to [-32768, 32767] to match X11 behaviour       */
         /* See comment in "freeglut_developer" mailing list 10/4/04 */
@@ -724,12 +725,13 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         GLboolean pressed = GL_TRUE;
         int button;
 
+        /* Per docs, use LOWORD/HIWORD for WinCE and GET_X_LPARAM/GET_Y_LPARAM for desktop windows */
 #if defined(_WIN32_WCE)
-        window->State.MouseX = 320-HIWORD( lParam );
+        window->State.MouseX = 320-HIWORD( lParam );    /* XXX: Docs say x should be loword and y hiword? */
         window->State.MouseY = LOWORD( lParam );
 #else
-        window->State.MouseX = LOWORD( lParam );
-        window->State.MouseY = HIWORD( lParam );
+        window->State.MouseX = GET_X_LPARAM( lParam );
+        window->State.MouseY = GET_Y_LPARAM( lParam );
 #endif /* defined(_WIN32_WCE) */
 
         /* Restrict to [-32768, 32767] to match X11 behaviour       */
@@ -832,10 +834,22 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
     case WM_MOUSEWHEEL:
     {
-        SFG_Window *child_window = NULL;
         int wheel_number = 0;   /* Only one scroll wheel on windows */
-        /* int GET_KEYSTATE_WPARAM( wParam ); */
+#if defined(_WIN32_WCE)
+        int modkeys = LOWORD(wParam); 
+        short ticks = (short)HIWORD(wParam);
+        /* commented out as should not be needed here, mouse motion is processed in WM_MOUSEMOVE first:
+        xPos = LOWORD(lParam);  -- straight from docs, not consistent with mouse nutton and mouse motion above (which i think is wrong)
+        yPos = HIWORD(lParam);
+        */
+#else
+        /* int modkeys = GET_KEYSTATE_WPARAM( wParam ); */
         short ticks = GET_WHEEL_DELTA_WPARAM( wParam );
+        /* commented out as should not be needed here, mouse motion is processed in WM_MOUSEMOVE first:
+        window->State.MouseX = GET_X_LPARAM( lParam );
+        window->State.MouseY = GET_Y_LPARAM( lParam );
+        */
+#endif /* defined(_WIN32_WCE) */
 
         window = fghWindowUnderCursor(window);
 
