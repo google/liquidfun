@@ -149,18 +149,27 @@ void fgPlatformWarpPointer ( int x, int y )
     XFlush( fgDisplay.pDisplay.Display );
 }
 
-void fghPlatformGetCursorPos(SFG_XYUse *mouse_pos)
+void fghPlatformGetCursorPos(const SFG_Window *window, GLboolean client, SFG_XYUse *mouse_pos)
 {
-    /* Get current pointer location in screen coordinates
+    /* Get current pointer location in screen coordinates (if client is false or window is NULL), else
+     * Get current pointer location relative to top-left of client area of window (if client is true and window is not NULL)
      */
+    Window w = (client && window && window->Window.Handle)? window->Window.Handle: fgDisplay.pDisplay.RootWindow;
     Window junk_window;
     unsigned int junk_mask;
-    int junk_pos;
+    int clientX, clientY;
 
-    XQueryPointer(fgDisplay.pDisplay.Display, fgDisplay.pDisplay.RootWindow,
+    XQueryPointer(fgDisplay.pDisplay.Display, w,
             &junk_window, &junk_window,
-            &mouse_pos->X, &mouse_pos->Y,
-            &junk_pos, &junk_pos, &junk_mask);
+            &mouse_pos->X, &mouse_pos->Y, /* Screen coords relative to root window's top-left */
+            &clientX, &clientY,           /* Client coords relative to window's top-left */
+            &junk_mask);
+
+    if (client && window && window->Window.Handle)
+    {
+        mouse_pos->X = clientX;
+        mouse_pos->Y = clientY;
+    }
 
     mouse_pos->Use = GL_TRUE;
 }

@@ -76,7 +76,7 @@ static float menu_pen_hback [4] = FREEGLUT_MENU_PEN_HBACK_COLORS;
 
 
 extern GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y );
-extern void fghPlatformGetCursorPos(SFG_XYUse *mouse_pos);
+extern void fghPlatformGetCursorPos(const SFG_Window *window, GLboolean client, SFG_XYUse *mouse_pos);
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
@@ -534,7 +534,7 @@ static void fghActivateMenu( SFG_Window* window, int button )
      * origin when looking at a child window
      * for parent windows: window->State.MouseX + glutGet( GLUT_WINDOW_X ) == mouse_pos.X
      */
-    fghPlatformGetCursorPos(&mouse_pos);
+    fghPlatformGetCursorPos(NULL, GL_FALSE, &mouse_pos);
     menu->X = mouse_pos.X;
     menu->Y = mouse_pos.Y;
 
@@ -744,12 +744,9 @@ void fgDeactivateMenu( SFG_Window *window )
             fgState.MenuStateCallback(GLUT_MENU_NOT_IN_USE);
         if (fgState.MenuStatusCallback)
         {
-            /* Get cursor position on screen and convert to relative to parent_window's client area */
+            /* Get cursor position relative to parent_window's client area */
             SFG_XYUse mouse_pos;
-            fghPlatformGetCursorPos(&mouse_pos);
-            
-            mouse_pos.X -= glutGet( GLUT_WINDOW_X );
-            mouse_pos.Y -= glutGet( GLUT_WINDOW_Y );
+            fghPlatformGetCursorPos(parent_window, GL_TRUE, &mouse_pos);
 
             fgState.MenuStatusCallback(GLUT_MENU_NOT_IN_USE, mouse_pos.X, mouse_pos.Y);
         }

@@ -349,7 +349,7 @@ static SFG_Window* fghWindowUnderCursor(SFG_Window *window)
      */
     if (window && window->Children.First)   /* This window has childs */
     {
-        SFG_WindowHandleType hwnd;
+        HWND hwnd;
         SFG_Window* child_window;
 
         /* Get mouse position at time of message */

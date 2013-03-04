@@ -128,12 +128,17 @@ void fgPlatformWarpPointer ( int x, int y )
 }
 
 
-void fghPlatformGetCursorPos(SFG_XYUse *mouse_pos)
+void fghPlatformGetCursorPos(const SFG_Window *window, GLboolean client, SFG_XYUse *mouse_pos)
 {
-    /* Get current pointer location in screen coordinates
+    /* Get current pointer location in screen coordinates (if client is false or window is NULL), else
+     * Get current pointer location relative to top-left of client area of window (if client is true and window is not NULL)
      */
     POINT pos;
     GetCursorPos(&pos);
+
+    /* convert to client coords if wanted */
+    if (client && window && window->Window.Handle)
+        ScreenToClient(window->Window.Handle,&pos);
 
     mouse_pos->X = pos.x;
     mouse_pos->Y = pos.y;
