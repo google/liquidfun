@@ -601,7 +601,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                  */
                 if (FETCH_WCB( *window, Entry ))
                 {
+                    SFG_Window* saved_window = fgStructure.CurrentWindow;
                     INVOKE_WCB( *window, Entry, ( GLUT_ENTERED ) );
+                    fgSetWindow(saved_window);
 
                     tme.cbSize = sizeof(TRACKMOUSEEVENT);
                     tme.dwFlags = TME_LEAVE;
