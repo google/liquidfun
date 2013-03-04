@@ -339,7 +339,7 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
         return 1;
 }
 
-static SFG_Window* fghWindowUnderCursor(SFG_Window *window)
+SFG_Window* fghWindowUnderCursor(SFG_Window *window)
 {
     /* Check if the current window that the mouse is over is a child window
      * of the window the message was sent to. Some events only sent to main window,
@@ -551,8 +551,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         break;
 
     case WM_SETFOCUS:
-/*        printf("WM_SETFOCUS: %p\n", window ); */
-
+        /*printf("WM_SETFOCUS: %p\n", window );*/
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
 
         SetActiveWindow( window->Window.Handle );
@@ -561,13 +560,11 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         break;
 
     case WM_KILLFOCUS:
-        {
-/*            printf("WM_KILLFOCUS: %p\n", window ); */
-            lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        /*printf("WM_KILLFOCUS: %p\n", window ); */
+        lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
 
-            /* Check if there are any open menus that need to be closed */
-            fgPlatformCheckMenuDeactivate();
-        }
+        /* Check if there are any open menus that need to be closed */
+        fgPlatformCheckMenuDeactivate();
         break;
 
 #if 0

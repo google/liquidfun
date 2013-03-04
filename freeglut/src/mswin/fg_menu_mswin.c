@@ -30,6 +30,7 @@
 #include "../fg_internal.h"
 
 extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window );
+extern SFG_Window* fghWindowUnderCursor(SFG_Window *window);
 
 
 GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
@@ -63,6 +64,8 @@ void fgPlatformCheckMenuDeactivate()
             fgDeactivateMenu(menu->ParentWindow);
         else if (!wnd->IsMenu)      /* Make sure we don't kill the menu when trying to enter a submenu */
         {
+            /* we need to know if user clicked a child window, any displayable area clicked that is not the menu's parent window should close the menu */
+            wnd = fghWindowUnderCursor(wnd);
             if (wnd!=menu->ParentWindow)
                 /* User switched to another FreeGLUT window */
                 fgDeactivateMenu(menu->ParentWindow);
