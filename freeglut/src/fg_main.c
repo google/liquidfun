@@ -374,7 +374,7 @@ static void fghSleepForEvents( void )
 {
     fg_time_t msec;
 
-    if( fgState.IdleCallback || fghHavePendingRedisplays( ) )
+    if( fghHavePendingRedisplays( ) )
         return;
 
     msec = fghNextTimer( );
@@ -447,8 +447,8 @@ void FGAPIENTRY glutMainLoop( void )
                     fgSetWindow( window );
                 fgState.IdleCallback( );
             }
-
-            fghSleepForEvents( );
+            else
+                fghSleepForEvents( );
         }
     }
 
