@@ -221,6 +221,7 @@ static void fghCheckTimers( void )
         SFG_Timer *timer = fgState.Timers.First;
 
         if( timer->TriggerTime > checkTime )
+            /* XXX: are timers always sorted by triggerTime? If not, this and fghNextTimer are wrong */
             break;
 
         fgListRemove( &fgState.Timers, &timer->Node );
