@@ -172,15 +172,21 @@ static void fghDisplayAll( void )
 static void fghcbCheckJoystickPolls( SFG_Window *window,
                                      SFG_Enumerator *enumerator )
 {
-    fg_time_t checkTime = fgElapsedTime( );
-
-    if( window->State.JoystickLastPoll + window->State.JoystickPollRate <=
-        checkTime )
+    fg_time_t checkTime;
+    
+    if (window->State.JoystickPollRate > 0 && FETCH_WCB( *window, Joystick ))
     {
+        /* This window has a joystick to be polled (if pollrate <= 0, user needs to poll manually with glutForceJoystickFunc */
+        checkTime= fgElapsedTime( );
+
+        if( window->State.JoystickLastPoll + window->State.JoystickPollRate <=
+            checkTime )
+        {
 #if !defined(_WIN32_WCE)
-        fgJoystickPollWindow( window );
+            fgJoystickPollWindow( window );
 #endif /* !defined(_WIN32_WCE) */
-        window->State.JoystickLastPoll = checkTime;
+            window->State.JoystickLastPoll = checkTime;
+        }
     }
 
     fgEnumSubWindows( window, fghcbCheckJoystickPolls, enumerator );
@@ -188,6 +194,10 @@ static void fghcbCheckJoystickPolls( SFG_Window *window,
 
 /*
  * Check all windows for joystick polling
+ * 
+ * The real way to do this is to make use of the glutTimer() API
+ * to more cleanly re-implement the joystick API.  Then, this code
+ * and all other "joystick timer" code can be yanked.
  */
 static void fghCheckJoystickPolls( void )
 {
@@ -312,29 +322,8 @@ void fgWarning( const char *fmt, ... )
  * there is a joystick callback.  We have a short-circuit early
  * return if we find any joystick handler registered.
  *
- * The real way to do this is to make use of the glutTimer() API
- * to more cleanly re-implement the joystick API.  Then, this code
- * and all other "joystick timer" code can be yanked.
  *
  */
-static void fghCheckJoystickCallback( SFG_Window* w, SFG_Enumerator* e)
-{
-    if( FETCH_WCB( *w, Joystick ) )
-    {
-        e->found = GL_TRUE;
-        e->data = w;
-    }
-    fgEnumSubWindows( w, fghCheckJoystickCallback, e );
-}
-static int fghHaveJoystick( void )
-{
-    SFG_Enumerator enumerator;
-
-    enumerator.found = GL_FALSE;
-    enumerator.data = NULL;
-    fgEnumWindows( fghCheckJoystickCallback, &enumerator );
-    return !!enumerator.data;
-}
 static void fghHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
 {
     if( w->State.Redisplay && w->State.Visible )
@@ -353,6 +342,7 @@ static int fghHavePendingRedisplays (void)
     fgEnumWindows( fghHavePendingRedisplaysCallback, &enumerator );
     return !!enumerator.data;
 }
+
 /*
  * Returns the number of GLUT ticks (milliseconds) till the next timer event.
  */
@@ -378,9 +368,9 @@ static void fghSleepForEvents( void )
         return;
 
     msec = fghNextTimer( );
-    /* XXX Use GLUT timers for joysticks... */
+    /* XXX Should use GLUT timers for joysticks... */
     /* XXX Dumb; forces granularity to .01sec */
-    if( fghHaveJoystick( ) && ( msec > 10 ) )     
+    if( fgState.NumActiveJoysticks>0 && ( msec > 10 ) )     
         msec = 10;
 
 	fgPlatformSleepForEvents ( msec );
@@ -398,7 +388,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
 
     if( fgState.Timers.First )
         fghCheckTimers( );
-    fghCheckJoystickPolls( );
+    if (fgState.NumActiveJoysticks>0)   /* If zero, don't poll joysticks */
+        fghCheckJoystickPolls( );
     fghDisplayAll( );
 
     fgCloseWindows( );

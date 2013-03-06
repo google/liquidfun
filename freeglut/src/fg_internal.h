@@ -316,7 +316,7 @@ struct tagSFG_State
     fgExecutionState ExecState;           /* Used for GLUT termination       */
     char            *ProgramName;         /* Name of the invoking program    */
     GLboolean        JoysticksInitialised;  /* Only initialize if application calls for them */
-    int              NumActiveJoysticks;    /* Number of active joysticks -- if zero, don't poll joysticks */
+    int              NumActiveJoysticks;    /* Number of active joysticks (callback defined and positive pollrate) -- if zero, don't poll joysticks */
     GLboolean        InputDevsInitialised;  /* Only initialize if application calls for them */
 
 	int              MouseWheelTicks;      /* Number of ticks the mouse wheel has turned */
