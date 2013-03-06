@@ -437,9 +437,11 @@ void FGAPIENTRY glutFullScreen( void )
         fgWarning("glutFullScreen called on a child window, ignoring...");
         return;
     }
-    else if (fgStructure.GameModeWindow != NULL && fgStructure.GameModeWindow->ID==win->ID)
+    else if (fgStructure.GameModeWindow != NULL && fgStructure.GameModeWindow->ID==win->ID && win->State.IsFullscreen)
     {
-        /* Ignore fullscreen call on GameMode window, those are always fullscreen already */
+        /* Ignore fullscreen call on GameMode window, those are always fullscreen already
+         * only exception is during first entering GameMode
+         */
         return;
     }
 
