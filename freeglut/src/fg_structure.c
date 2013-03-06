@@ -49,6 +49,7 @@ SFG_Structure fgStructure = { { NULL, NULL },  /* The list of windows       */
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
 extern void fgPlatformCreateWindow ( SFG_Window *window );
+extern void fghDefaultReshape(int width, int height);
 
 static void fghClearCallBacks( SFG_Window *window )
 {
@@ -77,6 +78,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
 	fgPlatformCreateWindow ( window );
 
     fghClearCallBacks( window );
+    SET_WCB( *window, Reshape, fghDefaultReshape);
 
     /* Initialize the object properties */
     window->ID = ++fgStructure.WindowID;
@@ -94,7 +96,7 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
     window->State.Cursor    = GLUT_CURSOR_INHERIT;
 
     /* Mark window as menu if a menu is to be created */
-    window->IsMenu = isMenu;
+    window->IsMenu          = isMenu;
 
     /*
      * Open the window now. The fgOpenWindow() function is system

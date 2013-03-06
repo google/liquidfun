@@ -121,7 +121,6 @@ void FGAPIENTRY glut##a##Func( FGCB##b callback )               \
 #define IMPLEMENT_CALLBACK_FUNC(a) IMPLEMENT_CALLBACK_FUNC_2NAME(a,a)
 
 /* Implement all these callback setter functions... */
-IMPLEMENT_CALLBACK_FUNC(Reshape);
 IMPLEMENT_CALLBACK_FUNC(Position);
 IMPLEMENT_CALLBACK_FUNC(Keyboard);
 IMPLEMENT_CALLBACK_FUNC(KeyboardUp);
@@ -161,6 +160,21 @@ void FGAPIENTRY glutDisplayFunc( FGCBDisplay callback )
         fgError( "Fatal error in program.  NULL display callback not "
                  "permitted in GLUT 3.0+ or freeglut 2.0.1+" );
     SET_CALLBACK( Display );
+}
+
+void fghDefaultReshape(int width, int height)
+{
+    glViewport( 0, 0, width, height );
+}
+
+void FGAPIENTRY glutReshapeFunc( FGCBReshape callback )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutReshapeFunc" );
+    
+    if( !callback )
+        callback = fghDefaultReshape;
+
+    SET_CALLBACK( Reshape );
 }
 
 /*

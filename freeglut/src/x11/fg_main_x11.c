@@ -662,13 +662,7 @@ void fgPlatformProcessSingleEvent ( void )
 
                     window->State.pWState.OldWidth = width;
                     window->State.pWState.OldHeight = height;
-                    if( FETCH_WCB( *window, Reshape ) )
-                        INVOKE_WCB( *window, Reshape, ( width, height ) );
-                    else
-                    {
-                        fgSetWindow( window );
-                        glViewport( 0, 0, width, height );
-                    }
+                    INVOKE_WCB( *window, Reshape, ( width, height ) );
                     glutPostRedisplay( );
                     if( window->IsMenu )
                         fgSetWindow( current_window );

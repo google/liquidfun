@@ -74,13 +74,7 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 
 	fgPlatformReshapeWindow ( window, width, height );
 
-    if( FETCH_WCB( *window, Reshape ) )
-        INVOKE_WCB( *window, Reshape, ( width, height ) );
-    else
-    {
-        fgSetWindow( window );
-        glViewport( 0, 0, width, height );
-    }
+    INVOKE_WCB( *window, Reshape, ( width, height ) );
 
     /*
      * Force a window redraw.  In Windows at least this is only a partial

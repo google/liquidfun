@@ -742,6 +742,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
 void fgPlatformDisplayWindow ( SFG_Window *window )
 {
+    /* This immediately generates a WM_PAINT message upon which we call the display callbacks to redraw the window */
     RedrawWindow(
         window->Window.Handle, NULL, NULL,
         RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
