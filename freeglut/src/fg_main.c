@@ -317,13 +317,11 @@ void fgWarning( const char *fmt, ... )
 
 
 /*
- * Indicates whether Joystick events are being used by ANY window.
+ * Indicates whether a redisplay is pending for ANY window.
  *
  * The current mechanism is to walk all of the windows and ask if
- * there is a joystick callback.  We have a short-circuit early
- * return if we find any joystick handler registered.
- *
- *
+ * a redisplay is pending. We have a short-circuit early
+ * return if we find any.
  */
 static void fghHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
 {
@@ -331,6 +329,7 @@ static void fghHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
     {
         e->found = GL_TRUE;
         e->data = w;
+        return;
     }
     fgEnumSubWindows( w, fghHavePendingRedisplaysCallback, e );
 }
