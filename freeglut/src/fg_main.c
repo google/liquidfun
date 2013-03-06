@@ -74,8 +74,6 @@ static void fghReshapeWindow ( SFG_Window *window, int width, int height )
 
 	fgPlatformReshapeWindow ( window, width, height );
 
-    INVOKE_WCB( *window, Reshape, ( width, height ) );
-
     /*
      * Force a window redraw.  In Windows at least this is only a partial
      * solution:  if the window is increasing in size in either dimension,

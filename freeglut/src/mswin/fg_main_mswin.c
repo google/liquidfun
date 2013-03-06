@@ -506,8 +506,15 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 #endif /* defined(_WIN32_WCE) */
             
             if (width!=window->State.Width || height!=window->State.Height)
-                /* Something changed, need to resize */
-                window->State.NeedToResize = GL_TRUE;
+            {
+                SFG_Window* saved_window = fgStructure.CurrentWindow;
+                
+                /* size changed, call reshape callback */
+                INVOKE_WCB( *window, Reshape, ( width, height ) );
+                glutPostRedisplay( );
+                if( window->IsMenu )
+                    fgSetWindow( saved_window );
+            }
         }
 
         /* according to docs, should return 0 */
