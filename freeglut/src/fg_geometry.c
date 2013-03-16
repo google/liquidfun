@@ -478,8 +478,8 @@ static void fghGenerateNormalVisualization(GLfloat *vertices, GLfloat *normals, 
                                            GLushort *vertIdxs, GLsizei numParts, GLsizei numVertIdxsPerPart)
 {
     GLushort i,j;
-    /* calc number of vertices to generate, allocate. TODO: FREE again after draw!
-     * two for each vertex in the input shape
+    /* calc number of vertices to generate, allocate. Must be freed by caller
+     * We do the free at the end of fghDrawNormalVisualization11/fghDrawNormalVisualization20
      */
     if (!vertIdxs)
         numNormalVertices = numVertices * 2;
