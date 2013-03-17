@@ -701,10 +701,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
         fgError( "Failed to create a window (%s)!", title );
 
     /* Store title */
-    {
-        window->State.pWState.WindowTitle = malloc (strlen(title) + 1);
-        strcpy(window->State.pWState.WindowTitle, title);
-    }
+    window->State.pWState.WindowTitle = strdup(title);
 
 #if !defined(_WIN32_WCE)
     /* Need to set requested style again, apparently Windows doesn't listen when requesting windows without title bar or borders */
@@ -732,8 +729,11 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 #if defined(_WIN32_WCE)
     ShowWindow( window->Window.Handle, SW_SHOW );
 #else
-    ShowWindow( window->Window.Handle,
-                fgState.ForceIconic ? SW_SHOWMINIMIZED : SW_SHOWNORMAL );
+    {
+        BOOL iconic = fgState.ForceIconic && !window->IsMenu && !gameMode && !isSubWindow;
+        ShowWindow( window->Window.Handle,
+                    iconic ? SW_SHOWMINIMIZED : SW_SHOWNORMAL );
+    }
 #endif /* defined(_WIN32_WCE) */
 
     ShowCursor( TRUE );
@@ -917,7 +917,8 @@ void fgPlatformGlutSetWindowTitle( const char* title )
         free(wstr);
     }
 #else
-    SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
+    if (!IsIconic(fgStructure.CurrentWindow->Window.Handle))
+        SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
 #endif
 
     /* Make copy of string to refer to later */
@@ -931,6 +932,11 @@ void fgPlatformGlutSetWindowTitle( const char* title )
  */
 void fgPlatformGlutSetIconTitle( const char* title )
 {
+#ifndef _WIN32_WCE
+    if (IsIconic(fgStructure.CurrentWindow->Window.Handle))
+        SetWindowText( fgStructure.CurrentWindow->Window.Handle, title );
+#endif
+
     /* Make copy of string to refer to later */
     if (fgStructure.CurrentWindow->State.pWState.IconTitle)
         free(fgStructure.CurrentWindow->State.pWState.IconTitle);
