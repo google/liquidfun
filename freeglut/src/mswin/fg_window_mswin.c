@@ -923,8 +923,7 @@ void fgPlatformGlutSetWindowTitle( const char* title )
     /* Make copy of string to refer to later */
     if (fgStructure.CurrentWindow->State.pWState.WindowTitle)
         free(fgStructure.CurrentWindow->State.pWState.WindowTitle);
-    fgStructure.CurrentWindow->State.pWState.WindowTitle = malloc (strlen(title) + 1);
-    strcpy(fgStructure.CurrentWindow->State.pWState.WindowTitle, title);
+    fgStructure.CurrentWindow->State.pWState.WindowTitle = strdup(title);
 }
 
 /*
@@ -935,8 +934,7 @@ void fgPlatformGlutSetIconTitle( const char* title )
     /* Make copy of string to refer to later */
     if (fgStructure.CurrentWindow->State.pWState.IconTitle)
         free(fgStructure.CurrentWindow->State.pWState.IconTitle);
-    fgStructure.CurrentWindow->State.pWState.IconTitle = malloc (strlen(title) + 1);
-    strcpy(fgStructure.CurrentWindow->State.pWState.IconTitle, title);
+    fgStructure.CurrentWindow->State.pWState.IconTitle = strdup(title);
 }
 
 /*
