@@ -30,6 +30,18 @@
 #include "fg_gl2.h"
 #include <math.h>
 
+/*
+ * A note: We do not use the GLuint data type for vertex index arrays
+ * in this code as Open GL ES1 only supports GLushort. This affects the
+ * cylindrical objects only (Torus, Sphere, Cylinder and Cone) and limits
+ * their number of vertices to 65535 (2^16-1). Thats about 256*256
+ * subdivisions, which is sufficient for just about any usage case, so
+ * I am not going to worry about it for now.
+ * One could do compile time detection of the gluint type through CMake,
+ * but it is likely that we'll eventually move to runtime selection
+ * of OpenGL or GLES1/2, which would make that strategy useless...
+ */
+
 /* declare for drawing using the different OpenGL versions here so we can
    have a nice code order below */
 #ifndef GL_ES_VERSION_2_0
@@ -1155,9 +1167,7 @@ static void fghGenerateSphere(GLfloat radius, GLint slices, GLint stacks, GLfloa
     *nVert = slices*(stacks-1)+2;
     if ((*nVert) > 65535)
         /*
-         * limit of glushort, thats 256*256 subdivisions, should be enough in practice.
-         * But still:
-         * TODO: must have a better solution than this low limit, at least for architectures where gluint is available
+         * limit of glushort, thats 256*256 subdivisions, should be enough in practice. See note above
          */
         fgWarning("fghGenerateSphere: too many slices or stacks requested, indices will wrap");
 
@@ -1252,9 +1262,7 @@ void fghGenerateCone(
 
     if ((*nVert) > 65535)
         /*
-         * limit of glushort, thats 256*256 subdivisions, should be enough in practice.
-         * But still:
-         * TODO: must have a better solution than this low limit, at least for architectures where gluint is available
+         * limit of glushort, thats 256*256 subdivisions, should be enough in practice. See note above
          */
         fgWarning("fghGenerateCone: too many slices or stacks requested, indices will wrap");
 
@@ -1339,9 +1347,7 @@ void fghGenerateCylinder(
 
     if ((*nVert) > 65535)
         /*
-         * limit of glushort, thats 256*256 subdivisions, should be enough in practice.
-         * But still:
-         * TODO: must have a better solution than this low limit, at least for architectures where gluint is available
+         * limit of glushort, thats 256*256 subdivisions, should be enough in practice. See note above
          */
         fgWarning("fghGenerateCylinder: too many slices or stacks requested, indices will wrap");
 
@@ -1443,9 +1449,7 @@ void fghGenerateTorus(
 
     if ((*nVert) > 65535)
         /*
-         * limit of glushort, thats 256*256 subdivisions, should be enough in practice.
-         * But still:
-         * TODO: must have a better solution than this low limit, at least for architectures where gluint is available
+         * limit of glushort, thats 256*256 subdivisions, should be enough in practice. See note above
          */
         fgWarning("fghGenerateTorus: too many slices or stacks requested, indices will wrap");
 
