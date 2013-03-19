@@ -37,6 +37,11 @@ How to build freeglut on UNIX
   - FreeBSD: cd /usr/ports/devel/cmake && make install
   Or directly from their website:
   http://www.cmake.org/cmake/resources/software.html
+- Make sure you have the basics for compiling code, such as C compiler
+  (e.g., GCC) and the make package.
+- Also make sure you have packages installed that provide the relevant
+  header files for x11 (including xrandr) and opengl (e.g.,
+  libgl1-mesa-dev, libx11-dev and libxrandr-dev on Debian/Ubuntu).
 - Install XInput: libxi-dev / libXi-devel
 - Run 'cmake .' in the freeglut directory to generate the makefile.
 - Run 'make' to build, and 'make install' to install freeglut.
