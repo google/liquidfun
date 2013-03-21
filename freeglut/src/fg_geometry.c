@@ -663,7 +663,7 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLfloat *verti
  * vertices and normals are unique.
  */
 #define DECLARE_SHAPE_CACHE(name,nameICaps,nameCaps)\
-    static GLboolean name##Cached = FALSE;\
+    static GLboolean name##Cached = GL_FALSE;\
     static GLfloat   name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
     static GLfloat   name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
     static void fgh##nameICaps##Generate()\
@@ -673,7 +673,7 @@ static void fghGenerateGeometry(int numFaces, int numEdgePerFace, GLfloat *verti
                             name##_verts, name##_norms);\
     }
 #define DECLARE_SHAPE_CACHE_DECOMPOSE_TO_TRIANGLE(name,nameICaps,nameCaps)\
-    static GLboolean name##Cached = FALSE;\
+    static GLboolean name##Cached = GL_FALSE;\
     static GLfloat   name##_verts[nameCaps##_VERT_ELEM_PER_OBJ];\
     static GLfloat   name##_norms[nameCaps##_VERT_ELEM_PER_OBJ];\
     static GLushort  name##_vertIdxs[nameCaps##_VERT_PER_OBJ_TRI];\
@@ -1172,8 +1172,8 @@ static void fghGenerateSphere(GLfloat radius, GLint slices, GLint stacks, GLfloa
         fgWarning("fghGenerateSphere: too many slices or stacks requested, indices will wrap");
 
     /* precompute values on unit circle */
-    fghCircleTable(&sint1,&cost1,-slices,FALSE);
-    fghCircleTable(&sint2,&cost2, stacks,TRUE);
+    fghCircleTable(&sint1,&cost1,-slices,GL_FALSE);
+    fghCircleTable(&sint2,&cost2, stacks,GL_TRUE);
 
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
     *vertices = malloc((*nVert)*3*sizeof(GLfloat));
@@ -1267,7 +1267,7 @@ void fghGenerateCone(
         fgWarning("fghGenerateCone: too many slices or stacks requested, indices will wrap");
 
     /* Pre-computed circle */
-    fghCircleTable(&sint,&cost,-slices,FALSE);
+    fghCircleTable(&sint,&cost,-slices,GL_FALSE);
 
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
     *vertices = malloc((*nVert)*3*sizeof(GLfloat));
@@ -1352,7 +1352,7 @@ void fghGenerateCylinder(
         fgWarning("fghGenerateCylinder: too many slices or stacks requested, indices will wrap");
 
     /* Pre-computed circle */
-    fghCircleTable(&sint,&cost,-slices,FALSE);
+    fghCircleTable(&sint,&cost,-slices,GL_FALSE);
 
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
     *vertices = malloc((*nVert)*3*sizeof(GLfloat));
@@ -1454,8 +1454,8 @@ void fghGenerateTorus(
         fgWarning("fghGenerateTorus: too many slices or stacks requested, indices will wrap");
 
     /* precompute values on unit circle */
-    fghCircleTable(&spsi,&cpsi, nRings,FALSE);
-    fghCircleTable(&sphi,&cphi,-nSides,FALSE);
+    fghCircleTable(&spsi,&cpsi, nRings,GL_FALSE);
+    fghCircleTable(&sphi,&cphi,-nSides,GL_FALSE);
 
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
     *vertices = malloc((*nVert)*3*sizeof(GLfloat));
@@ -2062,7 +2062,7 @@ static void fghTorus( GLfloat dInnerRadius, GLfloat dOuterRadius, GLint nSides, 
 void FGAPIENTRY glutSolidSphere(double radius, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSphere" );
-    fghSphere((GLfloat)radius, slices, stacks, FALSE );
+    fghSphere((GLfloat)radius, slices, stacks, GL_FALSE );
 }
 
 /*
@@ -2071,7 +2071,7 @@ void FGAPIENTRY glutSolidSphere(double radius, GLint slices, GLint stacks)
 void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSphere" );
-    fghSphere((GLfloat)radius, slices, stacks, TRUE );
+    fghSphere((GLfloat)radius, slices, stacks, GL_TRUE );
     
 }
 
@@ -2081,7 +2081,7 @@ void FGAPIENTRY glutWireSphere(double radius, GLint slices, GLint stacks)
 void FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint stacks )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCone" );
-    fghCone((GLfloat)base, (GLfloat)height, slices, stacks, FALSE );
+    fghCone((GLfloat)base, (GLfloat)height, slices, stacks, GL_FALSE );
 }
 
 /*
@@ -2090,7 +2090,7 @@ void FGAPIENTRY glutSolidCone( double base, double height, GLint slices, GLint s
 void FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCone" );
-    fghCone((GLfloat)base, (GLfloat)height, slices, stacks, TRUE );
+    fghCone((GLfloat)base, (GLfloat)height, slices, stacks, GL_TRUE );
 }
 
 
@@ -2100,7 +2100,7 @@ void FGAPIENTRY glutWireCone( double base, double height, GLint slices, GLint st
 void FGAPIENTRY glutSolidCylinder(double radius, double height, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCylinder" );
-    fghCylinder((GLfloat)radius, (GLfloat)height, slices, stacks, FALSE );
+    fghCylinder((GLfloat)radius, (GLfloat)height, slices, stacks, GL_FALSE );
 }
 
 /*
@@ -2109,7 +2109,7 @@ void FGAPIENTRY glutSolidCylinder(double radius, double height, GLint slices, GL
 void FGAPIENTRY glutWireCylinder(double radius, double height, GLint slices, GLint stacks)
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCylinder" );
-    fghCylinder((GLfloat)radius, (GLfloat)height, slices, stacks, TRUE );
+    fghCylinder((GLfloat)radius, (GLfloat)height, slices, stacks, GL_TRUE );
 }
 
 /*
@@ -2118,7 +2118,7 @@ void FGAPIENTRY glutWireCylinder(double radius, double height, GLint slices, GLi
 void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTorus" );
-    fghTorus((GLfloat)dInnerRadius, (GLfloat)dOuterRadius, nSides, nRings, TRUE);
+    fghTorus((GLfloat)dInnerRadius, (GLfloat)dOuterRadius, nSides, nRings, GL_TRUE);
 }
 
 /*
@@ -2127,7 +2127,7 @@ void FGAPIENTRY glutWireTorus( double dInnerRadius, double dOuterRadius, GLint n
 void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint nSides, GLint nRings )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTorus" );
-    fghTorus((GLfloat)dInnerRadius, (GLfloat)dOuterRadius, nSides, nRings, FALSE);
+    fghTorus((GLfloat)dInnerRadius, (GLfloat)dOuterRadius, nSides, nRings, GL_FALSE);
 }
 
 
@@ -2138,23 +2138,23 @@ void FGAPIENTRY glutSolidTorus( double dInnerRadius, double dOuterRadius, GLint 
     void FGAPIENTRY glutWire##nameICaps( void )\
     {\
         FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWire"#nameICaps );\
-        fgh##nameICaps( TRUE );\
+        fgh##nameICaps( GL_TRUE );\
     }\
     void FGAPIENTRY glutSolid##nameICaps( void )\
     {\
         FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolid"#nameICaps );\
-        fgh##nameICaps( FALSE );\
+        fgh##nameICaps( GL_FALSE );\
     }
 
 void FGAPIENTRY glutWireCube( double dSize )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireCube" );
-    fghCube( (GLfloat)dSize, TRUE );
+    fghCube( (GLfloat)dSize, GL_TRUE );
 }
 void FGAPIENTRY glutSolidCube( double dSize )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidCube" );
-    fghCube( (GLfloat)dSize, FALSE );
+    fghCube( (GLfloat)dSize, GL_FALSE );
 }
 
 DECLARE_SHAPE_INTERFACE(Dodecahedron)
@@ -2165,12 +2165,12 @@ DECLARE_SHAPE_INTERFACE(RhombicDodecahedron)
 void FGAPIENTRY glutWireSierpinskiSponge ( int num_levels, double offset[3], double scale )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireSierpinskiSponge" );
-    fghSierpinskiSponge ( num_levels, offset, (GLfloat)scale, TRUE );
+    fghSierpinskiSponge ( num_levels, offset, (GLfloat)scale, GL_TRUE );
 }
 void FGAPIENTRY glutSolidSierpinskiSponge ( int num_levels, double offset[3], double scale )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidSierpinskiSponge" );
-    fghSierpinskiSponge ( num_levels, offset, (GLfloat)scale, FALSE );
+    fghSierpinskiSponge ( num_levels, offset, (GLfloat)scale, GL_FALSE );
 }
 
 DECLARE_SHAPE_INTERFACE(Tetrahedron)
