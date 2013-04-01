@@ -175,6 +175,15 @@ FGAPI void    FGAPIENTRY glutWireCylinder( double radius, double height, GLint s
 FGAPI void    FGAPIENTRY glutSolidCylinder( double radius, double height, GLint slices, GLint stacks);
 
 /*
+ * Rest of functions for rendering Newell's teaset, found in freeglut_teapot.c
+ * NB: front facing polygons have clockwise winding, not counter clockwise
+ */
+FGAPI void    FGAPIENTRY glutWireTeacup( double size );
+FGAPI void    FGAPIENTRY glutSolidTeacup( double size );
+FGAPI void    FGAPIENTRY glutWireTeaspoon( double size );
+FGAPI void    FGAPIENTRY glutSolidTeaspoon( double size );
+
+/*
  * Extension functions, see freeglut_ext.c
  */
 typedef void (*GLUTproc)();

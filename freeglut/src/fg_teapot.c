@@ -37,14 +37,9 @@
 
 /* -- STATIC VARS: CACHES ---------------------------------------------------- */
 
-/* Teapot defs */
-#define GLUT_TEAPOT_N_PATCHES       (6*4 + 4*2)                                                                                 /* 6 patches are reproduced (rotated) 4 times, 4 patches (flipped) 2 times */
-#define GLUT_SOLID_TEAPOT_N_SUBDIV  10
-#define GLUT_SOLID_TEAPOT_N_VERT    GLUT_SOLID_TEAPOT_N_SUBDIV*GLUT_SOLID_TEAPOT_N_SUBDIV * GLUT_TEAPOT_N_PATCHES               /* N_SUBDIV^2 vertices per patch */
-#define GLUT_SOLID_TEAPOT_N_TRI     (GLUT_SOLID_TEAPOT_N_SUBDIV-1)*(GLUT_SOLID_TEAPOT_N_SUBDIV-1) * GLUT_TEAPOT_N_PATCHES * 2   /* if e.g. 7x7 vertices for each patch, there are 6*6 squares for each patch. Each square is decomposed into 2 triangles */
-
-#define GLUT_WIRE_TEAPOT_N_SUBDIV   7
-#define GLUT_WIRE_TEAPOT_N_VERT     GLUT_WIRE_TEAPOT_N_SUBDIV*GLUT_WIRE_TEAPOT_N_SUBDIV * GLUT_TEAPOT_N_PATCHES                 /* N_SUBDIV^2 vertices per patch */
+/* General defs */
+#define GLUT_SOLID_N_SUBDIV  8
+#define GLUT_WIRE_N_SUBDIV   10
 
 /* Bernstein coefficients only have to be precomputed once (number of patch subdivisions is fixed)
  * Can thus define arrays for them here, they will be filled upon first use.
@@ -52,28 +47,89 @@
  * Have separate caches for solid and wire as they use a different number of subdivisions
  * _0 is for Bernstein polynomials, _1 for their first derivative (which we need for normals)
  */
-static GLfloat bernWire_0 [GLUT_WIRE_TEAPOT_N_SUBDIV] [4];
-static GLfloat bernWire_1 [GLUT_WIRE_TEAPOT_N_SUBDIV] [4];
-static GLfloat bernSolid_0[GLUT_SOLID_TEAPOT_N_SUBDIV][4];
-static GLfloat bernSolid_1[GLUT_SOLID_TEAPOT_N_SUBDIV][4];
+static GLfloat bernWire_0 [GLUT_WIRE_N_SUBDIV] [4];
+static GLfloat bernWire_1 [GLUT_WIRE_N_SUBDIV] [4];
+static GLfloat bernSolid_0[GLUT_SOLID_N_SUBDIV][4];
+static GLfloat bernSolid_1[GLUT_SOLID_N_SUBDIV][4];
+
+/* Teapot defs */
+#define GLUT_TEAPOT_N_PATCHES       (6*4 + 4*2)                                                                     /* 6 patches are reproduced (rotated) 4 times, 4 patches (flipped) 2 times */
+#define GLUT_SOLID_TEAPOT_N_VERT    GLUT_SOLID_N_SUBDIV*GLUT_SOLID_N_SUBDIV * GLUT_TEAPOT_N_PATCHES                 /* N_SUBDIV^2 vertices per patch */
+#define GLUT_SOLID_TEAPOT_N_TRI     (GLUT_SOLID_N_SUBDIV-1)*(GLUT_SOLID_N_SUBDIV-1) * GLUT_TEAPOT_N_PATCHES * 2     /* if e.g. 7x7 vertices for each patch, there are 6*6 squares for each patch. Each square is decomposed into 2 triangles */
+
+#define GLUT_WIRE_TEAPOT_N_VERT     GLUT_WIRE_N_SUBDIV*GLUT_WIRE_N_SUBDIV * GLUT_TEAPOT_N_PATCHES                   /* N_SUBDIV^2 vertices per patch */
 
 /* Bit of caching:
  * vertex indices and normals only need to be generated once for
  * a given number of subdivisions as they don't change with scale.
  * Vertices can be cached and reused if scale didn't change.
  */
-static GLushort vertIdxsSolid[GLUT_SOLID_TEAPOT_N_TRI*3];
-static GLfloat  normsSolid   [GLUT_SOLID_TEAPOT_N_VERT*3];
-static GLfloat  vertsSolid   [GLUT_SOLID_TEAPOT_N_VERT*3];
-static GLfloat  texcsSolid   [GLUT_SOLID_TEAPOT_N_VERT*2];
-static GLfloat  lastScaleSolid  = 0.f;
-static GLboolean initedSolid    = GL_FALSE;
+static GLushort vertIdxsTeapotS[GLUT_SOLID_TEAPOT_N_TRI*3];
+static GLfloat  normsTeapotS   [GLUT_SOLID_TEAPOT_N_VERT*3];
+static GLfloat  vertsTeapotS   [GLUT_SOLID_TEAPOT_N_VERT*3];
+static GLfloat  texcsTeapotS   [GLUT_SOLID_TEAPOT_N_VERT*2];
+static GLfloat  lastScaleTeapotS = 0.f;
+static GLboolean initedTeapotS   = GL_FALSE;
 
-static GLushort vertIdxsWire [GLUT_WIRE_TEAPOT_N_VERT*2];
-static GLfloat  normsWire    [GLUT_WIRE_TEAPOT_N_VERT*3];
-static GLfloat  vertsWire    [GLUT_WIRE_TEAPOT_N_VERT*3];
-static GLfloat  lastScaleWire   = 0.f;
-static GLboolean initedWire     = GL_FALSE;
+static GLushort vertIdxsTeapotW[GLUT_WIRE_TEAPOT_N_VERT*2];
+static GLfloat  normsTeapotW   [GLUT_WIRE_TEAPOT_N_VERT*3];
+static GLfloat  vertsTeapotW   [GLUT_WIRE_TEAPOT_N_VERT*3];
+static GLfloat  lastScaleTeapotW = 0.f;
+static GLboolean initedTeapotW   = GL_FALSE;
+
+
+/* Teacup defs */
+#define GLUT_TEACUP_N_PATCHES       (6*4 + 1*2)                                                                     /* 6 patches are reproduced (rotated) 4 times, 1 patch (flipped) 2 times */
+#define GLUT_SOLID_TEACUP_N_VERT    GLUT_SOLID_N_SUBDIV*GLUT_SOLID_N_SUBDIV * GLUT_TEACUP_N_PATCHES                 /* N_SUBDIV^2 vertices per patch */
+#define GLUT_SOLID_TEACUP_N_TRI     (GLUT_SOLID_N_SUBDIV-1)*(GLUT_SOLID_N_SUBDIV-1) * GLUT_TEACUP_N_PATCHES * 2     /* if e.g. 7x7 vertices for each patch, there are 6*6 squares for each patch. Each square is decomposed into 2 triangles */
+
+#define GLUT_WIRE_TEACUP_N_VERT     GLUT_WIRE_N_SUBDIV*GLUT_WIRE_N_SUBDIV * GLUT_TEACUP_N_PATCHES                   /* N_SUBDIV^2 vertices per patch */
+
+/* Bit of caching:
+ * vertex indices and normals only need to be generated once for
+ * a given number of subdivisions as they don't change with scale.
+ * Vertices can be cached and reused if scale didn't change.
+ */
+static GLushort vertIdxsTeacupS[GLUT_SOLID_TEACUP_N_TRI*3];
+static GLfloat  normsTeacupS   [GLUT_SOLID_TEACUP_N_VERT*3];
+static GLfloat  vertsTeacupS   [GLUT_SOLID_TEACUP_N_VERT*3];
+static GLfloat  texcsTeacupS   [GLUT_SOLID_TEACUP_N_VERT*2];
+static GLfloat  lastScaleTeacupS = 0.f;
+static GLboolean initedTeacupS   = GL_FALSE;
+
+static GLushort vertIdxsTeacupW[GLUT_WIRE_TEACUP_N_VERT*2];
+static GLfloat  normsTeacupW   [GLUT_WIRE_TEACUP_N_VERT*3];
+static GLfloat  vertsTeacupW   [GLUT_WIRE_TEACUP_N_VERT*3];
+static GLfloat  lastScaleTeacupW = 0.f;
+static GLboolean initedTeacupW   = GL_FALSE;
+
+
+/* Teaspoon defs */
+#define GLUT_TEASPOON_N_PATCHES     GLUT_TEASPOON_N_INPUT_PATCHES
+#define GLUT_SOLID_TEASPOON_N_VERT  GLUT_SOLID_N_SUBDIV*GLUT_SOLID_N_SUBDIV * GLUT_TEASPOON_N_PATCHES               /* N_SUBDIV^2 vertices per patch */
+#define GLUT_SOLID_TEASPOON_N_TRI   (GLUT_SOLID_N_SUBDIV-1)*(GLUT_SOLID_N_SUBDIV-1) * GLUT_TEASPOON_N_PATCHES * 2   /* if e.g. 7x7 vertices for each patch, there are 6*6 squares for each patch. Each square is decomposed into 2 triangles */
+
+#define GLUT_WIRE_TEASPOON_N_VERT   GLUT_WIRE_N_SUBDIV*GLUT_WIRE_N_SUBDIV * GLUT_TEASPOON_N_PATCHES                 /* N_SUBDIV^2 vertices per patch */
+
+/* Bit of caching:
+ * vertex indices and normals only need to be generated once for
+ * a given number of subdivisions as they don't change with scale.
+ * Vertices can be cached and reused if scale didn't change.
+ */
+static GLushort vertIdxsTeaspoonS[GLUT_SOLID_TEASPOON_N_TRI*3];
+static GLfloat  normsTeaspoonS   [GLUT_SOLID_TEASPOON_N_VERT*3];
+static GLfloat  vertsTeaspoonS   [GLUT_SOLID_TEASPOON_N_VERT*3];
+static GLfloat  texcsTeaspoonS   [GLUT_SOLID_TEASPOON_N_VERT*2];
+static GLfloat  lastScaleTeaspoonS = 0.f;
+static GLboolean initedTeaspoonS   = GL_FALSE;
+
+static GLushort vertIdxsTeaspoonW[GLUT_WIRE_TEASPOON_N_VERT*2];
+static GLfloat  normsTeaspoonW   [GLUT_WIRE_TEASPOON_N_VERT*3];
+static GLfloat  vertsTeaspoonW   [GLUT_WIRE_TEASPOON_N_VERT*3];
+static GLfloat  lastScaleTeaspoonW = 0.f;
+static GLboolean initedTeaspoonW   = GL_FALSE;
+
+
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 extern void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLfloat *textcs, GLsizei numVertices,
@@ -271,33 +327,29 @@ static int evalBezier(GLfloat cp[4][4][3], int nSubDivs, float (*bern_0)[4], int
     return nVertVals*flag;
 }
 
-static void fghTeapot( GLfloat scale, GLboolean useWireMode )
+static void fghTeaset( GLfloat scale, GLboolean useWireMode,
+                       GLfloat (*cpdata)[3], int (*patchdata)[16],
+                       GLushort *vertIdxs,
+                       GLfloat *verts, GLfloat *norms, GLfloat *texcs,
+                       GLfloat *lastScale, GLboolean *inited,
+                       GLboolean needNormalFix, GLboolean rotFlip, GLfloat zOffset,
+                       int nVerts, int nInputPatches, int nPatches, int nTriangles )
 {
     /* for internal use */
     int p,o;
     GLfloat cp[4][4][3];
     /* to hold pointers to static vars/arrays */
     GLfloat (*bern_0)[4], (*bern_1)[4];
-    GLfloat *verts, *norms, *lastScale;
-    GLushort *vertIdxs;
-    GLboolean * inited;
-    int nSubDivs, nVerts;
+    int nSubDivs;
 
     /* Get relevant static arrays and variables */
     bern_0      = useWireMode ? bernWire_0                : bernSolid_0;
     bern_1      = useWireMode ? bernWire_1                : bernSolid_1;
-    verts       = useWireMode ? vertsWire                 : vertsSolid;
-    norms       = useWireMode ? normsWire                 : normsSolid;
-    lastScale   = useWireMode ? &lastScaleWire            : &lastScaleSolid;
-    vertIdxs    = useWireMode ? vertIdxsWire              : vertIdxsSolid;
-    inited      = useWireMode ? &initedWire               : &initedSolid;
-    nSubDivs    = useWireMode ? GLUT_WIRE_TEAPOT_N_SUBDIV : GLUT_SOLID_TEAPOT_N_SUBDIV;
-    nVerts      = useWireMode ? GLUT_WIRE_TEAPOT_N_VERT   : GLUT_SOLID_TEAPOT_N_VERT;
+    nSubDivs    = useWireMode ? GLUT_WIRE_N_SUBDIV        : GLUT_SOLID_N_SUBDIV;
 
     /* check if need to generate vertices */
     if (!*inited || scale != *lastScale)
     {
-        printf("regen\n");
         /* set vertex array to all 0 (not necessary for normals and vertex indices) */
         memset(verts,0,nVerts*3*sizeof(GLfloat));
 
@@ -306,26 +358,26 @@ static void fghTeapot( GLfloat scale, GLboolean useWireMode )
             pregenBernstein(nSubDivs,bern_0,bern_1);
 
         /* generate vertices and normals */
-        for (p=0, o=0; p<GLUT_TEAPOT_N_INPUT_PATCHES; p++)
+        for (p=0, o=0; p<nInputPatches; p++)
         {
             /* set flags for evalBezier function */
-            int flag      = p<6?4:2;            /* first six patches get 3 copies (rotations), last four get 2 copies (flips) */
-            int normalFix = p==3?1:p==5?2:0;    /* Fix normal vectors for vertices on top of lid (patch 4) and on middle of bottom (patch 6). Different flag value as different normal needed */
+            int flag      = rotFlip?p<6?4:2:1;                  /* For teapot and teacup, first six patches get 3 copies (rotations), others get 2 copies (flips). No rotating or flipping at all for teaspoon */
+            int normalFix = needNormalFix?p==3?1:p==5?2:0:0;    /* For teapot, fix normal vectors for vertices on top of lid (patch 4) and on middle of bottom (patch 6). Different flag value as different normal needed */
 
             /* collect control points */
             int i;
             for (i=0; i<16; i++)
             {
-                /* Original code draw with a 270° rot around X axis, a scaling and a translation along the Z-axis.
+                /* Original code draws with a 270° rot around X axis, a scaling and a translation along the Z-axis.
                  * Incorporating these in the control points is much cheaper than transforming all the vertices.
                  * Original:
                  * glRotated( 270.0, 1.0, 0.0, 0.0 );
                  * glScaled( 0.5 * scale, 0.5 * scale, 0.5 * scale );
-                 * glTranslated( 0.0, 0.0, -1.5 );
+                 * glTranslated( 0.0, 0.0, -zOffset );  -> was 1.5 for teapot, but should be 1.575 to center it on the Z axis. Teacup and teaspoon have different offsets
                  */
-                cp[i/4][i%4][0] =  cpdata[patchdata[p][i]][0]      *scale/2.f;
-                cp[i/4][i%4][1] = (cpdata[patchdata[p][i]][2]-1.5f)*scale/2.f;
-                cp[i/4][i%4][2] = -cpdata[patchdata[p][i]][1]      *scale/2.f;
+                cp[i/4][i%4][0] =  cpdata[patchdata[p][i]][0]         *scale/2.f;
+                cp[i/4][i%4][1] = (cpdata[patchdata[p][i]][2]-zOffset)*scale/2.f;
+                cp[i/4][i%4][2] = -cpdata[patchdata[p][i]][1]         *scale/2.f;
             }
 
             /* eval bezier patch */
@@ -339,7 +391,7 @@ static void fghTeapot( GLfloat scale, GLboolean useWireMode )
         if (!*inited)
         {
             int r,c;
-            /* generate texture coordinates if solid teapot */
+            /* generate texture coordinates if solid teapot/teacup/teaspoon */
             if (!useWireMode)
             {
                 /* generate for first patch */
@@ -349,21 +401,21 @@ static void fghTeapot( GLfloat scale, GLboolean useWireMode )
                     for (c=0; c<nSubDivs; c++, o+=2)
                     {
                         GLfloat v = c/(nSubDivs-1.f);
-                        texcsSolid[o+0] = u;
-                        texcsSolid[o+1] = v;
+                        texcs[o+0] = u;
+                        texcs[o+1] = v;
                     }
                 }
                 /* copy it over for all the other patches */
-                for (p=1; p<GLUT_TEAPOT_N_PATCHES; p++)
-                    memcpy(texcsSolid+p*nSubDivs*nSubDivs*2,texcsSolid,nSubDivs*nSubDivs*2*sizeof(GLfloat));
+                for (p=1; p<nPatches; p++)
+                    memcpy(texcs+p*nSubDivs*nSubDivs*2,texcs,nSubDivs*nSubDivs*2*sizeof(GLfloat));
             }
 
             /* build vertex index array */
             if (useWireMode)
             {
-                /* build vertex indices to draw teapot as line strips */
+                /* build vertex indices to draw teapot/teacup/teaspoon as line strips */
                 /* first strips along increasing u, constant v */
-                for (p=0, o=0; p<GLUT_TEAPOT_N_PATCHES; p++)
+                for (p=0, o=0; p<nPatches; p++)
                 {
                     int idx = nSubDivs*nSubDivs*p;
                     for (c=0; c<nSubDivs; c++)
@@ -372,7 +424,7 @@ static void fghTeapot( GLfloat scale, GLboolean useWireMode )
                 }
 
                 /* then strips along increasing v, constant u */
-                for (p=0; p<GLUT_TEAPOT_N_PATCHES; p++) /* don't reset o, we continue appending! */
+                for (p=0; p<nPatches; p++) /* don't reset o, we continue appending! */
                 {
                     int idx = nSubDivs*nSubDivs*p;
                     for (r=0; r<nSubDivs; r++)
@@ -385,8 +437,8 @@ static void fghTeapot( GLfloat scale, GLboolean useWireMode )
             }
             else
             {
-                /* build vertex indices to draw teapot as triangles */
-                for (p=0,o=0; p<GLUT_TEAPOT_N_PATCHES; p++)
+                /* build vertex indices to draw teapot/teacup/teaspoon as triangles */
+                for (p=0,o=0; p<nPatches; p++)
                 {
                     int idx = nSubDivs*nSubDivs*p;
                     for (r=0; r<nSubDivs-1; r++)
@@ -415,11 +467,10 @@ static void fghTeapot( GLfloat scale, GLboolean useWireMode )
     }
 
     /* draw */
-    // TODO: texture coordinates
     if (useWireMode)
-        fghDrawGeometryWire(verts, norms, nVerts, vertIdxs, GLUT_TEAPOT_N_PATCHES*nSubDivs*2, nSubDivs, GL_LINE_STRIP, NULL,0,0);
+        fghDrawGeometryWire (verts, norms,        nVerts, vertIdxs, nPatches*nSubDivs*2, nSubDivs, GL_LINE_STRIP, NULL,0,0);
     else
-        fghDrawGeometrySolid(verts,norms,texcsSolid,nVerts,vertIdxs,1,GLUT_SOLID_TEAPOT_N_TRI*3);
+        fghDrawGeometrySolid(verts, norms, texcs, nVerts, vertIdxs,1,nTriangles*3);
 }
 
 
@@ -431,8 +482,13 @@ static void fghTeapot( GLfloat scale, GLboolean useWireMode )
 void FGAPIENTRY glutWireTeapot( double size )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTeapot" );
-    /* We will use the general teapot rendering code */
-    fghTeapot( (GLfloat)size, GL_TRUE );
+    fghTeaset( (GLfloat)size, GL_TRUE,
+               cpdata_teapot, patchdata_teapot,
+               vertIdxsTeapotW,
+               vertsTeapotW, normsTeapotW, NULL,
+               &lastScaleTeapotW, &initedTeapotW,
+               GL_TRUE, GL_TRUE, 1.575f,
+               GLUT_WIRE_TEAPOT_N_VERT, GLUT_TEAPOT_N_INPUT_PATCHES, GLUT_TEAPOT_N_PATCHES, 0);
 }
 
 /*
@@ -441,13 +497,75 @@ void FGAPIENTRY glutWireTeapot( double size )
 void FGAPIENTRY glutSolidTeapot( double size )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTeapot" );
-    /* We will use the general teapot rendering code */
-    fghTeapot( (GLfloat)size, GL_FALSE );
+    fghTeaset( (GLfloat)size, GL_FALSE,
+               cpdata_teapot, patchdata_teapot,
+               vertIdxsTeapotS,
+               vertsTeapotS, normsTeapotS, texcsTeapotS,
+               &lastScaleTeapotS, &initedTeapotS,
+               GL_TRUE, GL_TRUE, 1.575f,
+               GLUT_SOLID_TEAPOT_N_VERT, GLUT_TEAPOT_N_INPUT_PATCHES, GLUT_TEAPOT_N_PATCHES, GLUT_SOLID_TEAPOT_N_TRI);
+}
+
+
+/*
+ * Renders a wired teacup...
+ */
+void FGAPIENTRY glutWireTeacup( double size )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTeacup" );
+    fghTeaset( (GLfloat)size/2.5f, GL_TRUE,
+               cpdata_teacup, patchdata_teacup,
+               vertIdxsTeacupW,
+               vertsTeacupW, normsTeacupW, NULL,
+               &lastScaleTeacupW, &initedTeacupW,
+               GL_FALSE, GL_TRUE, 1.5121f,
+               GLUT_WIRE_TEACUP_N_VERT, GLUT_TEACUP_N_INPUT_PATCHES, GLUT_TEACUP_N_PATCHES, 0);
+}
+
+/*
+ * Renders a filled teacup...
+ */
+void FGAPIENTRY glutSolidTeacup( double size )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTeacup" );
+    fghTeaset( (GLfloat)size/2.5f, GL_FALSE,
+               cpdata_teacup, patchdata_teacup,
+               vertIdxsTeacupS,
+               vertsTeacupS, normsTeacupS, texcsTeacupS,
+               &lastScaleTeacupS, &initedTeacupS,
+               GL_FALSE, GL_TRUE, 1.5121f,
+               GLUT_SOLID_TEACUP_N_VERT, GLUT_TEACUP_N_INPUT_PATCHES, GLUT_TEACUP_N_PATCHES, GLUT_SOLID_TEACUP_N_TRI);
+}
+
+
+/*
+ * Renders a wired teaspoon...
+ */
+void FGAPIENTRY glutWireTeaspoon( double size )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTeaspoon" );
+    fghTeaset( (GLfloat)size/2.5f, GL_TRUE,
+               cpdata_teaspoon, patchdata_teaspoon,
+               vertIdxsTeaspoonW,
+               vertsTeaspoonW, normsTeaspoonW, NULL,
+               &lastScaleTeaspoonW, &initedTeaspoonW,
+               GL_FALSE, GL_FALSE, -0.0315f,
+               GLUT_WIRE_TEASPOON_N_VERT, GLUT_TEASPOON_N_INPUT_PATCHES, GLUT_TEASPOON_N_PATCHES, 0);
+}
+
+/*
+ * Renders a filled teaspoon...
+ */
+void FGAPIENTRY glutSolidTeaspoon( double size )
+{
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTeaspoon" );
+    fghTeaset( (GLfloat)size/2.5f, GL_FALSE,
+               cpdata_teaspoon, patchdata_teaspoon,
+               vertIdxsTeaspoonS,
+               vertsTeaspoonS, normsTeaspoonS, texcsTeaspoonS,
+               &lastScaleTeaspoonS, &initedTeaspoonS,
+               GL_FALSE, GL_FALSE, -0.0315f,
+               GLUT_SOLID_TEASPOON_N_VERT, GLUT_TEASPOON_N_INPUT_PATCHES, GLUT_TEASPOON_N_PATCHES, GLUT_SOLID_TEASPOON_N_TRI);
 }
 
 /*** END OF FILE ***/
-
-
-
-
-

@@ -462,24 +462,22 @@ static void drawSolidCone(void)                { glutSolidCone(irad,orad,slices,
 static void drawWireCone(void)                 { glutWireCone(irad,orad,slices,stacks);          }  /* irad doubles as base input, and orad as height input */
 static void drawSolidCylinder(void)            { glutSolidCylinder(irad,orad,slices,stacks);     }  /* irad doubles as radius input, and orad as height input */
 static void drawWireCylinder(void)             { glutWireCylinder(irad,orad,slices,stacks);      }  /* irad doubles as radius input, and orad as height input */
+/* per Glut manpage, it should be noted that the teapot is rendered
+ * with clockwise winding for front facing polygons...
+ * Same for the teacup and teaspoon
+ */
 static void drawSolidTeapot(void)
-{
-    /* per Glut manpage, it should be noted that the teapot is rendered
-     * with clockwise winding for front facing polygons...
-     */
-    glFrontFace(GL_CW);
-    glutSolidTeapot(orad);  /* orad doubles as size input */
-    glFrontFace(GL_CCW);
-}
+{   glFrontFace(GL_CW);    glutSolidTeapot(orad);   glFrontFace(GL_CCW);    /* orad doubles as size input */}
 static void drawWireTeapot(void)
-{
-    /* per Glut manpage, it should be noted that the teapot is rendered
-     * with clockwise winding for front facing polygons...
-     */
-    glFrontFace(GL_CW);
-    glutWireTeapot(orad);  /* orad doubles as size input */
-    glFrontFace(GL_CCW);
-}
+{   glFrontFace(GL_CW);    glutWireTeapot(orad);    glFrontFace(GL_CCW);    /* orad doubles as size input */}
+static void drawSolidTeacup(void)
+{   glFrontFace(GL_CW);    glutSolidTeacup(orad);   glFrontFace(GL_CCW);    /* orad doubles as size input */}
+static void drawWireTeacup(void)
+{   glFrontFace(GL_CW);    glutWireTeacup(orad);    glFrontFace(GL_CCW);    /* orad doubles as size input */}
+static void drawSolidTeaspoon(void)
+{   glFrontFace(GL_CW);    glutSolidTeaspoon(orad); glFrontFace(GL_CCW);    /* orad doubles as size input */}
+static void drawWireTeaspoon(void)
+{   glFrontFace(GL_CW);    glutWireTeaspoon(orad);  glFrontFace(GL_CCW);    /* orad doubles as size input */}
 
 #define RADIUSFAC    0.70710678118654752440084436210485f
 
@@ -554,6 +552,8 @@ static const entry table [] =
     ENTRY (Icosahedron,GEO_NO_SIZE),
     ENTRY (SierpinskiSponge,GEO_SCALE),
     ENTRY (Teapot,GEO_SIZE),
+    ENTRY (Teacup,GEO_SIZE),
+    ENTRY (Teaspoon,GEO_SIZE),
     ENTRY (Torus,GEO_INNER_OUTER_RAD),
     ENTRY (Sphere,GEO_RAD),
     ENTRY (Cone,GEO_BASE_HEIGHT),
