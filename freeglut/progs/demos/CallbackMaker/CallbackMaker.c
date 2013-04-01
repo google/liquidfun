@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 
 static int sequence_number = 0 ;
 
@@ -80,15 +81,19 @@ Mod2Text(int mods, char *text)
     if (mods&GLUT_ACTIVE_CTRL)
         strcat(text,"CTRL");
     if (mods&GLUT_ACTIVE_SHIFT)
+    {
         if (text[0])
             strcat(text,"+SHIFT");
         else
             strcat(text,"SHIFT");
+    }
     if (mods&GLUT_ACTIVE_ALT)
+    {
         if (text[0])
             strcat(text,"+ALT");
         else
             strcat(text,"ALT");
+    }
 
     if (!text[0])
         strcat(text,"none");
@@ -213,7 +218,7 @@ Display(void)
 static void
 Warning(const char *fmt, va_list ap)
 {
-    printf("%6d Warning callback:\n");
+    printf("%6d Warning callback:\n",++sequence_number);
 
     /* print warning message */
     vprintf(fmt, ap);
@@ -223,7 +228,7 @@ static void
 Error(const char *fmt, va_list ap)
 {
     char dummy_string[STRING_LENGTH];
-    printf("%6d Error callback:\n");
+    printf("%6d Error callback:\n",++sequence_number);
 
     /* print warning message */
     vprintf(fmt, ap);

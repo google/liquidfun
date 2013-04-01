@@ -311,8 +311,6 @@ void readConfigFile ( char *fnme )
 int 
 main(int argc, char *argv[])
 {
-  int fractal_window ;
-
   glutInitWindowSize(500, 250);
   glutInitWindowPosition ( 140, 140 );
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE );
@@ -323,7 +321,7 @@ main(int argc, char *argv[])
   else
     readConfigFile ( "fractals.dat" ) ;
 
-  fractal_window = glutCreateWindow( window_title );
+  glutCreateWindow( window_title );
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
 

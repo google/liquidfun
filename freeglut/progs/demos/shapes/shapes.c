@@ -852,10 +852,12 @@ static void special (int key, int x, int y)
 
     /* Cuboctahedron can't be shown when in shader mode, skip it */
     if (useShader && NUMBEROF (table)-1 == ( unsigned )function_index)
+    {
         if (key==GLUT_KEY_PAGE_UP)
             function_index = 0;
         else
             function_index -= 1;
+    }
 }
 
 

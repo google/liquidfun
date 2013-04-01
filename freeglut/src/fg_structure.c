@@ -533,7 +533,7 @@ static void fghcbMenuByID( SFG_Menu *menu,
         return;
 
     /* Check the menu's ID. */
-    if( menu->ID == (int)(enumerator->data) )
+    if( menu->ID == *( int *)(enumerator->data) )
     {
         enumerator->found = GL_TRUE;
         enumerator->data = menu;
@@ -552,7 +552,7 @@ SFG_Menu* fgMenuByID( int menuID )
 
     /* This is easy and makes use of the menus enumeration defined above */
     enumerator.found = GL_FALSE;
-    enumerator.data = (void *)menuID;
+    enumerator.data = (void *)&menuID;
     fgEnumMenus( fghcbMenuByID, &enumerator );
 
     if( enumerator.found )
