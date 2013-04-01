@@ -205,6 +205,9 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutInitContextFunc)
     CHECK_NAME(glutPauseFunc)
     CHECK_NAME(glutResumeFunc)
+    CHECK_NAME(glutSetVertexAttribCoord3)
+    CHECK_NAME(glutSetVertexAttribNormal)
+    CHECK_NAME(glutSetVertexAttribTexCoord2)
 #undef CHECK_NAME
 
     return NULL;

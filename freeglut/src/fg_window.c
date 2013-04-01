@@ -148,6 +148,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 #endif
     window->Window.attribute_v_coord = -1;
     window->Window.attribute_v_normal = -1;
+    window->Window.attribute_v_texture = -1;
 
     fgInitGL2();
 

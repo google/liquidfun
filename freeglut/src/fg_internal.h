@@ -371,8 +371,14 @@ struct tagSFG_Context
 	SFG_PlatformContext pContext;    /* The window's FBConfig (X11) or device context (Windows) */
 
     int             DoubleBuffered;  /* Treat the window as double-buffered */
+
+    /* When drawing geometry to vertex attribute buffers, user specifies 
+     * the attribute indices for vertices, normals and/or texture coords
+     * to freeglut. Those are stored here
+     */
     GLint           attribute_v_coord;
     GLint           attribute_v_normal;
+    GLint           attribute_v_texture;
 };
 
 

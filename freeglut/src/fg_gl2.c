@@ -37,6 +37,11 @@ void FGAPIENTRY glutSetVertexAttribNormal(GLint attrib) {
     fgStructure.CurrentWindow->Window.attribute_v_normal = attrib;
 }
 
+void FGAPIENTRY glutSetVertexAttribTexCoord2(GLint attrib) {
+    if (fgStructure.CurrentWindow != NULL)
+        fgStructure.CurrentWindow->Window.attribute_v_texture = attrib;
+}
+
 void fgInitGL2() {
 #ifndef GL_ES_VERSION_2_0
     fgState.HasOpenGL20 = 0;

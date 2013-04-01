@@ -239,6 +239,7 @@ FGAPI void    FGAPIENTRY glutInitWarningFunc( void (* callback)( const char *fmt
 /* OpenGL >= 2.0 support */
 FGAPI void    FGAPIENTRY glutSetVertexAttribCoord3(GLint attrib);
 FGAPI void    FGAPIENTRY glutSetVertexAttribNormal(GLint attrib);
+FGAPI void    FGAPIENTRY glutSetVertexAttribTexCoord2(GLint attrib);
 
 /* Mobile platforms lifecycle */
 FGAPI void    FGAPIENTRY glutInitContextFunc(void (* callback)());

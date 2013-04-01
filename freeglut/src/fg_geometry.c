@@ -186,7 +186,7 @@ void fghDrawGeometrySolid(GLfloat *vertices, GLfloat *normals, GLfloat *textcs, 
 {
     GLint attribute_v_coord   = fgStructure.CurrentWindow->Window.attribute_v_coord;
     GLint attribute_v_normal  = fgStructure.CurrentWindow->Window.attribute_v_normal;
-    GLint attribute_v_texture = -1;   // TODO!!!
+    GLint attribute_v_texture = fgStructure.CurrentWindow->Window.attribute_v_texture;
 
     if (fgStructure.CurrentWindow->State.VisualizeNormals)
         /* generate normals for each vertex to be drawn as well */
