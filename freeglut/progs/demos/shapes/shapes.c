@@ -690,6 +690,7 @@ static void display(void)
         gl_UseProgram (program);
         glutSetVertexAttribCoord3(attribute_fg_coord);
         glutSetVertexAttribNormal(attribute_fg_normal);
+        /* There is also a glutSetVertexAttribTexCoord2, which is used only when drawing the teapot, teacup or teaspoon */
 
         gl_matrix_mode(GL_PROJECTION);
         gl_load_identity();
