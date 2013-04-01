@@ -28,7 +28,6 @@
 /* notes:
  * the (very little) required math is found here: http://www.gamasutra.com/view/feature/131848/tessellation_of_4x4_bezier_patches_.php?print=1
  * a much more optimized version is here, didn't bother to implement that: http://www.gamasutra.com/view/feature/131794/an_indepth_look_at_bicubic_bezier_.php?print=1
- * teacup and teaspoon data: ftp://ftp.funet.fi/pub/sci/graphics/packages/objects/teaset.tar.Z (figure out this sampling scheme)
  */
 
 #include <GL/freeglut.h>
