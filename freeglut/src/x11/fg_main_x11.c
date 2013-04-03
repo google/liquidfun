@@ -840,7 +840,7 @@ void fgPlatformProcessSingleEvent ( void )
              * private call should be generated.
              */
             if( fgCheckActiveMenu( window, button, pressed,
-                                   event.xbutton.x_root, event.xbutton.y_root ) )
+                                   event.xbutton.x, event.xbutton.y ) )
                 break;
 
             /*
