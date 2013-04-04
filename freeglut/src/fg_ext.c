@@ -203,12 +203,11 @@ static GLUTproc fghGetGLUTProcAddress( const char* procName )
     CHECK_NAME(glutInitContextProfile);
     CHECK_NAME(glutInitErrorFunc);
     CHECK_NAME(glutInitWarningFunc);
-    CHECK_NAME(glutInitContextFunc)
-    CHECK_NAME(glutPauseFunc)
-    CHECK_NAME(glutResumeFunc)
-    CHECK_NAME(glutSetVertexAttribCoord3)
-    CHECK_NAME(glutSetVertexAttribNormal)
-    CHECK_NAME(glutSetVertexAttribTexCoord2)
+    CHECK_NAME(glutInitContextFunc);
+    CHECK_NAME(glutAppStatusFunc);
+    CHECK_NAME(glutSetVertexAttribCoord3);
+    CHECK_NAME(glutSetVertexAttribNormal);
+    CHECK_NAME(glutSetVertexAttribTexCoord2);
 #undef CHECK_NAME
 
     return NULL;

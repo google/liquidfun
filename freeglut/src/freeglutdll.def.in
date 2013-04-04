@@ -159,8 +159,7 @@ EXPORTS
 	glutMultiMotionFunc
 	glutMultiPassiveFunc
     glutInitContextFunc
-    glutPauseFunc
-    glutResumeFunc
+    glutAppStatusFunc
     glutSetVertexAttribCoord3
     glutSetVertexAttribNormal
     glutSetVertexAttribTexCoord2

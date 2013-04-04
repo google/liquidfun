@@ -250,8 +250,10 @@ FGAPI void    FGAPIENTRY glutSetVertexAttribTexCoord2(GLint attrib);
 
 /* Mobile platforms lifecycle */
 FGAPI void    FGAPIENTRY glutInitContextFunc(void (* callback)());
-FGAPI void    FGAPIENTRY glutPauseFunc(void (* callback)());
-FGAPI void    FGAPIENTRY glutResumeFunc(void (* callback)());
+FGAPI void    FGAPIENTRY glutAppStatusFunc(void (* callback)(int));
+/* state flags that can be passed to callback set by glutAppStatusFunc */
+#define GLUT_APPSTATUS_PAUSE                0x0001
+#define GLUT_APPSTATUS_RESUME               0x0002
 
 /*
  * GLUT API macro definitions -- the display mode definitions

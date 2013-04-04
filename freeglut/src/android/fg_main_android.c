@@ -437,7 +437,7 @@ void fgPlatformProcessSingleEvent ( void )
   /* If we're not in RESUME state, Android paused us, so wait */
   struct android_app* app = fgDisplay.pDisplay.app;
   if (app->destroyRequested != 1 && app->activityState != APP_CMD_RESUME) {
-      INVOKE_WCB(*window, Pause, ());
+      INVOKE_WCB(*window, AppStatus, (GLUT_APPSTATUS_PAUSE));
 
     int FOREVER = -1;
     while (app->destroyRequested != 1 && (app->activityState != APP_CMD_RESUME)) {
@@ -472,7 +472,7 @@ void fgPlatformProcessSingleEvent ( void )
           fgWarning("Resuming application, but no callback to reload context resources (glutInitContextFunc)");
     }
 
-    INVOKE_WCB(*window, Resume, ());
+    INVOKE_WCB(*window, AppStatus, (GLUT_APPSTATUS_RESUME));
   }
 }
 

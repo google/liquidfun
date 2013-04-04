@@ -220,8 +220,7 @@ typedef void (* FGCBMultiMotion  )( int, int, int );
 typedef void (* FGCBMultiPassive )( int, int, int );
 
 typedef void (* FGCBInitContext)();
-typedef void (* FGCBPause)();
-typedef void (* FGCBResume)();
+typedef void (* FGCBAppStatus)(int);
 
 /* The global callbacks type definitions */
 typedef void (* FGCBIdle          )( void );
@@ -602,8 +601,7 @@ enum
 
     /* Mobile platforms LifeCycle */
     WCB_InitContext,
-    WCB_Pause,
-    WCB_Resume,
+    WCB_AppStatus,
 
     /* Presently ignored */
     WCB_Select,
