@@ -195,6 +195,26 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
         }
         glutHideWindow();
 
+
+    case 'p':
+    case 'P':
+        if (nChildWindow!=-1 && cChar=='p') /* Capital P always changes pointer for the main window*/
+        {
+            glutSetWindow(nChildWindow);
+            if (glutGet(GLUT_WINDOW_CURSOR)==GLUT_CURSOR_TOP_SIDE)
+                glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
+            else
+                glutSetCursor(GLUT_CURSOR_TOP_SIDE);
+        }
+        else
+        {
+            glutSetWindow(nWindow);
+            if (glutGet(GLUT_WINDOW_CURSOR)==GLUT_CURSOR_CYCLE)
+                glutSetCursor(GLUT_CURSOR_RIGHT_ARROW);
+            else
+                glutSetCursor(GLUT_CURSOR_CYCLE);
+        }
+
     default:
         break;
     }
