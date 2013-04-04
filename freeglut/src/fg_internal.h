@@ -306,6 +306,7 @@ struct tagSFG_State
     int              ActiveMenus;          /* Num. of currently active menus */
     FGCBMenuState    MenuStateCallback;    /* Menu callbacks are global      */
     FGCBMenuStatus   MenuStatusCallback;
+    void*            MenuFont;             /* Font to be used for newly created menus */
 
     SFG_XYUse        GameModeSize;         /* Game mode screen's dimensions  */
     int              GameModeDepth;        /* The pixel depth for game mode  */
@@ -640,6 +641,7 @@ struct tagSFG_Menu
     FGCBMenu            Callback;     /* The menu callback                   */
     FGCBDestroy         Destroy;      /* Destruction callback                */
     GLboolean           IsActive;     /* Is the menu selected?               */
+    void*               Font;         /* Font to be used for displaying this menu */
     int                 Width;        /* Menu box width in pixels            */
     int                 Height;       /* Menu box height in pixels           */
     int                 X, Y;         /* Menu box raster position            */

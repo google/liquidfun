@@ -88,6 +88,8 @@
 
 #define  GLUT_GEOMETRY_VISUALIZE_NORMALS    0x0205
 
+#define  GLUT_MENU_FONT                     0x0206  /* TOOD: now glutSetOption only */
+
 /*
  * New tokens for glutInitDisplayMode.
  * Only one GLUT_AUXn bit may be used at a time.
@@ -134,6 +136,11 @@ FGAPI void    FGAPIENTRY glutExit         ( void );
  */
 FGAPI void    FGAPIENTRY glutFullScreenToggle( void );
 FGAPI void    FGAPIENTRY glutLeaveFullScreen( void );
+
+/*
+ * Menu functions
+ */
+FGAPI void    FGAPIENTRY glutSetMenuFont( void* font );
 
 /*
  * Window-specific callback functions, see freeglut_callbacks.c

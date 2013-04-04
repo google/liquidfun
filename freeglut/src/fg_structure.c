@@ -132,6 +132,7 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     menu->ID       = ++fgStructure.MenuID;
     menu->Callback = menuCallback;
     menu->ActiveEntry = NULL;
+    menu->Font     = fgState.MenuFont;
 
     fgListInit( &menu->Entries );
     fgListAppend( &fgStructure.Menus, &menu->Node );

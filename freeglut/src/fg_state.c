@@ -44,6 +44,7 @@
 extern int fgPlatformGlutGet ( GLenum eWhat );
 extern int fgPlatformGlutDeviceGet ( GLenum eWhat );
 extern int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size);
+extern SFG_Font* fghFontByID( void* font );
 
 
 /* -- LOCAL DEFINITIONS ---------------------------------------------------- */
@@ -118,6 +119,18 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
     case GLUT_GEOMETRY_VISUALIZE_NORMALS:
       if( fgStructure.CurrentWindow != NULL )
         fgStructure.CurrentWindow->State.VisualizeNormals = value;
+      break;
+
+    case GLUT_MENU_FONT:
+        {
+            void* fontID = (void*)value;
+            SFG_Font* font;
+            font = fghFontByID( fontID );
+            if (!font)
+                fgWarning("glutSetOption(GLUT_MENU_FONT,...): bitmap font 0x%08x not found. Make sure you're not passing a stroke font. Ignoring...\n",fontID);
+            else
+                fgState.MenuFont = fontID;
+        }
       break;
 
     default:

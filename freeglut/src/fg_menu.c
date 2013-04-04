@@ -43,8 +43,8 @@
  * GLUT apparently uses host-system menus rather than building its own.
  * freeglut is building its own menus from scratch.)
  *
- * FREEGLUT_MENU_HEIGHT gives the height of ONE menu box.  This should be
- * the distances between two adjacent menu entries.  It should scale
+ * FREEGLUT_MENUENTRY_HEIGHT gives the height of ONE menu box.  This should
+ * be the distances between two adjacent menu entries.  It should scale
  * automatically with the font choice, so you needn't alter it---unless you
  * use a stroked font.
  *
@@ -56,8 +56,8 @@
  */
 /* See platform-specific header files for menu font and color definitions */
 
-#define  FREEGLUT_MENU_HEIGHT  (glutBitmapHeight(FREEGLUT_MENU_FONT) + \
-                                FREEGLUT_MENU_BORDER)
+#define  FREEGLUT_MENUENTRY_HEIGHT(font)    (glutBitmapHeight(font) + \
+                                            FREEGLUT_MENU_BORDER)
 #define  FREEGLUT_MENU_BORDER   2
 
 
@@ -77,6 +77,7 @@ static float menu_pen_hback [4] = FREEGLUT_MENU_PEN_HBACK_COLORS;
 
 extern GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y );
 extern void fghPlatformGetCursorPos(const SFG_Window *window, GLboolean client, SFG_XYUse *mouse_pos);
+extern SFG_Font* fghFontByID( void* font );
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
@@ -187,7 +188,7 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
         ( y >= FREEGLUT_MENU_BORDER ) &&
         ( y < menu->Height - FREEGLUT_MENU_BORDER )  )
     {
-        int menuID = ( y - FREEGLUT_MENU_BORDER ) / FREEGLUT_MENU_HEIGHT;
+        int menuID = ( y - FREEGLUT_MENU_BORDER ) / FREEGLUT_MENUENTRY_HEIGHT(menu->Font);
 
         /* The mouse cursor is somewhere over our box, check it out. */
         menuEntry = fghFindMenuEntry( menu, menuID + 1 );
@@ -235,7 +236,7 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
                 fghGetVMaxExtent(menu->ParentWindow, &max_x, &max_y);
                 menuEntry->SubMenu->X = menu->X + menu->Width;
                 menuEntry->SubMenu->Y = menu->Y +
-                    menuEntry->Ordinal * FREEGLUT_MENU_HEIGHT;
+                    menuEntry->Ordinal * FREEGLUT_MENUENTRY_HEIGHT(menu->Font);
 
                 if( menuEntry->SubMenu->X + menuEntry->SubMenu->Width > max_x )
                     menuEntry->SubMenu->X = menu->X - menuEntry->SubMenu->Width;
@@ -243,7 +244,7 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
                 if( menuEntry->SubMenu->Y + menuEntry->SubMenu->Height > max_y )
                 {
                     menuEntry->SubMenu->Y -= ( menuEntry->SubMenu->Height -
-                                               FREEGLUT_MENU_HEIGHT -
+                                               FREEGLUT_MENUENTRY_HEIGHT(menu->Font) -
                                                2 * FREEGLUT_MENU_BORDER );
                     if( menuEntry->SubMenu->Y < 0 )
                         menuEntry->SubMenu->Y = 0;
@@ -348,13 +349,13 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
             glColor4fv( menu_pen_hback );
             glBegin( GL_QUADS );
                 glVertex2i( border,
-                            (menuID + 0)*FREEGLUT_MENU_HEIGHT + border );
+                            (menuID + 0)*FREEGLUT_MENUENTRY_HEIGHT(menu->Font) + border );
                 glVertex2i( menu->Width - border,
-                            (menuID + 0)*FREEGLUT_MENU_HEIGHT + border );
+                            (menuID + 0)*FREEGLUT_MENUENTRY_HEIGHT(menu->Font) + border );
                 glVertex2i( menu->Width - border,
-                            (menuID + 1)*FREEGLUT_MENU_HEIGHT + border );
+                            (menuID + 1)*FREEGLUT_MENUENTRY_HEIGHT(menu->Font) + border );
                 glVertex2i( border,
-                            (menuID + 1)*FREEGLUT_MENU_HEIGHT + border );
+                            (menuID + 1)*FREEGLUT_MENUENTRY_HEIGHT(menu->Font) + border );
             glEnd( );
         }
     }
@@ -375,25 +376,25 @@ static void fghDisplayMenuBox( SFG_Menu* menu )
         /* Try to center the text - JCJ 31 July 2003*/
         glRasterPos2i(
             2 * border,
-            ( i + 1 )*FREEGLUT_MENU_HEIGHT -
-            ( int )( FREEGLUT_MENU_HEIGHT*0.3 - border )
+            ( i + 1 )*FREEGLUT_MENUENTRY_HEIGHT(menu->Font) -
+            ( int )( FREEGLUT_MENUENTRY_HEIGHT(menu->Font)*0.3 - border )
         );
 
         /* Have the label drawn, character after character: */
-        glutBitmapString( FREEGLUT_MENU_FONT,
+        glutBitmapString( menu->Font,
                           (unsigned char *)menuEntry->Text);
 
         /* If it's a submenu, draw a right arrow */
         if( menuEntry->SubMenu )
         {
-            int width = glutBitmapWidth( FREEGLUT_MENU_FONT, '_' );
+            int width = glutBitmapWidth( menu->Font, '_' );
             int x_base = menu->Width - 2 - width;
-            int y_base = i*FREEGLUT_MENU_HEIGHT + border;
+            int y_base = i*FREEGLUT_MENUENTRY_HEIGHT(menu->Font) + border;
             glBegin( GL_TRIANGLES );
                 glVertex2i( x_base, y_base + 2*border);
                 glVertex2i( menu->Width - 2, y_base +
-                            ( FREEGLUT_MENU_HEIGHT + border) / 2 );
-                glVertex2i( x_base, y_base + FREEGLUT_MENU_HEIGHT - border );
+                            ( FREEGLUT_MENUENTRY_HEIGHT(menu->Font) + border) / 2 );
+                glVertex2i( x_base, y_base + FREEGLUT_MENUENTRY_HEIGHT(menu->Font) - border );
             glEnd( );
         }
 
@@ -771,7 +772,7 @@ void fghCalculateMenuBoxSize( void )
     {
         /* Update the menu entry's width value */
         menuEntry->Width = glutBitmapLength(
-            FREEGLUT_MENU_FONT,
+            fgStructure.CurrentMenu->Font,
             (unsigned char *)menuEntry->Text
         );
 
@@ -781,7 +782,7 @@ void fghCalculateMenuBoxSize( void )
          */
         if (menuEntry->SubMenu )
             menuEntry->Width += glutBitmapLength(
-                FREEGLUT_MENU_FONT,
+                fgStructure.CurrentMenu->Font,
                 (unsigned char *)"_"
             );
 
@@ -789,7 +790,7 @@ void fghCalculateMenuBoxSize( void )
         if( menuEntry->Width > width )
             width = menuEntry->Width;
 
-        height += FREEGLUT_MENU_HEIGHT;
+        height += FREEGLUT_MENUENTRY_HEIGHT(fgStructure.CurrentMenu->Font);
     }
 
     /* Store the menu's box size now: */
@@ -904,6 +905,27 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
     menuEntry->ID      = -1;
 
     fgListAppend( &fgStructure.CurrentMenu->Entries, &menuEntry->Node );
+    fghCalculateMenuBoxSize( );
+}
+
+/*
+ * Changes the current menu's font
+ */
+void FGAPIENTRY glutSetMenuFont( void* fontID )
+{
+    SFG_Font* font;
+    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetMenuFont" );
+    freeglut_return_if_fail( fgStructure.CurrentMenu );
+
+    if (fgGetActiveMenu())
+        fgError("Menu manipulation not allowed while menus in use.");
+
+    font = fghFontByID( fontID );
+    if (!font)
+        fgWarning("glutChangeMenuFont: bitmap font 0x%08x not found. Make sure you're not passing a stroke font. Ignoring...\n",fontID);
+    freeglut_return_if_fail( font );
+
+    fgStructure.CurrentMenu->Font = fontID;
     fghCalculateMenuBoxSize( );
 }
 

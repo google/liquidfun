@@ -56,7 +56,7 @@ extern SFG_StrokeFont fgStrokeMonoRoman;
  * Matches a font ID with a SFG_Font structure pointer.
  * This was changed to match the GLUT header style.
  */
-static SFG_Font* fghFontByID( void* font )
+SFG_Font* fghFontByID( void* font )
 {
     if( font == GLUT_BITMAP_8_BY_13        )
         return &fgFontFixed8x13;
@@ -73,7 +73,6 @@ static SFG_Font* fghFontByID( void* font )
     if( font == GLUT_BITMAP_TIMES_ROMAN_24 )
         return &fgFontTimesRoman24;
 
-    fgWarning( "font 0x%08x not found", font );
     return 0;
 }
 
@@ -88,7 +87,6 @@ static SFG_StrokeFont* fghStrokeByID( void* font )
     if( font == GLUT_STROKE_MONO_ROMAN )
         return &fgStrokeMonoRoman;
 
-    fgWarning( "stroke font 0x%08x not found", font );
     return 0;
 }
 
@@ -104,8 +102,12 @@ void FGAPIENTRY glutBitmapCharacter( void* fontID, int character )
     SFG_Font* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapCharacter" );
     font = fghFontByID( fontID );
+    if (!font)
+    {
+        fgWarning("glutBitmapCharacter: bitmap font 0x%08x not found. Make sure you're not passing a stroke font.\n",fontID);
+        return;
+    }
     freeglut_return_if_fail( ( character >= 1 )&&( character < 256 ) );
-    freeglut_return_if_fail( font );
 
     /*
      * Find the character we want to draw (???)
@@ -135,7 +137,11 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
     SFG_Font* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapString" );
     font = fghFontByID( fontID );
-    freeglut_return_if_fail( font );
+    if (!font)
+    {
+        fgWarning("glutBitmapString: bitmap font 0x%08x not found. Make sure you're not passing a stroke font.\n",fontID);
+        return;
+    }
     if ( !string || ! *string )
         return;
 
@@ -182,9 +188,13 @@ int FGAPIENTRY glutBitmapWidth( void* fontID, int character )
 {
     SFG_Font* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapWidth" );
-    font = fghFontByID( fontID );
     freeglut_return_val_if_fail( character > 0 && character < 256, 0 );
-    freeglut_return_val_if_fail( font, 0 );
+    font = fghFontByID( fontID );
+    if (!font)
+    {
+        fgWarning("glutBitmapWidth: bitmap font 0x%08x not found. Make sure you're not passing a stroke font.\n",fontID);
+        return 0;
+    }
     return *( font->Characters[ character ] );
 }
 
@@ -198,7 +208,11 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
     SFG_Font* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapLength" );
     font = fghFontByID( fontID );
-    freeglut_return_val_if_fail( font, 0 );
+    if (!font)
+    {
+        fgWarning("glutBitmapLength: bitmap font 0x%08x not found. Make sure you're not passing a stroke font.\n",fontID);
+        return 0;
+    }
     if ( !string || ! *string )
         return 0;
 
@@ -227,7 +241,11 @@ int FGAPIENTRY glutBitmapHeight( void* fontID )
     SFG_Font* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutBitmapHeight" );
     font = fghFontByID( fontID );
-    freeglut_return_val_if_fail( font, 0 );
+    if (!font)
+    {
+        fgWarning("glutBitmapHeight: bitmap font 0x%08x not found. Make sure you're not passing a stroke font.\n",fontID);
+        return 0;
+    }
     return font->Height;
 }
 
@@ -242,9 +260,13 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
     SFG_StrokeFont* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeCharacter" );
     font = fghStrokeByID( fontID );
+    if (!font)
+    {
+        fgWarning("glutStrokeCharacter: stroke font 0x%08x not found. Make sure you're not passing a bitmap font.\n",fontID);
+        return;
+    }
     freeglut_return_if_fail( character >= 0 );
     freeglut_return_if_fail( character < font->Quantity );
-    freeglut_return_if_fail( font );
 
     schar = font->Characters[ character ];
     freeglut_return_if_fail( schar );
@@ -272,7 +294,11 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
     SFG_StrokeFont* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeString" );
     font = fghStrokeByID( fontID );
-    freeglut_return_if_fail( font );
+    if (!font)
+    {
+        fgWarning("glutStrokeString: stroke font 0x%08x not found. Make sure you're not passing a bitmap font.\n",fontID);
+        return;
+    }
     if ( !string || ! *string )
         return;
 
@@ -322,11 +348,15 @@ int FGAPIENTRY glutStrokeWidth( void* fontID, int character )
     SFG_StrokeFont* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeWidth" );
     font = fghStrokeByID( fontID );
+    if (!font)
+    {
+        fgWarning("glutStrokeWidth: stroke font 0x%08x not found. Make sure you're not passing a bitmap font.\n",fontID);
+        return 0;
+    }
     freeglut_return_val_if_fail( ( character >= 0 ) &&
                                  ( character < font->Quantity ),
                                  0
     );
-    freeglut_return_val_if_fail( font, 0 );
     schar = font->Characters[ character ];
     freeglut_return_val_if_fail( schar, 0 );
 
@@ -344,7 +374,11 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
     SFG_StrokeFont* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeLength" );
     font = fghStrokeByID( fontID );
-    freeglut_return_val_if_fail( font, 0 );
+    if (!font)
+    {
+        fgWarning("glutStrokeLength: stroke font 0x%08x not found. Make sure you're not passing a bitmap font.\n",fontID);
+        return 0;
+    }
     if ( !string || ! *string )
         return 0;
 
@@ -377,7 +411,11 @@ GLfloat FGAPIENTRY glutStrokeHeight( void* fontID )
     SFG_StrokeFont* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeHeight" );
     font = fghStrokeByID( fontID );
-    freeglut_return_val_if_fail( font, 0.0 );
+    if (!font)
+    {
+        fgWarning("glutStrokeHeight: stroke font 0x%08x not found. Make sure you're not passing a bitmap font.\n",fontID);
+        return 0.f;
+    }
     return font->Height;
 }
 
