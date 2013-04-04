@@ -19,11 +19,11 @@ set(VERSION_MINOR 0)
 set(VERSION_PATCH 0)
 
 
-# BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
+# FREEGLUT_BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
 # re-declare it here so it will show up in the GUI.
 # by default, we want to build both
-OPTION(BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
-OPTION(BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
+OPTION(FREEGLUT_BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
+OPTION(FREEGLUT_BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
 
 # option for whether warnings and errors should be printed
 OPTION(FREEGLUT_ERRORS "Lib prints errors to stderr" ON)
@@ -305,20 +305,20 @@ IF(WIN32)
     ENDIF()
 ENDIF()
 
-IF(BUILD_SHARED_LIBS)
+IF(FREEGLUT_BUILD_SHARED_LIBS)
     ADD_LIBRARY(freeglut SHARED ${FREEGLUT_SRCS})
 ENDIF()
-IF(BUILD_STATIC_LIBS)
+IF(FREEGLUT_BUILD_STATIC_LIBS)
     ADD_LIBRARY(freeglut_static STATIC ${FREEGLUT_SRCS})
 ENDIF()
 
 
 IF(WIN32)
     LIST(APPEND LIBS winmm)
-    IF(BUILD_SHARED_LIBS)
+    IF(FREEGLUT_BUILD_SHARED_LIBS)
         SET_TARGET_PROPERTIES(freeglut PROPERTIES COMPILE_FLAGS -DFREEGLUT_EXPORTS)
     ENDIF()
-    IF(BUILD_STATIC_LIBS)
+    IF(FREEGLUT_BUILD_STATIC_LIBS)
         SET_TARGET_PROPERTIES(freeglut_static PROPERTIES COMPILE_FLAGS -DFREEGLUT_STATIC)
         # need to set machine:x64 for linker, at least for VC10, and
         # doesn't hurt for older compilers:
@@ -364,14 +364,14 @@ ELSE()
         SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -gstabs+")
     ENDIF()
 ENDIF()
-IF(BUILD_SHARED_LIBS)
+IF(FREEGLUT_BUILD_SHARED_LIBS)
     TARGET_LINK_LIBRARIES(freeglut ${LIBS})
 ENDIF()
-IF(BUILD_STATIC_LIBS)
+IF(FREEGLUT_BUILD_STATIC_LIBS)
     TARGET_LINK_LIBRARIES(freeglut_static ${LIBS})
 ENDIF()
 
-IF(BUILD_SHARED_LIBS)
+IF(FREEGLUT_BUILD_SHARED_LIBS)
     INSTALL(TARGETS freeglut
             RUNTIME DESTINATION bin
             LIBRARY DESTINATION lib
@@ -383,7 +383,7 @@ IF(BUILD_SHARED_LIBS)
 			CONFIGURATIONS Debug)
     ENDIF()
 ENDIF()
-IF(BUILD_STATIC_LIBS)
+IF(FREEGLUT_BUILD_STATIC_LIBS)
     INSTALL(TARGETS freeglut_static
             RUNTIME DESTINATION bin
             LIBRARY DESTINATION lib
@@ -410,14 +410,14 @@ ENDIF()
 
 MACRO(ADD_DEMO name)
     IF( FREEGLUT_BUILD_DEMOS )
-        IF(BUILD_SHARED_LIBS)
+        IF(FREEGLUT_BUILD_SHARED_LIBS)
             ADD_EXECUTABLE(${name} ${ARGN})
             TARGET_LINK_LIBRARIES(${name} ${DEMO_LIBS} freeglut)
             IF(WIN32 AND MSVC)
                 SET_TARGET_PROPERTIES(${name} PROPERTIES DEBUG_POSTFIX d)
             ENDIF()
         ENDIF()
-        IF(BUILD_STATIC_LIBS)
+        IF(FREEGLUT_BUILD_STATIC_LIBS)
             ADD_EXECUTABLE(${name}_static ${ARGN})
             TARGET_LINK_LIBRARIES(${name}_static ${DEMO_LIBS} freeglut_static)
             SET_TARGET_PROPERTIES(${name}_static PROPERTIES COMPILE_FLAGS -DFREEGLUT_STATIC)
