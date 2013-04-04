@@ -787,6 +787,15 @@ void fgPlatformCloseWindow( SFG_Window* window )
         free(window->State.pWState.IconTitle);
 }
 
+/*
+ * Hide's specified window. For windows, currently only used
+ * to immediately hide menu windows...
+ */
+void fgPlatformHideWindow( SFG_Window* window )
+{
+    ShowWindow(window->Window.Handle, SW_HIDE);
+}
+
 
 /*
  * Set the current window's title

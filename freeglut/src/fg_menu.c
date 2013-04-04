@@ -78,6 +78,7 @@ static float menu_pen_hback [4] = FREEGLUT_MENU_PEN_HBACK_COLORS;
 extern GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y );
 extern void fghPlatformGetCursorPos(const SFG_Window *window, GLboolean client, SFG_XYUse *mouse_pos);
 extern SFG_Font* fghFontByID( void* font );
+extern void fgPlatformHideWindow( SFG_Window* window );
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
@@ -108,8 +109,7 @@ static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
 {
     SFG_MenuEntry *subMenuIter;
     /* Hide the present menu's window */
-    fgSetWindow( menuEntry->SubMenu->Window );
-    glutHideWindow( );
+    fgPlatformHideWindow( menuEntry->SubMenu->Window );
 
     /* Forget about having that menu active anymore, now: */
     menuEntry->SubMenu->Window->ActiveMenu = NULL;
@@ -127,8 +127,6 @@ static void fghDeactivateSubMenu( SFG_MenuEntry *menuEntry )
         if( subMenuIter->SubMenu )
             fghDeactivateSubMenu( subMenuIter );
     }
-
-    fgSetWindow ( menuEntry->SubMenu->ParentWindow ) ;
 }
 
 /*
@@ -421,36 +419,6 @@ static void fghSetMenuParentWindow( SFG_Window *window, SFG_Menu *menu )
             fghSetMenuParentWindow( window, menuEntry->SubMenu );
 }
 
-/*
- * Function to check for menu entry selection on menu deactivation
- */
-static void fghExecuteMenuCallback( SFG_Menu* menu )
-{
-    SFG_MenuEntry *menuEntry;
-
-    /* First of all check any of the active sub menus... */
-    for( menuEntry = (SFG_MenuEntry *)menu->Entries.First;
-         menuEntry;
-         menuEntry = (SFG_MenuEntry *)menuEntry->Node.Next)
-    {
-        if( menuEntry->IsActive )
-        {
-            if( menuEntry->SubMenu )
-                fghExecuteMenuCallback( menuEntry->SubMenu );
-            else
-                if( menu->Callback )
-                {
-                    SFG_Menu *save_menu = fgStructure.CurrentMenu;
-                    fgStructure.CurrentMenu = menu;
-                    menu->Callback( menuEntry->ID );
-                    fgStructure.CurrentMenu = save_menu;
-                }
-
-            return;
-        }
-    }
-}
-
 
 /*
  * Displays the currently active menu for the current window
@@ -592,13 +560,16 @@ void fgUpdateMenuHighlight ( SFG_Menu *menu )
 GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
                               int mouse_x, int mouse_y )
 {
+    GLboolean is_handled = GL_FALSE;
+    GLboolean is_clicked = GL_FALSE;
     /*
      * Near as I can tell, this is the menu behaviour:
      *  - Down-click the menu button, menu not active:  activate
      *    the menu with its upper left-hand corner at the mouse
      *    location.
      *  - Down-click any button outside the menu, menu active:
-     *    deactivate the menu
+     *    deactivate the menu, and potentially activate a new menu
+     *    at the new mouse location
      *  - Down-click any button inside the menu, menu active:
      *    select the menu entry and deactivate the menu
      *  - Up-click the menu button, menu not active:  nothing happens
@@ -618,7 +589,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
                                        mouse_y - window->ActiveMenu->Y;
         }
 
-        /* In the menu, invoke the callback and deactivate the menu */
+        /* In the menu, deactivate the menu and invoke the callback */
         if( fghCheckMenuStatus( window->ActiveMenu ) )
         {
             /*
@@ -626,18 +597,29 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
              * window to the window whose menu this is
              */
             SFG_Window *save_window = fgStructure.CurrentWindow;
-            SFG_Menu *save_menu = fgStructure.CurrentMenu;
+            SFG_Menu *save_menu = fgStructure.CurrentMenu, *active_menu = window->ActiveMenu;
+            SFG_MenuEntry *active_entry = active_menu->ActiveEntry;
             SFG_Window *parent_window = window->ActiveMenu->ParentWindow;
-            fgSetWindow( parent_window );
-            fgStructure.CurrentMenu = window->ActiveMenu;
 
-            /* Execute the menu callback */
-            fghExecuteMenuCallback( window->ActiveMenu );
+            /* get clicked entry */
+            while (active_entry->SubMenu)
+            {
+                active_menu  = active_entry->SubMenu;
+                active_entry = active_menu->ActiveEntry;
+            }
+
+            fgSetWindow( parent_window );
+            fgStructure.CurrentMenu = active_menu;
+
+            /* Deactivate menu and then call callback (we don't want menu to stay in view while callback is executing) */
             fgDeactivateMenu( parent_window );
+            active_menu->Callback( active_entry->ID );
 
             /* Restore the current window and menu */
             fgSetWindow( save_window );
             fgStructure.CurrentMenu = save_menu;
+
+            is_clicked = GL_TRUE;   /* Don't reopen... */
         }
         else if( pressed )
             /*
@@ -648,6 +630,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
              */
         {
             fgDeactivateMenu( window->ActiveMenu->ParentWindow );
+            /* Could reopen again in different location, as is_clicked remains false */
         }
 
         /*
@@ -659,11 +642,12 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
         if( ! window->IsMenu )
             window->State.Redisplay = GL_TRUE;
 
-        return GL_TRUE;
+        is_handled = GL_TRUE;
     }
 
     /* No active menu, let's check whether we need to activate one. */
-    if( ( 0 <= button ) &&
+    if( !is_clicked &&
+        ( 0 <= button ) &&
         ( FREEGLUT_MAX_MENUS > button ) &&
         ( window->Menu[ button ] ) &&
         pressed )
@@ -678,11 +662,11 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
             /* XXX Posting a requisite Redisplay seems bogus. */
             window->State.Redisplay = GL_TRUE;
             fghActivateMenu( window, button );
-            return GL_TRUE;
+            is_handled = GL_TRUE;
         }
     }
 
-    return GL_FALSE;
+    return is_handled;
 }
 
 /*
@@ -708,8 +692,7 @@ void fgDeactivateMenu( SFG_Window *window )
     parent_window = menu->ParentWindow;
 
     /* Hide the present menu's window */
-    fgSetWindow( menu->Window );
-    glutHideWindow( );
+    fgPlatformHideWindow( menu->Window );
 
     /* Forget about having that menu active anymore, now: */
     menu->Window->ActiveMenu = NULL;
@@ -733,8 +716,6 @@ void fgDeactivateMenu( SFG_Window *window )
     }
     /* Done deactivating menu */
     menuDeactivating = NULL;
-
-    fgSetWindow ( parent_window ) ;
 
     /* Menu status callback */
     if (fgState.MenuStateCallback || fgState.MenuStatusCallback)

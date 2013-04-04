@@ -1345,7 +1345,7 @@ void fgPlatformProcessWork(SFG_Window *window)
         {
         case DesireHiddenState:
             cmdShow = SW_HIDE;
-        	break;
+            break;
         case DesireIconicState:
             cmdShow = SW_MINIMIZE;
             /* Call on top-level window */
@@ -1353,7 +1353,10 @@ void fgPlatformProcessWork(SFG_Window *window)
                 win = win->Parent;
             break;
         case DesireNormalState:
-            cmdShow = SW_SHOW;
+            if (win->IsMenu)
+                cmdShow = SW_SHOWNOACTIVATE;    /* Just show, don't activate if its a menu */
+            else
+                cmdShow = SW_SHOW;
             break;
         }
 
