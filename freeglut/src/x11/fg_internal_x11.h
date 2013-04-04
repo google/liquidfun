@@ -113,6 +113,7 @@ struct tagSFG_PlatformWindowState
 {
     int             OldWidth;           /* Window width from before a resize */
     int             OldHeight;          /*   "    height  "    "    "   "    */
+    GLboolean       KeyRepeating;       /* Currently in repeat mode?         */    
 };
 
 

@@ -37,7 +37,7 @@ extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
  * and the window rect from the client area given the style of the window
  * (or a valid window pointer from which the style can be queried).
  */
-extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window );
+extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL posIsOutside );
 extern void fghGetStyleFromWindow( const SFG_Window *window, DWORD *windowStyle, DWORD *windowExStyle );
 extern void fghComputeWindowRectFromClientArea_UseStyle( RECT *clientRect, const DWORD windowStyle, const DWORD windowExStyle, BOOL posIsOutside );
 
@@ -161,17 +161,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
     case GLUT_WINDOW_Y:
     {
         /*
-         *  There is considerable confusion about the "right thing to
-         *  do" concerning window  size and position.  GLUT itself is
-         *  not consistent between Windows and UNIX/X11; since
-         *  platform independence is a virtue for "freeglut", we
-         *  decided to break with GLUT's behaviour.
-         *
-         *  Under UNIX/X11, it is apparently not possible to get the
-         *  window border sizes in order to subtract them off the
-         *  window's initial position until some time after the window
-         *  has been created.  Therefore we decided on the following
-         *  behaviour, both under Windows and under UNIX/X11:
+         *  NB:
          *  - When you create a window with position (x,y) and size
          *    (w,h), the upper left hand corner of the outside of the
          *    window is at (x,y) and the size of the drawable area is
@@ -213,11 +203,20 @@ int fgPlatformGlutGet ( GLenum eWhat )
     break;
 
     case GLUT_WINDOW_WIDTH:
-        freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
-        return fgStructure.CurrentWindow->State.Width;
     case GLUT_WINDOW_HEIGHT:
+    {
+        RECT winRect;
         freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
-        return fgStructure.CurrentWindow->State.Height;
+
+        GetClientRect( fgStructure.CurrentWindow->Window.Handle, &winRect);
+
+        switch( eWhat )
+        {
+        case GLUT_WINDOW_WIDTH:      return winRect.right-winRect.left;
+        case GLUT_WINDOW_HEIGHT:     return winRect.bottom-winRect.top;
+        }
+    }
+    break;
 
     case GLUT_WINDOW_BORDER_WIDTH :
     case GLUT_WINDOW_BORDER_HEIGHT :
@@ -240,7 +239,7 @@ int fgPlatformGlutGet ( GLenum eWhat )
             /* Also get window rect (including non-client area) */
             if (fgStructure.CurrentWindow && fgStructure.CurrentWindow->Window.Handle)
             {
-                fghGetClientArea(&clientRect,fgStructure.CurrentWindow);
+                fghGetClientArea(&clientRect,fgStructure.CurrentWindow, FALSE);
                 GetWindowRect(fgStructure.CurrentWindow->Window.Handle,&winRect);
             }
             else

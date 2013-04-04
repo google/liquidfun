@@ -29,7 +29,7 @@
 #include <GL/freeglut.h>
 #include "../fg_internal.h"
 
-extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window );
+extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL posIsOutside );
 extern SFG_Window* fghWindowUnderCursor(SFG_Window *window);
 
 
@@ -77,7 +77,7 @@ void fgPlatformCheckMenuDeactivate()
                  */
                 POINT mouse_pos;
                 RECT clientArea;
-                fghGetClientArea(&clientArea,menu->ParentWindow);
+                fghGetClientArea(&clientArea,menu->ParentWindow, FALSE);
                 GetCursorPos(&mouse_pos);
                 if ( !PtInRect( &clientArea, mouse_pos ) )
                     fgDeactivateMenu(menu->ParentWindow);

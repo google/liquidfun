@@ -84,7 +84,6 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
 static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
 #endif
-extern void fghNotifyWindowStatus(SFG_Window *window);
 
 
 /*
@@ -458,8 +457,12 @@ void fghComputeWindowRectFromClientArea_QueryWindow( RECT *clientRect, const SFG
  * specified window. Output is position of corners of client area (drawable area) on the screen.
  * Does not touch clientRect if window pointer or window handle is NULL.
  * (rect.right-rect.left,rect.bottom-rect.top) is the size of the drawable area.
+ * if posIsOutside is true, the output client Rect will follow freeGLUT's window
+ * specification convention in which the top-left corner is at the outside of
+ * the window, while the size (rect.right-rect.left,rect.bottom-rect.top) remains to be the
+ * size of the drawable area.
  */
-void fghGetClientArea( RECT *clientRect, const SFG_Window *window )
+void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL posIsOutside )
 {
     POINT topLeftClient = {0,0};
 
@@ -467,10 +470,21 @@ void fghGetClientArea( RECT *clientRect, const SFG_Window *window )
     
     /* Get size of client rect */
     GetClientRect(window->Window.Handle, clientRect);
-    /* Get position of top-left of client area on the screen */
-    ClientToScreen(window->Window.Handle,&topLeftClient);
-    /* Add top-left offset */
-    OffsetRect(clientRect,topLeftClient.x,topLeftClient.y);
+    if (posIsOutside)
+    {
+        RECT windowRect;
+        /* Get position of outside of window, including decorations */
+        GetWindowRect(window->Window.Handle,&windowRect);
+        /* Add top-left offset */
+        OffsetRect(clientRect,windowRect.left,windowRect.top);
+    }
+    else
+    {
+        /* Get position of top-left of client area on the screen */
+        ClientToScreen(window->Window.Handle,&topLeftClient);
+        /* Add top-left offset */
+        OffsetRect(clientRect,topLeftClient.x,topLeftClient.y);
+    }
 }
 
 
@@ -622,7 +636,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     }
     if( !sizeUse )
     {
-        if( ! window->IsMenu )
+        if( !window->IsMenu )
         {
             w = CW_USEDEFAULT;
             h = CW_USEDEFAULT;
@@ -630,9 +644,6 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
         else /* fail safe - Windows can make a window of size (0, 0) */
             w = h = 300; /* default window size */
     }
-    /* store requested client area width and height */
-    window->State.Width = w;
-    window->State.Height = h;
 
 #if !defined(_WIN32_WCE)    /* no decorations for windows CE */
     if( sizeUse )
@@ -697,6 +708,8 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     );
 #endif /* defined(_WIN32_WCE) */
 
+    /* WM_CREATE message got sent and was handled by window proc */
+
     if( !( window->Window.Handle ) )
         fgError( "Failed to create a window (%s)!", title );
 
@@ -740,99 +753,6 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 }
 
 
-void fgPlatformDisplayWindow ( SFG_Window *window )
-{
-    /* This immediately generates a WM_PAINT message upon which we call the display callbacks to redraw the window */
-    RedrawWindow(
-        window->Window.Handle, NULL, NULL,
-        RDW_NOERASE | RDW_INTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW
-        );
-}
-
-
-void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
-{
-    RECT windowRect;
-
-    /*
-     * HACK HACK HACK:
-     * Before we do anything else, check if this is a newly created window
-     * that did not have its windowStatus/visibility func called yet
-     * we do that on first paint, but because I want to keep the paint
-     * operation as lean as possible, we do it here. The first paint
-     * goes together with a first resize call before the display callback
-     * is called, so this is just in time. Shitty place to do it, but this
-     * is the only reliable way I can think of to call the callback upon
-     * first draw of the window.
-     * More broadly speaking, I know this is an ugly hack, but I'm not sure
-     * what else to do about it.  Depending on WM_ACTIVATE would not work
-     * as not all windows get this when you are opening multiple before the
-     * mainloop starts. WM_SHOWWINDOW looked like an interesting candidate,
-     * but it is generated and processed before glutCreate(Sub)Window
-     * returns, so no callback can yet be set on the window.
-     */
-    /* Check windowStatus/visibility func has been notified that window is visible (deferred from creation time to give user opportunity to register callbacks) */
-    if (!window->State.pWState.WindowFuncCalled)
-    {
-        fghNotifyWindowStatus(window);
-        window->State.pWState.WindowFuncCalled = GL_TRUE;
-    }
-
-    /*
-     * For windowed mode, get the current position of the
-     * window and resize taking the size of the frame
-     * decorations into account.
-     *
-     * Note on maximizing behavior of Windows: the resize borders are off
-     * the screen such that the client area extends all the way from the
-     * leftmost corner to the rightmost corner to maximize screen real
-     * estate. A caption is still shown however to allow interaction with
-     * the window controls. This is default behavior of Windows that
-     * FreeGLUT sticks with. To alter, one would have to check if
-     * WS_MAXIMIZE style is set when a resize event is triggered, and
-     * then manually correct the windowRect to put the borders back on
-     * screen.
-     */
-
-    /* "GetWindowRect" returns the pixel coordinates of the outside of the window */
-    GetWindowRect( window->Window.Handle, &windowRect );
-
-    /* Create rect in FreeGLUT format, (X,Y) topleft outside window, WxH of client area */
-    windowRect.right    = windowRect.left+width;
-    windowRect.bottom   = windowRect.top+height;
-
-    if (window->Parent == NULL)
-        /* get the window rect from this to feed to SetWindowPos, correct for window decorations */
-        fghComputeWindowRectFromClientArea_QueryWindow(&windowRect,window,TRUE);
-    else
-    {
-        /* correct rect for position client area of parent window
-         * (SetWindowPos input for child windows is in coordinates
-         * relative to the parent's client area).
-         * Child windows don't have decoration, so no need to correct
-         * for them.
-         */
-        RECT parentRect;
-        fghGetClientArea( &parentRect, window->Parent );
-        OffsetRect(&windowRect,-parentRect.left,-parentRect.top);
-    }
-    
-    /* Do the actual resizing */
-    SetWindowPos( window->Window.Handle,
-                  HWND_TOP,
-                  windowRect.left, windowRect.top,
-                  windowRect.right - windowRect.left,
-                  windowRect.bottom- windowRect.top,
-                  SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
-                  SWP_NOZORDER
-    );
-
-    /* Set new width and height so we can test for that in WM_SIZE message handler and don't do anything if not needed */
-    window->State.Width  = width;
-    window->State.Height = height;
-}
-
-
 /*
  * Closes a window, destroying the frame and OpenGL context
  */
@@ -873,38 +793,6 @@ void fgPlatformCloseWindow( SFG_Window* window )
 }
 
 
-
-/*
- * This function makes the current window visible
- */
-void fgPlatformGlutShowWindow( void )
-{
-    ShowWindow( fgStructure.CurrentWindow->Window.Handle, SW_SHOW );
-}
-
-/*
- * This function hides the current window
- */
-void fgPlatformGlutHideWindow( void )
-{
-    ShowWindow( fgStructure.CurrentWindow->Window.Handle, SW_HIDE );
-}
-
-/*
- * Iconify the current window (top-level windows only)
- */
-void fgPlatformGlutIconifyWindow( void )
-{
-    SFG_Window *win = fgStructure.CurrentWindow;
-
-    /* Call on parent window */
-    while (win->Parent)
-        win = win->Parent;
-
-    /* Visibility status of window gets updated in the WM_SHOWWINDOW handler */
-    ShowWindow(win->Window.Handle, SW_MINIMIZE);
-}
-
 /*
  * Set the current window's title
  */
@@ -941,188 +829,6 @@ void fgPlatformGlutSetIconTitle( const char* title )
     if (fgStructure.CurrentWindow->State.pWState.IconTitle)
         free(fgStructure.CurrentWindow->State.pWState.IconTitle);
     fgStructure.CurrentWindow->State.pWState.IconTitle = strdup(title);
-}
-
-/*
- * Change the current window's position
- */
-void fgPlatformGlutPositionWindow( int x, int y )
-{
-    RECT winRect;
-
-    /* "GetWindowRect" returns the pixel coordinates of the outside of the window */
-    GetWindowRect( fgStructure.CurrentWindow->Window.Handle, &winRect );
-    MoveWindow(
-        fgStructure.CurrentWindow->Window.Handle,
-        x,
-        y,
-        winRect.right - winRect.left,
-        winRect.bottom - winRect.top,
-        TRUE
-    );
-}
-
-/*
- * Lowers the current window (by Z order change)
- */
-void fgPlatformGlutPushWindow( void )
-{
-    SetWindowPos(
-        fgStructure.CurrentWindow->Window.Handle,
-        HWND_BOTTOM,
-        0, 0, 0, 0,
-        SWP_NOSIZE | SWP_NOMOVE
-    );
-}
-
-/*
- * Raises the current window (by Z order change)
- */
-void fgPlatformGlutPopWindow( void )
-{
-    SetWindowPos(
-        fgStructure.CurrentWindow->Window.Handle,
-        HWND_TOP,
-        0, 0, 0, 0,
-        SWP_NOSIZE | SWP_NOMOVE
-    );
-}
-
-/*
- * Resize the current window so that it fits the whole screen
- */
-void fgPlatformGlutFullScreen( SFG_Window *win )
-{
-#if !defined(_WIN32_WCE) /* FIXME: what about WinCE */
-
-    if (glutGet(GLUT_FULL_SCREEN))
-    {
-        /*  Leave full screen state before entering fullscreen again (resizing?) */
-        glutLeaveFullScreen();
-    }
-
-    {
-#if(WINVER >= 0x0500) /* Windows 2000 or later */
-        RECT rect;
-        HMONITOR hMonitor;
-        MONITORINFO mi;
-
-        /* For fullscreen mode, first remove all window decoration
-         * and set style to popup so it will overlap the taskbar
-         * then force to maximize on the screen on which it has the most
-         * overlap.
-         */
-
-        
-        /* save current window rect, style, exstyle and maximized state */
-        win->State.pWState.OldMaximized = !!IsZoomed(win->Window.Handle);
-        if (win->State.pWState.OldMaximized)
-            /* We force the window into restored mode before going
-             * fullscreen because Windows doesn't seem to hide the
-             * taskbar if the window is in the maximized state.
-             */
-            SendMessage(win->Window.Handle, WM_SYSCOMMAND, SC_RESTORE, 0);
-
-        GetWindowRect( win->Window.Handle, &win->State.pWState.OldRect );
-        win->State.pWState.OldStyle   = GetWindowLong(win->Window.Handle, GWL_STYLE);
-        win->State.pWState.OldStyleEx = GetWindowLong(win->Window.Handle, GWL_EXSTYLE);
-
-        /* remove decorations from style */
-        SetWindowLong(win->Window.Handle, GWL_STYLE,
-                      win->State.pWState.OldStyle & ~(WS_CAPTION | WS_THICKFRAME));
-        SetWindowLong(win->Window.Handle, GWL_EXSTYLE,
-                      win->State.pWState.OldStyleEx & ~(WS_EX_DLGMODALFRAME |
-                      WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
-
-        /* For fullscreen mode, find the monitor that is covered the most
-         * by the window and get its rect as the resize target.
-	     */
-        hMonitor= MonitorFromRect(&win->State.pWState.OldRect, MONITOR_DEFAULTTONEAREST);
-        mi.cbSize = sizeof(mi);
-        GetMonitorInfo(hMonitor, &mi);
-        rect = mi.rcMonitor;
-#else   /* if (WINVER >= 0x0500) */
-        RECT rect;
-
-        /* For fullscreen mode, force the top-left corner to 0,0
-         * and adjust the window rectangle so that the client area
-         * covers the whole screen.
-         */
-
-        rect.left   = 0;
-        rect.top    = 0;
-        rect.right  = fgDisplay.ScreenWidth;
-        rect.bottom = fgDisplay.ScreenHeight;
-
-        AdjustWindowRect ( &rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS |
-                                  WS_CLIPCHILDREN, FALSE );
-#endif  /* (WINVER >= 0x0500) */
-
-        /*
-         * then resize window
-         * SWP_NOACTIVATE     Do not activate the window
-         * SWP_NOOWNERZORDER  Do not change position in z-order
-         * SWP_NOSENDCHANGING Suppress WM_WINDOWPOSCHANGING message
-         * SWP_NOZORDER       Retains the current Z order (ignore 2nd param)
-         */
-        SetWindowPos( fgStructure.CurrentWindow->Window.Handle,
-                      HWND_TOP,
-                      rect.left,
-                      rect.top,
-                      rect.right  - rect.left,
-                      rect.bottom - rect.top,
-                      SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
-                      SWP_NOZORDER
-                    );
-
-        win->State.IsFullscreen = GL_TRUE;
-    }
-#endif
-}
-
-/*
- * If we are fullscreen, resize the current window back to its original size
- */
-void fgPlatformGlutLeaveFullScreen( SFG_Window *win )
-{
-#if !defined(_WIN32_WCE) /* FIXME: what about WinCE */
-    if (!glutGet(GLUT_FULL_SCREEN))
-    {
-        /* nothing to do */
-        return;
-    }
-
-    /* restore style of window before making it fullscreen */
-    SetWindowLong(win->Window.Handle, GWL_STYLE, win->State.pWState.OldStyle);
-    SetWindowLong(win->Window.Handle, GWL_EXSTYLE, win->State.pWState.OldStyleEx);
-
-    /* Then resize */
-    SetWindowPos(win->Window.Handle,
-        HWND_TOP,
-        win->State.pWState.OldRect.left,
-        win->State.pWState.OldRect.top,
-        win->State.pWState.OldRect.right  - win->State.pWState.OldRect.left,
-        win->State.pWState.OldRect.bottom - win->State.pWState.OldRect.top,
-        SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING |
-        SWP_NOZORDER
-        );
-
-    if (win->State.pWState.OldMaximized)
-        SendMessage(win->Window.Handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
-
-    win->State.IsFullscreen = GL_FALSE;
-#endif
-}
-
-/*
- * Toggle the window's full screen state.
- */
-void fgPlatformGlutFullScreenToggle( SFG_Window *win )
-{
-    if (!win->State.IsFullscreen)
-        glutFullScreen();
-    else
-        glutLeaveFullScreen();
 }
 
 

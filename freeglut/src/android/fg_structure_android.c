@@ -33,6 +33,4 @@
 void fgPlatformCreateWindow ( SFG_Window *window )
 {
   fghPlatformCreateWindowEGL(window);
-  window->State.pWState.LastWidth = -1;
-  window->State.pWState.LastHeight = -1;
 }

@@ -56,17 +56,8 @@ extern void fgPlatformOpenWindow( SFG_Window* window, const char* title,
                                   GLboolean sizeUse, int w, int h,
                                   GLboolean gameMode, GLboolean isSubWindow );
 extern void fgPlatformCloseWindow( SFG_Window* window );
-extern void fgPlatformGlutShowWindow( void );
-extern void fgPlatformGlutHideWindow( void );
-extern void fgPlatformGlutIconifyWindow( void );
 extern void fgPlatformGlutSetWindowTitle( const char* title );
 extern void fgPlatformGlutSetIconTitle( const char* title );
-extern void fgPlatformGlutPositionWindow( int x, int y );
-extern void fgPlatformGlutPushWindow( void );
-extern void fgPlatformGlutPopWindow( void );
-extern void fgPlatformGlutFullScreen( SFG_Window *win );
-extern void fgPlatformGlutLeaveFullScreen( SFG_Window *win );
-extern void fgPlatformGlutFullScreenToggle( SFG_Window *win );
 
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
@@ -152,7 +143,7 @@ void fgOpenWindow( SFG_Window* window, const char* title,
 
     fgInitGL2();
 
-    window->State.NeedToInitContext = GL_TRUE;
+    window->State.WorkMask |= GLUT_INIT_WORK;
 }
 
 /*
@@ -301,7 +292,8 @@ void FGAPIENTRY glutShowWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutShowWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutShowWindow" );
 
-	fgPlatformGlutShowWindow ();
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_VISIBILITY_WORK;
+    fgStructure.CurrentWindow->State.DesiredVisibility = DesireNormalState;
 
     fgStructure.CurrentWindow->State.Redisplay = GL_TRUE;
 }
@@ -314,7 +306,8 @@ void FGAPIENTRY glutHideWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutHideWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutHideWindow" );
 
-	fgPlatformGlutHideWindow ();
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_VISIBILITY_WORK;
+    fgStructure.CurrentWindow->State.DesiredVisibility = DesireHiddenState;
 
     fgStructure.CurrentWindow->State.Redisplay = GL_FALSE;
 }
@@ -327,7 +320,8 @@ void FGAPIENTRY glutIconifyWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutIconifyWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIconifyWindow" );
 
-	fgPlatformGlutIconifyWindow ();
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_VISIBILITY_WORK;
+    fgStructure.CurrentWindow->State.DesiredVisibility = DesireIconicState;
 
     fgStructure.CurrentWindow->State.Redisplay = GL_FALSE;
 }
@@ -373,9 +367,9 @@ void FGAPIENTRY glutReshapeWindow( int width, int height )
       glutLeaveFullScreen();
     }
 
-    fgStructure.CurrentWindow->State.NeedToResize = GL_TRUE;
-    fgStructure.CurrentWindow->State.Width  = width ;
-    fgStructure.CurrentWindow->State.Height = height;
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_SIZE_WORK;
+    fgStructure.CurrentWindow->State.DesiredWidth  = width ;
+    fgStructure.CurrentWindow->State.DesiredHeight = height;
 }
 
 /*
@@ -392,7 +386,9 @@ void FGAPIENTRY glutPositionWindow( int x, int y )
       glutLeaveFullScreen();
     }
 
-	fgPlatformGlutPositionWindow ( x, y );
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_POSITION_WORK;
+    fgStructure.CurrentWindow->State.DesiredXpos = x;
+    fgStructure.CurrentWindow->State.DesiredYpos = y;
 }
 
 /*
@@ -403,7 +399,8 @@ void FGAPIENTRY glutPushWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPushWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPushWindow" );
 
-	fgPlatformGlutPushWindow ();
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_ZORDER_WORK;
+    fgStructure.CurrentWindow->State.DesiredZOrder = -1;
 }
 
 /*
@@ -414,7 +411,8 @@ void FGAPIENTRY glutPopWindow( void )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPopWindow" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutPopWindow" );
 
-	fgPlatformGlutPopWindow ();
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_ZORDER_WORK;
+    fgStructure.CurrentWindow->State.DesiredZOrder = 1;
 }
 
 /*
@@ -441,12 +439,13 @@ void FGAPIENTRY glutFullScreen( void )
     else if (fgStructure.GameModeWindow != NULL && fgStructure.GameModeWindow->ID==win->ID && win->State.IsFullscreen)
     {
         /* Ignore fullscreen call on GameMode window, those are always fullscreen already
-         * only exception is during first entering GameMode
+         * only exception is when first entering GameMode
          */
         return;
     }
 
-	fgPlatformGlutFullScreen ( win );
+    if (!win->State.IsFullscreen)
+	    win->State.WorkMask |= GLUT_FULL_SCREEN_WORK;
 }
 
 /*
@@ -454,14 +453,11 @@ void FGAPIENTRY glutFullScreen( void )
  */
 void FGAPIENTRY glutLeaveFullScreen( void )
 {
-    SFG_Window *win;
-
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreen" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreen" );
 
-    win = fgStructure.CurrentWindow;
-
-	fgPlatformGlutLeaveFullScreen ( win );
+    if (fgStructure.CurrentWindow->State.IsFullscreen)
+        fgStructure.CurrentWindow->State.WorkMask |= GLUT_FULL_SCREEN_WORK;
 }
 
 /*
@@ -469,14 +465,10 @@ void FGAPIENTRY glutLeaveFullScreen( void )
  */
 void FGAPIENTRY glutFullScreenToggle( void )
 {
-    SFG_Window *win;
-
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutFullScreenToggle" );
     FREEGLUT_EXIT_IF_NO_WINDOW ( "glutFullScreenToggle" );
 
-    win = fgStructure.CurrentWindow;
-
-	fgPlatformGlutFullScreenToggle ( win );
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_FULL_SCREEN_WORK;
 }
 
 /*

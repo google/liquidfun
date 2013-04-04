@@ -32,8 +32,6 @@
 #include "egl/fg_window_egl.h"
 #include <android/native_app_glue/android_native_app_glue.h>
 
-extern void fghRedrawWindow(SFG_Window *window);
-
 /*
  * Opens a window. Requires a SFG_Window object created and attached
  * to the freeglut structure. OpenGL context is created here.
@@ -96,14 +94,6 @@ void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height )
 }
 
 /*
- * A static helper function to execute display callback for a window
- */
-void fgPlatformDisplayWindow ( SFG_Window *window )
-{
-  fghRedrawWindow ( window ) ;
-}
-
-/*
  * Closes a window, destroying the frame and OpenGL context
  */
 void fgPlatformCloseWindow( SFG_Window* window )
@@ -113,25 +103,25 @@ void fgPlatformCloseWindow( SFG_Window* window )
 }
 
 /*
- * This function makes the current window visible
+ * This function makes the specified window visible
  */
-void fgPlatformGlutShowWindow( void )
+void fgPlatformShowWindow( void )
 {
-  fprintf(stderr, "fgPlatformGlutShowWindow: STUB\n");
+  fprintf(stderr, "fgPlatformShowWindow: STUB\n");
 }
 
 /*
- * This function hides the current window
+ * This function hides the specified window
  */
-void fgPlatformGlutHideWindow( void )
+void fgPlatformHideWindow( SFG_Window *window )
 {
-  fprintf(stderr, "fgPlatformGlutHideWindow: STUB\n");
+  fprintf(stderr, "fgPlatformHideWindow: STUB\n");
 }
 
 /*
- * Iconify the current window (top-level windows only)
+ * Iconify the specified window (top-level windows only)
  */
-void fgPlatformGlutIconifyWindow( void )
+void fgPlatformIconifyWindow( SFG_Window *window )
 {
   fprintf(stderr, "fgPlatformGlutIconifyWindow: STUB\n");
 }
@@ -152,49 +142,33 @@ void fgPlatformGlutSetIconTitle( const char* title )
   fprintf(stderr, "fgPlatformGlutSetIconTitle: STUB\n");}
 
 /*
- * Change the current window's position
+ * Change the specified window's position
  */
-void fgPlatformGlutPositionWindow( int x, int y )
+void fgPlatformPositionWindow( SFG_Window *window, int x, int y )
 {
-  fprintf(stderr, "fgPlatformGlutPositionWindow: STUB\n");
+  fprintf(stderr, "fgPlatformPositionWindow: STUB\n");
 }
 
 /*
- * Lowers the current window (by Z order change)
+ * Lowers the specified window (by Z order change)
  */
-void fgPlatformGlutPushWindow( void )
+void fgPlatformPushWindow( SFG_Window *window )
 {
-  fprintf(stderr, "fgPlatformGlutPushWindow: STUB\n");
+  fprintf(stderr, "fgPlatformPushWindow: STUB\n");
 }
 
 /*
- * Raises the current window (by Z order change)
+ * Raises the specified window (by Z order change)
  */
-void fgPlatformGlutPopWindow( void )
+void fgPlatformPopWindow( SFG_Window *window )
 {
-  fprintf(stderr, "fgPlatformGlutPopWindow: STUB\n");
-}
-
-/*
- * Resize the current window so that it fits the whole screen
- */
-void fgPlatformGlutFullScreen( SFG_Window *win )
-{
-  fprintf(stderr, "fgPlatformGlutFullScreen: STUB\n");
-}
-
-/*
- * If we are fullscreen, resize the current window back to its original size
- */
-void fgPlatformGlutLeaveFullScreen( SFG_Window *win )
-{
-  fprintf(stderr, "fgPlatformGlutLeaveFullScreen: STUB\n");
+  fprintf(stderr, "fgPlatformPopWindow: STUB\n");
 }
 
 /*
  * Toggle the window's full screen state.
  */
-void fgPlatformGlutFullScreenToggle( SFG_Window *win )
+void fgPlatformFullScreenToggle( SFG_Window *win )
 {
-  fprintf(stderr, "fgPlatformGlutFullScreenToggle: STUB\n");
+  fprintf(stderr, "fgPlatformFullScreenToggle: STUB\n");
 }

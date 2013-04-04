@@ -382,19 +382,86 @@ struct tagSFG_Context
 };
 
 
-typedef struct tagSFG_WindowState SFG_WindowState;
-struct tagSFG_WindowState
+/*
+ * Bitmasks indicating the different kinds of
+ * actions that can be scheduled for a window.
+ */
+#define GLUT_INIT_WORK        (1<<0)
+#define GLUT_VISIBILITY_WORK  (1<<1)
+#define GLUT_POSITION_WORK    (1<<2)
+#define GLUT_SIZE_WORK        (1<<3)
+#define GLUT_ZORDER_WORK      (1<<4)
+#define GLUT_FULL_SCREEN_WORK (1<<5)
+
+/*
+ * An enumeration containing the state of the GLUT execution:
+ * initializing, running, or stopping
+ */
+typedef enum
 {
-    /* Note that on Windows, sizes always refer to the client area, thus without the window decorations */
+  DesireHiddenState,
+  DesireIconicState,
+  DesireNormalState
+} fgDesiredVisibility ;
+
+/*
+ *  There is considerable confusion about the "right thing to
+ *  do" concerning window  size and position.  GLUT itself is
+ *  not consistent between Windows and UNIX/X11; since
+ *  platform independence is a virtue for "freeglut", we
+ *  decided to break with GLUT's behaviour.
+ *
+ *  Under UNIX/X11, it is apparently not possible to get the
+ *  window border sizes in order to subtract them off the
+ *  window's initial position until some time after the window
+ *  has been created.  Therefore we decided on the following
+ *  behaviour, both under Windows and under UNIX/X11:
+ *  - When you create a window with position (x,y) and size
+ *    (w,h), the upper left hand corner of the outside of the
+ *    window is at (x,y) and the size of the drawable area is
+ *    (w,h).
+ *  - When you query the size and position of the window--as
+ *    is happening here for Windows--"freeglut" will return
+ *    the size of the drawable area--the (w,h) that you
+ *    specified when you created the window--and the coordinates
+ *    of the upper left hand corner of the drawable area, i.e.
+ *    of the client rect--which is NOT the (x,y) you specified.
+ */
+typedef struct tagSFG_WindowState SFG_WindowState;
+struct tagSFG_WindowState   /* as per notes above, sizes always refer to the client area (thus without the window decorations) */
+{
+    /* window state - size, position, look */
+    int             Xpos;               /* Window's top-left of client area, X-coordinate */
+    int             Ypos;               /* Window's top-left of client area, Y-coordinate */
     int             Width;              /* Window's width in pixels          */
     int             Height;             /* The same about the height         */
+    GLboolean       Visible;            /* Is the window visible now? Not using fgVisibilityState as we only care if visible or not */
+    int             Cursor;             /* The currently selected cursor style */
+    GLboolean       IsFullscreen;       /* is the window fullscreen?         */
+
+    /* FreeGLUT operations are deferred, that is, window moving, resizing,
+     * Z-order changing, making full screen or not do not happen immediately
+     * upon the user's request, but only in the next iteration of the main
+     * loop, before the display callback is called. This allows multiple
+     * reshape, position, etc requests to be combined into one and is
+     * compatible with the way GLUT does things. Callbacks get triggered
+     * based on the feedback/messages/notifications from the window manager.
+     * Below here we define what work should be done, as well as the relevant
+     * parameters for this work.
+     */
+    unsigned int    WorkMask;           /* work (resize, etc) to be done on the window */
+    int             DesiredXpos;        /* desired X location */
+    int             DesiredYpos;        /* desired Y location */
+    int             DesiredWidth;       /* desired window width */
+    int             DesiredHeight;      /* desired window height */
+    int             DesiredZOrder;      /* desired window Z Order position */
+    fgDesiredVisibility DesiredVisibility;/* desired visibility (hidden, iconic, shown/normal) */
+
 
 	SFG_PlatformWindowState pWState;    /* Window width/height (X11) or rectangle/style (Windows) from before a resize, and other stuff only needed on specific platforms */
 
     GLboolean       Redisplay;          /* Do we have to redisplay?          */
-    GLboolean       Visible;            /* Is the window visible now         */
 
-    int             Cursor;             /* The currently selected cursor     */
 
     long            JoystickPollRate;   /* The joystick polling rate         */
     fg_time_t       JoystickLastPoll;   /* When the last poll happened       */
@@ -402,13 +469,6 @@ struct tagSFG_WindowState
     int             MouseX, MouseY;     /* The most recent mouse position    */
 
     GLboolean       IgnoreKeyRepeat;    /* Whether to ignore key repeat.     */
-    GLboolean       KeyRepeating;       /* Currently in repeat mode          */
-
-    GLboolean       NeedToResize;       /* Do we need to resize the window?  */
-
-    GLboolean       IsFullscreen;       /* is the window fullscreen? */
-
-    GLboolean       NeedToInitContext;  /* are OpenGL context/resources loaded? */
 
     GLboolean       VisualizeNormals;   /* When drawing objects, draw vectors representing the normals as well? */
 };

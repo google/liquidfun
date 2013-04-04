@@ -54,8 +54,7 @@
 #    define MIN(a,b) (((a)<(b)) ? (a) : (b))
 #endif
 
-extern void fgPlatformReshapeWindow ( SFG_Window *window, int width, int height );
-extern void fgPlatformDisplayWindow ( SFG_Window *window );
+extern void fgPlatformProcessWork   ( SFG_Window *window );
 extern fg_time_t fgPlatformSystemTime ( void );
 extern void fgPlatformSleepForEvents( fg_time_t msec );
 extern void fgPlatformProcessSingleEvent ( void );
@@ -66,69 +65,118 @@ extern void fgPlatformMainLoopPreliminaryWork ( void );
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
-static void fghReshapeWindow ( SFG_Window *window, int width, int height )
+void fghOnReshapeNotify(SFG_Window *window, int width, int height, GLboolean forceNotify)
 {
-    SFG_Window *current_window = fgStructure.CurrentWindow;
+    GLboolean notify = GL_FALSE;
 
-    freeglut_return_if_fail( window != NULL );
+    if( width  != window->State.Width ||
+        height != window->State.Height )
+    {
+        window->State.Width = width;
+        window->State.Height = height;
 
-	fgPlatformReshapeWindow ( window, width, height );
+        notify = GL_TRUE;
+    }
 
-    /*
-     * Force a window redraw.  In Windows at least this is only a partial
-     * solution:  if the window is increasing in size in either dimension,
-     * the already-drawn part does not get drawn again and things look funny.
-     * But without this we get this bad behaviour whenever we resize the
-     * window.
-     * DN: Hmm.. the above sounds like a concern only in single buffered mode...
-     */
-    window->State.Redisplay = GL_TRUE;
+    if (notify || forceNotify)
+    {
+        SFG_Window *saved_window = fgStructure.CurrentWindow;
 
-    if( window->IsMenu )
-        fgSetWindow( current_window );
+        INVOKE_WCB( *window, Reshape, ( width, height ) );
+
+        /*
+         * Force a window redraw.  In Windows at least this is only a partial
+         * solution:  if the window is increasing in size in either dimension,
+         * the already-drawn part does not get drawn again and things look funny.
+         * But without this we get this bad behaviour whenever we resize the
+         * window.
+         * DN: Hmm.. the above sounds like a concern only in single buffered mode...
+         */
+        glutPostRedisplay( );
+        if( window->IsMenu )
+            fgSetWindow( saved_window );
+    }
+}
+
+void fghOnPositionNotify(SFG_Window *window, int x, int y, GLboolean forceNotify)
+{
+    GLboolean notify = GL_FALSE;
+
+    if( x  != window->State.Xpos ||
+        y != window->State.Ypos )
+    {
+        window->State.Xpos = x;
+        window->State.Ypos = y;
+
+        notify = GL_TRUE;
+    }
+
+    if (notify || forceNotify)
+    {
+        SFG_Window *saved_window = fgStructure.CurrentWindow;
+        INVOKE_WCB( *window, Position, ( x, y ) );
+        fgSetWindow( saved_window );
+    }
 }
 
 /*
  * Calls a window's redraw method. This is used when
- * a redraw is forced by the incoming window messages.
+ * a redraw is forced by the incoming window messages,
+ * or if a redisplay is otherwise pending.
+ * this is lean and mean without checks as it is
+ * currently only called from fghcbDisplayWindow which
+ * only calls this if the window is visible and needs
+ * a redisplay.
+ * Note that the fgSetWindow call on Windows makes the
+ * right device context current on windows, allowing
+ * direct drawing without BeginPaint/EndPaint in the
+ * WM_PAINT handler.
  */
 void fghRedrawWindow ( SFG_Window *window )
 {
     SFG_Window *current_window = fgStructure.CurrentWindow;
 
-    freeglut_return_if_fail( window );
-
-    if( window->State.NeedToInitContext ) {
-        INVOKE_WCB( *window, InitContext, ());
-        window->State.NeedToInitContext = GL_FALSE;
-    }
-
-    freeglut_return_if_fail( FETCH_WCB ( *window, Display ) );
-
-    window->State.Redisplay = GL_FALSE;
-
-    freeglut_return_if_fail( window->State.Visible );
-
     fgSetWindow( window );
-
-    if( window->State.NeedToResize )
-    {
-        /* Set need to resize to false before calling fghReshapeWindow, otherwise
-           in the case the user's reshape callback calls glutReshapeWindow,
-           his request would get canceled after fghReshapeWindow gets called.
-         */
-        window->State.NeedToResize = GL_FALSE;
-
-        fghReshapeWindow(
-            window,
-            window->State.Width,
-            window->State.Height
-        );
-    }
-
     INVOKE_WCB( *window, Display, ( ) );
 
     fgSetWindow( current_window );
+}
+
+void fghRedrawWindowAndChildren ( SFG_Window *window )
+{
+    SFG_Window* child;
+
+    fghRedrawWindow(window);
+
+    for( child = ( SFG_Window * )window->Children.First;
+         child;
+         child = ( SFG_Window * )child->Node.Next )
+    {
+        fghRedrawWindowAndChildren(child);
+    }
+}
+
+
+static void fghcbProcessWork( SFG_Window *window,
+                              SFG_Enumerator *enumerator )
+{
+    if( window->State.WorkMask )
+		fgPlatformProcessWork ( window );
+
+    fgEnumSubWindows( window, fghcbProcessWork, enumerator );
+}
+
+/*
+ * Make all windows process their work list
+ */
+static void fghProcessWork( void )
+{
+    SFG_Enumerator enumerator;
+
+    enumerator.found = GL_FALSE;
+    enumerator.data  =  NULL;
+
+    fgEnumWindows( fghcbProcessWork, &enumerator );
 }
 
 
@@ -139,7 +187,7 @@ static void fghcbDisplayWindow( SFG_Window *window,
         window->State.Visible )
     {
         window->State.Redisplay = GL_FALSE;
-		fgPlatformDisplayWindow ( window );
+		fghRedrawWindow ( window );
     }
 
     fgEnumSubWindows( window, fghcbDisplayWindow, enumerator );
@@ -376,12 +424,18 @@ static void fghSleepForEvents( void )
  */
 void FGAPIENTRY glutMainLoopEvent( void )
 {
+    /* Process input */
 	fgPlatformProcessSingleEvent ();
 
     if( fgState.Timers.First )
         fghCheckTimers( );
     if (fgState.NumActiveJoysticks>0)   /* If zero, don't poll joysticks */
         fghCheckJoystickPolls( );
+
+    /* Perform work on the window (position, reshape, etc) */
+    fghProcessWork( );
+
+    /* Display */
     fghDisplayAll( );
 
     fgCloseWindows( );

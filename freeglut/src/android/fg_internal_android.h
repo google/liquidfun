@@ -106,8 +106,7 @@ struct tagSFG_PlatformJoystick
 typedef struct tagSFG_PlatformWindowState SFG_PlatformWindowState;
 struct tagSFG_PlatformWindowState
 {
-    int32_t LastHeight;
-    int32_t LastWidth;
+    char unused;
 };
 
 #endif  /* FREEGLUT_INTERNAL_ANDROID_H */

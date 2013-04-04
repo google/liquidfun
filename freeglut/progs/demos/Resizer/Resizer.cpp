@@ -4,10 +4,6 @@
 
 int nWindow, nChildWindow = -1;
 int nLoopMain = 0;
-
-int nPosX,  nPosY;
-int nWidth, nHeight;
-
 GLboolean bChildPosDone = GL_FALSE, bChildSizeDone = GL_FALSE;
 
 void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY );
@@ -21,14 +17,14 @@ void WindowStatus(int state);
 
 void DrawQuad()
 {
-    nWidth  = glutGet(GLUT_WINDOW_WIDTH);
-    nHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    int width  = glutGet(GLUT_WINDOW_WIDTH);
+    int height = glutGet(GLUT_WINDOW_HEIGHT);
 
     glBegin(GL_QUADS);
-        glVertex2d(nWidth*.25, nHeight*.75);
-        glVertex2d(nWidth*.75, nHeight*.75);
-        glVertex2d(nWidth*.75, nHeight*.25);
-        glVertex2d(nWidth*.25, nHeight*.25);
+        glVertex2d(width*.25, height*.75);
+        glVertex2d(width*.75, height*.75);
+        glVertex2d(width*.75, height*.25);
+        glVertex2d(width*.25, height*.25);
     glEnd();
 }
 
@@ -36,6 +32,12 @@ void UnhideTimer(int window)
 {
     glutSetWindow(window);
     glutShowWindow();
+}
+
+void ChangeTitleTimer(int unused)
+{
+    glutSetIconTitle("new icon title");
+    glutSetWindowTitle("new test title");
 }
 
 void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
@@ -72,7 +74,7 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
         {
             glutSetWindow(nWindow);
             printf("main window resize\n");
-            if (nWidth<400)
+            if (glutGet(GLUT_WINDOW_WIDTH)<400)
                 glutReshapeWindow(600,300);
             else
                 glutReshapeWindow(300,300);
@@ -103,7 +105,7 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
              * the client area is at a different position if the window has borders
              * and/or a title bar.
              */
-            if (nPosX<400)
+            if (glutGet(GLUT_WINDOW_X)<400)
                 glutPositionWindow(600,300);
             else
                 glutPositionWindow(300,300);
@@ -112,16 +114,47 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
         break;
 
 
+    case 'd':
+    case 'D':
+        if (nChildWindow!=-1 && cChar=='d') /* Capital D always moves+resizes the main window*/
+        {
+            glutSetWindow(nChildWindow);
+            if (!bChildPosDone)
+                glutPositionWindow(glutGet(GLUT_WINDOW_X)+50,glutGet(GLUT_WINDOW_Y)+50);
+            else
+                glutPositionWindow(glutGet(GLUT_WINDOW_X)-50,glutGet(GLUT_WINDOW_Y)-50);
+            bChildPosDone = !bChildPosDone;
+            if (!bChildSizeDone)
+                glutReshapeWindow(glutGet(GLUT_WINDOW_WIDTH)+50,glutGet(GLUT_WINDOW_HEIGHT)+50);
+            else
+                glutReshapeWindow(glutGet(GLUT_WINDOW_WIDTH)-50,glutGet(GLUT_WINDOW_HEIGHT)-50);
+            bChildSizeDone = !bChildSizeDone;
+        }
+        else
+        {
+            if (glutGet(GLUT_WINDOW_X)<400)
+                glutPositionWindow(600,300);
+            else
+                glutPositionWindow(300,300);
+            if (glutGet(GLUT_WINDOW_WIDTH)<400)
+                glutReshapeWindow(600,300);
+            else
+                glutReshapeWindow(300,300);
+        }
+        break;
+
+
     case 'c':
     case 'C':
         if (nChildWindow==-1)
         {
+            int width  = glutGet(GLUT_WINDOW_WIDTH);
+            int height = glutGet(GLUT_WINDOW_HEIGHT);
+
             /* open child window */
             printf("open child window\n");
-            nWidth  = glutGet(GLUT_WINDOW_WIDTH);
-            nHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-            nChildWindow = glutCreateSubWindow(nWindow,(int)(nWidth*.35),(int)(nHeight*.35),(int)(nWidth*.3),(int)(nHeight*.3));
+            nChildWindow = glutCreateSubWindow(nWindow,(int)(width*.35),(int)(height*.35),(int)(width*.3),(int)(height*.3));
             glutKeyboardFunc( SampleKeyboard );
             glutDisplayFunc( Redisplay );
             glutReshapeFunc( Reshape );
@@ -144,6 +177,7 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
     case 'i':
     case 'I':
         glutIconifyWindow();
+        glutTimerFunc(1500, ChangeTitleTimer, 0);
         break;
 
 
@@ -175,7 +209,7 @@ void Reshape(int width, int height)
 {
     int win = glutGetWindow();
 
-    printf("reshape %s, %dx%d\n",win==nWindow?"main":"child",
+    printf("reshape %s, client area: %dx%d\n",win==nWindow?"main":"child",
         width, height);
 
     glViewport(0,0,width,height);
@@ -185,9 +219,21 @@ void Reshape(int width, int height)
 
     if (win==nWindow && nChildWindow!=-1)
     {
+        /* Put child window in right place */
+        int x = (int)(width*.35), y=(int)(height*.35), w=(int)(width*.3), h = (int)(height*.3);
+        if (bChildPosDone)
+        {
+            x += 50;
+            y += 50;
+        }
+        if (bChildSizeDone)
+        {
+            w += 50;
+            h += 50;
+        }
         glutSetWindow(nChildWindow);
-        glutPositionWindow((int)(width*.35),(int)(height*.35));
-        glutReshapeWindow((int)(width*.3),(int)(height*.3));
+        glutPositionWindow(x,y);
+        glutReshapeWindow(w,h);
         glutSetWindow(nWindow);
     }
 }
@@ -196,7 +242,7 @@ void Position(int x, int y)
 {
     int win = glutGetWindow();
 
-    printf("position, %s: (%d,%d)\n",win==nWindow?"top-left of main":"top-left of child relative to parent",
+    printf("position, %s: (%d,%d)\n",win==nWindow?"top-left (non-client) of main":"top-left of child relative to parent",
         x, y);
 }
 
@@ -232,12 +278,14 @@ void Redisplay(void)
 void Timer(int unused)
 {
     int win = glutGetWindow();
+    int x, y;
+    int width, height;
     int border, caption;
 
-    nPosX   = glutGet(GLUT_WINDOW_X);
-    nPosY   = glutGet(GLUT_WINDOW_Y);
-    nWidth  = glutGet(GLUT_WINDOW_WIDTH);
-    nHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    x       = glutGet(GLUT_WINDOW_X);
+    y       = glutGet(GLUT_WINDOW_Y);
+    width   = glutGet(GLUT_WINDOW_WIDTH);
+    height  = glutGet(GLUT_WINDOW_HEIGHT);
     border  = glutGet(GLUT_WINDOW_BORDER_WIDTH);
     caption = glutGet(GLUT_WINDOW_HEADER_HEIGHT);
     /* returned position is top-left of client area, to get top-left of
@@ -253,14 +301,14 @@ void Timer(int unused)
     /* printf("window border: %dpx, caption: %dpx\n",border,caption); */
     if (win==nWindow)
         printf("main  window %dx%d, top-left of client at: (%d,%d), of window at: (%d,%d)\n",
-            nWidth, nHeight,
-            nPosX ,nPosY,
-            nPosX-border,
-            nPosY-border-caption);
+            width, height,
+            x ,y,
+            x-border,
+            y-border-caption);
     else
         printf("child window %dx%d, top-left of client at: (%d,%d), relative to parent\n",
-        nWidth, nHeight,
-        nPosX ,nPosY);
+        width, height,
+        x ,y);
 
     /* (re)set the timer callback and ask glut to call it in 500 ms */
     glutTimerFunc(500, Timer, 0);
@@ -287,6 +335,7 @@ int main(int argc, char* argv[])
     glutInitWindowSize(200,200);
 
     nWindow = glutCreateWindow("test");
+    glutSetIconTitle("test icon title");
     printf("main window id: %d\n", nWindow);
 
     glutKeyboardFunc( SampleKeyboard );

@@ -28,8 +28,12 @@
 #include <GL/freeglut.h>
 #include "../fg_internal.h"
 
-
 extern void fghRedrawWindow ( SFG_Window *window );
+extern void fghRedrawWindowAndChildren ( SFG_Window *window );
+extern void fghOnReshapeNotify(SFG_Window *window, int width, int height, GLboolean forceNotify);
+extern void fghOnPositionNotify(SFG_Window *window, int x, int y, GLboolean forceNotify);
+extern void fghComputeWindowRectFromClientArea_QueryWindow( RECT *clientRect, const SFG_Window *window, BOOL posIsOutside );
+extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL posIsOutside );
 
 extern void fgNewWGLCreateContext( SFG_Window* window );
 extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
@@ -128,17 +132,14 @@ void fgPlatformProcessSingleEvent ( void )
 
 
 
-static void fghUpdateWindowStatus(SFG_Window *window, GLboolean visState)
+static void fghPlatformOnWindowStatusNotify(SFG_Window *window, GLboolean visState, GLboolean forceNotify)
 {
+    GLboolean notify = GL_FALSE;
     SFG_Window* child;
 
     if (window->State.Visible != visState)
     {
         window->State.Visible = visState;
-        /* On win32 we only have two states, window displayed and window not displayed (iconified) 
-         * We map these to GLUT_FULLY_RETAINED and GLUT_HIDDEN respectively.
-         */
-        INVOKE_WCB( *window, WindowStatus, ( visState ? GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
 
         /* If top level window (not a subwindow/child), and icon title text available, switch titles based on visibility state */
         if (!window->Parent && window->State.pWState.IconTitle)
@@ -150,22 +151,28 @@ static void fghUpdateWindowStatus(SFG_Window *window, GLboolean visState)
                 /* not visible, set icon title */
                 SetWindowText( window->Window.Handle, window->State.pWState.IconTitle );
         }
+
+        notify = GL_TRUE;
     }
 
-    /* Also set visibility state for children */
+    if (notify || forceNotify)
+    {
+        SFG_Window *saved_window = fgStructure.CurrentWindow;
+
+        /* On win32 we only have two states, window displayed and window not displayed (iconified) 
+         * We map these to GLUT_FULLY_RETAINED and GLUT_HIDDEN respectively.
+         */
+        INVOKE_WCB( *window, WindowStatus, ( visState ? GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
+        fgSetWindow( saved_window );
+    }
+
+    /* Also set windowStatus/visibility state for children */
     for( child = ( SFG_Window * )window->Children.First;
          child;
          child = ( SFG_Window * )child->Node.Next )
     {
-        fghUpdateWindowStatus(child, visState);
+        fghPlatformOnWindowStatusNotify(child, visState, GL_FALSE); /* No need to propagate forceNotify. Childs get this from their own INIT_WORK */
     }
-}
-
-void fghNotifyWindowStatus(SFG_Window *window)
-{
-    INVOKE_WCB( *window, WindowStatus, ( window->State.Visible?GLUT_FULLY_RETAINED:GLUT_HIDDEN ) );
-
-    /* Don't notify children, they get their own just before first time they're drawn */
 }
 
 void fgPlatformMainLoopPreliminaryWork ( void )
@@ -447,21 +454,6 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 #endif
         }
 
-        window->State.NeedToResize = GL_TRUE;
-        /* if we used CW_USEDEFAULT (thats a negative value) for the size
-         * of the window, query the window now for the size at which it
-         * was created.
-         */
-        if( ( window->State.Width < 0 ) || ( window->State.Height < 0 ) )
-        {
-            SFG_Window *current_window = fgStructure.CurrentWindow;
-
-            fgSetWindow( window );
-            window->State.Width = glutGet( GLUT_WINDOW_WIDTH );
-            window->State.Height = glutGet( GLUT_WINDOW_HEIGHT );
-            fgSetWindow( current_window );
-        }
-
         ReleaseDC( window->Window.Handle, window->Window.pContext.Device );
 
 #if defined(_WIN32_WCE)
@@ -488,48 +480,71 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
         /* Update visibility state of the window */
         if (wParam==SIZE_MINIMIZED)
-            fghUpdateWindowStatus(window,GL_FALSE);
+            fghPlatformOnWindowStatusNotify(window,GL_FALSE,GL_FALSE);
         else if (wParam==SIZE_RESTORED && !window->State.Visible)
-            fghUpdateWindowStatus(window,GL_TRUE);
+            fghPlatformOnWindowStatusNotify(window,GL_TRUE,GL_FALSE);
 
-        /* Check window visible, we don't want to resize when the user or glutIconifyWindow minimized the window */
+        /* Check window visible, we don't want do anything when we get a WM_SIZE because the user or glutIconifyWindow minimized the window */
         if( window->State.Visible )
         {
-            /* get old values first to compare to below */
-            int width = window->State.Width, height=window->State.Height;
+            int width, height;
 #if defined(_WIN32_WCE)
-            window->State.Width  = HIWORD(lParam);
-            window->State.Height = LOWORD(lParam);
+            width  = HIWORD(lParam);
+            height = LOWORD(lParam);
 #else
-            window->State.Width  = LOWORD(lParam);
-            window->State.Height = HIWORD(lParam);
+            width  = LOWORD(lParam);
+            height = HIWORD(lParam);
 #endif /* defined(_WIN32_WCE) */
             
-            if (width!=window->State.Width || height!=window->State.Height)
-            {
-                SFG_Window* saved_window = fgStructure.CurrentWindow;
-                
-                /* size changed, call reshape callback */
-                INVOKE_WCB( *window, Reshape, ( width, height ) );
-                glutPostRedisplay( );
-                if( window->IsMenu )
-                    fgSetWindow( saved_window );
-            }
+            /* Update state and call callback, if there was a change */
+            fghOnReshapeNotify(window, width, height, GL_FALSE);
         }
 
         /* according to docs, should return 0 */
         lRet = 0;
         break;
 
+    case WM_SIZING:
+        {
+            /* User resize-dragging the window, call reshape callback and
+             * force redisplay so display keeps running during dragging.
+             * Screen still wont update when not moving the cursor though...
+             */
+            /* PRECT prect = (PRECT) lParam; */
+            RECT rect;
+            /* printf("WM_SIZING: nc-area: %i,%i\n",prect->right-prect->left,prect->bottom-prect->top); */
+            /* Get client area, the rect in lParam is including non-client area. */
+            fghGetClientArea(&rect,window,FALSE);
+
+            /* We'll get a WM_SIZE as well, but as state has
+             * already been updated here, the fghOnReshapeNotify
+             * in the handler for that message doesn't do anything.
+             */
+            fghOnReshapeNotify(window, rect.right-rect.left, rect.bottom-rect.top, GL_FALSE);
+
+            /* Now directly call the drawing function to update
+             * window and window's childs.
+             * This mimics the WM_PAINT messages that are received during
+             * resizing. Note that we don't have a WM_MOVING handler
+             * as move-dragging doesn't generate WM_MOVE or WM_PAINT
+             * messages until the mouse is released.
+             */
+            fghRedrawWindowAndChildren(window);
+        }
+
+        /* according to docs, should return TRUE */
+        lRet = TRUE;
+        break;
+
     case WM_MOVE:
         {
-            SFG_Window* saved_window = fgStructure.CurrentWindow;
-            RECT windowRect;
-
             /* Check window is minimized, we don't want to call the position callback when the user or glutIconifyWindow minimized the window */
             if (!IsIconic(window->Window.Handle))
             {
-                /* Get top-left of non-client area of window, matching coordinates of
+                RECT windowRect;
+                
+                /* lParam contains coordinates of top-left of client area.
+                 * Get top-left of non-client area of window, matching coordinates of
                  * glutInitPosition and glutPositionWindow, but not those of 
                  * glutGet(GLUT_WINDOW_X) and glutGet(GLUT_WINDOW_Y), which return
                  * top-left of client area.
@@ -548,8 +563,8 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                     windowRect.top  = topleft.y;
                 }
 
-                INVOKE_WCB( *window, Position, ( windowRect.left, windowRect.top ) );
-                fgSetWindow(saved_window);
+                /* Update state and call callback, if there was a change */
+                fghOnPositionNotify(window, windowRect.left, windowRect.top, GL_FALSE);
             }
         }
 
@@ -642,12 +657,12 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         /* printf("WM_SHOWWINDOW, shown? %i, source: %i\n",wParam,lParam); */
         if (wParam)
         {
-            fghUpdateWindowStatus(window, GL_TRUE);
+            fghPlatformOnWindowStatusNotify(window, GL_TRUE, GL_FALSE);
             window->State.Redisplay = GL_TRUE;
         }
         else
         {
-            fghUpdateWindowStatus(window, GL_FALSE);
+            fghPlatformOnWindowStatusNotify(window, GL_FALSE, GL_FALSE);
             window->State.Redisplay = GL_FALSE;
         }
         break;
@@ -655,19 +670,21 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_PAINT:
     {
         RECT rect;
-
+        
+        /* As per docs, upon receiving WM_PAINT, first check if the update region is not empty before you call BeginPaint */
         if (GetUpdateRect(hWnd,&rect,FALSE))
         {
-            /* As per docs, upon receiving WM_PAINT, first check if the update region is not empty before you call BeginPaint */
+            /* Dummy begin/end paint to validate rect that needs
+             * redrawing, then signal that a redisplay is needed.
+             * This allows us full control about when we do any
+             * redrawing, and is the same as what original GLUT
+             * does.
+             */
             PAINTSTRUCT ps;
-
-            /* Turn on the visibility in case it was turned off somehow */
-            window->State.Visible = GL_TRUE;
-
-            InvalidateRect( hWnd, NULL, GL_FALSE );
             BeginPaint( hWnd, &ps );
-            fghRedrawWindow( window );
             EndPaint( hWnd, &ps );
+
+            window->State.Redisplay = GL_TRUE;
         }
         lRet = 0;   /* As per docs, should return 0 */
     }
@@ -1107,4 +1124,239 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     }
 
     return lRet;
+}
+
+
+/* Step through the work list */
+void fgPlatformProcessWork(SFG_Window *window)
+{
+    unsigned int workMask = window->State.WorkMask;
+    /* Now clear it so that any callback generated by the actions below can set work again */
+    window->State.WorkMask = 0;
+
+    /* This is before the first display callback: call a few callbacks to inform user of window size, position, etc
+     * we know this is before the first display callback of a window as for all windows GLUT_INIT_WORK is set when
+     * they are opened, and work is done before displaying in the mainloop.
+     */
+    if (workMask & GLUT_INIT_WORK)
+    {
+        RECT windowRect;
+
+        /* Notify windowStatus/visibility */
+        fghPlatformOnWindowStatusNotify(window, window->State.Visible, GL_TRUE);
+
+        /* get and notify window's position */
+        GetWindowRect(window->Window.Handle,&windowRect);
+        fghOnPositionNotify(window, windowRect.left, windowRect.top, GL_TRUE);
+
+        /* get and notify window's size */
+        GetClientRect(window->Window.Handle,&windowRect);
+        fghOnReshapeNotify(window, windowRect.right-windowRect.left, windowRect.bottom-windowRect.top, GL_TRUE);
+
+        /* Call init context callback */
+        INVOKE_WCB( *window, InitContext, ());
+
+        /* Lastly, check if we have a display callback, error out if not
+         * This is the right place to do it, as the redisplay will be
+         * next right after we exit this function, so there is no more
+         * opportunity for the user to register a callback for this window.
+         */
+        if (!FETCH_WCB(*window, Display))
+            fgError ( "ERROR:  No display callback registered for window %d\n", window->ID );
+    }
+
+    /* On windows we can position, resize and change z order at the same time */
+    if (workMask & (GLUT_POSITION_WORK|GLUT_SIZE_WORK|GLUT_ZORDER_WORK|GLUT_FULL_SCREEN_WORK))
+    {
+        UINT flags = SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING | SWP_NOSIZE | SWP_NOZORDER;
+        HWND insertAfter = HWND_TOP;
+        RECT clientRect;
+
+#if !defined(_WIN32_WCE) /* FIXME: what about WinCE */
+        if (workMask & GLUT_FULL_SCREEN_WORK)
+        {
+            /* This asks us to toggle fullscreen mode */
+            flags |= SWP_FRAMECHANGED;
+
+            if (window->State.IsFullscreen)
+            {
+                /* If we are fullscreen, resize the current window back to its original size */
+                /* printf("OldRect %i,%i to %i,%i\n",window->State.pWState.OldRect.left,window->State.pWState.OldRect.top,window->State.pWState.OldRect.right,window->State.pWState.OldRect.bottom); */
+
+                /* restore style of window before making it fullscreen */
+                SetWindowLong(window->Window.Handle, GWL_STYLE, window->State.pWState.OldStyle);
+                SetWindowLong(window->Window.Handle, GWL_EXSTYLE, window->State.pWState.OldStyleEx);
+
+                /* Then set up resize/reposition, unless user already queued up reshape/position work */
+                if (!(workMask & GLUT_POSITION_WORK))
+                {
+                    workMask |= GLUT_POSITION_WORK;
+                    window->State.DesiredXpos   = window->State.pWState.OldRect.left;
+                    window->State.DesiredYpos   = window->State.pWState.OldRect.top;
+                }
+                if (!(workMask & GLUT_SIZE_WORK))
+                {
+                    workMask |= GLUT_SIZE_WORK;
+                    window->State.DesiredWidth  = window->State.pWState.OldRect.right  - window->State.pWState.OldRect.left;
+                    window->State.DesiredHeight = window->State.pWState.OldRect.bottom - window->State.pWState.OldRect.top;
+                }
+                
+                /* We'll finish off the fullscreen operation below after the other GLUT_POSITION_WORK|GLUT_SIZE_WORK|GLUT_ZORDER_WORK */
+            }
+            else
+            {
+                /* we are currently not fullscreen, go to fullscreen:
+                 * remove window decoration and then maximize
+                 */
+                RECT rect;
+                HMONITOR hMonitor;
+                MONITORINFO mi;
+        
+                /* save current window rect, style, exstyle and maximized state */
+                window->State.pWState.OldMaximized = !!IsZoomed(window->Window.Handle);
+                if (window->State.pWState.OldMaximized)
+                    /* We force the window into restored mode before going
+                     * fullscreen because Windows doesn't seem to hide the
+                     * taskbar if the window is in the maximized state.
+                     */
+                    SendMessage(window->Window.Handle, WM_SYSCOMMAND, SC_RESTORE, 0);
+
+                fghGetClientArea( &window->State.pWState.OldRect, window, GL_TRUE );
+                window->State.pWState.OldStyle   = GetWindowLong(window->Window.Handle, GWL_STYLE);
+                window->State.pWState.OldStyleEx = GetWindowLong(window->Window.Handle, GWL_EXSTYLE);
+
+                /* remove decorations from style */
+                SetWindowLong(window->Window.Handle, GWL_STYLE,
+                              window->State.pWState.OldStyle & ~(WS_CAPTION | WS_THICKFRAME));
+                SetWindowLong(window->Window.Handle, GWL_EXSTYLE,
+                              window->State.pWState.OldStyleEx & ~(WS_EX_DLGMODALFRAME |
+                              WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
+
+                /* For fullscreen mode, find the monitor that is covered the most
+                 * by the window and get its rect as the resize target.
+	             */
+                GetWindowRect(window->Window.Handle, &rect);
+                hMonitor= MonitorFromRect(&rect, MONITOR_DEFAULTTONEAREST);
+                mi.cbSize = sizeof(mi);
+                GetMonitorInfo(hMonitor, &mi);
+                rect = mi.rcMonitor;
+
+                /* then setup window resize, overwriting other work queued on the window */
+                window->State.WorkMask |= GLUT_POSITION_WORK | GLUT_SIZE_WORK;
+                window->State.WorkMask &= ~GLUT_ZORDER_WORK;
+                window->State.DesiredXpos   = rect.left;
+                window->State.DesiredYpos   = rect.top;
+                window->State.DesiredWidth  = rect.right  - rect.left;
+                window->State.DesiredHeight = rect.bottom - rect.top;
+            }
+        }
+#endif /*!defined(_WIN32_WCE) */
+
+        /* Now deal with normal position, reshape and z order requests (some might have been set when handling GLUT_FULLSCREEN_WORK above */
+        {
+            /* get rect describing window's current position and size, 
+             * in screen coordinates and in FreeGLUT format
+             * (size (right-left, bottom-top) is client area size, top and left
+             * are outside of window including decorations).
+             */
+            fghGetClientArea( &clientRect, window, TRUE );
+
+            if (workMask & GLUT_POSITION_WORK)
+            {
+                flags &= ~SWP_NOMOVE;
+                
+                /* Move rect so that top-left is at requested position */
+                /* This also automatically makes sure that child window requested coordinates are relative
+                 * to top-left of parent's client area (needed input for SetWindowPos on child windows),
+                 * so no need to further correct rect for child windows below (childs don't have decorations either).
+                 */
+                OffsetRect(&clientRect,window->State.DesiredXpos-clientRect.left,window->State.DesiredYpos-clientRect.top);
+            }
+            if (workMask & GLUT_SIZE_WORK)
+            {
+                flags &= ~SWP_NOSIZE;
+                
+                /* Note on maximizing behavior of Windows: the resize borders are off
+                 * the screen such that the client area extends all the way from the
+                 * leftmost corner to the rightmost corner to maximize screen real
+                 * estate. A caption is still shown however to allow interaction with
+                 * the window controls. This is default behavior of Windows that
+                 * FreeGLUT sticks with. To alter, one would have to check if
+                 * WS_MAXIMIZE style is set when a resize event is triggered, and
+                 * then manually correct the windowRect to put the borders back on
+                 * screen.
+                 */
+
+                /* Set new size of window, WxH specify client area */
+                clientRect.right    = clientRect.left + window->State.DesiredWidth;
+                clientRect.bottom   = clientRect.top  + window->State.DesiredHeight;
+            }
+            if (workMask & GLUT_ZORDER_WORK)
+            {
+                flags &= ~SWP_NOZORDER;
+
+                /* Could change this to push it down or up one window at a time with some
+                 * more code using GetWindow with GW_HWNDPREV and GW_HWNDNEXT.
+                 * What would be consistent with X11? Win32 GLUT does what we do here...
+                 */
+                if (window->State.DesiredZOrder < 0)
+                    insertAfter = HWND_BOTTOM;
+            }
+        }
+
+        /* Adjust for window decorations
+         * Child windows don't have decoration, so no need to correct
+         */
+        if (!window->Parent)
+            /* get the window rect from this to feed to SetWindowPos, correct for window decorations */
+            fghComputeWindowRectFromClientArea_QueryWindow(&clientRect,window,TRUE);
+    
+        /* Do the requested positioning, moving, and z order push/pop. */
+        SetWindowPos( window->Window.Handle,
+                      insertAfter,
+                      clientRect.left, clientRect.top,
+                      clientRect.right - clientRect.left,
+                      clientRect.bottom- clientRect.top,
+                      flags
+        );
+
+        /* Finish off the fullscreen operation we were doing, if any */
+        if (workMask & GLUT_FULL_SCREEN_WORK)
+        {
+            if (window->State.IsFullscreen)
+            {
+                /* leaving fullscreen, restore maximized state, if any */
+                if (window->State.pWState.OldMaximized)
+                    SendMessage(window->Window.Handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+
+                window->State.IsFullscreen = GL_FALSE;
+            }
+            else
+                window->State.IsFullscreen = GL_TRUE;
+        }
+    }
+
+    if (workMask & GLUT_VISIBILITY_WORK)
+    {
+        /* Visibility status of window gets updated in the WM_SHOWWINDOW and WM_SIZE handlers */
+        int cmdShow = 0;
+        SFG_Window *win = window;
+        switch (window->State.DesiredVisibility)
+        {
+        case DesireHiddenState:
+            cmdShow = SW_HIDE;
+        	break;
+        case DesireIconicState:
+            cmdShow = SW_MINIMIZE;
+            /* Call on top-level window */
+            while (win->Parent)
+                win = win->Parent;
+            break;
+        case DesireNormalState:
+            cmdShow = SW_SHOW;
+            break;
+        }
+
+        ShowWindow( win->Window.Handle, cmdShow );
+    }
 }
