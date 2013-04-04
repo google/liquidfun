@@ -296,7 +296,7 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
                 wParam=code[ 0 ];
 
             INVOKE_WCB( *window, KeyboardUp,
-                   ( (char)wParam,
+                   ( (char)(wParam & 0xFF), /* and with 0xFF to indicate to runtime that we want to strip out higher bits - otherwise we get a runtime error when "Smaller Type Checks" is enabled */
                         window->State.MouseX, window->State.MouseY )
             );
         }
