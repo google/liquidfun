@@ -364,7 +364,8 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
     XFree(visualInfo);
 
-    if( !isSubWindow)
+    /* wait till window visible */
+    if( !isSubWindow && !window->IsMenu)
         XPeekIfEvent( fgDisplay.pDisplay.Display, &eventReturnBuffer, &fghWindowIsVisible, (XPointer)(window->Window.Handle) );
 #undef WINDOW_CONFIG
 }
