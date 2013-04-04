@@ -213,10 +213,10 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
         }
 
         menu->ActiveEntry = menuEntry;
-        menu->IsActive = GL_TRUE;  /* XXX Do we need this? */
+        menu->IsActive = GL_TRUE;
 
         /*
-         * OKi, we have marked that entry as active, but it would be also
+         * OK, we have marked that entry as active, but it would be also
          * nice to have its contents updated, in case it's a sub menu.
          * Also, ignore the return value of the check function:
          */
@@ -633,15 +633,6 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
             /* Could reopen again in different location, as is_clicked remains false */
         }
 
-        /*
-         * XXX Why does an active menu require a redisplay at
-         * XXX this point?  If this can come out cleanly, then
-         * XXX it probably should do so; if not, a comment should
-         * XXX explain it.
-         */
-        if( ! window->IsMenu )
-            window->State.Redisplay = GL_TRUE;
-
         is_handled = GL_TRUE;
     }
 
@@ -659,8 +650,6 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
         if (window->State.MouseX>0 && window->State.MouseY>0 &&
             window->State.MouseX<window->State.Width && window->State.MouseY<window->State.Height)
         {
-            /* XXX Posting a requisite Redisplay seems bogus. */
-            window->State.Redisplay = GL_TRUE;
             fghActivateMenu( window, button );
             is_handled = GL_TRUE;
         }

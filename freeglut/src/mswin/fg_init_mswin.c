@@ -57,9 +57,6 @@ void fgPlatformInitialize( const char* displayName )
          * Each of the windows should have its own device context, and we
          * want redraw events during Vertical and Horizontal Resizes by
          * the user.
-         *
-         * XXX Old code had "| CS_DBCLCKS" commented out.  Plans for the
-         * XXX future?  Dead-end idea?
          */
         wc.lpfnWndProc    = fgPlatformWindowProc;
         wc.cbClsExtra     = 0;

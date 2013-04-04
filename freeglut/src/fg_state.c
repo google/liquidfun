@@ -61,9 +61,6 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetOption" );
 
-    /*
-     * XXX In chronological code add order.  (WHY in that order?)
-     */
     switch( eWhat )
     {
     case GLUT_INIT_WINDOW_X:
@@ -161,7 +158,6 @@ int FGAPIENTRY glutGet( GLenum eWhat )
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGet" );
 
-    /* XXX In chronological code add order.  (WHY in that order?) */
     switch( eWhat )
     {
     /* Following values are stored in fgState and fgDisplay global structures */
