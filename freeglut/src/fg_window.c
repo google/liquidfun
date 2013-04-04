@@ -120,10 +120,10 @@ void fgOpenWindow( SFG_Window* window, const char* title,
                    GLboolean sizeUse, int w, int h,
                    GLboolean gameMode, GLboolean isSubWindow )
 {
-	fgPlatformOpenWindow( window, title,
-                   positionUse, x, y,
-                   sizeUse, w, h,
-                   gameMode, isSubWindow );
+    fgPlatformOpenWindow( window, title,
+                          positionUse, x, y,
+                          sizeUse, w, h,
+                          gameMode, isSubWindow );
 
     fgSetWindow( window );
 

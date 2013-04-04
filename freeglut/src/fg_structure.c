@@ -113,7 +113,6 @@ SFG_Window* fgCreateWindow( SFG_Window* parent, const char* title,
  */
 SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
 {
-    int x = 100, y = 100, w = 1, h = 1;
     SFG_Window *current_window = fgStructure.CurrentWindow;
 
     /* Have the menu object created */
@@ -122,13 +121,11 @@ SFG_Menu* fgCreateMenu( FGCBMenu menuCallback )
     menu->ParentWindow = NULL;
 
     /* Create a window for the menu to reside in. */
-
-    fgCreateWindow( NULL, "freeglut menu", GL_TRUE, x, y, GL_TRUE, w, h,
+    fgCreateWindow( NULL, "freeglut menu", GL_FALSE, 0, 0, GL_FALSE, 0, 0,
                     GL_FALSE, GL_TRUE );
     menu->Window = fgStructure.CurrentWindow;
     glutDisplayFunc( fgDisplayMenu );
 
-    glutHideWindow( );  /* Hide the window for now */
     fgSetWindow( current_window );
 
     /* Initialize the object properties: */

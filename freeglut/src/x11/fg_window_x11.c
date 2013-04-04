@@ -300,12 +300,6 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     }
 #endif
 
-    /*
-     * XXX Assume the new window is visible by default
-     * XXX Is this a  safe assumption?
-     */
-    window->State.Visible = GL_TRUE;
-
     sizeHints.flags = 0;
     if ( positionUse )
         sizeHints.flags |= USPosition;
@@ -362,7 +356,11 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
        fgRegisterDevices( fgDisplay.pDisplay.Display, &(window->Window.Handle) );
     #endif
 
-    XMapWindow( fgDisplay.pDisplay.Display, window->Window.Handle );
+    if (!window->IsMenu)    /* Don't show window after creation if its a menu */
+    {
+        XMapWindow( fgDisplay.pDisplay.Display, window->Window.Handle );
+        window->State.Visible = GL_TRUE;
+    }
 
     XFree(visualInfo);
 

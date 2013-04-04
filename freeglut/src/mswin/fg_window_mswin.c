@@ -636,17 +636,11 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     }
     if( !sizeUse )
     {
-        if( !window->IsMenu )
-        {
-            w = CW_USEDEFAULT;
-            h = CW_USEDEFAULT;
-        }
-        else /* fail safe - Windows can make a window of size (0, 0) */
-            w = h = 300; /* default window size */
+        w = CW_USEDEFAULT;
+        h = CW_USEDEFAULT;
     }
-
-#if !defined(_WIN32_WCE)    /* no decorations for windows CE */
-    if( sizeUse )
+#if !defined(_WIN32_WCE)    /* no decorations for windows CE, so nothing to do */
+    else
     {
         RECT windowRect;
         /*
@@ -742,8 +736,9 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 #if defined(_WIN32_WCE)
     ShowWindow( window->Window.Handle, SW_SHOW );
 #else
+    if (!window->IsMenu)    /* Don't show window after creation if its a menu */
     {
-        BOOL iconic = fgState.ForceIconic && !window->IsMenu && !gameMode && !isSubWindow;
+        BOOL iconic = fgState.ForceIconic && !gameMode && !isSubWindow;
         ShowWindow( window->Window.Handle,
                     iconic ? SW_SHOWMINIMIZED : SW_SHOWNORMAL );
     }
