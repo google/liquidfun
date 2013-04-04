@@ -118,18 +118,6 @@ void FGAPIENTRY glutSetOption( GLenum eWhat, int value )
         fgStructure.CurrentWindow->State.VisualizeNormals = value;
       break;
 
-    case GLUT_MENU_FONT:
-        {
-            void* fontID = (void*)value;
-            SFG_Font* font;
-            font = fghFontByID( fontID );
-            if (!font)
-                fgWarning("glutSetOption(GLUT_MENU_FONT,...): bitmap font 0x%08x not found. Make sure you're not passing a stroke font. Ignoring...\n",fontID);
-            else
-                fgState.MenuFont = fontID;
-        }
-      break;
-
     default:
         fgWarning( "glutSetOption(): missing enum handle %d", eWhat );
         break;

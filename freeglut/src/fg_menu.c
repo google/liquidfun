@@ -881,19 +881,23 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
 /*
  * Changes the current menu's font
  */
-void FGAPIENTRY glutSetMenuFont( void* fontID )
+void FGAPIENTRY glutSetMenuFont( int menuID, void* fontID )
 {
     SFG_Font* font;
+    SFG_Menu* menu;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetMenuFont" );
-    freeglut_return_if_fail( fgStructure.CurrentMenu );
+    menu = fgMenuByID( menuID );
+    freeglut_return_if_fail( menu );
 
     if (fgGetActiveMenu())
         fgError("Menu manipulation not allowed while menus in use.");
 
     font = fghFontByID( fontID );
     if (!font)
+    {
         fgWarning("glutChangeMenuFont: bitmap font 0x%08x not found. Make sure you're not passing a stroke font. Ignoring...\n",fontID);
-    freeglut_return_if_fail( font );
+        return;
+    }
 
     fgStructure.CurrentMenu->Font = fontID;
     fghCalculateMenuBoxSize( );

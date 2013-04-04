@@ -640,8 +640,6 @@ main(int argc, char *argv[])
    * what we demonstrate here.
    */
   glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
-  /* global setting: default font for any menus created after this call (we call it again below to demo) */
-  glutSetOption(GLUT_MENU_FONT,(int)GLUT_BITMAP_HELVETICA_12);
 
   /* Set other global callback (global as in not associated with any specific menu or window) */
   glutIdleFunc ( Idle );
@@ -665,9 +663,8 @@ main(int argc, char *argv[])
   glutAddMenuEntry( "Sub menu A2 (02)", 12 );
   glutAddMenuEntry( "Sub menu A3 (03)", 13 );
   glutMenuDestroyFunc ( MenuDestroy );  /* callback specific to this menu */
-
-  /* change font for any menus created after this call */
-  glutSetOption(GLUT_MENU_FONT,(int)GLUT_BITMAP_8_BY_13);
+  /* Change font for this menu */
+  glutSetMenuFont(subMenuA, GLUT_BITMAP_HELVETICA_12);
 
   subMenuB = glutCreateMenu( MenuCallback );
   glutAddMenuEntry( "Sub menu B1 (04)", 14 );
@@ -675,6 +672,7 @@ main(int argc, char *argv[])
   glutAddMenuEntry( "Sub menu B3 (06)", 16 );
   glutAddSubMenu( "Going to sub menu A", subMenuA );
   glutMenuDestroyFunc ( MenuDestroy );  /* callback specific to this menu */
+  glutSetMenuFont(subMenuB, GLUT_BITMAP_9_BY_15);
 
   menuID = glutCreateMenu( MenuCallback );
   glutAddMenuEntry( "Entry one",   21 );
@@ -687,8 +685,6 @@ main(int argc, char *argv[])
   glutMenuDestroyFunc ( MenuDestroy );  /* callback specific to this menu */
 
   glutAttachMenu( GLUT_LEFT_BUTTON );
-  /* You can also change the font of the current menu: */
-  glutSetMenuFont(GLUT_BITMAP_TIMES_ROMAN_10);
 
 
   /* Position second window right next to the first */
