@@ -672,7 +672,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
          * window thus has mouse capture
          */
         if (window->State.MouseX>0 && window->State.MouseY>0 &&
-            window->State.MouseX<window->State.Width && window->State.MouseX<window->State.Height)
+            window->State.MouseX<window->State.Width && window->State.MouseY<window->State.Height)
         {
             /* XXX Posting a requisite Redisplay seems bogus. */
             window->State.Redisplay = GL_TRUE;
