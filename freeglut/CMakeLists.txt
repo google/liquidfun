@@ -292,16 +292,16 @@ ENDIF()
 # The generated config.h is placed in the project's build directory, just to
 # ensure that all CMake-generated files are kept away from the main source tree.
 # As a result, the build directory must to be added to the include path list.
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
-INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
+INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src)
 ADD_DEFINITIONS(-DHAVE_CONFIG_H)
 IF(WIN32)
     # we also have to generate freeglut.rc, which contains the version
     # number
-    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/freeglut.rc.in ${CMAKE_BINARY_DIR}/freeglut.rc)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/freeglut.rc.in ${CMAKE_BINARY_DIR}/freeglut.rc)
     IF (MSVC AND NOT CMAKE_CL_64)
         # .def file only for 32bit Windows builds with Visual Studio
-        CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/src/freeglutdll.def.in ${CMAKE_BINARY_DIR}/freeglutdll.def)
+        CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/src/freeglutdll.def.in ${CMAKE_BINARY_DIR}/freeglutdll.def)
     ENDIF()
 ENDIF()
 
@@ -486,7 +486,7 @@ ELSEIF(FREEGLUT_GLES1)
   SET(PC_LIBNAME "freeglut-gles1")
   SET(PC_FILENAME "freeglut-gles1.pc")
 ENDIF()
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/freeglut.pc.in ${CMAKE_BINARY_DIR}/freeglut.pc @ONLY)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/freeglut.pc.in ${CMAKE_BINARY_DIR}/freeglut.pc @ONLY)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/freeglut.pc DESTINATION share/pkgconfig/ RENAME ${PC_FILENAME})
 # TODO: change the library and .pc name when building for GLES,
 # e.g. -lglut-GLES2
