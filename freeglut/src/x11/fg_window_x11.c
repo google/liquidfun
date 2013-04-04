@@ -42,10 +42,10 @@
 static int fghResizeFullscrToggle(void)
 {
     XWindowAttributes attributes;
+    SFG_Window *win = fgStructure.CurrentWindow;
 
     if(glutGet(GLUT_FULL_SCREEN)) {
         /* restore original window size */
-        SFG_Window *win = fgStructure.CurrentWindow;
         fgStructure.CurrentWindow->State.WorkMask = GLUT_SIZE_WORK;
         fgStructure.CurrentWindow->State.DesiredWidth  = win->State.pWState.OldWidth;
         fgStructure.CurrentWindow->State.DesiredHeight = win->State.pWState.OldHeight;
