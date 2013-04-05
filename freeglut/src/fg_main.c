@@ -308,7 +308,7 @@ void fgError( const char *fmt, ... )
         va_end( ap );
 
     } else {
-#if FREEGLUT_ERRORS
+#ifdef FREEGLUT_PRINT_ERRORS
         va_start( ap, fmt );
 
         fprintf( stderr, "freeglut ");
@@ -341,7 +341,7 @@ void fgWarning( const char *fmt, ... )
         va_end( ap );
 
     } else {
-#if FREEGLUT_WARNINGS
+#ifdef FREEGLUT_PRINT_WARNINGS
         va_start( ap, fmt );
 
         fprintf( stderr, "freeglut ");

@@ -26,10 +26,10 @@ OPTION(FREEGLUT_BUILD_SHARED_LIBS "Build FreeGLUT shared library." ON)
 OPTION(FREEGLUT_BUILD_STATIC_LIBS "Build FreeGLUT static library." ON)
 
 # option for whether warnings and errors should be printed
-OPTION(FREEGLUT_ERRORS "Lib prints errors to stderr" ON)
-#MARK_AS_ADVANCED(FREEGLUT_ERRORS)
-OPTION(FREEGLUT_WARNINGS "Lib prints warnings to stderr" ON)
-#MARK_AS_ADVANCED(FREEGLUT_WARNINGS)
+OPTION(FREEGLUT_PRINT_ERRORS "Lib prints errors to stderr" ON)
+#MARK_AS_ADVANCED(FREEGLUT_PRINT_ERRORS)
+OPTION(FREEGLUT_PRINT_WARNINGS "Lib prints warnings to stderr" ON)
+#MARK_AS_ADVANCED(FREEGLUT_PRINT_WARNINGS)
 
 # option to also copy .pdb files to install directory when executing
 # INSTALL target
