@@ -981,6 +981,12 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         /* Help screen says this message must be passed to "DefWindowProc" */
         break;
 
+    case WM_DISPLAYCHANGE: /* 0x007E */
+        /* The system display resolution/depth has changed */
+        fgDisplay.ScreenWidth = LOWORD(lParam);
+        fgDisplay.ScreenHeight = HIWORD(lParam);
+        break;
+
     case WM_SYSCOMMAND :  /* 0x0112 */
         {
           /*
