@@ -59,6 +59,7 @@ SET(FREEGLUT_SRCS
     src/fg_ext.c
     src/fg_font_data.c
     src/fg_gamemode.c
+    src/fg_geometry.c
     src/fg_gl2.c
     src/fg_gl2.h
     src/fg_init.c
@@ -74,6 +75,8 @@ SET(FREEGLUT_SRCS
     src/fg_stroke_mono_roman.c
     src/fg_stroke_roman.c
     src/fg_structure.c
+    src/fg_teapot.c
+    src/fg_teapot_data.h
     src/fg_videoresize.c
     src/fg_window.c
 )
@@ -82,13 +85,9 @@ IF(NOT FREEGLUT_GLES2 AND NOT FREEGLUT_GLES1)
     LIST(APPEND FREEGLUT_SRCS
         src/fg_font.c
         src/fg_menu.c
-        src/fg_teapot.c
-        src/fg_teapot_data.h
-        src/fg_geometry.c
     )
 ELSE()
     LIST(APPEND FREEGLUT_SRCS
-        src/fg_geometry.c
         src/gles_stubs.c
     )
 ENDIF()
