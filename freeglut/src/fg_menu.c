@@ -265,7 +265,7 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
             }
 
             /* Activate it because its parent entry is active */
-            menuEntry->SubMenu->IsActive = GL_TRUE;  /* XXX Do we need this? */
+            menuEntry->SubMenu->IsActive = GL_TRUE;
         }
 
         /* Report back that we have caught the menu cursor */
@@ -546,8 +546,7 @@ static void fghActivateMenu( SFG_Window* window, int button )
 
 /*
  * Update Highlight states of the menu
- *
- * Current mouse position is in menu->Window->State.MouseX/Y.
+ * NB: Current mouse position is in menu->Window->State.MouseX/Y
  */
 void fgUpdateMenuHighlight ( SFG_Menu *menu )
 {
@@ -597,27 +596,24 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
              * window to the window whose menu this is
              */
             SFG_Window *save_window = fgStructure.CurrentWindow;
-            SFG_Menu *save_menu = fgStructure.CurrentMenu, *active_menu = window->ActiveMenu;
-            SFG_MenuEntry *active_entry = active_menu->ActiveEntry;
+            SFG_Menu *save_menu = fgStructure.CurrentMenu, *active_menu = window->ActiveMenu;   /* active menu is always the one with the mouse in it, due to fghCheckMenuStatus */
+            SFG_MenuEntry *active_entry = active_menu->ActiveEntry;                             /* currently highlighted item -> must be the one that was just clicked */
             SFG_Window *parent_window = window->ActiveMenu->ParentWindow;
 
-            /* get clicked entry */
-            while (active_entry->SubMenu)
+            /* ignore clicks on the submenu entry */
+            if (!active_entry->SubMenu)
             {
-                active_menu  = active_entry->SubMenu;
-                active_entry = active_menu->ActiveEntry;
+                fgSetWindow( parent_window );
+                fgStructure.CurrentMenu = active_menu;
+
+                /* Deactivate menu and then call callback (we don't want menu to stay in view while callback is executing) */
+                fgDeactivateMenu( parent_window );
+                active_menu->Callback( active_entry->ID );
+
+                /* Restore the current window and menu */
+                fgSetWindow( save_window );
+                fgStructure.CurrentMenu = save_menu;
             }
-
-            fgSetWindow( parent_window );
-            fgStructure.CurrentMenu = active_menu;
-
-            /* Deactivate menu and then call callback (we don't want menu to stay in view while callback is executing) */
-            fgDeactivateMenu( parent_window );
-            active_menu->Callback( active_entry->ID );
-
-            /* Restore the current window and menu */
-            fgSetWindow( save_window );
-            fgStructure.CurrentMenu = save_menu;
 
             is_clicked = GL_TRUE;   /* Don't reopen... */
         }
@@ -748,9 +744,9 @@ void fghCalculateMenuBoxSize( void )
 
         /*
          * If the entry is a submenu, then it needs to be wider to
-         * accomodate the arrow. JCJ 31 July 2003
+         * accommodate the arrow.
          */
-        if (menuEntry->SubMenu )
+        if (menuEntry->SubMenu)
             menuEntry->Width += glutBitmapLength(
                 fgStructure.CurrentMenu->Font,
                 (unsigned char *)"_"
