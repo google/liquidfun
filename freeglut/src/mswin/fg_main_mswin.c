@@ -983,6 +983,20 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
         break;
 
+    case WM_NCLBUTTONDOWN:
+    case WM_NCMBUTTONDOWN:
+    case WM_NCRBUTTONDOWN:
+        {
+            SFG_Menu *menu;
+            if (fgStructure.Menus.First && (menu = fgGetActiveMenu()))
+                /* user clicked non-client area of window while a menu is open. Close menu */
+                fgDeactivateMenu(menu->ParentWindow);
+
+            /* and always pass to DefWindowProc */
+            lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        }
+        break;
+
 #if 0
     case WM_ACTIVATE:
         /* printf("WM_ACTIVATE: %x (ID: %i) %d %d\n",lParam, window->ID, HIWORD(wParam), LOWORD(wParam)); */
