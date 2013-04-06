@@ -29,8 +29,6 @@
 #include <GL/freeglut.h>
 #include "../fg_internal.h"
 
-extern void fghGetClientArea( RECT *clientRect, const SFG_Window *window, BOOL posIsOutside );
-extern SFG_Window* fghWindowUnderCursor(SFG_Window *window);
 
 
 GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
@@ -41,10 +39,8 @@ GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
 
 void fgPlatformCheckMenuDeactivate()
 {
-    /* If we have an open menu, see if the open menu should be closed
-     * when focus was lost because user either switched
-     * application or FreeGLUT window (if one is running multiple
-     * windows). If so, close menu the active menu.
+    /* User/system switched application focus.
+     * If we have an open menu, close it.
      */
     SFG_Menu* menu = NULL;
 
@@ -53,36 +49,8 @@ void fgPlatformCheckMenuDeactivate()
 
     if ( menu )
     {
-        SFG_Window* wnd = NULL;
-        HWND hwnd = GetFocus();  /* Get window with current focus - NULL for non freeglut windows */
-        if (hwnd)
-            /* See which of our windows it is */
-            wnd = fgWindowByHandle(hwnd);
-
-        if (!hwnd || !wnd)
-            /* User switched to another application*/
-            fgDeactivateMenu(menu->ParentWindow);
-        else if (!wnd->IsMenu)      /* Make sure we don't kill the menu when trying to enter a submenu */
-        {
-            /* we need to know if user clicked a child window, any displayable area clicked that is not the menu's parent window should close the menu */
-            wnd = fghWindowUnderCursor(wnd);
-            if (wnd!=menu->ParentWindow)
-                /* User switched to another FreeGLUT window */
-                fgDeactivateMenu(menu->ParentWindow);
-            else
-            {
-                /* Check if focus lost because non-client area of
-                 * window was pressed (pressing on client area is
-                 * handled in fgCheckActiveMenu)
-                 */
-                POINT mouse_pos;
-                RECT clientArea;
-                fghGetClientArea(&clientArea,menu->ParentWindow, FALSE);
-                GetCursorPos(&mouse_pos);
-                if ( !PtInRect( &clientArea, mouse_pos ) )
-                    fgDeactivateMenu(menu->ParentWindow);
-            }
-        }
+        printf("focus menu close\n");
+        fgDeactivateMenu(menu->ParentWindow);
     }
 };
 

@@ -568,7 +568,8 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
      *    location.
      *  - Down-click any button outside the menu, menu active:
      *    deactivate the menu, and potentially activate a new menu
-     *    at the new mouse location
+     *    at the new mouse location. This includes clicks in
+     *    different windows of course
      *  - Down-click any button inside the menu, menu active:
      *    select the menu entry and deactivate the menu
      *  - Up-click the menu button, menu not active:  nothing happens
@@ -630,6 +631,15 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
         }
 
         is_handled = GL_TRUE;
+    }
+    else if ( fgStructure.Menus.First ) /* Don't have to check whether this was a downpress or an uppress, there is no way to get an uppress in another window before a downpress... */
+    {
+        /* if another window than the one clicked in has an open menu, close it */
+        SFG_Menu *menu = fgGetActiveMenu();
+        if ( menu ) /* any open menu? */
+            fgDeactivateMenu( menu->ParentWindow );
+
+        /* Leave is_handled to false, we didn't do anything relevant from the perspective of the window that was clicked */
     }
 
     /* No active menu, let's check whether we need to activate one. */
