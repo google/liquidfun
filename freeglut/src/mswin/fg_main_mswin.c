@@ -589,9 +589,20 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         fgPlatformCheckMenuDeactivate();
         break;
 
+    case WM_MOUSEACTIVATE:
+        /* Clicks should not activate the menu.
+         * Especially important when clicking on a menu's submenu item which has no effect.
+         */
+        printf("WM_MOUSEACTIVATE\n");
+        if (window->IsMenu)
+            lRet = MA_NOACTIVATEANDEAT;
+        else
+            lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
+        break;
+
 #if 0
     case WM_ACTIVATE:
-        //printf("WM_ACTIVATE: %x (ID: %i) %d %d\n",lParam, window->ID, HIWORD(wParam), LOWORD(wParam));
+        /* printf("WM_ACTIVATE: %x (ID: %i) %d %d\n",lParam, window->ID, HIWORD(wParam), LOWORD(wParam)); */
         if (LOWORD(wParam) != WA_INACTIVE)
         {
 /*            printf("WM_ACTIVATE: fgSetCursor( %p, %d)\n", window,
@@ -629,7 +640,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                     tme.hwndTrack = window->Window.Handle;
                     TrackMouseEvent(&tme);
 
-                    window->State.pWState.MouseTracking = GL_TRUE;
+                    window->State.pWState.MouseTracking = TRUE;
                 }
             }
         }
@@ -648,7 +659,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             INVOKE_WCB( *window, Entry, ( GLUT_LEFT ) );
             fgSetWindow(saved_window);
 
-            window->State.pWState.MouseTracking = GL_FALSE;
+            window->State.pWState.MouseTracking = FALSE;
             lRet = 0;   /* As per docs, must return zero */
         }
         break;
