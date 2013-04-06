@@ -48,10 +48,7 @@ void fgPlatformCheckMenuDeactivate()
         menu = fgGetActiveMenu();
 
     if ( menu )
-    {
-        printf("focus menu close\n");
         fgDeactivateMenu(menu->ParentWindow);
-    }
 };
 
 

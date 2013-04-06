@@ -1768,7 +1768,7 @@ void fgPlatformProcessWork(SFG_Window *window)
             break;
         case DesireNormalState:
             if (win->IsMenu)
-                cmdShow = SW_SHOWNOACTIVATE;    /* Just show, don't activate if its a menu */
+                cmdShow = SW_SHOWNA;    /* Just show, don't activate if its a menu */
             else
                 cmdShow = SW_SHOW;
             break;
