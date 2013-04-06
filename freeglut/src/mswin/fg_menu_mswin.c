@@ -37,18 +37,25 @@ GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
     *y = glutGet ( GLUT_SCREEN_HEIGHT );
 }
 
-void fgPlatformCheckMenuDeactivate()
+void fgPlatformCheckMenuDeactivate(HWND newFocusWnd)
 {
     /* User/system switched application focus.
      * If we have an open menu, close it.
      */
     SFG_Menu* menu = NULL;
 
-    if ( fgStructure.Menus.First )
+    if ( fgState.ActiveMenus )
         menu = fgGetActiveMenu();
 
     if ( menu )
-        fgDeactivateMenu(menu->ParentWindow);
+    {
+        if (newFocusWnd != menu->Window->Window.Handle)
+            /* When in GameMode, the menu's parent window will lose focus when the menu is opened.
+             * This is sadly necessary as we need to do an activating ShowWindow() for the menu
+             * to pop up over the gamemode window
+             */
+            fgDeactivateMenu(menu->ParentWindow);
+    }
 };
 
 

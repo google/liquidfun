@@ -39,7 +39,7 @@ extern void fgNewWGLCreateContext( SFG_Window* window );
 extern GLboolean fgSetupPixelFormat( SFG_Window* window, GLboolean checkOnly,
                                      unsigned char layer_type );
 
-extern void fgPlatformCheckMenuDeactivate();
+extern void fgPlatformCheckMenuDeactivate(HWND newFocusWnd);
 
 #ifdef WM_TOUCH
 typedef BOOL (WINAPI *pGetTouchInputInfo)(HTOUCHINPUT,UINT,PTOUCHINPUT,int);
@@ -969,14 +969,14 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
 
         /* Check if there are any open menus that need to be closed */
-        fgPlatformCheckMenuDeactivate();
+        fgPlatformCheckMenuDeactivate((HWND)wParam);
         break;
 
     case WM_MOUSEACTIVATE:
         /* Clicks should not activate the menu.
          * Especially important when clicking on a menu's submenu item which has no effect.
          */
-        printf("WM_MOUSEACTIVATE\n");
+        /*printf("WM_MOUSEACTIVATE\n");*/
         if (window->IsMenu)
             lRet = MA_NOACTIVATEANDEAT;
         else
@@ -988,7 +988,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_NCRBUTTONDOWN:
         {
             SFG_Menu *menu;
-            if (fgStructure.Menus.First && (menu = fgGetActiveMenu()))
+            if (fgState.ActiveMenus && (menu = fgGetActiveMenu()))
                 /* user clicked non-client area of window while a menu is open. Close menu */
                 fgDeactivateMenu(menu->ParentWindow);
 
@@ -1767,8 +1767,8 @@ void fgPlatformProcessWork(SFG_Window *window)
                 win = win->Parent;
             break;
         case DesireNormalState:
-            if (win->IsMenu)
-                cmdShow = SW_SHOWNA;    /* Just show, don't activate if its a menu */
+            if (win->IsMenu && (!fgStructure.GameModeWindow || win->ActiveMenu->ParentWindow != fgStructure.GameModeWindow))
+                cmdShow = SW_SHOWNA;    /* Just show, don't activate window if its a menu. Only exception is when the parent is a gamemode window as the menu would pop under it when we do this... */
             else
                 cmdShow = SW_SHOW;
             break;

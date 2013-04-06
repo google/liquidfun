@@ -632,7 +632,7 @@ GLboolean fgCheckActiveMenu ( SFG_Window *window, int button, GLboolean pressed,
 
         is_handled = GL_TRUE;
     }
-    else if ( fgStructure.Menus.First ) /* Don't have to check whether this was a downpress or an uppress, there is no way to get an uppress in another window before a downpress... */
+    else if ( fgState.ActiveMenus ) /* Don't have to check whether this was a downpress or an uppress, there is no way to get an uppress in another window before a downpress... */
     {
         /* if another window than the one clicked in has an open menu, close it */
         SFG_Menu *menu = fgGetActiveMenu();
@@ -784,7 +784,7 @@ int FGAPIENTRY glutCreateMenu( FGCBMenu callback )
 {
     /* The menu object creation code resides in freeglut_structure.c */
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCreateMenu" );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     return fgCreateMenu( callback )->ID;
@@ -801,7 +801,7 @@ void FGAPIENTRY glutDestroyMenu( int menuID )
     menu = fgMenuByID( menuID );
 
     freeglut_return_if_fail( menu );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     /* The menu object destruction code resides in freeglut_structure.c */
@@ -846,7 +846,7 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
     menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     menuEntry->Text = strdup( label );
@@ -871,7 +871,7 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
     subMenu = fgMenuByID( subMenuID );
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     freeglut_return_if_fail( subMenu );
@@ -895,7 +895,7 @@ void FGAPIENTRY glutSetMenuFont( int menuID, void* fontID )
     menu = fgMenuByID( menuID );
     freeglut_return_if_fail( menu );
 
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     font = fghFontByID( fontID );
@@ -919,7 +919,7 @@ void FGAPIENTRY glutChangeToMenuEntry( int item, const char* label, int value )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutChangeToMenuEntry" );
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     /* Get n-th menu entry in the current menu, starting from one: */
@@ -949,7 +949,7 @@ void FGAPIENTRY glutChangeToSubMenu( int item, const char* label,
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutChangeToSubMenu" );
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     /* Get handle to sub menu */
@@ -982,7 +982,7 @@ void FGAPIENTRY glutRemoveMenuItem( int item )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutRemoveMenuItem" );
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     /* Get n-th menu entry in the current menu, starting from one: */
@@ -1008,7 +1008,7 @@ void FGAPIENTRY glutAttachMenu( int button )
     freeglut_return_if_fail( fgStructure.CurrentWindow );
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     freeglut_return_if_fail( button >= 0 );
@@ -1027,7 +1027,7 @@ void FGAPIENTRY glutDetachMenu( int button )
     freeglut_return_if_fail( fgStructure.CurrentWindow );
 
     freeglut_return_if_fail( fgStructure.CurrentMenu );
-    if (fgGetActiveMenu())
+    if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
     freeglut_return_if_fail( button >= 0 );
