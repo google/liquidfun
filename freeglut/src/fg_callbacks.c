@@ -63,6 +63,7 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, FGCBTimer callback, int tim
     timer->ID        = timerID;
     timer->TriggerTime = fgElapsedTime() + timeOut;
 
+    /* Insert such that timers are sorted by end-time */
     for( node = fgState.Timers.First; node; node = node->Node.Next )
     {
         if( node->TriggerTime > timer->TriggerTime )

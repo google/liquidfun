@@ -261,7 +261,7 @@ static void fghCheckTimers( void )
         SFG_Timer *timer = fgState.Timers.First;
 
         if( timer->TriggerTime > checkTime )
-            /* XXX: are timers always sorted by triggerTime? If not, this and fghNextTimer are wrong */
+            /* Timers are sorted by triggerTime */
             break;
 
         fgListRemove( &fgState.Timers, &timer->Node );
@@ -388,12 +388,13 @@ static int fghHavePendingRedisplays (void)
  */
 static fg_time_t fghNextTimer( void )
 {
-    fg_time_t currentTime = fgElapsedTime();
-    SFG_Timer *timer = fgState.Timers.First;
+    fg_time_t currentTime;
+    SFG_Timer *timer = fgState.Timers.First;    /* timers are sorted by trigger time, so only have to check the first */
 
     if( !timer )
         return INT_MAX;
 
+    currentTime = fgElapsedTime();
     if( timer->TriggerTime < currentTime )
         return 0;
     else
