@@ -92,7 +92,7 @@ void fghOnReshapeNotify(SFG_Window *window, int width, int height, GLboolean for
          * window.
          * DN: Hmm.. the above sounds like a concern only in single buffered mode...
          */
-        glutPostRedisplay( );
+        window->State.WorkMask |= GLUT_DISPLAY_WORK;
         if( window->IsMenu )
             fgSetWindow( saved_window );
     }
@@ -177,33 +177,6 @@ static void fghProcessWork( void )
     enumerator.data  =  NULL;
 
     fgEnumWindows( fghcbProcessWork, &enumerator );
-}
-
-
-static void fghcbDisplayWindow( SFG_Window *window,
-                                SFG_Enumerator *enumerator )
-{
-    if( window->State.Redisplay &&
-        window->State.Visible )
-    {
-        window->State.Redisplay = GL_FALSE;
-		fghRedrawWindow ( window );
-    }
-
-    fgEnumSubWindows( window, fghcbDisplayWindow, enumerator );
-}
-
-/*
- * Make all windows perform a display call
- */
-static void fghDisplayAll( void )
-{
-    SFG_Enumerator enumerator;
-
-    enumerator.found = GL_FALSE;
-    enumerator.data  =  NULL;
-
-    fgEnumWindows( fghcbDisplayWindow, &enumerator );
 }
 
 /*
@@ -357,29 +330,28 @@ void fgWarning( const char *fmt, ... )
 
 
 /*
- * Indicates whether a redisplay is pending for ANY window.
+ * Indicates whether work is pending for ANY window.
  *
  * The current mechanism is to walk all of the windows and ask if
- * a redisplay is pending. We have a short-circuit early
- * return if we find any.
+ * work is pending. We have a short-circuit early return if we find any.
  */
-static void fghHavePendingRedisplaysCallback( SFG_Window* w, SFG_Enumerator* e)
+static void fghHavePendingWorkCallback( SFG_Window* w, SFG_Enumerator* e)
 {
-    if( w->State.Redisplay && w->State.Visible )
+    if( w->State.WorkMask )
     {
         e->found = GL_TRUE;
         e->data = w;
         return;
     }
-    fgEnumSubWindows( w, fghHavePendingRedisplaysCallback, e );
+    fgEnumSubWindows( w, fghHavePendingWorkCallback, e );
 }
-static int fghHavePendingRedisplays (void)
+static int fghHavePendingWork (void)
 {
     SFG_Enumerator enumerator;
 
     enumerator.found = GL_FALSE;
     enumerator.data = NULL;
-    fgEnumWindows( fghHavePendingRedisplaysCallback, &enumerator );
+    fgEnumWindows( fghHavePendingWorkCallback, &enumerator );
     return !!enumerator.data;
 }
 
@@ -405,7 +377,7 @@ static void fghSleepForEvents( void )
 {
     fg_time_t msec;
 
-    if( fghHavePendingRedisplays( ) )
+    if( fghHavePendingWork( ) )
         return;
 
     msec = fghNextTimer( );
@@ -433,11 +405,8 @@ void FGAPIENTRY glutMainLoopEvent( void )
     if (fgState.NumActiveJoysticks>0)   /* If zero, don't poll joysticks */
         fghCheckJoystickPolls( );
 
-    /* Perform work on the window (position, reshape, etc) */
+    /* Perform work on the window (position, reshape, display, etc) */
     fghProcessWork( );
-
-    /* Display */
-    fghDisplayAll( );
 
     fgCloseWindows( );
 }

@@ -295,7 +295,7 @@ void FGAPIENTRY glutShowWindow( void )
     fgStructure.CurrentWindow->State.WorkMask |= GLUT_VISIBILITY_WORK;
     fgStructure.CurrentWindow->State.DesiredVisibility = DesireNormalState;
 
-    fgStructure.CurrentWindow->State.Redisplay = GL_TRUE;
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_DISPLAY_WORK;
 }
 
 /*
@@ -309,7 +309,7 @@ void FGAPIENTRY glutHideWindow( void )
     fgStructure.CurrentWindow->State.WorkMask |= GLUT_VISIBILITY_WORK;
     fgStructure.CurrentWindow->State.DesiredVisibility = DesireHiddenState;
 
-    fgStructure.CurrentWindow->State.Redisplay = GL_FALSE;
+    fgStructure.CurrentWindow->State.WorkMask &= ~GLUT_DISPLAY_WORK;
 }
 
 /*
@@ -323,7 +323,7 @@ void FGAPIENTRY glutIconifyWindow( void )
     fgStructure.CurrentWindow->State.WorkMask |= GLUT_VISIBILITY_WORK;
     fgStructure.CurrentWindow->State.DesiredVisibility = DesireIconicState;
 
-    fgStructure.CurrentWindow->State.Redisplay = GL_FALSE;
+    fgStructure.CurrentWindow->State.WorkMask &= ~GLUT_DISPLAY_WORK;
 }
 
 /*

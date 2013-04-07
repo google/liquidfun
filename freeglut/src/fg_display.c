@@ -47,7 +47,7 @@ void FGAPIENTRY glutPostRedisplay( void )
                 " with no current window defined.", "glutPostRedisplay" ) ;
 	}
 
-    fgStructure.CurrentWindow->State.Redisplay = GL_TRUE;
+    fgStructure.CurrentWindow->State.WorkMask |= GLUT_DISPLAY_WORK;
 }
 
 /*
@@ -98,7 +98,7 @@ void FGAPIENTRY glutPostWindowRedisplay( int windowID )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPostWindowRedisplay" );
     window = fgWindowByID( windowID );
     freeglut_return_if_fail( window );
-    window->State.Redisplay = GL_TRUE;
+    window->State.WorkMask |= GLUT_DISPLAY_WORK;
 }
 
 /*** END OF FILE ***/

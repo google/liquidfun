@@ -207,7 +207,7 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
 
         if( menuEntry != menu->ActiveEntry )
         {
-            menu->Window->State.Redisplay = GL_TRUE;
+            menu->Window->State.WorkMask |= GLUT_DISPLAY_WORK;
             if( menu->ActiveEntry )
                 menu->ActiveEntry->IsActive = GL_FALSE;
         }
@@ -277,7 +277,7 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
         ( !menu->ActiveEntry->SubMenu ||
           !menu->ActiveEntry->SubMenu->IsActive ) )
     {
-        menu->Window->State.Redisplay = GL_TRUE;
+        menu->Window->State.WorkMask |= GLUT_DISPLAY_WORK;
         menu->ActiveEntry->IsActive = GL_FALSE;
         menu->ActiveEntry = NULL;
     }

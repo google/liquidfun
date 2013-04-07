@@ -392,6 +392,7 @@ struct tagSFG_Context
 #define GLUT_SIZE_WORK        (1<<3)
 #define GLUT_ZORDER_WORK      (1<<4)
 #define GLUT_FULL_SCREEN_WORK (1<<5)
+#define GLUT_DISPLAY_WORK     (1<<6)
 
 /*
  * An enumeration containing the state of the GLUT execution:
@@ -457,11 +458,7 @@ struct tagSFG_WindowState   /* as per notes above, sizes always refer to the cli
     int             DesiredZOrder;      /* desired window Z Order position */
     fgDesiredVisibility DesiredVisibility;/* desired visibility (hidden, iconic, shown/normal) */
 
-
 	SFG_PlatformWindowState pWState;    /* Window width/height (X11) or rectangle/style (Windows) from before a resize, and other stuff only needed on specific platforms */
-
-    GLboolean       Redisplay;          /* Do we have to redisplay?          */
-
 
     long            JoystickPollRate;   /* The joystick polling rate         */
     fg_time_t       JoystickLastPoll;   /* When the last poll happened       */
