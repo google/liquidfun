@@ -436,9 +436,6 @@ void fgPlatformProcessWork(SFG_Window *window)
     {
         if( window->State.Visible )
             fghRedrawWindow ( window );
-
-        /* Strip out display work that might have ended up on work list now as some of the above genereates callbacks */
-        window->State.WorkMask &= ~GLUT_DISPLAY_WORK;
     }
 }
 
