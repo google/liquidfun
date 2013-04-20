@@ -432,10 +432,17 @@ void fgPlatformProcessWork(SFG_Window *window)
         }
     }
 
-    if (workMask & GLUT_DISPLAY_WORK)
+    /* check window state's workmask as well as some of the above callbacks might have generated redisplay requests. We can deal with those right now instead of wait for the next mainloop iteration. */
+    if (workMask & GLUT_DISPLAY_WORK || window->State.WorkMask & GLUT_DISPLAY_WORK)
     {
         if( window->State.Visible )
+        {
+            /* Strip out display work from the work list */
+            /* NB: do this before the display callback is called as user might call postredisplay in his display callback */
+            window->State.WorkMask &= ~GLUT_DISPLAY_WORK;
+
             fghRedrawWindow ( window );
+        }
     }
 }
 
