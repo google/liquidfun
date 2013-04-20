@@ -465,7 +465,7 @@ void fgPlatformProcessSingleEvent ( void )
        * be not possible to ensure InitContext CB gets called before
        * Resume CB like that.. so maybe just force calling initContext CB
        * here is best. Or we could force work on the window in question..
-       * 1) save old work mask, 2) set mask to init only, 3) call fgPlatformProcessWork directly
+       * 1) save old work mask, 2) set mask to init only, 3) call fgProcessWork directly
        * 4) set work mask back to the one saved in step 1.
        */
       if (!FETCH_WCB(*window, InitContext))
