@@ -51,8 +51,8 @@
 #include "android/native_app_glue/android_native_app_glue.h"
 #include "android/fg_main_android.h"
 
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "FreeGLUT", __VA_ARGS__))
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT-jnicb", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "FreeGLUT-jnicb", __VA_ARGS__))
 
 /* Cf. freeglut_main_android.c */
 extern int32_t handle_input(struct android_app* app, AInputEvent* event);
