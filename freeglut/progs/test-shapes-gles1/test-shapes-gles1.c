@@ -100,6 +100,10 @@ static void drawSolidCone(void)                { glutSolidCone(orad,orad,slices,
 static void drawWireCone(void)                 { glutWireCone(orad,orad,slices,stacks);          }  /* orad doubles as size input */
 static void drawSolidCylinder(void)            { glutSolidCylinder(orad,orad,slices,stacks);     }  /* orad doubles as size input */
 static void drawWireCylinder(void)             { glutWireCylinder(orad,orad,slices,stacks);      }  /* orad doubles as size input */
+static void drawSolidTeapot(void)
+{   glFrontFace(GL_CW);    glutSolidTeapot(orad);   glFrontFace(GL_CCW);    /* orad doubles as size input */}
+static void drawWireTeapot(void)
+{   glFrontFace(GL_CW);    glutWireTeapot(orad);    glFrontFace(GL_CCW);    /* orad doubles as size input */}
 
 /*
  * This structure defines an entry in our function-table.
@@ -121,7 +125,7 @@ static const entry table [] =
     ENTRY (RhombicDodecahedron),
     ENTRY (Icosahedron),
     ENTRY (SierpinskiSponge),
-    /* ENTRY (Teapot), */
+    ENTRY (Teapot),
     ENTRY (Torus),
     ENTRY (Sphere),
     ENTRY (Cone),

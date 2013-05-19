@@ -29,6 +29,7 @@ void glutChangeToSubMenu( int item, const char* label, int value ) {}
 void glutRemoveMenuItem( int item ) {}
 void glutAttachMenu( int button ) {}
 void glutDetachMenu( int button ) {}
+void glutSetMenuFont( int menuID, void* font ) {}
 
 void glutBitmapCharacter( void* font, int character ) {}
 int  glutBitmapWidth( void* font, int character ) { return 0; }

@@ -557,7 +557,7 @@ static void fghDrawNormalVisualization11()
 
     /* Done, free memory, reset color */
     free(verticesForNormalVisualization);
-    glColor4fv(currentColor);
+    glColor4f(currentColor[0],currentColor[1],currentColor[2],currentColor[3]);
 }
 #endif
 

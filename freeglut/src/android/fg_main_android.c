@@ -414,7 +414,7 @@ void fgPlatformProcessSingleEvent ( void )
   if (window != NULL && window->Window.Handle != NULL) {
     int32_t width = ANativeWindow_getWidth(window->Window.Handle);
     int32_t height = ANativeWindow_getHeight(window->Window.Handle);
-    fghOnReshapeNotify(width,height);
+    fghOnReshapeNotify(window,width,height,GL_FALSE);
   }
 
   /* Read pending event. */
