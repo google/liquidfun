@@ -29,9 +29,9 @@
 #include <GL/freeglut.h>
 #include "../fg_internal.h"
 
+#ifdef HAVE_X11_EXTENSIONS_XRANDR_H
 static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
 {
-#ifdef HAVE_X11_EXTENSIONS_XRANDR_H
     int event_base, error_base, ver_major, ver_minor, use_rate;
     XRRScreenConfiguration *xrr_config = 0;
     Status result = -1;
@@ -137,9 +137,9 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
         return 0;
     }
 
-#endif  /* HAVE_X11_EXTENSIONS_XRANDR_H */
     return -1;
 }
+#endif  /* HAVE_X11_EXTENSIONS_XRANDR_H */
 
 /*
  * Remembers the current visual settings, so that
@@ -147,7 +147,9 @@ static int xrandr_resize(int xsz, int ysz, int rate, int just_checking)
  */
 void fgPlatformRememberState( void )
 {
+#   if defined(HAVE_X11_EXTENSIONS_XRANDR_H) | defined(HAVE_X11_EXTENSIONS_XF86VMODE_H)
     int event_base, error_base;
+#   endif
 
     /*
      * Remember the current pointer location before going fullscreen
