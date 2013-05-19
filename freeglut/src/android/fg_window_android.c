@@ -64,6 +64,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     /* fgPlatformProcessSingleEvent(); */
   }
   window->Window.Handle = fgDisplay.pDisplay.single_native_window;
+  window->State.WorkMask |= GLUT_INIT_WORK;
 
   /* Create context */
   fghChooseConfig(&window->Window.pContext.egl.Config);

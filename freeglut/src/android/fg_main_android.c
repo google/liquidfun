@@ -330,7 +330,6 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     /* The window is being shown, get it ready. */
     LOGI("handle_cmd: APP_CMD_INIT_WINDOW %p", app->window);
     fgDisplay.pDisplay.single_native_window = app->window;
-    window->State.WorkMask |= GLUT_INIT_WORK;
     /* start|resume: glPlatformOpenWindow was waiting for Handle to be
        defined and will now continue processing */
     break;
