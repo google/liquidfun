@@ -31,6 +31,10 @@
 void fgPlatformInitialize()
 {
   fghPlatformInitializeEGL();
+
+  /* Get start time */
+  fgState.Time = fgSystemTime();
+
   fgState.Initialised = GL_TRUE;
 }
 
