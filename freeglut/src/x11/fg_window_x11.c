@@ -28,8 +28,9 @@
 
 #define FREEGLUT_BUILDING_LIB
 #include <GL/freeglut.h>
-#include <limits.h>  /* LONG_MAX */
-#include <unistd.h>  /* usleep */
+#include <limits.h>     /* LONG_MAX */
+#include <unistd.h>     /* usleep, gethostname, getpid */
+#include <sys/types.h>  /* pid_t */
 #include "../fg_internal.h"
 
 #ifdef EGL_VERSION_1_0
@@ -339,6 +340,41 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
     XSetWMProtocols( fgDisplay.pDisplay.Display, window->Window.Handle,
                      &fgDisplay.pDisplay.DeleteWindow, 1 );
+
+    if (fgDisplay.pDisplay.NetWMSupported
+        && fgDisplay.pDisplay.NetWMPid != None
+        && fgDisplay.pDisplay.ClientMachine != None)
+    {
+      char hostname[HOST_NAME_MAX];
+      pid_t pid = getpid();
+
+      if (pid > 0 && gethostname(hostname, sizeof(hostname)) > -1)
+      {
+        hostname[sizeof(hostname) - 1] = '\0';
+
+        XChangeProperty(
+            fgDisplay.pDisplay.Display,
+            window->Window.Handle,
+            fgDisplay.pDisplay.NetWMPid,
+            XA_CARDINAL,
+            32,
+            PropModeReplace,
+            (unsigned char *) &pid,
+            1
+        );
+
+        XChangeProperty(
+            fgDisplay.pDisplay.Display,
+            window->Window.Handle,
+            fgDisplay.pDisplay.ClientMachine,
+            XA_STRING,
+            8,
+            PropModeReplace,
+            (unsigned char *) hostname,
+            strlen(hostname)
+        );
+      }
+    }
 
 #ifdef EGL_VERSION_1_0
     fghPlatformOpenWindowEGL(window);

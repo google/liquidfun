@@ -82,9 +82,9 @@ static int fghGetWindowProperty(Window window,
 			       "fghGetWindowProperty");
 
   if (type_returned != type)
-    {
-      number_of_elements = 0;
-    }
+  {
+    number_of_elements = 0;
+  }
 
   return number_of_elements;
 }
@@ -113,30 +113,30 @@ static int fghNetWMSupported(void)
                                            XA_WINDOW,
                                            (unsigned char **) window_ptr_1);
   if (number_of_windows == 1)
+  {
+    Window ** window_ptr_2;
+
+    window_ptr_2 = malloc(sizeof(Window *));
+
+    /* Check that the window has the same property set to the same value. */
+    number_of_windows = fghGetWindowProperty(**window_ptr_1,
+                                             wm_check,
+                                             XA_WINDOW,
+                                             (unsigned char **) window_ptr_2);
+    if ((number_of_windows == 1) && (**window_ptr_1 == **window_ptr_2))
     {
-      Window ** window_ptr_2;
-
-      window_ptr_2 = malloc(sizeof(Window *));
-
-      /* Check that the window has the same property set to the same value. */
-      number_of_windows = fghGetWindowProperty(**window_ptr_1,
-                                               wm_check,
-                                               XA_WINDOW,
-                                               (unsigned char **) window_ptr_2);
-      if ((number_of_windows == 1) && (**window_ptr_1 == **window_ptr_2))
-      {
-        /* NET WM compliant */
-        net_wm_supported = 1;
-      }
-
-      XFree(*window_ptr_2);
-      free(window_ptr_2);
+      /* NET WM compliant */
+      net_wm_supported = 1;
     }
 
-        XFree(*window_ptr_1);
-        free(window_ptr_1);
+    XFree(*window_ptr_2);
+    free(window_ptr_2);
+  }
 
-        return net_wm_supported;
+  XFree(*window_ptr_1);
+  free(window_ptr_1);
+
+  return net_wm_supported;
 }
 
 /*  Check if "hint" is present in "property" for "window". */
@@ -216,8 +216,12 @@ void fgPlatformInitialize( const char* displayName )
     /* Create the state and full screen atoms */
     fgDisplay.pDisplay.State           = None;
     fgDisplay.pDisplay.StateFullScreen = None;
+    fgDisplay.pDisplay.NetWMPid        = None;
+    fgDisplay.pDisplay.ClientMachine   = None;
 
-    if (fghNetWMSupported())
+    fgDisplay.pDisplay.NetWMSupported = fghNetWMSupported();
+
+    if (fgDisplay.pDisplay.NetWMSupported)
     {
       const Atom supported = fghGetAtom("_NET_SUPPORTED");
       const Atom state     = fghGetAtom("_NET_WM_STATE");
@@ -236,6 +240,9 @@ void fgPlatformInitialize( const char* displayName )
           fgDisplay.pDisplay.StateFullScreen = full_screen;
         }
       }
+
+      fgDisplay.pDisplay.NetWMPid = fghGetAtom("_NET_WM_PID");
+      fgDisplay.pDisplay.ClientMachine = fghGetAtom("WM_CLIENT_MACHINE");
     }
 
     /* Get start time */
