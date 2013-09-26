@@ -141,7 +141,7 @@ if(BOX2D_BUILD_SHARED)
 		${BOX2D_Rope_HDRS}
 	)
 	set_target_properties(Box2D_shared PROPERTIES
-		OUTPUT_NAME "Box2D"
+		OUTPUT_NAME "splash2d"
 		CLEAN_DIRECT_OUTPUT 1
 		VERSION ${BOX2D_VERSION}
 	)
@@ -165,7 +165,7 @@ if(BOX2D_BUILD_STATIC)
 		${BOX2D_Rope_SRCS}
 		${BOX2D_Rope_HDRS}
 	)
-	set_target_properties(Box2D PROPERTIES
+	set_target_properties(splash2d PROPERTIES
 		CLEAN_DIRECT_OUTPUT 1
 		VERSION ${BOX2D_VERSION}
 	)

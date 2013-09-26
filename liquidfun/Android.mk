@@ -3,16 +3,16 @@ LOCAL_PATH:=$(call my-dir)
 include $(CLEAR_VARS)
 
 # Module name and dependencies.
-LOCAL_MODULE:=libBox2D
+LOCAL_MODULE:=libsplash2d
 LOCAL_MODULE_TAGS:=optional
 LOCAL_SHARED_LIBRARIES:=libstlport
 
-# Whether to build using Box2D's cmake project or use Android's build system
+# Whether to build using splash2d's cmake project or use Android's build system
 # directly.
-BOX2D_BUILD_USING_CMAKE?=0
+SPLASH2D_BUILD_USING_CMAKE?=0
 
 # === Build using the standard Android build process. ===
-ifeq ($(BOX2D_BUILD_USING_CMAKE),0)
+ifeq ($(SPLASH2D_BUILD_USING_CMAKE),0)
 
 # Execute a shell command relative to this module's directory.
 define execute-local
@@ -31,7 +31,7 @@ include external/stlport/libstlport.mk
 # include rules to build this as a shared library.
 include $(BUILD_SHARED_LIBRARY)
 
-else  # BOX2D_BUILD_USING_CMAKE
+else  # SPLASH2D_BUILD_USING_CMAKE
 
 # === Build using cmake. ===
 
@@ -53,4 +53,4 @@ include external/stlport/libstlport.mk
 # Generate build rules for the module.
 include external/box2d/cmake.mk
 
-endif  # BOX2D_BUILD_USING_CMAKE
+endif  # SPLASH2D_BUILD_USING_CMAKE
