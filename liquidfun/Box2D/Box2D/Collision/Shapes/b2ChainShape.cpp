@@ -133,6 +133,13 @@ void b2ChainShape::GetChildEdge(b2EdgeShape* edge, int32 index) const
 	}
 }
 
+void b2ChainShape::ComputeDistance(const b2Transform& xf, const b2Vec2& p, float32* distance, b2Vec2* normal, int32 childIndex) const
+{
+	b2EdgeShape edge;
+	GetChildEdge(&edge, childIndex);
+	edge.ComputeDistance(xf, p, distance, normal, 0);
+}
+
 bool b2ChainShape::TestPoint(const b2Transform& xf, const b2Vec2& p) const
 {
 	B2_NOT_USED(xf);

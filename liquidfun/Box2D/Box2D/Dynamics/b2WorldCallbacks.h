@@ -29,6 +29,7 @@ class b2Joint;
 class b2Contact;
 struct b2ContactResult;
 struct b2Manifold;
+class b2ParticleGroup;
 
 /// Joints and fixtures are destroyed when their associated
 /// body is destroyed. Implement this listener so that you
@@ -45,6 +46,12 @@ public:
 	/// Called when any fixture is about to be destroyed due
 	/// to the destruction of its parent body.
 	virtual void SayGoodbye(b2Fixture* fixture) = 0;
+
+	/// Called when any particle group is about to be destroyed.
+	virtual void SayGoodbye(b2ParticleGroup* group)
+	{
+		B2_NOT_USED(group);
+	}
 };
 
 /// Implement this class to provide collision filtering. In other words, you can implement
@@ -128,6 +135,14 @@ public:
 	/// Called for each fixture found in the query AABB.
 	/// @return false to terminate the query.
 	virtual bool ReportFixture(b2Fixture* fixture) = 0;
+
+	/// Called for each particle found in the query AABB.
+	/// @return false to terminate the query.
+	virtual bool ReportParticle(int32 index)
+	{
+		B2_NOT_USED(index);
+		return false;
+	}
 };
 
 /// Callback class for ray casts.
@@ -150,6 +165,13 @@ public:
 	/// closest hit, 1 to continue
 	virtual float32 ReportFixture(	b2Fixture* fixture, const b2Vec2& point,
 									const b2Vec2& normal, float32 fraction) = 0;
+
+	/// Called for each particle found in the query.
+	virtual float32 ReportParticle(	int32 index, const b2Vec2& point,
+									const b2Vec2& normal, float32 fraction)
+	{
+		return 0;
+	}
 };
 
 #endif

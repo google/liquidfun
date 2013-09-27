@@ -25,6 +25,7 @@
 #include <Box2D/Dynamics/b2ContactManager.h>
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
 #include <Box2D/Dynamics/b2TimeStep.h>
+#include <Box2D/Particle/b2ParticleSystem.h>
 
 struct b2AABB;
 struct b2BodyDef;
@@ -34,6 +35,7 @@ class b2Body;
 class b2Draw;
 class b2Fixture;
 class b2Joint;
+class b2ParticleGroup;
 
 /// The world class manages all physics entities, dynamic simulation,
 /// and asynchronous queries. The world also contains efficient memory
@@ -209,6 +211,98 @@ public:
 	/// @warning this should be called outside of a time step.
 	void Dump();
 
+	/// Create a particle given a definition. No reference to the definition
+	/// is retained.
+	/// @warning This function is locked during callbacks.
+	/// @return the index of the particle.
+	int32 CreateParticle(const b2ParticleDef& def);
+
+	/// Destroy a particle.
+	/// The particle will be removed after next step.
+	void DestroyParticle(int32 index);
+
+	/// Create a particles given a definition. No reference to the definition
+	/// is retained.
+	/// @warning This function is locked during callbacks.
+	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
+
+	/// Join two particle groups.
+	/// @param the first group. It will be preserved.
+	/// @param the second group. It will be destroyed.
+	/// @warning This function is locked during callbacks.
+	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
+
+	/// Destroy a particle group.
+	/// This function is locked during callbacks.
+	/// @warning This automatically deletes all associated particles.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticleGroup(b2ParticleGroup* group);
+
+	/// Get the world particle group list. With the returned group, use
+	/// b2ParticleGroup::GetNext to get the next group in the world list.
+	/// A NULL group indicates the end of the list.
+	/// @return the head of the world particle group list.
+	b2ParticleGroup* GetParticleGroupList();
+	const b2ParticleGroup* GetParticleGroupList() const;
+
+	/// Get the number of particle groups.
+	int32 GetParticleGroupCount() const;
+
+	/// Get the number of particles.
+	int32 GetParticleCount() const;
+
+	/// Change the particle density.
+	void SetParticleDensity(float32 density);
+
+	/// Get the particle density.
+	float32 GetParticleDensity() const;
+
+	/// Change the particle gravity scale. Adjusts the effect of the global
+	/// gravity vector on particles. Default value is 1.0f.
+	void SetParticleGravityScale(float32 gravityScale);
+
+	/// Get the particle gravity scale.
+	float32 GetParticleGravityScale() const;
+
+	/// Damping is used to reduce the velocity of particles. The damping
+	/// parameter can be larger than 1.0f but the damping effect becomes
+	/// sensitive to the time step when the damping parameter is large.
+	void SetParticleDamping(float32 damping);
+
+	/// Get damping for particles
+	float32 GetParticleDamping() const;
+
+	/// Change the particle radius.
+	void SetParticleRadius(float32 radius);
+
+	/// Get the particle radius.
+	float32 GetParticleRadius() const;
+
+	/// Get the particle data.
+	/// @return the pointer to the head of the particle data.
+	uint32* GetParticleFlagsBuffer();
+	b2Vec2* GetParticlePositionBuffer();
+	b2Vec2* GetParticleVelocityBuffer();
+	b2ParticleColor* GetParticleColorBuffer();
+	void** GetParticleUserDataBuffer();
+	const uint32* GetParticleFlagsBuffer() const;
+	const b2Vec2* GetParticlePositionBuffer() const;
+	const b2Vec2* GetParticleVelocityBuffer() const;
+	const b2ParticleColor* GetParticleColorBuffer() const;
+	b2ParticleGroup* const* GetParticleGroupBuffer() const;
+	void* const* GetParticleUserDataBuffer() const;
+
+	/// Get contacts between particles
+	const b2ParticleContact* GetParticleContacts();
+	int32 GetParticleContactCount();
+
+	/// Get contacts between particles and bodies
+	const b2ParticleBodyContact* GetParticleBodyContacts();
+	int32 GetParticleBodyContactCount();
+
+	/// Compute the kinetic energy that can be lost by damping force
+	float32 ComputeParticleCollisionEnergy() const;
+
 private:
 
 	// m_flags
@@ -223,12 +317,15 @@ private:
 	friend class b2Fixture;
 	friend class b2ContactManager;
 	friend class b2Controller;
+	friend class b2ParticleSystem;
 
 	void Solve(const b2TimeStep& step);
 	void SolveTOI(const b2TimeStep& step);
 
 	void DrawJoint(b2Joint* joint);
 	void DrawShape(b2Fixture* shape, const b2Transform& xf, const b2Color& color);
+
+	void DrawParticleSystem(const b2ParticleSystem* system);
 
 	b2BlockAllocator m_blockAllocator;
 	b2StackAllocator m_stackAllocator;
@@ -261,6 +358,8 @@ private:
 	bool m_stepComplete;
 
 	b2Profile m_profile;
+
+	b2ParticleSystem m_particleSystem;
 };
 
 inline b2Body* b2World::GetBodyList()
@@ -349,6 +448,26 @@ inline const b2ContactManager& b2World::GetContactManager() const
 inline const b2Profile& b2World::GetProfile() const
 {
 	return m_profile;
+}
+
+inline b2ParticleGroup* b2World::GetParticleGroupList()
+{
+	return m_particleSystem.GetParticleGroupList();
+}
+
+inline const b2ParticleGroup* b2World::GetParticleGroupList() const
+{
+	return m_particleSystem.GetParticleGroupList();
+}
+
+inline int32 b2World::GetParticleGroupCount() const
+{
+	return m_particleSystem.GetParticleGroupCount();
+}
+
+inline int32 b2World::GetParticleCount() const
+{
+	return m_particleSystem.GetParticleCount();
 }
 
 #endif

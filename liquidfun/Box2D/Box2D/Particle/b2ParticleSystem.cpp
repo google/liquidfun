@@ -1,0 +1,1622 @@
+#include <Box2D/Particle/b2ParticleSystem.h>
+#include <Box2D/Particle/b2ParticleGroup.h>
+#include <Box2D/Particle/b2VoronoiDiagram.h>
+#include <Box2D/Common/b2BlockAllocator.h>
+#include <Box2D/Dynamics/b2World.h>
+#include <Box2D/Dynamics/b2WorldCallbacks.h>
+#include <Box2D/Dynamics/b2Body.h>
+#include <Box2D/Dynamics/b2Fixture.h>
+#include <Box2D/Collision/Shapes/b2Shape.h>
+#include <algorithm>
+
+static const uint32 xTruncBits = 12;
+static const uint32 yTruncBits = 12;
+static const uint32 tagBits = 8 * sizeof(uint32);
+static const uint32 yOffset = 1 << (yTruncBits - 1);
+static const uint32 yShift = tagBits - yTruncBits;
+static const uint32 xShift = tagBits - yTruncBits - xTruncBits;
+static const uint32 xScale = 1 << xShift;
+static const uint32 xOffset = xScale * (1 << (xTruncBits - 1));
+static const uint32 xMask = (1 << xTruncBits) - 1;
+static const uint32 yMask = (1 << yTruncBits) - 1;
+
+static inline uint32 computeTag(float32 x, float32 y)
+{
+	return ((uint32)(y + yOffset) << yShift) + (uint32)(xScale * x + xOffset);
+}
+
+static inline uint32 computeRelativeTag(uint32 tag, int32 x, int32 y)
+{
+	return tag + (y << yShift) + (x << xShift);
+}
+
+b2ParticleSystem::b2ParticleSystem()
+{
+
+	m_timestamp = 0;
+	m_allFlags = 0;
+	m_density = 1;
+	m_inverseDensity = 1;
+	m_gravityScale = 1;
+	m_particleDiameter = 1;
+	m_inverseDiameter = 1;
+	m_squaredDiameter = 1;
+
+	m_count = 0;
+	m_capacity = 0;
+	m_flagsBuffer = NULL;
+	m_positionBuffer = NULL;
+	m_velocityBuffer = NULL;
+	m_accumulationBuffer = NULL;
+	m_accumulation2Buffer = NULL;
+	m_depthBuffer = NULL;
+	m_colorBuffer = NULL;
+	m_groupBuffer = NULL;
+	m_userDataBuffer = NULL;
+
+	m_proxyCount = 0;
+	m_proxyCapacity = 0;
+	m_proxyBuffer = NULL;
+
+	m_contactCount = 0;
+	m_contactCapacity = 0;
+	m_contactBuffer = NULL;
+
+	m_bodyContactCount = 0;
+	m_bodyContactCapacity = 0;
+	m_bodyContactBuffer = NULL;
+
+	m_pairCount = 0;
+	m_pairCapacity = 0;
+	m_pairBuffer = NULL;
+
+	m_triadCount = 0;
+	m_triadCapacity = 0;
+	m_triadBuffer = NULL;
+
+	m_groupCount = 0;
+	m_groupList = NULL;
+
+	m_pressureStrength = 0.05f;
+	m_dampingStrength = 1.0f;
+	m_elasticStrength = 0.25f;
+	m_springStrength = 0.25f;
+	m_viscousStrength = 0.25f;
+	m_surfaceTensionStrengthA = 0.1f;
+	m_surfaceTensionStrengthB = 0.2f;
+	m_powderStrength = 0.5f;
+	m_ejectionStrength = 0.5f;
+
+	m_world = NULL;
+
+}
+
+b2ParticleSystem::~b2ParticleSystem()
+{
+}
+
+template <typename T>
+void b2ParticleSystem::ReallocateBuffer(T *&buffer, int32 oldCapacity, int32 newCapacity, bool required)
+{
+	if (required || buffer)
+	{
+		T *oldBuffer = buffer;
+		T *newBuffer = static_cast<T*>(m_world->m_blockAllocator.Allocate(sizeof(T) * newCapacity));
+		for (int32 i = 0; i < oldCapacity; i++)
+		{
+			newBuffer[i] = oldBuffer[i];
+		}
+#ifndef NDEBUG
+		memset(newBuffer + oldCapacity, -1, sizeof(T) * (newCapacity - oldCapacity));
+#endif
+		m_world->m_blockAllocator.Free(oldBuffer, sizeof(T) * oldCapacity);
+		buffer = newBuffer;
+	}
+}
+
+template <typename T> T *b2ParticleSystem::RequestParticleBuffer(T *&buffer)
+{
+	if (!buffer)
+	{
+		buffer = static_cast<T*>(m_world->m_blockAllocator.Allocate(sizeof(T) * m_capacity));
+		memset(buffer, 0, sizeof(T) * m_capacity);
+	}
+	return buffer;
+}
+
+int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
+{
+	if (m_count >= m_capacity)
+	{
+		int32 oldCapacity = m_capacity;
+		int32 newCapacity = m_count ? 2 * m_count : 256;
+		ReallocateBuffer(m_flagsBuffer, oldCapacity, newCapacity, true);
+		ReallocateBuffer(m_positionBuffer, oldCapacity, newCapacity, true);
+		ReallocateBuffer(m_velocityBuffer, oldCapacity, newCapacity, true);
+		ReallocateBuffer(m_accumulationBuffer, oldCapacity, newCapacity, true);
+		ReallocateBuffer(m_accumulation2Buffer, oldCapacity, newCapacity, false);
+		ReallocateBuffer(m_depthBuffer, oldCapacity, newCapacity, false);
+		ReallocateBuffer(m_colorBuffer, oldCapacity, newCapacity, false);
+		ReallocateBuffer(m_groupBuffer, oldCapacity, newCapacity, true);
+		ReallocateBuffer(m_userDataBuffer, oldCapacity, newCapacity, false);
+		m_capacity = newCapacity;
+	}
+	m_flagsBuffer[m_count] = def.flags;
+	m_positionBuffer[m_count] = def.position;
+	m_velocityBuffer[m_count] = def.velocity;
+	m_groupBuffer[m_count] = NULL;
+	if (m_depthBuffer)
+	{
+		m_depthBuffer[m_count] = 0;
+	}
+	if (m_colorBuffer || !def.color.IsZero())
+	{
+		RequestParticleBuffer(m_colorBuffer)[m_count] = def.color;
+	}
+	if (m_userDataBuffer || def.userData)
+	{
+		RequestParticleBuffer(m_userDataBuffer)[m_count] = def.userData;
+	}
+	if (m_proxyCount >= m_proxyCapacity)
+	{
+		int32 oldCapacity = m_proxyCapacity;
+		int32 newCapacity = m_proxyCount ? 2 * m_proxyCount : 256;
+		ReallocateBuffer(m_proxyBuffer, oldCapacity, newCapacity, true);
+		m_proxyCapacity = newCapacity;
+	}
+	m_proxyBuffer[m_proxyCount++].index = m_count;
+	return m_count++;
+}
+
+void b2ParticleSystem::DestroyParticle(int32 index)
+{
+	m_flagsBuffer[index] |= b2_zombieParticle;
+}
+
+b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef& groupDef)
+{
+	float32 stride = GetParticleStride();
+	b2Transform identity;
+	identity.SetIdentity();
+	b2Transform transform = identity;
+	int32 firstIndex = m_count;
+	if (groupDef.shape)
+	{
+		b2ParticleDef particleDef;
+		particleDef.flags = groupDef.flags;
+		particleDef.color = groupDef.color;
+		particleDef.userData = groupDef.userData;
+		const b2Shape *shape = groupDef.shape;
+		transform.Set(groupDef.position, groupDef.angle);
+		b2AABB aabb;
+		int32 childCount = shape->GetChildCount();
+		for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+		{
+			if (childIndex == 0)
+			{
+				shape->ComputeAABB(&aabb, identity, childIndex);
+			}
+			else
+			{
+				b2AABB childAABB;
+				shape->ComputeAABB(&childAABB, identity, childIndex);
+				aabb.Combine(childAABB);
+			}
+		}
+		for (float32 y = floorf(aabb.lowerBound.y / stride) * stride; y < aabb.upperBound.y; y += stride)
+		{
+			for (float32 x = floorf(aabb.lowerBound.x / stride) * stride; x < aabb.upperBound.x; x += stride)
+			{
+				b2Vec2 p(x, y);
+				if (shape->TestPoint(identity, p))
+				{
+					p = b2Mul(transform, p);
+					particleDef.position = p;
+					particleDef.velocity =
+						groupDef.linearVelocity +
+						b2Cross(groupDef.angularVelocity, p - groupDef.position);
+					CreateParticle(particleDef);
+				}
+			}
+		}
+	}
+	int32 lastIndex = m_count;
+
+	void* mem = m_world->m_blockAllocator.Allocate(sizeof(b2ParticleGroup));
+	b2ParticleGroup* group = new (mem) b2ParticleGroup();
+	group->m_system = this;
+	group->m_firstIndex = firstIndex;
+	group->m_lastIndex = lastIndex;
+	group->m_flags = groupDef.flags;
+	group->m_userData = groupDef.userData;
+	group->m_transform = transform;
+	group->m_destroyAutomatically = groupDef.destroyAutomatically;
+	group->m_prev = NULL;
+	group->m_next = m_groupList;
+	if (m_groupList)
+	{
+		m_groupList->m_prev = group;
+	}
+	m_groupList = group;
+	++m_groupCount;
+	for (int32 i = firstIndex; i < lastIndex; i++)
+	{
+		m_groupBuffer[i] = group;
+	}
+
+	UpdateContacts();
+	if (groupDef.flags & k_pairFlags)
+	{
+		for (int32 k = 0; k < m_contactCount; k++)
+		{
+			const b2ParticleContact& contact = m_contactBuffer[k];
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			if (a > b) b2Swap(a, b);
+			if (firstIndex <= a && b < lastIndex)
+			{
+				if (m_pairCount >= m_pairCapacity)
+				{
+					int32 oldCapacity = m_pairCapacity;
+					int32 newCapacity = m_pairCount ? 2 * m_pairCount : 256;
+					ReallocateBuffer(m_pairBuffer, oldCapacity, newCapacity, true);
+					m_pairCapacity = newCapacity;
+				}
+				Pair& pair = m_pairBuffer[m_pairCount];
+				pair.indexA = a;
+				pair.indexB = b;
+				pair.flags = contact.flags;
+				pair.strength = groupDef.strength;
+				pair.distance = b2Distance(
+					m_positionBuffer[a],
+					m_positionBuffer[b]);
+				m_pairCount++;
+			}
+		}
+	}
+	if (groupDef.flags & k_triadFlags)
+	{
+		b2VoronoiDiagram diagram(
+			&m_world->m_stackAllocator,
+			m_positionBuffer + firstIndex, lastIndex - firstIndex,
+			stride / 2);
+
+		CreateParticleGroupCallback callback;
+		callback.system = this;
+		callback.def = &groupDef;
+		callback.firstIndex = firstIndex;
+		diagram.GetNodes(callback);
+	}
+	if (groupDef.flags & k_depthFlags)
+	{
+		ComputeDepthForGroup(group);
+	}
+
+	return group;
+}
+
+void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b, int32 c) const
+{
+	a += firstIndex;
+	b += firstIndex;
+	c += firstIndex;
+	const b2Vec2& pa = system->m_positionBuffer[a];
+	const b2Vec2& pb = system->m_positionBuffer[b];
+	const b2Vec2& pc = system->m_positionBuffer[c];
+	b2Vec2 dab = pa - pb;
+	b2Vec2 dbc = pb - pc;
+	b2Vec2 dca = pc - pa;
+	if (b2Dot(dab, dab) < 4 && b2Dot(dbc, dbc) < 4 && b2Dot(dca, dca) < 4)
+	{
+		if (system->m_triadCount >= system->m_triadCapacity)
+		{
+			int32 oldCapacity = system->m_triadCapacity;
+			int32 newCapacity = system->m_triadCount ? 2 * system->m_triadCount : 256;
+			system->ReallocateBuffer(system->m_triadBuffer, oldCapacity, newCapacity, true);
+			system->m_triadCapacity = newCapacity;
+		}
+		Triad& triad = system->m_triadBuffer[system->m_triadCount];
+		triad.indexA = a;
+		triad.indexB = b;
+		triad.indexC = c;
+		triad.flags =
+			system->m_flagsBuffer[a] |
+			system->m_flagsBuffer[b] |
+			system->m_flagsBuffer[c];
+		triad.strength = def->strength;
+		b2Vec2 p = (float32) 1 / 3 * (pa + pb + pc);
+		triad.pa = pa - p;
+		triad.pb = pb - p;
+		triad.pc = pc - p;
+		triad.ka = -b2Dot(dca, dab);
+		triad.kb = -b2Dot(dab, dbc);
+		triad.kc = -b2Dot(dbc, dca);
+		triad.s = b2Cross(pa, pb) + b2Cross(pb, pc) + b2Cross(pc, pa);
+		system->m_triadCount++;
+	}
+};
+
+void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB)
+{
+	RotateBuffer(groupB->m_firstIndex, groupB->m_lastIndex, m_count);
+	b2Assert(groupB->m_lastIndex == m_count);
+	RotateBuffer(groupA->m_firstIndex, groupA->m_lastIndex, groupB->m_firstIndex);
+	b2Assert(groupA->m_lastIndex == groupB->m_firstIndex);
+	groupA->m_lastIndex = groupB->m_lastIndex;
+	groupB->m_firstIndex = groupB->m_lastIndex;
+	DestroyParticleGroup(groupB);
+}
+
+void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
+{
+	b2Assert(m_groupCount > 0);
+
+	if (m_world->m_destructionListener)
+	{
+		m_world->m_destructionListener->SayGoodbye(group);
+	}
+
+	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+	{
+		m_flagsBuffer[i] |= b2_zombieParticle;
+		m_groupBuffer[i] = NULL;
+	}
+
+	if (group->m_prev)
+	{
+		group->m_prev->m_next = group->m_next;
+	}
+	if (group->m_next)
+	{
+		group->m_next->m_prev = group->m_prev;
+	}
+	if (group == m_groupList)
+	{
+		m_groupList = group->m_next;
+	}
+
+	--m_groupCount;
+	group->~b2ParticleGroup();
+	m_world->m_blockAllocator.Free(group, sizeof(b2ParticleGroup));
+
+	if (group->GetParticleCount() > 0)
+	{
+		SolveZombie();
+	}
+}
+
+void b2ParticleSystem::ComputeDepthForGroup(b2ParticleGroup* group)
+{
+	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+	{
+		m_accumulationBuffer[i] = 0;
+	}
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		if (a >= group->m_firstIndex && a < group->m_lastIndex &&
+			b >= group->m_firstIndex && b < group->m_lastIndex)
+		{
+			float32 w = contact.weight;
+			m_accumulationBuffer[a] += w;
+			m_accumulationBuffer[b] += w;
+		}
+	}
+	RequestParticleBuffer(m_depthBuffer);
+	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+	{
+		float32 w = m_accumulationBuffer[i];
+		m_depthBuffer[i] = w < 0.8f ? 0 : b2_maxFloat;
+	}
+	int32 interationCount = group->GetParticleCount();
+	for (int32 t = 0; t < interationCount; t++)
+	{
+		bool updated = false;
+		for (int32 k = 0; k < m_contactCount; k++)
+		{
+			const b2ParticleContact& contact = m_contactBuffer[k];
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			if (a >= group->m_firstIndex && a < group->m_lastIndex &&
+				b >= group->m_firstIndex && b < group->m_lastIndex)
+			{
+				float32 r = 1 - contact.weight;
+				float32& ap0 = m_depthBuffer[a];
+				float32& bp0 = m_depthBuffer[b];
+				float32 ap1 = bp0 + r;
+				float32 bp1 = ap0 + r;
+				if (ap0 > ap1)
+				{
+					ap0 = ap1;
+					updated = true;
+				}
+				if (bp0 > bp1)
+				{
+					bp0 = bp1;
+					updated = true;
+				}
+			}
+		}
+		if (!updated)
+		{
+			break;
+		}
+	}
+	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+	{
+		float32& p = m_depthBuffer[i];
+		if (p < b2_maxFloat)
+		{
+			p *= m_particleDiameter;
+		}
+		else
+		{
+			p = 0;
+		}
+	}
+
+}
+
+inline void b2ParticleSystem::AddContact(int32 a, int32 b)
+{
+	b2Vec2 d = m_positionBuffer[b] - m_positionBuffer[a];
+	float32 d2 = b2Dot(d, d);
+	if (d2 < m_squaredDiameter)
+	{
+		if (m_contactCount >= m_contactCapacity)
+		{
+			int32 oldCapacity = m_contactCapacity;
+			int32 newCapacity = m_contactCount ? 2 * m_contactCount : 256;
+			ReallocateBuffer(m_contactBuffer, oldCapacity, newCapacity, true);
+			m_contactCapacity = newCapacity;
+		}
+		float32 invD = b2InvSqrt(d2);
+		b2ParticleContact& contact = m_contactBuffer[m_contactCount];
+		contact.indexA = a;
+		contact.indexB = b;
+		contact.flags = m_flagsBuffer[a] | m_flagsBuffer[b];
+		contact.weight = 1 - d2 * invD * m_inverseDiameter;
+		contact.normal = invD * d;
+		m_contactCount++;
+	}
+}
+
+void b2ParticleSystem::UpdateContacts()
+{
+	Proxy* beginProxy = m_proxyBuffer;
+	Proxy* endProxy = beginProxy + m_proxyCount;
+	for (Proxy* proxy = beginProxy; proxy < endProxy; ++proxy)
+	{
+		int32 i = proxy->index;
+		b2Vec2 p = m_positionBuffer[i];
+		proxy->tag = computeTag(m_inverseDiameter * p.x, m_inverseDiameter * p.y);
+	}
+	std::sort(beginProxy, endProxy);
+	m_contactCount = 0;
+	for (Proxy *a = beginProxy, *c = beginProxy; a < endProxy; a++)
+	{
+		uint32 rightTag = computeRelativeTag(a->tag, 1, 0);
+		for (Proxy* b = a + 1; b < endProxy; b++)
+		{
+			if (rightTag < b->tag) break;
+			AddContact(a->index, b->index);
+		}
+		uint32 bottomLeftTag = computeRelativeTag(a->tag, -1, 1);
+		for (; c < endProxy; c++)
+		{
+			if (bottomLeftTag <= c->tag) break;
+		}
+		uint32 bottomRightTag = computeRelativeTag(a->tag, 1, 1);
+		for (Proxy* b = c; b < endProxy; b++)
+		{
+			if (bottomRightTag < b->tag) break;
+			AddContact(a->index, b->index);
+		}
+	}
+}
+
+void b2ParticleSystem::UpdateBodyContacts()
+{
+	b2AABB aabb;
+	aabb.lowerBound.x = +b2_maxFloat;
+	aabb.lowerBound.y = +b2_maxFloat;
+	aabb.upperBound.x = -b2_maxFloat;
+	aabb.upperBound.y = -b2_maxFloat;
+	for (int32 i = 0; i < m_count; i++)
+	{
+		b2Vec2 p = m_positionBuffer[i];
+		aabb.lowerBound = b2Min(aabb.lowerBound, p);
+		aabb.upperBound = b2Max(aabb.upperBound, p);
+	}
+	aabb.lowerBound.x -= m_particleDiameter;
+	aabb.lowerBound.y -= m_particleDiameter;
+	aabb.upperBound.x += m_particleDiameter;
+	aabb.upperBound.y += m_particleDiameter;
+	m_bodyContactCount = 0;
+	struct Callback:b2QueryCallback
+	{
+		bool ReportFixture(b2Fixture* fixture)
+		{
+			if (fixture->IsSensor())
+			{
+				return true;
+			}
+			const b2Shape* shape = fixture->GetShape();
+			b2Body* b = fixture->GetBody();
+			b2Vec2 bp = b->GetWorldCenter();
+			float32 bm = b->GetMass();
+			float32 bI = b->GetInertia() - bm * b->GetLocalCenter().LengthSquared();
+			float32 invBm = bm > 0 ? 1 / bm : 0;
+			float32 invBI = bI > 0 ? 1 / bI : 0;
+			int32 childCount = shape->GetChildCount();
+			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+			{
+				b2AABB aabb = fixture->GetAABB(childIndex);
+				aabb.lowerBound.x -= system->m_particleDiameter;
+				aabb.lowerBound.y -= system->m_particleDiameter;
+				aabb.upperBound.x += system->m_particleDiameter;
+				aabb.upperBound.y += system->m_particleDiameter;
+				Proxy* beginProxy = system->m_proxyBuffer;
+				Proxy* endProxy = beginProxy + system->m_proxyCount;
+				Proxy* firstProxy = std::lower_bound(
+					beginProxy, endProxy,
+					computeTag(
+						system->m_inverseDiameter * aabb.lowerBound.x,
+						system->m_inverseDiameter * aabb.lowerBound.y));
+				Proxy* lastProxy = std::upper_bound(
+					firstProxy, endProxy,
+					computeTag(
+						system->m_inverseDiameter * aabb.upperBound.x,
+						system->m_inverseDiameter * aabb.upperBound.y));
+				for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
+				{
+					int32 a = proxy->index;
+					b2Vec2 ap = system->m_positionBuffer[a];
+					if (aabb.lowerBound.x <= ap.x && ap.x <= aabb.upperBound.x &&
+						aabb.lowerBound.y <= ap.y && ap.y <= aabb.upperBound.y)
+					{
+						float32 d;
+						b2Vec2 n;
+						fixture->ComputeDistance(ap, &d, &n, childIndex);
+						if (d < system->m_particleDiameter)
+						{
+							float32 invAm =
+								system->m_flagsBuffer[a] & b2_wallParticle ?
+								0 : system->GetParticleInvMass();
+							b2Vec2 rp = ap - bp;
+							float32 rpn = b2Cross(rp, n);
+							if (system->m_bodyContactCount >= system->m_bodyContactCapacity)
+							{
+								int32 oldCapacity = system->m_bodyContactCapacity;
+								int32 newCapacity = system->m_bodyContactCount ? 2 * system->m_bodyContactCount : 256;
+								system->ReallocateBuffer(system->m_bodyContactBuffer, oldCapacity, newCapacity, true);
+								system->m_bodyContactCapacity = newCapacity;
+							}
+							b2ParticleBodyContact& contact = system->m_bodyContactBuffer[system->m_bodyContactCount];
+							contact.index = a;
+							contact.body = b;
+							contact.weight = 1 - d * system->m_inverseDiameter;
+							contact.normal = -n;
+							contact.mass = 1 / (invAm + invBm + invBI * rpn * rpn);
+							system->m_bodyContactCount++;
+						}
+					}
+				}
+			}
+			return true;
+		}
+		b2ParticleSystem* system;
+	} callback;
+	callback.system = this;
+	m_world->QueryAABB(&callback, aabb);
+}
+
+void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
+{
+	b2AABB aabb;
+	aabb.lowerBound.x = +b2_maxFloat;
+	aabb.lowerBound.y = +b2_maxFloat;
+	aabb.upperBound.x = -b2_maxFloat;
+	aabb.upperBound.y = -b2_maxFloat;
+	for (int32 i = 0; i < m_count; i++)
+	{
+		b2Vec2 v = m_velocityBuffer[i];
+		b2Vec2 p1 = m_positionBuffer[i];
+		b2Vec2 p2 = p1 + step.dt * v;
+		aabb.lowerBound = b2Min(aabb.lowerBound, b2Min(p1, p2));
+		aabb.upperBound = b2Max(aabb.upperBound, b2Max(p1, p2));
+	}
+	struct Callback:b2QueryCallback
+	{
+		bool ReportFixture(b2Fixture* fixture)
+		{
+			if (fixture->IsSensor())
+			{
+				return true;
+			}
+			const b2Shape* shape = fixture->GetShape();
+			b2Body* body = fixture->GetBody();
+			Proxy* beginProxy = system->m_proxyBuffer;
+			Proxy* endProxy = beginProxy + system->m_proxyCount;
+			int32 childCount = shape->GetChildCount();
+			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+			{
+				b2AABB aabb = fixture->GetAABB(childIndex);
+				aabb.lowerBound.x -= system->m_particleDiameter;
+				aabb.lowerBound.y -= system->m_particleDiameter;
+				aabb.upperBound.x += system->m_particleDiameter;
+				aabb.upperBound.y += system->m_particleDiameter;
+				Proxy* firstProxy = std::lower_bound(
+					beginProxy, endProxy,
+					computeTag(
+						system->m_inverseDiameter * aabb.lowerBound.x,
+						system->m_inverseDiameter * aabb.lowerBound.y));
+				Proxy* lastProxy = std::upper_bound(
+					firstProxy, endProxy,
+					computeTag(
+						system->m_inverseDiameter * aabb.upperBound.x,
+						system->m_inverseDiameter * aabb.upperBound.y));
+				for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
+				{
+					int32 a = proxy->index;
+					b2Vec2 ap = system->m_positionBuffer[a];
+					if (aabb.lowerBound.x <= ap.x && ap.x <= aabb.upperBound.x &&
+						aabb.lowerBound.y <= ap.y && ap.y <= aabb.upperBound.y)
+					{
+						b2Vec2 av = system->m_velocityBuffer[a];
+						b2RayCastOutput output;
+						b2RayCastInput input;
+						input.p1 = b2Mul(body->m_xf, b2MulT(body->m_xf0, ap));
+						input.p2 = ap + step.dt * av;
+						input.maxFraction = 1;
+						if (fixture->RayCast(&output, input, childIndex))
+						{
+							b2Vec2 p =
+								(1 - output.fraction) * input.p1 +
+								output.fraction * input.p2 +
+								b2_linearSlop * output.normal;
+							b2Vec2 v = step.inv_dt * (p - ap);
+							system->m_velocityBuffer[a] = v;
+							b2Vec2 f = system->GetParticleMass() * (av - v);
+							f = b2Dot(f, output.normal) * output.normal;
+							body->ApplyLinearImpulse(f, p, true);
+						}
+					}
+				}
+			}
+			return true;
+		}
+		b2ParticleSystem* system;
+		b2TimeStep step;
+	} callback;
+	callback.system = this;
+	callback.step = step;
+	m_world->QueryAABB(&callback, aabb);
+}
+
+void b2ParticleSystem::Solve(const b2TimeStep& step)
+{
+	++m_timestamp;
+	if (m_count == 0)
+	{
+		return;
+	}
+	m_allFlags = 0;
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_allFlags |= m_flagsBuffer[i];
+	}
+	b2Vec2 gravity = step.dt * m_gravityScale * m_world->GetGravity();
+	float32 criticalVelocytySquared = GetCriticalVelocitySquared(step);
+	for (int32 i = 0; i < m_count; i++)
+	{
+		b2Vec2& v = m_velocityBuffer[i];
+		v += gravity;
+		float32 v2 = b2Dot(v, v);
+		if (v2 > criticalVelocytySquared)
+		{
+			v *= b2Sqrt(criticalVelocytySquared / v2);
+		}
+	}
+	SolveCollision(step);
+	if (m_allFlags & b2_rigidParticle)
+	{
+		SolveRigid(step);
+	}
+	if (m_allFlags & b2_wallParticle)
+	{
+		SolveWall(step);
+	}
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_positionBuffer[i] += step.dt * m_velocityBuffer[i];
+	}
+	UpdateBodyContacts();
+	UpdateContacts();
+	if (m_allFlags & b2_viscousParticle)
+	{
+		SolveViscous(step);
+	}
+	if (m_allFlags & b2_powderParticle)
+	{
+		SolvePowder(step);
+	}
+	if (m_allFlags & b2_tensileParticle)
+	{
+		SolveTensile(step);
+	}
+	if (m_allFlags & b2_elasticParticle)
+	{
+		SolveElastic(step);
+	}
+	if (m_allFlags & b2_springParticle)
+	{
+		SolveSpring(step);
+	}
+	if (m_allFlags & k_depthFlags)
+	{
+		SolveDepth(step);
+	}
+	SolvePressure(step);
+	SolveDamping(step);
+	if (m_allFlags & b2_zombieParticle)
+	{
+		SolveZombie();
+	}
+}
+
+void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
+{
+	// calculates the sum of contact-weights for each particle
+	// that means dimensionless density
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_accumulationBuffer[i] = 0;
+	}
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		int32 a = contact.index;
+		float32 w = contact.weight;
+		m_accumulationBuffer[a] += w;
+	}
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		float32 w = contact.weight;
+		m_accumulationBuffer[a] += w;
+		m_accumulationBuffer[b] += w;
+	}
+	// ignores powder particles
+	if (m_allFlags & k_noPressureFlags)
+	{
+		for (int32 i = 0; i < m_count; i++)
+		{
+			if (m_flagsBuffer[i] & k_noPressureFlags)
+			{
+				m_accumulationBuffer[i] = 0;
+			}
+		}
+	}
+	// calculates pressure as a linear function of density
+	float32 pressurePerWeight = m_pressureStrength * GetCriticalPressure(step);
+	for (int32 i = 0; i < m_count; i++)
+	{
+		float32 w = m_accumulationBuffer[i];
+		float32 h = pressurePerWeight * b2Max(0.0f, w - 1.0f);
+		m_accumulationBuffer[i] = h;
+	}
+	// applies pressure between each particles in contact
+	float32 velocityPerPressure = step.dt / (m_density * m_particleDiameter);
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		int32 a = contact.index;
+		b2Body* b = contact.body;
+		float32 w = contact.weight;
+		float32 m = contact.mass;
+		b2Vec2 n = contact.normal;
+		b2Vec2 p = m_positionBuffer[a];
+		float32 h = m_accumulationBuffer[a] + pressurePerWeight * w;
+		b2Vec2 f = velocityPerPressure * w * m * h * n;
+		m_velocityBuffer[a] -= GetParticleInvMass() * f;
+		b->ApplyLinearImpulse(f, p, true);
+	}
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		float32 w = contact.weight;
+		b2Vec2 n = contact.normal;
+		float32 h = m_accumulationBuffer[a] + m_accumulationBuffer[b];
+		b2Vec2 f = velocityPerPressure * w * h * n;
+		m_velocityBuffer[a] -= f;
+		m_velocityBuffer[b] += f;
+	}
+}
+
+void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
+{
+	// reduces normal velocity of each contact
+	float32 damping = m_dampingStrength;
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		int32 a = contact.index;
+		b2Body* b = contact.body;
+		float32 w = contact.weight;
+		float32 m = contact.mass;
+		b2Vec2 n = contact.normal;
+		b2Vec2 p = m_positionBuffer[a];
+		b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) - m_velocityBuffer[a];
+		float32 vn = b2Dot(v, n);
+		if (vn < 0)
+		{
+			b2Vec2 f = damping * w * m * vn * n;
+			m_velocityBuffer[a] += GetParticleInvMass() * f;
+			b->ApplyLinearImpulse(-f, p, true);
+		}
+	}
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		float32 w = contact.weight;
+		b2Vec2 n = contact.normal;
+		b2Vec2 v = m_velocityBuffer[b] - m_velocityBuffer[a];
+		float32 vn = b2Dot(v, n);
+		if (vn < 0)
+		{
+			b2Vec2 f = damping * w * vn * n;
+			m_velocityBuffer[a] += f;
+			m_velocityBuffer[b] -= f;
+		}
+	}
+}
+
+void b2ParticleSystem::SolveWall(const b2TimeStep& step)
+{
+	for (int32 i = 0; i < m_count; i++)
+	{
+		if (m_flagsBuffer[i] & b2_wallParticle)
+		{
+			m_velocityBuffer[i].SetZero();
+		}
+	}
+}
+
+void b2ParticleSystem::SolveRigid(const b2TimeStep& step)
+{
+	for (b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
+	{
+		if (group->m_flags & b2_rigidParticle)
+		{
+			group->UpdateStatistics();
+			b2Rot rotation(step.dt * group->m_angularVelocity);
+			b2Transform transform(
+				group->m_center + step.dt * group->m_linearVelocity -
+				b2Mul(rotation, group->m_center), rotation);
+			group->m_transform = b2Mul(transform, group->m_transform);
+			b2Transform velocityTransform;
+			velocityTransform.p.x = step.inv_dt * transform.p.x;
+			velocityTransform.p.y = step.inv_dt * transform.p.y;
+			velocityTransform.q.s = step.inv_dt * transform.q.s;
+			velocityTransform.q.c = step.inv_dt * (transform.q.c - 1);
+			for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+			{
+				m_velocityBuffer[i] = b2Mul(velocityTransform, m_positionBuffer[i]);
+			}
+		}
+	}
+}
+
+void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
+{
+	float32 elasticStrength = step.inv_dt * m_elasticStrength;
+	for (int32 k = 0; k < m_triadCount; k++)
+	{
+		const Triad& triad = m_triadBuffer[k];
+		if (triad.flags & b2_elasticParticle)
+		{
+			int32 a = triad.indexA;
+			int32 b = triad.indexB;
+			int32 c = triad.indexC;
+			const b2Vec2& oa = triad.pa;
+			const b2Vec2& ob = triad.pb;
+			const b2Vec2& oc = triad.pc;
+			const b2Vec2& pa = m_positionBuffer[a];
+			const b2Vec2& pb = m_positionBuffer[b];
+			const b2Vec2& pc = m_positionBuffer[c];
+			b2Vec2 p = (float32) 1 / 3 * (pa + pb + pc);
+			b2Rot r;
+			r.s = b2Cross(oa, pa) + b2Cross(ob, pb) + b2Cross(oc, pc);
+			r.c = b2Dot(oa, pa) + b2Dot(ob, pb) + b2Dot(oc, pc);
+			float32 r2 = r.s * r.s + r.c * r.c;
+			float32 invR = b2InvSqrt(r2);
+			r.s *= invR;
+			r.c *= invR;
+			float32 strength = elasticStrength * triad.strength;
+			m_velocityBuffer[a] += strength * (b2Mul(r, oa) - (pa - p));
+			m_velocityBuffer[b] += strength * (b2Mul(r, ob) - (pb - p));
+			m_velocityBuffer[c] += strength * (b2Mul(r, oc) - (pc - p));
+		}
+	}
+}
+
+void b2ParticleSystem::SolveSpring(const b2TimeStep& step)
+{
+	float32 springStrength = step.inv_dt * m_springStrength;
+	for (int32 k = 0; k < m_pairCount; k++)
+	{
+		const Pair& pair = m_pairBuffer[k];
+		if (pair.flags & b2_springParticle)
+		{
+			int32 a = pair.indexA;
+			int32 b = pair.indexB;
+			b2Vec2 d = m_positionBuffer[b] - m_positionBuffer[a];
+			float32 r0 = pair.distance;
+			float32 r1 = d.Length();
+			float32 strength = springStrength * pair.strength;
+			b2Vec2 f = strength * (r0 - r1) / r1 * d;
+			m_velocityBuffer[a] -= f;
+			m_velocityBuffer[b] += f;
+		}
+	}
+}
+
+void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
+{
+	RequestParticleBuffer(m_accumulation2Buffer);
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_accumulationBuffer[i] = 0;
+		m_accumulation2Buffer[i] = b2Vec2_zero;
+	}
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		if (contact.flags & b2_tensileParticle)
+		{
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			float32 w = contact.weight;
+			b2Vec2 n = contact.normal;
+			m_accumulationBuffer[a] += w;
+			m_accumulationBuffer[b] += w;
+			m_accumulation2Buffer[a] -= (1 - w) * w * n;
+			m_accumulation2Buffer[b] += (1 - w) * w * n;
+		}
+	}
+	float32 strengthA = m_surfaceTensionStrengthA * GetCriticalVelocity(step);
+	float32 strengthB = m_surfaceTensionStrengthB * GetCriticalVelocity(step);
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		if (contact.flags & b2_tensileParticle)
+		{
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			float32 w = contact.weight;
+			b2Vec2 n = contact.normal;
+			float32 h = m_accumulationBuffer[a] + m_accumulationBuffer[b];
+			b2Vec2 s = m_accumulation2Buffer[b] - m_accumulation2Buffer[a];
+			float32 fn = (strengthA * (h - 2) + strengthB * b2Dot(s, n)) * w;
+			b2Vec2 f = fn * n;
+			m_velocityBuffer[a] -= f;
+			m_velocityBuffer[b] += f;
+		}
+	}
+}
+
+void b2ParticleSystem::SolveViscous(const b2TimeStep& step)
+{
+	float32 viscousStrength = m_viscousStrength;
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		int32 a = contact.index;
+		if (m_flagsBuffer[a] & b2_viscousParticle)
+		{
+			b2Body* b = contact.body;
+			float32 w = contact.weight;
+			float32 m = contact.mass;
+			b2Vec2 p = m_positionBuffer[a];
+			b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) - m_velocityBuffer[a];
+			b2Vec2 f = viscousStrength * m * w * v;
+			m_velocityBuffer[a] += GetParticleInvMass() * f;
+			b->ApplyLinearImpulse(-f, p, true);
+		}
+	}
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		if (contact.flags & b2_viscousParticle)
+		{
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			float32 w = contact.weight;
+			b2Vec2 v = m_velocityBuffer[b] - m_velocityBuffer[a];
+			b2Vec2 f = viscousStrength * w * v;
+			m_velocityBuffer[a] += f;
+			m_velocityBuffer[b] -= f;
+		}
+	}
+}
+
+void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
+{
+	float32 powderStrength = m_powderStrength * GetCriticalVelocity(step);
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		int32 a = contact.index;
+		if (m_flagsBuffer[a] & b2_powderParticle)
+		{
+			b2Body* b = contact.body;
+			float32 w = contact.weight;
+			float32 m = contact.mass;
+			b2Vec2 p = m_positionBuffer[a];
+			b2Vec2 n = contact.normal;
+			b2Vec2 f = powderStrength * m * w * n;
+			m_velocityBuffer[a] -= GetParticleInvMass() * f;
+			b->ApplyLinearImpulse(f, p, true);
+		}
+	}
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		if (contact.flags & b2_powderParticle)
+		{
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			float32 w = contact.weight;
+			b2Vec2 n = contact.normal;
+			b2Vec2 f = powderStrength * w * n;
+			m_velocityBuffer[a] -= f;
+			m_velocityBuffer[b] += f;
+		}
+	}
+}
+
+void b2ParticleSystem::SolveDepth(const b2TimeStep& step)
+{
+	// applies extra repulsive force from solid particle groups
+	float32 ejectionStrength = step.inv_dt * m_ejectionStrength;
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		if (contact.flags & k_depthFlags)
+		{
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			if (m_groupBuffer[a] != m_groupBuffer[b])
+			{
+				float32 w = contact.weight;
+				b2Vec2 n = contact.normal;
+				float32 h = m_depthBuffer[a] + m_depthBuffer[b];
+				b2Vec2 f = ejectionStrength * h * w * n;
+				m_velocityBuffer[a] -= f;
+				m_velocityBuffer[b] += f;
+			}
+		}
+	}
+}
+
+void b2ParticleSystem::SolveZombie()
+{
+	// removes particles with zombie flag
+	int32 newCount = 0;
+	int32* newIndices = (int32*) m_world->m_stackAllocator.Allocate(sizeof(int32) * m_count);
+	for (int32 i = 0; i < m_count; i++)
+	{
+		int32 flags = m_flagsBuffer[i];
+		if (flags & b2_zombieParticle)
+		{
+			newIndices[i] = -1;
+		}
+		else
+		{
+			newIndices[i] = newCount;
+			if (i != newCount)
+			{
+				m_flagsBuffer[newCount] = m_flagsBuffer[i];
+				m_positionBuffer[newCount] = m_positionBuffer[i];
+				m_velocityBuffer[newCount] = m_velocityBuffer[i];
+				if (m_depthBuffer)
+				{
+					m_depthBuffer[newCount] = m_depthBuffer[i];
+				}
+				if (m_colorBuffer)
+				{
+					m_colorBuffer[newCount] = m_colorBuffer[i];
+				}
+				if (m_userDataBuffer)
+				{
+					m_userDataBuffer[newCount] = m_userDataBuffer[i];
+				}
+			}
+			newCount++;
+		}
+	}
+
+	// predicate functions
+	struct Test
+	{
+		static bool IsProxyInvalid(const Proxy& proxy)
+		{
+			return proxy.index < 0;
+		}
+		static bool IsContactInvalid(const b2ParticleContact& contact)
+		{
+			return contact.indexA < 0 || contact.indexB < 0;
+		}
+		static bool IsBodyContactInvalid(const b2ParticleBodyContact& contact)
+		{
+			return contact.index < 0;
+		}
+		static bool IsPairInvalid(const Pair& pair)
+		{
+			return pair.indexA < 0 || pair.indexB < 0;
+		}
+		static bool IsTriadInvalid(const Triad& triad)
+		{
+			return triad.indexA < 0 || triad.indexB < 0 || triad.indexC < 0;
+		}
+	};
+
+	// update proxies
+	for (int32 k = 0; k < m_proxyCount; k++)
+	{
+		Proxy& proxy = m_proxyBuffer[k];
+		proxy.index = newIndices[proxy.index];
+	}
+	Proxy* lastProxy = std::remove_if(
+		m_proxyBuffer, m_proxyBuffer + m_proxyCount,
+		Test::IsProxyInvalid);
+	m_proxyCount = (int32) (lastProxy - m_proxyBuffer);
+
+	// update contacts
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		b2ParticleContact& contact = m_contactBuffer[k];
+		contact.indexA = newIndices[contact.indexA];
+		contact.indexB = newIndices[contact.indexB];
+	}
+	b2ParticleContact* lastContact = std::remove_if(
+		m_contactBuffer, m_contactBuffer + m_contactCount,
+		Test::IsContactInvalid);
+	m_contactCount = (int32) (lastContact - m_contactBuffer);
+
+	// update particle-body contacts
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		contact.index = newIndices[contact.index];
+	}
+	b2ParticleBodyContact* lastBodyContact = std::remove_if(
+		m_bodyContactBuffer, m_bodyContactBuffer + m_bodyContactCount,
+		Test::IsBodyContactInvalid);
+	m_bodyContactCount = (int32) (lastBodyContact - m_bodyContactBuffer);
+
+	// update pairs
+	for (int32 k = 0; k < m_pairCount; k++)
+	{
+		Pair& pair = m_pairBuffer[k];
+		pair.indexA = newIndices[pair.indexA];
+		pair.indexB = newIndices[pair.indexB];
+	}
+	Pair* lastPair = std::remove_if(
+		m_pairBuffer, m_pairBuffer + m_pairCount, Test::IsPairInvalid);
+	m_pairCount = (int32) (lastPair - m_pairBuffer);
+
+	// update triads
+	for (int32 k = 0; k < m_triadCount; k++)
+	{
+		Triad& triad = m_triadBuffer[k];
+		triad.indexA = newIndices[triad.indexA];
+		triad.indexB = newIndices[triad.indexB];
+		triad.indexC = newIndices[triad.indexC];
+	}
+	Triad* lastTriad = std::remove_if(
+		m_triadBuffer, m_triadBuffer + m_triadCount,
+		Test::IsTriadInvalid);
+	m_triadCount = (int32) (lastTriad - m_triadBuffer);
+
+	// update groups
+	for (b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
+	{
+		int32 firstIndex = newCount;
+		int32 lastIndex = 0;
+		bool modified = false;
+		for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+		{
+			int32 j = newIndices[i];
+			if (j >= 0) {
+				firstIndex = b2Min(firstIndex, j);
+				lastIndex = b2Max(lastIndex, j + 1);
+			} else {
+				modified = true;
+			}
+		}
+		if (firstIndex < lastIndex)
+		{
+			group->m_firstIndex = firstIndex;
+			group->m_lastIndex = lastIndex;
+			if (modified)
+			{
+				if (group->m_flags & b2_rigidParticle)
+				{
+					group->m_toBeSplit = true;
+				}
+			}
+		}
+		else
+		{
+			group->m_firstIndex = 0;
+			group->m_lastIndex = 0;
+			if (group->m_destroyAutomatically)
+			{
+				group->m_toBeDestroyed = true;
+			}
+		}
+	}
+
+	// update particle count
+	m_count = newCount;
+	m_world->m_stackAllocator.Free(newIndices);
+
+	// destroy bodies with no particles
+	for (b2ParticleGroup* group = m_groupList; group;)
+	{
+		b2ParticleGroup* next = group->GetNext();
+		if (group->m_toBeDestroyed)
+		{
+			DestroyParticleGroup(group);
+		}
+		else if (group->m_toBeSplit)
+		{
+		}
+		group = next;
+	}
+}
+
+void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
+{
+	// move the particles assigned to the given group toward the end of array
+	if (start == mid || mid == end)
+	{
+		return;
+	}
+	struct NewIndices
+	{
+		int32 operator[](int32 i) const
+		{
+			if (i < start)
+			{
+				return i;
+			}
+			else if (i < mid)
+			{
+				return i - start - mid + end;
+			}
+			else
+			{
+				return i + start - mid;
+			}
+		}
+		int32 start, mid, end;
+	} newIndices;
+	newIndices.start = start;
+	newIndices.mid = mid;
+	newIndices.end = end;
+
+	std::rotate(m_flagsBuffer + start, m_flagsBuffer + mid, m_flagsBuffer + end);
+	std::rotate(m_positionBuffer + start, m_positionBuffer + mid, m_positionBuffer + end);
+	std::rotate(m_velocityBuffer + start, m_velocityBuffer + mid, m_velocityBuffer + end);
+	if (m_depthBuffer)
+	{
+		std::rotate(m_depthBuffer + start, m_depthBuffer + mid, m_depthBuffer + end);
+	}
+	if (m_colorBuffer)
+	{
+		std::rotate(m_colorBuffer + start, m_colorBuffer + mid, m_colorBuffer + end);
+	}
+	if (m_userDataBuffer)
+	{
+		std::rotate(m_userDataBuffer + start, m_userDataBuffer + mid, m_userDataBuffer + end);
+	}
+
+	// update proxies
+	for (int32 k = 0; k < m_proxyCount; k++)
+	{
+		Proxy& proxy = m_proxyBuffer[k];
+		proxy.index = newIndices[proxy.index];
+	}
+
+	// update contacts
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		b2ParticleContact& contact = m_contactBuffer[k];
+		contact.indexA = newIndices[contact.indexA];
+		contact.indexB = newIndices[contact.indexB];
+	}
+
+	// update particle-body contacts
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		contact.index = newIndices[contact.index];
+	}
+
+	// update pairs
+	for (int32 k = 0; k < m_pairCount; k++)
+	{
+		Pair& pair = m_pairBuffer[k];
+		pair.indexA = newIndices[pair.indexA];
+		pair.indexB = newIndices[pair.indexB];
+	}
+
+	// update triads
+	for (int32 k = 0; k < m_triadCount; k++)
+	{
+		Triad& triad = m_triadBuffer[k];
+		triad.indexA = newIndices[triad.indexA];
+		triad.indexB = newIndices[triad.indexB];
+		triad.indexC = newIndices[triad.indexC];
+	}
+
+	// update groups
+	for (b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
+	{
+		group->m_firstIndex = newIndices[group->m_firstIndex];
+		group->m_lastIndex = newIndices[group->m_lastIndex - 1] + 1;
+	}
+}
+
+void b2ParticleSystem::SetParticleRadius(float32 radius)
+{
+	m_particleDiameter = 2 * radius;
+	m_squaredDiameter = m_particleDiameter * m_particleDiameter;
+	m_inverseDiameter = 1 / m_particleDiameter;
+}
+
+void b2ParticleSystem::SetParticleDensity(float32 density)
+{
+	m_density = density;
+	m_inverseDensity =  1 / m_density;
+}
+
+float32 b2ParticleSystem::GetParticleDensity() const
+{
+	return m_density;
+}
+
+void b2ParticleSystem::SetParticleGravityScale(float32 gravityScale)
+{
+	m_gravityScale = gravityScale;
+}
+
+float32 b2ParticleSystem::GetParticleGravityScale() const
+{
+	return m_gravityScale;
+}
+
+void b2ParticleSystem::SetParticleDamping(float32 damping)
+{
+	m_dampingStrength = damping;
+}
+
+float32 b2ParticleSystem::GetParticleDamping() const
+{
+	return m_dampingStrength;
+}
+
+float32 b2ParticleSystem::GetParticleRadius() const
+{
+	return m_particleDiameter / 2;
+}
+
+float32 b2ParticleSystem::GetCriticalVelocity(const b2TimeStep& step) const
+{
+	return m_particleDiameter * step.inv_dt;
+}
+
+float32 b2ParticleSystem::GetCriticalVelocitySquared(const b2TimeStep& step) const
+{
+	float32 velocity = GetCriticalVelocity(step);
+	return velocity * velocity;
+}
+
+float32 b2ParticleSystem::GetCriticalPressure(const b2TimeStep& step) const
+{
+	return m_density * GetCriticalVelocitySquared(step);
+}
+
+float32 b2ParticleSystem::GetParticleStride() const
+{
+	return 0.75f * m_particleDiameter;
+}
+
+float32 b2ParticleSystem::GetParticleMass() const
+{
+	float32 stride = GetParticleStride();
+	return m_density * stride * stride;
+}
+
+float32 b2ParticleSystem::GetParticleInvMass() const
+{
+	return 1.777777f * m_inverseDensity * m_inverseDiameter * m_inverseDiameter;
+}
+
+uint32* b2ParticleSystem::GetParticleFlagsBuffer()
+{
+	return m_flagsBuffer;
+}
+
+b2Vec2* b2ParticleSystem::GetParticlePositionBuffer()
+{
+	return m_positionBuffer;
+}
+
+b2Vec2* b2ParticleSystem::GetParticleVelocityBuffer()
+{
+	return m_velocityBuffer;
+}
+
+b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer()
+{
+	return RequestParticleBuffer(m_colorBuffer);
+}
+
+void** b2ParticleSystem::GetParticleUserDataBuffer()
+{
+	return RequestParticleBuffer(m_userDataBuffer);
+}
+
+const uint32* b2ParticleSystem::GetParticleFlagsBuffer() const
+{
+	return m_flagsBuffer;
+}
+
+const b2Vec2* b2ParticleSystem::GetParticlePositionBuffer() const
+{
+	return m_positionBuffer;
+}
+
+const b2Vec2* b2ParticleSystem::GetParticleVelocityBuffer() const
+{
+	return m_velocityBuffer;
+}
+
+const b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer() const
+{
+	return ((b2ParticleSystem*) this)->GetParticleColorBuffer();
+}
+
+b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer() const
+{
+	return m_groupBuffer;
+}
+
+void* const* b2ParticleSystem::GetParticleUserDataBuffer() const
+{
+	return ((b2ParticleSystem*) this)->GetParticleUserDataBuffer();
+}
+
+void b2ParticleSystem::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const
+{
+	if (m_proxyCount == 0)
+	{
+		return;
+	}
+	Proxy* beginProxy = m_proxyBuffer;
+	Proxy* endProxy = beginProxy + m_proxyCount;
+	Proxy* firstProxy = std::lower_bound(
+		beginProxy, endProxy,
+		computeTag(
+			m_inverseDiameter * aabb.lowerBound.x,
+			m_inverseDiameter * aabb.lowerBound.y));
+	Proxy* lastProxy = std::upper_bound(
+		firstProxy, endProxy,
+		computeTag(
+			m_inverseDiameter * aabb.upperBound.x,
+			m_inverseDiameter * aabb.upperBound.y));
+	for (Proxy* proxy = firstProxy; proxy < lastProxy; ++proxy)
+	{
+		int32 i = proxy->index;
+		const b2Vec2& p = m_positionBuffer[i];
+		if (aabb.lowerBound.x < p.x && p.x < aabb.upperBound.x &&
+			aabb.lowerBound.y < p.y && p.y < aabb.upperBound.y)
+		{
+			if (!callback->ReportParticle(i))
+			{
+				break;
+			}
+		}
+	}
+}
+
+void b2ParticleSystem::RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b2Vec2& point2) const
+{
+	if (m_proxyCount == 0)
+	{
+		return;
+	}
+	Proxy* beginProxy = m_proxyBuffer;
+	Proxy* endProxy = beginProxy + m_proxyCount;
+	Proxy* firstProxy = std::lower_bound(
+		beginProxy, endProxy,
+		computeTag(
+			m_inverseDiameter * b2Min(point1.x, point2.x) - 1,
+			m_inverseDiameter * b2Min(point1.y, point2.y) - 1));
+	Proxy* lastProxy = std::upper_bound(
+		firstProxy, endProxy,
+		computeTag(
+			m_inverseDiameter * b2Max(point1.x, point2.x) + 1,
+			m_inverseDiameter * b2Max(point1.y, point2.y) + 1));
+	float32 fraction = 1;
+	// solving the following equation:
+	// ((1-t)*point1+t*point2-position)^2=diameter^2
+	// where t is a potential fraction
+	b2Vec2 v = point2 - point1;
+	float32 v2 = b2Dot(v, v);
+	for (Proxy* proxy = firstProxy; proxy < lastProxy; ++proxy)
+	{
+		int32 i = proxy->index;
+		b2Vec2 p = point1 - m_positionBuffer[i];
+		float32 pv = b2Dot(p, v);
+		float32 p2 = b2Dot(p, p);
+		float32 determinant = pv * pv - v2 * (p2 - m_squaredDiameter);
+		if (determinant >= 0)
+		{
+			float32 sqrtDeterminant = b2Sqrt(determinant);
+			// find a solution between 0 and fraction
+			float32 t = (-pv - sqrtDeterminant) / v2;
+			if (t > fraction)
+			{
+				continue;
+			}
+			if (t < 0)
+			{
+				t = (-pv + sqrtDeterminant) / v2;
+				if (t < 0 || t > fraction)
+				{
+					continue;
+				}
+			}
+			b2Vec2 n = p + t * v;
+			n.Normalize();
+			float32 f = callback->ReportParticle(i, point1 + t * v, n, t);
+			fraction = b2Min(fraction, f);
+			if (fraction <= 0)
+			{
+				break;
+			}
+		}
+	}
+}
+
+float32 b2ParticleSystem::ComputeParticleCollisionEnergy() const
+{
+	float32 sum_v2 = 0;
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		b2Vec2 n = contact.normal;
+		b2Vec2 v = m_velocityBuffer[b] - m_velocityBuffer[a];
+		float32 vn = b2Dot(v, n);
+		if (vn < 0)
+		{
+			sum_v2 += vn * vn;
+		}
+	}
+	return 0.5f * GetParticleMass() * sum_v2;
+}
