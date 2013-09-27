@@ -78,6 +78,16 @@ using namespace std;
 #include "VerticalStack.h"
 #include "Web.h"
 
+#include "Particles.h"
+#include "DrawingParticles.h"
+#include "RigidParticles.h"
+#include "ElasticParticles.h"
+#include "ParticlesSurfaceTension.h"
+#include "WaveMachine.h"
+#include "DamBreak.h"
+#include "Soup.h"
+#include "LiquidTimer.h"
+
 TestEntry g_testEntries[] =
 {
 	{"Continuous Test", ContinuousTest::Create},
@@ -129,5 +139,16 @@ TestEntry g_testEntries[] =
 	{"Slider Crank", SliderCrank::Create},
 	{"Varying Friction", VaryingFriction::Create},
 	{"Add Pair Stress Test", AddPair::Create},
+
+	{"DamBreak", DamBreak::Create},
+	{"Liquid Timer", LiquidTimer::Create},
+	{"Wave Machine", WaveMachine::Create},
+	{"Particles", Particles::Create},
+	{"Particle Drawing", DrawingParticles::Create},
+	{"Soup", Soup::Create},
+	{"Rigid Particles", RigidParticles::Create},
+	{"Elastic Particles", ElasticParticles::Create},
+	{"Surface Tension", ParticlesSurfaceTension::Create},
+
 	{NULL, NULL}
 };

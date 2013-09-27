@@ -185,6 +185,9 @@ protected:
 	b2Vec2 m_bombSpawnPoint;
 	bool m_bombSpawning;
 	b2Vec2 m_mouseWorld;
+	bool m_mouseTracing;
+	b2Vec2 m_mouseTracerPosition;
+	b2Vec2 m_mouseTracerVelocity;
 	int32 m_stepCount;
 
 	b2Profile m_maxProfile;

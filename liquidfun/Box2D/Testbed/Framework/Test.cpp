@@ -51,6 +51,11 @@ Test::Test()
 
 	m_stepCount = 0;
 
+	m_mouseWorld = b2Vec2_zero;
+	m_mouseTracing = false;
+	m_mouseTracerPosition = b2Vec2_zero;
+	m_mouseTracerVelocity = b2Vec2_zero;
+
 	b2BodyDef bodyDef;
 	m_groundBody = m_world->CreateBody(&bodyDef);
 
@@ -135,9 +140,45 @@ public:
 	b2Fixture* m_fixture;
 };
 
+class QueryCallback2 : public b2QueryCallback
+{
+public:
+	QueryCallback2(b2World* world, const b2Shape* shape, const b2Vec2& velocity)
+	{
+		m_world = world;
+		m_shape = shape;
+		m_velocity = velocity;
+	}
+
+	bool ReportFixture(b2Fixture* fixture)
+	{
+		return false;
+	}
+
+	bool ReportParticle(int32 index)
+	{
+		b2Transform xf;
+		xf.SetIdentity();
+		b2Vec2 p = m_world->GetParticlePositionBuffer()[index];
+		if (m_shape->TestPoint(xf, p))
+		{
+			b2Vec2& v = m_world->GetParticleVelocityBuffer()[index];
+			v = m_velocity;
+		}
+		return true;
+	}
+
+	b2World* m_world;
+	const b2Shape* m_shape;
+	b2Vec2 m_velocity;
+};
+
 void Test::MouseDown(const b2Vec2& p)
 {
 	m_mouseWorld = p;
+	m_mouseTracing = true;
+	m_mouseTracerPosition = p;
+	m_mouseTracerVelocity = b2Vec2_zero;
 	
 	if (m_mouseJoint != NULL)
 	{
@@ -202,6 +243,8 @@ void Test::ShiftMouseDown(const b2Vec2& p)
 
 void Test::MouseUp(const b2Vec2& p)
 {
+	m_mouseTracing = false;
+
 	if (m_mouseJoint)
 	{
 		m_world->DestroyJoint(m_mouseJoint);
@@ -314,6 +357,11 @@ void Test::Step(Settings* settings)
 		m_debugDraw.DrawString(5, m_textLine, "bodies/contacts/joints = %d/%d/%d", bodyCount, contactCount, jointCount);
 		m_textLine += DRAW_STRING_NEW_LINE;
 
+		int32 particleCount = m_world->GetParticleCount();
+		int32 groupCount = m_world->GetParticleGroupCount();
+		m_debugDraw.DrawString(5, m_textLine, "bodies/contacts/joints/particles/groups = %d/%d/%d/%d/%d", bodyCount, contactCount, jointCount, particleCount, groupCount);
+		m_textLine += DRAW_STRING_NEW_LINE;
+
 		int32 proxyCount = m_world->GetProxyCount();
 		int32 height = m_world->GetTreeHeight();
 		int32 balance = m_world->GetTreeBalance();
@@ -379,6 +427,23 @@ void Test::Step(Settings* settings)
 		m_textLine += DRAW_STRING_NEW_LINE;
 		m_debugDraw.DrawString(5, m_textLine, "broad-phase [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.broadphase, aveProfile.broadphase, m_maxProfile.broadphase);
 		m_textLine += DRAW_STRING_NEW_LINE;
+	}
+
+	if (m_mouseTracing && !m_mouseJoint)
+	{
+		float32 delay = 0.1f;
+		b2Vec2 acceleration = 2 / delay * (1 / delay * (m_mouseWorld - m_mouseTracerPosition) - m_mouseTracerVelocity);
+		m_mouseTracerVelocity += timeStep * acceleration;
+		m_mouseTracerPosition += timeStep * m_mouseTracerVelocity;
+		b2CircleShape shape;
+		shape.m_p = m_mouseTracerPosition;
+		shape.m_radius = 2;
+		QueryCallback2 callback(m_world, &shape, m_mouseTracerVelocity);
+		b2AABB aabb;
+		b2Transform xf;
+		xf.SetIdentity();
+		shape.ComputeAABB(&aabb, xf, 0);
+		m_world->QueryAABB(&callback, aabb);
 	}
 
 	if (m_mouseJoint)
