@@ -74,8 +74,13 @@
 /*
  * Always include OpenGL and GLU headers
  */
+#ifdef MACOS
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
 
 /*
  * GLUT API macro definitions -- the special key codes:
@@ -580,4 +585,3 @@ static int FGAPIENTRY FGUNUSED glutCreateMenu_ATEXIT_HACK(void (* func)(int)) { 
 /*** END OF FILE ***/
 
 #endif /* __FREEGLUT_STD_H__ */
-
