@@ -20,7 +20,7 @@ OS X:
 - compile & run
 
 Linux:
-- cmake -G "Unix Makefiles"
+- cmake -G'Unix Makefiles' -DLIB_INSTALL_DIR=.
 - make
 
 Android:
