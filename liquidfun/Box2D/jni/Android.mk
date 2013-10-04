@@ -1,4 +1,4 @@
-LOCAL_PATH:=$(call my-dir)
+LOCAL_PATH:=$(call my-dir)/..
 
 # Whether to build using box2d's cmake project or use Android's build system
 # directly.
@@ -36,10 +36,12 @@ define box2d-build
 $(eval \
   $$(call box2d-module,$(1))
   LOCAL_SRC_FILES:=\
-    $(call execute-local, "find Box2D/Box2D -name '*.cpp'")
+    $(call execute-local, "find Box2D -name '*.cpp'")
   LOCAL_COPY_HEADERS:=\
-    $(call execute-local, "find Box2D/Box2D -name '*.h'")
-  LOCAL_C_INCLUDES:=$(LOCAL_PATH)/Box2D
+    $(call execute-local, "find Box2D -name '*.h'")
+# May need this for Android build process.
+#  LOCAL_C_INCLUDES:=$(LOCAL_PATH)
+  LOCAL_EXPORT_C_INCLUDES:=$(LOCAL_C_INCLUDES)
   $$(call add-stlport-includes))
 endef
 
@@ -71,7 +73,7 @@ $(eval \
     -DLIB_INSTALL_DIR="." \
     $(2)
   # Path of the source project relative to LOCAL_PATH.
-  LOCAL_CMAKE_PROJECT_PATH:=Box2D
+  LOCAL_CMAKE_PROJECT_PATH:=.
   # Path containing headers to be redistributed with the library.
   LOCAL_CMAKE_HEADER_INSTALL_PATH:=include
   $$(call add-stlport-includes))
@@ -81,13 +83,13 @@ endef
 include $(CLEAR_VARS)
 $(call box2d-build,,-DBOX2D_BUILD_STATIC=OFF -DBOX2D_BUILD_SHARED=ON)
 LOCAL_CMAKE_INCLUDE_RULES:=$(BUILD_SHARED_LIBRARY)
-include $(LOCAL_PATH)/cmake.mk
+include $(LOCAL_PATH)/jni/cmake.mk
 
 # --- libBox2D_static ---
 include $(CLEAR_VARS)
 $(call box2d-build,_static,-DBOX2D_BUILD_STATIC=ON -DBOX2D_BUILD_SHARED=OFF)
 LOCAL_CMAKE_MODULE_OVERRIDE:=libBox2D
 LOCAL_CMAKE_INCLUDE_RULES:=$(BUILD_STATIC_LIBRARY)
-include $(LOCAL_PATH)/cmake.mk
+include $(LOCAL_PATH)/jni/cmake.mk
 
 endif  # BOX2D_BUILD_USING_CMAKE
