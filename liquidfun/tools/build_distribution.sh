@@ -35,6 +35,9 @@ declare -r this_dir="${PWD}"
 declare -r script_name="$(basename ${this})"
 declare -r project_dir="$(canonicalpath $(dirname ${0})/../)"
 declare -r project_name="$(basename ${project_dir})"
+# Space separated paths to directories required by the project relative to
+# project_dir/..
+declare -r out_of_tree_dependencies=""
 declare -r tempdir_template="/tmp/${project_name}tmpXXXXXX"
 declare -r host_types="windows osx"
 # Bash 3 (default on OSX) doesn't have associative arrays so do this manually.
@@ -46,7 +49,7 @@ local archiver=\"tar -czf\"; local extension=tar.gz
 local archiver=\"zip -q -r\"; local extension=zip"
 
 # Root directory of the cmake project relative to ${project_dir}.
-declare -r project_cmake_dir="Box2D"
+declare -r project_cmake_dir="${project_name}/Box2D"
 
 # Generate a case insensitive sed expression from $1.
 case_insensitive_sed_expression() {
@@ -59,6 +62,16 @@ case_insensitive_sed_expression() {
     fi
   done
   echo "${exp}"
+}
+
+# Convert a path $1 from a/b/c to ../../../ and convert separators from /
+# to $2.
+relative_path() {
+  local -r separator="${2}"
+  echo "${1}" | sed -r 's@^./@@;
+                        s@[^/]*$@@;
+                        s@([^/]+)@..@g;
+                        s@/@'"${separator//\\/\\\\}"'@g;'
 }
 
 # Convert absolute paths to paths relative to $1 using the path separator $2
@@ -75,11 +88,7 @@ absolute_to_relative_paths() {
     for f in $(find . -type f); do
       local relative=".${separator}"
       if [[ $((use_relative_replacement)) -ne 0 ]]; then
-        relative=$(echo "${f}" | \
-                       sed -r 's@^./@@;
-                               s@[^/]*$@@;
-                               s@([^/]+)@..@g;
-                               s@/@'"${separator//\\/\\\\}"'@g;')
+        relative=$(relative_path "${f}" "${separator}")
         # Special case replacement for .pbxproj files which reference files
         # relative to the parent directory.
         if echo "${f}" | grep -q '.pbxproj$'; then
@@ -98,12 +107,22 @@ s@'"${replace_regexp}"'@'"${relative}"'@g;' "${f}" 2>/dev/null || true
 }
 
 # Make a cmake generated Xcode project redistributable.
+# $1 is the name of the host used to generate the Xcode project.
+# $2 is the name of the temporary directory that was used on the host to
+# generate the Xcode project.
+# $3 is the subdirectory within the temporary directory that contains the
+# cmake project.
 make_redistributable_osx() {
   local -r host="${1}"
   local -r temp_dir="${2}"
+  local -r cmake_project="${3}"
   local cmake_path="$(dirname "$(ssh ${host} which cmake)")"
   cmake_path="$(echo "${cmake_path}" | sed -r 's@/[^/]+$@@')"
+  local temp_dir_cmake="${temp_dir}/${cmake_project}"
   absolute_to_relative_paths "${cmake_path}" / / 0
+  pushd "${cmake_project}" >/dev/null
+  absolute_to_relative_paths "${temp_dir_cmake}" / / 1
+  popd >/dev/null
   absolute_to_relative_paths "${temp_dir}" / / 1
   # Fix up mangled header search paths.
   for f in $(find . -type f -name '*.pbxproj'); do
@@ -130,9 +149,15 @@ make_redistributable_osx() {
 }
 
 # Make a cmake generated Visual Studio project redistributable.
+# $1 is the name of the host used to generate the Visual Studio project.
+# $2 is the name of the temporary directory that was used on the host to
+# generate the Visual Studio project.
+# $3 is the subdirectory within the temporary directory that contains the
+# cmake project.
 make_redistributable_windows() {
   local -r host="${1}"
   local -r temp_dir="${2}"
+  local -r cmake_project="${3}"
   local cmake_path="$(ssh ${host} cygpath -w \
                        \$\(readlink -f \$\(dirname \$\(which cmake\)\)/..\))\\"
   local temp_dir_native="$(ssh ${host} cygpath -w \
@@ -143,9 +168,16 @@ Unable to determine ${host} path for ${temp_dir}, can't convert project files
 to relative paths." >&2
     return 1
   fi
+  local temp_dir_native_cmake="${temp_dir_native}\\${cmake_project//\//\\}"
+  temp_dir_native_cmake="$(case_insensitive_sed_expression \
+                             "${temp_dir_native_cmake}")"
   cmake_path="$(case_insensitive_sed_expression "${cmake_path}")"
   temp_dir_native="$(case_insensitive_sed_expression "${temp_dir_native}")"
   absolute_to_relative_paths "${cmake_path//\\/[/\\\\]}" '\\' '[/\\\\]' 0
+  pushd "${cmake_project}" >/dev/null
+  absolute_to_relative_paths "${temp_dir_native_cmake//\\/[/\\\\]}" '\\' \
+    '[/\\\\]' 1
+  popd >/dev/null
   absolute_to_relative_paths "${temp_dir_native//\\/[/\\\\]}" '\\' '[/\\\\]' 1
   # Remove machine specific cmake files that aren't required.
   find -name CMakeCache.txt -o \
@@ -154,6 +186,7 @@ to relative paths." >&2
        -name cmake_install.cmake -o \
        -name 'ALL_BUILD.*' | \
     xargs rm -rf
+  pushd "${cmake_project}" >/dev/null
   # Remove the ALL_BUILD project from the solution file.
   awk 'BEGIN { p = 1 }
        /Project.*ALL_BUILD/ { p = 0 }
@@ -161,21 +194,27 @@ to relative paths." >&2
        /^EndProject/ { p = 1 }' \
       Box2D.sln > Box2D.sln.new &&
     mv Box2D.sln.new Box2D.sln
+  popd >/dev/null
 }
 
 # Clean the source tree of any files that don't need to be redistributed.
 clean_tree() {
   local -r files_to_remove="\
+# .git directories.
+$(for d in ${project_name} ${out_of_tree_dependencies}; do \
+  echo ${d}/.git; done)
+# Old version of freeglut superceded by ../freeglut.
+#${project_name}/Box2D/freeglut # Enable this when freeglut is moved.
 # Not required: this is generated by Cmake for splash2d.
-Box2D/Build
+${project_name}/Box2D/Build
 # Moved to Readme.Splash2D.txt
-Building.txt
+${project_name}/Building.txt
 # Not tested.
-Contributions
+${project_name}/Contributions
 # Only contains the build distribution script.
-tools
+${project_name}/tools
 # License tracking in the Android source tree.
-MODULE_LICENSE_BSD_LIKE
+${project_name}/MODULE_LICENSE_BSD_LIKE
 "
   (
     IFS=$'\n'
@@ -234,7 +273,7 @@ main() {
   local windows_host=""
   local osx_host=""
   local leave_host_dirs=0
-  while getopts "r:w:o:" options; do
+  while getopts "r:w:o:l" options; do
     case ${options} in
       r) release_version="${OPTARG}" ;;
       w) windows_host="${OPTARG}" ;;
@@ -259,7 +298,10 @@ ${dirty_files}" >&2
 
   # Copy the project directory and clean it.
   local -r project_dir_clean="$(mktemp -d ${tempdir_template})"
-  cp -a ${project_dir}/* "${project_dir_clean}"
+  cp -a "${project_dir}" "${project_dir_clean}"
+  for d in ${out_of_tree_dependencies}; do
+    cp -a "${project_dir}/../${d}" "${project_dir_clean}"
+  done
   pushd "${project_dir_clean}" >/dev/null
   clean_tree
   popd >/dev/null
@@ -285,9 +327,9 @@ ${dirty_files}" >&2
                -DCMAKE_SUPPRESS_REGENERATION=TRUE \
                -DCMAKE_USE_RELATIVE_PATHS=TRUE"
       rsync -aru ${host}:${temp_dir}/* ${target_dir}
-      pushd ${target_dir}/${project_cmake_dir} >/dev/null
-      eval "make_redistributable_${host_type} ${host} \
-              ${temp_dir}/${project_cmake_dir}"
+      pushd "${target_dir}" >/dev/null
+      eval "make_redistributable_${host_type} ${host} ${temp_dir} \
+              ${project_cmake_dir}"
       popd >/dev/null
       ssh "${host}" "rm -rf ${temp_dir}"
       cp -a ${target_dir}/* "${project_dir_clean}"
