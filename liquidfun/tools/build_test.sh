@@ -5,9 +5,9 @@
 # to build_summary.log
 
 declare -r this="$(readlink -f ${0})"
-declare -r project_dir="$(readlink -f $(dirname ${0})/../)"
+declare -r project_dir="$(readlink -f $(dirname ${0})/../Box2D)"
 declare -r project_name="$(basename ${project_dir})"
-declare -r android_root="$(readlink -f ${project_dir}/../../../../)"
+declare -r android_root="$(readlink -f ${project_dir}/../../../../../)"
 # TODO(smiles): Select this based upon uname.
 declare -r cmake="$(readlink -f \
 ${android_root}/prebuilts/cmake/linux-x86/current/bin/cmake)"
