@@ -66,6 +66,7 @@ source_group(Tests FILES ${Testbed_Tests_SRCS})
 include_directories (
 	${OPENGL_INCLUDE_DIR}
 	${Box2D_SOURCE_DIR}
+	../../../freeglut/include
 )
 
 if(APPLE)

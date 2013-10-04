@@ -41,7 +41,7 @@ set(glui_SRCS
 
 include_directories (
 	${OPENGL_INCLUDE_DIR}
-	../
+	../../../freeglut/include
 )
 
 add_library(glui
