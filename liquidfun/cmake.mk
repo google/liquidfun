@@ -90,7 +90,7 @@ Contents/bin/cmake
   endif)
 endef
 
-# Find the cmake exectuable and set the CMAKE variable to its' path.
+# Find the cmake exectuable and set the CMAKE variable to cmake's path.
 # If the makefile is being used by the NDK, the PATH is searched for the
 # cmake executable.
 define cmake-find-executable
@@ -297,7 +297,7 @@ endef
 
 ifeq ($(NDK_PROJECT_PATH),)
 # Install a cmake built module in $(PRIVATE_CMAKE_SYMBOLIC_INPUT) and copy
-# its' headers to $(PRIVATE_CMAKE_OUT_HEADERS)/$(PRIVATE_CMAKE_MODULE).
+# the module's headers to $(PRIVATE_CMAKE_OUT_HEADERS)/$(PRIVATE_CMAKE_MODULE).
 define cmake-install
 ( mkdir -p $(dir $(PRIVATE_CMAKE_SYMBOLIC_INPUT)) && \
   $(call cmake-copy-file,\
