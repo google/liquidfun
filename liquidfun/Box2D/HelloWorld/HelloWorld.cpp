@@ -21,6 +21,24 @@
 #include <cstdio>
 using namespace std;
 
+#if defined(ANDROID) || defined(__ANDROID__)
+#include <android/log.h>
+#include <android_native_app_glue.h>
+
+#define printf(...) \
+  ((void)__android_log_print(ANDROID_LOG_INFO, "HelloWorld", __VA_ARGS__))
+
+int main(int argc, char** argv);
+
+// Entry point for the android native activity.
+void android_main(struct android_app* state) {
+    // Make sure android native glue isn't stripped.
+    app_dummy();
+    main(0, NULL);
+}
+#endif // defined(ANDROID) || defined(__ANDROID__)
+
+
 // This is a simple example of building and running a simulation
 // using Box2D. Here we create a large ground box and a small dynamic
 // box.
