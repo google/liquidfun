@@ -22,7 +22,7 @@
 #ifdef __APPLE__
 	#include <GLUT/glut.h>
 #else
-	#include "freeglut/freeglut.h"
+	#include "GL/freeglut.h"
 #endif
 
 #include <cstring>

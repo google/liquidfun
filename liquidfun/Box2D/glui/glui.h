@@ -35,8 +35,12 @@
 #ifdef __APPLE__
 	#include <GLUT/glut.h>
 #else
-	#include "freeglut/freeglut.h"
+	#include "GL/freeglut.h"
 #endif
+
+#if defined(ANDROID) || defined(__ANDROID__)
+#include "GLEmu/gl_emu.h"
+#endif // defined(ANDROID) || defined(__ANDROID__)
 
 #include <cstdlib>
 #include <cstdio>

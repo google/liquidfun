@@ -21,8 +21,12 @@
 #ifdef __APPLE__
 	#include <GLUT/glut.h>
 #else
-	#include "freeglut/freeglut.h"
+	#include "GL/freeglut.h"
 #endif
+
+#if defined(ANDROID) || defined(__ANDROID__)
+#include "GLEmu/gl_emu.h"
+#endif // defined(ANDROID) || defined(__ANDROID__)
 
 #include <cstdio>
 #include <cstdarg>
@@ -154,6 +158,7 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
 {
+#if !defined(ANDROID) || !defined(__ANDROID__)
 	char buffer[128];
 
 	va_list arg;
@@ -184,6 +189,7 @@ void DebugDraw::DrawString(int x, int y, const char *string, ...)
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+#endif // !defined(ANDROID) || !defined(__ANDROID__)
 }
 
 void DebugDraw::DrawString(const b2Vec2& p, const char *string, ...)

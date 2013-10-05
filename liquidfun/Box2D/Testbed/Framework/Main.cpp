@@ -302,6 +302,12 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 		
 		if (state == GLUT_UP)
 		{
+#if defined(ANDROID) || defined(__ANDROID__)
+			// Allow Android to advance to the next test.
+			if (p.x < -30) testSelection = max(0, testSelection - 1);
+			if (p.x >  30) testSelection++;
+			if (!g_testEntries[testSelection].name) testSelection--;
+#endif // defined(ANDROID) || defined(__ANDROID__)
 			test->MouseUp(p);
 		}
 	}
