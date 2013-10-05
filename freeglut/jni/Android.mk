@@ -33,12 +33,14 @@ ${eval \
     LOCAL_STATIC_LIBRARIES:=$$(libraries)
   else
     LOCAL_LDLIBS:=$$(foreach l,$$(libraries),-l$$(l))
+    LOCAL_EXPORT_LDLIBS:=$$(LOCAL_LDLIBS))
     # Allow runtime linking of main().
     LOCAL_ALLOW_UNDEFINED_SYMBOLS:=true
     # Export symbols.
     LOCAL_CFLAGS+=-DFREEGLUT_EXPORTS
   endif
-  LOCAL_EXPORT_C_INCLUDES:=$(LOCAL_PATH)/include}
+  LOCAL_EXPORT_C_INCLUDES:=$(LOCAL_PATH)/include
+  LOCAL_EXPORT_CFLAGS+=-DFREEGLUT_GLES$1}
 endef
 
 include $(CLEAR_VARS)
