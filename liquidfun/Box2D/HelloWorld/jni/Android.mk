@@ -2,12 +2,13 @@ LOCAL_PATH:=$(call my-dir)/..
 
 # --- HelloWorld ---
 include $(CLEAR_VARS)
-LOCAL_MODULE:=HelloWorld
+namespace:=$(if $(NDK_PROJECT_PATH),,_splash2d)
+LOCAL_MODULE:=HelloWorld${namespace}
 LOCAL_MODULE_TAGS:=optional
 LOCAL_SRC_FILES:=$(LOCAL_PATH)/HelloWorld.cpp
 LOCAL_C_INCLUDES:=$(LOCAL_PATH)/..
 LOCAL_LDLIBS:=-llog -landroid
-LOCAL_STATIC_LIBRARIES:=android_native_app_glue libBox2D_static
+LOCAL_STATIC_LIBRARIES:=android_native_app_glue libsplash2d_static
 include $(BUILD_SHARED_LIBRARY)
 # Import Box2D libraries and native_app_glue.
 $(call import-module,Box2D/jni)
