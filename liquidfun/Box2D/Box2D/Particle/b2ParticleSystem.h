@@ -90,16 +90,16 @@ private:
 		int32 firstIndex;
 	};
 
-	/// All particle types that requre cerating pairs
+	/// All particle types that require creating pairs
 	static const int32 k_pairFlags =
 		b2_springParticle;
-	/// All particle types that requre cerating triads
+	/// All particle types that require creating triads
 	static const int32 k_triadFlags =
 		b2_elasticParticle;
-	/// All particle types that requre computing depth
+	/// All particle types that require computing depth
 	static const int32 k_noPressureFlags =
 		b2_powderParticle;
-	/// All particle types that requre computing depth
+	/// All particle types that require computing depth
 	static const int32 k_depthFlags =
 		b2_elasticParticle|
 		b2_rigidParticle|
