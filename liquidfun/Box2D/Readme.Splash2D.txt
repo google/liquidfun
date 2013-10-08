@@ -52,6 +52,12 @@ Eclipse plugin (see http://developer.android.com/sdk/index.html).
 * If the target is a physical device, unlock the device and observe the
   application executing.
 
+By default code is generated for devices that support the armeabi-v7a ABI.
+To generate code for all ABIs to include in a fat .apk override APP_ABI on
+ndk-build's command line...
+
+$ ndk-build APP_ABI=armeabi-v7a
+
 
 === Linux ===
 
