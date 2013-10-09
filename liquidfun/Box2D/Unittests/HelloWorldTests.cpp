@@ -115,6 +115,7 @@ TEST_F(HelloWorldTests, PositionAngleTest) {
 int
 main(int argc, char **argv)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+	BodyTracker::SetWorkingDirectory(argv[0]);
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

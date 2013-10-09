@@ -1,20 +1,22 @@
 #include "BodyTracker.h"
-#include <sstream>
-#include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <stdlib.h>
+#include <iostream>
+#include <sstream>
 #include <math.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#include <stdio.h>
 #define PRINT_PRECISION 8
+
+std::string BodyTracker::s_baselineRootDir;
 
 BodyTracker::BodyTracker(const std::string &baselineFile, const std::string &outputFile, int32 flags) :
 	m_tracking(true),
 	m_baselineRead(false),
 	m_flags(flags),
-	m_baselineFile(baselineFile),
-	m_outputFile(outputFile)
+	m_baselineFile(s_baselineRootDir + baselineFile),
+	m_outputFile(s_baselineRootDir + outputFile)
 {
 }
 
@@ -330,4 +332,24 @@ BodyTracker::GetErrors() const
 		m_errors.insert(m_errors.begin(), "Mismatch with baseline '" + m_baselineFile + "':");
 	}
 	return m_errors;
+}
+
+// Set the root directory for baseline and output files using argv[0]
+// (the program's path).
+void BodyTracker::SetWorkingDirectory(const char *argv0)
+{
+	std::string executablePath = argv0;
+	std::string separator = executablePath.rfind('/') >= 0 ? "/" : "\\";
+	std::string currentDirectory = "." + separator;
+	std::string relativeExecutablePath =
+		executablePath.compare(0, currentDirectory.length(),
+								currentDirectory) == 0 ?
+		executablePath.substr(currentDirectory.length()) : executablePath;
+
+	char workingDirectory[PATH_MAX];
+	getcwd(workingDirectory, sizeof(workingDirectory));
+	std::string fullPathToExecutable =
+		std::string(workingDirectory) + separator + relativeExecutablePath;
+	s_baselineRootDir = fullPathToExecutable.substr(
+		0, fullPathToExecutable.rfind(separator[0])) + separator;
 }

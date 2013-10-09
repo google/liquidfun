@@ -56,6 +56,10 @@ class BodyTracker {
 	// Get strings representing the errors if any of the Compare() functions return false.
 	const std::vector<std::string> &GetErrors() const;
 
+    public:
+	// Set the root directory for baseline and output files using argv[0]
+	// (the program's path).
+	static void SetWorkingDirectory(const char *argv0);
 
     private:
 	bool ReadBaseline();
@@ -85,5 +89,8 @@ class BodyTracker {
 	int32 m_baselineFlags;
 
 	mutable std::vector<std::string> m_errors;
+
+	// Root directory for baseline and output files.
+	static std::string s_baselineRootDir;
 };
 #endif

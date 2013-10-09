@@ -12,7 +12,7 @@ set(GUNIT_INCDIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../googletest/include)
 set(GTEST_LIBDIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../googletest)
 
 # This is the directory into which the executables are built.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${GUNIT_INCDIR} ${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories(${GTEST_LIBDIR} ${CMAKE_CURRENT_SOURCE_DIR}/../Box2D)
