@@ -13,6 +13,7 @@ option(BOX2D_INSTALL_DOC "Install Box2D documentation" OFF)
 option(BOX2D_BUILD_SHARED "Build Box2D shared libraries" OFF)
 option(BOX2D_BUILD_STATIC "Build Box2D static libraries" ON)
 option(BOX2D_BUILD_EXAMPLES "Build Box2D examples" ON)
+option(BOX2D_BUILD_UNITTESTS "Build Box2D Unit Tests" ON)
 
 set(BOX2D_VERSION 2.3.0)
 
@@ -29,6 +30,11 @@ if(BOX2D_BUILD_EXAMPLES)
   add_subdirectory(glui)
   add_subdirectory(Testbed)
 endif(BOX2D_BUILD_EXAMPLES)
+
+if(BOX2D_BUILD_UNITTESTS)
+  add_subdirectory(../../googletest googletest)
+  add_subdirectory(Unittests)
+endif(BOX2D_BUILD_UNITTESTS)
 
 if(BOX2D_INSTALL_DOC)
   install(DIRECTORY Documentation DESTINATION share/doc/Box2D PATTERN ".svn" EXCLUDE)

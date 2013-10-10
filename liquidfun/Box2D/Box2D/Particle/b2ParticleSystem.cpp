@@ -1303,11 +1303,15 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 			}
 			else if (i < mid)
 			{
-				return i - start - mid + end;
+				return i + end - mid;
+			}
+			else if (i < end)
+			{
+				return i + start - mid;
 			}
 			else
 			{
-				return i + start - mid;
+				return i;
 			}
 		}
 		int32 start, mid, end;
