@@ -32,6 +32,11 @@ void DestructionListener::SayGoodbye(b2Joint* joint)
 	}
 }
 
+void DestructionListener::SayGoodbye(b2ParticleGroup* group)
+{
+	test->ParticleGroupDestroyed(group);
+}
+
 Test::Test()
 {
 	b2Vec2 gravity;

@@ -173,6 +173,38 @@ void b2ParticleSystem::DestroyParticle(int32 index)
 	m_flagsBuffer[index] |= b2_zombieParticle;
 }
 
+void b2ParticleSystem::DestroyParticlesInShape(const b2Shape* shape, const b2Transform& xf)
+{
+	struct Callback : b2QueryCallback
+	{
+		bool ReportFixture(b2Fixture* fixture)
+		{
+			return false;
+		}
+
+		bool ReportParticle(int32 index)
+		{
+			if (shape->TestPoint(xf, system->m_positionBuffer[index]))
+			{
+				system->m_flagsBuffer[index] |= b2_zombieParticle;
+			}
+			return true;
+		}
+
+		b2ParticleSystem* system;
+		const b2Shape* shape;
+		b2Transform xf;
+
+	} callback;
+	callback.system = this;
+	callback.shape = shape;
+	callback.xf = xf;
+	b2AABB aabb;
+	shape->ComputeAABB(&aabb, xf, 0);
+	m_world->QueryAABB(&callback, aabb);
+	SolveZombie();
+}
+
 b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef& groupDef)
 {
 	float32 stride = GetParticleStride();
@@ -228,6 +260,7 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 	group->m_firstIndex = firstIndex;
 	group->m_lastIndex = lastIndex;
 	group->m_flags = groupDef.flags;
+	group->m_strength = groupDef.strength;
 	group->m_userData = groupDef.userData;
 	group->m_transform = transform;
 	group->m_destroyAutomatically = groupDef.destroyAutomatically;
@@ -338,14 +371,114 @@ void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b,
 
 void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB)
 {
+	b2Assert(groupA != groupB);
 	RotateBuffer(groupB->m_firstIndex, groupB->m_lastIndex, m_count);
 	b2Assert(groupB->m_lastIndex == m_count);
 	RotateBuffer(groupA->m_firstIndex, groupA->m_lastIndex, groupB->m_firstIndex);
 	b2Assert(groupA->m_lastIndex == groupB->m_firstIndex);
+
+	uint32 flags = groupA->m_flags | groupB->m_flags;
+	if (flags & k_pairFlags)
+	{
+		for (int32 k = 0; k < m_contactCount; k++)
+		{
+			const b2ParticleContact& contact = m_contactBuffer[k];
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			if (a > b) b2Swap(a, b);
+			if (groupA->m_firstIndex <= a && a < groupA->m_lastIndex &&
+				groupB->m_firstIndex <= b && b < groupB->m_lastIndex)
+			{
+				if (m_pairCount >= m_pairCapacity)
+				{
+					int32 oldCapacity = m_pairCapacity;
+					int32 newCapacity = m_pairCount ? 2 * m_pairCount : 256;
+					ReallocateBuffer(m_pairBuffer, oldCapacity, newCapacity, true);
+					m_pairCapacity = newCapacity;
+				}
+				Pair& pair = m_pairBuffer[m_pairCount];
+				pair.indexA = a;
+				pair.indexB = b;
+				pair.flags = contact.flags;
+				pair.strength = b2Min(groupA->m_strength, groupB->m_strength);
+				pair.distance = b2Distance(m_positionBuffer[a], m_positionBuffer[b]);
+				m_pairCount++;
+			}
+		}
+	}
+	if (flags & k_triadFlags)
+	{
+		b2VoronoiDiagram diagram(
+			&m_world->m_stackAllocator,
+			m_positionBuffer + groupA->m_firstIndex, groupB->m_lastIndex - groupA->m_firstIndex,
+			GetParticleStride() / 2);
+		JoinParticleGroupsCallback callback;
+		callback.system = this;
+		callback.groupA = groupA;
+		callback.groupB = groupB;
+		diagram.GetNodes(callback);
+	}
+
 	groupA->m_lastIndex = groupB->m_lastIndex;
 	groupB->m_firstIndex = groupB->m_lastIndex;
 	DestroyParticleGroup(groupB);
+
+	if (flags & k_depthFlags)
+	{
+		ComputeDepthForGroup(groupA);
+	}
 }
+
+void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b, int32 c) const
+{
+	a += groupA->m_firstIndex;
+	b += groupA->m_firstIndex;
+	c += groupA->m_firstIndex;
+	int32 countA =
+		(a < groupB->m_firstIndex) +
+		(b < groupB->m_firstIndex) +
+		(c < groupB->m_firstIndex);
+	if (countA > 0 && countA < 3)
+	{
+		uint32 af = system->m_flagsBuffer[a];
+		uint32 bf = system->m_flagsBuffer[b];
+		uint32 cf = system->m_flagsBuffer[c];
+		if (af & bf & cf & k_triadFlags)
+		{
+			const b2Vec2& pa = system->m_positionBuffer[a];
+			const b2Vec2& pb = system->m_positionBuffer[b];
+			const b2Vec2& pc = system->m_positionBuffer[c];
+			b2Vec2 dab = pa - pb;
+			b2Vec2 dbc = pb - pc;
+			b2Vec2 dca = pc - pa;
+			if (b2Dot(dab, dab) < 4 && b2Dot(dbc, dbc) < 4 && b2Dot(dca, dca) < 4)
+			{
+				if (system->m_triadCount >= system->m_triadCapacity)
+				{
+					int32 oldCapacity = system->m_triadCapacity;
+					int32 newCapacity = system->m_triadCount ? 2 * system->m_triadCount : 256;
+					system->ReallocateBuffer(system->m_triadBuffer, oldCapacity, newCapacity, true);
+					system->m_triadCapacity = newCapacity;
+				}
+				Triad& triad = system->m_triadBuffer[system->m_triadCount];
+				triad.indexA = a;
+				triad.indexB = b;
+				triad.indexC = c;
+				triad.flags = af | bf | cf;
+				triad.strength = b2Min(groupA->m_strength, groupB->m_strength);
+				b2Vec2 p = (float32) 1 / 3 * (pa + pb + pc);
+				triad.pa = pa - p;
+				triad.pb = pb - p;
+				triad.pc = pc - p;
+				triad.ka = -b2Dot(dca, dab);
+				triad.kb = -b2Dot(dab, dbc);
+				triad.kc = -b2Dot(dbc, dca);
+				triad.s = b2Cross(pa, pb) + b2Cross(pb, pc) + b2Cross(pc, pa);
+				system->m_triadCount++;
+			}
+		}
+	}
+};
 
 void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 {
@@ -1058,14 +1191,17 @@ void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 		int32 a = contact.index;
 		if (m_flagsBuffer[a] & b2_powderParticle)
 		{
-			b2Body* b = contact.body;
 			float32 w = contact.weight;
-			float32 m = contact.mass;
-			b2Vec2 p = m_positionBuffer[a];
-			b2Vec2 n = contact.normal;
-			b2Vec2 f = powderStrength * m * w * n;
-			m_velocityBuffer[a] -= GetParticleInvMass() * f;
-			b->ApplyLinearImpulse(f, p, true);
+			if (w > 0.25f)
+			{
+				b2Body* b = contact.body;
+				float32 m = contact.mass;
+				b2Vec2 p = m_positionBuffer[a];
+				b2Vec2 n = contact.normal;
+				b2Vec2 f = powderStrength * m * (w - 0.25f) * n;
+				m_velocityBuffer[a] -= GetParticleInvMass() * f;
+				b->ApplyLinearImpulse(f, p, true);
+			}
 		}
 	}
 	for (int32 k = 0; k < m_contactCount; k++)
@@ -1073,13 +1209,16 @@ void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 		const b2ParticleContact& contact = m_contactBuffer[k];
 		if (contact.flags & b2_powderParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
 			float32 w = contact.weight;
-			b2Vec2 n = contact.normal;
-			b2Vec2 f = powderStrength * w * n;
-			m_velocityBuffer[a] -= f;
-			m_velocityBuffer[b] += f;
+			if (w > 0.25f)
+			{
+				int32 a = contact.indexA;
+				int32 b = contact.indexB;
+				b2Vec2 n = contact.normal;
+				b2Vec2 f = powderStrength * (w - 0.25f) * n;
+				m_velocityBuffer[a] -= f;
+				m_velocityBuffer[b] += f;
+			}
 		}
 	}
 }

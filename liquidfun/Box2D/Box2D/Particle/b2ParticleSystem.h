@@ -90,6 +90,14 @@ private:
 		int32 firstIndex;
 	};
 
+	struct JoinParticleGroupsCallback
+	{
+		void operator()(int32 a, int32 b, int32 c) const;
+		b2ParticleSystem* system;
+		b2ParticleGroup* groupA;
+		b2ParticleGroup* groupB;
+	};
+
 	/// All particle types that require creating pairs
 	static const int32 k_pairFlags =
 		b2_springParticle;
@@ -114,6 +122,7 @@ private:
 
 	int32 CreateParticle(const b2ParticleDef& def);
 	void DestroyParticle(int32 index);
+	void DestroyParticlesInShape(const b2Shape* shape, const b2Transform& xf);
 	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
 	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 	void DestroyParticleGroup(b2ParticleGroup* group);
