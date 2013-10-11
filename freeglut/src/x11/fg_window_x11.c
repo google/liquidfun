@@ -40,6 +40,10 @@
 #include "x11/fg_window_x11_glx.h"
 #endif
 
+#ifdef __APPLE__
+#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#endif
+
 static int fghResizeFullscrToggle(void)
 {
     XWindowAttributes attributes;

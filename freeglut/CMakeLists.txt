@@ -246,6 +246,12 @@ IF(UNIX AND NOT ANDROID)
         CHECK_INCLUDE_FILES("${X11_Xinput_INCLUDE_PATH}/X11/extensions/XInput2.h" HAVE_X11_EXTENSIONS_XINPUT2_H)
         LIST(APPEND LIBS ${X11_Xinput_LIB})
     ENDIF()
+    # Add XQuartz GL to the linker command line on OSX and /usr/X11/lib to the
+    # search path so it's possible to find Xxf86vm.
+    IF(APPLE)
+      LIST(APPEND LIBS GL)
+      LINK_DIRECTORIES(/usr/X11/lib)
+    ENDIF()
 ENDIF()
 IF(ANDROID)
     # -landroid for ANativeWindow
@@ -293,6 +299,10 @@ ENDIF()
 # As a result, the build directory must to be added to the include path list.
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# Add X11 include path on OSX so that XQuartz headers are found.
+IF(APPLE)
+    INCLUDE_DIRECTORIES(${X11_INC_SEARCH_PATH})
+ENDIF()
 ADD_DEFINITIONS(-DHAVE_CONFIG_H)
 IF(WIN32)
     # we also have to generate freeglut.rc, which contains the version
