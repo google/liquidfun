@@ -20,13 +20,8 @@
 #define BOX2D_H
 
 /**
-\mainpage Box2D API Documentation
+\mainpage Splash2D API Documentation
 
-\section intro_sec Getting Started
-
-For documentation please see http://box2d.org/documentation.html
-
-For discussion please visit http://box2d.org/forum
 */
 
 // These include files constitute the main Box2D API

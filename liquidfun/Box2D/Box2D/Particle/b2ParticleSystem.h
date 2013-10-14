@@ -21,18 +21,36 @@ struct b2AABB;
 
 struct b2ParticleContact
 {
+	///Indices of the respective particles making contact.
+	///
 	int32 indexA, indexB;
+	///The logical sum of the particle behaviors that have been set.
+	///
 	uint32 flags;
+	/// Weight of the contact. A value between 0.0f and 1.0f.
+	///
 	float32 weight;
+	///The normalized direction from A to B.
+	///
 	b2Vec2 normal;
 };
 
 struct b2ParticleBodyContact
 {
+	/// Index of the particle making contact.
+	///
 	int32 index;
+	/// The body making contact.
+	///
 	b2Body* body;
+	///Weight of the contact. A value between 0.0f and 1.0f.
+	///
 	float32 weight;
+	/// The normalized direction from the particle to the body.
+	///
 	b2Vec2 normal;
+	/// The effective mass used in calculating force.
+	///
 	float32 mass;
 };
 

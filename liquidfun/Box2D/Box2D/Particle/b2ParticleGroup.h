@@ -28,13 +28,15 @@ struct b2ParticleGroupDef
 		userData = NULL;
 	}
 
-	/// The logical sum of particle type flags.
+	/// The logical sum of the particle-behavior flags.
 	uint32 flags;
 
 	/// The world position of the group.
+	/// Moves the group’s shape a distance equal to the value of position.
 	b2Vec2 position;
 
 	/// The world angle of the group in radians.
+	/// Rotates the shape by an angle equal to the value of angle.
 	float32 angle;
 
 	/// The linear velocity of the group's origin in world co-ordinates.
@@ -46,18 +48,16 @@ struct b2ParticleGroupDef
 	/// The color of all particles in the group.
 	b2ParticleColor color;
 
-	/// The scale of force inside the group with flag b2_elasticParticle or b2_springParticle.
+	/// The strength of cohesion among the particles in a group with flag b2_elasticParticle or b2_springParticle.
 	float32 strength;
 
-	/// The shape, this must be set. The shape will not be retained, so you
-	/// can create the shape on the stack.
+	/// Shape containing the particle group.
 	const b2Shape* shape;
 
-	/// If true, the group will be destroyed when all particles of it are destroyed.
-	/// The initial value is true.
+	/// If true, destroy the group automatically after its last particle has been destroyed.
 	bool destroyAutomatically;
 
-	/// Use this to store application specific group data.
+	/// Use this to store application-specific group data.
 	void* userData;
 
 };
@@ -68,41 +68,74 @@ class b2ParticleGroup
 
 public:
 
-	/// Get the next group.
+	/// Get the next particle group from the list in b2_World.
 	b2ParticleGroup* GetNext();
 	const b2ParticleGroup* GetNext() const;
 
 	/// Get the number of particles.
 	int32 GetParticleCount() const;
 
-	/// Get the particle data.
-	/// @return the pointer to the head of the particle data.
+	/// Gets an indexed buffer containing the type of each particle in the group. The indices in the buffer match
+	/// those of the particles themselves. For instance, the behavior flags for the zeroth-index particle are
+	/// stored in the zeroth index of the buffer.
+	/// You can change particle types on the fly by writing new values to the buffer.
 	uint32* GetParticleFlagsBuffer();
+
+	/// Get the position of each particle in the group.
 	b2Vec2* GetParticlePositionBuffer();
+
+	/// Get the velocity of each particle in the group.
 	b2Vec2* GetParticleVelocityBuffer();
+
+	/// Get the color of each particle in the group.
 	b2ParticleColor* GetParticleColorBuffer();
+
+	/// Get application-specific data for each particle in the group.
 	void** GetParticleUserDataBuffer();
+
+	/// Get the type of each particle in the group. The obtained values cannot be changed.
 	const uint32* GetParticleFlagsBuffer() const;
+
+	/// Get the position of each particle in the group. The obtained values cannot be changed.
 	const b2Vec2* GetParticlePositionBuffer() const;
+
+	/// Get the velocity of each particle in the group. The obtained values cannot be changed.
 	const b2Vec2* GetParticleVelocityBuffer() const;
+
+	/// Get the color of each particle in the group. The obtained values cannot be changed.
 	const b2ParticleColor* GetParticleColorBuffer() const;
+
+	/// Get application-specific data for each particle in the group. The obtained values cannot be changed.
 	void* const* GetParticleUserDataBuffer() const;
 
-	/// Get the flags of the group.
+	/// Get the iniital particle-behavior flags for the group.
 	int32 GetFlags() const;
 
-	/// Get the statistics of the group.
+	/// Get the total mass of the group: the sum of all particles in it.
 	float32 GetMass() const;
+
+	/// Get the moment of inertia for the group.
 	float32 GetInertia() const;
+
+	/// Get the center of gravity for the group.
 	b2Vec2 GetCenter() const;
+
+	/// Get the linear velocity of the group.
 	b2Vec2 GetLinearVelocity() const;
+
+	/// Get the angular velocity of the group.
 	float32 GetAngularVelocity() const;
 
-	/// Get the group transform for the group's origin.
-	/// It is updated only for rigid particles.
-	/// @return the world transform of the group's origin.
+	/// Get the position of the group's origin and rotation.
+	/// Used only with groups of rigid particles.
 	const b2Transform& GetTransform() const;
+
+	/// Get position of the particle group as a whole.
+	/// Used only with groups of rigid particles.
 	const b2Vec2& GetPosition() const;
+
+	/// Get the rotational angle of the particle group as a whole.
+	/// Used only with groups of rigid particles.
 	float32 GetAngle() const;
 
 	/// Get the user data pointer that was provided in the group definition.

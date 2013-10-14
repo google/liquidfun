@@ -20,18 +20,33 @@ enum b2ParticleFlag
 	b2_zombieParticle =      1 << 26, // removed after next step
 };
 
-/// Small-sized color object for each particle
+/// Small color object for each particle
 struct b2ParticleColor
 {
 	uint8 r,g,b,a;
 	b2ParticleColor() {}
-	b2ParticleColor(int32 r, int32 g, int32 b, int32 a) : r(r), g(g), b(b), a(a) {}
+	/// Constructor with four elements: r (red), g (green), b (blue), and a (opacity).
+	/// Each element can be specified 0 to 255.
+	b2ParticleColor(int32 r, int32 g, int32 b, int32 a) : r(r), g(g), b(b), a(a)
+	{}
+
+	/// Constructor that initializes the above four elements with the value of the b2Color object
+	///
 	b2ParticleColor(const b2Color& color);
+
+	/// True when all four color elements equal 0. When true, no memory is used for particle color.
+	///
 	bool IsZero() const
 	{
 		return !r && !g && !b && !a;
 	}
+
+	/// Used internally to convert the value of b2Color.
+	///
 	b2Color GetColor() const;
+
+	/// Sets color for current object using the four elements described above.
+	///
 	void Set(int32 r_, int32 g_, int32 b_, int32 a_)
 	{
 		r = r_;
@@ -39,6 +54,9 @@ struct b2ParticleColor
 		b = b_;
 		a = a_;
 	}
+
+	/// Initializes the above four elements with the value of the b2Color object
+	///
 	void Set(const b2Color& color);
 };
 
@@ -58,7 +76,9 @@ struct b2ParticleDef
 		userData = NULL;
 	}
 
-	/// The logical sum of particle type flags.
+	/// Specifies the type of particle. A particle may be more than one type.
+	/// Multiple types are chained by logical sums, for example:
+	/// pd.flags = b2_elasticParticle | b2_viscousParticle
 	uint32 flags;
 
 	/// The world position of the particle.
@@ -70,7 +90,7 @@ struct b2ParticleDef
 	/// The color of the particle.
 	b2ParticleColor color;
 
-	/// Use this to store application specific body data.
+	/// Use this to store application-specific body data.
 	void* userData;
 
 };
