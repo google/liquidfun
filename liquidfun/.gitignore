@@ -1,0 +1,10 @@
+*.o
+*.o.d
+*.class
+*.a
+*~
+Box2D/Testbed/bin/
+Box2D/Testbed/gen/
+Box2D/Testbed/libs/
+Box2D/Testbed/obj/
+
