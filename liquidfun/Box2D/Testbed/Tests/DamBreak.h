@@ -22,10 +22,10 @@ public:
 
 		}
 
-		m_world->SetParticleRadius(0.2f);
+		m_world->SetParticleRadius(0.15f);
 		{
 			b2PolygonShape shape;
-			shape.SetAsBox(5, 10, b2Vec2(-15, 10.1f), 0);
+			shape.SetAsBox(8, 10, b2Vec2(-12, 10.1f), 0);
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
 			m_world->CreateParticleGroup(pd);

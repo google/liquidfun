@@ -45,7 +45,7 @@ public:
 			}
 		}
 
-		m_world->SetParticleRadius(0.5f);
+		m_world->SetParticleRadius(0.2f);
 		{
 			b2PolygonShape shape;
 			shape.SetAsBox(20, 10, b2Vec2(0, 10), 0);

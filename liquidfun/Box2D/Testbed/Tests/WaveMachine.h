@@ -42,7 +42,7 @@ public:
 			m_joint = (b2RevoluteJoint*)m_world->CreateJoint(&jd);
 		}
 
-		m_world->SetParticleRadius(0.2f);
+		m_world->SetParticleRadius(0.15f);
 		{
 			b2ParticleGroupDef pd;
 

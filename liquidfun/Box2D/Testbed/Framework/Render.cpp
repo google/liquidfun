@@ -70,37 +70,20 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
 void DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
 {
 #ifdef ANDROID
-	// FIXME: this doesn't render the last few points
-	const int N = 10;
-	static float vcache[N][6];
-	static int n = 0;
-
-	if (n != N)
+	if (num_cached_points != MAX_CACHED_POINTS)
 	{
-		vcache[n][0] = center.x;
-		vcache[n][1] = center.y;
-		vcache[n][2] = color.r;
-		vcache[n][3] = color.g;
-		vcache[n][4] = color.b;
-		vcache[n][5] = 1;
-		n++;
+		pointcache[num_cached_points][0] = center.x;
+		pointcache[num_cached_points][1] = center.y;
+		pointcache[num_cached_points][2] = color.r;
+		pointcache[num_cached_points][3] = color.g;
+		pointcache[num_cached_points][4] = color.b;
+		pointcache[num_cached_points][5] = 1;
+		num_cached_points++;
 	}
 
-	if (n == N)
+	if (num_cached_points == MAX_CACHED_POINTS)
 	{
-		n = 0;
-
-		glPointSize(5);	// be better if we could relate this to "radius" in worldspace
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_COLOR_ARRAY);
-		glVertexPointer(2, GL_FLOAT, sizeof(float) * 6, &vcache[0][0]);
-		glColorPointer (4, GL_FLOAT, sizeof(float) * 6, &vcache[0][2]);
-
-		glDrawArrays(GL_POINTS, 0, N);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_COLOR_ARRAY);
+		FlushPoints();
 	}
 #else
 	const float32 k_segments = 16.0f;
@@ -116,6 +99,23 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& 
 	}
 	glEnd();
 #endif
+}
+
+void DebugDraw::FlushPoints()
+{
+	glPointSize(2);	// be better if we could relate this to "radius" in worldspace
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glVertexPointer(2, GL_FLOAT, sizeof(float) * 6, &pointcache[0][0]);
+	glColorPointer (4, GL_FLOAT, sizeof(float) * 6, &pointcache[0][2]);
+
+	glDrawArrays(GL_POINTS, 0, num_cached_points);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+
+	num_cached_points = 0;
 }
 
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)

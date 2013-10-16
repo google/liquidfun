@@ -21,10 +21,6 @@
 
 using namespace std;
 
-#ifdef ANDROID
-#include <android/log.h>
-#endif
-
 void DestructionListener::SayGoodbye(b2Joint* joint)
 {
 	if (test->m_mouseJoint == joint)
@@ -355,6 +351,7 @@ void Test::Step(Settings* settings)
 	m_world->Step(timeStep, settings->velocityIterations, settings->positionIterations);
 
 	m_world->DrawDebugData();
+	m_debugDraw.FlushPoints();
 
 	if (timeStep > 0.0f)
 	{

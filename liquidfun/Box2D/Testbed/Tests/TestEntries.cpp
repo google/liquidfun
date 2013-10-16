@@ -90,6 +90,16 @@ using namespace std;
 
 TestEntry g_testEntries[] =
 {
+	{"DamBreak", DamBreak::Create},
+	{"Liquid Timer", LiquidTimer::Create},
+	{"Wave Machine", WaveMachine::Create},
+	{"Particles", Particles::Create},
+	{"Particle Drawing", DrawingParticles::Create},
+	{"Soup", Soup::Create},
+	{"Rigid Particles", RigidParticles::Create},
+	{"Elastic Particles", ElasticParticles::Create},
+	{"Surface Tension", ParticlesSurfaceTension::Create},
+
 	{"Continuous Test", ContinuousTest::Create},
 	{"Time of Impact", TimeOfImpact::Create},
 	{"Motor Joint", MotorJoint::Create},
@@ -139,16 +149,6 @@ TestEntry g_testEntries[] =
 	{"Slider Crank", SliderCrank::Create},
 	{"Varying Friction", VaryingFriction::Create},
 	{"Add Pair Stress Test", AddPair::Create},
-
-	{"DamBreak", DamBreak::Create},
-	{"Liquid Timer", LiquidTimer::Create},
-	{"Wave Machine", WaveMachine::Create},
-	{"Particles", Particles::Create},
-	{"Particle Drawing", DrawingParticles::Create},
-	{"Soup", Soup::Create},
-	{"Rigid Particles", RigidParticles::Create},
-	{"Elastic Particles", ElasticParticles::Create},
-	{"Surface Tension", ParticlesSurfaceTension::Create},
 
 	{NULL, NULL}
 };

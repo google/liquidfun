@@ -22,7 +22,7 @@ public:
 
 		}
 
-		m_world->SetParticleRadius(0.2f);
+		m_world->SetParticleRadius(0.15f);
 		m_world->SetParticleGravityScale(0.5f);
 		{
 			b2PolygonShape shape;

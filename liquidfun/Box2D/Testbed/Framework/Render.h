@@ -28,6 +28,8 @@ struct b2AABB;
 class DebugDraw : public b2Draw
 {
 public:
+	DebugDraw() : num_cached_points(0) {}
+
 	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
 
 	void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
@@ -49,6 +51,13 @@ public:
     void DrawAABB(b2AABB* aabb, const b2Color& color);
 
     void OutputFPS();
+
+    void FlushPoints();
+
+private:
+	enum { MAX_CACHED_POINTS = 64 };
+	float pointcache[MAX_CACHED_POINTS][6];
+	int num_cached_points;
 };
 
 
