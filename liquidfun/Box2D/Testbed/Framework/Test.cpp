@@ -18,7 +18,12 @@
 
 #include "Test.h"
 #include <cstdio>
+
 using namespace std;
+
+#ifdef ANDROID
+#include <android/log.h>
+#endif
 
 void DestructionListener::SayGoodbye(b2Joint* joint)
 {
@@ -314,6 +319,8 @@ void Test::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 
 void Test::Step(Settings* settings)
 {
+	m_debugDraw.OutputFPS();
+
 	float32 timeStep = settings->hz > 0.0f ? 1.0f / settings->hz : float32(0.0f);
 
 	if (settings->pause)

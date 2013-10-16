@@ -26,6 +26,7 @@
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #include "GLEmu/gl_emu.h"
+#include <android/log.h>
 #endif // defined(ANDROID) || defined(__ANDROID__)
 
 #include <cstdio>
@@ -68,6 +69,40 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
 
 void DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
 {
+#ifdef ANDROID
+	// FIXME: this doesn't render the last few points
+	const int N = 10;
+	static float vcache[N][6];
+	static int n = 0;
+
+	if (n != N)
+	{
+		vcache[n][0] = center.x;
+		vcache[n][1] = center.y;
+		vcache[n][2] = color.r;
+		vcache[n][3] = color.g;
+		vcache[n][4] = color.b;
+		vcache[n][5] = 1;
+		n++;
+	}
+
+	if (n == N)
+	{
+		n = 0;
+
+		glPointSize(5);	// be better if we could relate this to "radius" in worldspace
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
+		glVertexPointer(2, GL_FLOAT, sizeof(float) * 6, &vcache[0][0]);
+		glColorPointer (4, GL_FLOAT, sizeof(float) * 6, &vcache[0][2]);
+
+		glDrawArrays(GL_POINTS, 0, N);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+	}
+#else
 	const float32 k_segments = 16.0f;
 	const float32 k_increment = 2.0f * b2_pi / k_segments;
 	float32 theta = 0.0f;
@@ -80,6 +115,7 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& 
 		theta += k_increment;
 	}
 	glEnd();
+#endif
 }
 
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
@@ -223,3 +259,19 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
 	glVertex2f(aabb->lowerBound.x, aabb->upperBound.y);
 	glEnd();
 }
+
+void DebugDraw::OutputFPS()
+{
+	static int lastms = 0;
+	int curms = glutGet(GLUT_ELAPSED_TIME);
+	int delta = curms - lastms;
+	lastms = curms;
+
+	static int dsmooth = 16;
+	dsmooth = (dsmooth * 30 + delta) / 31;
+
+#ifdef ANDROID
+	__android_log_print(ANDROID_LOG_VERBOSE, "Testbed", "msec = %d", dsmooth);
+#endif
+}
+
