@@ -113,6 +113,18 @@ typedef double float64;
 #define b2_toiBaugarte				0.75f
 
 
+// Particle
+
+// The standard distance between particles, divided by the particle radius.
+#define b2_particleStride			0.75f
+
+// The maximum distance between particles in a triad, divided by the particle radius.
+#define b2_maxTriadDistance			2
+#define b2_maxTriadDistanceSquared		(b2_maxTriadDistance * b2_maxTriadDistance)
+
+// The initial size of particle data buffers.
+#define b2_minParticleBufferSize	256
+
 // Sleep
 
 /// The time that a body must be still before it will go to sleep.
