@@ -118,6 +118,7 @@ private:
 	b2ParticleSystem* m_system;
 	int32 m_firstIndex, m_lastIndex;
 	uint32 m_flags;
+	float32 m_strength;
 	b2ParticleGroup* m_prev;
 	b2ParticleGroup* m_next;
 

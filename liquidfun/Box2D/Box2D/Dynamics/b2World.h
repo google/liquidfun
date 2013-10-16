@@ -221,6 +221,11 @@ public:
 	/// The particle will be removed after next step.
 	void DestroyParticle(int32 index);
 
+	/// Destroy particles inside a shape.
+	/// This function is locked during callbacks.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticlesInShape(const b2Shape* shape, const b2Transform& xf);
+
 	/// Create a particles given a definition. No reference to the definition
 	/// is retained.
 	/// @warning This function is locked during callbacks.

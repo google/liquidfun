@@ -114,6 +114,7 @@ class DestructionListener : public b2DestructionListener
 public:
 	void SayGoodbye(b2Fixture* fixture) { B2_NOT_USED(fixture); }
 	void SayGoodbye(b2Joint* joint);
+	void SayGoodbye(b2ParticleGroup* group);
 
 	Test* test;
 };
@@ -145,7 +146,7 @@ public:
 	void ShiftMouseDown(const b2Vec2& p);
 	virtual void MouseDown(const b2Vec2& p);
 	virtual void MouseUp(const b2Vec2& p);
-	void MouseMove(const b2Vec2& p);
+	virtual void MouseMove(const b2Vec2& p);
 	void LaunchBomb();
 	void LaunchBomb(const b2Vec2& position, const b2Vec2& velocity);
 	
@@ -154,6 +155,9 @@ public:
 
 	// Let derived tests know that a joint was destroyed.
 	virtual void JointDestroyed(b2Joint* joint) { B2_NOT_USED(joint); }
+
+	// Let derived tests know that a particle group was destroyed.
+	virtual void ParticleGroupDestroyed(b2ParticleGroup* group) { B2_NOT_USED(group); }
 
 	// Callbacks for derived classes.
 	virtual void BeginContact(b2Contact* contact) { B2_NOT_USED(contact); }

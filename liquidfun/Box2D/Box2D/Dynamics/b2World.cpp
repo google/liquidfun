@@ -1444,6 +1444,16 @@ void b2World::DestroyParticle(int32 index)
 	m_particleSystem.DestroyParticle(index);
 }
 
+void b2World::DestroyParticlesInShape(const b2Shape* shape, const b2Transform& xf)
+{
+	b2Assert(IsLocked() == false);
+	if (IsLocked())
+	{
+		return;
+	}
+	m_particleSystem.DestroyParticlesInShape(shape, xf);
+}
+
 b2ParticleGroup* b2World::CreateParticleGroup(const b2ParticleGroupDef& def)
 {
 	b2Assert(IsLocked() == false);
