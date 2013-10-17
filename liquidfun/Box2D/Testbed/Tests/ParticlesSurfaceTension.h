@@ -52,7 +52,7 @@ public:
 			shape.m_p.Set(0, 20);
 			shape.m_radius = 5;
 			b2ParticleGroupDef pd;
-			pd.flags = b2_tensileParticle;
+			pd.flags = b2_tensileParticle | b2_colorMixingParticle;
 			pd.shape = &shape;
 			pd.color.Set(255, 0, 0, 255);
 			m_world->CreateParticleGroup(pd);
@@ -63,7 +63,7 @@ public:
 			shape.m_p.Set(-10, 20);
 			shape.m_radius = 5;
 			b2ParticleGroupDef pd;
-			pd.flags = b2_tensileParticle;
+			pd.flags = b2_tensileParticle | b2_colorMixingParticle;
 			pd.shape = &shape;
 			pd.color.Set(0, 255, 0, 255);
 			m_world->CreateParticleGroup(pd);
@@ -78,7 +78,7 @@ public:
 				b2Vec2(0, 35)};
 			shape.Set(vertices, 4);
 			b2ParticleGroupDef pd;
-			pd.flags = b2_tensileParticle;
+			pd.flags = b2_tensileParticle | b2_colorMixingParticle;
 			pd.shape = &shape;
 			pd.color.Set(0, 0, 255, 255);
 			m_world->CreateParticleGroup(pd);
