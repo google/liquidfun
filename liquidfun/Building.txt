@@ -1,5 +1,4 @@
-﻿Splash2D is an extension of Box2D, a 2D physics engine for games
-(see http://www.box2d.org).
+Splash2D uses CMake to describe the build in a platform independent manner.
 
 API documentation is located in Documentation/.
 
@@ -61,7 +60,7 @@ By default code is generated for devices that support the armeabi-v7a ABI.
 To generate code for all ABIs to include in a fat .apk override APP_ABI on
 ndk-build's command line...
 
-$ ndk-build APP_ABI=armeabi-v7a
+$ ndk-build
 
 
 === Linux ===
