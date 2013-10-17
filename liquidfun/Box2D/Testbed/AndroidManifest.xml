@@ -15,6 +15,7 @@
              This will take care of integrating with our NDK code. -->
         <activity android:name="android.app.NativeActivity"
                   android:label="@string/app_name"
+                  android:screenOrientation="landscape"
                   android:configChanges="orientation|keyboardHidden">
             <!-- Tell NativeActivity the name of the .so -->
             <meta-data android:name="android.app.lib_name"

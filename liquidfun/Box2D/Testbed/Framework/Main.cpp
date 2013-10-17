@@ -55,7 +55,7 @@ static void Resize(int32 w, int32 h)
 	glLoadIdentity();
 	float32 ratio = float32(tw) / float32(th);
 
-	b2Vec2 extents(ratio * 25.0f, 25.0f);
+	b2Vec2 extents = ratio >= 1 ? b2Vec2(ratio * 25.0f, 25.0f) : b2Vec2(25.0f, 25.0f / ratio);
 	extents *= viewZoom;
 
 	b2Vec2 lower = settings.viewCenter - extents;
