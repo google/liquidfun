@@ -48,53 +48,63 @@ ConservationTests::TearDown()
 TEST_F(ConservationTests, GravityCenter) {
 	int32 particleCount = m_world->GetParticleCount();
 	const b2Vec2 *positionBuffer = m_world->GetParticlePositionBuffer();
-	b2Vec2 before = b2Vec2_zero;
+	float64 beforeX = 0;
+	float64 beforeY = 0;
 	for (int32 i = 0; i < particleCount; i++) {
-		before += positionBuffer[i];
+		beforeX += positionBuffer[i].x;
+		beforeY += positionBuffer[i].y;
 	}
-	before *= 1 / particleCount;
+	beforeX /= particleCount;
+	beforeY /= particleCount;
 	for (int32 t = 0; t < NUMBER_OF_STEPS; t++) {
 		m_world->Step(DELTA_T, 1, 1);
 	}
-	b2Vec2 after = b2Vec2_zero;
+	float64 afterX = 0;
+	float64 afterY = 0;
 	for (int32 i = 0; i < particleCount; i++) {
-		after += positionBuffer[i];
+		afterX += positionBuffer[i].x;
+		afterY += positionBuffer[i].y;
 	}
-	after *= 1 / particleCount;
-	EXPECT_TRUE(b2Distance(before, after) < EPSILON) <<
-		"the gravity center changed from (" << before.x << "," << before.y << ") to (" << after.x << "," << after.y << ")";
+	afterX /= particleCount;
+	afterY /= particleCount;
+	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON && std::abs(beforeY - afterY) < EPSILON) <<
+		"the gravity center changed from (" << beforeX << "," << beforeY << ") to (" << afterX << "," << afterY << ")";
 }
 
 TEST_F(ConservationTests, LinearMomentum) {
 	int32 particleCount = m_world->GetParticleCount();
 	const b2Vec2 *velocityBuffer = m_world->GetParticleVelocityBuffer();
-	b2Vec2 before = b2Vec2_zero;
+	float64 beforeX = 0;
+	float64 beforeY = 0;
 	for (int32 i = 0; i < particleCount; i++) {
-		before += velocityBuffer[i];
+		beforeX += velocityBuffer[i].x;
+		beforeY += velocityBuffer[i].y;
 	}
 	for (int32 t = 0; t < NUMBER_OF_STEPS; t++) {
 		m_world->Step(DELTA_T, 1, 1);
 	}
-	b2Vec2 after = b2Vec2_zero;
+	float64 afterX = 0;
+	float64 afterY = 0;
 	for (int32 i = 0; i < particleCount; i++) {
-		after += velocityBuffer[i];
+		afterX += velocityBuffer[i].x;
+		afterY += velocityBuffer[i].y;
 	}
-	EXPECT_TRUE(b2Distance(before, after) < EPSILON) <<
-		"the linear momentum changed from (" << before.x << "," << before.y << ") to (" << after.x << "," << after.y << ")";
+	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON && std::abs(beforeY - afterY) < EPSILON) <<
+		"the linear momentum changed from (" << beforeX << "," << beforeY << ") to (" << afterX << "," << afterY << ")";
 }
 
 TEST_F(ConservationTests, AngularMomentum) {
 	int32 particleCount = m_world->GetParticleCount();
 	const b2Vec2 *positionBuffer = m_world->GetParticlePositionBuffer();
 	const b2Vec2 *velocityBuffer = m_world->GetParticleVelocityBuffer();
-	float32 before = 0;
+	float64 before = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		before += b2Cross(positionBuffer[i], velocityBuffer[i]);
 	}
 	for (int32 t = 0; t < NUMBER_OF_STEPS; t++) {
 		m_world->Step(DELTA_T, 1, 1);
 	}
-	float32 after = 0;
+	float64 after = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		after += b2Cross(positionBuffer[i], velocityBuffer[i]);
 	}
@@ -105,7 +115,7 @@ TEST_F(ConservationTests, AngularMomentum) {
 TEST_F(ConservationTests, KineticEnergy) {
 	int32 particleCount = m_world->GetParticleCount();
 	const b2Vec2 *velocityBuffer = m_world->GetParticleVelocityBuffer();
-	float32 before = 0;
+	float64 before = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		b2Vec2 v = velocityBuffer[i];
 		before += b2Dot(v, v) / 2;
@@ -113,7 +123,7 @@ TEST_F(ConservationTests, KineticEnergy) {
 	for (int32 t = 0; t < NUMBER_OF_STEPS; t++) {
 		m_world->Step(DELTA_T, 1, 1);
 	}
-	float32 after = 0;
+	float64 after = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		b2Vec2 v = velocityBuffer[i];
 		after += b2Dot(v, v) / 2;
