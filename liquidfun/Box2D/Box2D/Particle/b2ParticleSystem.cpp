@@ -86,7 +86,6 @@ b2ParticleSystem::b2ParticleSystem()
 	m_surfaceTensionStrengthB = 0.2f;
 	m_powderStrength = 0.5f;
 	m_ejectionStrength = 0.5f;
-	m_colorMixingStrength = 0.5f;
 
 	m_world = NULL;
 
@@ -893,10 +892,6 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	{
 		SolveDepth(step);
 	}
-	if (m_allFlags & b2_colorMixingParticle)
-	{
-		SolveColorMixing(step);
-	}
 	SolvePressure(step);
 	SolveDamping(step);
 	if (m_allFlags & b2_zombieParticle)
@@ -1248,36 +1243,6 @@ void b2ParticleSystem::SolveDepth(const b2TimeStep& step)
 				m_velocityBuffer[a] -= f;
 				m_velocityBuffer[b] += f;
 			}
-		}
-	}
-}
-
-void b2ParticleSystem::SolveColorMixing(const b2TimeStep& step)
-{
-	// mixes color between contacting particles
-	RequestParticleBuffer(m_colorBuffer);
-	int32 colorMixing256 = (int32) (256 * m_colorMixingStrength);
-	for (int32 k = 0; k < m_contactCount; k++)
-	{
-		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		if (m_flagsBuffer[a] & m_flagsBuffer[b] & b2_colorMixingParticle)
-		{
-			b2ParticleColor& colorA = m_colorBuffer[a];
-			b2ParticleColor& colorB = m_colorBuffer[b];
-			int32 dr = (colorMixing256 * (colorB.r - colorA.r)) >> 8;
-			int32 dg = (colorMixing256 * (colorB.g - colorA.g)) >> 8;
-			int32 db = (colorMixing256 * (colorB.b - colorA.b)) >> 8;
-			int32 da = (colorMixing256 * (colorB.a - colorA.a)) >> 8;
-			colorA.r += dr;
-			colorA.g += dg;
-			colorA.b += db;
-			colorA.a += da;
-			colorB.r -= dr;
-			colorB.g -= dg;
-			colorB.b -= db;
-			colorB.a -= da;
 		}
 	}
 }

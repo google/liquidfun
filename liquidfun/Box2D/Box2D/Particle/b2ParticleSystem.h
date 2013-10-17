@@ -144,7 +144,6 @@ private:
 	void SolveViscous(const b2TimeStep& step);
 	void SolvePowder(const b2TimeStep& step);
 	void SolveDepth(const b2TimeStep& step);
-	void SolveColorMixing(const b2TimeStep& step);
 	void SolveZombie();
 	void RotateBuffer(int32 start, int32 mid, int32 end);
 
@@ -236,7 +235,6 @@ private:
 	float32 m_surfaceTensionStrengthB;
 	float32 m_powderStrength;
 	float32 m_ejectionStrength;
-	float32 m_colorMixingStrength;
 
 	b2World* m_world;
 };
