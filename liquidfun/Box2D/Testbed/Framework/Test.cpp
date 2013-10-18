@@ -52,7 +52,10 @@ Test::Test()
 	m_world->SetDestructionListener(&m_destructionListener);
 	m_world->SetContactListener(this);
 	m_world->SetDebugDraw(&m_debugDraw);
-	
+
+	m_world->SetParticleGravityScale(0.4f);
+	m_world->SetParticleDensity(1.2f);
+
 	m_bombSpawning = false;
 
 	m_stepCount = 0;

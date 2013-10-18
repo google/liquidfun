@@ -23,7 +23,6 @@ public:
 		}
 
 		m_world->SetParticleRadius(0.15f);
-		m_world->SetParticleGravityScale(0.5f);
 		{
 			b2PolygonShape shape;
 			shape.SetAsBox(20, 4, b2Vec2(0, 36), 0);

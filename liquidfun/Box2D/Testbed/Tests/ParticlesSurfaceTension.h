@@ -45,7 +45,7 @@ public:
 			}
 		}
 
-		m_world->SetParticleRadius(0.2f);
+		m_world->SetParticleRadius(0.3f);
 
 		{
 			b2CircleShape shape;
