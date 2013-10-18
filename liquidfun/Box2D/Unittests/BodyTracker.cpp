@@ -5,7 +5,14 @@
 #include <sstream>
 #include <math.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include <direct.h>  // _getcwd()
+#define getcwd _getcwd
+#include <windows.h> // For MAX_PATH
+#define PATH_MAX MAX_PATH
+#else
 #include <unistd.h>
+#endif // _WIN32
 
 #define PRINT_PRECISION 8
 
@@ -137,9 +144,9 @@ b2Vec2 parseVec(const std::string str)
 	std::istringstream buf(str);
 	std::string tok;
 	std::getline(buf, tok, ' ');
-	ret.x = atof(tok.c_str());
+	ret.x = (float)(atof(tok.c_str()));
 	std::getline(buf, tok, ' ');
-	ret.y = atof(tok.c_str());
+	ret.y = (float)(atof(tok.c_str()));
 	return ret;
 }
 
@@ -190,7 +197,7 @@ BodyTracker::ReadBaseline()
 
 	// Create mask of all baseline flags and enforce that it matches generated samples.
 	m_baselineFlags = 0;
-	for ( int32 i = 0 ; i < flagVals.size() ; i++ )
+	for (size_t i = 0 ; i < flagVals.size() ; i++ )
 		m_baselineFlags |= flagVals[i];
 	if (m_baselineFlags != m_flags) {
 		m_errors.push_back("Error: baseline data does not match generated data");
@@ -209,13 +216,11 @@ BodyTracker::ReadBaseline()
 			continue;
 		}
 		Sample sample;
-		bool timeSet = false;
 		std::istringstream buf(str);
 		int32 field = 0;
 		for ( std::string tok ; std::getline(buf, tok, ',') ; ++field ) {
-			if (field == 0) {
-				sample.timeStep = atof(tok.c_str());
-				timeSet = true;
+			if (field == 0){
+				sample.timeStep = (float)atof(tok.c_str());
 				continue;
 			}
 			const TrackFlags flagVal = static_cast<TrackFlags>(flagVals[field-1]);
@@ -223,7 +228,7 @@ BodyTracker::ReadBaseline()
 			case TRACK_POSITION:
 				sample.position = parseVec(tok);
 			case TRACK_ANGLE:
-				sample.angle = atof(tok.c_str());
+				sample.angle = (float)atof(tok.c_str());
 			case TRACK_WORLD_CENTER:
 				sample.worldCenter = parseVec(tok);
 			case TRACK_LOCAL_CENTER:
@@ -231,7 +236,7 @@ BodyTracker::ReadBaseline()
 			case TRACK_LINEAR_VELOCITY:
 				sample.linearVelocity = parseVec(tok);
 			case TRACK_ANGULAR_VELOCITY:
-				sample.angularVelocity = atof(tok.c_str());
+				sample.angularVelocity = (float)atof(tok.c_str());
 			}
 		}
 		samples->push_back(sample);
@@ -249,7 +254,7 @@ floatsEqual(float32 a, float32 b, float32 epsilon)
 static bool
 vecsEqual(const b2Vec2 &a, const b2Vec2 &b, float32 epsilon)
 {
-	return floatsEqual(a.x, b.x, epsilon) and floatsEqual(a.y, b.y, epsilon);
+	return floatsEqual(a.x, b.x, epsilon) && floatsEqual(a.y, b.y, epsilon);
 }
 
 bool
@@ -283,10 +288,9 @@ BodyTracker::CompareToBaseline(const b2Body *body, int32 flag, float32 epsilon) 
 	}
 
 	// Assume that each sample in each of the two arrays represent the same sample.
-	bool ret = true;
 	std::stringstream diffs;
 	const SampleVec &baselineSamples = it2->second;
-	for (int i = 0 ; i < samples.size() ; i++ ) {
+	for (size_t i = 0 ; i < samples.size() ; i++ ) {
 		const Sample &sample = samples[i];
 		const Sample &baselineSample = baselineSamples[i];
 		if ((flag & TRACK_POSITION) && !vecsEqual(sample.position, baselineSample.position, epsilon))

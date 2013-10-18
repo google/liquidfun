@@ -95,9 +95,6 @@ TEST_F(HelloWorldTests, PositionAngleTest) {
 		// It is generally best to keep the time step and iterations fixed.
 		m_world->Step(timeStep, velocityIterations, positionIterations);
 
-		// Now print the position and angle of the body.
-		b2Vec2 position = m_body->GetPosition();
-		float32 angle = m_body->GetAngle();
 		tracker.TrackStep(m_body, i);
 	}
 	tracker.EndTracking();
@@ -106,8 +103,8 @@ TEST_F(HelloWorldTests, PositionAngleTest) {
 	std::string errString;
 	if (!matched) {
 		const std::vector<std::string> &errors = tracker.GetErrors();
-		for (int32 i = 0 ; i < errors.size() ; i++ )
-		errString += "\t" + errors[i] + "\n";
+		for (size_t i = 0 ; i < errors.size() ; i++ )
+			errString += "\t" + errors[i] + "\n";
 	}
 	EXPECT_TRUE(matched) << errString;
 }

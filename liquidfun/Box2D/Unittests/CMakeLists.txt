@@ -11,15 +11,27 @@ cmake_minimum_required(VERSION 2.8)
 set(GUNIT_INCDIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../googletest/include)
 set(GTEST_LIBDIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../googletest)
 
+# Include helper functions and macros used by Google Test.
+include(${GTEST_LIBDIR}/cmake/internal_utils.cmake)
+config_compiler_and_linker()
+string(REPLACE "-W4" "-W3" cxx_default "${cxx_default}")
+string(REPLACE "-Wshadow" "" cxx_default "${cxx_default}")
+string(REPLACE "-Wextra" "" cxx_default "${cxx_default}")
+
 # This is the directory into which the executables are built.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${GUNIT_INCDIR} ${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories(${GTEST_LIBDIR} ${CMAKE_CURRENT_SOURCE_DIR}/../Box2D)
-add_definitions(-DGUNIT_NO_GOOGLE3)
 
 # These are support sources that are used for unit tests.
 set(SUPPORT_SRCS BodyTracker.cpp)
+
+# Common libraries for tests.
+if(NOT MSVC)
+  find_package(Threads)
+endif()
+set(COMMON_LIBS "gtest;Box2D;${CMAKE_THREAD_LIBS_INIT}")
 
 # PUT ADDITIONAL UNIT TEST BINARIES BELOW!
 # The commands should be of the form:
@@ -31,22 +43,13 @@ set(SUPPORT_SRCS BodyTracker.cpp)
 #    <binary-name> is the name of the binary you wish to create
 #    <cpp-files> is the list of cpp files in support of that binary.
 
-# HelloWorldTests
-add_executable(HelloWorldTests HelloWorldTests.cpp ${SUPPORT_SRCS})
-target_link_libraries(HelloWorldTests gtest Box2D pthread)
+function(test_executable name)
+  cxx_executable_with_flags(${name} "${cxx_default}" "${COMMON_LIBS}"
+                            ${name}.cpp ${SUPPORT_SRCS})
+endfunction()
 
-# ConfinementTests
-add_executable(ConfinementTests ConfinementTests.cpp ${SUPPORT_SRCS})
-target_link_libraries(ConfinementTests gtest Box2D pthread)
-
-# ConservationTests
-add_executable(ConservationTests ConservationTests.cpp ${SUPPORT_SRCS})
-target_link_libraries(ConservationTests gtest Box2D pthread)
-
-# FunctionTests
-add_executable(FunctionTests FunctionTests.cpp ${SUPPORT_SRCS})
-target_link_libraries(FunctionTests gtest Box2D pthread)
-
-# CallbackTests
-add_executable(CallbackTests CallbackTests.cpp ${SUPPORT_SRCS})
-target_link_libraries(CallbackTests gtest Box2D pthread)
+test_executable(CallbackTests)
+test_executable(ConfinementTests)
+test_executable(ConservationTests)
+test_executable(FunctionTests)
+test_executable(HelloWorldTests)
