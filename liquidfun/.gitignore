@@ -3,8 +3,11 @@
 *.class
 *.a
 *~
-Box2D/Testbed/bin/
-Box2D/Testbed/gen/
-Box2D/Testbed/libs/
-Box2D/Testbed/obj/
-
+**/bin/**
+**/gen/**
+**/libs/**
+**/obj/**
+build.xml
+local.properties
+project.properties
+proguard-project.txt
