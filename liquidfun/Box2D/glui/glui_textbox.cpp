@@ -1065,7 +1065,7 @@ void    GLUI_TextBox::set_text( const char *new_text )
 
 /*************************************** GLUI_TextBox::dump() **************/
 
-void   GLUI_TextBox::dump( FILE *out, char *name )
+void   GLUI_TextBox::dump( FILE *out, const char *name )
 {
   fprintf( out, 
        "%s (edittext@%p):   line:%d ins_pt:%d  subs:%d/%d  sel:%d/%d   len:%d\n",
