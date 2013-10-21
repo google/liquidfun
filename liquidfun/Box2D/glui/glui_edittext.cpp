@@ -930,10 +930,10 @@ int    GLUI_EditText::special_handler( int key,int modifiers )
 
 int    GLUI_EditText::find_word_break( int start, int direction )
 {
-  int    i, j;
-  char   *breaks = " :-.,";
-  int     num_break_chars = (int)strlen(breaks), text_len = (int)text.length();
-  int     new_pt;
+  int         i, j;
+  const char *breaks = " :-.,";
+  int         num_break_chars = (int)strlen(breaks), text_len = (int)text.length();
+  int         new_pt;
 
   /** If we're moving left, we have to start two back, in case we're either
   already at the beginning of a word, or on a separating token.  
