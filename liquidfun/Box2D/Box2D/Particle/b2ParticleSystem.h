@@ -82,16 +82,20 @@ private:
 		float32 ka, kb, kc, s;
 	};
 
-	struct CreateParticleGroupCallback
+	// Callback used with b2VoronoiDiagram.
+	class CreateParticleGroupCallback
 	{
+	public:
 		void operator()(int32 a, int32 b, int32 c) const;
 		b2ParticleSystem* system;
 		const b2ParticleGroupDef* def;
 		int32 firstIndex;
 	};
 
-	struct JoinParticleGroupsCallback
+	// Callback used with b2VoronoiDiagram.
+	class JoinParticleGroupsCallback
 	{
+	public:
 		void operator()(int32 a, int32 b, int32 c) const;
 		b2ParticleSystem* system;
 		b2ParticleGroup* groupA;

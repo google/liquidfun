@@ -96,7 +96,7 @@ public:
 			break;
 		}
 	}
-	
+
 	void MouseMove(const b2Vec2& p)
 	{
 		Test::MouseMove(p);
@@ -155,7 +155,7 @@ public:
 	{
 		return new DrawingParticles;
 	}
-	
+
 	b2ParticleGroup* m_lastGroup;
 	bool m_drawing;
 	int32 m_flags;

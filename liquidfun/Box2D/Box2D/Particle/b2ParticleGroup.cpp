@@ -8,7 +8,7 @@ b2ParticleGroup::b2ParticleGroup()
 	m_firstIndex = 0;
 	m_lastIndex = 0;
 	m_flags = 0;
-	m_strength = 1;
+	m_strength = 1.0f;
 	m_prev = NULL;
 	m_next = NULL;
 
