@@ -211,14 +211,14 @@ public:
 	/// @warning this should be called outside of a time step.
 	void Dump();
 
-	/// Create a particle given a definition. No reference to the definition
-	/// is retained.
+	/// Create a particle whose properties have been defined.
+	/// No reference to the definition is retained.
 	/// @warning This function is locked during callbacks.
 	/// @return the index of the particle.
 	int32 CreateParticle(const b2ParticleDef& def);
 
 	/// Destroy a particle.
-	/// The particle will be removed after next step.
+	/// The particle is removed after the next step.
 	void DestroyParticle(int32 index);
 
 	/// Destroy particles inside a shape.
@@ -226,14 +226,14 @@ public:
 	/// @warning This function is locked during callbacks.
 	void DestroyParticlesInShape(const b2Shape* shape, const b2Transform& xf);
 
-	/// Create a particles given a definition. No reference to the definition
-	/// is retained.
+	/// Create a particle group whose properties have been defined. No reference
+	/// to the definition is retained.
 	/// @warning This function is locked during callbacks.
 	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
 
 	/// Join two particle groups.
-	/// @param the first group. It will be preserved.
-	/// @param the second group. It will be destroyed.
+	/// @param the first group. Expands to encompass the second group.
+	/// @param the second group. It is destroyed.
 	/// @warning This function is locked during callbacks.
 	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 
