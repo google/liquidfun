@@ -1,4 +1,4 @@
-﻿Splash2D is an extension of Box2D, a 2D physics engine for games
+Splash2D is an extension of Box2D, a 2D physics engine for games
 (see http://www.box2d.org).
 
 API documentation is located in Documentation/.
@@ -54,14 +54,14 @@ Eclipse plugin (see http://developer.android.com/sdk/index.html).
 * If the target is a physical device, unlock the device and observe the
   application executing.
 
-NOTE: The Testbed application currently only runs on a physical target. Emulator (in)compatibility is currently under investigation.
+NOTE: The Testbed application currently only runs on a physical target.
 
 
 By default code is generated for devices that support the armeabi-v7a ABI.
 To generate code for all ABIs to include in a fat .apk override APP_ABI on
 ndk-build's command line...
 
-$ ndk-build APP_ABI=armeabi-v7a
+$ ndk-build APP_ABI=all
 
 
 === Linux ===
@@ -75,13 +75,14 @@ In addition, to build sample applications, the OpenGL and GLU
 installed on the development system.
 
 Building with cmake requires the generation of makefiles from the cmake
-project, and then executing "make" to build the library and sample applications.
+project, and then executing "make" to build the library and sample
+applications.
 
 The cmake project directory for splash2d is located in splash2d/Box2D.
 You can build all build targets using the following.
 
 $ cd splash2d/Box2D
-$ cmake -G'Unix Makefiles' -DBOX2D_INSTALL=OFF
+$ cmake -G'Unix Makefiles'
 $ make
 
 You can configure the build targets using options exposed in
@@ -92,6 +93,10 @@ command line.  For example:
 
 $ ./splash2d/Box2D/Testbed/Testbed
 
+
+Use the run_tests.sh script to execute unit tests:
+
+$ ./splash2d/Box2D/Unittests/run_tests.sh
 
 === Windows ===
 
@@ -110,20 +115,28 @@ To execute a sample:
   pane and select "Set as StartUp Project".
 * Select "Debug->Start Debugging" from the menu.
 
-When working with the source distribution, you can use cmake (see http://www.cmake.org) to generate the Visual Studio solution and project file.
-For example, the following generates the Visual Studio solution in the splash2d/Box2D directory.
+When working with the source distribution, you can use cmake
+(see http://www.cmake.org) to generate the Visual Studio solution and project
+file.  For example, the following generates the Visual Studio solution in the
+splash2d/Box2D directory.
 
 > cd splash2d/Box2D
-> cmake -G"Visual Studio 11" -DBOX2D_INSTALL=OFF
+> cmake -G"Visual Studio 11"
 
 
+Use the run_tests.bat batch file to execute unit tests:
+
+> splash2d\Box2D\Unittests\run_tests.bat
 
 
 === OSX ===
 
 A Xcode project is distributed with splash2d to build the library and examples
-on OSX.  The Xcode project has been generated using cmake, and modified to remove
-any host-specific dependencies. You must have installed Xquartz (http://xquartz.macosforge.org/) in order to run splash2d sample applications. After installing Xquartz, you must reboot your machine to set the DISPLAY environment variable correctly.
+on OSX.  The Xcode project has been generated using cmake, and modified to
+remove any host-specific dependencies. You must have installed Xquartz
+(http://xquartz.macosforge.org/) in order to run splash2d sample applications.
+After installing Xquartz, you must reboot your machine to set the DISPLAY
+environment variable correctly.
 
 To build using Xcode:
 * Double-click on splash2d/Box2D/Box2D.xcodeproj to open the project in Xcode.
@@ -135,7 +148,13 @@ To execute a sample:
 * Click the "Run" button.
 
 When working with the source distribution, you can generate the
-Xcode project using cmake (see http://www.cmake.org).  For example, the following generates the Xcode project in the splash2d/Box2D directory.
+Xcode project using cmake (see http://www.cmake.org).  For example, the
+following generates the Xcode project in the splash2d/Box2D directory.
 
 $ cd splash2d/Box2D
-$ cmake -G"Xcode" -DBOX2D_INSTALL=OFF
+$ cmake -G"Xcode"
+
+
+Use the run_tests.sh script to execute unit tests:
+
+$ ./splash2d/Box2D/Unittests/run_tests.sh
