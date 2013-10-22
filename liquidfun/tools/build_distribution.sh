@@ -37,7 +37,7 @@ declare -r project_dir="$(canonicalpath $(dirname ${0})/../)"
 declare -r project_name="$(basename ${project_dir})"
 # Space separated paths to directories required by the project relative to
 # project_dir/..
-declare -r out_of_tree_dependencies="freeglut"
+declare -r out_of_tree_dependencies="freeglut googletest"
 declare -r tempdir_template="/tmp/${project_name}tmpXXXXXX"
 declare -r host_types="windows osx"
 # Bash 3 (default on OSX) doesn't have associative arrays so do this manually.

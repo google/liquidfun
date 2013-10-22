@@ -36,12 +36,12 @@ set(COMMON_LIBS "gtest;Box2D;${CMAKE_THREAD_LIBS_INIT}")
 # PUT ADDITIONAL UNIT TEST BINARIES BELOW!
 # The commands should be of the form:
 #
-# add_executable(<binary-name> <cpp-files> SUPPORT_SRCS)
-# target_link_libraries(<binary-name> gtest Box2D)
+# test_executable(<test-name>)
 #
-# Where:
-#    <binary-name> is the name of the binary you wish to create
-#    <cpp-files> is the list of cpp files in support of that binary.
+# Where <test-name> is the name of the output test executable and the basename
+# of the source file for the test.  For example, test_executable(CallbackTests)
+# generates an executable called CallbackTests which is the result of compiling
+# CallbackTests.cpp along with any files specified by the SOURCE_SRCS variable.
 
 function(test_executable name)
   cxx_executable_with_flags(${name} "${cxx_default}" "${COMMON_LIBS}"
