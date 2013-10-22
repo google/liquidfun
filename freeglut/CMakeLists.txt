@@ -297,7 +297,31 @@ ENDIF()
 # The generated config.h is placed in the project's build directory, just to
 # ensure that all CMake-generated files are kept away from the main source tree.
 # As a result, the build directory must to be added to the include path list.
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
+#
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Android" OR
+   ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR
+   ${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR
+   ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+STRING(TOLOWER -${CMAKE_SYSTEM_NAME} SYSTEM_NAME_LOWERCASE)
+ELSE()
+SET(SYSTEM_NAME_LOWERCASE "-other")
+ENDIF()
+FILE(WRITE ${CMAKE_BINARY_DIR}/config.h "
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__) \\
+    || defined(_WIN32) || defined(_WIN32_WCE) || defined(__CYGWIN__)
+#    include \"config-windows.h\"
+#elif defined(__ANDROID__)
+#    include \"config-android.h\"
+#elif defined(__APPLE__)
+#    include \"config-darwin.h\"
+#elif defined(__linux__)
+#    include \"config-linux.h\"
+#else
+#    include \"config-other.h\"
+#endif
+")
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+               ${CMAKE_BINARY_DIR}/config${SYSTEM_NAME_LOWERCASE}.h)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # Add X11 include path on OSX so that XQuartz headers are found.
 IF(APPLE)
