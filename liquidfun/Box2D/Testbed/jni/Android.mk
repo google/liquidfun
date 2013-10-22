@@ -1,6 +1,6 @@
 LOCAL_PATH:=$(call my-dir)/..
 
-# --- HelloWorld ---
+# --- Testbed ---
 include $(CLEAR_VARS)
 namespace:=$(if $(NDK_PROJECT_PATH),,_splash2d)
 LOCAL_MODULE:=Testbed
@@ -10,9 +10,6 @@ LOCAL_SRC_FILES:=\
 	$(wildcard $(LOCAL_PATH)/Tests/*.cpp) \
 	$(wildcard $(LOCAL_PATH)/../glui/*.cpp) \
     $(wildcard $(LOCAL_PATH)/../GLEmu/*cpp)
-LOCAL_C_INCLUDES:=\
-	$(LOCAL_PATH)/.. \
-	$(LOCAL_PATH)/../../../freeglut/include
 LOCAL_CFLAGS:=-DFREEGLUT_GLES1
 LOCAL_STATIC_LIBRARIES:=splash2d_static freeglut-gles1_static
 LOCAL_LDLIBS:=-llog -landroid -lEGL -lGLESv1_CM
