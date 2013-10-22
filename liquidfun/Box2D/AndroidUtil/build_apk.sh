@@ -12,7 +12,9 @@ get_number_of_cores() {
     CYGWIN*|Linux)
       awk '/^processor/ { n=$3 } END { print n + 1 }' /proc/cpuinfo
       ;;
-    *) 1
+    *)
+      echo 1
+      ;;
   esac
 }
 
@@ -33,17 +35,17 @@ xpath string(/manifest/application/activity\
 
 # Get the number of Android devices connected to the system.
 get_number_of_devices_connected() {
-  adb devices -l | tail -n+2 | wc -l
+  adb devices -l | \
+    awk '/^..*$/ { if (p) { print $0 } }
+         /List of devices attached/ { p = 1 }' | \
+    wc -l
 }
-
-
-# Kill the entire process group if this shell exits.
-trap "kill 0" SIGINT SIGTERM EXIT
 
 # Parse arguments for this script.
 adb_device=
 ant_target=release
 disable_deploy=0
+disable_build=0
 run_debugger=0
 launch=1
 for opt; do
@@ -56,6 +58,9 @@ for opt; do
       if [[ "${adb_device}" != "" ]]; then
         adb_device="-s ${adb_device}"
       fi
+      ;;
+    BUILD=0)
+      disable_build=1
       ;;
     DEPLOY=0)
       disable_deploy=1
@@ -72,12 +77,14 @@ Build the Android package in the current directory and deploy it to a
 connected device.
 
 Usage: $(basename $0) \\
-         [ADB_DEVICE=serial_number] [DEPLOY=0] [RUN_DEBUGGER=1] [LAUNCH=0] \\
-         [ndk-build arguments ...]
+         [ADB_DEVICE=serial_number] [BUILD=0] [DEPLOY=0] [RUN_DEBUGGER=1] \
+         [LAUNCH=0] [ndk-build arguments ...]
 
 ADB_DEVICE=serial_number:
   serial_number specifies the device to deploy the built apk to if multiple
   Android devices are connected to the host.
+BUILD=0:
+  Disables the build of the package.
 DEPLOY=0:
   Disables the deployment of the built apk to the Android device.
 RUN_DEBUGGER=1:
@@ -124,8 +131,10 @@ $(adb devices -l)
   exit 1
 fi
 
-# Build native code.
-ndk-build -j$(get_number_of_cores) "$@"
+if [[ $((disable_build)) -eq 0 ]]; then
+  # Build native code.
+  ndk-build -j$(get_number_of_cores) "$@"
+fi
 
 # Get the package name from the manifest.
 declare -r android_manifest=AndroidManifest.xml
@@ -135,31 +144,34 @@ package_basename=${package_name/*./}
 package_filename=$(get_library_name_from_manifest ${android_manifest})
 [[ "${package_filename}" == "" ]] && package_filename="${package_basename}"
 
-# Create build.xml and local.properties files.
-# Use `android list targets` to figure out what your options are for --target
-android update project --target android-10 -n ${package_filename} --path .
-
-# Build the apk.
-ant ${ant_target}
-
+# Output apk name.
 declare -r built_apk=bin/${package_filename}-${ant_target}.apk
 
-# Sign release apks with a temporary key as these packages will not be
-# redistributed.
-if [[ "${ant_target}" == "release" ]]; then
-  keystore=${package_filename}.keystore
-  key_alias=splash2d
-  key_password=${key_alias}
-  if [[ ! -e ${keystore} ]]; then
-    keytool -genkey -v -dname "cn=, ou=${key_alias}, o=fpl" \
-      -storepass ${key_password} \
-      -keypass ${key_password} -keystore ${package_filename}.keystore \
-      -alias ${key_alias} -keyalg RSA -keysize 2048 -validity 60
+if [[ $((disable_build)) -eq 0 ]]; then
+  # Create build.xml and local.properties files.
+  # Use `android list targets` to figure out what your options are for --target
+  android update project --target android-10 -n ${package_filename} --path .
+
+  # Build the apk.
+  ant ${ant_target}
+
+  # Sign release apks with a temporary key as these packages will not be
+  # redistributed.
+  if [[ "${ant_target}" == "release" ]]; then
+    keystore=${package_filename}.keystore
+    key_alias=splash2d
+    key_password=${key_alias}
+    if [[ ! -e ${keystore} ]]; then
+      keytool -genkey -v -dname "cn=, ou=${key_alias}, o=fpl" \
+        -storepass ${key_password} \
+        -keypass ${key_password} -keystore ${package_filename}.keystore \
+        -alias ${key_alias} -keyalg RSA -keysize 2048 -validity 60
+    fi
+    cp bin/${package_filename}-${ant_target}-unsigned.apk ${built_apk}
+    jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+      -keystore ${package_filename}.keystore -storepass ${key_password} \
+      -keypass ${key_password} ${built_apk} ${key_alias}
   fi
-  cp bin/${package_filename}-${ant_target}-unsigned.apk ${built_apk}
-  jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
-    -keystore ${package_filename}.keystore -storepass ${key_password} \
-    -keypass ${key_password} ${built_apk} ${key_alias}
 fi
 
 if [[ $((disable_deploy)) -eq 0 ]]; then
@@ -179,7 +191,10 @@ elif [[ $((launch)) -eq 1 ]]; then
     # Display logcat in the background.
     adb ${adb_device} logcat &
     logcat_pid=$!
-    # Launch the activity.
+    # Kill adb logcat if this shell exits.
+    trap "kill ${logcat_pid}" SIGINT SIGTERM EXIT
+
+    # Launch the activity and wait for it to complete.
     adb ${adb_device} shell am start -S -W -n \
       ${package_name}/android.app.NativeActivity
   )

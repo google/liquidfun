@@ -2,6 +2,7 @@
 #include "Box2D/Box2D.h"
 #include <stdio.h>
 #include "BodyTracker.h"
+#include "AndroidUtil/AndroidMainWrapper.h"
 #define EPSILON 0.001f
 
 class FunctionTests : public ::testing::Test {
