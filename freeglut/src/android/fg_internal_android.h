@@ -50,19 +50,23 @@ struct tagSFG_PlatformContext
 };
 
 
+typedef int fg_bool;
+static const fg_bool fg_false = 0;
+static const fg_bool fg_true = 1;
+
 /**
  * Virtual PAD (spots on touchscreen that simulate keys)
  */
 struct vpad_state {
-    bool on;
-    bool left;
-    bool right;
-    bool up;
-    bool down;
+    fg_bool on;
+    fg_bool left;
+    fg_bool right;
+    fg_bool up;
+    fg_bool down;
 };
 struct touchscreen {
     struct vpad_state vpad;
-    bool in_mmotion;
+    fg_bool in_mmotion;
 };
 
 

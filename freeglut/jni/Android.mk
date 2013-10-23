@@ -15,9 +15,6 @@ ${eval \
     $(LOCAL_PATH)/src \
     $(LOCAL_PATH)/include
   LOCAL_CFLAGS:=-DFREEGLUT_GLES$1 \
-                -Dbool=int \
-                -Dfalse=0 \
-                -D"true=(!false)" \
                 -DNEED_XPARSEGEOMETRY_IMPL
   LOCAL_CFLAGS+=\
     ${foreach v,VERSION_MAJOR VERSION_MINOR VERSION_PATCH,\

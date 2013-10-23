@@ -242,48 +242,48 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
     if (!touchscreen.in_mmotion) {
       struct vpad_state prev_vpad = touchscreen.vpad;
       touchscreen.vpad.left = touchscreen.vpad.right
-	= touchscreen.vpad.up = touchscreen.vpad.down = false;
+	= touchscreen.vpad.up = touchscreen.vpad.down = fg_false;
 
       /* int32_t width = ANativeWindow_getWidth(window->Window.Handle); */
       int32_t height = ANativeWindow_getHeight(window->Window.Handle);
       if (action == AMOTION_EVENT_ACTION_DOWN || action == AMOTION_EVENT_ACTION_MOVE) {
 	if ((x > 0 && x < 100) && (y > (height - 100) && y < height))
-	  touchscreen.vpad.left = true;
+	  touchscreen.vpad.left = fg_true;
 	if ((x > 200 && x < 300) && (y > (height - 100) && y < height))
-	  touchscreen.vpad.right = true;
+	  touchscreen.vpad.right = fg_true;
 	if ((x > 100 && x < 200) && (y > (height - 100) && y < height))
-	  touchscreen.vpad.down = true;
+	  touchscreen.vpad.down = fg_true;
 	if ((x > 100 && x < 200) && (y > (height - 200) && y < (height - 100)))
-	  touchscreen.vpad.up = true;
+	  touchscreen.vpad.up = fg_true;
       }
       if (action == AMOTION_EVENT_ACTION_DOWN && 
 	  (touchscreen.vpad.left || touchscreen.vpad.right || touchscreen.vpad.down || touchscreen.vpad.up))
-	touchscreen.vpad.on = true;
+	touchscreen.vpad.on = fg_true;
       if (action == AMOTION_EVENT_ACTION_UP)
-	touchscreen.vpad.on = false;
+	touchscreen.vpad.on = fg_false;
       if (prev_vpad.left != touchscreen.vpad.left
 	  || prev_vpad.right != touchscreen.vpad.right
 	  || prev_vpad.up != touchscreen.vpad.up
 	  || prev_vpad.down != touchscreen.vpad.down
 	  || prev_vpad.on != touchscreen.vpad.on) {
 	if (FETCH_WCB(*window, Special)) {
-	  if (prev_vpad.left == false && touchscreen.vpad.left == true)
+	  if (prev_vpad.left == fg_false && touchscreen.vpad.left == fg_true)
 	    INVOKE_WCB(*window, Special, (GLUT_KEY_LEFT, x, y));
-	  else if (prev_vpad.right == false && touchscreen.vpad.right == true)
+	  else if (prev_vpad.right == fg_false && touchscreen.vpad.right == fg_true)
 	    INVOKE_WCB(*window, Special, (GLUT_KEY_RIGHT, x, y));
-	  else if (prev_vpad.up == false && touchscreen.vpad.up == true)
+	  else if (prev_vpad.up == fg_false && touchscreen.vpad.up == fg_true)
 	    INVOKE_WCB(*window, Special, (GLUT_KEY_UP, x, y));
-	  else if (prev_vpad.down == false && touchscreen.vpad.down == true)
+	  else if (prev_vpad.down == fg_false && touchscreen.vpad.down == fg_true)
 	    INVOKE_WCB(*window, Special, (GLUT_KEY_DOWN, x, y));
 	}
 	if (FETCH_WCB(*window, SpecialUp)) {
-	  if (prev_vpad.left == true && touchscreen.vpad.left == false)
+	  if (prev_vpad.left == fg_true && touchscreen.vpad.left == fg_false)
 	    INVOKE_WCB(*window, SpecialUp, (GLUT_KEY_LEFT, x, y));
-	  if (prev_vpad.right == true && touchscreen.vpad.right == false)
+	  if (prev_vpad.right == fg_true && touchscreen.vpad.right == fg_false)
 	    INVOKE_WCB(*window, SpecialUp, (GLUT_KEY_RIGHT, x, y));
-	  if (prev_vpad.up == true && touchscreen.vpad.up == false)
+	  if (prev_vpad.up == fg_true && touchscreen.vpad.up == fg_false)
 	    INVOKE_WCB(*window, SpecialUp, (GLUT_KEY_UP, x, y));
-	  if (prev_vpad.down == true && touchscreen.vpad.down == false)
+	  if (prev_vpad.down == fg_true && touchscreen.vpad.down == fg_false)
 	    INVOKE_WCB(*window, SpecialUp, (GLUT_KEY_DOWN, x, y));
 	}
 	return EVENT_HANDLED;
@@ -295,10 +295,10 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
       window->State.MouseX = x;
       window->State.MouseY = y;
       if (action == AMOTION_EVENT_ACTION_DOWN && FETCH_WCB(*window, Mouse)) {
-	touchscreen.in_mmotion = true;
+	touchscreen.in_mmotion = fg_true;
 	INVOKE_WCB(*window, Mouse, (GLUT_LEFT_BUTTON, GLUT_DOWN, x, y));
       } else if (action == AMOTION_EVENT_ACTION_UP && FETCH_WCB(*window, Mouse)) {
-	touchscreen.in_mmotion = false;
+	touchscreen.in_mmotion = fg_false;
 	INVOKE_WCB(*window, Mouse, (GLUT_LEFT_BUTTON, GLUT_UP, x, y));
       } else if (action == AMOTION_EVENT_ACTION_MOVE && FETCH_WCB(*window, Motion)) {
 	INVOKE_WCB(*window, Motion, (x, y));
