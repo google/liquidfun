@@ -34,4 +34,7 @@ extern unsigned long fgPlatformSystemTime(void);
 extern void fgPlatformSleepForEvents(long msec);
 extern void fgPlatformMainLoopPreliminaryWork(void);
 
+// utility function shared between main & window
+extern void fgAndroidTryCreateContextAndSurface(SFG_Window* window);
+
 #endif

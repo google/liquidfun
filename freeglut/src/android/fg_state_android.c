@@ -71,10 +71,10 @@ int fgPlatformGlutGet ( GLenum eWhat )
   case GLUT_WINDOW_WIDTH:
   case GLUT_WINDOW_HEIGHT:
     {
-      if ( fgStructure.CurrentWindow == NULL )
+        if ( fgStructure.CurrentWindow == NULL || *fgStructure.CurrentWindow->Window.Handle == NULL )
 	return 0;
-      int32_t width = ANativeWindow_getWidth(fgStructure.CurrentWindow->Window.Handle);
-      int32_t height = ANativeWindow_getHeight(fgStructure.CurrentWindow->Window.Handle);
+      int32_t width = ANativeWindow_getWidth(*fgStructure.CurrentWindow->Window.Handle);
+      int32_t height = ANativeWindow_getHeight(*fgStructure.CurrentWindow->Window.Handle);
       switch ( eWhat )
 	{
 	case GLUT_WINDOW_WIDTH:

@@ -109,7 +109,7 @@ void fghPlatformOpenWindowEGL( SFG_Window* window )
   EGLDisplay display = fgDisplay.pDisplay.egl.Display;
   EGLConfig  config  = window->Window.pContext.egl.Config;
 
-  EGLSurface surface = eglCreateWindowSurface(display, config, window->Window.Handle, NULL);
+  EGLSurface surface = eglCreateWindowSurface(display, config, *window->Window.Handle, NULL);
   if (surface == EGL_NO_SURFACE)
     fgError("Cannot create EGL window surface, err=%x\n", eglGetError());
   window->Window.pContext.egl.Surface = surface;

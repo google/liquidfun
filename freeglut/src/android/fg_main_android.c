@@ -175,7 +175,7 @@ void fgPlatformSleepForEvents( long msec )
  * Process the next input event.
  */
 int32_t handle_input(struct android_app* app, AInputEvent* event) {
-  SFG_Window* window = fgWindowByHandle(app->window);
+  SFG_Window* window = fgWindowByHandle(&app->window);
   if (window == NULL)
     return EVENT_NOT_HANDLED;
 
@@ -244,8 +244,8 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
       touchscreen.vpad.left = touchscreen.vpad.right
 	= touchscreen.vpad.up = touchscreen.vpad.down = fg_false;
 
-      /* int32_t width = ANativeWindow_getWidth(window->Window.Handle); */
-      int32_t height = ANativeWindow_getHeight(window->Window.Handle);
+      /* int32_t width = ANativeWindow_getWidth(*window->Window.Handle); */
+      int32_t height = ANativeWindow_getHeight(*window->Window.Handle);
       if (action == AMOTION_EVENT_ACTION_DOWN || action == AMOTION_EVENT_ACTION_MOVE) {
 	if ((x > 0 && x < 100) && (y > (height - 100) && y < height))
 	  touchscreen.vpad.left = fg_true;
@@ -316,7 +316,7 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
  * Process the next main command.
  */
 void handle_cmd(struct android_app* app, int32_t cmd) {
-  SFG_Window* window = fgWindowByHandle(app->window);  /* may be NULL */
+  SFG_Window* window = fgWindowByHandle(&app->window);  /* may be NULL */
   switch (cmd) {
   /* App life cycle, in that order: */
   case APP_CMD_START:
@@ -329,7 +329,7 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
   case APP_CMD_INIT_WINDOW: /* surfaceCreated */
     /* The window is being shown, get it ready. */
     LOGI("handle_cmd: APP_CMD_INIT_WINDOW %p", app->window);
-    fgDisplay.pDisplay.single_native_window = app->window;
+    fgDisplay.pDisplay.single_native_window = &app->window;
     /* start|resume: glPlatformOpenWindow was waiting for Handle to be
        defined and will now continue processing */
     break;
@@ -338,7 +338,7 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     break;
   case APP_CMD_WINDOW_RESIZED:
     LOGI("handle_cmd: APP_CMD_WINDOW_RESIZED");
-    if (window->Window.pContext.egl.Surface != EGL_NO_SURFACE)
+    if (window && window->Window.pContext.egl.Surface != EGL_NO_SURFACE)
       /* Make ProcessSingleEvent detect the new size, only available
 	 after the next SwapBuffer */
       glutPostRedisplay();
@@ -361,8 +361,9 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
   case APP_CMD_TERM_WINDOW: /* surfaceDestroyed */
     /* The application is being hidden, but may be restored */
     LOGI("handle_cmd: APP_CMD_TERM_WINDOW");
-    fghPlatformCloseWindowEGL(window);
-    fgDisplay.pDisplay.single_native_window = NULL;
+    if (window) fghPlatformCloseWindowEGL(window);
+    // this is only needed if EGLNativeWindowType is not represented as pointer to pointer:
+    //fgDisplay.pDisplay.single_native_window = NULL;
     break;
   case APP_CMD_STOP:
     LOGI("handle_cmd: APP_CMD_STOP");
@@ -411,10 +412,12 @@ void fgPlatformProcessSingleEvent ( void )
      2.3, that next SwapBuffer is fake (but still necessary to get the
      new size). */
   SFG_Window* window = fgStructure.CurrentWindow;
-  if (window != NULL && window->Window.Handle != NULL) {
-    int32_t width = ANativeWindow_getWidth(window->Window.Handle);
-    int32_t height = ANativeWindow_getHeight(window->Window.Handle);
+  if (window && window->Window.Handle && *window->Window.Handle) {
+    int32_t width = ANativeWindow_getWidth(*window->Window.Handle);
+    int32_t height = ANativeWindow_getHeight(*window->Window.Handle);
     fghOnReshapeNotify(window,width,height,GL_FALSE);
+
+    fgAndroidTryCreateContextAndSurface(window);
   }
 
   /* Read pending event. */

@@ -38,7 +38,7 @@ struct android_app;
 struct tagSFG_PlatformDisplay
 {
   struct tagSFG_PlatformDisplayEGL egl;
-  EGLNativeWindowType single_native_window;
+  EGLNativeWindowType *single_native_window;
   struct android_app* app;
 };
 

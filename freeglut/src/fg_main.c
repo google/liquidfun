@@ -39,6 +39,10 @@
 #    define VFPRINTF(s,f,a)
 #endif
 
+#ifdef ANDROID
+#include <android/log.h>
+#endif
+
 /*
  * Try to get the maximum value allowed for ints, falling back to the minimum
  * guaranteed by ISO C99 if there is no suitable header.
@@ -283,22 +287,28 @@ void fgError( const char *fmt, ... )
         va_end( ap );
 
     } else {
-#ifdef FREEGLUT_PRINT_ERRORS
-        va_start( ap, fmt );
+        #ifdef FREEGLUT_PRINT_ERRORS
+            va_start( ap, fmt );
 
-        fprintf( stderr, "freeglut ");
-        if( fgState.ProgramName )
-            fprintf( stderr, "(%s): ", fgState.ProgramName );
-        VFPRINTF( stderr, fmt, ap );
-        fprintf( stderr, "\n" );
+            #ifdef ANDROID
+                __android_log_vprint(ANDROID_LOG_ERROR, "freeglut", fmt, ap);
+            #else
+                fprintf( stderr, "freeglut ");
+                if( fgState.ProgramName )
+                    fprintf( stderr, "(%s): ", fgState.ProgramName );
+                VFPRINTF( stderr, fmt, ap );
+                fprintf( stderr, "\n" );
+            #endif
 
-        va_end( ap );
-#endif
+            va_end( ap );
+        #endif
 
-        if ( fgState.Initialised )
-            fgDeinitialize ();
+        #ifndef ANDROID
+            if ( fgState.Initialised )
+                fgDeinitialize ();
 
-        exit( 1 );
+            exit( 1 );
+        #endif
     }
 }
 

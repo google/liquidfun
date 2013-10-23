@@ -31,6 +31,40 @@
 #include "fg_internal.h"
 #include "egl/fg_window_egl.h"
 #include <android/native_app_glue/android_native_app_glue.h>
+#include <assert.h>
+
+/*
+ * Creates a Context and Surface on demand if none exist yet,
+ * to be called after a valid window handle is present
+ */
+
+void fgAndroidTryCreateContextAndSurface(SFG_Window* window)
+{
+  if (!window->Window.Context) {
+    window->State.WorkMask |= GLUT_INIT_WORK;
+
+    /* Create context */
+    fghChooseConfig(&window->Window.pContext.egl.Config);
+    window->Window.Context = fghCreateNewContextEGL(window);
+  }
+
+  if (!window->Window.pContext.egl.Surface) {
+    EGLDisplay display = fgDisplay.pDisplay.egl.Display;
+
+    /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
+     * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
+     * As soon as we picked a EGLConfig, we can safely reconfigure the
+     * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
+    EGLint vid;
+    eglGetConfigAttrib(display, window->Window.pContext.egl.Config, EGL_NATIVE_VISUAL_ID, &vid);
+    int32_t err = ANativeWindow_setBuffersGeometry(*window->Window.Handle, 0, 0, vid);
+    assert(!err);
+
+    fghPlatformOpenWindowEGL(window);
+
+    window->State.Visible = GL_TRUE;
+  }
+}
 
 /*
  * Opens a window. Requires a SFG_Window object created and attached
@@ -42,7 +76,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
                            GLboolean gameMode, GLboolean isSubWindow )
 {
   /* TODO: only one full-screen window possible? */
-  if (fgDisplay.pDisplay.single_native_window != NULL) {
+  if (fgDisplay.pDisplay.single_native_window && *fgDisplay.pDisplay.single_native_window != NULL) {
     fgWarning("You can't have more than one window on Android");
     return;
   }
@@ -54,7 +88,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
   /* We can't return from this function before the OpenGL context is
      properly made current with a valid surface. So we wait for the
      surface. */
-  while (fgDisplay.pDisplay.single_native_window == NULL) {
+  while (fgDisplay.pDisplay.single_native_window == NULL || *fgDisplay.pDisplay.single_native_window == NULL) {
     /* APP_CMD_INIT_WINDOW will do the job */
     int ident;
     int events;
@@ -64,26 +98,8 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     /* fgPlatformProcessSingleEvent(); */
   }
   window->Window.Handle = fgDisplay.pDisplay.single_native_window;
-  window->State.WorkMask |= GLUT_INIT_WORK;
 
-  /* Create context */
-  fghChooseConfig(&window->Window.pContext.egl.Config);
-  window->Window.Context = fghCreateNewContextEGL(window);
-
-  EGLDisplay display = fgDisplay.pDisplay.egl.Display;
-
-  /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-   * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-   * As soon as we picked a EGLConfig, we can safely reconfigure the
-   * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
-  EGLint vid;
-  eglGetConfigAttrib(display, window->Window.pContext.egl.Config,
-		     EGL_NATIVE_VISUAL_ID, &vid);
-  ANativeWindow_setBuffersGeometry(window->Window.Handle, 0, 0, vid);
-
-  fghPlatformOpenWindowEGL(window);
-
-  window->State.Visible = GL_TRUE;
+  fgAndroidTryCreateContextAndSurface(window);
 }
 
 /*

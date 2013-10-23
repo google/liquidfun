@@ -229,6 +229,8 @@ void fgDeinitialize( void )
         return;
     }
 
+    fgState.Initialised = GL_FALSE;  // fgState.Initialised needs to be set here to prevent fgDeinitialize from entering an infinite loop in its error handling.
+
 	/* If we're in game mode, we want to leave game mode */
     if( fgStructure.GameModeWindow ) {
         glutLeaveGameMode();
@@ -264,8 +266,6 @@ void fgDeinitialize( void )
     fgState.MinorVersion = 0;
     fgState.ContextFlags = 0;
     fgState.ContextProfile = 0;
-
-    fgState.Initialised = GL_FALSE;
 
     fgState.Position.X = -1;
     fgState.Position.Y = -1;

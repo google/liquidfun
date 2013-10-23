@@ -28,6 +28,10 @@
 
 void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
 {
-  if (!eglSwapBuffers(pDisplayPtr->egl.Display, CurrentWindow->Window.pContext.egl.Surface))
-    fgError("eglSwapBuffers: error %x\n", eglGetError());
+    if (!eglSwapBuffers(pDisplayPtr->egl.Display, CurrentWindow->Window.pContext.egl.Surface))
+    {
+        int err = eglGetError();
+        if (err != EGL_BAD_CURRENT_SURFACE) // on certain hardware, this is occasionally returned without it being a real error
+            fgError("eglSwapBuffers: error %x\n", err);
+    }
 }
