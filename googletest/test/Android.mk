@@ -88,5 +88,7 @@ sources := \
   gtest_unittest.cc \
   gtest_prod_test.cc
 
+ifeq ($(NDK_PROJECT_PATH),)
 $(call host-test, $(sources))
+endif
 $(call target-test, $(sources))

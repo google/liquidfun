@@ -39,6 +39,7 @@ libgtest_host_includes := \
 #######################################################################
 # gtest lib host
 
+ifeq ($(NDK_PROJECT_PATH),)
 include $(CLEAR_VARS)
 
 LOCAL_CPP_EXTENSION := .cc
@@ -47,15 +48,17 @@ LOCAL_SRC_FILES := gtest-all.cc
 
 LOCAL_C_INCLUDES := $(libgtest_host_includes)
 
-LOCAL_CFLAGS += -O0
+LOCAL_CFLAGS += -O0 $(GTEST_ADDITIONAL_CFLAGS)
 
 LOCAL_MODULE := libgtest_host
 
 include $(BUILD_HOST_STATIC_LIBRARY)
+endif
 
 #######################################################################
 # gtest_main lib host
 
+ifeq ($(NDK_PROJECT_PATH),)
 include $(CLEAR_VARS)
 
 LOCAL_CPP_EXTENSION := .cc
@@ -64,11 +67,12 @@ LOCAL_SRC_FILES := gtest_main.cc
 
 LOCAL_C_INCLUDES := $(libgtest_host_includes)
 
-LOCAL_CFLAGS += -O0
+LOCAL_CFLAGS += -O0 $(GTEST_ADDITIONAL_CFLAGS)
 
 LOCAL_MODULE := libgtest_main_host
 
 include $(BUILD_HOST_STATIC_LIBRARY)
+endif
 
 #######################################################################
 # gtest lib target
@@ -89,6 +93,10 @@ LOCAL_CPP_EXTENSION := .cc
 LOCAL_SRC_FILES := gtest-all.cc
 
 LOCAL_C_INCLUDES := $(libgtest_target_includes)
+
+LOCAL_CFLAGS += $(GTEST_ADDITIONAL_CFLAGS)
+
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../include
 
 LOCAL_MODULE := libgtest
 
@@ -114,6 +122,13 @@ LOCAL_SRC_FILES := gtest_main.cc
 
 LOCAL_C_INCLUDES := $(libgtest_target_includes)
 
+LOCAL_CFLAGS += $(GTEST_ADDITIONAL_CFLAGS)
+
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../include
+
 LOCAL_MODULE := libgtest_main
 
 include $(BUILD_STATIC_LIBRARY)
+
+# Clear additional flags.
+GTEST_ADDITIONAL_CFLAGS :=

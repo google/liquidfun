@@ -62,6 +62,22 @@
 # include <windows.h>  // NOLINT
 #endif  // GTEST_OS_WINDOWS
 
+#if GTEST_OS_LINUX_ANDROID
+#include <android/log.h>
+#if !defined(GTEST_ANDROID_LOG_PRINT)
+#define GTEST_ANDROID_LOG_PRINT __android_log_print
+#endif // !defined(GTEST_ANDROID_LOG_PRINT)
+#if !defined(GTEST_ANDROID_LOG_VPRINT)
+#define GTEST_ANDROID_LOG_VPRINT __android_log_vprint
+#endif // !defined(GTEST_ANDROID_LOG_VPRINT)
+
+// Redefine printf() and vprintf() to print to the Android log.
+#define printf(...) \
+  ((void)GTEST_ANDROID_LOG_PRINT(ANDROID_LOG_INFO, "gtest", __VA_ARGS__))
+#define vprintf(format_, arg_) \
+  ((void)GTEST_ANDROID_LOG_VPRINT(ANDROID_LOG_INFO, "gtest", format_, arg_))
+#endif  // GTEST_OS_LINUX_ANDROID
+
 #include "gtest/gtest.h"  // NOLINT
 #include "gtest/gtest-spi.h"
 
