@@ -110,7 +110,6 @@ void glRecti(int x1, int y1, int x2, int y2) {
 }
 
 void glDrawBuffer(int mode) {
-  assert(0);
 }
 
 void glDrawPixels(int width, int height, int format, int type, const void* data) {

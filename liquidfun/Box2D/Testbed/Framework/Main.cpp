@@ -53,7 +53,7 @@ static void Resize(int32 w, int32 h)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	float32 ratio = float32(tw) / float32(th);
+	float32 ratio = th ? float32(tw) / float32(th) : 1;
 
 	b2Vec2 extents = ratio >= 1 ? b2Vec2(ratio * 25.0f, 25.0f) : b2Vec2(25.0f, 25.0f / ratio);
 	extents *= viewZoom;
@@ -101,10 +101,9 @@ static void SimulationLoop()
 	b2Vec2 oldCenter = settings.viewCenter;
 	settings.hz = settingsHz;
 	test->Step(&settings);
-	if (oldCenter.x != settings.viewCenter.x || oldCenter.y != settings.viewCenter.y)
-	{
-		Resize(width, height);
-	}
+
+    // call this each frame, to function correctly with devices that may recreate the GL Context without us asking for it
+    Resize(width, height);
 
 	test->DrawTitle(entry->name);
 
