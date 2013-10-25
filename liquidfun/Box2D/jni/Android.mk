@@ -33,6 +33,7 @@ $(eval \
   LOCAL_COPY_HEADERS:=\
     $(call execute-local, "find Box2D -name '*.h'")
   LOCAL_EXPORT_C_INCLUDES:=$(LOCAL_PATH)
+  LOCAL_ARM_MODE:=arm
   $$(call add-stlport-includes))
 endef
 

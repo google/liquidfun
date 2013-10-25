@@ -9,6 +9,7 @@ LOCAL_LDLIBS:=-llog -landroid
 LOCAL_STATIC_LIBRARIES:=android_native_app_glue libsplash2d_static \
                         libandroidutil_static
 ANDROIDUTIL_ADDITIONAL_CFLAGS:=-DANDROID_LOG_PRINT_TAG="$(LOCAL_MODULE)"
+LOCAL_ARM_MODE:=arm
 include $(BUILD_SHARED_LIBRARY)
 # Import Box2D libraries and native_app_glue.
 $(call import-module,Box2D/jni)

@@ -13,6 +13,7 @@ LOCAL_SRC_FILES:=\
 LOCAL_CFLAGS:=-DFREEGLUT_GLES1
 LOCAL_STATIC_LIBRARIES:=splash2d_static freeglut-gles1_static
 LOCAL_LDLIBS:=-llog -landroid -lEGL -lGLESv1_CM
+LOCAL_ARM_MODE:=arm
 include $(BUILD_SHARED_LIBRARY)
 # Import splash2d libraries and freeglut.
 $(call import-module,Box2D/jni)
