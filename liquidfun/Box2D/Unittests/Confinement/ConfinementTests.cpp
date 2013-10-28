@@ -2,6 +2,7 @@
 #include "Box2D/Box2D.h"
 #include <stdio.h>
 #include "BodyTracker.h"
+#include "AndroidUtil/AndroidMainWrapper.h"
 #define EPSILON 0.001f
 #define DELTA_T 0.01f
 #define NUMBER_OF_STEPS 210

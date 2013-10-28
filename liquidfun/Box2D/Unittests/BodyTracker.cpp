@@ -276,7 +276,7 @@ BodyTracker::CompareToBaseline(const b2Body *body, int32 flag, float32 epsilon) 
 		return false;
 	}
 
-	double printPrecision = 1.0 / pow(10, PRINT_PRECISION);
+	double printPrecision = 1.0 / pow(10.0f, PRINT_PRECISION);
 	if (epsilon < printPrecision) {
 		std::stringstream strstream;
 		strstream << "Specified epsilon "

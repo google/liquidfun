@@ -21,7 +21,8 @@ string(REPLACE "-Wextra" "" cxx_default "${cxx_default}")
 # This is the directory into which the executables are built.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-include_directories(${GUNIT_INCDIR} ${CMAKE_CURRENT_SOURCE_DIR}/..)
+include_directories(${GUNIT_INCDIR} ${CMAKE_CURRENT_SOURCE_DIR}
+                                    ${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories(${GTEST_LIBDIR} ${CMAKE_CURRENT_SOURCE_DIR}/../Box2D)
 
 # These are support sources that are used for unit tests.
@@ -44,12 +45,12 @@ set(COMMON_LIBS "gtest;Box2D;${CMAKE_THREAD_LIBS_INIT}")
 # CallbackTests.cpp along with any files specified by the SOURCE_SRCS variable.
 
 function(test_executable name)
-  cxx_executable_with_flags(${name} "${cxx_default}" "${COMMON_LIBS}"
-                            ${name}.cpp ${SUPPORT_SRCS})
+  cxx_executable_with_flags(${name}Tests "${cxx_default}" "${COMMON_LIBS}"
+                            ${name}/${name}Tests.cpp ${SUPPORT_SRCS})
 endfunction()
 
-test_executable(CallbackTests)
-test_executable(ConfinementTests)
-test_executable(ConservationTests)
-test_executable(FunctionTests)
-test_executable(HelloWorldTests)
+test_executable(Callback)
+test_executable(Confinement)
+test_executable(Conservation)
+test_executable(Function)
+test_executable(HelloWorld)
