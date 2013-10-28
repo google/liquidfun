@@ -94,7 +94,7 @@ EGLContext fghCreateNewContextEGL( SFG_Window* window ) {
 
 void fgPlatformSetWindow ( SFG_Window *window )
 {
-  if (eglMakeCurrent(fgDisplay.pDisplay.egl.Display,
+  if (window && eglMakeCurrent(fgDisplay.pDisplay.egl.Display,
 		     window->Window.pContext.egl.Surface,
 		     window->Window.pContext.egl.Surface,
 		     window->Window.Context) == EGL_FALSE)
