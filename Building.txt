@@ -37,6 +37,7 @@ $ ndk-build
 Running an example requires the Android Development Toolkit (ADT) and the NDK
 Eclipse plugin (see http://developer.android.com/sdk/index.html).
 
+Running an application using Eclipse:
 * Build a project using "ndk-build" (see above).
 * Open ADT Eclipse.
 * Select "File->Import..." from the menu.
@@ -54,6 +55,15 @@ Eclipse plugin (see http://developer.android.com/sdk/index.html).
 * If the target is a physical device, unlock the device and observe the
   application executing.
 
+Building and running an application using build_apk.sh:
+* Change into the directory containing the project to build.
+* Run build_apk.sh.
+
+For example, the following will build the Testbed application, deploy it to
+the connected device and start it...
+$ cd splash2d/Box2D/Testbed
+$ ../AndroidUtil/build_apk.sh
+
 NOTE: The Testbed application currently only runs on a physical target.
 
 
@@ -63,6 +73,13 @@ ndk-build's command line...
 
 $ ndk-build APP_ABI=all
 
+
+Use the run_tests_android.sh script to execute unit tests:
+
+$ ./splash2d/Box2D/Unittests/run_tests_android.sh
+
+run_tests_android.sh will build, deploy and execute each unit test on the
+connected device using build_apk.sh.
 
 === Linux ===
 
