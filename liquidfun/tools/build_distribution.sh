@@ -228,6 +228,7 @@ ${project_name}/MODULE_LICENSE_BSD_LIKE
       rm -rf "${f}"
     done
   )
+  find "${project_name}" -type d -empty | xargs -I@ rm -rf "@"
 }
 
 # Brand files with version information by replacing SPLASH2D_VERSION with
