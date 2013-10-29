@@ -15,7 +15,6 @@ using namespace std;
 
 struct vertex {
   float x, y, u, v;
-  unsigned char r, g, b, a;
 };
 
 vector<vertex> vertbuf;
@@ -25,10 +24,7 @@ int curmode = GL_QUADS;
 
 void glColor3ub(unsigned char r, unsigned char g, unsigned char b)
 {
-  curvert.r = r;
-  curvert.g = g;
-  curvert.b = b;
-  curvert.a = 255;
+  glColor4ub(r, g, b, 255);
 }
 
 void glColor3f(float r, float g, float b) { glColor3ub(r * 255, g * 255, b * 255); }
@@ -76,13 +72,11 @@ void glEnd() {
   float *buf = &vertbuf[0].x;
   glEnableClientState(GL_VERTEX_ARRAY);        glVertexPointer  (2, GL_FLOAT,         sizeof(vertex), buf + 0);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY); glTexCoordPointer(2, GL_FLOAT,         sizeof(vertex), buf + 2);
-  glEnableClientState(GL_COLOR_ARRAY);         glColorPointer   (4, GL_UNSIGNED_BYTE, sizeof(vertex), buf + 4);
 
   glDrawArrays(curmode, 0, vertbuf.size());
 
   glDisableClientState(GL_VERTEX_ARRAY); 
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY); 
 }
 
 void glColorMaterial(int face, int mode) {

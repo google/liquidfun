@@ -32,6 +32,8 @@ public:
 
 	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
 
+    void DrawFlatPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
+
 	void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
 
 	void DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color);
@@ -53,6 +55,8 @@ public:
     void OutputFPS();
 
     void FlushPoints();
+
+    void DrawArrow(const b2Color& color);
 
 private:
 	enum { MAX_CACHED_POINTS = 64 };

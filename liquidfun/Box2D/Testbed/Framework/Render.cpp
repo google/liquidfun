@@ -24,10 +24,10 @@
 	#include "GL/freeglut.h"
 #endif
 
-#if defined(ANDROID) || defined(__ANDROID__)
+#ifdef __ANDROID__
 #include "GLEmu/gl_emu.h"
 #include <android/log.h>
-#endif // defined(ANDROID) || defined(__ANDROID__)
+#endif // __ANDROID__
 
 #include <cstdio>
 #include <cstdarg>
@@ -38,6 +38,17 @@ void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2C
 {
 	glColor3f(color.r, color.g, color.b);
 	glBegin(GL_LINE_LOOP);
+	for (int32 i = 0; i < vertexCount; ++i)
+	{
+		glVertex2f(vertices[i].x, vertices[i].y);
+	}
+	glEnd();
+}
+
+void DebugDraw::DrawFlatPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+{
+	glColor4f(color.r, color.g, color.b, 1);
+	glBegin(GL_TRIANGLE_FAN);
 	for (int32 i = 0; i < vertexCount; ++i)
 	{
 		glVertex2f(vertices[i].x, vertices[i].y);
@@ -275,3 +286,10 @@ void DebugDraw::OutputFPS()
 #endif
 }
 
+void DebugDraw::DrawArrow(const b2Color& color)
+{
+    b2Vec2 square[4] = { b2Vec2(1, 1), b2Vec2(1, -1), b2Vec2(-1, -1), b2Vec2(-1, 1) };
+    DrawFlatPolygon(square, 4, color);
+    b2Vec2 tri[3] = { b2Vec2(1, 1.75f), b2Vec2(2.5f, 0), b2Vec2(1, -1.75f) };
+    DrawFlatPolygon(tri, 3, color);
+}

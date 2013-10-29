@@ -39,8 +39,24 @@ namespace
 	GLUI *glui;
 	float32 viewZoom = 1.0f;
 	int tx, ty, tw, th;
-	bool rMouseDown;
+	bool rMouseDown = false;
+	bool lMouseDown = false;
 	b2Vec2 lastp;
+	b2Vec2 extents;
+#ifdef __ANDROID__
+	const float arrowScale = 2.5;  // relative to worldspace
+	const float arrowSize = 3.5; // see geometry in DrawArrow()
+	const float arrowOffset = arrowScale * arrowSize; // defines hitbox & position
+	enum ArrowSelection 
+	{
+		e_ArrowSelectionNone = 0,
+		e_ArrowSelectionLeft,
+		e_ArrowSelectionRight,
+	};
+	ArrowSelection whichArrow = e_ArrowSelectionNone;
+    const b2Color arrowActiveColor(0, 1, 0);
+    const b2Color arrowPassiveColor(0.5f, 0.5f, 0.5f);
+#endif // __ANDROID__
 }
 
 static void Resize(int32 w, int32 h)
@@ -55,7 +71,7 @@ static void Resize(int32 w, int32 h)
 	glLoadIdentity();
 	float32 ratio = th ? float32(tw) / float32(th) : 1;
 
-	b2Vec2 extents = ratio >= 1 ? b2Vec2(ratio * 25.0f, 25.0f) : b2Vec2(25.0f, 25.0f / ratio);
+	extents = ratio >= 1 ? b2Vec2(ratio * 25.0f, 25.0f) : b2Vec2(25.0f, 25.0f / ratio);
 	extents *= viewZoom;
 
 	b2Vec2 lower = settings.viewCenter - extents;
@@ -69,10 +85,6 @@ static b2Vec2 ConvertScreenToWorld(int32 x, int32 y)
 {
 	float32 u = x / float32(tw);
 	float32 v = (th - y) / float32(th);
-
-	float32 ratio = float32(tw) / float32(th);
-	b2Vec2 extents(ratio * 25.0f, 25.0f);
-	extents *= viewZoom;
 
 	b2Vec2 lower = settings.viewCenter - extents;
 	b2Vec2 upper = settings.viewCenter + extents;
@@ -100,10 +112,27 @@ static void SimulationLoop()
 
 	b2Vec2 oldCenter = settings.viewCenter;
 	settings.hz = settingsHz;
+
+	// call this each frame, to function correctly with devices that may recreate the GL Context without us asking for it
+	Resize(width, height);
+
 	test->Step(&settings);
 
-    // call this each frame, to function correctly with devices that may recreate the GL Context without us asking for it
-    Resize(width, height);
+#ifdef __ANDROID__
+	// special purpose code for Android: draw navigational arrows to browse test cases, since we don't have the full desktop UI
+	DebugDraw dbgDraw;
+	glPushMatrix();
+	glTranslatef(settings.viewCenter.x + extents.x - arrowOffset + arrowScale, settings.viewCenter.y, 0);
+	glScalef(arrowScale, arrowScale, 1);
+	dbgDraw.DrawArrow(lMouseDown && whichArrow == e_ArrowSelectionRight ? arrowActiveColor : arrowPassiveColor);
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(settings.viewCenter.x - extents.x + arrowOffset - arrowScale, settings.viewCenter.y, 0);
+	glRotatef(180, 0, 0, 1);
+	glScalef(arrowScale, arrowScale, 1);
+	dbgDraw.DrawArrow(lMouseDown && whichArrow == e_ArrowSelectionLeft ? arrowActiveColor : arrowPassiveColor);
+	glPopMatrix();
+#endif // __ANDROID__
 
 	test->DrawTitle(entry->name);
 
@@ -288,6 +317,7 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 		b2Vec2 p = ConvertScreenToWorld(x, y);
 		if (state == GLUT_DOWN)
 		{
+			lMouseDown = true;
 			b2Vec2 p = ConvertScreenToWorld(x, y);
 			if (mod == GLUT_ACTIVE_SHIFT)
 			{
@@ -298,17 +328,36 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 				test->MouseDown(p);
 			}
 		}
-		
+
 		if (state == GLUT_UP)
 		{
-#if defined(ANDROID) || defined(__ANDROID__)
-			// Allow Android to advance to the next test.
-			if (p.x < -30) testSelection = max(0, testSelection - 1);
-			if (p.x >  30) testSelection++;
-			if (!g_testEntries[testSelection].name) testSelection--;
-#endif // defined(ANDROID) || defined(__ANDROID__)
+			lMouseDown = false;
 			test->MouseUp(p);
 		}
+
+#ifdef __ANDROID__
+		// Allow Android to advance to the next test.
+		bool withinYrange = fabs(p.y - settings.viewCenter.y) < arrowScale * 2;
+		if (withinYrange && p.x < -(extents.x - arrowOffset))
+		{
+			whichArrow = e_ArrowSelectionLeft;
+			if (state == GLUT_UP) testSelection = max(0, testSelection - 1);
+		}
+		else if (withinYrange && p.x >  (extents.x - arrowOffset))
+		{
+			whichArrow = e_ArrowSelectionRight;
+			if (state == GLUT_UP) 
+			{
+				testSelection++;
+				if (!g_testEntries[testSelection].name) testSelection--;
+			}
+		}
+		else
+		{
+			whichArrow = e_ArrowSelectionNone;
+		}
+#endif // __ANDROID__
+
 	}
 	else if (button == GLUT_RIGHT_BUTTON)
 	{
@@ -361,7 +410,7 @@ static void Restart(int)
 	delete test;
 	entry = g_testEntries + testIndex;
 	test = entry->createFcn();
-    Resize(width, height);
+	Resize(width, height);
 }
 
 static void Pause(int)
