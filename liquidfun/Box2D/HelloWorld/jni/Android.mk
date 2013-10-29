@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 namespace:=$(if $(NDK_PROJECT_PATH),,_splash2d)
 LOCAL_MODULE:=HelloWorld${namespace}
 LOCAL_MODULE_TAGS:=optional
-LOCAL_SRC_FILES:=$(LOCAL_PATH)/HelloWorld.cpp
+LOCAL_SRC_FILES:=HelloWorld.cpp
 LOCAL_LDLIBS:=-llog -landroid
 LOCAL_STATIC_LIBRARIES:=android_native_app_glue libsplash2d_static \
                         libandroidutil_static

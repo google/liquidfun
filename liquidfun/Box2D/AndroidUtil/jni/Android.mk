@@ -7,8 +7,8 @@ namespace:=$(if $(NDK_PROJECT_PATH),,_splash2d)
 LOCAL_MODULE:=libandroidutil$(namespace)_static
 LOCAL_MODULE_TAGS:=optional
 LOCAL_SRC_FILES:=\
-	$(LOCAL_PATH)/AndroidLogPrint.c \
-	$(LOCAL_PATH)/AndroidMainWrapper.c
+	AndroidLogPrint.c \
+	AndroidMainWrapper.c
 LOCAL_C_INCLUDES:=\
 	$(LOCAL_PATH)/.. \
 	$(NDK_ROOT)/sources/android/native_app_glue

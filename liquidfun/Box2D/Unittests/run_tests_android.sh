@@ -17,7 +17,7 @@ declare -r test_blacklist="HelloWorld"
 
 # Execute the build_apk script.
 build_apk() {
-  "${script_directory}/../AndroidUtil/build_apk.sh" "${@}"
+  "${script_directory}/../AndroidUtil/build_apk.sh" "$@"
 }
 
 # Get the test directories, assumes the current directory is script_directory.
@@ -50,9 +50,9 @@ for test_dir in ${test_dirs}; do
   # The Android framework can cause an application to restart multiple times
   # so only capture the log from the first instance.
   if [[ $((BUILD_ENABLED)) -eq 1 ]]; then
-    build_apk "${@}" LAUNCH=0
+    build_apk "$@" LAUNCH=0
   fi
-  build_apk "${@}" BUILD=0 | \
+  build_apk "$@" BUILD=0 | \
     awk '/^I\/'"${test_name}"'/ {
            log_prefix = $0
            sub(/:.*/, "", log_prefix)
