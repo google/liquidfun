@@ -8,6 +8,12 @@ declare -r android_root=${script_directory}/../../../../../../
 
 # Minimum Android target version supported by this project.
 : ${BUILDAPK_ANDROID_TARGET_MINVERSION:=10}
+# Directory containing the Android SDK
+# (http://developer.android.com/sdk/index.html).
+: ${ANDROID_SDK_HOME:=}
+# Directory containing the Android NDK
+# (http://developer.android.com/tools/sdk/ndk/index.html).
+: ${NDK_HOME:=}
 
 # Get the number of CPU cores present on the host.
 get_number_of_cores() {
@@ -45,28 +51,69 @@ get_number_of_devices_connected() {
     awk '/^..*$/ { if (p) { print $0 } }
          /List of devices attached/ { p = 1 }' | \
     wc -l
+  return ${PIPESTATUS[0]}
 }
 
-ndkbuild() {
-  local ndkbuild_path=$(which ndk-build)
-  # TODO: When the released NDK is checked into the Android tree, use it here.
-  if [[ "${ndkbuild_path}" == "" ]]; then
-    echo -e "Unable to find ndk-build." \
-            "\nAdd the Android NDK directory to the PATH." >&2
+# Find and run "adb".
+adb() {
+  local adb_path=
+  for path in "$(which adb 2>/dev/null)" \
+              "${ANDROID_SDK_HOME}/sdk/platform-tools/adb" \
+              "${android_root}/prebuilts/sdk/platform-tools/adb"; do
+    if [[ -e "${path}" ]]; then
+      adb_path="${path}"
+      break
+    fi
+  done
+  if [[ "${adb_path}" == "" ]]; then
+    echo -e "Unable to find adb." \
+           "\nAdd the Android ADT sdk/platform-tools directory to the" \
+           "PATH." >&2
     exit 1
   fi
-  "${ndkbuild_path}" "${@}"
+  "${adb_path}" "$@"
 }
 
-android_tool() {
-  local android_path=$(which android)
-  # TODO: When the released SDK is checked into the Android tree, use it here.
+# Find and run "android".
+android() {
+  local android_executable=android
+  if echo "$(uname -s)" | grep -q CYGWIN; then
+    android_executable=android.bat
+  fi
+  local android_path=
+  for path in "$(which ${android_executable})" \
+              "${ANDROID_SDK_HOME}/sdk/tools/${android_executable}" \
+              "${android_root}/prebuilts/sdk/tools/${android_executable}"; do
+    if [[ -e "${path}" ]]; then
+      android_path="${path}"
+      break
+    fi
+  done
   if [[ "${android_path}" == "" ]]; then
     echo -e "Unable to find android tool." \
            "\nAdd the Android ADT sdk/tools directory to the PATH." >&2
     exit 1
   fi
-  "${android_path}" "${@}"
+  "${android_path}" "$@"
+}
+
+# Find and run "ndk-build"
+ndkbuild() {
+  local ndkbuild_path=
+  for path in "$(which ndk-build 2>/dev/null)" \
+              "${NDK_HOME}/ndk-build" \
+              "${android_root}/prebuilts/ndk/current/ndk-build"; do
+    if [[ -e "${path}" ]]; then
+      ndkbuild_path="${path}"
+      break
+    fi
+  done
+  if [[ "${ndkbuild_path}" == "" ]]; then
+    echo -e "Unable to find ndk-build." \
+            "\nAdd the Android NDK directory to the PATH." >&2
+    exit 1
+  fi
+  "${ndkbuild_path}" "$@"
 }
 
 # Parse arguments for this script.
@@ -183,7 +230,7 @@ if [[ $((disable_build)) -eq 0 ]]; then
   # Get the list of installed android targets and select the oldest target
   # that is at least as new as BUILDAPK_ANDROID_TARGET_MINVERSION.
   declare -r android_targets_installed=$( \
-    android_tool list targets | \
+    android list targets | \
     awk -F'"' '/^id:.*android/ { print $2 }')
   android_build_target=
   for android_target in $(echo "${android_targets_installed}" | \
@@ -208,8 +255,8 @@ if [[ $((disable_build)) -eq 0 ]]; then
   echo "Building for android target ${android_build_target}" >&2
 
   # Create build.xml and local.properties files.
-  android_tool update project --target "${android_build_target}" \
-                              -n ${package_filename} --path .
+  android update project --target "${android_build_target}" \
+                         -n ${package_filename} --path .
 
   # Build the apk.
   ant ${ant_target}
