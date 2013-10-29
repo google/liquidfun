@@ -46,8 +46,10 @@ void FGAPIENTRY glutPostRedisplay( void )
       fgError ( " ERROR:  Function <%s> called"
                 " with no current window defined.", "glutPostRedisplay" ) ;
 	}
-
-    fgStructure.CurrentWindow->State.WorkMask |= GLUT_DISPLAY_WORK;
+    else
+    {
+        fgStructure.CurrentWindow->State.WorkMask |= GLUT_DISPLAY_WORK;
+    }
 }
 
 /*

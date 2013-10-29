@@ -330,6 +330,7 @@ void handle_cmd(struct android_app* app, int32_t cmd) {
     /* The window is being shown, get it ready. */
     LOGI("handle_cmd: APP_CMD_INIT_WINDOW %p", app->window);
     fgDisplay.pDisplay.single_native_window = &app->window;
+    if (window) window->Window.Handle = &app->window;
     /* start|resume: glPlatformOpenWindow was waiting for Handle to be
        defined and will now continue processing */
     break;
@@ -412,6 +413,9 @@ void fgPlatformProcessSingleEvent ( void )
      2.3, that next SwapBuffer is fake (but still necessary to get the
      new size). */
   SFG_Window* window = fgStructure.CurrentWindow;
+
+  window->Window.Handle = fgDisplay.pDisplay.single_native_window;
+
   if (window && window->Window.Handle && *window->Window.Handle) {
     int32_t width = ANativeWindow_getWidth(*window->Window.Handle);
     int32_t height = ANativeWindow_getHeight(*window->Window.Handle);
