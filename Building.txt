@@ -8,7 +8,7 @@ Building Splash2D and Running Examples
 
 === Android ===
 
-This document  assumes that you have installed the Android NDK
+This document assumes that you have installed the Android NDK
 (http://developer.android.com/tools/sdk/ndk/index.html) on the
 machine performing the build.
 
@@ -55,6 +55,17 @@ Running an application using Eclipse:
 * If the target is a physical device, unlock the device and observe the
   application executing.
 
+
+It's also possible to build, deploy and execute an application using
+build_apk.sh.  build_apk.sh requires the installation of the Android NDK
+(http://developer.android.com/tools/sdk/ndk/index.html) and Android SDK
+(http://developer.android.com/sdk/index.html) along the Android SDK's
+prerequisites.  On Windows the script requires a Cygwin installation
+(http://www.cygwin.com/) as it makes use of bash and common unix utilities.
+In addition, build_apk.sh requires the addition of the Android SDK sdk/tools,
+Android SDK sdk/platform-tools and NDK root directories to the PATH
+environment variable.
+
 Building and running an application using build_apk.sh:
 * Change into the directory containing the project to build.
 * Run build_apk.sh.
@@ -79,7 +90,8 @@ Use the run_tests_android.sh script to execute unit tests:
 $ ./splash2d/Box2D/Unittests/run_tests_android.sh
 
 run_tests_android.sh will build, deploy and execute each unit test on the
-connected device using build_apk.sh.
+connected device using build_apk.sh.  run_tests_android.sh makes use of
+build_apk.sh which has setup requirements as described above.
 
 === Linux ===
 
