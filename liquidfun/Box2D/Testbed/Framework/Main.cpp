@@ -36,7 +36,7 @@ namespace
 	int32 framePeriod = 16;
 	int32 mainWindow;
 	float settingsHz = 60.0;
-	GLUI *glui;
+	GLUI *glui = NULL;
 	float32 viewZoom = 1.0f;
 	int tx, ty, tw, th;
 	bool rMouseDown = false;
@@ -54,8 +54,8 @@ namespace
 		e_ArrowSelectionRight,
 	};
 	ArrowSelection whichArrow = e_ArrowSelectionNone;
-    const b2Color arrowActiveColor(0, 1, 0);
-    const b2Color arrowPassiveColor(0.5f, 0.5f, 0.5f);
+	const b2Color arrowActiveColor(0, 1, 0);
+	const b2Color arrowPassiveColor(0.5f, 0.5f, 0.5f);
 #endif // __ANDROID__
 }
 
@@ -202,7 +202,7 @@ static void Keyboard(unsigned char key, int x, int y)
 		{
 			testSelection = testCount - 1;
 		}
-		glui->sync_live();
+		if (glui) glui->sync_live();
 		break;
 
 		// Press ] to next test.
@@ -212,7 +212,7 @@ static void Keyboard(unsigned char key, int x, int y)
 		{
 			testSelection = 0;
 		}
-		glui->sync_live();
+		if (glui) glui->sync_live();
 		break;
 		
 	default:
@@ -456,6 +456,7 @@ int main(int argc, char** argv)
 	//glutSetOption (GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
 	glutDisplayFunc(SimulationLoop);
+
 	GLUI_Master.set_glutReshapeFunc(Resize);  
 	GLUI_Master.set_glutKeyboardFunc(Keyboard);
 	GLUI_Master.set_glutSpecialFunc(KeyboardSpecial);
@@ -466,6 +467,8 @@ int main(int argc, char** argv)
 	glutMotionFunc(MouseMotion);
 
 	glutKeyboardUpFunc(KeyboardUp);
+
+#ifndef __ANDROID__
 
 	glui = GLUI_Master.create_glui_subwindow( mainWindow, 
 		GLUI_SUBWINDOW_RIGHT );
@@ -522,7 +525,10 @@ int main(int argc, char** argv)
 	glui->add_button("Restart", 0, Restart);
 
 	glui->add_button("Quit", 0,(GLUI_Update_CB)Exit);
+
 	glui->set_main_gfx_window( mainWindow );
+
+#endif // __ANDROID__
 
 	// Use a timer to control the frame rate.
 	glutTimerFunc(framePeriod, Timer, 0);
