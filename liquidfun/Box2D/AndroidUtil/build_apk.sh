@@ -3,6 +3,12 @@
 # Build, deploy, debug / execute a native Android package based upon
 # NativeActivity.
 
+declare -r script_directory=$(dirname $0)
+declare -r android_root=${script_directory}/../../../../../../
+
+# Minimum Android target version supported by this project.
+: ${BUILDAPK_ANDROID_TARGET_MINVERSION:=10}
+
 # Get the number of CPU cores present on the host.
 get_number_of_cores() {
   case $(uname -s) in
@@ -39,6 +45,28 @@ get_number_of_devices_connected() {
     awk '/^..*$/ { if (p) { print $0 } }
          /List of devices attached/ { p = 1 }' | \
     wc -l
+}
+
+ndkbuild() {
+  local ndkbuild_path=$(which ndk-build)
+  # TODO: When the released NDK is checked into the Android tree, use it here.
+  if [[ "${ndkbuild_path}" == "" ]]; then
+    echo -e "Unable to find ndk-build." \
+            "\nAdd the Android NDK directory to the PATH." >&2
+    exit 1
+  fi
+  "${ndkbuild_path}" "${@}"
+}
+
+android_tool() {
+  local android_path=$(which android)
+  # TODO: When the released SDK is checked into the Android tree, use it here.
+  if [[ "${android_path}" == "" ]]; then
+    echo -e "Unable to find android tool." \
+           "\nAdd the Android ADT sdk/tools directory to the PATH." >&2
+    exit 1
+  fi
+  "${android_path}" "${@}"
 }
 
 # Parse arguments for this script.
@@ -133,13 +161,17 @@ fi
 
 if [[ $((disable_build)) -eq 0 ]]; then
   # Build native code.
-  ndk-build -j$(get_number_of_cores) "$@"
+  ndkbuild -j$(get_number_of_cores) "$@"
 fi
 
 # Get the package name from the manifest.
 declare -r android_manifest=AndroidManifest.xml
 package_name=$(get_package_name_from_manifest ${android_manifest})
-[[ "${package_name}" == "" ]] && exit 1
+if [[ "${package_name}" == "" ]]; then
+  echo -e "No package name specified in ${android_manifest},"\
+          "skipping apk build, deploy\nand launch steps." >&2
+  exit 0
+fi
 package_basename=${package_name/*./}
 package_filename=$(get_library_name_from_manifest ${android_manifest})
 [[ "${package_filename}" == "" ]] && package_filename="${package_basename}"
@@ -148,9 +180,36 @@ package_filename=$(get_library_name_from_manifest ${android_manifest})
 declare -r built_apk=bin/${package_filename}-${ant_target}.apk
 
 if [[ $((disable_build)) -eq 0 ]]; then
+  # Get the list of installed android targets and select the oldest target
+  # that is at least as new as BUILDAPK_ANDROID_TARGET_MINVERSION.
+  declare -r android_targets_installed=$( \
+    android_tool list targets | \
+    awk -F'"' '/^id:.*android/ { print $2 }')
+  android_build_target=
+  for android_target in $(echo "${android_targets_installed}" | \
+                          awk -F- '{ print $2 }' | sort -n); do
+    if [[ $((android_target)) -ge \
+          $((BUILDAPK_ANDROID_TARGET_MINVERSION)) ]]; then
+      android_build_target="android-${android_target}"
+      break
+    fi
+  done
+  if [[ "${android_build_target}" == "" ]]; then
+    echo -e \
+      "Found installed Android targets:" \
+      "$(echo ${android_targets_installed} | sed 's/ /\n  /g;s/^/\n  /;')" \
+      "\nAndroid SDK platform" \
+      "android-$((BUILDAPK_ANDROID_TARGET_MINVERSION))" \
+      "must be installed to build this project." \
+      "\nUse the \"android\" application to install API" \
+      "$((BUILDAPK_ANDROID_TARGET_MINVERSION)) or newer." >&2
+    exit 1
+  fi
+  echo "Building for android target ${android_build_target}" >&2
+
   # Create build.xml and local.properties files.
-  # Use `android list targets` to figure out what your options are for --target
-  android update project --target android-10 -n ${package_filename} --path .
+  android_tool update project --target "${android_build_target}" \
+                              -n ${package_filename} --path .
 
   # Build the apk.
   ant ${ant_target}
@@ -180,7 +239,14 @@ if [[ $((disable_deploy)) -eq 0 ]]; then
     true # no error check
 
   # Install the apk.
-  adb ${adb_device} install ${built_apk}
+  # NOTE: The following works around adb not returning an error code when
+  # it fails to install an apk.
+  echo "Install ${built_apk}" >&2
+  declare -r adb_install_result=$(adb ${adb_device} install ${built_apk})
+  echo "${adb_install_result}"
+  if echo "${adb_install_result}" | grep -qF 'Failure ['; then
+    exit 1
+  fi
 fi
 
 if [[ "${ant_target}" == "debug" && $((run_debugger)) -eq 1 ]]; then
@@ -194,8 +260,20 @@ elif [[ $((launch)) -eq 1 ]]; then
     # Kill adb logcat if this shell exits.
     trap "kill ${logcat_pid}" SIGINT SIGTERM EXIT
 
+    # Determine the SDK version of Android on the device.
+    declare -r android_sdk_version=$(
+      adb ${adb_device} shell cat system/build.prop | \
+      awk -F= '/ro.build.version.sdk/ {
+                 v=$2; sub(/[ \r\n]/, "", v); print v
+               }')
+    # If the SDK is newer than 10, "am" supports stopping an activity.
+    adb_stop_activity=
+    if [[ $((android_sdk_version)) -gt 10 ]]; then
+      adb_stop_activity=-S
+    fi
+
     # Launch the activity and wait for it to complete.
-    adb ${adb_device} shell am start -S -W -n \
+    adb ${adb_device} shell am start ${adb_stop_activity} -W -n \
       ${package_name}/android.app.NativeActivity
   )
 fi
