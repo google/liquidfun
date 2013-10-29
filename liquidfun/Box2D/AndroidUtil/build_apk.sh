@@ -54,6 +54,18 @@ get_number_of_devices_connected() {
   return ${PIPESTATUS[0]}
 }
 
+# Kill a process and its' children.  This is provided for cygwin which
+# doesn't ship with pkill.
+kill_process_group() {
+  local parent_pid="${1}"
+  local child_pid=
+  for child_pid in $(ps -f | \
+                     awk '{ if ($3 == '"${parent_pid}"') { print $2 } }'); do
+    kill_process_group "${child_pid}"
+  done
+  kill "${parent_pid}"
+}
+
 # Find and run "adb".
 adb() {
   local adb_path=
@@ -305,7 +317,7 @@ elif [[ $((launch)) -eq 1 ]]; then
     adb ${adb_device} logcat &
     logcat_pid=$!
     # Kill adb logcat if this shell exits.
-    trap "kill ${logcat_pid}" SIGINT SIGTERM EXIT
+    trap "kill_process_group ${logcat_pid}" SIGINT SIGTERM EXIT
 
     # Determine the SDK version of Android on the device.
     declare -r android_sdk_version=$(
