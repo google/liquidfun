@@ -38,7 +38,7 @@ declare -r project_name="$(basename ${project_dir})"
 # Space separated paths to directories required by the project relative to
 # project_dir/..
 declare -r out_of_tree_dependencies="freeglut googletest"
-declare -r tempdir_template="/tmp/${project_name}tmpXXXXXX"
+declare -r tempdir_template="${project_name}tmpXXXXXX"
 declare -r host_types="windows osx"
 # Bash 3 (default on OSX) doesn't have associative arrays so do this manually.
 declare -r generators_windows="Visual Studio 11"
@@ -336,7 +336,8 @@ ${dirty_files}" >&2
     if [[ "${host}" != "" ]]; then
       eval "local generator=\"\${generators_${host_type}}\""
       local target_dir=${project_dir}_${host_type}
-      local temp_dir=$(ssh "${host}" "mktemp -d ${tempdir_template}")
+      local temp_dir=$(ssh "${host}" \
+                           "cd \$(mktemp -d ${tempdir_template}); pwd")
       echo "Generating ${generator} project files for ${host_type} on"\
            "${host}" >&2
       rsync -aru ${project_dir_clean}/* ${host}:${temp_dir}
