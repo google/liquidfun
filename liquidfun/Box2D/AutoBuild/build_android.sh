@@ -16,8 +16,7 @@ build_apk() {
 find_projects() {
   (
     IFS=$'\n'
-    for manifest in $(find Box2D -type f -name AndroidManifest.xml | \
-                        grep -v AndroidTemplate | sort); do
+    for manifest in $(find Box2D -type f -name AndroidManifest.xml | sort); do
       target_dir=$(dirname "${manifest}")
       if [[ ! -d "${target_dir}/jni" ]]; then
         continue

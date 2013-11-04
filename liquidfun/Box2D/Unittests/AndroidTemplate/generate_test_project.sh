@@ -32,7 +32,10 @@ generate_project() {
   (
     IFS=$'\n'
     for f in $(find "${script_dir}" -type f | grep -vF "${script_name}"); do
-      output_file=$(echo "${f}" | sed "s@${script_dir}@${output_dir}@")
+      output_file=$( \
+        echo "${f}" | \
+        sed -r 's@'"${script_dir}"'@'"${output_dir}"'@;
+                s@(/[^/]+)Ignore(.*)@\1\2@g')
     file_output_dir=$(dirname "${output_file}")
     mkdir -p "${file_output_dir}"
     cat "${f}" | \

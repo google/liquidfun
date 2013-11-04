@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Empty Manifest so the NDK build process can find the project
      directory. -->
-<manifest/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.google.fpl.splash2d"
+          android:versionCode="1"
+          android:versionName="1.0">
+    <!-- Empty application since this project just builds the splash2d
+         libraries -->
+    <application android:label="splash2d" android:enabled="false"
+                 android:hasCode="false">
+        <activity android:name="android.app.NativeActivity">
+            <meta-data android:name="android.app.lib_name"
+                       android:value="splash2d" />
+        </activity>
+    </application>
+</manifest>

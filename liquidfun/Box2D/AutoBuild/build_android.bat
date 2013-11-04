@@ -57,11 +57,7 @@ for /R . %%a in (jni) do (
       set project_dir=%%b
       set project_dir=!project_dir:~0,-1!
       if exist !project_dir!\AndroidManifest.xml (
-        for %%c in (!project_dir!) do (
-          if not "%%~nc"=="AndroidTemplate" (
-            set projects=!projects! %%c
-          )
-        )
+        set projects=!projects! !project_dir!
       )
     )
   )

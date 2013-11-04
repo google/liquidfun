@@ -22,9 +22,8 @@ build_apk() {
 
 # Get the test directories, assumes the current directory is script_directory.
 get_test_directories() {
-  find . -mindepth 1 -maxdepth 1 -type d | \
-    grep -Ev '(AndroidTemplate|baselines)' | \
-    sed 's@^\./@@' | \
+  find . -type f -name 'AndroidManifest.xml' | \
+    sed -r 's@^\./@@;s@/[^/]+$@@' | \
     grep -Fv "${test_blacklist}"
 }
 
