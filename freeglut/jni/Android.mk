@@ -22,6 +22,7 @@ ${eval \
                 -DVERSION_MAJOR=$(VERSION_MAJOR) \
                 -DVERSION_MINOR=$(VERSION_MINOR) \
                 -DVERSION_PATCH=$(VERSION_PATCH)
+  LOCAL_ARM_MODE:=arm
   ifeq ($1,1)
     gllibsuffix:=_CM
   else
