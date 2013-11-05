@@ -273,6 +273,7 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
 
 void DebugDraw::OutputFPS()
 {
+	static bool debugPrintFrameTime = false;
 	static int lastms = 0;
 	int curms = glutGet(GLUT_ELAPSED_TIME);
 	int delta = curms - lastms;
@@ -281,9 +282,12 @@ void DebugDraw::OutputFPS()
 	static int dsmooth = 16;
 	dsmooth = (dsmooth * 30 + delta) / 31;
 
+	if ( debugPrintFrameTime )
+	{
 #ifdef ANDROID
-	__android_log_print(ANDROID_LOG_VERBOSE, "Testbed", "msec = %d", dsmooth);
+		__android_log_print(ANDROID_LOG_VERBOSE, "Testbed", "msec = %d", dsmooth);
 #endif
+	}
 }
 
 void DebugDraw::DrawArrow(const b2Color& color)
