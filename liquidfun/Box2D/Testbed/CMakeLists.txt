@@ -28,6 +28,8 @@ set(Testbed_Tests_SRCS
 	Tests/CompoundShapes.h
 	Tests/Confined.h
 	Tests/ContinuousTest.h
+	Tests/ConvexHull.h
+	Tests/ConveyorBelt.h
 	Tests/DistanceTest.h
 	Tests/Dominos.h
 	Tests/DumpShell.h
@@ -35,6 +37,9 @@ set(Testbed_Tests_SRCS
 	Tests/EdgeShapes.h
 	Tests/EdgeTest.h
 	Tests/Gears.h
+	Tests/Mobile.h
+	Tests/MobileBalanced.h
+	Tests/MotorJoint.h
 	Tests/OneSidedPlatform.h
 	Tests/Pinball.h
 	Tests/PolyCollision.h
@@ -53,10 +58,21 @@ set(Testbed_Tests_SRCS
 	Tests/TheoJansen.h
 	Tests/Tiles.h
 	Tests/TimeOfImpact.h
+	Tests/Tumbler.h
 	Tests/VaryingFriction.h
 	Tests/VaryingRestitution.h
 	Tests/VerticalStack.h
 	Tests/Web.h
+
+	Tests/Particles.h
+	Tests/DrawingParticles.h
+	Tests/RigidParticles.h
+	Tests/ElasticParticles.h
+	Tests/ParticlesSurfaceTension.h
+	Tests/WaveMachine.h
+	Tests/DamBreak.h
+	Tests/Soup.h
+	Tests/LiquidTimer.h
 )
 
 # These are used to create visual studio folders.
