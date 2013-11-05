@@ -90,6 +90,7 @@ static SFG_StrokeFont* fghStrokeByID( void* font )
     return 0;
 }
 
+#if !defined(FREEGLUT_GLES2) && !defined(FREEGLUT_GLES1)
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
@@ -249,6 +250,8 @@ int FGAPIENTRY glutBitmapHeight( void* fontID )
     return font->Height;
 }
 
+#endif // !defined(FREEGLUT_GLES2) && !defined(FREEGLUT_GLES1)
+
 /*
  * Draw a stroke character
  */
@@ -274,14 +277,10 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
 
     for( i = 0; i < schar->Number; i++, strip++ )
     {
-        glBegin( GL_LINE_STRIP );
-        for( j = 0; j < strip->Number; j++ )
-            glVertex2f( strip->Vertices[ j ].X, strip->Vertices[ j ].Y );
-        glEnd( );
-				glBegin( GL_POINTS );
-        for( j = 0; j < strip->Number; j++ )
-            glVertex2f( strip->Vertices[ j ].X, strip->Vertices[ j ].Y );
-				glEnd( );
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 0, &strip->Vertices[0].X);
+        glDrawArrays(GL_LINE_STRIP, 0, strip->Number);
+        glDisableClientState(GL_VERTEX_ARRAY);
     }
     glTranslatef( schar->Right, 0.0, 0.0 );
 }
@@ -307,6 +306,9 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
      * A newline will simply translate the next character's insertion
      * point back to the start of the line and down one line.
      */
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+
     while( ( c = *string++) )
         if( c < font->Quantity )
         {
@@ -324,12 +326,8 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 
                     for( i = 0; i < schar->Number; i++, strip++ )
                     {
-                        glBegin( GL_LINE_STRIP );
-                        for( j = 0; j < strip->Number; j++ )
-                            glVertex2f( strip->Vertices[ j ].X,
-                                        strip->Vertices[ j ].Y);
-
-                        glEnd( );
+                        glVertexPointer(2, GL_FLOAT, 0, &strip->Vertices[0].X);
+                        glDrawArrays(GL_LINE_STRIP, 0, strip->Number);
                     }
 
                     length += schar->Right;
@@ -337,6 +335,8 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
                 }
             }
         }
+
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 /*

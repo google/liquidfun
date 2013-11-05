@@ -30,3 +30,4 @@ stamp-h1
 cross-android
 cross-woe
 native
+version.cmake
