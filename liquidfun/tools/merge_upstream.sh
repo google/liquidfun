@@ -8,9 +8,9 @@ declare -r project_name=$(basename "${project_root}")
 declare -r git_config="${project_root}/.git/config"
 
 # Upstream subversion repo to merge.
-: ${SVN_UPSTREAM:=http://box2d.googlecode.com/svn/trunk/}
+: ${SVN_UPSTREAM:=}
 # Upstream git repo to merge.
-: ${GIT_UPSTREAM:=}
+: ${GIT_UPSTREAM:=../../../../external/box2d}
 # Name of the git branch from the upstream repo to merge.
 : ${GIT_BRANCH:=master}
 
