@@ -174,7 +174,7 @@ void b2ParticleSystem::DestroyParticle(int32 index)
 	m_flagsBuffer[index] |= b2_zombieParticle;
 }
 
-void b2ParticleSystem::DestroyParticlesInShape(const b2Shape* shape, const b2Transform& xf)
+void b2ParticleSystem::DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf)
 {
 	class DestroyParticlesInShapeCallback : public b2QueryCallback
 	{
@@ -198,15 +198,15 @@ void b2ParticleSystem::DestroyParticlesInShape(const b2Shape* shape, const b2Tra
 		b2Transform m_xf;
 
 	public:
-		DestroyParticlesInShapeCallback(b2ParticleSystem* system, const b2Shape* shape, const b2Transform& xf)
+		DestroyParticlesInShapeCallback(b2ParticleSystem* system, const b2Shape& shape, const b2Transform& xf)
 		{
 			m_system = system;
-			m_shape = shape;
+			m_shape = &shape;
 			m_xf = xf;
 		}
 	} callback(this, shape, xf);
 	b2AABB aabb;
-	shape->ComputeAABB(&aabb, xf, 0);
+	shape.ComputeAABB(&aabb, xf, 0);
 	m_world->QueryAABB(&callback, aabb);
 	SolveZombie();
 }

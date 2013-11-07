@@ -1143,16 +1143,16 @@ void b2World::DrawJoint(b2Joint* joint)
 	}
 }
 
-void b2World::DrawParticleSystem(const b2ParticleSystem* system)
+void b2World::DrawParticleSystem(const b2ParticleSystem& system)
 {
-	int32 particleCount = system->GetParticleCount();
+	int32 particleCount = system.GetParticleCount();
 	if (particleCount)
 	{
-		float32 particleRadius = system->GetParticleRadius();
-		const b2Vec2* positionBuffer = system->GetParticlePositionBuffer();
-		if (system->m_colorBuffer)
+		float32 particleRadius = system.GetParticleRadius();
+		const b2Vec2* positionBuffer = system.GetParticlePositionBuffer();
+		if (system.m_colorBuffer)
 		{
-			const b2ParticleColor* colorBuffer = system->GetParticleColorBuffer();
+			const b2ParticleColor* colorBuffer = system.GetParticleColorBuffer();
 			for (int32 i = 0; i < particleCount; i++)
 			{
 				const b2ParticleColor& color = colorBuffer[i];
@@ -1173,10 +1173,6 @@ void b2World::DrawParticleSystem(const b2ParticleSystem* system)
 					positionBuffer[i], particleRadius,
 					b2Color(1, 1, 1));
 			}
-		}
-		// TODO(smiles): What is this all out?  Should this be removed?
-		//for (b2ParticleGroup* group = system->GetParticleGroupBuffer(); group; group = group->GetNext())
-		{
 		}
 	}
 }
@@ -1219,7 +1215,7 @@ void b2World::DrawDebugData()
 				}
 			}
 		}
-		DrawParticleSystem(&m_particleSystem);
+		DrawParticleSystem(m_particleSystem);
 	}
 
 	if (flags & b2Draw::e_jointBit)
@@ -1444,7 +1440,7 @@ void b2World::DestroyParticle(int32 index)
 	m_particleSystem.DestroyParticle(index);
 }
 
-void b2World::DestroyParticlesInShape(const b2Shape* shape, const b2Transform& xf)
+void b2World::DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf)
 {
 	b2Assert(IsLocked() == false);
 	if (IsLocked())

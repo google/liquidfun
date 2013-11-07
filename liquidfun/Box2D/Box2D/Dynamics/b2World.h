@@ -224,7 +224,7 @@ public:
 	/// Destroy particles inside a shape.
 	/// This function is locked during callbacks.
 	/// @warning This function is locked during callbacks.
-	void DestroyParticlesInShape(const b2Shape* shape, const b2Transform& xf);
+	void DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf);
 
 	/// Create a particle group whose properties have been defined. No reference
 	/// to the definition is retained.
@@ -330,7 +330,7 @@ private:
 	void DrawJoint(b2Joint* joint);
 	void DrawShape(b2Fixture* shape, const b2Transform& xf, const b2Color& color);
 
-	void DrawParticleSystem(const b2ParticleSystem* system);
+	void DrawParticleSystem(const b2ParticleSystem& system);
 
 	b2BlockAllocator m_blockAllocator;
 	b2StackAllocator m_stackAllocator;

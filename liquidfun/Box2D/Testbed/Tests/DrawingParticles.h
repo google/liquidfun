@@ -108,7 +108,7 @@ public:
 			b2Transform xf;
 			xf.SetIdentity();
 
-			m_world->DestroyParticlesInShape(&shape, xf);
+			m_world->DestroyParticlesInShape(shape, xf);
 
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
