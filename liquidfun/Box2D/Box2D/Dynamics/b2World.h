@@ -293,6 +293,12 @@ public:
 	/// Get the number of particles.
 	int32 GetParticleCount() const;
 
+	/// Get the maximum number of particles.
+	int32 GetParticleMaxCount() const;
+
+	/// Set the maximum number of particles.
+	void SetParticleMaxCount(int32 count);
+
 	/// Change the particle density.
 	void SetParticleDensity(float32 density);
 
@@ -333,6 +339,15 @@ public:
 	const b2ParticleColor* GetParticleColorBuffer() const;
 	b2ParticleGroup* const* GetParticleGroupBuffer() const;
 	void* const* GetParticleUserDataBuffer() const;
+
+	/// Set a buffer for particle data.
+	/// @param buffer is a pointer to a block of memory.
+	/// @param size is the number of values in the block.
+	void SetParticleFlagsBuffer(uint32* buffer, int32 capacity);
+	void SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity);
+	void SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity);
+	void SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity);
+	void SetParticleUserDataBuffer(void** buffer, int32 capacity);
 
 	/// Get contacts between particles
 	const b2ParticleContact* GetParticleContacts();

@@ -49,7 +49,8 @@ b2ParticleSystem::b2ParticleSystem()
 	m_squaredDiameter = 1;
 
 	m_count = 0;
-	m_capacity = 0;
+	m_internalAllocatedCapacity = 0;
+	m_maxCount = 0;
 	m_flagsBuffer = NULL;
 	m_positionBuffer = NULL;
 	m_velocityBuffer = NULL;
@@ -59,6 +60,11 @@ b2ParticleSystem::b2ParticleSystem()
 	m_colorBuffer = NULL;
 	m_groupBuffer = NULL;
 	m_userDataBuffer = NULL;
+	m_userSuppliedFlagsBufferCapacity = 0;
+	m_userSuppliedPositionBufferCapacity = 0;
+	m_userSuppliedVelocityBufferCapacity = 0;
+	m_userSuppliedColorBufferCapacity = 0;
+	m_userSuppliedUserDataBufferCapacity = 0;
 
 	m_proxyCount = 0;
 	m_proxyCapacity = 0;
@@ -102,77 +108,101 @@ b2ParticleSystem::~b2ParticleSystem()
 {
 }
 
-template <typename T>
-void b2ParticleSystem::ReallocateBuffer(T *&buffer, int32 oldCapacity, int32 newCapacity, bool required)
+// Reallocate a buffer
+template <typename T> T* b2ParticleSystem::ReallocateBuffer(T* oldBuffer, int32 oldCapacity, int32 newCapacity)
 {
-	if (required || buffer)
-	{
-		T *oldBuffer = buffer;
-		T *newBuffer = static_cast<T*>(m_world->m_blockAllocator.Allocate(sizeof(T) * newCapacity));
-		for (int32 i = 0; i < oldCapacity; i++)
-		{
-			newBuffer[i] = oldBuffer[i];
-		}
-#if DEBUG
-		memset(newBuffer + oldCapacity, -1, sizeof(T) * (newCapacity - oldCapacity));
-#endif
-		m_world->m_blockAllocator.Free(oldBuffer, sizeof(T) * oldCapacity);
-		buffer = newBuffer;
-	}
+	T* newBuffer = (T*) m_world->m_blockAllocator.Allocate(sizeof(T) * newCapacity);
+	memcpy(newBuffer, oldBuffer, sizeof(T) * oldCapacity);
+	m_world->m_blockAllocator.Free(oldBuffer, sizeof(T) * oldCapacity);
+	return newBuffer;
 }
 
-template <typename T> T *b2ParticleSystem::RequestParticleBuffer(T *&buffer)
+// Reallocate a buffer
+template <typename T> T* b2ParticleSystem::ReallocateBuffer(T* buffer, int32 userSuppliedCapacity, int32 oldCapacity, int32 newCapacity, bool deferred)
 {
-	if (!buffer)
+	b2Assert(newCapacity > oldCapacity);
+	// A 'deffered' buffer is reallocated only if it is not NULL.
+	// If 'userSuppliedCapacity' is not zero, buffer is user supplied and must be kept.
+	b2Assert(!userSuppliedCapacity || newCapacity <= userSuppliedCapacity);
+	if ((!deferred || buffer) && !userSuppliedCapacity)
 	{
-		buffer = static_cast<T*>(m_world->m_blockAllocator.Allocate(sizeof(T) * m_capacity));
-		memset(buffer, 0, sizeof(T) * m_capacity);
+		buffer = ReallocateBuffer(buffer, oldCapacity, newCapacity);
 	}
 	return buffer;
 }
 
+template <typename T> T* b2ParticleSystem::RequestParticleBuffer(T* buffer)
+{
+	if (!buffer)
+	{
+		buffer = (T*) (m_world->m_blockAllocator.Allocate(sizeof(T) * m_internalAllocatedCapacity));
+		memset(buffer, 0, sizeof(T) * m_internalAllocatedCapacity);
+	}
+	return buffer;
+}
+
+static int32 LimitCapacity(int32 capacity, int32 maxCount)
+{
+	return maxCount && capacity > maxCount ? maxCount : capacity;
+}
+
 int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 {
-	if (m_count >= m_capacity)
+	if (m_count >= m_internalAllocatedCapacity)
 	{
-		int32 oldCapacity = m_capacity;
-		int32 newCapacity = m_count ? 2 * m_count : b2_minParticleBufferSize;
-		ReallocateBuffer(m_flagsBuffer, oldCapacity, newCapacity, true);
-		ReallocateBuffer(m_positionBuffer, oldCapacity, newCapacity, true);
-		ReallocateBuffer(m_velocityBuffer, oldCapacity, newCapacity, true);
-		ReallocateBuffer(m_accumulationBuffer, oldCapacity, newCapacity, true);
-		ReallocateBuffer(m_accumulation2Buffer, oldCapacity, newCapacity, false);
-		ReallocateBuffer(m_depthBuffer, oldCapacity, newCapacity, false);
-		ReallocateBuffer(m_colorBuffer, oldCapacity, newCapacity, false);
-		ReallocateBuffer(m_groupBuffer, oldCapacity, newCapacity, true);
-		ReallocateBuffer(m_userDataBuffer, oldCapacity, newCapacity, false);
-		m_capacity = newCapacity;
+		int32 capacity = m_count ? 2 * m_count : b2_minParticleBufferCapacity;
+		capacity = LimitCapacity(capacity, m_maxCount);
+		capacity = LimitCapacity(capacity, m_userSuppliedFlagsBufferCapacity);
+		capacity = LimitCapacity(capacity, m_userSuppliedPositionBufferCapacity);
+		capacity = LimitCapacity(capacity, m_userSuppliedVelocityBufferCapacity);
+		capacity = LimitCapacity(capacity, m_userSuppliedColorBufferCapacity);
+		capacity = LimitCapacity(capacity, m_userSuppliedUserDataBufferCapacity);
+		if (m_internalAllocatedCapacity < capacity)
+		{
+			m_flagsBuffer = ReallocateBuffer(m_flagsBuffer, m_userSuppliedFlagsBufferCapacity, m_internalAllocatedCapacity, capacity, false);
+			m_positionBuffer = ReallocateBuffer(m_positionBuffer, m_userSuppliedPositionBufferCapacity, m_internalAllocatedCapacity, capacity, false);
+			m_velocityBuffer = ReallocateBuffer(m_velocityBuffer, m_userSuppliedVelocityBufferCapacity, m_internalAllocatedCapacity, capacity, false);
+			m_accumulationBuffer = ReallocateBuffer(m_accumulationBuffer, 0, m_internalAllocatedCapacity, capacity, false);
+			m_accumulation2Buffer = ReallocateBuffer(m_accumulation2Buffer, 0, m_internalAllocatedCapacity, capacity, true);
+			m_depthBuffer = ReallocateBuffer(m_depthBuffer, 0, m_internalAllocatedCapacity, capacity, true);
+			m_colorBuffer = ReallocateBuffer(m_colorBuffer, m_userSuppliedColorBufferCapacity, m_internalAllocatedCapacity, capacity, true);
+			m_groupBuffer = ReallocateBuffer(m_groupBuffer, 0, m_internalAllocatedCapacity, capacity, false);
+			m_userDataBuffer = ReallocateBuffer(m_userDataBuffer, m_userSuppliedUserDataBufferCapacity, m_internalAllocatedCapacity, capacity, true);
+			m_internalAllocatedCapacity = capacity;
+		}
 	}
-	m_flagsBuffer[m_count] = def.flags;
-	m_positionBuffer[m_count] = def.position;
-	m_velocityBuffer[m_count] = def.velocity;
-	m_groupBuffer[m_count] = NULL;
+	if (m_count >= m_internalAllocatedCapacity)
+	{
+		return b2_invalidParticleIndex;
+	}
+	int32 index = m_count++;
+	m_flagsBuffer[index] = def.flags;
+	m_positionBuffer[index] = def.position;
+	m_velocityBuffer[index] = def.velocity;
+	m_groupBuffer[index] = NULL;
 	if (m_depthBuffer)
 	{
-		m_depthBuffer[m_count] = 0;
+		m_depthBuffer[index] = 0;
 	}
 	if (m_colorBuffer || !def.color.IsZero())
 	{
-		RequestParticleBuffer(m_colorBuffer)[m_count] = def.color;
+		m_colorBuffer = RequestParticleBuffer(m_colorBuffer);
+		m_colorBuffer[index] = def.color;
 	}
 	if (m_userDataBuffer || def.userData)
 	{
-		RequestParticleBuffer(m_userDataBuffer)[m_count] = def.userData;
+		m_userDataBuffer = RequestParticleBuffer(m_userDataBuffer);
+		m_userDataBuffer[index] = def.userData;
 	}
 	if (m_proxyCount >= m_proxyCapacity)
 	{
 		int32 oldCapacity = m_proxyCapacity;
-		int32 newCapacity = m_proxyCount ? 2 * m_proxyCount : b2_minParticleBufferSize;
-		ReallocateBuffer(m_proxyBuffer, oldCapacity, newCapacity, true);
+		int32 newCapacity = m_proxyCount ? 2 * m_proxyCount : b2_minParticleBufferCapacity;
+		m_proxyBuffer = ReallocateBuffer(m_proxyBuffer, oldCapacity, newCapacity);
 		m_proxyCapacity = newCapacity;
 	}
-	m_proxyBuffer[m_proxyCount++].index = m_count;
-	return m_count++;
+	m_proxyBuffer[m_proxyCount++].index = index;
+	return index;
 }
 
 void b2ParticleSystem::DestroyParticle(
@@ -322,8 +352,8 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 				if (m_pairCount >= m_pairCapacity)
 				{
 					int32 oldCapacity = m_pairCapacity;
-					int32 newCapacity = m_pairCount ? 2 * m_pairCount : b2_minParticleBufferSize;
-					ReallocateBuffer(m_pairBuffer, oldCapacity, newCapacity, true);
+					int32 newCapacity = m_pairCount ? 2 * m_pairCount : b2_minParticleBufferCapacity;
+					m_pairBuffer = ReallocateBuffer(m_pairBuffer, oldCapacity, newCapacity);
 					m_pairCapacity = newCapacity;
 				}
 				Pair& pair = m_pairBuffer[m_pairCount];
@@ -378,8 +408,8 @@ void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b,
 		if (system->m_triadCount >= system->m_triadCapacity)
 		{
 			int32 oldCapacity = system->m_triadCapacity;
-			int32 newCapacity = system->m_triadCount ? 2 * system->m_triadCount : b2_minParticleBufferSize;
-			system->ReallocateBuffer(system->m_triadBuffer, oldCapacity, newCapacity, true);
+			int32 newCapacity = system->m_triadCount ? 2 * system->m_triadCount : b2_minParticleBufferCapacity;
+			system->m_triadBuffer = system->ReallocateBuffer(system->m_triadBuffer, oldCapacity, newCapacity);
 			system->m_triadCapacity = newCapacity;
 		}
 		Triad& triad = system->m_triadBuffer[system->m_triadCount];
@@ -431,8 +461,8 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 				if (m_pairCount >= m_pairCapacity)
 				{
 					int32 oldCapacity = m_pairCapacity;
-					int32 newCapacity = m_pairCount ? 2 * m_pairCount : b2_minParticleBufferSize;
-					ReallocateBuffer(m_pairBuffer, oldCapacity, newCapacity, true);
+					int32 newCapacity = m_pairCount ? 2 * m_pairCount : b2_minParticleBufferCapacity;
+					m_pairBuffer = ReallocateBuffer(m_pairBuffer, oldCapacity, newCapacity);
 					m_pairCapacity = newCapacity;
 				}
 				Pair& pair = m_pairBuffer[m_pairCount];
@@ -502,8 +532,8 @@ void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b, 
 				if (system->m_triadCount >= system->m_triadCapacity)
 				{
 					int32 oldCapacity = system->m_triadCapacity;
-					int32 newCapacity = system->m_triadCount ? 2 * system->m_triadCount : b2_minParticleBufferSize;
-					system->ReallocateBuffer(system->m_triadBuffer, oldCapacity, newCapacity, true);
+					int32 newCapacity = system->m_triadCount ? 2 * system->m_triadCount : b2_minParticleBufferCapacity;
+					system->m_triadBuffer = system->ReallocateBuffer(system->m_triadBuffer, oldCapacity, newCapacity);
 					system->m_triadCapacity = newCapacity;
 				}
 				Triad& triad = system->m_triadBuffer[system->m_triadCount];
@@ -583,7 +613,7 @@ void b2ParticleSystem::ComputeDepthForGroup(b2ParticleGroup* group)
 			m_accumulationBuffer[b] += w;
 		}
 	}
-	RequestParticleBuffer(m_depthBuffer);
+	m_depthBuffer = RequestParticleBuffer(m_depthBuffer);
 	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 	{
 		float32 w = m_accumulationBuffer[i];
@@ -647,8 +677,8 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 		if (m_contactCount >= m_contactCapacity)
 		{
 			int32 oldCapacity = m_contactCapacity;
-			int32 newCapacity = m_contactCount ? 2 * m_contactCount : b2_minParticleBufferSize;
-			ReallocateBuffer(m_contactBuffer, oldCapacity, newCapacity, true);
+			int32 newCapacity = m_contactCount ? 2 * m_contactCount : b2_minParticleBufferCapacity;
+			m_contactBuffer = ReallocateBuffer(m_contactBuffer, oldCapacity, newCapacity);
 			m_contactCapacity = newCapacity;
 		}
 		float32 invD = b2InvSqrt(d2);
@@ -769,8 +799,8 @@ void b2ParticleSystem::UpdateBodyContacts()
 							if (m_system->m_bodyContactCount >= m_system->m_bodyContactCapacity)
 							{
 								int32 oldCapacity = m_system->m_bodyContactCapacity;
-								int32 newCapacity = m_system->m_bodyContactCount ? 2 * m_system->m_bodyContactCount : b2_minParticleBufferSize;
-								m_system->ReallocateBuffer(m_system->m_bodyContactBuffer, oldCapacity, newCapacity, true);
+								int32 newCapacity = m_system->m_bodyContactCount ? 2 * m_system->m_bodyContactCount : b2_minParticleBufferCapacity;
+								m_system->m_bodyContactBuffer = m_system->ReallocateBuffer(m_system->m_bodyContactBuffer, oldCapacity, newCapacity);
 								m_system->m_bodyContactCapacity = newCapacity;
 							}
 							b2ParticleBodyContact& contact = m_system->m_bodyContactBuffer[m_system->m_bodyContactCount];
@@ -1172,7 +1202,7 @@ void b2ParticleSystem::SolveSpring(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 {
-	RequestParticleBuffer(m_accumulation2Buffer);
+	m_accumulation2Buffer = RequestParticleBuffer(m_accumulation2Buffer);
 	for (int32 i = 0; i < m_count; i++)
 	{
 		m_accumulationBuffer[i] = 0;
@@ -1315,7 +1345,7 @@ void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 void b2ParticleSystem::SolveColorMixing(const b2TimeStep& step)
 {
 	// mixes color between contacting particles
-	RequestParticleBuffer(m_colorBuffer);
+	m_colorBuffer = RequestParticleBuffer(m_colorBuffer);
 	int32 colorMixing256 = (int32) (256 * m_colorMixingStrength);
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
@@ -1360,7 +1390,7 @@ void b2ParticleSystem::SolveZombie()
 			{
 				destructionListener->SayGoodbye(i);
 			}
-			newIndices[i] = -1;
+			newIndices[i] = b2_invalidParticleIndex;
 		}
 		else
 		{
@@ -1718,12 +1748,25 @@ b2Vec2* b2ParticleSystem::GetParticleVelocityBuffer()
 
 b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer()
 {
-	return RequestParticleBuffer(m_colorBuffer);
+	m_colorBuffer = RequestParticleBuffer(m_colorBuffer);
+	return m_colorBuffer;
 }
 
 void** b2ParticleSystem::GetParticleUserDataBuffer()
 {
-	return RequestParticleBuffer(m_userDataBuffer);
+	m_userDataBuffer = RequestParticleBuffer(m_userDataBuffer);
+	return m_userDataBuffer;
+}
+
+int32 b2ParticleSystem::GetParticleMaxCount() const
+{
+	return m_maxCount;
+}
+
+void b2ParticleSystem::SetParticleMaxCount(int32 count)
+{
+	b2Assert(m_count <= count);
+	m_maxCount = count;
 }
 
 const uint32* b2ParticleSystem::GetParticleFlagsBuffer() const
@@ -1754,6 +1797,42 @@ b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer() const
 void* const* b2ParticleSystem::GetParticleUserDataBuffer() const
 {
 	return ((b2ParticleSystem*) this)->GetParticleUserDataBuffer();
+}
+
+template <typename T> void b2ParticleSystem::SetParticleBuffer(T*& buffer, int32& userSuppliedCapacity, T* newBuffer, int32 newCapacity)
+{
+	b2Assert((newBuffer && newCapacity) || (!newBuffer && !newCapacity));
+	if (!userSuppliedCapacity)
+	{
+		m_world->m_blockAllocator.Free(buffer, sizeof(T) * m_internalAllocatedCapacity);
+	}
+	buffer = newBuffer;
+	userSuppliedCapacity = newCapacity;
+}
+
+void b2ParticleSystem::SetParticleFlagsBuffer(uint32* buffer, int32 capacity)
+{
+	SetParticleBuffer(m_flagsBuffer, m_userSuppliedFlagsBufferCapacity, buffer, capacity);
+}
+
+void b2ParticleSystem::SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity)
+{
+	SetParticleBuffer(m_positionBuffer, m_userSuppliedPositionBufferCapacity, buffer, capacity);
+}
+
+void b2ParticleSystem::SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity)
+{
+	SetParticleBuffer(m_velocityBuffer, m_userSuppliedVelocityBufferCapacity, buffer, capacity);
+}
+
+void b2ParticleSystem::SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity)
+{
+	SetParticleBuffer(m_colorBuffer, m_userSuppliedColorBufferCapacity, buffer, capacity);
+}
+
+void b2ParticleSystem::SetParticleUserDataBuffer(void** buffer, int32 capacity)
+{
+	SetParticleBuffer(m_userDataBuffer, m_userSuppliedUserDataBufferCapacity, buffer, capacity);
 }
 
 void b2ParticleSystem::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const

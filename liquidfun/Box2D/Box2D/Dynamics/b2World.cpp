@@ -1384,6 +1384,16 @@ void b2World::Dump()
 	b2Log("bodies = NULL;\n");
 }
 
+int32 b2World::GetParticleMaxCount() const
+{
+	return m_particleSystem.GetParticleMaxCount();
+}
+
+void b2World::SetParticleMaxCount(int32 count)
+{
+	m_particleSystem.SetParticleMaxCount(count);
+}
+
 void b2World::SetParticleDensity(float32 density)
 {
 	m_particleSystem.SetParticleDensity(density);
@@ -1536,6 +1546,31 @@ b2ParticleGroup* const* b2World::GetParticleGroupBuffer() const
 void* const* b2World::GetParticleUserDataBuffer() const
 {
 	return m_particleSystem.GetParticleUserDataBuffer();
+}
+
+void b2World::SetParticleFlagsBuffer(uint32* buffer, int32 capacity)
+{
+	m_particleSystem.SetParticleFlagsBuffer(buffer, capacity);
+}
+
+void b2World::SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity)
+{
+	m_particleSystem.SetParticlePositionBuffer(buffer, capacity);
+}
+
+void b2World::SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity)
+{
+	m_particleSystem.SetParticleVelocityBuffer(buffer, capacity);
+}
+
+void b2World::SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity)
+{
+	m_particleSystem.SetParticleColorBuffer(buffer, capacity);
+}
+
+void b2World::SetParticleUserDataBuffer(void** buffer, int32 capacity)
+{
+	m_particleSystem.SetParticleUserDataBuffer(buffer, capacity);
 }
 
 const b2ParticleContact* b2World::GetParticleContacts()
