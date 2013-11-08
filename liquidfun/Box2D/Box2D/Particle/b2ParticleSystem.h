@@ -67,6 +67,18 @@ private:
 	friend class b2World;
 	friend class b2ParticleGroup;
 
+	template <typename T>
+	struct ParticleBuffer
+	{
+		ParticleBuffer()
+		{
+			data = NULL;
+			userSuppliedCapacity = 0;
+		}
+		T* data;
+		int32 userSuppliedCapacity;
+	};
+
 	/// Used for detecting particle contacts
 	struct Proxy
 	{
@@ -140,6 +152,7 @@ private:
 
 	template <typename T> T* ReallocateBuffer(T* buffer, int32 oldCapacity, int32 newCapacity);
 	template <typename T> T* ReallocateBuffer(T* buffer, int32 userSuppliedCapacity, int32 oldCapacity, int32 newCapacity, bool deferred);
+	template <typename T> T* ReallocateBuffer(ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity, bool deferred);
 	template <typename T> T* RequestParticleBuffer(T* buffer);
 
 	int32 CreateParticle(const b2ParticleDef& def);
@@ -206,7 +219,7 @@ private:
 	const b2ParticleColor* GetParticleColorBuffer() const;
 	b2ParticleGroup* const* GetParticleGroupBuffer() const;
 	void* const* GetParticleUserDataBuffer() const;
-	template <typename T> void SetParticleBuffer(T*& oldBuffer, int32& userSuppliedCapacity, T* newBuffer, int32 newCapacity);
+	template <typename T> void SetParticleBuffer(ParticleBuffer<T>* buffer, T* newBufferData, int32 newCapacity);
 	void SetParticleFlagsBuffer(uint32* buffer, int32 capacity);
 	void SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity);
 	void SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity);
@@ -230,20 +243,15 @@ private:
 	int32 m_count;
 	int32 m_internalAllocatedCapacity;
 	int32 m_maxCount;
-	uint32* m_flagsBuffer;
-	b2Vec2* m_positionBuffer;
-	b2Vec2* m_velocityBuffer;
+	ParticleBuffer<uint32> m_flagsBuffer;
+	ParticleBuffer<b2Vec2> m_positionBuffer;
+	ParticleBuffer<b2Vec2> m_velocityBuffer;
 	float32* m_accumulationBuffer; // temporary values
 	b2Vec2* m_accumulation2Buffer; // temporary vectorial values
 	float32* m_depthBuffer; // distance from the surface
-	b2ParticleColor* m_colorBuffer;
+	ParticleBuffer<b2ParticleColor> m_colorBuffer;
 	b2ParticleGroup** m_groupBuffer;
-	void** m_userDataBuffer;
-	int32 m_userSuppliedFlagsBufferCapacity;
-	int32 m_userSuppliedPositionBufferCapacity;
-	int32 m_userSuppliedVelocityBufferCapacity;
-	int32 m_userSuppliedColorBufferCapacity;
-	int32 m_userSuppliedUserDataBufferCapacity;
+	ParticleBuffer<void*> m_userDataBuffer;
 
 	int32 m_proxyCount;
 	int32 m_proxyCapacity;

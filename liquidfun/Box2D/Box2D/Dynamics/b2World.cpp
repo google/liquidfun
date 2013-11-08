@@ -1150,7 +1150,7 @@ void b2World::DrawParticleSystem(const b2ParticleSystem& system)
 	{
 		float32 particleRadius = system.GetParticleRadius();
 		const b2Vec2* positionBuffer = system.GetParticlePositionBuffer();
-		if (system.m_colorBuffer)
+		if (system.m_colorBuffer.data)
 		{
 			const b2ParticleColor* colorBuffer = system.GetParticleColorBuffer();
 			for (int32 i = 0; i < particleCount; i++)
