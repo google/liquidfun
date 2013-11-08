@@ -96,35 +96,37 @@ add_fetch_git_remote() {
 # have been deleted in our branch and added / copied / deleted / renamed in
 # another so they're handled here.
 resolve_deleted_renamed_conflicts() {
-  (
-    # Disable filename expansion (globbing) so that it's possible to compare
-    # each filename to a glob in the if statement below.
-    set -f
-    IFS=$'\n'
-	local merge_ours=$(awk '
-      /^#/ {
-        next;
-      }
+  if [[ -e .gitattributes ]]; then
+    (
+      # Disable filename expansion (globbing) so that it's possible to compare
+      # each filename to a glob in the if statement below.
+      set -f
+      IFS=$'\n'
+      local merge_ours=$(awk '
+        /^#/ {
+          next;
+        }
 
-      $2 ~ /merge=ours/ {
-        filename_glob = $1;
-        # Escape for bash if statement below.
-        gsub(/\//, "\\/", filename_glob);
-        gsub(/\*/, "*", filename_glob);
-        print filename_glob;
-      }' .gitattributes)
-    for file in $(git status -s | \
-                  awk '$1 ~ /^U[ACDR]/ || $1 ~ /^DU/ { print $2 }'); do
-      for use_ours_glob in ${merge_ours}; do
-        eval "
-          if [[ \"\${file/${use_ours_glob}/}\" == \"\" ]]; then
-            echo 'Dropping upstream changes to ${file}' >&2
-            git rm ${file}
-          fi
-        "
+        $2 ~ /merge=ours/ {
+          filename_glob = $1;
+          # Escape for bash if statement below.
+          gsub(/\//, "\\/", filename_glob);
+          gsub(/\*/, "*", filename_glob);
+          print filename_glob;
+        }' .gitattributes)
+      for file in $(git status -s | \
+                    awk '$1 ~ /^U[ACDR]/ || $1 ~ /^DU/ { print $2 }'); do
+        for use_ours_glob in ${merge_ours}; do
+          eval "
+            if [[ \"\${file/${use_ours_glob}/}\" == \"\" ]]; then
+              echo 'Dropping upstream changes to ${file}' >&2
+              git rm ${file}
+            fi
+          "
+        done
       done
-    done
-  )
+    )
+  fi
 }
 
 main() {
@@ -152,7 +154,7 @@ main() {
   # Mirror the subversion repo into a local git repository.
   if [[ "${SVN_UPSTREAM}" != "" ]]; then
     mirror_svn "${temp_upstream}" "${SVN_UPSTREAM}"
-	GIT_UPSTREAM="${temp_upstream}"
+    GIT_UPSTREAM="${temp_upstream}"
   fi
 
   if [[ "${GIT_UPSTREAM}" == "" ]] ;then
