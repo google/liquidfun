@@ -106,6 +106,13 @@ android() {
            "\nAdd the Android ADT sdk/tools directory to the PATH." >&2
     exit 1
   fi
+  # Make sure ant is installed.
+  if [[ "$(which ant)" == "" ]]; then
+    echo -e "Unable to find ant." \
+            "\nPlease install ant and add to the PATH." >&2
+    exit 1
+  fi
+
   "${android_path}" "$@"
 }
 
