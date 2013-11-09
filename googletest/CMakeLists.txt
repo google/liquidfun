@@ -77,7 +77,7 @@ target_link_libraries(gtest_main gtest)
 #
 # They are not built by default.  To build them, set the
 # gtest_build_samples option to ON.  You can do it by running ccmake
-# or specifying the -Dbuild_gtest_samples=ON flag when running cmake.
+# or specifying the -Dgtest_build_samples=ON flag when running cmake.
 
 if (gtest_build_samples)
   cxx_executable(sample1_unittest samples gtest_main samples/sample1.cc)
@@ -124,6 +124,8 @@ if (gtest_build_tests)
     test/gtest-param-test2_test.cc)
   cxx_test(gtest-port_test gtest_main)
   cxx_test(gtest_pred_impl_unittest gtest_main)
+  cxx_test(gtest_premature_exit_test gtest
+    test/gtest_premature_exit_test.cc)
   cxx_test(gtest-printers_test gtest_main)
   cxx_test(gtest_prod_test gtest_main
     test/production.cc)
@@ -140,10 +142,13 @@ if (gtest_build_tests)
   ############################################################
   # C++ tests built with non-standard compiler flags.
 
-  cxx_library(gtest_no_exception "${cxx_no_exception}"
-    src/gtest-all.cc)
-  cxx_library(gtest_main_no_exception "${cxx_no_exception}"
-    src/gtest-all.cc src/gtest_main.cc)
+  # MSVC 7.1 does not support STL with exceptions disabled.
+  if (NOT MSVC OR MSVC_VERSION GREATER 1310)
+    cxx_library(gtest_no_exception "${cxx_no_exception}"
+      src/gtest-all.cc)
+    cxx_library(gtest_main_no_exception "${cxx_no_exception}"
+      src/gtest-all.cc src/gtest_main.cc)
+  endif()
   cxx_library(gtest_main_no_rtti "${cxx_no_rtti}"
     src/gtest-all.cc src/gtest_main.cc)
 
@@ -189,11 +194,15 @@ if (gtest_build_tests)
   cxx_executable(gtest_break_on_failure_unittest_ test gtest)
   py_test(gtest_break_on_failure_unittest)
 
-  cxx_executable_with_flags(
-    gtest_catch_exceptions_no_ex_test_
-    "${cxx_no_exception}"
-    gtest_main_no_exception
-    test/gtest_catch_exceptions_test_.cc)
+  # MSVC 7.1 does not support STL with exceptions disabled.
+  if (NOT MSVC OR MSVC_VERSION GREATER 1310)
+    cxx_executable_with_flags(
+      gtest_catch_exceptions_no_ex_test_
+      "${cxx_no_exception}"
+      gtest_main_no_exception
+      test/gtest_catch_exceptions_test_.cc)
+  endif()
+
   cxx_executable_with_flags(
     gtest_catch_exceptions_ex_test_
     "${cxx_exception}"
@@ -222,11 +231,14 @@ if (gtest_build_tests)
   cxx_executable(gtest_shuffle_test_ test gtest)
   py_test(gtest_shuffle_test)
 
-  cxx_executable(gtest_throw_on_failure_test_ test gtest_no_exception)
-  set_target_properties(gtest_throw_on_failure_test_
-    PROPERTIES
-    COMPILE_FLAGS "${cxx_no_exception}")
-  py_test(gtest_throw_on_failure_test)
+  # MSVC 7.1 does not support STL with exceptions disabled.
+  if (NOT MSVC OR MSVC_VERSION GREATER 1310)
+    cxx_executable(gtest_throw_on_failure_test_ test gtest_no_exception)
+    set_target_properties(gtest_throw_on_failure_test_
+      PROPERTIES
+      COMPILE_FLAGS "${cxx_no_exception}")
+    py_test(gtest_throw_on_failure_test)
+  endif()
 
   cxx_executable(gtest_uninitialized_test_ test gtest)
   py_test(gtest_uninitialized_test)

@@ -52,4 +52,6 @@ class PrivateCode {
   int x_;
 };
 
+PrivateCode::PrivateCode() { }
+
 #endif  // GTEST_TEST_PRODUCTION_H_
