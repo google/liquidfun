@@ -52,6 +52,8 @@ class PrivateCode {
   int x_;
 };
 
+#if defined(GTEST_OS_LINUX_ANDROID)
 PrivateCode::PrivateCode() { }
+#endif // defined(GTEST_OS_LINUX_ANDROID)
 
 #endif  // GTEST_TEST_PRODUCTION_H_
