@@ -1,3 +1,8 @@
+@rem Copyright 2013 Google. All rights reserved.
+@rem
+@rem Use of this source code is governed by a BSD-style
+@rem license that can be found in the LICENSE file or at
+@rem https://developers.google.com/open-source/licenses/bsd
 @echo off
 rem See help text below or run with -h for a description of this batch file.
 

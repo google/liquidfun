@@ -1,3 +1,8 @@
+// Copyright 2013 Google. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file or at
+// https://developers.google.com/open-source/licenses/bsd
 #include "gtest/gtest.h"
 #include "Box2D/Box2D.h"
 #include <stdio.h>
