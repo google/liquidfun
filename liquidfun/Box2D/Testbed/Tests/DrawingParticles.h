@@ -64,40 +64,43 @@ public:
 		m_world->SetParticleRadius(0.5f);
 		m_lastGroup = NULL;
 		m_drawing = true;
-		m_flags = TestParticleType();
+		m_particleFlags = 0;
+		m_groupFlags = 0;
 	}
 
 	void Keyboard(unsigned char key)
 	{
 		m_drawing = key != 'X';
+		m_particleFlags = 0;
+		m_groupFlags = 0;
 		switch (key)
 		{
 		case 'E':
-			m_flags = b2_elasticParticle;
+			m_particleFlags = b2_elasticParticle;
+			m_groupFlags = b2_solidParticleGroup;
 			break;
 		case 'P':
-			m_flags = b2_powderParticle;
+			m_particleFlags = b2_powderParticle;
 			break;
 		case 'R':
-			m_flags = b2_rigidParticle;
+			m_groupFlags = b2_rigidParticleGroup | b2_solidParticleGroup;
 			break;
 		case 'S':
-			m_flags = b2_springParticle;
+			m_particleFlags = b2_springParticle;
+			m_groupFlags = b2_solidParticleGroup;
 			break;
 		case 'T':
-			m_flags = b2_tensileParticle;
+			m_particleFlags = b2_tensileParticle;
 			break;
 		case 'V':
-			m_flags = b2_viscousParticle;
+			m_particleFlags = b2_viscousParticle;
 			break;
 		case 'W':
-			m_flags = b2_wallParticle;
+			m_particleFlags = b2_wallParticle;
+			m_groupFlags = b2_solidParticleGroup;
 			break;
 		case 'Z':
-			m_flags = b2_zombieParticle;
-			break;
-		default:
-			m_flags = 0;
+			m_particleFlags = b2_zombieParticle;
 			break;
 		}
 	}
@@ -117,9 +120,10 @@ public:
 
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
-			pd.flags = m_flags;
+			pd.flags = m_particleFlags;
+			pd.groupFlags = m_groupFlags;
 			b2ParticleGroup* group = m_world->CreateParticleGroup(pd);
-			if (m_lastGroup && group->GetFlags() == m_lastGroup->GetFlags())
+			if (m_lastGroup && group->GetGroupFlags() == m_lastGroup->GetGroupFlags())
 			{
 				m_world->JoinParticleGroups(m_lastGroup, group);
 			}
@@ -163,7 +167,8 @@ public:
 
 	b2ParticleGroup* m_lastGroup;
 	bool m_drawing;
-	int32 m_flags;
+	int32 m_particleFlags;
+	int32 m_groupFlags;
 
 };
 

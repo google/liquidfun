@@ -14,15 +14,15 @@ struct b2Color;
 /// Zero means liquid.
 enum b2ParticleFlag
 {
-	b2_elasticParticle =     1 << 5,  // with restitution from deformation
-	b2_colorMixingParticle = 1 << 13, // mixing color between contacting particles
-	b2_powderParticle =      1 << 16, // wihthout isotropic pressure
-	b2_rigidParticle =       1 << 18, // keeps its shape
-	b2_springParticle =      1 << 19, // with restitution from stretching
-	b2_tensileParticle =     1 << 20, // with surface tension
-	b2_viscousParticle =     1 << 22, // with viscosity
-	b2_wallParticle =        1 << 23, // zero velocity
-	b2_zombieParticle =      1 << 26, // removed after next step
+	b2_waterParticle =       0,
+	b2_zombieParticle =      1 << 1, // removed after next step
+	b2_wallParticle =        1 << 2, // zero velocity
+	b2_springParticle =      1 << 3, // with restitution from stretching
+	b2_elasticParticle =     1 << 4, // with restitution from deformation
+	b2_viscousParticle =     1 << 5, // with viscosity
+	b2_powderParticle =      1 << 6, // wihthout isotropic pressure
+	b2_tensileParticle =     1 << 7, // with surface tension
+	b2_colorMixingParticle = 1 << 8, // mixing color between contacting particles
 };
 
 /// Small color object for each particle

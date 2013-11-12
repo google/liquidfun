@@ -134,11 +134,6 @@ private:
 	/// All particle types that require computing depth
 	static const int32 k_noPressureFlags =
 		b2_powderParticle;
-	/// All particle types that require computing depth
-	static const int32 k_depthFlags =
-		b2_elasticParticle|
-		b2_rigidParticle|
-		b2_wallParticle;
 
 	b2ParticleSystem();
 	~b2ParticleSystem();
@@ -170,7 +165,7 @@ private:
 	void SolveTensile(const b2TimeStep& step);
 	void SolveViscous(const b2TimeStep& step);
 	void SolvePowder(const b2TimeStep& step);
-	void SolveDepth(const b2TimeStep& step);
+	void SolveSolid(const b2TimeStep& step);
 	void SolveColorMixing(const b2TimeStep& step);
 	void SolveZombie();
 	void RotateBuffer(int32 start, int32 mid, int32 end);
@@ -211,7 +206,8 @@ private:
 	float32 ComputeParticleCollisionEnergy() const;
 
 	int32 m_timestamp;
-	int32 m_allFlags;
+	int32 m_allParticleFlags;
+	int32 m_allGroupFlags;
 	float32 m_density;
 	float32 m_inverseDensity;
 	float32 m_gravityScale;

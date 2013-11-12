@@ -58,6 +58,7 @@ public:
 			shape.m_radius = 5;
 			b2ParticleGroupDef pd;
 			pd.flags = b2_springParticle;
+			pd.groupFlags = b2_solidParticleGroup;
 			pd.shape = &shape;
 			pd.color.Set(255, 0, 0, 255);
 			m_world->CreateParticleGroup(pd);
@@ -69,6 +70,7 @@ public:
 			shape.m_radius = 5;
 			b2ParticleGroupDef pd;
 			pd.flags = b2_elasticParticle;
+			pd.groupFlags = b2_solidParticleGroup;
 			pd.shape = &shape;
 			pd.color.Set(0, 255, 0, 255);
 			m_world->CreateParticleGroup(pd);
@@ -79,6 +81,7 @@ public:
 			shape.SetAsBox(10, 5);
 			b2ParticleGroupDef pd;
 			pd.flags = b2_elasticParticle;
+			pd.groupFlags = b2_solidParticleGroup;
 			pd.position.Set(10, 40);
 			pd.angle = -0.5f;
 			pd.angularVelocity = 2.0f;

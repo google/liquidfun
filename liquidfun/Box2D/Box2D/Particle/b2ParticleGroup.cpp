@@ -12,7 +12,7 @@ b2ParticleGroup::b2ParticleGroup()
 	m_system = NULL;
 	m_firstIndex = 0;
 	m_lastIndex = 0;
-	m_flags = 0;
+	m_groupFlags = 0;
 	m_strength = 1.0f;
 	m_prev = NULL;
 	m_next = NULL;
@@ -87,9 +87,14 @@ void* const* b2ParticleGroup::GetParticleUserDataBuffer() const
 	return m_system->GetParticleUserDataBuffer() + m_firstIndex;
 }
 
-int32 b2ParticleGroup::GetFlags() const
+int32 b2ParticleGroup::GetGroupFlags() const
 {
-	return m_flags;
+	return m_groupFlags;
+}
+
+void b2ParticleGroup::SetGroupFlags(int32 flags)
+{
+	m_groupFlags = flags;
 }
 
 float32 b2ParticleGroup::GetMass() const

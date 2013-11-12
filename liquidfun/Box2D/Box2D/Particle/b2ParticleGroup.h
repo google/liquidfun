@@ -14,6 +14,12 @@ class b2ParticleSystem;
 class b2ParticleGroup;
 struct b2ParticleColor;
 
+enum b2ParticleGroupFlag
+{
+	b2_solidParticleGroup =   1 << 0, // prevents overlapping or leaking
+	b2_rigidParticleGroup =   1 << 1, // keeps its shape
+};
+
 /// A particle group definition holds all the data needed to construct a particle group.
 /// You can safely re-use these definitions.
 struct b2ParticleGroupDef
@@ -22,6 +28,7 @@ struct b2ParticleGroupDef
 	b2ParticleGroupDef()
 	{
 		flags = 0;
+		groupFlags = 0;
 		position = b2Vec2_zero;
 		angle = 0;
 		linearVelocity = b2Vec2_zero;
@@ -33,8 +40,11 @@ struct b2ParticleGroupDef
 		userData = NULL;
 	}
 
-	/// The logical sum of the particle-behavior flags.
+	/// The particle-behavior flags.
 	uint32 flags;
+
+	/// The group-construction flags.
+	uint32 groupFlags;
 
 	/// The world position of the group.
 	/// Moves the group’s shape a distance equal to the value of position.
@@ -113,8 +123,11 @@ public:
 	/// Get application-specific data for each particle in the group. The obtained values cannot be changed.
 	void* const* GetParticleUserDataBuffer() const;
 
-	/// Get the iniital particle-behavior flags for the group.
-	int32 GetFlags() const;
+	/// Get the construction flags for the group.
+	int32 GetGroupFlags() const;
+
+	/// Set the construction flags for the group.
+	void SetGroupFlags(int32 flags);
 
 	/// Get the total mass of the group: the sum of all particles in it.
 	float32 GetMass() const;
@@ -155,7 +168,7 @@ private:
 
 	b2ParticleSystem* m_system;
 	int32 m_firstIndex, m_lastIndex;
-	uint32 m_flags;
+	uint32 m_groupFlags;
 	float32 m_strength;
 	b2ParticleGroup* m_prev;
 	b2ParticleGroup* m_next;

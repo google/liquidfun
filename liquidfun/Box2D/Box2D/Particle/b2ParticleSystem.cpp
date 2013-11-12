@@ -39,7 +39,8 @@ b2ParticleSystem::b2ParticleSystem()
 {
 
 	m_timestamp = 0;
-	m_allFlags = 0;
+	m_allParticleFlags = 0;
+	m_allGroupFlags = 0;
 	m_density = 1;
 	m_inverseDensity = 1;
 	m_gravityScale = 1;
@@ -270,7 +271,7 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 	group->m_system = this;
 	group->m_firstIndex = firstIndex;
 	group->m_lastIndex = lastIndex;
-	group->m_flags = groupDef.flags;
+	group->m_groupFlags = groupDef.groupFlags;
 	group->m_strength = groupDef.strength;
 	group->m_userData = groupDef.userData;
 	group->m_transform = transform;
@@ -331,7 +332,7 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 		callback.firstIndex = firstIndex;
 		diagram.GetNodes(callback);
 	}
-	if (groupDef.flags & k_depthFlags)
+	if (groupDef.groupFlags & b2_solidParticleGroup)
 	{
 		ComputeDepthForGroup(group);
 	}
@@ -391,8 +392,13 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 	RotateBuffer(groupA->m_firstIndex, groupA->m_lastIndex, groupB->m_firstIndex);
 	b2Assert(groupA->m_lastIndex == groupB->m_firstIndex);
 
-	uint32 flags = groupA->m_flags | groupB->m_flags;
-	if (flags & k_pairFlags)
+	uint32 particleFlags = 0;
+	for (int32 i = groupA->m_firstIndex; i < groupB->m_lastIndex; i++)
+	{
+		particleFlags |= m_flagsBuffer[i];
+	}
+
+	if (particleFlags & k_pairFlags)
 	{
 		for (int32 k = 0; k < m_contactCount; k++)
 		{
@@ -420,7 +426,8 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 			}
 		}
 	}
-	if (flags & k_triadFlags)
+
+	if (particleFlags & k_triadFlags)
 	{
 		b2VoronoiDiagram diagram(
 			&m_world->m_stackAllocator,
@@ -433,11 +440,13 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 		diagram.GetNodes(callback);
 	}
 
+	uint32 groupFlags = groupA->m_groupFlags | groupB->m_groupFlags;
+	groupA->m_groupFlags = groupFlags;
 	groupA->m_lastIndex = groupB->m_lastIndex;
 	groupB->m_firstIndex = groupB->m_lastIndex;
 	DestroyParticleGroup(groupB);
 
-	if (flags & k_depthFlags)
+	if (groupFlags & b2_solidParticleGroup)
 	{
 		ComputeDepthForGroup(groupA);
 	}
@@ -866,10 +875,15 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	{
 		return;
 	}
-	m_allFlags = 0;
+	m_allParticleFlags = 0;
 	for (int32 i = 0; i < m_count; i++)
 	{
-		m_allFlags |= m_flagsBuffer[i];
+		m_allParticleFlags |= m_flagsBuffer[i];
+	}
+	m_allGroupFlags = 0;
+	for (const b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
+	{
+		m_allGroupFlags |= group->m_groupFlags;
 	}
 	b2Vec2 gravity = step.dt * m_gravityScale * m_world->GetGravity();
 	float32 criticalVelocytySquared = GetCriticalVelocitySquared(step);
@@ -884,11 +898,11 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		}
 	}
 	SolveCollision(step);
-	if (m_allFlags & b2_rigidParticle)
+	if (m_allGroupFlags & b2_rigidParticleGroup)
 	{
 		SolveRigid(step);
 	}
-	if (m_allFlags & b2_wallParticle)
+	if (m_allParticleFlags & b2_wallParticle)
 	{
 		SolveWall(step);
 	}
@@ -898,37 +912,37 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	}
 	UpdateBodyContacts();
 	UpdateContacts();
-	if (m_allFlags & b2_viscousParticle)
+	if (m_allParticleFlags & b2_viscousParticle)
 	{
 		SolveViscous(step);
 	}
-	if (m_allFlags & b2_powderParticle)
+	if (m_allParticleFlags & b2_powderParticle)
 	{
 		SolvePowder(step);
 	}
-	if (m_allFlags & b2_tensileParticle)
+	if (m_allParticleFlags & b2_tensileParticle)
 	{
 		SolveTensile(step);
 	}
-	if (m_allFlags & b2_elasticParticle)
+	if (m_allParticleFlags & b2_elasticParticle)
 	{
 		SolveElastic(step);
 	}
-	if (m_allFlags & b2_springParticle)
+	if (m_allParticleFlags & b2_springParticle)
 	{
 		SolveSpring(step);
 	}
-	if (m_allFlags & k_depthFlags)
+	if (m_allGroupFlags & b2_solidParticleGroup)
 	{
-		SolveDepth(step);
+		SolveSolid(step);
 	}
-	if (m_allFlags & b2_colorMixingParticle)
+	if (m_allParticleFlags & b2_colorMixingParticle)
 	{
 		SolveColorMixing(step);
 	}
 	SolvePressure(step);
 	SolveDamping(step);
-	if (m_allFlags & b2_zombieParticle)
+	if (m_allParticleFlags & b2_zombieParticle)
 	{
 		SolveZombie();
 	}
@@ -959,7 +973,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 		m_accumulationBuffer[b] += w;
 	}
 	// ignores powder particles
-	if (m_allFlags & k_noPressureFlags)
+	if (m_allParticleFlags & k_noPressureFlags)
 	{
 		for (int32 i = 0; i < m_count; i++)
 		{
@@ -1062,7 +1076,7 @@ void b2ParticleSystem::SolveRigid(const b2TimeStep& step)
 {
 	for (b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
 	{
-		if (group->m_flags & b2_rigidParticle)
+		if (group->m_groupFlags & b2_rigidParticleGroup)
 		{
 			group->UpdateStatistics();
 			b2Rot rotation(step.dt * group->m_angularVelocity);
@@ -1258,26 +1272,23 @@ void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 	}
 }
 
-void b2ParticleSystem::SolveDepth(const b2TimeStep& step)
+void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 {
 	// applies extra repulsive force from solid particle groups
 	float32 ejectionStrength = step.inv_dt * m_ejectionStrength;
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & k_depthFlags)
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		if (m_groupBuffer[a] != m_groupBuffer[b])
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			if (m_groupBuffer[a] != m_groupBuffer[b])
-			{
-				float32 w = contact.weight;
-				b2Vec2 n = contact.normal;
-				float32 h = m_depthBuffer[a] + m_depthBuffer[b];
-				b2Vec2 f = ejectionStrength * h * w * n;
-				m_velocityBuffer[a] -= f;
-				m_velocityBuffer[b] += f;
-			}
+			float32 w = contact.weight;
+			b2Vec2 n = contact.normal;
+			float32 h = m_depthBuffer[a] + m_depthBuffer[b];
+			b2Vec2 f = ejectionStrength * h * w * n;
+			m_velocityBuffer[a] -= f;
+			m_velocityBuffer[b] += f;
 		}
 	}
 }
@@ -1454,7 +1465,7 @@ void b2ParticleSystem::SolveZombie()
 			group->m_lastIndex = lastIndex;
 			if (modified)
 			{
-				if (group->m_flags & b2_rigidParticle)
+				if (group->m_groupFlags & b2_rigidParticleGroup)
 				{
 					group->m_toBeSplit = true;
 				}
@@ -1485,6 +1496,7 @@ void b2ParticleSystem::SolveZombie()
 		}
 		else if (group->m_toBeSplit)
 		{
+			// TODO: split the group
 		}
 		group = next;
 	}
