@@ -177,8 +177,10 @@ To execute a sample:
 * Click the "Run" button.
 
 When working with the source distribution, you can generate the
-Xcode project using cmake (see http://www.cmake.org).  For example, the
-following generates the Xcode project in the splash2d/Box2D directory.
+Xcode project using cmake (see http://www.cmake.org).  cmake version 2.8.12.1
+or above is required to build this project on OSX 10.9 (Mavericks).
+For example, the following generates the Xcode project in the splash2d/Box2D
+directory.
 
 $ cd splash2d/Box2D
 $ cmake -G"Xcode"

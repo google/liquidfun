@@ -32,11 +32,7 @@
 #ifndef GLUI_GLUI_H
 #define GLUI_GLUI_H
 
-#ifdef __APPLE__
-	#include <GLUT/glut.h>
-#else
-	#include "GL/freeglut.h"
-#endif
+#include "GL/freeglut.h"
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #include "GLEmu/gl_emu.h"

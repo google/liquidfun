@@ -89,7 +89,7 @@ if(APPLE)
 	# We are not using the Apple's framework version, but X11's
 	include_directories( /usr/X11/include )
 	link_directories( /usr/X11/lib )
-	set (OPENGL_LIBRARIES GL GLU GLUT X11)
+	set (OPENGL_LIBRARIES GL GLU X11)
 elseif(WIN32)
 	set (ADDITIONAL_LIBRARIES winmm)
 endif(APPLE)
