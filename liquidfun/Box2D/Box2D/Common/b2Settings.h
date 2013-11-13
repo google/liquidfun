@@ -23,7 +23,11 @@
 #include <cmath>
 
 #define B2_NOT_USED(x) ((void)(x))
+#if DEBUG
 #define b2Assert(A) assert(A)
+#else
+#define b2Assert(A)
+#endif
 
 typedef signed char	int8;
 typedef signed short int16;

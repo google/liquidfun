@@ -52,6 +52,7 @@ $(eval \
     $(subst $(LOCAL_PATH)/,,\
       $(foreach source_dir,$(source_directories),\
         $(wildcard $(LOCAL_PATH)/Box2D/$(source_dir)/*.h)))
+  LOCAL_CFLAGS:=$(if $(APP_DEBUG),-DDEBUG=1,-DDEBUG=0)
   LOCAL_EXPORT_C_INCLUDES:=$(LOCAL_PATH)
   LOCAL_ARM_MODE:=arm
   $$(call add-stlport-includes))
