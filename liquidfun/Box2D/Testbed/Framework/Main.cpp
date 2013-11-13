@@ -61,6 +61,7 @@ namespace
 	int parameterIndex = 0;
 	bool parameterChanged = false;
 	bool extraArrows = false;
+	const char *parameterName = "";
 	const b2Color arrowActiveColor(0, 1, 0);
 	const b2Color arrowPassiveColor(0.5f, 0.5f, 0.5f);
 #endif // __ANDROID__
@@ -124,7 +125,19 @@ int TestParticleType()
 		b2_viscousParticle,
 		b2_wallParticle,
 	};
-	return flags[parameterIndex % (sizeof(flags) / sizeof(int))];
+	static const char *flagNames[] = {
+		"default",
+		"elastic",
+		"powder",
+		"rigid",
+		"spring",
+		"tensile",
+		"viscous",
+		"wall",
+	};
+	int whichFlag = parameterIndex % (sizeof(flags) / sizeof(int));
+	parameterName = flagNames[whichFlag];
+	return flags[whichFlag];
 #endif // __ANDROID__
 	return 0;
 }
@@ -161,14 +174,24 @@ static void SimulationLoop()
 	// special purpose code for Android: draw navigational arrows to browse test cases, since we don't have the full desktop UI
 	Arrow(e_ArrowSelectionRight, 1, 0, 1, 0);
 	Arrow(e_ArrowSelectionLeft, -1, 180, 1, 0);
+	string msg = entry->name;
 	if (extraArrows)
 	{
 		Arrow(e_ArrowParameterRight, 1, 0, smallerArrowFactor, arrowOffset * smallerArrowFactor + arrowGap);
 		Arrow(e_ArrowParameterLeft, -1, 180, smallerArrowFactor, arrowOffset * smallerArrowFactor + arrowGap);
+		msg += " : ";
+		msg += parameterName;
 	}
+
+	glColor4f(1, 1, 1, 1);
+	glPushMatrix();
+	glTranslatef(-20, -4, 0);
+	glScalef(0.015f, 0.015f, 1);
+	glutStrokeString(GLUT_STROKE_MONO_ROMAN, (const unsigned char *)msg.c_str());
+	glPopMatrix();
+
 	if (parameterChanged) { parameterChanged = false; testIndex = -1; } // force test restart below
 #endif // __ANDROID__
-	//glutStrokeString(GLUT_STROKE_MONO_ROMAN, (const unsigned char *)"ABC");
 
 	test->DrawTitle(entry->name);
 
