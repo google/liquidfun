@@ -59,7 +59,7 @@ public:
 		m_world->SetParticleRadius(0.5f);
 		m_lastGroup = NULL;
 		m_drawing = true;
-		m_flags = 0;
+		m_flags = TestParticleType();
 	}
 
 	void Keyboard(unsigned char key)

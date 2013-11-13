@@ -13,9 +13,17 @@ enum GLenum_emu {
   GL_DRAW_BUFFER,
   GLU_FILL,
   GLU_SMOOTH,
+  GL_UNPACK_SWAP_BYTES,
+  GL_UNPACK_LSB_FIRST,
+  GL_UNPACK_ROW_LENGTH,
+  GL_UNPACK_SKIP_ROWS,
+  GL_UNPACK_SKIP_PIXELS,
+  GL_CLIENT_PIXEL_STORE_BIT,
 };
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 void glColor3f(float r, float g, float b);
 void glColor3fv(const float *color);
@@ -46,15 +54,17 @@ void glOrtho(double left, double right, double bottom, double top, double near, 
 void gluOrtho2D(double left, double right, double bottom, double top);
 
 struct GLUquadric {};
-typedef GLUquadric GLUquadricObj;
+typedef struct GLUquadric GLUquadricObj;
 
-GLUquadric* gluNewQuadric();
-void gluQuadricNormals(GLUquadric *quad, int normal);
-void gluQuadricTexture(GLUquadric *quad, bool texture);
-void gluSphere(GLUquadric *quad, double radius, int slices, int stacks);
-void gluQuadricDrawStyle(GLUquadric *quad, int draw);
+struct GLUquadric* gluNewQuadric();
+void gluQuadricNormals(struct GLUquadric *quad, int normal);
+void gluQuadricTexture(struct GLUquadric *quad, int texture);
+void gluSphere(struct GLUquadric *quad, double radius, int slices, int stacks);
+void gluQuadricDrawStyle(struct GLUquadric *quad, int draw);
 
+#ifdef __cplusplus
 }
+#endif
 
 #endif
 

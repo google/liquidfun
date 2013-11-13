@@ -47,13 +47,20 @@ namespace
 	const float arrowScale = 2.5;  // relative to worldspace
 	const float arrowSize = 3.5; // see geometry in DrawArrow()
 	const float arrowOffset = arrowScale * arrowSize; // defines hitbox & position
+	const float smallerArrowFactor = 0.5f;
+	const float arrowGap = 3;
 	enum ArrowSelection 
 	{
 		e_ArrowSelectionNone = 0,
 		e_ArrowSelectionLeft,
 		e_ArrowSelectionRight,
+		e_ArrowParameterLeft,
+		e_ArrowParameterRight,
 	};
 	ArrowSelection whichArrow = e_ArrowSelectionNone;
+	int parameterIndex = 0;
+	bool parameterChanged = false;
+	bool extraArrows = false;
 	const b2Color arrowActiveColor(0, 1, 0);
 	const b2Color arrowPassiveColor(0.5f, 0.5f, 0.5f);
 #endif // __ANDROID__
@@ -103,6 +110,38 @@ static void Timer(int)
 	glutTimerFunc(framePeriod, Timer, 0);
 }
 
+int TestParticleType()
+{
+#ifdef __ANDROID__
+	extraArrows = true;
+	static int flags[] = {
+		0,
+		b2_elasticParticle,
+		b2_powderParticle,
+		b2_rigidParticle,
+		b2_springParticle,
+		b2_tensileParticle,
+		b2_viscousParticle,
+		b2_wallParticle,
+	};
+	return flags[parameterIndex % (sizeof(flags) / sizeof(int))];
+#endif // __ANDROID__
+	return 0;
+}
+
+#ifdef __ANDROID__
+void Arrow(ArrowSelection as, int dir, float angle, float scale, float offset2)
+{
+	DebugDraw dbgDraw;
+	glPushMatrix();
+	glTranslatef(settings.viewCenter.x + (extents.x - arrowOffset + arrowScale - offset2) * dir, settings.viewCenter.y, 0);
+	glRotatef(angle, 0, 0, 1);
+	glScalef(arrowScale * scale, arrowScale * scale, 1);
+	dbgDraw.DrawArrow(lMouseDown && whichArrow == as ? arrowActiveColor : arrowPassiveColor);
+	glPopMatrix();
+}
+#endif // __ANDROID__
+
 static void SimulationLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -120,19 +159,16 @@ static void SimulationLoop()
 
 #ifdef __ANDROID__
 	// special purpose code for Android: draw navigational arrows to browse test cases, since we don't have the full desktop UI
-	DebugDraw dbgDraw;
-	glPushMatrix();
-	glTranslatef(settings.viewCenter.x + extents.x - arrowOffset + arrowScale, settings.viewCenter.y, 0);
-	glScalef(arrowScale, arrowScale, 1);
-	dbgDraw.DrawArrow(lMouseDown && whichArrow == e_ArrowSelectionRight ? arrowActiveColor : arrowPassiveColor);
-	glPopMatrix();
-	glPushMatrix();
-	glTranslatef(settings.viewCenter.x - extents.x + arrowOffset - arrowScale, settings.viewCenter.y, 0);
-	glRotatef(180, 0, 0, 1);
-	glScalef(arrowScale, arrowScale, 1);
-	dbgDraw.DrawArrow(lMouseDown && whichArrow == e_ArrowSelectionLeft ? arrowActiveColor : arrowPassiveColor);
-	glPopMatrix();
+	Arrow(e_ArrowSelectionRight, 1, 0, 1, 0);
+	Arrow(e_ArrowSelectionLeft, -1, 180, 1, 0);
+	if (extraArrows)
+	{
+		Arrow(e_ArrowParameterRight, 1, 0, smallerArrowFactor, arrowOffset * smallerArrowFactor + arrowGap);
+		Arrow(e_ArrowParameterLeft, -1, 180, smallerArrowFactor, arrowOffset * smallerArrowFactor + arrowGap);
+	}
+	if (parameterChanged) { parameterChanged = false; testIndex = -1; } // force test restart below
 #endif // __ANDROID__
+	//glutStrokeString(GLUT_STROKE_MONO_ROMAN, (const unsigned char *)"ABC");
 
 	test->DrawTitle(entry->name);
 
@@ -341,7 +377,12 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 		if (withinYrange && p.x < -(extents.x - arrowOffset))
 		{
 			whichArrow = e_ArrowSelectionLeft;
-			if (state == GLUT_UP) testSelection = max(0, testSelection - 1);
+			if (state == GLUT_UP)
+			{
+				testSelection = max(0, testSelection - 1);
+				extraArrows = false;
+				parameterIndex = 0;
+			}
 		}
 		else if (withinYrange && p.x >  (extents.x - arrowOffset))
 		{
@@ -350,7 +391,19 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 			{
 				testSelection++;
 				if (!g_testEntries[testSelection].name) testSelection--;
+				extraArrows = false;
+				parameterIndex = 0;
 			}
+		}
+		else if (extraArrows && withinYrange && p.x < -(extents.x - arrowOffset - arrowOffset * smallerArrowFactor - arrowGap))
+		{
+			whichArrow = e_ArrowParameterLeft;
+			if (state == GLUT_UP) { parameterIndex--; parameterChanged = true; }
+		}
+		else if (extraArrows && withinYrange && p.x >  (extents.x - arrowOffset - arrowOffset * smallerArrowFactor - arrowGap))
+		{
+			whichArrow = e_ArrowParameterRight;
+			if (state == GLUT_UP) { parameterIndex++; parameterChanged = true; }
 		}
 		else
 		{

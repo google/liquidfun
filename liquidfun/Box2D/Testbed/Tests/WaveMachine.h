@@ -45,6 +45,7 @@ public:
 		m_world->SetParticleRadius(0.15f);
 		{
 			b2ParticleGroupDef pd;
+			pd.flags = TestParticleType();
 
 			b2PolygonShape shape;
 			shape.SetAsBox(9.0f, 9.0f, b2Vec2(0.0f, 10.0f), 0.0);

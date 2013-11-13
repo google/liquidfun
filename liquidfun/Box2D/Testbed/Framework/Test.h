@@ -198,4 +198,6 @@ protected:
 	b2Profile m_totalProfile;
 };
 
+extern int TestParticleType();
+
 #endif
