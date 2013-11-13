@@ -129,7 +129,7 @@ GLUquadric* gluNewQuadric() {
 }
 
 void gluQuadricNormals(GLUquadric *quad, int normal) { assert(0); }
-void gluQuadricTexture(GLUquadric *quad, bool texture) { assert(0); }
+void gluQuadricTexture(GLUquadric *quad, int texture) { assert(0); }
 void gluSphere(GLUquadric *quad, double radius, int slices, int stacks) { assert(0); }
 void gluQuadricDrawStyle(GLUquadric *quad, int draw) { assert(0); }
 

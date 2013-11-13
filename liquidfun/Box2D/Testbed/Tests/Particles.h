@@ -56,6 +56,7 @@ public:
 			shape.m_p.Set(0, 30);
 			shape.m_radius = 20;
 			b2ParticleGroupDef pd;
+			pd.flags = TestParticleType();
 			pd.shape = &shape;
 			m_world->CreateParticleGroup(pd);
 		}
