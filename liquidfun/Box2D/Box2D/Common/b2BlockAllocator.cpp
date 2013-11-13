@@ -131,7 +131,7 @@ void* b2BlockAllocator::Allocate(int32 size)
 
 		b2Chunk* chunk = m_chunks + m_chunkCount;
 		chunk->blocks = (b2Block*)b2Alloc(b2_chunkSize);
-#if defined(_DEBUG)
+#if DEBUG
 		memset(chunk->blocks, 0xcd, b2_chunkSize);
 #endif
 		int32 blockSize = s_blockSizes[index];
@@ -172,7 +172,7 @@ void b2BlockAllocator::Free(void* p, int32 size)
 	int32 index = s_blockSizeLookup[size];
 	b2Assert(0 <= index && index < b2_blockSizes);
 
-#ifdef _DEBUG
+#if DEBUG
 	// Verify the memory address and size is valid.
 	int32 blockSize = s_blockSizes[index];
 	bool found = false;

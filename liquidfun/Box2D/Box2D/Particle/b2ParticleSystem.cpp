@@ -107,7 +107,7 @@ void b2ParticleSystem::ReallocateBuffer(T *&buffer, int32 oldCapacity, int32 new
 		{
 			newBuffer[i] = oldBuffer[i];
 		}
-#ifndef NDEBUG
+#if DEBUG
 		memset(newBuffer + oldCapacity, -1, sizeof(T) * (newCapacity - oldCapacity));
 #endif
 		m_world->m_blockAllocator.Free(oldBuffer, sizeof(T) * oldCapacity);

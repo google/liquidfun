@@ -37,8 +37,10 @@ void b2Free(void* mem)
 // You can modify this to use your logging facility.
 void b2Log(const char* string, ...)
 {
+#if DEBUG
 	va_list args;
 	va_start(args, string);
 	vprintf(string, args);
 	va_end(args);
+#endif
 }
