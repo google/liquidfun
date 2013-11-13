@@ -7,6 +7,7 @@
 *.vcxproj.filters
 *.vcxproj.user
 *.sln
+*.suo
 Box2D/*.def
 Box2D/*.rc
 Box2D/*.pc
