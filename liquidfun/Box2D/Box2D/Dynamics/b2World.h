@@ -213,18 +213,55 @@ public:
 
 	/// Create a particle whose properties have been defined.
 	/// No reference to the definition is retained.
+	/// A simulation step must occur before it's possible to interact with a
+	/// newly created particle.  For example, DestroyParticleInShape() will
+	/// not destroy a particle until Step() has been called.
 	/// @warning This function is locked during callbacks.
 	/// @return the index of the particle.
 	int32 CreateParticle(const b2ParticleDef& def);
 
 	/// Destroy a particle.
 	/// The particle is removed after the next step.
-	void DestroyParticle(int32 index);
+	void DestroyParticle(int32 index)
+	{
+		DestroyParticle(index, false);
+	}
+
+	/// Destroy a particle.
+	/// The particle is removed after the next step.
+	/// @param Index of the particle to destroy.
+	/// @param Whether to call the destruction listener just before the
+	/// particle is destroyed.
+	void DestroyParticle(int32 index, bool callDestructionListener);
+
+	/// Destroy particles inside a shape without enabling the destruction
+	/// callback for destroyed particles.
+	/// This function is locked during callbacks.
+	/// For more information see
+	/// DestroyParticleInShape(const b2Shape&, const b2Transform&,bool).
+	/// @param Shape which encloses particles that should be destroyed.
+	/// @param Transform applied to the shape.
+	/// @warning This function is locked during callbacks.
+	/// @return Number of particles destroyed.
+	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf)
+	{
+		return DestroyParticlesInShape(shape, xf, false);
+	}
 
 	/// Destroy particles inside a shape.
 	/// This function is locked during callbacks.
+	/// In addition, this function immediately destroys particles in the shape
+	/// in constrast to DestroyParticle() which defers the destruction until
+	/// the next simulation step.
+	/// @param Shape which encloses particles that should be destroyed.
+	/// @param Transform applied to the shape.
+	/// @param Whether to call the world b2DestructionListener for each
+	/// particle destroyed.
 	/// @warning This function is locked during callbacks.
-	void DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf);
+	/// @return Number of particles destroyed.
+	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf,
+	                              bool callDestructionListener);
+
 
 	/// Create a particle group whose properties have been defined. No reference
 	/// to the definition is retained.

@@ -143,8 +143,12 @@ private:
 	template <typename T> T *RequestParticleBuffer(T *&buffer);
 
 	int32 CreateParticle(const b2ParticleDef& def);
-	void DestroyParticle(int32 index);
-	void DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf);
+	void DestroyParticle(int32 index, bool callDestructionListener);
+	// Destroy particles in the specified shape with the transform xf applied
+	// optionally calling the destruction listener for particles that are
+	// destroyed.
+	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf,
+	                              bool callDestructionListener);
 	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
 	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 	void DestroyParticleGroup(b2ParticleGroup* group);

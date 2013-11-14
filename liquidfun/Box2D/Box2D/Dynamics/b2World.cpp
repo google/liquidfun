@@ -1435,19 +1435,21 @@ int32 b2World::CreateParticle(const b2ParticleDef& def)
 	return p;
 }
 
-void b2World::DestroyParticle(int32 index)
+void b2World::DestroyParticle(int32 index, bool callDestructionListener)
 {
-	m_particleSystem.DestroyParticle(index);
+	m_particleSystem.DestroyParticle(index, callDestructionListener);
 }
 
-void b2World::DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf)
+int32 b2World::DestroyParticlesInShape(
+	const b2Shape& shape, const b2Transform& xf, bool callDestructionListener)
 {
 	b2Assert(IsLocked() == false);
 	if (IsLocked())
 	{
-		return;
+		return 0;
 	}
-	m_particleSystem.DestroyParticlesInShape(shape, xf);
+	return m_particleSystem.DestroyParticlesInShape(shape, xf,
+													callDestructionListener);
 }
 
 b2ParticleGroup* b2World::CreateParticleGroup(const b2ParticleGroupDef& def)

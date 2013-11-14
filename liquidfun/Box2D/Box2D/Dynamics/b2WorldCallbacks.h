@@ -52,6 +52,15 @@ public:
 	{
 		B2_NOT_USED(group);
 	}
+
+	/// Called when a particle is about to be destroyed.
+	/// The index can be used in conjunction with
+	/// b2World::GetParticleUserDataBuffer() to determine which particle has
+	/// been destroyed.
+	virtual void SayGoodbye(int32 index)
+	{
+		B2_NOT_USED(index);
+	}
 };
 
 /// Implement this class to provide collision filtering. In other words, you can implement

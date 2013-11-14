@@ -175,15 +175,35 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	return m_count++;
 }
 
-void b2ParticleSystem::DestroyParticle(int32 index)
+void b2ParticleSystem::DestroyParticle(
+	int32 index, bool callDestructionListener)
 {
-	m_flagsBuffer[index] |= b2_zombieParticle;
+	uint32 flags = b2_zombieParticle;
+	if (callDestructionListener)
+	{
+		flags |= b2_destructionListener;
+	}
+	m_flagsBuffer[index] |= flags;
 }
 
-void b2ParticleSystem::DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf)
+int32 b2ParticleSystem::DestroyParticlesInShape(
+	const b2Shape& shape, const b2Transform& xf,
+	bool callDestructionListener)
 {
 	class DestroyParticlesInShapeCallback : public b2QueryCallback
 	{
+	public:
+		DestroyParticlesInShapeCallback(
+			b2ParticleSystem* system, const b2Shape& shape,
+			const b2Transform& xf, bool callDestructionListener)
+		{
+			m_system = system;
+			m_shape = &shape;
+			m_xf = xf;
+			m_callDestructionListener = callDestructionListener;
+			m_destroyed = 0;
+		}
+
 		bool ReportFixture(b2Fixture* fixture)
 		{
 			return false;
@@ -194,27 +214,26 @@ void b2ParticleSystem::DestroyParticlesInShape(const b2Shape& shape, const b2Tra
 			b2Assert(index >=0 && index < m_system->m_count);
 			if (m_shape->TestPoint(m_xf, m_system->m_positionBuffer[index]))
 			{
-				m_system->m_flagsBuffer[index] |= b2_zombieParticle;
+				m_system->DestroyParticle(index, m_callDestructionListener);
+				m_destroyed++;
 			}
 			return true;
 		}
 
+		int32 Destroyed() { return m_destroyed; }
+
+	private:
 		b2ParticleSystem* m_system;
 		const b2Shape* m_shape;
 		b2Transform m_xf;
-
-	public:
-		DestroyParticlesInShapeCallback(b2ParticleSystem* system, const b2Shape& shape, const b2Transform& xf)
-		{
-			m_system = system;
-			m_shape = &shape;
-			m_xf = xf;
-		}
-	} callback(this, shape, xf);
+		bool m_callDestructionListener;
+		int32 m_destroyed;
+	} callback(this, shape, xf, callDestructionListener);
 	b2AABB aabb;
 	shape.ComputeAABB(&aabb, xf, 0);
 	m_world->QueryAABB(&callback, aabb);
 	SolveZombie();
+	return callback.Destroyed();
 }
 
 b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef& groupDef)
@@ -1327,12 +1346,20 @@ void b2ParticleSystem::SolveZombie()
 {
 	// removes particles with zombie flag
 	int32 newCount = 0;
-	int32* newIndices = (int32*) m_world->m_stackAllocator.Allocate(sizeof(int32) * m_count);
+	int32* newIndices = (int32*) m_world->m_stackAllocator.Allocate(
+		sizeof(int32) * m_count);
 	for (int32 i = 0; i < m_count; i++)
 	{
 		int32 flags = m_flagsBuffer[i];
 		if (flags & b2_zombieParticle)
 		{
+			b2DestructionListener * const destructionListener =
+				m_world->m_destructionListener;
+			if ((flags & b2_destructionListener) &&
+				destructionListener)
+			{
+				destructionListener->SayGoodbye(i);
+			}
 			newIndices[i] = -1;
 		}
 		else
