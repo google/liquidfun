@@ -7,8 +7,7 @@ ${eval \
   LOCAL_MODULE:=freeglut-gles$1$2
   LOCAL_SRC_FILES:=\
     $(subst $(LOCAL_PATH)/,,\
-      $(filter-out $(LOCAL_PATH)/src/fg_font.c \
-                   $(LOCAL_PATH)/src/fg_menu.c,\
+      $(filter-out $(LOCAL_PATH)/src/fg_menu.c,\
         $(wildcard $(LOCAL_PATH)/src/*.c)) \
       $(wildcard $(LOCAL_PATH)/src/android/*.c) \
       $(wildcard $(LOCAL_PATH)/src/android/native_app_glue/*.c) \
