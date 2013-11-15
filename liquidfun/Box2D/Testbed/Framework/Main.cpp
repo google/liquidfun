@@ -49,7 +49,7 @@ namespace
 	const float arrowOffset = arrowScale * arrowSize; // defines hitbox & position
 	const float smallerArrowFactor = 0.5f;
 	const float arrowGap = 3;
-	enum ArrowSelection 
+	enum ArrowSelection
 	{
 		e_ArrowSelectionNone = 0,
 		e_ArrowSelectionLeft,
@@ -116,20 +116,18 @@ int TestParticleType()
 #ifdef __ANDROID__
 	extraArrows = true;
 	static int flags[] = {
-		0,
+		b2_waterParticle,
 		b2_elasticParticle,
 		b2_powderParticle,
-		b2_rigidParticle,
 		b2_springParticle,
 		b2_tensileParticle,
 		b2_viscousParticle,
 		b2_wallParticle,
 	};
 	static const char *flagNames[] = {
-		"default",
+		"water",
 		"elastic",
 		"powder",
-		"rigid",
 		"spring",
 		"tensile",
 		"viscous",
@@ -249,7 +247,7 @@ static void Keyboard(unsigned char key, int x, int y)
 			test->LaunchBomb();
 		}
 		break;
- 
+
 	case 'p':
 		settings.pause = !settings.pause;
 		break;
@@ -273,7 +271,7 @@ static void Keyboard(unsigned char key, int x, int y)
 		}
 		if (glui) glui->sync_live();
 		break;
-		
+
 	default:
 		if (test)
 		{
@@ -410,7 +408,7 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 		else if (withinYrange && p.x >  (extents.x - arrowOffset))
 		{
 			whichArrow = e_ArrowSelectionRight;
-			if (state == GLUT_UP) 
+			if (state == GLUT_UP)
 			{
 				testSelection++;
 				if (!g_testEntries[testSelection].name) testSelection--;
@@ -438,7 +436,7 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 	else if (button == GLUT_RIGHT_BUTTON)
 	{
 		if (state == GLUT_DOWN)
-		{	
+		{
 			lastp = ConvertScreenToWorld(x, y);
 			rMouseDown = true;
 		}
@@ -454,7 +452,7 @@ static void MouseMotion(int32 x, int32 y)
 {
 	b2Vec2 p = ConvertScreenToWorld(x, y);
 	test->MouseMove(p);
-	
+
 	if (rMouseDown)
 	{
 		b2Vec2 diff = p - lastp;
@@ -533,7 +531,7 @@ int main(int argc, char** argv)
 
 	glutDisplayFunc(SimulationLoop);
 
-	GLUI_Master.set_glutReshapeFunc(Resize);  
+	GLUI_Master.set_glutReshapeFunc(Resize);
 	GLUI_Master.set_glutKeyboardFunc(Keyboard);
 	GLUI_Master.set_glutSpecialFunc(KeyboardSpecial);
 	GLUI_Master.set_glutMouseFunc(Mouse);
@@ -546,7 +544,7 @@ int main(int argc, char** argv)
 
 #ifndef __ANDROID__
 
-	glui = GLUI_Master.create_glui_subwindow( mainWindow, 
+	glui = GLUI_Master.create_glui_subwindow( mainWindow,
 		GLUI_SUBWINDOW_RIGHT );
 
 	glui->add_statictext("Tests");
