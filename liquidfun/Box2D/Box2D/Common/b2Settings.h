@@ -119,14 +119,20 @@ typedef double float64;
 
 // Particle
 
-// The standard distance between particles, divided by the particle radius.
+/// The standard distance between particles, divided by the particle radius.
 #define b2_particleStride			0.75f
 
-// The maximum distance between particles in a triad, divided by the particle radius.
+/// The minimum particle weight that produces pressure.
+#define b2_minParticleWeight			1.0f
+
+/// The upper limit for particle weight used in pressure calculation.
+#define b2_maxParticleWeight		5.0f
+
+/// The maximum distance between particles in a triad, divided by the particle radius.
 #define b2_maxTriadDistance			2
 #define b2_maxTriadDistanceSquared		(b2_maxTriadDistance * b2_maxTriadDistance)
 
-// The initial size of particle data buffers.
+/// The initial size of particle data buffers.
 #define b2_minParticleBufferSize	256
 
 // Sleep

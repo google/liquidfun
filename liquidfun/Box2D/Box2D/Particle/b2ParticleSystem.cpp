@@ -988,7 +988,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 	for (int32 i = 0; i < m_count; i++)
 	{
 		float32 w = m_accumulationBuffer[i];
-		float32 h = pressurePerWeight * b2Max(0.0f, w - 1.0f);
+		float32 h = pressurePerWeight * b2Max(0.0f, b2Min(w, b2_maxParticleWeight) - b2_minParticleWeight);
 		m_accumulationBuffer[i] = h;
 	}
 	// applies pressure between each particles in contact
