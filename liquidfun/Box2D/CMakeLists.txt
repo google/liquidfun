@@ -44,11 +44,11 @@ foreach(FLAGS_TYPE C CXX)
   endforeach(BUILD_TYPE_SUFFIX)
   # If no build configuration is specified, default to release flags to align
   # with cmake's default build configuration for makefiles.
-  if(NOT CMAKE_BUILD_TYPE)
+  if(NOT CMAKE_BUILD_TYPE AND UNIX AND NOT APPLE)
     set(FLAGS_VARIABLE CMAKE_${FLAGS_TYPE}_FLAGS)
     file(APPEND "flags.cmake"
          "set(${FLAGS_VARIABLE} \"\${${FLAGS_VARIABLE}} ${RELEASE_FLAGS}\")\n")
-  endif(NOT CMAKE_BUILD_TYPE)
+  endif(NOT CMAKE_BUILD_TYPE AND UNIX AND NOT APPLE)
 endforeach(FLAGS_TYPE)
 include("flags.cmake")
 
