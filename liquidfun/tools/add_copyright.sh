@@ -1,10 +1,20 @@
 #!/bin/bash -eu
 #
-# Copyright 2013 Google. All rights reserved.
+# Copyright (c) 2013 Google, Inc.
 #
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file or at
-# https://developers.google.com/open-source/licenses/bsd
+# This software is provided 'as-is', without any express or implied
+# warranty.  In no event will the authors be held liable for any damages
+# arising from the use of this software.
+# Permission is granted to anyone to use this software for any purpose,
+# including commercial applications, and to alter it and redistribute it
+# freely, subject to the following restrictions:
+# 1. The origin of this software must not be misrepresented; you must not
+# claim that you wrote the original software. If you use this software
+# in a product, an acknowledgment in the product documentation would be
+# appreciated but is not required.
+# 2. Altered source versions must be plainly marked as such, and must not be
+# misrepresented as being the original software.
+# 3. This notice may not be removed or altered from any source distribution.
 
 # Upstream git repo to compare against.
 : ${GIT_UPSTREAM:=../../../../external/box2d}
@@ -16,27 +26,42 @@ declare -r project_root=$(cd "${this_dir}/.."; pwd)
 declare -r project_name=$(basename "${project_root}")
 declare -r year=$(date +%Y)
 
+declare -r existing_copyright_regexp='Copyright [^ ][^ ]*'
+declare -r copyright_regexp='Copyright \(c\) [^ ][^ ]* Google'
+declare -r copyright_title="\
+Copyright (c) ${year} Google, Inc."
 declare -r copyright="\
-Copyright ${year} Google. All rights reserved.
+${copyright_title}
 
-Use of this source code is governed by a BSD-style
-license that can be found in the LICENSE file or at
-https://developers.google.com/open-source/licenses/bsd"
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+1. The origin of this software must not be misrepresented; you must not
+claim that you wrote the original software. If you use this software
+in a product, an acknowledgment in the product documentation would be
+appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+"
 
 # Files to add the copyright header to (re - regular expression), the
 # comment style to use (cs / ce - line comment start / end or pcs / pce -
 # paragraph comment start / end) and the number of lines to skip before
 # adding the comment (skip).
 declare -r files_comment_regexp='
-re="\.cpp$"; cs="// "; ce=""; pcs=""; pce=""; skip=0;
-re="\.c$"; cs="// "; ce=""; pcs=""; pce=""; skip=0;
-re="\.h$"; cs="// "; ce=""; pcs=""; pce=""; skip=0;
+re="\.cpp$"; cs="* "; ce=""; pcs="/*\n"; pce="*/\n"; skip=0;
+re="\.c$"; cs="* "; ce=""; pcs="/*\n"; pce="*/\n"; skip=0;
+re="\.h$"; cs="* "; ce=""; pcs="/*\n"; pce="*/\n"; skip=0;
 re="\.mk$"; cs="# "; ce=""; pcs=""; pce=""; skip=0;
 re="\.sh$"; cs="# "; ce=""; pcs=""; pce=""; skip=1;
 re="\.bat$"; cs="@rem "; ce=""; pcs=""; pce=""; skip=0;
 re="CMakeLists\.txt$"; cs="# "; ce=""; pcs=""; pce=""; skip=0;
-re="/\.project$"; cs="     "; ce="";  pcs="<!-- "; pce=" -->"; skip=1;
-re="\.xml$"; cs="     "; ce=""; pcs="<!-- "; pce=" -->"; skip=1;
+re="/\.project$"; cs="     "; ce="";  pcs="<!-- "; pce=" -->\n"; skip=1;
+re="\.xml$"; cs="     "; ce=""; pcs="<!-- "; pce=" -->\n"; skip=1;
 '
 
 # Display usage of this script.
@@ -71,29 +96,59 @@ main() {
 
   (
     IFS=$'\n'
-    # For all added files...
-    for filename in $(git diff --summary ${remote_branch}..HEAD | \
-                        awk '/create/ {
-                               line=$0;
-                               sub(/ *create  *mode  *[^ ][^ ]* */, "", line);
-                               print line }'); do
+	# For all modified files...
+    # NOTE: -b (ignore whitespace) doesn't work with --name-only so this
+    # ignores whitespace then extracts the filenames from the diff output.
+	for filename in $(git diff --diff-filter=M -b ${remote_branch}..HEAD | \
+                      awk '/^diff / { f=$4; sub(/b\//, "", f); print f }' ); do
       local check_file=0
       for comment_data in ${files_comment_regexp}; do
         eval "${comment_data}"
         # If the file should contain a copyright header.
-        if echo ${filename} | grep -qE "${re}"; then
+        if echo "${filename}" | grep -qE "${re}"; then
+          # If a license header is present but the Google copyright isn't.
+          if head -n10 "${filename}" | \
+             grep -qE "${existing_copyright_regexp}"; then
+            if ! head -n10 "${filename}" | grep -qE "${copyright_regexp}"; then
+              check_file=1
+              echo "${filename} - insert copyright" >&2
+              local new_filename="${filename}.new"
+              awk '{ print $0 } /'"${existing_copyright_regexp}"'/ { exit }' \
+                "${filename}" > "${new_filename}"
+              echo -e "${cs}${copyright_title}${ce}" >> "${new_filename}"
+              awk '/'"${existing_copyright_regexp}"'/ { p = 1; next; }
+                   { if (p) { print $0 } }' "${filename}" >> "${new_filename}"
+              cat "${new_filename}" | sed 's@^\(<!-- \) *@\1@' > "${filename}"
+              rm "${new_filename}"
+            fi
+          fi
+        fi
+      done
+      if [[ $((check_file)) -eq 0 ]]; then
+        echo "${filename} - skipped modified file" >&2
+      fi
+    done
+
+    # For all added files...
+    for filename in $(git diff --name-only --diff-filter=A \
+                        ${remote_branch}..HEAD); do
+      local check_file=0
+      for comment_data in ${files_comment_regexp}; do
+        eval "${comment_data}"
+        # If the file should contain a copyright header.
+        if echo "${filename}" | grep -qE "${re}"; then
           check_file=1
           # If the copyright header isn't present.
-          if ! head -n10 ${filename} | \
-               grep -qE 'Copyright [^ ][^ ]* Google'; then
+          if ! head -n10 "${filename}" | \
+               grep -qE 'Copyright [^ ][^ ]* [^ ][^ ]* Google'; then
             # Add the copyright header to the file.
-            echo "${filename}" >&2
+            echo "${filename} - add copyright" >&2
             local new_filename="${filename}.new"
             head -n${skip} "${filename}" > "${new_filename}"
-            echo -n "${pcs}" >> "${new_filename}"
-            echo -n "${copyright}" | \
+            echo -ne "${pcs}" >> "${new_filename}"
+            echo -ne "${copyright}" | \
               sed 's~^~'"${cs}"'~;s~$~'"${ce}"'~;s~ *$~~' >> "${new_filename}"
-            echo "${pce}" >> "${new_filename}"
+            echo -ne "${pce}" >> "${new_filename}"
             tail -n+$((skip + 1)) "${filename}" >> "${new_filename}"
             cat "${new_filename}" | sed 's@^\(<!-- \) *@\1@' > "${filename}"
             rm "${new_filename}"
@@ -101,7 +156,7 @@ main() {
         fi
       done
       if [[ $((check_file)) -eq 0 ]]; then
-        echo "Skipping ${filename}" >&2
+        echo "${filename} - skipped added file" >&2
       fi
     done
   )
