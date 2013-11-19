@@ -80,6 +80,20 @@
 #   define  TARGET_HOST_SOLARIS    0
 #endif
 
+/* Compile time assert macro for compilers that don't support static_assert().
+ * e.g COMPILE_TIME_ASSERT(sizeof(long) == 4, long_is_4_bytes); would verify
+ * that the size of the long type is 4 bytes at compile time. */
+#define COMPILE_TIME_ASSERT_EXPAND_IDENTIFIER(a, b, c)  a ## b ##c
+#define COMPILE_TIME_ASSERT_IDENTIFIER(a, b, c) \
+  COMPILE_TIME_ASSERT_EXPAND_IDENTIFIER(a, b, c)
+#define COMPILE_TIME_ASSERT_MESSAGE(msg) \
+  COMPILE_TIME_ASSERT_IDENTIFIER(compile_time_assert_failed_at_line_, \
+                                 __LINE__, _ ## msg)
+#define COMPILE_TIME_ASSERT(expr, msg) \
+  typedef struct { int COMPILE_TIME_ASSERT_MESSAGE(msg) : !!(expr); } \
+    COMPILE_TIME_ASSERT_MESSAGE(msg)
+
+
 /* -- FIXED CONFIGURATION LIMITS ------------------------------------------- */
 
 #define  FREEGLUT_MAX_MENUS         3
@@ -745,6 +759,11 @@ struct tagSFG_StrokeVertex
 {
     GLfloat         X, Y;
 };
+
+/* Verify this structure can safely be used cast to an array of floats for use
+   with glVertexPointer(). */
+COMPILE_TIME_ASSERT(sizeof(SFG_StrokeVertex) == sizeof(GLfloat) * 2,
+                    SFG_StrokeVertex_can_be_used_with_glVertexPointer);
 
 typedef struct tagSFG_StrokeStrip SFG_StrokeStrip;
 struct tagSFG_StrokeStrip
