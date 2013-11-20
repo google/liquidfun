@@ -345,6 +345,16 @@ public:
 	/// Compute the kinetic energy that can be lost by damping force
 	float32 ComputeParticleCollisionEnergy() const;
 
+	/// Get API version.
+	const b2Version* GetVersion() const {
+		return m_liquidFunVersion;
+	}
+
+	/// Get API version string.
+	const char* GetVersionString() const {
+		return m_liquidFunVersionString;
+	}
+
 private:
 
 	// m_flags
@@ -402,6 +412,11 @@ private:
 	b2Profile m_profile;
 
 	b2ParticleSystem m_particleSystem;
+
+	/// Used to reference b2_LiquidFunVersion so that it's not stripped from
+	/// the static library.
+	const b2Version *m_liquidFunVersion;
+	const char *m_liquidFunVersionString;
 };
 
 inline b2Body* b2World::GetBodyList()

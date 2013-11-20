@@ -62,6 +62,10 @@ b2World::b2World(const b2Vec2& gravity)
 
 	m_particleSystem.m_world = this;
 
+	m_liquidFunVersion = &b2_liquidFunVersion;
+	m_liquidFunVersionString = b2_liquidFunVersionString;
+
+
 	memset(&m_profile, 0, sizeof(b2Profile));
 }
 
