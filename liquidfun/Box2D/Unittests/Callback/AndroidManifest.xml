@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright 2013 Google. All rights reserved.
-
-     Use of this source code is governed by a BSD-style
-     license that can be found in the LICENSE file or at
-     https://developers.google.com/open-source/licenses/bsd -->
 <!-- BEGIN_INCLUDE(manifest) -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.google.fpl.splash2d.callbacktests"

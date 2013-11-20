@@ -1,8 +1,3 @@
-@rem Copyright 2013 Google. All rights reserved.
-@rem
-@rem Use of this source code is governed by a BSD-style
-@rem license that can be found in the LICENSE file or at
-@rem https://developers.google.com/open-source/licenses/bsd
 @echo off
 rem Search .NET framework install directories for the latest version of msbuild
 rem and run it with this batch file's arguments if it's found.
