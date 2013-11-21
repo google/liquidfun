@@ -79,6 +79,18 @@ private:
 	friend class b2World;
 	friend class b2ParticleGroup;
 
+	template <typename T>
+	struct ParticleBuffer
+	{
+		ParticleBuffer()
+		{
+			data = NULL;
+			userSuppliedCapacity = 0;
+		}
+		T* data;
+		int32 userSuppliedCapacity;
+	};
+
 	/// Used for detecting particle contacts
 	struct Proxy
 	{
@@ -150,9 +162,10 @@ private:
 	b2ParticleSystem();
 	~b2ParticleSystem();
 
-	template <typename T>
-	void ReallocateBuffer(T *&buffer, int32 oldCapacity, int32 newCapacity, bool required);
-	template <typename T> T *RequestParticleBuffer(T *&buffer);
+	template <typename T> T* ReallocateBuffer(T* buffer, int32 oldCapacity, int32 newCapacity);
+	template <typename T> T* ReallocateBuffer(T* buffer, int32 userSuppliedCapacity, int32 oldCapacity, int32 newCapacity, bool deferred);
+	template <typename T> T* ReallocateBuffer(ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity, bool deferred);
+	template <typename T> T* RequestParticleBuffer(T* buffer);
 
 	int32 CreateParticle(const b2ParticleDef& def);
 	void DestroyParticle(int32 index, bool callDestructionListener);
@@ -205,6 +218,8 @@ private:
 	const b2ParticleGroup* GetParticleGroupList() const;
 	int32 GetParticleGroupCount() const;
 	int32 GetParticleCount() const;
+	int32 GetParticleMaxCount() const;
+	void SetParticleMaxCount(int32 count);
 	uint32* GetParticleFlagsBuffer();
 	b2Vec2* GetParticlePositionBuffer();
 	b2Vec2* GetParticleVelocityBuffer();
@@ -216,6 +231,12 @@ private:
 	const b2ParticleColor* GetParticleColorBuffer() const;
 	b2ParticleGroup* const* GetParticleGroupBuffer() const;
 	void* const* GetParticleUserDataBuffer() const;
+	template <typename T> void SetParticleBuffer(ParticleBuffer<T>* buffer, T* newBufferData, int32 newCapacity);
+	void SetParticleFlagsBuffer(uint32* buffer, int32 capacity);
+	void SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity);
+	void SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity);
+	void SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity);
+	void SetParticleUserDataBuffer(void** buffer, int32 capacity);
 
 	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
 	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b2Vec2& point2) const;
@@ -232,16 +253,17 @@ private:
 	float32 m_squaredDiameter;
 
 	int32 m_count;
-	int32 m_capacity;
-	uint32* m_flagsBuffer;
-	b2Vec2* m_positionBuffer;
-	b2Vec2* m_velocityBuffer;
+	int32 m_internalAllocatedCapacity;
+	int32 m_maxCount;
+	ParticleBuffer<uint32> m_flagsBuffer;
+	ParticleBuffer<b2Vec2> m_positionBuffer;
+	ParticleBuffer<b2Vec2> m_velocityBuffer;
 	float32* m_accumulationBuffer; // temporary values
 	b2Vec2* m_accumulation2Buffer; // temporary vectorial values
 	float32* m_depthBuffer; // distance from the surface
-	b2ParticleColor* m_colorBuffer;
+	ParticleBuffer<b2ParticleColor> m_colorBuffer;
 	b2ParticleGroup** m_groupBuffer;
-	void** m_userDataBuffer;
+	ParticleBuffer<void*> m_userDataBuffer;
 
 	int32 m_proxyCount;
 	int32 m_proxyCapacity;

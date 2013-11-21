@@ -202,6 +202,51 @@ TEST_F(FunctionTests, GetParticleBuffer) {
 			  constGroup->GetParticleUserDataBuffer());
 }
 
+TEST_F(FunctionTests, SetParticleBuffer) {
+	static const int32 size = 256;
+	uint32 flagsBuffer[size];
+	b2Vec2 positionBuffer[size];
+	b2Vec2 velocityBuffer[size];
+	b2ParticleColor colorBuffer[size];
+	void *userDataBuffer[size];
+	m_world->SetParticleFlagsBuffer(flagsBuffer, size);
+	m_world->SetParticlePositionBuffer(positionBuffer, size);
+	m_world->SetParticleVelocityBuffer(velocityBuffer, size);
+	m_world->SetParticleColorBuffer(colorBuffer, size);
+	m_world->SetParticleUserDataBuffer(userDataBuffer, size);
+	EXPECT_EQ(m_world->GetParticleFlagsBuffer(), flagsBuffer);
+	EXPECT_EQ(m_world->GetParticlePositionBuffer(), positionBuffer);
+	EXPECT_EQ(m_world->GetParticleVelocityBuffer(), velocityBuffer);
+	EXPECT_EQ(m_world->GetParticleColorBuffer(), colorBuffer);
+	EXPECT_EQ(m_world->GetParticleUserDataBuffer(), userDataBuffer);
+	b2ParticleGroupDef def;
+	b2PolygonShape shape;
+	shape.SetAsBox(10, 10);
+	def.shape = &shape;
+	m_world->CreateParticleGroup(def);
+	EXPECT_LE(m_world->GetParticleCount(), size);
+	EXPECT_EQ(m_world->GetParticleFlagsBuffer(), flagsBuffer);
+	EXPECT_EQ(m_world->GetParticlePositionBuffer(), positionBuffer);
+	EXPECT_EQ(m_world->GetParticleVelocityBuffer(), velocityBuffer);
+	EXPECT_EQ(m_world->GetParticleColorBuffer(), colorBuffer);
+	EXPECT_EQ(m_world->GetParticleUserDataBuffer(), userDataBuffer);
+	uint32 newFlagsBuffer[size];
+	b2Vec2 newPositionBuffer[size];
+	b2Vec2 newVelocityBuffer[size];
+	b2ParticleColor newColorBuffer[size];
+	void *newUserDataBuffer[size];
+	m_world->SetParticleFlagsBuffer(newFlagsBuffer, size);
+	m_world->SetParticlePositionBuffer(newPositionBuffer, size);
+	m_world->SetParticleVelocityBuffer(newVelocityBuffer, size);
+	m_world->SetParticleColorBuffer(newColorBuffer, size);
+	m_world->SetParticleUserDataBuffer(newUserDataBuffer, size);
+	EXPECT_EQ(m_world->GetParticleFlagsBuffer(), newFlagsBuffer);
+	EXPECT_EQ(m_world->GetParticlePositionBuffer(), newPositionBuffer);
+	EXPECT_EQ(m_world->GetParticleVelocityBuffer(), newVelocityBuffer);
+	EXPECT_EQ(m_world->GetParticleColorBuffer(), newColorBuffer);
+	EXPECT_EQ(m_world->GetParticleUserDataBuffer(), newUserDataBuffer);
+}
+
 TEST_F(FunctionTests, GroupData) {
 	b2ParticleGroupDef def;
 	def.flags = b2_elasticParticle | b2_springParticle;

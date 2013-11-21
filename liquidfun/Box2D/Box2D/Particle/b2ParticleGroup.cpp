@@ -175,8 +175,8 @@ void b2ParticleGroup::UpdateStatistics() const
 		for (int32 i = m_firstIndex; i < m_lastIndex; i++)
 		{
 			m_mass += m;
-			m_center += m * m_system->m_positionBuffer[i];
-			m_linearVelocity += m * m_system->m_velocityBuffer[i];
+			m_center += m * m_system->m_positionBuffer.data[i];
+			m_linearVelocity += m * m_system->m_velocityBuffer.data[i];
 		}
 		if (m_mass > 0)
 		{
@@ -187,8 +187,8 @@ void b2ParticleGroup::UpdateStatistics() const
 		m_angularVelocity = 0;
 		for (int32 i = m_firstIndex; i < m_lastIndex; i++)
 		{
-			b2Vec2 p = m_system->m_positionBuffer[i] - m_center;
-			b2Vec2 v = m_system->m_velocityBuffer[i] - m_linearVelocity;
+			b2Vec2 p = m_system->m_positionBuffer.data[i] - m_center;
+			b2Vec2 v = m_system->m_velocityBuffer.data[i] - m_linearVelocity;
 			m_inertia += m * b2Dot(p, p);
 			m_angularVelocity += m * b2Cross(p, v);
 		}
