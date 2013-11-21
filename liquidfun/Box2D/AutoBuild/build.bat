@@ -68,8 +68,19 @@ cd %~d0%~p0
 rem Search the path for cmake.
 set cmake=
 rem Look for a prebuilt cmake in the tree.
-set android_root=..\..\..\..\..\..
-set cmake_prebuilt=%android_root%\prebuilts\cmake\windows\current\bin\cmake.exe
+set android_root=..\..\..\..\..\..\
+for %%a in (%android_root%) do (
+  set android_root=%%~da%%~pa
+)
+set cmake_prebuilts_root=%android_root%prebuilts\cmake\windows
+for /F %%a in ('dir /b %cmake_prebuilts_root%\cmake-*') do (
+  if exist %cmake_prebuilts_root%\%%a\bin\cmake.exe (
+    set cmake_prebuilt=%cmake_prebuilts_root%\%%a\bin\cmake.exe
+    goto found_cmake_prebuilt
+  )
+)
+:found_cmake_prebuilt
+
 if exist %cmake_prebuilt% (
   set cmake=%cmake_prebuilt%
   goto check_cmake_version
