@@ -31,6 +31,18 @@
 #include <cstring>
 using namespace std;
 
+void LoadOrtho2DMatrix(double left, double right, double bottom, double top)
+{
+#if USE_GL_KIT
+	const GLKMatrix4 matrix = GLKMatrix4MakeOrtho(left, right, bottom, top,
+												  -1.0, 1.0);
+	glLoadMatrixf((const GLfloat*)&matrix);
+#else
+	// L/R/B/T
+	gluOrtho2D(left, right, bottom, top);
+#endif // USE_GL_KIT
+}
+
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
 	glColor3f(color.r, color.g, color.b);
@@ -215,7 +227,7 @@ void DebugDraw::DrawString(int x, int y, const char *string, ...)
 	glLoadIdentity();
 	int w = glutGet(GLUT_WINDOW_WIDTH);
 	int h = glutGet(GLUT_WINDOW_HEIGHT);
-	gluOrtho2D(0, w, h, 0);
+	LoadOrtho2DMatrix(0, w, h, 0);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();

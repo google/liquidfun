@@ -164,7 +164,6 @@ int    GLUI_TextBox::mouse_held_down_handler( int local_x, int local_y,
 /****************************** GLUI_TextBox::key_handler() **********/
 int    GLUI_TextBox::key_handler( unsigned char key,int modifiers )
 {
-  int regular_key;
   /* int has_selection;              */
 
   if ( NOT glui )
@@ -173,7 +172,6 @@ int    GLUI_TextBox::key_handler( unsigned char key,int modifiers )
   if ( debug )
     dump( stdout, "-> KEY HANDLER" );
 
-  regular_key = false;
   bool ctrl_down = (modifiers & GLUT_ACTIVE_CTRL)!=0;
   /*  has_selection = (sel_start != sel_end);              */
 
@@ -269,14 +267,6 @@ int    GLUI_TextBox::key_handler( unsigned char key,int modifiers )
   else { /* Regular key */    
     if ( key == 13 )           /* RETURNS are written as newlines*/
       key = '\n';
-
-    regular_key = true;
-
-    /** This is just to get rid of warnings - the flag regular_key is 
-        set if the key was not a backspace, return, whatever.  But I
-        believe if we're here, we know it was a regular key anyway */
-    if ( regular_key ) {
-    }
 
     /**** If there's a current selection, erase it ******/
     if ( sel_start != sel_end ) {
@@ -586,7 +576,6 @@ void    GLUI_TextBox::draw_text( int x, int y )
   if ( sel_start != sel_end ) {
     sel_x_start = text_x;
     sel_x_end   = text_x;
-    delta = 0;
     for( i=substring_start; sel_x_end < (w - text_x) && i<=substring_end; i++ ) {
       delta = 0;
       if (text[i] == '\t') // Character is a tab, go to next tab stop
@@ -827,7 +816,7 @@ void     GLUI_TextBox::draw_insertion_pt( void )
                                           between the text and the box       **/
   
   curr_x += substring_width(sol,insertion_pt-1);
-  if (insertion_pt == text.length() && text[text.length()-1] == '\n'
+  if ((insertion_pt == text.length() && text[text.length()-1] == '\n')
       || curr_x-this->x_abs > (w - 2 - GLUI_TEXTBOX_BOXINNERMARGINX)) { // Insert on the next line 
     curr_x = this->x_abs + GLUI_TEXTBOX_BOXINNERMARGINX;
     line++;
@@ -1071,7 +1060,7 @@ void   GLUI_TextBox::dump( FILE *out, const char *name )
        "%s (edittext@%p):   line:%d ins_pt:%d  subs:%d/%d  sel:%d/%d   len:%d\n",
        name, this, curr_line,
        insertion_pt, substring_start, substring_end, sel_start, sel_end,
-       text.length());
+       (int)text.length());
 }
 
 

@@ -38,7 +38,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${GUNIT_INCDIR} ${CMAKE_CURRENT_SOURCE_DIR}
                                     ${CMAKE_CURRENT_SOURCE_DIR}/..)
-link_directories(${GTEST_LIBDIR} ${CMAKE_CURRENT_SOURCE_DIR}/../Box2D)
 
 # These are support sources that are used for unit tests.
 set(SUPPORT_SRCS BodyTracker.cpp)

@@ -88,8 +88,8 @@ include_directories (
 if(APPLE)
 	# We are not using the Apple's framework version, but X11's
 	include_directories( /usr/X11/include )
-	link_directories( /usr/X11/lib )
-	set (OPENGL_LIBRARIES GL GLU X11)
+	link_directories( /usr/X11/lib/ )
+	find_library(OPENGL_LIBRARIES NAMES GL GLU X11 HINTS /usr/X11/lib)
 elseif(WIN32)
 	set (ADDITIONAL_LIBRARIES winmm)
 endif(APPLE)

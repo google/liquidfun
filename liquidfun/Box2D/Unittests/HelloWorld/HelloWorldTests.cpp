@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include "BodyTracker.h"
 #include "AndroidUtil/AndroidMainWrapper.h"
-#define EPSILON 0.0001
+#define BASELINE_TEST_EPSILON 0.0001f
 
 class HelloWorldTests : public ::testing::Test {
     protected:
@@ -113,11 +113,12 @@ TEST_F(HelloWorldTests, PositionAngleTest) {
 		// It is generally best to keep the time step and iterations fixed.
 		m_world->Step(timeStep, velocityIterations, positionIterations);
 
-		tracker.TrackStep(m_body, i);
+		tracker.TrackStep(m_body, static_cast<float32>(i));
 	}
 	tracker.EndTracking();
 	bool matched = tracker.CompareToBaseline(m_body,
-			BodyTracker::TRACK_POSITION | BodyTracker::TRACK_ANGLE, EPSILON);
+			BodyTracker::TRACK_POSITION | BodyTracker::TRACK_ANGLE,
+			BASELINE_TEST_EPSILON);
 	std::string errString;
 	if (!matched) {
 		const std::vector<std::string> &errors = tracker.GetErrors();

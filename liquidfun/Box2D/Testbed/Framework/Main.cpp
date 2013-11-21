@@ -87,7 +87,7 @@ static void Resize(int32 w, int32 h)
 	b2Vec2 upper = settings.viewCenter + extents;
 
 	// L/R/B/T
-	gluOrtho2D(lower.x, upper.x, lower.y, upper.y);
+	LoadOrtho2DMatrix(lower.x, upper.x, lower.y, upper.y);
 }
 
 static b2Vec2 ConvertScreenToWorld(int32 x, int32 y)
@@ -161,7 +161,6 @@ static void SimulationLoop()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	b2Vec2 oldCenter = settings.viewCenter;
 	settings.hz = settingsHz;
 
 	// call this each frame, to function correctly with devices that may recreate the GL Context without us asking for it
@@ -520,7 +519,9 @@ int main(int argc, char** argv)
 	testSelection = testIndex;
 
 	entry = g_testEntries + testIndex;
-	test = entry->createFcn();
+    if (entry && entry->createFcn) {
+        test = entry->createFcn();
+    }
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);

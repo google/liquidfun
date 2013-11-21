@@ -166,7 +166,7 @@ void GLUI_TreePanel::formatNode(GLUI_Tree *temp)
   GLUI_String level_name="";
   GLUI_String full_name="";
 
-  temp->level_name == "";
+  temp->level_name = "";
 
   if (format & GLUI_TREEPANEL_DISPLAY_HIERARCHY) {
     if (format & GLUI_TREEPANEL_HIERARCHY_LEVEL_ONLY) {

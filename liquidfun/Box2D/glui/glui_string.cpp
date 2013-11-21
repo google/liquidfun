@@ -42,6 +42,7 @@ GLUI_String& glui_format_str(GLUI_String& str, const char* fmt, ...)
   char stackbuf[ISIZE];
   size_t bufsz = ISIZE;
   char *buf = stackbuf;
+  stackbuf[0] = '\0';
   str = "";
   va_list arg;
   while (1) {
@@ -56,7 +57,7 @@ GLUI_String& glui_format_str(GLUI_String& str, const char* fmt, ...)
     if (buf==stackbuf) buf = (char*)malloc(sizeof(char)*bufsz);
     else buf = (char*)realloc(buf, sizeof(char)*bufsz);
   }
+  str = buf;
   if (buf!=stackbuf) free(buf);
-  str=buf;
   return str;
 }

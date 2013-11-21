@@ -104,7 +104,7 @@ int    GLUI_List::mouse_down_handler( int local_x, int local_y )
     if (scrollbar)
       scrollbar->set_int_val(curr_line);
     this->execute_callback();
-    if (associated_object != NULL)
+    if (associated_object != NULL) {
       if (cb_click_type == GLUI_SINGLE_CLICK) {
         if (obj_cb) {
           // obj_cb(associated_object, user_id);
@@ -119,6 +119,7 @@ int    GLUI_List::mouse_down_handler( int local_x, int local_y )
           last_line = curr_line;
         }
       }
+    }
     if ( can_draw())
       update_and_draw_text();
   }
@@ -187,7 +188,6 @@ void    GLUI_List::deactivate( void )
 void    GLUI_List::draw( int x, int y )
 {
   int line = 0;
-  int box_width;
   GLUI_List_Item *item;
  
   GLUI_DRAWINGSENTINAL_IDIOM
@@ -230,9 +230,6 @@ void    GLUI_List::draw( int x, int y )
     glVertex2i( w-2, h-2 );               glVertex2i(2, h-2 );
     glEnd();
   }
-
-  /* Figure out how wide the box is */
-  box_width = get_box_width();
 
   /* Figure out which lines are visible*/
 

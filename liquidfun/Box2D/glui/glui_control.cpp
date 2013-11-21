@@ -373,7 +373,7 @@ void GLUI_Control::draw_name(int x, int y)
 
 void GLUI_Control::align()
 {
-  int  col_x, col_y, col_w, col_h, col_x_off, col_y_off;
+  int  col_x = 0, col_y, col_w = 0, col_h, col_x_off = 0, col_y_off;
   int  orig_x_abs;
 
   orig_x_abs = x_abs;
@@ -456,7 +456,7 @@ void GLUI_Control::pack_old(int x, int y)
   y_top_column = curr_y;
   column_x     = 0;
   if ( this == glui->main_panel ) {
-    x=x;
+    (void)x;
   }
   /*** Iterate over children, packing them first ***/
   node = (GLUI_Control*) this->first_child();

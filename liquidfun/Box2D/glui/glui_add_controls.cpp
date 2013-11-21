@@ -256,6 +256,7 @@ GLUI_Listbox   *GLUI::add_listbox_to_panel( GLUI_Panel *panel,
 }
 
 
+#ifdef GLUI_ROTATION
 /*********************************** GLUI:: add_rotation() ************/
 
 GLUI_Rotation   *GLUI:: add_rotation( const char *name, float *value_ptr,
@@ -274,6 +275,7 @@ GLUI_Rotation *GLUI::add_rotation_to_panel( GLUI_Panel *panel,
 {
   return new GLUI_Rotation( panel, name, value_ptr, id, callback );
 }
+#endif // GLUI_ROTATION
 
 
 /*********************************** GLUI:: add_translation() ************/

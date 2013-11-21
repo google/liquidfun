@@ -667,6 +667,9 @@ protected:
     /*********** Controls ************/
 
     virtual int    add_control( GLUI_Node *parent, GLUI_Control *control );
+    virtual int  add_control( GLUI_Control *control ) {
+        return GLUI_Node::add_control(control);
+    }
 
 
     /********** Constructors and Destructors ***********/
@@ -682,7 +685,7 @@ public:
     void            *font;
     int              curr_modifiers;
 
-    void         adjust_glut_xy( int &x, int &y ) { x; y = h-y; }
+    void         adjust_glut_xy( int &x, int &y ) { (void)x; y = h-y; }
     void         activate_control( GLUI_Control *control, int how );
     void         align_controls( GLUI_Control *control );
     void         deactivate_current_control( void );
@@ -806,19 +809,19 @@ public:
     virtual int    get_id( void ) const { return int(user_id); }
     virtual void   set_id( int id ) { user_id=id; }
 
-    virtual int mouse_down_handler( int local_x, int local_y )                 { local_x; local_y; return false; }
-    virtual int mouse_up_handler( int local_x, int local_y, bool inside )       { local_x; local_y; inside; return false; }
-    virtual int mouse_held_down_handler( int local_x, int local_y, bool inside) { local_x; local_y; inside; return false; }
-    virtual int key_handler( unsigned char key, int modifiers )                { key; modifiers; return false; }
-    virtual int special_handler( int key,int modifiers )                       { key; modifiers; return false; }
+    virtual int mouse_down_handler( int local_x, int local_y )                 { (void)local_x; (void)local_y; return false; }
+    virtual int mouse_up_handler( int local_x, int local_y, bool inside )       { (void)local_x; (void)local_y; (void)inside; return false; }
+    virtual int mouse_held_down_handler( int local_x, int local_y, bool inside) { (void)local_x; (void)local_y; (void)inside; return false; }
+    virtual int key_handler( unsigned char key, int modifiers )                { (void)key; (void)modifiers; return false; }
+    virtual int special_handler( int key,int modifiers )                       { (void)key; (void)modifiers; return false; }
 
     virtual void update_size( void )     { }
     virtual void idle( void )            { }
-    virtual int  mouse_over( int state, int x, int y ) { state; x; y; return false; }
+    virtual int  mouse_over( int state, int x, int y ) { (void)state; (void)x; (void)y; return false; }
 
     virtual void enable( void ); 
     virtual void disable( void );
-    virtual void activate( int how )     { how; active = true; }
+    virtual void activate( int how )     { (void)how; active = true; }
     virtual void deactivate( void )     { active = false; }
 
     /** Hide (shrink into a rollout) and unhide (expose from a rollout) */
@@ -876,7 +879,7 @@ public:
     void         sync_live( int recurse, int draw );  /* Reads live variable */
     void         init_live( void );
     void         output_live( int update_main_gfx );        /** Writes live variable **/
-    virtual void set_text( const char *t )   { t; }
+    virtual void set_text( const char *t )   { (void)t; }
     void         execute_callback( void );
     void         get_this_column_dims( int *col_x, int *col_y, 
                                        int *col_w, int *col_h, 
@@ -911,7 +914,7 @@ public:
         spacebar_mouse_click = true;    /* Does spacebar simulate a mouse click? */
         live_type      = GLUI_LIVE_NONE;
         text = "";
-        last_live_text == "";
+        last_live_text = "";
         live_inited    = false;
         collapsible    = false;
         is_open        = true;
@@ -1282,7 +1285,7 @@ public:
     void set_level(int l) { level = l; }
     void set_format(int f) { format = f; }
     void set_current(int c) { is_current = c; }
-    int get_id() { return id; }
+    virtual int get_id( void ) const { return id; }
     int get_level() { return level; }
     int get_child_number() { return child_number; }
     void enable_bar() { if (column) { column->int_val = 1;  set_color(red, green, blue); } }
@@ -1444,11 +1447,13 @@ public:
                                         const char *name, int *live_var=NULL,
                                         int id=-1, GLUI_CB callback=GLUI_CB());
 
+#ifdef GLUI_ROTATION
     GLUI_Rotation *add_rotation( const char *name, float *live_var=NULL,
                                  int id=-1, GLUI_CB callback=GLUI_CB()	);
     GLUI_Rotation *add_rotation_to_panel( GLUI_Panel *panel,
                                           const char *name, float *live_var=NULL,
                                           int id=-1, GLUI_CB callback=GLUI_CB());
+#endif // GLUI_ROTATION
   
     GLUI_Translation *add_translation( const char *name,
                                        int trans_type, float *live_var=NULL,
@@ -2405,6 +2410,7 @@ public:
     }
 };
 
+#ifdef GLUI_ROTATION
 /************************************************************/
 /*                                                          */
 /*                   Rotation class                         */
@@ -2459,6 +2465,7 @@ public:
 protected:
     void common_init();
 };
+#endif // GLUI_ROTATION
 
 /************************************************************/
 /*                                                          */
@@ -2476,7 +2483,6 @@ public:
     int trans_type;  /* Is this an XY or a Z controller? */
     int down_x, down_y;
     float scale_factor;
-    GLUquadricObj *quadObj;
     int   trans_mouse_code;
     float orig_x, orig_y, orig_z;
     int   locked;
@@ -2534,7 +2540,6 @@ protected:
         alignment           = GLUI_ALIGN_CENTER;
         trans_type          = GLUI_TRANSLATION_XY;
         scale_factor        = 1.0;
-        quadObj             = NULL;
         trans_mouse_code    = GLUI_TRANSLATION_MOUSE_NONE;
     }
 };

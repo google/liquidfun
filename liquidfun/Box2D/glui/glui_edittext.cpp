@@ -392,10 +392,11 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
       }
     }
 
-    /** This is just to get rid of warnings - the flag regular_key is 
+    /** This is just to get rid of warnings - the flag regular_key is
       set if the key was not a backspace, return, whatever.  But I
       believe if we're here, we know it was a regular key anyway */
-    if ( regular_key ) {
+    if ( regular_key && debug ) {
+        dump( stdout, "<- KEY HANDLER regular_key" );
     }
 
     /**** If there's a current selection, erase it ******/
@@ -414,6 +415,10 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
     substring_end++;
 
     sel_start = sel_end = insertion_pt;
+  }
+
+  if ( regular_key && debug ) {
+    dump( stdout, "<- KEY HANDLER regular_key" );
   }
 
   /******** Now redraw text ***********/

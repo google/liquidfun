@@ -114,17 +114,11 @@ public:
 
 	void Step(Settings* settings)
 	{
-		bool sleeping = true;
 		for (b2Body* b = m_world->GetBodyList(); b; b = b->GetNext())
 		{
 			if (b->GetType() != b2_dynamicBody)
 			{
 				continue;
-			}
-
-			if (b->IsAwake())
-			{
-				sleeping = false;
 			}
 		}
 
@@ -132,11 +126,6 @@ public:
 		{
 			m_stepCount += 0;
 		}
-
-		//if (sleeping)
-		//{
-		//	CreateCircle();
-		//}
 
 		Test::Step(settings);
 

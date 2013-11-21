@@ -225,13 +225,16 @@ BodyTracker::ReadBaseline()
 
 	// Iterate over all strings in file.
 	std::string bodyName;
-	SampleVec *samples;
+	SampleVec *samples = 0;
 	for (std::string str ; std::getline(in, str) ; ) {
 		if (str.length() > 0 && str[0] != '\t') {
 			m_baselineSamples[str] = SampleVec();
 			samples = &m_baselineSamples[str];
 			continue;
 		}
+        if (!samples) {
+            continue;
+        }
 		Sample sample;
 		std::istringstream buf(str);
 		int32 field = 0;
@@ -360,7 +363,8 @@ BodyTracker::GetErrors() const
 void BodyTracker::SetWorkingDirectory(const char *argv0)
 {
 	std::string executablePath = argv0;
-	std::string separator = executablePath.rfind('/') >= 0 ? "/" : "\\";
+	std::string separator = executablePath.rfind('/') != std::string::npos ?
+		"/" : "\\";
 	std::string currentDirectory = "." + separator;
 	std::string relativeExecutablePath =
 		executablePath.compare(0, currentDirectory.length(),

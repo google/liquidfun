@@ -22,6 +22,13 @@
 
 #include <Box2D/Box2D.h>
 
+#if defined(__APPLE__)
+#define USE_GL_KIT 1
+#include <GLKit/GLKMath.h>
+#else
+#define USE_GL_KIT 0
+#endif // defined(__APPLE__)
+
 struct b2AABB;
 
 // This class implements debug drawing callbacks that are invoked
@@ -65,5 +72,6 @@ private:
 	int num_cached_points;
 };
 
+void LoadOrtho2DMatrix(double left, double right, double bottom, double top);
 
 #endif

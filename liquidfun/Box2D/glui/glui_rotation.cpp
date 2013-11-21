@@ -30,6 +30,7 @@
 *****************************************************************************/
 
 #include "glui.h"
+#ifdef GLUI_ROTATION
 #include "arcball.h"
 #include "algebra3.h"
 
@@ -471,3 +472,6 @@ void GLUI_Rotation::common_init( void )
 
   reset();
 }
+#else
+int msvcIgnoreEmptyObject = 0x1620317;
+#endif // GLUI_ROTATION

@@ -52,25 +52,6 @@ FIXME: there's a heck of a lot of duplication between this and glui_scrollbar.cp
 #define  GLUI_SPINNER_CALLBACK_INTERVAL    1
 
  
-/****************************** spinner_edittext_callback() ******************/
-/*   This function is not used anymore.  It has been replaced by directly    */
-/*   Including an optional pointer to a spinner from an edittext box         */
-
-void  spinner_edittext_callback( int id )
-{
-  GLUI_Spinner *spinner;
-
-  putchar( '.' ); flushout;
-  
-  spinner = (GLUI_Spinner*) id;
-
-  if ( NOT spinner )
-    return;
-
-  spinner->do_callbacks();
-}
-
-
 /****************************** GLUI_Spinner::GLUI_Spinner() ****************/
 
 GLUI_Spinner::GLUI_Spinner( GLUI_Node* parent, const char *name, 
@@ -112,10 +93,11 @@ void GLUI_Spinner::common_construct( GLUI_Node* parent, const char *name,
 {
   common_init();
 
-  if ( NOT strcmp( name, "Spinner Test" ))
-    id=id;
+  if ( NOT strcmp( name, "Spinner Test" )) {
+    (void)id;
+  }
 
-  int text_type;
+  int text_type = 0;
   if ( data_t == GLUI_SPINNER_INT ) {
     text_type = GLUI_EDITTEXT_INT;
   }
@@ -124,6 +106,7 @@ void GLUI_Spinner::common_construct( GLUI_Node* parent, const char *name,
   }
   else {
     assert(0); /* Did not pass in a valid data type */
+    return;
   }
 
   user_id     = id;
@@ -643,5 +626,3 @@ int    GLUI_Spinner::get_int_val( void )
   else 
     return 0; 
 }
-
-
