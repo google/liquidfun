@@ -29,33 +29,34 @@ class b2VoronoiDiagram
 
 public:
 
-	b2VoronoiDiagram(
-		b2StackAllocator *allocator,
-		const b2Vec2 *generatorData, int32 generatorCount,
-		float32 radius);
+	b2VoronoiDiagram(b2StackAllocator* allocator, int32 generatorCapacity);
 	~b2VoronoiDiagram();
 
+	void AddGenerator(const b2Vec2& center, int32 tag);
+
+	void Generate(float32 radius);
+
 	template<class Callback>
-	void GetNodes(const Callback &callback) const
+	void GetNodes(const Callback& callback) const
 	{
 		for (int32 y = 0; y < m_countY - 1; y++)
 		{
 			for (int32 x = 0; x < m_countX - 1; x++)
 			{
 				int32 i = x + y * m_countX;
-				int32 a = m_diagram[i];
-				int32 b = m_diagram[i + 1];
-				int32 c = m_diagram[i + m_countX];
-				int32 d = m_diagram[i + 1 + m_countX];
+				const Generator* a = m_diagram[i];
+				const Generator* b = m_diagram[i + 1];
+				const Generator* c = m_diagram[i + m_countX];
+				const Generator* d = m_diagram[i + 1 + m_countX];
 				if (b != c)
 				{
 					if (a != b && a != c)
 					{
-						callback(a, b, c);
+						callback(a->tag, b->tag, c->tag);
 					}
 					if (d != b && d != c)
 					{
-						callback(b, d, c);
+						callback(b->tag, d->tag, c->tag);
 					}
 				}
 			}
@@ -64,9 +65,32 @@ public:
 
 private:
 
+	struct Generator
+	{
+		b2Vec2 center;
+		int32 tag;
+	};
+
+	struct b2VoronoiDiagramTask
+	{
+		int32 m_x, m_y, m_i;
+		Generator* m_generator;
+
+		b2VoronoiDiagramTask() {}
+		b2VoronoiDiagramTask(int32 x, int32 y, int32 i, Generator* g)
+		{
+			m_x = x;
+			m_y = y;
+			m_i = i;
+			m_generator = g;
+		}
+	};
+
 	b2StackAllocator *m_allocator;
+	Generator* m_generatorBuffer;
+	int32 m_generatorCount;
 	int32 m_countX, m_countY;
-	int32 *m_diagram;
+	Generator** m_diagram;
 
 };
 
