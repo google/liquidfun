@@ -1124,15 +1124,18 @@ static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GL
     const GLfloat angle = (halfCircle?1:2)*(GLfloat)M_PI/(GLfloat)( ( n == 0 ) ? 1 : n );
 
     /* Allocate memory for n samples, plus duplicate of first entry at the end */
-    *sint = malloc(sizeof(GLfloat) * (size+1));
-    *cost = malloc(sizeof(GLfloat) * (size+1));
+    *sint = calloc(1, sizeof(GLfloat) * (size+1));
+    *cost = calloc(1, sizeof(GLfloat) * (size+1));
 
     /* Bail out if memory allocation fails, fgError never returns */
     if (!(*sint) || !(*cost))
     {
         free(*sint);
         free(*cost);
+        *sint=NULL;
+        *cost=NULL;
         fgError("Failed to allocate memory in fghCircleTable");
+        return;
     }
 
     /* Compute cos and sin around the circle */
@@ -1194,7 +1197,10 @@ static void fghGenerateSphere(GLfloat radius, GLint slices, GLint stacks, GLfloa
     {
         free(*vertices);
         free(*normals);
+        *vertices = NULL;
+        *normals = NULL;
         fgError("Failed to allocate memory in fghGenerateSphere");
+        return;
     }
 
     /* top */
@@ -1268,6 +1274,8 @@ void fghGenerateCone(
     {
         /* nothing to generate */
         *nVert = 0;
+        *vertices = NULL;
+        *normals = NULL;
         return;
     }
     *nVert = slices*(stacks+2)+1;   /* need an extra stack for closing off bottom with correct normals */
@@ -1288,7 +1296,10 @@ void fghGenerateCone(
     {
         free(*vertices);
         free(*normals);
+        *vertices = NULL;
+        *normals = NULL;
         fgError("Failed to allocate memory in fghGenerateCone");
+        return;
     }
 
     /* bottom */
@@ -1353,6 +1364,8 @@ void fghGenerateCylinder(
     {
         /* nothing to generate */
         *nVert = 0;
+        *vertices = NULL;
+        *normals = NULL;
         return;
     }
     *nVert = slices*(stacks+3)+2;   /* need two extra stacks for closing off top and bottom with correct normals */
@@ -1373,7 +1386,10 @@ void fghGenerateCylinder(
     {
         free(*vertices);
         free(*normals);
+        *vertices = NULL;
+        *normals = NULL;
         fgError("Failed to allocate memory in fghGenerateCylinder");
+        return;
     }
 
     z=0;
@@ -1472,11 +1488,16 @@ void fghGenerateTorus(
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
     *vertices = malloc((*nVert)*3*sizeof(GLfloat));
     *normals  = malloc((*nVert)*3*sizeof(GLfloat));
-    if (!(*vertices) || !(*normals))
+    if (!(*vertices) || !(*normals) || !(spsi && cpsi && sphi && cphi))
     {
+        free(spsi);
+        free(cpsi);
+        free(sphi);
+        free(cphi);
         free(*vertices);
         free(*normals);
         fgError("Failed to allocate memory in fghGenerateTorus");
+        return;
     }
 
     for( j=0; j<nRings; j++ )
@@ -1548,6 +1569,7 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
         {
             free(vertices);
             fgError("Failed to allocate memory in fghCube");
+            return;
         }
 
         for (i=0; i<CUBE_VERT_ELEM_PER_OBJ; i++)
@@ -1564,7 +1586,7 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
         fghDrawGeometrySolid(vertices, cube_norms, NULL, CUBE_VERT_PER_OBJ,
                              cube_vertIdxs, 1, CUBE_VERT_PER_OBJ_TRI);
 
-    if (dSize!=1.f)
+    if (dSize!=1.f && vertices != cube_verts)
         /* cleanup allocated memory */
         free(vertices);
 }
@@ -1594,6 +1616,7 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
             free(vertices);
             free(normals);
             fgError("Failed to allocate memory in fghSierpinskiSponge");
+            return;
         }
 
         /* Generate elements */
@@ -1616,14 +1639,17 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
 static void fghSphere( GLfloat radius, GLint slices, GLint stacks, GLboolean useWireMode )
 {
     int i,j,idx, nVert;
-    GLfloat *vertices, *normals;
+    GLfloat *vertices = NULL, *normals = NULL;
 
     /* Generate vertices and normals */
     fghGenerateSphere(radius,slices,stacks,&vertices,&normals,&nVert);
     
-    if (nVert==0)
+    if (nVert==0 || !normals || !vertices) {
+        if (normals) free(normals);
+        if (vertices) free(vertices);
         /* nothing to draw */
         return;
+    }
 
     if (useWireMode)
     {
@@ -1637,9 +1663,12 @@ static void fghSphere( GLfloat radius, GLint slices, GLint stacks, GLboolean use
         stackIdx = malloc(slices*(stacks-1)*sizeof(GLushort));
         if (!(stackIdx) || !(sliceIdx))
         {
+            free(normals);
+            free(vertices);
             free(stackIdx);
             free(sliceIdx);
             fgError("Failed to allocate memory in fghSphere");
+            return;
         }
 
         /* generate for each stack */
@@ -1747,9 +1776,12 @@ static void fghCone( GLfloat base, GLfloat height, GLint slices, GLint stacks, G
     /* Note, (stacks+1)*slices vertices for side of object, slices+1 for top and bottom closures */
     fghGenerateCone(base,height,slices,stacks,&vertices,&normals,&nVert);
 
-    if (nVert==0)
+    if (nVert==0) {
+        free(normals);
+        free(vertices);
         /* nothing to draw */
         return;
+    }
 
     if (useWireMode)
     {
@@ -1763,9 +1795,12 @@ static void fghCone( GLfloat base, GLfloat height, GLint slices, GLint stacks, G
         sliceIdx = malloc(slices*2     *sizeof(GLushort));
         if (!(stackIdx) || !(sliceIdx))
         {
+            free(normals);
+            free(vertices);
             free(stackIdx);
             free(sliceIdx);
             fgError("Failed to allocate memory in fghCone");
+            return;
         }
 
         /* generate for each stack */
@@ -1859,8 +1894,12 @@ static void fghCylinder( GLfloat radius, GLfloat height, GLint slices, GLint sta
     fghGenerateCylinder(radius,height,slices,stacks,&vertices,&normals,&nVert);
 
     if (nVert==0)
+    {
         /* nothing to draw */
+        free(vertices);
+        free(normals);
         return;
+    }
 
     if (useWireMode)
     {
@@ -1869,14 +1908,17 @@ static void fghCylinder( GLfloat radius, GLfloat height, GLint slices, GLint sta
          * We have a bunch of line_loops to draw for each stack, and a
          * bunch for each slice.
          */
-
-        stackIdx = malloc(slices*(stacks+1)*sizeof(GLushort));
-        sliceIdx = malloc(slices*2         *sizeof(GLushort));
+        GLint allocSize = slices*(stacks+1)*sizeof(GLushort);
+        stackIdx = allocSize > 0 ? malloc(allocSize) : NULL;
+        sliceIdx = slices > 0 ? malloc(slices*2*sizeof(GLushort)) : NULL;
         if (!(stackIdx) || !(sliceIdx))
         {
+            free(vertices);
+            free(normals);
             free(stackIdx);
             free(sliceIdx);
             fgError("Failed to allocate memory in fghCylinder");
+            return;
         }
 
         /* generate for each stack */
@@ -2032,6 +2074,7 @@ static void fghTorus( GLfloat dInnerRadius, GLfloat dOuterRadius, GLint nSides, 
         {
             free(stripIdx);
             fgError("Failed to allocate memory in fghTorus");
+            return;
         }
 
         for( i=0, idx=0; i<nSides; i++ )

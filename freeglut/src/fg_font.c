@@ -259,7 +259,7 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
 {
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
-    int i, j;
+    int i;
     SFG_StrokeFont* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeCharacter" );
     font = fghStrokeByID( fontID );
@@ -288,7 +288,7 @@ void FGAPIENTRY glutStrokeCharacter( void* fontID, int character )
 void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 {
     unsigned char c;
-    int i, j;
+    int i;
     float length = 0.0;
     SFG_StrokeFont* font;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutStrokeString" );

@@ -194,7 +194,7 @@ int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
                 }
             }
 
-          array = malloc(sizeof(int) * (*size));
+          if (*size) array = malloc(sizeof(int) * (*size));
           for (i = 0; i < *size; i++)
             {
               array[i] = temp_array[i];

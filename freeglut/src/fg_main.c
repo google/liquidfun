@@ -310,6 +310,9 @@ void fgError( const char *fmt, ... )
             exit( 1 );
         #endif
     }
+#if TARGET_HOST_POSIX_X11
+    exit( 1 );
+#endif // TARGET_HOST_POSIX_X11
 }
 
 void fgWarning( const char *fmt, ... )

@@ -54,9 +54,11 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, FGCBTimer callback, int tim
     }
     else
     {
-        if( ! (timer = malloc(sizeof(SFG_Timer))) )
+        if( ! (timer = malloc(sizeof(SFG_Timer))) ) {
             fgError( "Fatal error: "
                      "Memory allocation failure in glutTimerFunc()" );
+            return;
+        }
     }
 
     timer->Callback  = callback;
@@ -250,7 +252,7 @@ void FGAPIENTRY glutJoystickFunc( FGCBJoystick callback, int pollInterval )
     fgStructure.CurrentWindow->State.JoystickLastPoll =
         fgElapsedTime() - fgStructure.CurrentWindow->State.JoystickPollRate;
 
-    if( fgStructure.CurrentWindow->State.JoystickLastPoll < 0 )
+    if( fgStructure.CurrentWindow->State.JoystickLastPoll == ~((fg_time_t)0) )
         fgStructure.CurrentWindow->State.JoystickLastPoll = 0;
 }
 

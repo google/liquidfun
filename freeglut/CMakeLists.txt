@@ -240,7 +240,7 @@ IF(UNIX AND NOT ANDROID)
         SET(HAVE_X11_EXTENSIONS_XF86VMODE_H TRUE)
         # Work-around http://www.cmake.org/Bug/bug_view_page.php?bug_id=6976
         IF(NOT "${X11_Xxf86vm_LIB}")
-            SET(X11_Xxf86vm_LIB "Xxf86vm")
+            FIND_LIBRARY(X11_Xxf86vm_LIB NAMES Xxf86vm HINTS /usr/X11/lib)
         ENDIF()
         LIST(APPEND LIBS ${X11_Xxf86vm_LIB})
     ENDIF()

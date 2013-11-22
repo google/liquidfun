@@ -200,6 +200,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
     FREEGLUT_INTERNAL_ERROR_EXIT( visualInfo != NULL,
                                   "visualInfo could not be retrieved from FBConfig", "fgOpenWindow" );
+    if (!visualInfo) return;
 
     /*
      * XXX HINT: the masks should be updated when adding/removing callbacks.

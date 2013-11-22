@@ -192,6 +192,7 @@ static GLboolean fghCheckMenuStatus( SFG_Menu* menu )
         menuEntry = fghFindMenuEntry( menu, menuID + 1 );
         FREEGLUT_INTERNAL_ERROR_EXIT( menuEntry, "Cannot find menu entry",
                                       "fghCheckMenuStatus" );
+        if (!menuEntry) return GL_FALSE;
 
         menuEntry->IsActive = GL_TRUE;
         menuEntry->Ordinal = menuID;
@@ -430,6 +431,7 @@ void fgDisplayMenu( void )
 
     FREEGLUT_INTERNAL_ERROR_EXIT ( fgStructure.CurrentWindow, "Displaying menu in nonexistent window",
                                    "fgDisplayMenu" );
+    if (!window) return;
 
     /* Check if there is an active menu attached to this window... */
     menu = window->ActiveMenu;
@@ -844,7 +846,7 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
     SFG_MenuEntry* menuEntry;
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAddMenuEntry" );
     menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
-
+    if (!fgStructure.CurrentMenu) free(menuEntry);
     freeglut_return_if_fail( fgStructure.CurrentMenu );
     if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
@@ -869,11 +871,12 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAddSubMenu" );
     menuEntry = ( SFG_MenuEntry * )calloc( sizeof( SFG_MenuEntry ), 1 );
     subMenu = fgMenuByID( subMenuID );
-
+    if (!fgStructure.CurrentMenu) free(menuEntry);
     freeglut_return_if_fail( fgStructure.CurrentMenu );
     if (fgState.ActiveMenus)
         fgError("Menu manipulation not allowed while menus in use.");
 
+    if (!subMenu) free(menuEntry);
     freeglut_return_if_fail( subMenu );
 
     menuEntry->Text    = strdup( label );

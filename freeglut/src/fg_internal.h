@@ -913,13 +913,19 @@ extern SFG_State fgState;
     if( !(expr) )                                 \
         return val ;
 
+#if defined(__APPLE__)
+#define FREEGLUT_DO_NOT_CONTINUE_EXECUTION 1
+#else
+#define FREEGLUT_DO_NOT_CONTINUE_EXECUTION \
+    ( fgState.ActionOnWindowClose != GLUT_ACTION_CONTINUE_EXECUTION )
+#endif // defined(__APPLE__)
+
 /*
  * A call to those macros assures us that there is a current
  * window set, respectively:
  */
 #define  FREEGLUT_EXIT_IF_NO_WINDOW( string )                               \
-  if ( ! fgStructure.CurrentWindow &&                                       \
-       ( fgState.ActionOnWindowClose != GLUT_ACTION_CONTINUE_EXECUTION ) )  \
+  if ( ! fgStructure.CurrentWindow && FREEGLUT_DO_NOT_CONTINUE_EXECUTION )  \
   {                                                                         \
     fgError ( " ERROR:  Function <%s> called"                               \
               " with no current window defined.", (string) ) ;              \

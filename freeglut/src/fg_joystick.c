@@ -935,6 +935,7 @@ void fgJoystickPollWindow( SFG_Window* window )
     float axes[ _JS_MAX_AXES ];
     int buttons;
     int ident;
+    memset(axes, 0, sizeof(axes));
 
     freeglut_return_if_fail( window );
     freeglut_return_if_fail( FETCH_WCB( *window, Joystick ) );

@@ -340,6 +340,18 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
             fgError ("Could not allocate space for the program's name.");
     }
 
+    if (!pargc)
+    {
+        static int empty_argc = 0;
+        pargc = &empty_argc;
+    }
+    if (!argv)
+    {
+        static char empty_string = '\0';
+        static char *empty_argv[] = { &empty_string };
+        argv = (char**)&empty_argv;
+    }
+
     fgCreateStructure( );
 
 	fghParseCommandLineArguments ( pargc, argv, &displayName, &geometry );
