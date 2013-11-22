@@ -171,6 +171,11 @@ struct b2Version
 };
 
 /// Current version.
+/// Version of Box2D, Splash2D is based upon.
 extern b2Version b2_version;
+
+/// Global variable is used to identify the version of LiquidFun
+extern const b2Version b2_liquidFunVersion;
+extern const char *b2_liquidFunVersionString;
 
 #endif
