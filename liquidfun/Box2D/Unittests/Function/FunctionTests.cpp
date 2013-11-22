@@ -168,16 +168,7 @@ TEST_F(FunctionTests, GetParticleBuffer) {
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
 	b2ParticleGroup *group = m_world->CreateParticleGroup(def);
-	EXPECT_EQ(m_world->GetParticleFlagsBuffer(),
-			  group->GetParticleFlagsBuffer());
-	EXPECT_EQ(m_world->GetParticlePositionBuffer(),
-			  group->GetParticlePositionBuffer());
-	EXPECT_EQ(m_world->GetParticleVelocityBuffer(),
-			  group->GetParticleVelocityBuffer());
-	EXPECT_EQ(m_world->GetParticleColorBuffer(),
-			  group->GetParticleColorBuffer());
-	EXPECT_EQ(m_world->GetParticleUserDataBuffer(),
-			  group->GetParticleUserDataBuffer());
+	EXPECT_EQ(group->GetBufferIndex(), 0);
 	const b2World *constWorld = m_world;
 	EXPECT_EQ(m_world->GetParticleFlagsBuffer(),
 			  constWorld->GetParticleFlagsBuffer());
@@ -190,16 +181,7 @@ TEST_F(FunctionTests, GetParticleBuffer) {
 	EXPECT_EQ(m_world->GetParticleUserDataBuffer(),
 			  constWorld->GetParticleUserDataBuffer());
 	const b2ParticleGroup *constGroup = group;
-	EXPECT_EQ(group->GetParticleFlagsBuffer(),
-			  constGroup->GetParticleFlagsBuffer());
-	EXPECT_EQ(group->GetParticlePositionBuffer(),
-			  constGroup->GetParticlePositionBuffer());
-	EXPECT_EQ(group->GetParticleVelocityBuffer(),
-			  constGroup->GetParticleVelocityBuffer());
-	EXPECT_EQ(group->GetParticleColorBuffer(),
-			  constGroup->GetParticleColorBuffer());
-	EXPECT_EQ(group->GetParticleUserDataBuffer(),
-			  constGroup->GetParticleUserDataBuffer());
+	EXPECT_EQ(group->GetBufferIndex(), constGroup->GetBufferIndex());
 }
 
 TEST_F(FunctionTests, SetParticleBuffer) {

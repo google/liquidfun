@@ -102,38 +102,8 @@ public:
 	/// Get the number of particles.
 	int32 GetParticleCount() const;
 
-	/// Gets an indexed buffer containing the type of each particle in the group. The indices in the buffer match
-	/// those of the particles themselves. For instance, the behavior flags for the zeroth-index particle are
-	/// stored in the zeroth index of the buffer.
-	/// You can change particle types on the fly by writing new values to the buffer.
-	uint32* GetParticleFlagsBuffer();
-
-	/// Get the position of each particle in the group.
-	b2Vec2* GetParticlePositionBuffer();
-
-	/// Get the velocity of each particle in the group.
-	b2Vec2* GetParticleVelocityBuffer();
-
-	/// Get the color of each particle in the group.
-	b2ParticleColor* GetParticleColorBuffer();
-
-	/// Get application-specific data for each particle in the group.
-	void** GetParticleUserDataBuffer();
-
-	/// Get the type of each particle in the group. The obtained values cannot be changed.
-	const uint32* GetParticleFlagsBuffer() const;
-
-	/// Get the position of each particle in the group. The obtained values cannot be changed.
-	const b2Vec2* GetParticlePositionBuffer() const;
-
-	/// Get the velocity of each particle in the group. The obtained values cannot be changed.
-	const b2Vec2* GetParticleVelocityBuffer() const;
-
-	/// Get the color of each particle in the group. The obtained values cannot be changed.
-	const b2ParticleColor* GetParticleColorBuffer() const;
-
-	/// Get application-specific data for each particle in the group. The obtained values cannot be changed.
-	void* const* GetParticleUserDataBuffer() const;
+	/// Get the offset of this group in the global particle buffer
+	int32 GetBufferIndex() const;
 
 	/// Get the construction flags for the group.
 	int32 GetGroupFlags() const;
