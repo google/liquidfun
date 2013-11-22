@@ -91,7 +91,9 @@ struct freeglutBitmapFont
 };
 
 
-struct freeglutStrokeFont glutStrokeRoman ;
+/* At least 1 variable in an object needs to be initialized for the OSX mach
+ * linker to link an object from a static library. */
+struct freeglutStrokeFont glutStrokeRoman = {NULL, 0, NULL, 0.0f, 0.0f};
 struct freeglutStrokeFont glutStrokeMonoRoman ;
 
 struct freeglutBitmapFont glutBitmap9By15 ;
@@ -101,4 +103,3 @@ struct freeglutBitmapFont glutBitmapTimesRoman24 ;
 struct freeglutBitmapFont glutBitmapHelvetica10 ;
 struct freeglutBitmapFont glutBitmapHelvetica12 ;
 struct freeglutBitmapFont glutBitmapHelvetica18 ;
-
