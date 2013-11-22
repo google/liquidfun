@@ -49,54 +49,9 @@ b2ParticleGroup::~b2ParticleGroup()
 {
 }
 
-uint32* b2ParticleGroup::GetParticleFlagsBuffer()
+int32 b2ParticleGroup::GetBufferIndex() const
 {
-	return m_system->GetParticleFlagsBuffer() + m_firstIndex;
-}
-
-b2Vec2* b2ParticleGroup::GetParticlePositionBuffer()
-{
-	return m_system->GetParticlePositionBuffer() + m_firstIndex;
-}
-
-b2Vec2* b2ParticleGroup::GetParticleVelocityBuffer()
-{
-	return m_system->GetParticleVelocityBuffer() + m_firstIndex;
-}
-
-b2ParticleColor* b2ParticleGroup::GetParticleColorBuffer()
-{
-	return m_system->GetParticleColorBuffer() + m_firstIndex;
-}
-
-void** b2ParticleGroup::GetParticleUserDataBuffer()
-{
-	return m_system->GetParticleUserDataBuffer() + m_firstIndex;
-}
-
-const uint32* b2ParticleGroup::GetParticleFlagsBuffer() const
-{
-	return m_system->GetParticleFlagsBuffer() + m_firstIndex;
-}
-
-const b2Vec2* b2ParticleGroup::GetParticlePositionBuffer() const
-{
-	return m_system->GetParticlePositionBuffer() + m_firstIndex;
-}
-
-const b2Vec2* b2ParticleGroup::GetParticleVelocityBuffer() const
-{
-	return m_system->GetParticleVelocityBuffer() + m_firstIndex;
-}
-
-const b2ParticleColor* b2ParticleGroup::GetParticleColorBuffer() const
-{
-	return m_system->GetParticleColorBuffer() + m_firstIndex;
-}
-
-void* const* b2ParticleGroup::GetParticleUserDataBuffer() const
-{
-	return m_system->GetParticleUserDataBuffer() + m_firstIndex;
+  return m_firstIndex;
 }
 
 int32 b2ParticleGroup::GetGroupFlags() const
