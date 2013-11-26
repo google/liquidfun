@@ -14,14 +14,14 @@
 @rem misrepresented as being the original software.
 @rem 3. This notice may not be removed or altered from any source distribution.
 @echo off
-rem Execute Splash2D unit tests on Windows.
+rem Execute LiquidFun unit tests on Windows.
 rem
-rem This assumes Splash2D test executables have been built for Windows and are
+rem This assumes LiquidFun test executables have been built for Windows and are
 rem located in the following folders:
-rem * splash2d\Box2D\Unittests\Debug
-rem * splash2d\Box2D\Unittests\Release
-rem * splash2d\Box2D\Unittests\MinSizeRel
-rem * splash2d\Box2D\Unittests\RelWithDebInfo
+rem * Box2D\Unittests\Debug
+rem * Box2D\Unittests\Release
+rem * Box2D\Unittests\MinSizeRel
+rem * Box2D\Unittests\RelWithDebInfo
 rem
 rem It's possible to build tests for one build configuration and execute
 rem all tests under the output directory using this script.

@@ -173,7 +173,7 @@ struct b2Version
 };
 
 /// Current version.
-/// Version of Box2D, Splash2D is based upon.
+/// Version of Box2D, LiquidFun is based upon.
 extern b2Version b2_version;
 
 /// Global variable is used to identify the version of LiquidFun

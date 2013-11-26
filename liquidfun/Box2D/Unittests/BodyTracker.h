@@ -15,7 +15,7 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef SPLASH2D_BODY_TRACKER_H
+#ifndef LIQUIDFUN_BODY_TRACKER_H
 #include "Box2D/Box2D.h"
 #include <string>
 #include <map>

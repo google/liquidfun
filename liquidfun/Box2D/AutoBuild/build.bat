@@ -17,7 +17,7 @@
 rem See help text below or run with -h for a description of this batch file.
 
 rem Project name.
-set project_name=Splash2D
+set project_name=LiquidFun
 rem Minimum cmake version this project has been tested with.
 set cmake_minversion_minmaj=2.8
 rem Build configuration options.

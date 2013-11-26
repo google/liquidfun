@@ -17,7 +17,7 @@
 #
 # Build this project on Linux or OSX.
 
-declare -r project_name=Splash2D
+declare -r project_name=LiquidFun
 declare -r script_name=$(basename $0)
 declare -r script_directory="$(cd "$(dirname "$0")"; pwd)"
 declare -r android_root="${script_directory}/../../../../../.."

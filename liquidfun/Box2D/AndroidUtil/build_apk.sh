@@ -299,7 +299,7 @@ if [[ $((disable_build)) -eq 0 ]]; then
   # redistributed.
   if [[ "${ant_target}" == "release" ]]; then
     keystore=${package_filename}.keystore
-    key_alias=splash2d
+    key_alias=${package_basename}
     key_password=${key_alias}
     if [[ ! -e ${keystore} ]]; then
       keytool -genkey -v -dname "cn=, ou=${key_alias}, o=fpl" \

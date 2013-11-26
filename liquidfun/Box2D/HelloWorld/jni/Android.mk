@@ -17,12 +17,12 @@
 LOCAL_PATH:=$(call my-dir)/..
 
 include $(CLEAR_VARS)
-namespace:=$(if $(NDK_PROJECT_PATH),,_splash2d)
+namespace:=$(if $(NDK_PROJECT_PATH),,_liquidfun)
 LOCAL_MODULE:=HelloWorld${namespace}
 LOCAL_MODULE_TAGS:=optional
 LOCAL_SRC_FILES:=HelloWorld.cpp
 LOCAL_LDLIBS:=-llog -landroid
-LOCAL_STATIC_LIBRARIES:=android_native_app_glue libsplash2d_static \
+LOCAL_STATIC_LIBRARIES:=android_native_app_glue libliquidfun_static \
                         libandroidutil_static
 ANDROIDUTIL_ADDITIONAL_CFLAGS:=-DANDROID_LOG_PRINT_TAG="$(LOCAL_MODULE)"
 LOCAL_ARM_MODE:=arm

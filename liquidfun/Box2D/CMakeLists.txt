@@ -8,7 +8,7 @@ else(UNIX)
 	set(BOX2D_INSTALL_BY_DEFAULT OFF)
 endif(UNIX)
 
-# Splash2d build configuration.
+# LiquidFun build configuration.
 # Force gtest to compile against the shared CRT.
 if(MSVC)
   set(gtest_force_shared_crt ON CACHE INTERNAL "")

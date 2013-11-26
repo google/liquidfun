@@ -18,7 +18,7 @@ LOCAL_PATH:=$(call my-dir)/..
 # Additional CFLAGS can be added to the library by setting ANDROIDUTIL_CFLAGS
 # before importing this package.
 include $(CLEAR_VARS)
-namespace:=$(if $(NDK_PROJECT_PATH),,_splash2d)
+namespace:=$(if $(NDK_PROJECT_PATH),,_liquidfun)
 LOCAL_MODULE:=libandroidutil$(namespace)_static
 LOCAL_MODULE_TAGS:=optional
 LOCAL_SRC_FILES:=\

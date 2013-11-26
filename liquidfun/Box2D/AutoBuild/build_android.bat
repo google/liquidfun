@@ -19,7 +19,7 @@ rem Build all Android projects, see help text below for a description of this
 rem script's arguments.
 
 rem Project name.
-set project_name=Splash2D
+set project_name=LiquidFun
 rem Save this batch file's directory.
 set script_directory=%~d0%~p0
 rem Get the absolute path of the project root directory.

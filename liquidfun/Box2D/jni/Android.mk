@@ -39,9 +39,9 @@ endef
 # build target's name.
 define box2d-module
 $(eval \
-  LOCAL_MODULE:=libsplash2d$(1)
+  LOCAL_MODULE:=libliquidfun$(1)
   LOCAL_MODULE_TAGS:=optional
-  LOCAL_COPY_HEADERS_TO:=splash2d$(1))
+  LOCAL_COPY_HEADERS_TO:=liquidfun$(1))
 endef
 
 # Execute a shell command relative to this module's directory.
@@ -69,13 +69,13 @@ $(eval \
   $$(call add-stlport-includes))
 endef
 
-# --- libsplash2d ---
+# --- libliquidfun ---
 # Build shared library.
 include $(CLEAR_VARS)
 $(call box2d-build,)
 include $(BUILD_SHARED_LIBRARY)
 
-# --- libsplash2d_static ---
+# --- libliquidfun_static ---
 # Build static library.
 include $(CLEAR_VARS)
 $(call box2d-build,_static)

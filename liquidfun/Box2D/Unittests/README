@@ -1,7 +1,7 @@
-Unit tests for Splash2D:
----- ----- --- ---------
+Unit tests for LiquidFun:
+---- ----- --- ----------
 
-This directory contains a set of unit tests to run on Splash2D.
+This directory contains a set of unit tests to run on LiquidFun.
 It leverages google's "gtest" framework.
 
 Along with just using the standard framework, it provides an infrastructure
@@ -19,7 +19,7 @@ performs the appropriate comparisons.  Please see the header file for usage
 information.
 
 
-For build Instructions, see Box2D/Readme.Splash2D.txt.
+For build Instructions, see Box2D/Documentation/Building.txt.
 
 Running the Tests:
 
@@ -52,7 +52,7 @@ And when an error occurs in a test, the output will look something like this:
 [ RUN      ] HelloWorldTests.Allocation
 [       OK ] HelloWorldTests.Allocation (0 ms)
 [ RUN      ] HelloWorldTests.PositionAngleTest
-splash2d/Box2D/Unittests/HelloWorldTests.cpp:110: Failure
+liquidfun/Box2D/Unittests/HelloWorldTests.cpp:110: Failure
 Value of: matched
   Actual: false
 Expected: true
