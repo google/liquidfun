@@ -499,6 +499,10 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 		diagram.GetNodes(callback);
 	}
 
+	for (int32 i = groupB->m_firstIndex; i < groupB->m_lastIndex; i++)
+	{
+		m_groupBuffer[i] = groupA;
+	}
 	uint32 groupFlags = groupA->m_groupFlags | groupB->m_groupFlags;
 	groupA->m_groupFlags = groupFlags;
 	groupA->m_lastIndex = groupB->m_lastIndex;
@@ -581,6 +585,8 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 		m_groupBuffer[i] = NULL;
 	}
 
+	bool needsSolveZombie = group->GetParticleCount() > 0;
+
 	if (group->m_prev)
 	{
 		group->m_prev->m_next = group->m_next;
@@ -598,7 +604,7 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 	group->~b2ParticleGroup();
 	m_world->m_blockAllocator.Free(group, sizeof(b2ParticleGroup));
 
-	if (group->GetParticleCount() > 0)
+	if (needsSolveZombie)
 	{
 		SolveZombie();
 	}
@@ -1409,6 +1415,7 @@ void b2ParticleSystem::SolveZombie()
 				m_flagsBuffer.data[newCount] = m_flagsBuffer.data[i];
 				m_positionBuffer.data[newCount] = m_positionBuffer.data[i];
 				m_velocityBuffer.data[newCount] = m_velocityBuffer.data[i];
+				m_groupBuffer[newCount] = m_groupBuffer[i];
 				if (m_depthBuffer)
 				{
 					m_depthBuffer[newCount] = m_depthBuffer[i];
@@ -1605,6 +1612,7 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	std::rotate(m_flagsBuffer.data + start, m_flagsBuffer.data + mid, m_flagsBuffer.data + end);
 	std::rotate(m_positionBuffer.data + start, m_positionBuffer.data + mid, m_positionBuffer.data + end);
 	std::rotate(m_velocityBuffer.data + start, m_velocityBuffer.data + mid, m_velocityBuffer.data + end);
+	std::rotate(m_groupBuffer + start, m_groupBuffer + mid, m_groupBuffer + end);
 	if (m_depthBuffer)
 	{
 		std::rotate(m_depthBuffer + start, m_depthBuffer + mid, m_depthBuffer + end);
@@ -1798,7 +1806,7 @@ const b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer() const
 	return ((b2ParticleSystem*) this)->GetParticleColorBuffer();
 }
 
-b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer() const
+const b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer() const
 {
 	return m_groupBuffer;
 }
@@ -1836,6 +1844,11 @@ void b2ParticleSystem::SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity)
 void b2ParticleSystem::SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity)
 {
 	SetParticleBuffer(&m_colorBuffer, buffer, capacity);
+}
+
+b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer()
+{
+	return m_groupBuffer;
 }
 
 void b2ParticleSystem::SetParticleUserDataBuffer(void** buffer, int32 capacity)

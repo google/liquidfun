@@ -176,6 +176,8 @@ TEST_F(FunctionTests, GetParticleBuffer) {
 			  constWorld->GetParticlePositionBuffer());
 	EXPECT_EQ(m_world->GetParticleVelocityBuffer(),
 			  constWorld->GetParticleVelocityBuffer());
+	EXPECT_EQ(m_world->GetParticleGroupBuffer(),
+			  constWorld->GetParticleGroupBuffer());
 	EXPECT_EQ(m_world->GetParticleColorBuffer(),
 			  constWorld->GetParticleColorBuffer());
 	EXPECT_EQ(m_world->GetParticleUserDataBuffer(),
@@ -300,6 +302,42 @@ TEST_F(FunctionTests, JoinParticleGroups) {
 	m_world->JoinParticleGroups(group1, group2);
 	EXPECT_EQ(m_world->GetParticleGroupCount(), 2);
 	EXPECT_EQ(count1 + count2, group1->GetParticleCount());
+}
+
+TEST_F(FunctionTests, GroupBuffer) {
+	b2ParticleGroupDef def;
+	b2PolygonShape shape;
+	shape.SetAsBox(10, 10);
+	def.shape = &shape;
+	b2ParticleGroup *group1 = m_world->CreateParticleGroup(def);
+	shape.SetAsBox(10, 20);
+	b2ParticleGroup *group2 = m_world->CreateParticleGroup(def);
+	shape.SetAsBox(10, 30);
+	b2ParticleGroup *group3 = m_world->CreateParticleGroup(def);
+	const b2ParticleGroup *const *groupBuffer = m_world->GetParticleGroupBuffer();
+	int32 offset1 = group1->GetBufferIndex();
+	int32 count1 = group1->GetParticleCount();
+	for (int32 i = 0; i < count1; i++) {
+		ASSERT_EQ(group1, groupBuffer[offset1 + i]);
+	}
+	int32 offset2 = group2->GetBufferIndex();
+	int32 count2 = group2->GetParticleCount();
+	for (int32 i = 0; i < count2; i++) {
+		ASSERT_EQ(group2, groupBuffer[offset2 + i]);
+	}
+	int32 offset3 = group3->GetBufferIndex();
+	int32 count3 = group3->GetParticleCount();
+	for (int32 i = 0; i < count3; i++) {
+		ASSERT_EQ(group3, groupBuffer[offset3 + i]);
+	}
+	m_world->JoinParticleGroups(group1, group2);
+	m_world->DestroyParticleGroup(group3);
+	groupBuffer = m_world->GetParticleGroupBuffer();
+	int32 count = m_world->GetParticleCount();
+	m_world->Step(0.001f, 1, 1);
+	for (int32 i = 0; i < count; i++) {
+		ASSERT_EQ(group1, groupBuffer[i]);
+	}
 }
 
 TEST_F(FunctionTests, GetParticleContact) {

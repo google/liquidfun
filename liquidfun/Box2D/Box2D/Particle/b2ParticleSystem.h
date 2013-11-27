@@ -229,13 +229,14 @@ private:
 	const b2Vec2* GetParticlePositionBuffer() const;
 	const b2Vec2* GetParticleVelocityBuffer() const;
 	const b2ParticleColor* GetParticleColorBuffer() const;
-	b2ParticleGroup* const* GetParticleGroupBuffer() const;
+	const b2ParticleGroup* const* GetParticleGroupBuffer() const;
 	void* const* GetParticleUserDataBuffer() const;
 	template <typename T> void SetParticleBuffer(ParticleBuffer<T>* buffer, T* newBufferData, int32 newCapacity);
 	void SetParticleFlagsBuffer(uint32* buffer, int32 capacity);
 	void SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity);
 	void SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity);
 	void SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity);
+	b2ParticleGroup* const* GetParticleGroupBuffer();
 	void SetParticleUserDataBuffer(void** buffer, int32 capacity);
 
 	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;

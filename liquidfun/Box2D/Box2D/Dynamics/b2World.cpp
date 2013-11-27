@@ -1543,7 +1543,7 @@ const b2ParticleColor* b2World::GetParticleColorBuffer() const
 	return m_particleSystem.GetParticleColorBuffer();
 }
 
-b2ParticleGroup* const* b2World::GetParticleGroupBuffer() const
+const b2ParticleGroup* const* b2World::GetParticleGroupBuffer() const
 {
 	return m_particleSystem.GetParticleGroupBuffer();
 }
@@ -1571,6 +1571,11 @@ void b2World::SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity)
 void b2World::SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity)
 {
 	m_particleSystem.SetParticleColorBuffer(buffer, capacity);
+}
+
+b2ParticleGroup* const* b2World::GetParticleGroupBuffer()
+{
+	return m_particleSystem.GetParticleGroupBuffer();
 }
 
 void b2World::SetParticleUserDataBuffer(void** buffer, int32 capacity)

@@ -333,12 +333,13 @@ public:
 	b2Vec2* GetParticlePositionBuffer();
 	b2Vec2* GetParticleVelocityBuffer();
 	b2ParticleColor* GetParticleColorBuffer();
+	b2ParticleGroup* const* GetParticleGroupBuffer();
 	void** GetParticleUserDataBuffer();
 	const uint32* GetParticleFlagsBuffer() const;
 	const b2Vec2* GetParticlePositionBuffer() const;
 	const b2Vec2* GetParticleVelocityBuffer() const;
 	const b2ParticleColor* GetParticleColorBuffer() const;
-	b2ParticleGroup* const* GetParticleGroupBuffer() const;
+	const b2ParticleGroup* const* GetParticleGroupBuffer() const;
 	void* const* GetParticleUserDataBuffer() const;
 
 	/// Set a buffer for particle data.
