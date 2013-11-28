@@ -15,7 +15,7 @@ var NAVTREE =
     [ "Loose Ends", "a00024.html", null ],
     [ "Debug Drawing", "a00026.html", null ],
     [ "Limitations", "a00028.html", null ],
-    [ "References<br>", "a00030.html", null ]
+    [ "References", "a00030.html", null ]
   ] ]
 ];
 
