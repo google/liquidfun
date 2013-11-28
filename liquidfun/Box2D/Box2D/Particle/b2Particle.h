@@ -32,7 +32,7 @@ enum b2ParticleFlag
 	b2_springParticle =      1 << 3, // with restitution from stretching
 	b2_elasticParticle =     1 << 4, // with restitution from deformation
 	b2_viscousParticle =     1 << 5, // with viscosity
-	b2_powderParticle =      1 << 6, // wihthout isotropic pressure
+	b2_powderParticle =      1 << 6, // without isotropic pressure
 	b2_tensileParticle =     1 << 7, // with surface tension
 	b2_colorMixingParticle = 1 << 8, // mixing color between contacting particles
 	b2_destructionListener = 1 << 9, // call b2DestructionListener on destruction

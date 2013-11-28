@@ -260,7 +260,7 @@ private:
 	ParticleBuffer<b2Vec2> m_positionBuffer;
 	ParticleBuffer<b2Vec2> m_velocityBuffer;
 	float32* m_accumulationBuffer; // temporary values
-	b2Vec2* m_accumulation2Buffer; // temporary vectorial values
+	b2Vec2* m_accumulation2Buffer; // temporary vector values
 	float32* m_depthBuffer; // distance from the surface
 	ParticleBuffer<b2ParticleColor> m_colorBuffer;
 	b2ParticleGroup** m_groupBuffer;

@@ -59,7 +59,7 @@ struct b2ParticleGroupDef
 	uint32 groupFlags;
 
 	/// The world position of the group.
-	/// Moves the group’s shape a distance equal to the value of position.
+	/// Moves the group's shape a distance equal to the value of position.
 	b2Vec2 position;
 
 	/// The world angle of the group in radians.
