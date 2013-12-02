@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta content="Physics library which including fluid simulation for game developers." name="description">
+<title>LiquidFun</title>
+<link href="Programmers-Guide/html/doxygen.css"
+      rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div class="header"><div class="headertitle">
+  <h2 class="title">LiquidFun</h1></div></div>
+
+<div class="contents">
+<div class="toc">
+  <ul>
+    <li><a href="#Overview">Overview</a></li>
+    <li><a href="#Releases">Releases</a></li>
+    <li><a href="#Documentation">Documentation</a></li>
+    <li><a href="#Examples">Examples</a></li>
+      <ul>
+        <li><a href="#Dambreak">Dambreak</a></li>
+        <li><a href="#ElasticParticles">Elastic Particles</a></li>
+        <li><a href="#SurfaceTension">Surface Tension</a></li>
+        <li><a href="#WaveMachine">Wave Machine</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+<div class="textblock">
+<a name="Overview"><h2>Overview</h2></a>
+<p>LiquidFun is a 2D rigid body and fluid simulation C++ library for games
+based upon <a href="http://box2d.org">Box2D</a>.  Programmers can use it in
+their games to make objects move in realistic ways and game worlds more
+interactive.  From the game engine's point of view, a physics engine is
+just a system for procedural animation.</p>
+
+<p><a href="particles-small.png">
+  <img src="particles-small.png" width="640" height="388"></a></p>
+
+<a name="Releases"><h2>Releases</h2></a>
+<p>Stable releases of LiquidFun are available for download from
+<a href="http://github.com/google/liquidfun/releases">
+github.com/google/liquidfun/releases</a>.</p>
+
+LiquidFun source code is available for download from
+<a href="http://github.com/google/liquidfun">github.com/google/liquidfun</a>.
+</p>
+
+<a name="Documentation"><h2>Documentation</h2></a>
+
+<p>LiquidFun's documentation consists of <a href="TODO">Build Instructions</a>,
+a <a href="Programmers-Guide.html">Programmer's Guide</a> and
+<a href="API-Ref.html">API reference</a>.</p>
+
+<p>The <a href="TODO">Build Instructions</a> describe how to build the library,
+examples and unit test binaries from source for each target operating system.
+Start working through the Build Instructions after <a href="#Releases">
+downloading the library's source</a>.</p>
+
+<p>A background of game physics, descriptions of LiquidFun's component and
+examples of how to use the library are provided in the
+<a href="Programmers-Guide.html">Programmer's Guide</a>.</p>
+
+<p>The <a href="API-Ref.html">API reference</a> is intended
+to be used by advanced developers who have already read the
+<a href="Programmers-Guide.html">Programer's Guide</a> since it provides
+detailed descriptions of all C++ objects and functions in the library.</p>
+
+<p>Discussions with LiquidFun users and developers occur on the
+<a href="https://groups.google.com/forum/#!forum/liquidfun">mailing list</a>.
+Issues with the LiquidFun library can be filed on the
+<a href="https://github.com/google/liquidfun/issues">issues tracker</a>.</p>
+
+<a name="Examples"><h2>Examples</h2></a>
+
+<p>The following videos demonstrate the fluid simulation functionality of
+liquidfun.  The videos are recordings of the Testbed application running on
+OSX</p>
+
+<a name="Dambreak"><h3>Dambreak</h3></a>
+<p>An initially rectangle shaped wall of water particles falling under gravity
+and crashing around a rectangular space.</p>
+<iframe src="https://docs.google.com/a/google.com/file/d/0ByHsbZRfS2zMbHhJbXlBRjFzbjA/preview" width="640" height="385"></iframe>
+
+<a name="ElasticParticles"><h3>Elastic Particles</h3></a>
+<p>Three groups of elastic particles interacting with a circular rigid body.
+</p>
+<iframe src="https://docs.google.com/a/google.com/file/d/0ByHsbZRfS2zMd0kxRzFxZW5IUGc/preview" width="640" height="385"></iframe>
+
+<a name="Particles"><h3>Particles</h3></a>
+<p>Water particles falling under gravity into a container with a circular rigid
+body displacing them.</p>
+<iframe src="https://docs.google.com/a/google.com/file/d/0ByHsbZRfS2zMYmltellXVmNxR1k/preview" width="640" height="385"></iframe>
+
+<a name="SurfaceTension"><h3>Surface Tension</h3></a>
+<p>Three different colored groups of particles with surface tension
+demonstrating attraction and color mixing.</p>
+<iframe src="https://docs.google.com/a/google.com/file/d/0ByHsbZRfS2zMYXZwZlJJazFiRW8/preview" width="640" height="385"></iframe>
+
+<a name="WaveMachine"><h3>Wave Machine</h3></a>
+<p>Water sloshing around an oscillating container.</p>
+<iframe src="https://docs.google.com/a/google.com/file/d/0ByHsbZRfS2zMRjBPeUVIMlZKdVk/preview" width="640" height="385"></iframe>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-46159502-1', 'google.github.io');
+ga('send', 'pageview');
+</script>
+
+</body>
+</html>
