@@ -19,7 +19,7 @@
 
 declare -r script_name="$(basename $0)"
 
-: ${UPSTREAM_DEFAULT:=https://github.com/google/liquidfun.git|master}
+: ${UPSTREAM_DEFAULT:="https://github.com/google/liquidfun.git|master"}
 
 # Display a help message and exit.
 usage() {
@@ -28,7 +28,8 @@ Merge a set of git projects into single tree preserving history and optionally
 filtering author / committer names and e-mail addresses.
 
 Usage: ${script_name} [-e email_filter_regexp] [-a name_filter_regexp] \\
-         [-h] [-u upstream_url:branch] \\
+         [-s sed_commit_filter_exp] [-f sed_file_filter_exp] [-h] \\
+         [-u upstream_url:branch] \\
          -r 'url0|remote0|remote_branch0 ... url0|remoteN|remote_branchN'
 
 -e email_filter_regexp:
@@ -37,6 +38,13 @@ Usage: ${script_name} [-e email_filter_regexp] [-a name_filter_regexp] \\
 -a name_filter_regexp:
   Extended regular expression used to match author / commmitter names that
   should be filtered from the branch history.
+-s sed_commit_filter_exp:
+  Extended sed expression (see 'sed -r') that will be used to modify all commit
+  messages.
+-f sed_file_filter_exp:
+  Extended sed expression (see 'see -r') that will be used to modify all files
+  in each commit.  Since this operates over all files in each commit this can
+  be a \*very\* slow operation.
 -h:
   Display this help message.
 -r url|remote|remote_branch
@@ -58,14 +66,20 @@ main() {
   # Expressions used to filter author and committer, names and email addresses.
   local email_filter_regexp=
   local name_filter_regexp=
+  # Expression used to filter all commit messages.
+  local sed_commit_filter_exp=''
+  # Expression used to modify all files in each commit.
+  local sed_file_filter_exp=''
   # Remote branches to merge into a single tree.
   local remotes=
   # Upstream url / branch to push to.
   local upstream="${UPSTREAM_DEFAULT}"
-  while getopts "e:a:hr:u:" option; do
+  while getopts "e:a:hr:s:f:u:" option; do
     case ${option} in
       e ) email_filter_regexp="${OPTARG}";;
       a ) name_filter_regexp="${OPTARG}";;
+      s ) sed_commit_filter_exp="${OPTARG}";;
+      f ) sed_file_filter_exp="${OPTARG}";;
       h ) usage;;
       r ) remotes="${OPTARG}";;
       u ) upstream="${OPTARG}";;
@@ -88,7 +102,7 @@ main() {
         echo "export ${variable}=\$(\
                 echo \$${variable} | \
                 sed -r 's%${name_filter_regexp}%Anonymous%')"
-      done)
+      done);
   else
     local -r git_commit_filter=""
   fi
@@ -122,11 +136,16 @@ main() {
     git checkout -b ${current_branch} ${remote}/${branch}
     git filter-branch \
       --force \
-      --commit-filter "${git_commit_filter}; git commit-tree \$@" \
+      --commit-filter "
+        ${git_commit_filter};
+        sed -r '${sed_commit_filter_exp}' | git commit-tree \$@" \
       --tree-filter "
         mkdir -p '${remote}';
         find . -maxdepth 1 | sed 's@^\./@@' | grep -vE '^(${remote}|\.)\$' | \
-          xargs -I@ mv '@' '${remote}';" \
+          xargs -I@ mv '@' '${remote}';
+        [[ '${sed_file_filter_exp}' != '' ]] && \
+          find '${remote}' -type f | \
+            xargs -I@ sed -r -i '${sed_file_filter_exp}' '@'" \
       ${current_branch}
     if [[ "${first_branch}" == "" ]]; then
       first_branch="${current_branch}"
