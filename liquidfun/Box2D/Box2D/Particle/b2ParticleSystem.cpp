@@ -124,7 +124,7 @@ template <typename T> T* b2ParticleSystem::ReallocateBuffer(T* oldBuffer, int32 
 template <typename T> T* b2ParticleSystem::ReallocateBuffer(T* buffer, int32 userSuppliedCapacity, int32 oldCapacity, int32 newCapacity, bool deferred)
 {
 	b2Assert(newCapacity > oldCapacity);
-	// A 'deffered' buffer is reallocated only if it is not NULL.
+	// A 'deferred' buffer is reallocated only if it is not NULL.
 	// If 'userSuppliedCapacity' is not zero, buffer is user supplied and must be kept.
 	b2Assert(!userSuppliedCapacity || newCapacity <= userSuppliedCapacity);
 	if ((!deferred || buffer) && !userSuppliedCapacity)
