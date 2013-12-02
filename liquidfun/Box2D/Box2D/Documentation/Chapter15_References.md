@@ -1,4 +1,4 @@
-# References<br>
+# References
 
 Erin Catto's GDC Tutorials:<br/>
 [http://code.google.com/p/box2d/downloads/list](http://code.google.com/p/box2d/downloads/list)<br/>
