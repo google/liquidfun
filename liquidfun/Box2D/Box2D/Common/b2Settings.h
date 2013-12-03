@@ -182,6 +182,10 @@ extern const b2Version b2_liquidFunVersion;
 /// b2_liquidFunVersionString is used by Google developers to identify which
 /// applications uploaded to Google Play are using this library.  This allows
 /// the development team at Google to determine the popularity of the library.
+/// How it works: Applications that are uploaded to the Google Play Store are
+/// scanned for this version string.  We track which applications are using it
+/// to measure popularity.  You are free to remove it (of course) but we would
+/// appreciate if you left it in.
 extern const char *b2_liquidFunVersionString;
 
 #endif
