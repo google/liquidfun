@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>Splash2D: b2VoronoiDiagram Class Reference</title>
+<title>LiquidFun: b2VoronoiDiagram Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">Splash2D
+   <div id="projectname">LiquidFun
    </div>
   </td>
  </tr>
@@ -47,8 +47,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
                onmouseout="return searchBox.OnSearchSelectHide()"
                alt=""/>
           <input type="text" id="MSearchField" value="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)"
-               onblur="searchBox.OnSearchFieldFocus(false)"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
                onkeyup="searchBox.OnSearchFieldChange(event)"/>
           </span><span class="right">
             <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
@@ -74,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0"
+<iframe src="javascript:void(0)" frameborder="0" 
         name="MSearchResults" id="MSearchResults">
 </iframe>
 </div>
@@ -82,6 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classb2_voronoi_diagram-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -89,16 +90,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>A field representing the nearest generator from each point.
+<p>A field representing the nearest generator from each point.  
  <a href="classb2_voronoi_diagram.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="b2_voronoi_diagram_8h_source.html">b2VoronoiDiagram.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a40cd2ba4da00d877be5c51f7c7606f93"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40cd2ba4da00d877be5c51f7c7606f93"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>b2VoronoiDiagram</b> (<a class="el" href="classb2_stack_allocator.html">b2StackAllocator</a> *allocator, const <a class="el" href="structb2_vec2.html">b2Vec2</a> *generatorData, int32 generatorCount, float32 radius)</td></tr>
-<tr class="separator:a40cd2ba4da00d877be5c51f7c7606f93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affceaf7c8c314a79d4061caa25fa6c86"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="affceaf7c8c314a79d4061caa25fa6c86"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>b2VoronoiDiagram</b> (<a class="el" href="classb2_stack_allocator.html">b2StackAllocator</a> *allocator, int32 generatorCapacity)</td></tr>
+<tr class="separator:affceaf7c8c314a79d4061caa25fa6c86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf14bde19ad574d568bb619aec9614dd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf14bde19ad574d568bb619aec9614dd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AddGenerator</b> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;center, int32 tag)</td></tr>
+<tr class="separator:acf14bde19ad574d568bb619aec9614dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a068c23952ad7d5fc9e6710d74680c63e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a068c23952ad7d5fc9e6710d74680c63e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Generate</b> (float32 radius)</td></tr>
+<tr class="separator:a068c23952ad7d5fc9e6710d74680c63e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8eab412d170ffd54bb5e77e65d20a70f"><td class="memTemplParams" colspan="2"><a class="anchor" id="a8eab412d170ffd54bb5e77e65d20a70f"></a>
 template&lt;class Callback &gt; </td></tr>
 <tr class="memitem:a8eab412d170ffd54bb5e77e65d20a70f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetNodes</b> (const Callback &amp;callback) const </td></tr>
@@ -107,13 +114,13 @@ template&lt;class Callback &gt; </td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A field representing the nearest generator from each point. </p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
-<li>/usr/local/google/ub-games-master/vendor/unbundled_google/libs/splash2d/Box2D/Box2D/Particle/<a class="el" href="b2_voronoi_diagram_8h_source.html">b2VoronoiDiagram.h</a></li>
-<li>/usr/local/google/ub-games-master/vendor/unbundled_google/libs/splash2d/Box2D/Box2D/Particle/b2VoronoiDiagram.cpp</li>
+<li><a class="el" href="b2_voronoi_diagram_8h_source.html">b2VoronoiDiagram.h</a></li>
+<li>b2VoronoiDiagram.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 21 2013 13:38:46 for Splash2D by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 3 2013 16:20:22 for LiquidFun by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
