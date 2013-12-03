@@ -17,7 +17,7 @@
  -->
 <!-- BEGIN_INCLUDE(manifest) -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.google.fpl.liquidfun.TEST_NAME_TO_REPLACE_LOWER"
+          package="com.google.fpg.liquidfun.TEST_NAME_TO_REPLACE_LOWER"
           android:versionCode="1"
           android:versionName="1.0">
 
