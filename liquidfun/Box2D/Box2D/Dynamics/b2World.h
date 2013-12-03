@@ -74,8 +74,8 @@ public:
 	/// @warning This function is locked during callbacks.
 	b2Body* CreateBody(const b2BodyDef* def);
 
-	/// Destroy a rigid body given a definition. No reference to the definition
-	/// is retained. This function is locked during callbacks.
+	/// Destroy a rigid body.
+	/// This function is locked during callbacks.
 	/// @warning This automatically deletes all associated shapes and joints.
 	/// @warning This function is locked during callbacks.
 	void DestroyBody(b2Body* body);
