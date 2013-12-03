@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>Splash2D: /usr/local/google/ub-games-master/vendor/unbundled_google/libs/splash2d/Box2D/Box2D/Dynamics/Contacts/b2ContactSolver.h Source File</title>
+<title>LiquidFun: b2ContactSolver.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">Splash2D
+   <div id="projectname">LiquidFun
    </div>
   </td>
  </tr>
@@ -47,8 +47,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
                onmouseout="return searchBox.OnSearchSelectHide()"
                alt=""/>
           <input type="text" id="MSearchField" value="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)"
-               onblur="searchBox.OnSearchFieldFocus(false)"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
                onkeyup="searchBox.OnSearchFieldChange(event)"/>
           </span><span class="right">
             <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
@@ -72,14 +72,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0"
+<iframe src="javascript:void(0)" frameborder="0" 
         name="MSearchResults" id="MSearchResults">
 </iframe>
 </div>
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_347c16e26edee38db12e02b3a72c6da4.html">ub-games-master</a></li><li class="navelem"><a class="el" href="dir_3d346d0a84b193b2bd6d7877411dbaba.html">vendor</a></li><li class="navelem"><a class="el" href="dir_da75ccd4201880b8ff375b4021f91f37.html">unbundled_google</a></li><li class="navelem"><a class="el" href="dir_731f806e151297b5ec442544bab8bb22.html">libs</a></li><li class="navelem"><a class="el" href="dir_50fdb4984762fc092aa566657178fda6.html">splash2d</a></li><li class="navelem"><a class="el" href="dir_c65fa3e071d6b230b516f2e34e737910.html">Box2D</a></li><li class="navelem"><a class="el" href="dir_6c6afa733cb8c0895a73988d2b561e72.html">Box2D</a></li><li class="navelem"><a class="el" href="dir_a575929d48a4055bd633712537cc246e.html">Dynamics</a></li><li class="navelem"><a class="el" href="dir_79610587b8c862a92a3589b3cc101381.html">Contacts</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_4adbe910e807faea824f4d71cf48195e.html">Dynamics</a></li><li class="navelem"><a class="el" href="dir_39037f20ed96345475e9b075eb4f4bd4.html">Contacts</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -115,7 +115,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">class </span><a class="code" href="classb2_contact.html">b2Contact</a>;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">class </span><a class="code" href="classb2_body.html">b2Body</a>;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">class </span><a class="code" href="classb2_stack_allocator.html">b2StackAllocator</a>;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">struct </span><a class="code" href="structb2_contact_position_constraint.html">b2ContactPositionConstraint</a>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">struct </span>b2ContactPositionConstraint;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
 <div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="structb2_velocity_constraint_point.html">   31</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structb2_velocity_constraint_point.html">b2VelocityConstraintPoint</a></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;{</div>
@@ -174,7 +174,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <a class="code" href="structb2_position.html">b2Position</a>* m_positions;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <a class="code" href="structb2_velocity.html">b2Velocity</a>* m_velocities;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="classb2_stack_allocator.html">b2StackAllocator</a>* m_allocator;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="structb2_contact_position_constraint.html">b2ContactPositionConstraint</a>* m_positionConstraints;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    b2ContactPositionConstraint* m_positionConstraints;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="structb2_contact_velocity_constraint.html">b2ContactVelocityConstraint</a>* m_velocityConstraints;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="classb2_contact.html">b2Contact</a>** m_contacts;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordtype">int</span> m_count;</div>
@@ -182,7 +182,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor"></span></div>
-<div class="ttc" id="structb2_contact_position_constraint_html"><div class="ttname"><a href="structb2_contact_position_constraint.html">b2ContactPositionConstraint</a></div><div class="ttdef"><b>Definition:</b> b2ContactSolver.cpp:29</div></div>
 <div class="ttc" id="structb2_contact_solver_def_html"><div class="ttname"><a href="structb2_contact_solver_def.html">b2ContactSolverDef</a></div><div class="ttdef"><b>Definition:</b> b2ContactSolver.h:59</div></div>
 <div class="ttc" id="classb2_stack_allocator_html"><div class="ttname"><a href="classb2_stack_allocator.html">b2StackAllocator</a></div><div class="ttdef"><b>Definition:</b> b2StackAllocator.h:37</div></div>
 <div class="ttc" id="structb2_velocity_constraint_point_html"><div class="ttname"><a href="structb2_velocity_constraint_point.html">b2VelocityConstraintPoint</a></div><div class="ttdef"><b>Definition:</b> b2ContactSolver.h:31</div></div>
@@ -190,17 +189,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structb2_position_html"><div class="ttname"><a href="structb2_position.html">b2Position</a></div><div class="ttdoc">This is an internal structure. </div><div class="ttdef"><b>Definition:</b> b2TimeStep.h:49</div></div>
 <div class="ttc" id="structb2_time_step_html"><div class="ttname"><a href="structb2_time_step.html">b2TimeStep</a></div><div class="ttdoc">This is an internal structure. </div><div class="ttdef"><b>Definition:</b> b2TimeStep.h:38</div></div>
 <div class="ttc" id="structb2_mat22_html"><div class="ttname"><a href="structb2_mat22.html">b2Mat22</a></div><div class="ttdoc">A 2-by-2 matrix. Stored in column-major order. </div><div class="ttdef"><b>Definition:</b> b2Math.h:194</div></div>
-<div class="ttc" id="classb2_body_html"><div class="ttname"><a href="classb2_body.html">b2Body</a></div><div class="ttdoc">A rigid body. These are created via b2World::CreateBody. </div><div class="ttdef"><b>Definition:</b> b2Body.h:126</div></div>
+<div class="ttc" id="classb2_body_html"><div class="ttname"><a href="classb2_body.html">b2Body</a></div><div class="ttdoc">A rigid body. These are created via b2World::CreateBody. </div><div class="ttdef"><b>Definition:</b> b2Body.h:127</div></div>
 <div class="ttc" id="structb2_contact_velocity_constraint_html"><div class="ttname"><a href="structb2_contact_velocity_constraint.html">b2ContactVelocityConstraint</a></div><div class="ttdef"><b>Definition:</b> b2ContactSolver.h:42</div></div>
 <div class="ttc" id="structb2_velocity_html"><div class="ttname"><a href="structb2_velocity.html">b2Velocity</a></div><div class="ttdoc">This is an internal structure. </div><div class="ttdef"><b>Definition:</b> b2TimeStep.h:56</div></div>
 <div class="ttc" id="structb2_vec2_html"><div class="ttname"><a href="structb2_vec2.html">b2Vec2</a></div><div class="ttdoc">A 2D column vector. </div><div class="ttdef"><b>Definition:</b> b2Math.h:64</div></div>
 <div class="ttc" id="classb2_contact_html"><div class="ttname"><a href="classb2_contact.html">b2Contact</a></div><div class="ttdef"><b>Definition:</b> b2Contact.h:77</div></div>
 <div class="ttc" id="classb2_contact_solver_html"><div class="ttname"><a href="classb2_contact_solver.html">b2ContactSolver</a></div><div class="ttdef"><b>Definition:</b> b2ContactSolver.h:69</div></div>
-<div class="ttc" id="b2_settings_8h_html_aa5f44cc9edf711433dea2b2ec94f3c42"><div class="ttname"><a href="b2_settings_8h.html#aa5f44cc9edf711433dea2b2ec94f3c42">b2_maxManifoldPoints</a></div><div class="ttdeci">#define b2_maxManifoldPoints</div><div class="ttdef"><b>Definition:</b> b2Settings.h:49</div></div>
+<div class="ttc" id="b2_settings_8h_html_aa5f44cc9edf711433dea2b2ec94f3c42"><div class="ttname"><a href="b2_settings_8h.html#aa5f44cc9edf711433dea2b2ec94f3c42">b2_maxManifoldPoints</a></div><div class="ttdeci">#define b2_maxManifoldPoints</div><div class="ttdef"><b>Definition:</b> b2Settings.h:56</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 21 2013 13:38:45 for Splash2D by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 3 2013 16:20:20 for LiquidFun by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

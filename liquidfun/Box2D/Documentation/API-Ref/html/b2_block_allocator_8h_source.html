@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>Splash2D: /usr/local/google/ub-games-master/vendor/unbundled_google/libs/splash2d/Box2D/Box2D/Common/b2BlockAllocator.h Source File</title>
+<title>LiquidFun: b2BlockAllocator.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">Splash2D
+   <div id="projectname">LiquidFun
    </div>
   </td>
  </tr>
@@ -47,8 +47,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
                onmouseout="return searchBox.OnSearchSelectHide()"
                alt=""/>
           <input type="text" id="MSearchField" value="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)"
-               onblur="searchBox.OnSearchFieldFocus(false)"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
                onkeyup="searchBox.OnSearchFieldChange(event)"/>
           </span><span class="right">
             <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
@@ -72,14 +72,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0"
+<iframe src="javascript:void(0)" frameborder="0" 
         name="MSearchResults" id="MSearchResults">
 </iframe>
 </div>
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_347c16e26edee38db12e02b3a72c6da4.html">ub-games-master</a></li><li class="navelem"><a class="el" href="dir_3d346d0a84b193b2bd6d7877411dbaba.html">vendor</a></li><li class="navelem"><a class="el" href="dir_da75ccd4201880b8ff375b4021f91f37.html">unbundled_google</a></li><li class="navelem"><a class="el" href="dir_731f806e151297b5ec442544bab8bb22.html">libs</a></li><li class="navelem"><a class="el" href="dir_50fdb4984762fc092aa566657178fda6.html">splash2d</a></li><li class="navelem"><a class="el" href="dir_c65fa3e071d6b230b516f2e34e737910.html">Box2D</a></li><li class="navelem"><a class="el" href="dir_6c6afa733cb8c0895a73988d2b561e72.html">Box2D</a></li><li class="navelem"><a class="el" href="dir_9dbfe6a9592e0bc15875946ea3087520.html">Common</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_4ab6b4cc6a7edbff49100e9123df213f.html">Common</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -115,8 +115,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">const</span> int32 b2_blockSizes = 14;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">const</span> int32 b2_chunkArrayIncrement = 128;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">struct </span><a class="code" href="structb2_block.html">b2Block</a>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">struct </span><a class="code" href="structb2_chunk.html">b2Chunk</a>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">struct </span>b2Block;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">struct </span>b2Chunk;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
 <div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classb2_block_allocator.html">   35</a></span>&#160;<span class="keyword">class </span><a class="code" href="classb2_block_allocator.html">b2BlockAllocator</a></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;{</div>
@@ -132,11 +132,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="structb2_chunk.html">b2Chunk</a>* m_chunks;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    b2Chunk* m_chunks;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    int32 m_chunkCount;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    int32 m_chunkSpace;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="structb2_block.html">b2Block</a>* m_freeLists[b2_blockSizes];</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    b2Block* m_freeLists[b2_blockSizes];</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keyword">static</span> int32 s_blockSizes[b2_blockSizes];</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">static</span> uint8 s_blockSizeLookup[b2_maxBlockSize + 1];</div>
@@ -144,16 +144,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;};</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classb2_block_allocator_html_a945fdf86e260318b930a53dcc887ca8b"><div class="ttname"><a href="classb2_block_allocator.html#a945fdf86e260318b930a53dcc887ca8b">b2BlockAllocator::Free</a></div><div class="ttdeci">void Free(void *p, int32 size)</div><div class="ttdoc">Free memory. This will use b2Free if the size is larger than b2_maxBlockSize. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:157</div></div>
-<div class="ttc" id="structb2_chunk_html"><div class="ttname"><a href="structb2_chunk.html">b2Chunk</a></div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:46</div></div>
+<div class="ttc" id="classb2_block_allocator_html_a945fdf86e260318b930a53dcc887ca8b"><div class="ttname"><a href="classb2_block_allocator.html#a945fdf86e260318b930a53dcc887ca8b">b2BlockAllocator::Free</a></div><div class="ttdeci">void Free(void *p, int32 size)</div><div class="ttdoc">Free memory. This will use b2Free if the size is larger than b2_maxBlockSize. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:158</div></div>
 <div class="ttc" id="classb2_block_allocator_html"><div class="ttname"><a href="classb2_block_allocator.html">b2BlockAllocator</a></div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.h:35</div></div>
-<div class="ttc" id="structb2_block_html"><div class="ttname"><a href="structb2_block.html">b2Block</a></div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:52</div></div>
 <div class="ttc" id="b2_settings_8h_html"><div class="ttname"><a href="b2_settings_8h.html">b2Settings.h</a></div></div>
-<div class="ttc" id="classb2_block_allocator_html_a437bf775c23f6e36af11a6d1653d7040"><div class="ttname"><a href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">b2BlockAllocator::Allocate</a></div><div class="ttdeci">void * Allocate(int32 size)</div><div class="ttdoc">Allocate memory. This will use b2Alloc if the size is larger than b2_maxBlockSize. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:99</div></div>
+<div class="ttc" id="classb2_block_allocator_html_a437bf775c23f6e36af11a6d1653d7040"><div class="ttname"><a href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">b2BlockAllocator::Allocate</a></div><div class="ttdeci">void * Allocate(int32 size)</div><div class="ttdoc">Allocate memory. This will use b2Alloc if the size is larger than b2_maxBlockSize. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:100</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 21 2013 13:38:45 for Splash2D by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 3 2013 16:20:20 for LiquidFun by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
