@@ -35,13 +35,20 @@ $(eval \
   endif)
 endef
 
+# NOTE: This is a temporary change that renames the library build targets to
+# splash2d *only* when the Android build system (not NDK) is being used to
+# build this library.  This works around this project being duplicated in
+# platform/vendor/unbundled_google/libs/liquidfun which define the
+# libliquidfun and libliquidfun_static build targets.
+lib_name:=$(if $(NDK_PROJECT_PATH),liquidfun,splash2d)
+
 # Configure common local variables to build box2d adding $(1) to the end of the
 # build target's name.
 define box2d-module
 $(eval \
-  LOCAL_MODULE:=libliquidfun$(1)
+  LOCAL_MODULE:=lib$(lib_name)$(1)
   LOCAL_MODULE_TAGS:=optional
-  LOCAL_COPY_HEADERS_TO:=liquidfun$(1))
+  LOCAL_COPY_HEADERS_TO:=$(lib_name)$(1))
 endef
 
 # Execute a shell command relative to this module's directory.

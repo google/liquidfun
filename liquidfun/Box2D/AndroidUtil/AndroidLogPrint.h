@@ -121,7 +121,7 @@ extern "C" {
 #endif  // defined(__cplusplus)
 
 // Global tag used for log output.  This can used when filtering the output of
-// "adb logcat" to distiguish the log messages from this application vs.
+// "adb logcat" to distinguish the log messages from this application vs.
 // other applications and the rest of the system.
 extern const char *gAndroidLogPrintfTag;
 

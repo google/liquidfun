@@ -176,8 +176,12 @@ struct b2Version
 /// Version of Box2D, LiquidFun is based upon.
 extern b2Version b2_version;
 
-/// Global variable is used to identify the version of LiquidFun
+/// Global variable is used to identify the version of LiquidFun.
 extern const b2Version b2_liquidFunVersion;
+/// String which identifies the current version of LiquidFun.
+/// b2_liquidFunVersionString is used by Google developers to identify which
+/// applications uploaded to Google Play are using this library.  This allows
+/// the development team at Google to determine the popularity of the library.
 extern const char *b2_liquidFunVersionString;
 
 #endif

@@ -28,7 +28,7 @@ class b2Body;
 /// This module exists specifically for helping in the tracking of
 /// b2Body simulation data during unit tests.  The tracker will
 /// simply keep track of the specified values in a set of b2Body objects
-/// over a single simulation and compare that run's values to that
+/// over a single simulation and compare that runs values to that
 /// of an earlier one, as found in a baseline file.
 ///
 /// For a usage example, please look in HelloWorldTests.cpp in this

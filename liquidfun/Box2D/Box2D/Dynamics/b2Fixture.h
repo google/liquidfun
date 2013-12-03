@@ -157,7 +157,7 @@ public:
 	/// @param p a point in world coordinates.
 	bool TestPoint(const b2Vec2& p) const;
 
-	/// Compure the distance from this fixture.
+	/// Compute the distance from this fixture.
 	/// @param p a point in world coordinates.
 	void ComputeDistance(const b2Vec2& p, float32* distance, b2Vec2* normal, int32 childIndex) const;
 
