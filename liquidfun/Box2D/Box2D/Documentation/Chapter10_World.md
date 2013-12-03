@@ -96,8 +96,7 @@ b->GetNext())`<br/>
 (GameActor*)b->GetUserData();`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`if (myActor->IsDead())`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myWorld->DestroyBody(b);
- // ERROR: now GetNext returns garbage.`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myWorld->DestroyBody(b); // ERROR: now GetNext returns garbage.`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
 
@@ -115,8 +114,7 @@ the body.
 (GameActor*)b->GetUserData();`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`if (myActor->IsDead())`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myWorld->DestroyBody(b);
-`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myWorld->DestroyBody(b);`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
 
@@ -167,8 +165,7 @@ fixture)`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`b2Body* body =
 fixture->GetBody();`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`body->SetAwake(true);`<b
-r/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`body->SetAwake(true);`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`// Return true to
 continue the query.`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`return true;`<br/>

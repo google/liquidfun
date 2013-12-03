@@ -24,9 +24,8 @@ designed to allow you to manipulate large numbers of particles efficiently.
 ## Particles
 A particle is round, and the minimal unit of matter in a particle system. By
 default, a particle behaves as a liquid. You can set behavioral flags,
-however,
-to assign different behaviors (explained in X.4 to X.10, below) to the
-particle.
+however, to assign different behaviors (explained in
+[Particle Behaviors](#pb)) to individual particles or groups of particles.
 You can also set other particle properties including position, velocity, and
 color.<br/>
 The `b2Particle.h` file contains the enumerated behavior values, as well as
@@ -131,8 +130,8 @@ m_world->GetParticleGroupList();`<br/>
 &nbsp;&nbsp;&nbsp;`{`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	b2ParticleGroup* nextGroup =
 group->GetNext(); // access this before we destroy the group`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	
-m_world->DestroyParticleGroup(group);`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	m_world->DestroyParticleGroup(group);`
+<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	group = nextGroup;`<br/>
 &nbsp;&nbsp;&nbsp;`}`
 
@@ -150,6 +149,25 @@ two types of particle groups:
 
 ###Solid
 
+A solid particle group prevents other bodies from lodging inside of it. Should
+anything penetrate it, the solid particle group pushes the offending body back
+out to its surface.
+
+You cannot define a particle group as only solid. It must have one of four
+other behaviors, as well: it must either be combined with the rigid-group
+behavior, or with the wall, spring, or elastic particle behavior.
+
+To define a group combining solid- and rigid-group behaviors, use a single
+statement. For example:
+
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup;`
+
+To define a group combining solid-group behavior with a given particle
+behavior, use two statements. For example:
+
+&nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`<br/>
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`<br/>
+
 A solid particle group possesses especially strong repulsive force. It is
 useful, for example, in a case where:
 
@@ -161,7 +179,7 @@ specify a solid particle group. In many cases, a group will be defined as not
 only solid, but with additional behaviors, as well. For example, solid and
 elastic
 
-[TODO: Flesh out details with Suto-san in TOK]
+
 
 ###Rigid
 
@@ -178,14 +196,13 @@ particles.
     * For example, creating a snowman from three round particle groups, and
 then merging them into a single particle group.
 
-For individual particles, use the b2ParticleFlag enum.
-
-&nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle | b2_viscousParticle;`
-
 Use the `b2_rigidParticleGroup` flag of the `b2ParticleGroupFlag` enum to
-specify a rigid particle group.
+specify a rigid particle group.  For example:
 
-The b2ParticleFlag enum provides the following flags. Note that different
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_rigidParticleGroup;`
+
+For individual particles, use the b2ParticleFlag enum. The b2ParticleFlag enum
+provides the flags described in the following sections.  Note that different
 particle behaviors may exact different performance costs.
 
 ### Elastic
@@ -295,7 +312,7 @@ destroying them all in a batch takes the same time as it would to destroy a
 single particle.<br/>
 In the following example, every other particle in a group is designated as a
 zombie, and will be destroyed in the next step of the solver. (For more
-information on the Splash2D solver, see Chapter 1. Introduction.)
+information on the LiquidFun solver, see Chapter 1. Introduction.)
 
 &nbsp;&nbsp;&nbsp;`b2ParticleGroup*group=
 m_world->CreateParticleGroup(pd);`<br/>
@@ -309,6 +326,9 @@ m_world->CreateParticleGroup(pd);`<br/>
 
 Note that you can assign multiple behaviors to a particle or group. Use
 the | ("bitwise OR") operator to chain behavior flags. For example:
+
+&nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle | b2_viscousParticle;`
+
 ## Particle Properties
 
 ### Color

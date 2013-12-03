@@ -122,9 +122,8 @@ should set the b2BodyType at construction time to make the body dynamic.
 
     Caution
 
-    You must set the body type to b2_dynamicBody if you want the body to move
-in response to forces.
-	
+    You must set the body type to b2_dynamicBody if you want the body to move in response to forces.
+
 
 
 Next we create and attach a polygon shape using a fixture definition. First we
@@ -145,8 +144,7 @@ to 1. The default density is zero. Also, the friction on the shape is set to
 
     Caution
 
-    A dynamic body should have at least one fixture with a non-zero density.
-Otherwise you will get strange behavior.
+    A dynamic body should have at least one fixture with a non-zero density.  Otherwise you will get strange behavior.
 
 Using the fixture definition we can now create the fixture. This automatically
 updates the mass of the body. You can add as many fixtures as you like to a

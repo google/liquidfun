@@ -28,7 +28,7 @@ struct b2ParticleColor;
 
 enum b2ParticleGroupFlag
 {
-	b2_solidParticleGroup =   1 << 0, // prevents overlapping or leaking
+	b2_solidParticleGroup =   1 << 0, // resists penetration
 	b2_rigidParticleGroup =   1 << 1, // keeps its shape
 };
 

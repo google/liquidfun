@@ -65,8 +65,8 @@ filtering will prevent the creation of contacts. Contacts are destroyed with
 the AABBs cease to overlap.
 
 So you might gather that there may be contacts created for fixtures that are
-not touching (just their AABBs). Well, this is correct. It's a "chicken or
-egg" problem. We don't know if we need a contact object until one is created
+not touching (just their AABBs). Well, this is correct. It's a "chicken or egg"
+problem. We don't know if we need a contact object until one is created
 to analyze the collision. We could delete the contact right away if the shapes
 are not touching, or we can just wait until the AABBs stop overlapping.
 LiquidFun takes the latter approach because it lets the system cache
@@ -204,8 +204,7 @@ oldManifold)`<br/>
 &nbsp;&nbsp;&nbsp;`contact->GetWorldManifold(&worldManifold);`<br/>
 &nbsp;&nbsp;&nbsp;`if (worldManifold.normal.y < -0.5f)`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`contact->SetEnabled(fals
-e);`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`contact->SetEnabled(false);`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
 
@@ -216,8 +215,7 @@ approach velocity of collisions.
 oldManifold)`<br/>
 &nbsp;&nbsp;&nbsp;`{`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`b2WorldManifold worldManifold;`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`contact->GetWorldManifold(&worldManifold);
-`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`contact->GetWorldManifold(&worldManifold);`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`b2PointState state1[2], state2[2];`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`b2GetPointStates(state1, state2,
 oldManifold, contact->GetManifold());`<br/>
@@ -238,8 +236,7 @@ approachVelocity = b2Dot(vB – vA, worldManifold.normal);`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`if (approachVelocity >
 1.0f)`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`MyPlay
-CollisionSound();`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`MyPlayCollisionSound();`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
@@ -294,19 +291,15 @@ point->FixtureB->GetBody();`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`if (massB > massA)`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`nuke[n
-ukeCount++] = bodyA;`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`nuke[nukeCount++] = bodyA;`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`else`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`nuke[n
-ukeCount++] = bodyB;`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`nuke[nukeCount++] = bodyB;`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`if (nukeCount ==
-k_maxNuke)`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`if (nukeCount == k_maxNuke)`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`break;
-`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`break;`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
@@ -352,9 +345,7 @@ filterB.groupIndex && filterA.groupIndex != 0)`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`return
 filterA.groupIndex > 0;`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`bool collide = (filterA.maskBits &
-filterB.categoryBits) != 0 && (filterA.categoryBits & filterB.maskBits) !=
-0;`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`bool collide = (filterA.maskBits & filterB.categoryBits) != 0 && (filterA.categoryBits & filterB.maskBits) != 0;`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`return collide;`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
 

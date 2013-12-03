@@ -63,9 +63,7 @@ up an old issue:
 
     Caution
 
-    Don't try to create a joint on the stack or on the heap using new or
-malloc. You 	must create and destroy bodies and joints using the create and
-destroy methods of the b2World class.
+    Don't try to create a joint on the stack or on the heap using new or malloc.  You must create and destroy bodies and joints using the create and destroy methods of the b2World class.
 
 Here's an example of the lifetime of a revolute joint:
 
@@ -375,10 +373,7 @@ situation. What happens if those joints are deleted?
 
     Caution
 
-    Always delete gear joints before the revolute/prismatic joints on the
-gears. Otherwise your code will crash in a bad way due to the orphaned joint
-pointers in the gear joint. You should also delete the gear joint before you
-delete any of the bodies involved.
+    Always delete gear joints before the revolute/prismatic joints on the gears. Otherwise your code will crash in a bad way due to the orphaned joint pointers in the gear joint. You should also delete the gear joint before you delete any of the bodies involved.
 
 
 ### Mouse Joint
