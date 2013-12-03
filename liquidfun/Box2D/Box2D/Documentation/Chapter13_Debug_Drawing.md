@@ -1,6 +1,7 @@
 # Debug Drawing
 
-You can implement the b2DebugDraw class to get detailed drawing of the physics world. Here are the available entities:
+You can implement the b2DebugDraw class to get detailed drawing of the physics
+world. Here are the available entities:
 
 * shape outlines
 
@@ -10,8 +11,13 @@ You can implement the b2DebugDraw class to get detailed drawing of the physics w
 
 * center of mass
 
-<img align="center" src="image_24.png" alt="Debug drawing" height="306" width="431"><br/>
-This is the preferred method of drawing these physics entities, rather than accessing the data directly. The reason is that much of the necessary data is internal and subject to change.
+<img align="center" src="image_24.png" alt="Debug drawing" height="306"
+width="431"><br/>
+This is the preferred method of drawing these physics entities, rather than
+accessing the data directly. The reason is that much of the necessary data is
+internal and subject to change.
 
-The testbed draws physics entities using the debug draw facility and the contact listener, so it serves as the primary example of how to implement debug drawing as well as how to draw contact points.
+The testbed draws physics entities using the debug draw facility and the
+contact listener, so it serves as the primary example of how to implement
+debug drawing as well as how to draw contact points.
 
