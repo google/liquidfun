@@ -60,6 +60,8 @@ public:
 		}
 
 		m_world->SetParticleRadius(0.15f);
+		m_world->SetParticleDamping(0.2f);
+
 		{
 			b2ParticleGroupDef pd;
 			pd.flags = TestParticleType();
