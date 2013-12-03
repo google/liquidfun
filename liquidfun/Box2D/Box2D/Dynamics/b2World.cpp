@@ -1488,14 +1488,14 @@ void b2World::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* group
 	m_particleSystem.JoinParticleGroups(groupA, groupB);
 }
 
-void b2World::DestroyParticleGroup(b2ParticleGroup* group)
+void b2World::DestroyParticlesInGroup(b2ParticleGroup* group, bool callDestructionListener)
 {
 	b2Assert(IsLocked() == false);
 	if (IsLocked())
 	{
 		return;
 	}
-	m_particleSystem.DestroyParticleGroup(group);
+	m_particleSystem.DestroyParticlesInGroup(group, callDestructionListener);
 }
 
 uint32* b2World::GetParticleFlagsBuffer()

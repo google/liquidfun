@@ -272,8 +272,15 @@ int32 b2ParticleSystem::DestroyParticlesInShape(
 	b2AABB aabb;
 	shape.ComputeAABB(&aabb, xf, 0);
 	m_world->QueryAABB(&callback, aabb);
-	SolveZombie();
 	return callback.Destroyed();
+}
+
+void b2ParticleSystem::DestroyParticlesInGroup(
+	b2ParticleGroup* group, bool callDestructionListener)
+{
+	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++) {
+		DestroyParticle(i, callDestructionListener);
+	}
 }
 
 b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef& groupDef)
@@ -348,7 +355,7 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 		m_groupBuffer[i] = group;
 	}
 
-	UpdateContacts();
+	UpdateContacts(true);
 	if (groupDef.flags & k_pairFlags)
 	{
 		for (int32 k = 0; k < m_contactCount; k++)
@@ -381,10 +388,12 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 	if (groupDef.flags & k_triadFlags)
 	{
 		b2VoronoiDiagram diagram(
-			&m_world->m_stackAllocator,
-			m_positionBuffer.data + firstIndex, lastIndex - firstIndex,
-			stride / 2);
-
+			&m_world->m_stackAllocator, lastIndex - firstIndex);
+		for (int32 i = firstIndex; i < lastIndex; i++)
+		{
+			diagram.AddGenerator(m_positionBuffer.data[i], i);
+		}
+		diagram.Generate(stride / 2);
 		CreateParticleGroupCallback callback;
 		callback.system = this;
 		callback.def = &groupDef;
@@ -401,9 +410,6 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 
 void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b, int32 c) const
 {
-	a += firstIndex;
-	b += firstIndex;
-	c += firstIndex;
 	const b2Vec2& pa = system->m_positionBuffer.data[a];
 	const b2Vec2& pb = system->m_positionBuffer.data[b];
 	const b2Vec2& pc = system->m_positionBuffer.data[c];
@@ -457,6 +463,7 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 		particleFlags |= m_flagsBuffer.data[i];
 	}
 
+	UpdateContacts(true);
 	if (particleFlags & k_pairFlags)
 	{
 		for (int32 k = 0; k < m_contactCount; k++)
@@ -485,13 +492,19 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 			}
 		}
 	}
-
 	if (particleFlags & k_triadFlags)
 	{
 		b2VoronoiDiagram diagram(
 			&m_world->m_stackAllocator,
-			m_positionBuffer.data + groupA->m_firstIndex, groupB->m_lastIndex - groupA->m_firstIndex,
-			GetParticleStride() / 2);
+			groupB->m_lastIndex - groupA->m_firstIndex);
+		for (int32 i = groupA->m_firstIndex; i < groupB->m_lastIndex; i++)
+		{
+			if (!(m_flagsBuffer.data[i] & b2_zombieParticle))
+			{
+				diagram.AddGenerator(m_positionBuffer.data[i], i);
+			}
+		}
+		diagram.Generate(GetParticleStride() / 2);
 		JoinParticleGroupsCallback callback;
 		callback.system = this;
 		callback.groupA = groupA;
@@ -517,9 +530,6 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 
 void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b, int32 c) const
 {
-	a += groupA->m_firstIndex;
-	b += groupA->m_firstIndex;
-	c += groupA->m_firstIndex;
 	// Create a triad if it will contain particles from both groups.
 	int32 countA =
 		(a < groupB->m_firstIndex) +
@@ -570,9 +580,11 @@ void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b, 
 	}
 };
 
+// Only called from SolveZombie() or JoinParticleGroups().
 void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 {
 	b2Assert(m_groupCount > 0);
+	b2Assert(group);
 
 	if (m_world->m_destructionListener)
 	{
@@ -581,11 +593,8 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 
 	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 	{
-		m_flagsBuffer.data[i] |= b2_zombieParticle;
 		m_groupBuffer[i] = NULL;
 	}
-
-	bool needsSolveZombie = group->GetParticleCount() > 0;
 
 	if (group->m_prev)
 	{
@@ -603,11 +612,6 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 	--m_groupCount;
 	group->~b2ParticleGroup();
 	m_world->m_blockAllocator.Free(group, sizeof(b2ParticleGroup));
-
-	if (needsSolveZombie)
-	{
-		SolveZombie();
-	}
 }
 
 void b2ParticleSystem::ComputeDepthForGroup(b2ParticleGroup* group)
@@ -708,7 +712,12 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 	}
 }
 
-void b2ParticleSystem::UpdateContacts()
+static bool b2ParticleContactIsZombie(const b2ParticleContact& contact)
+{
+	return contact.flags & b2_zombieParticle;
+}
+
+void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 {
 	Proxy* beginProxy = m_proxyBuffer;
 	Proxy* endProxy = beginProxy + m_proxyCount;
@@ -739,6 +748,13 @@ void b2ParticleSystem::UpdateContacts()
 			if (bottomRightTag < b->tag) break;
 			AddContact(a->index, b->index);
 		}
+	}
+	if (exceptZombie)
+	{
+		b2ParticleContact* lastContact = std::remove_if(
+			m_contactBuffer, m_contactBuffer + m_contactCount,
+			b2ParticleContactIsZombie);
+		m_contactCount = (int32) (lastContact - m_contactBuffer);
 	}
 }
 
@@ -945,6 +961,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	{
 		m_allParticleFlags |= m_flagsBuffer.data[i];
 	}
+	if (m_allParticleFlags & b2_zombieParticle)
+	{
+		SolveZombie();
+	}
 	m_allGroupFlags = 0;
 	for (const b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
 	{
@@ -976,7 +996,7 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		m_positionBuffer.data[i] += step.dt * m_velocityBuffer.data[i];
 	}
 	UpdateBodyContacts();
-	UpdateContacts();
+	UpdateContacts(false);
 	if (m_allParticleFlags & b2_viscousParticle)
 	{
 		SolveViscous(step);
@@ -1007,10 +1027,6 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	}
 	SolvePressure(step);
 	SolveDamping(step);
-	if (m_allParticleFlags & b2_zombieParticle)
-	{
-		SolveZombie();
-	}
 }
 
 void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
@@ -1340,6 +1356,7 @@ void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 {
 	// applies extra repulsive force from solid particle groups
+	m_depthBuffer = RequestParticleBuffer(m_depthBuffer);
 	float32 ejectionStrength = step.inv_dt * m_ejectionStrength;
 	for (int32 k = 0; k < m_contactCount; k++)
 	{

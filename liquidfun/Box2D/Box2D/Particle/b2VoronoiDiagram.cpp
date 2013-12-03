@@ -19,74 +19,89 @@
 #include <Box2D/Particle/b2StackQueue.h>
 #include <Box2D/Collision/b2Collision.h>
 
-struct b2VoronoiDiagramTask
-{
-	int32 m_x, m_y, m_i, m_k;
-	b2VoronoiDiagramTask() {}
-	b2VoronoiDiagramTask(int32 x, int32 y, int32 i, int32 k)
-	{
-		m_x = x;
-		m_y = y;
-		m_i = i;
-		m_k = k;
-	}
-};
-
 b2VoronoiDiagram::b2VoronoiDiagram(
-	b2StackAllocator *allocator,
-	const b2Vec2 *generators, int32 generatorCount,
-	float32 radius)
+	b2StackAllocator* allocator, int32 generatorCapacity)
 {
 	m_allocator = allocator;
+	m_generatorBuffer =
+		(Generator*) allocator->Allocate(sizeof(Generator) * generatorCapacity);
+	m_generatorCount = 0;
+	m_countX = 0;
+	m_countY = 0;
+	m_diagram = NULL;
+}
+
+b2VoronoiDiagram::~b2VoronoiDiagram()
+{
+	if (m_diagram)
+	{
+		m_allocator->Free(m_diagram);
+	}
+	m_allocator->Free(m_generatorBuffer);
+}
+
+void b2VoronoiDiagram::AddGenerator(const b2Vec2& center, int32 tag)
+{
+	Generator& g = m_generatorBuffer[m_generatorCount++];
+	g.center = center;
+	g.tag = tag;
+}
+
+void b2VoronoiDiagram::Generate(float32 radius)
+{
+	b2Assert(m_diagram == NULL);
 	float32 inverseRadius = 1 / radius;
 	b2Vec2 lower(+b2_maxFloat, +b2_maxFloat);
 	b2Vec2 upper(-b2_maxFloat, -b2_maxFloat);
-	for (int32 k = 0; k < generatorCount; k++)
+	for (int32 k = 0; k < m_generatorCount; k++)
 	{
-		b2Vec2 g = generators[k];
-		lower = b2Min(lower, g);
-		upper = b2Max(upper, g);
+		Generator& g = m_generatorBuffer[k];
+		lower = b2Min(lower, g.center);
+		upper = b2Max(upper, g.center);
 	}
 	m_countX = 1 + (int32) (inverseRadius * (upper.x - lower.x));
 	m_countY = 1 + (int32) (inverseRadius * (upper.y - lower.y));
-	m_diagram = (int32*) m_allocator->Allocate(sizeof(int32) * m_countX * m_countY);
+	m_diagram = (Generator**)
+		m_allocator->Allocate(sizeof(Generator*) * m_countX * m_countY);
 	for (int32 i = 0; i < m_countX * m_countY; i++)
 	{
-		m_diagram[i] = -1;
+		m_diagram[i] = NULL;
 	}
-	b2StackQueue<b2VoronoiDiagramTask> queue(m_allocator, 4 * m_countX * m_countX);
-	for (int32 k = 0; k < generatorCount; k++)
+	b2StackQueue<b2VoronoiDiagramTask> queue(
+		m_allocator, 4 * m_countX * m_countX);
+	for (int32 k = 0; k < m_generatorCount; k++)
 	{
-		b2Vec2 g = inverseRadius * (generators[k] - lower);
-		int32 x = b2Max(0, b2Min((int32) g.x, m_countX - 1));
-		int32 y = b2Max(0, b2Min((int32) g.y, m_countY - 1));
-		queue.Push(b2VoronoiDiagramTask(x, y, x + y * m_countX, k));
+		Generator& g = m_generatorBuffer[k];
+		g.center = inverseRadius * (g.center - lower);
+		int32 x = b2Max(0, b2Min((int32) g.center.x, m_countX - 1));
+		int32 y = b2Max(0, b2Min((int32) g.center.y, m_countY - 1));
+		queue.Push(b2VoronoiDiagramTask(x, y, x + y * m_countX, &g));
 	}
 	while (!queue.Empty())
 	{
 		int32 x = queue.Front().m_x;
 		int32 y = queue.Front().m_y;
 		int32 i = queue.Front().m_i;
-		int32 k = queue.Front().m_k;
+		Generator* g = queue.Front().m_generator;
 		queue.Pop();
-		if (m_diagram[i] < 0)
+		if (!m_diagram[i])
 		{
-			m_diagram[i] = k;
+			m_diagram[i] = g;
 			if (x > 0)
 			{
-				queue.Push(b2VoronoiDiagramTask(x - 1, y, i - 1, k));
+				queue.Push(b2VoronoiDiagramTask(x - 1, y, i - 1, g));
 			}
 			if (y > 0)
 			{
-				queue.Push(b2VoronoiDiagramTask(x, y - 1, i - m_countX, k));
+				queue.Push(b2VoronoiDiagramTask(x, y - 1, i - m_countX, g));
 			}
 			if (x < m_countX - 1)
 			{
-				queue.Push(b2VoronoiDiagramTask(x + 1, y, i + 1, k));
+				queue.Push(b2VoronoiDiagramTask(x + 1, y, i + 1, g));
 			}
 			if (y < m_countY - 1)
 			{
-				queue.Push(b2VoronoiDiagramTask(x, y + 1, i + m_countX, k));
+				queue.Push(b2VoronoiDiagramTask(x, y + 1, i + m_countX, g));
 			}
 		}
 	}
@@ -98,8 +113,8 @@ b2VoronoiDiagram::b2VoronoiDiagram(
 			for (int32 x = 0; x < m_countX - 1; x++)
 			{
 				int32 i = x + y * m_countX;
-				int32 a = m_diagram[i];
-				int32 b = m_diagram[i + 1];
+				Generator* a = m_diagram[i];
+				Generator* b = m_diagram[i + 1];
 				if (a != b)
 				{
 					queue.Push(b2VoronoiDiagramTask(x, y, i, b));
@@ -112,8 +127,8 @@ b2VoronoiDiagram::b2VoronoiDiagram(
 			for (int32 x = 0; x < m_countX; x++)
 			{
 				int32 i = x + y * m_countX;
-				int32 a = m_diagram[i];
-				int32 b = m_diagram[i + m_countX];
+				Generator* a = m_diagram[i];
+				Generator* b = m_diagram[i + m_countX];
 				if (a != b)
 				{
 					queue.Push(b2VoronoiDiagramTask(x, y, i, b));
@@ -127,18 +142,16 @@ b2VoronoiDiagram::b2VoronoiDiagram(
 			int32 x = queue.Front().m_x;
 			int32 y = queue.Front().m_y;
 			int32 i = queue.Front().m_i;
-			int32 k = queue.Front().m_k;
+			Generator* k = queue.Front().m_generator;
 			queue.Pop();
-			int32 a = m_diagram[i];
-			int32 b = k;
+			Generator* a = m_diagram[i];
+			Generator* b = k;
 			if (a != b)
 			{
-				b2Vec2 va = inverseRadius * (generators[a] - lower);
-				b2Vec2 vb = inverseRadius * (generators[b] - lower);
-				float32 ax = va.x - x;
-				float32 ay = va.y - y;
-				float32 bx = vb.x - x;
-				float32 by = vb.y - y;
+				float32 ax = a->center.x - x;
+				float32 ay = a->center.y - y;
+				float32 bx = b->center.x - x;
+				float32 by = b->center.y - y;
 				float32 a2 = ax * ax + ay * ay;
 				float32 b2 = bx * bx + by * by;
 				if (a2 > b2)
@@ -169,9 +182,4 @@ b2VoronoiDiagram::b2VoronoiDiagram(
 			break;
 		}
 	}
-}
-
-b2VoronoiDiagram::~b2VoronoiDiagram()
-{
-	m_allocator->Free(m_diagram);
 }

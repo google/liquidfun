@@ -131,18 +131,24 @@ TEST_F(FunctionTests, DestroyParticlesInShape) {
 	m_world->Step(0.001f, 1, 1);
 	destroyed = m_world->DestroyParticlesInShape(shape, xf);
 	EXPECT_EQ(destroyed, 1);
+	EXPECT_EQ(m_world->GetParticleCount(), 1);
+	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(m_world->GetParticleCount(), 0);
 
 	m_world->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
 	destroyed = m_world->DestroyParticlesInShape(shape, xf, true);
 	EXPECT_EQ(destroyed, 1);
+	EXPECT_EQ(m_world->GetParticleCount(), 1);
+	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(m_world->GetParticleCount(), 0);
 
 	m_world->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
 	destroyed = m_world->DestroyParticlesInShape(shape, xf, false);
 	EXPECT_EQ(destroyed, 1);
+	EXPECT_EQ(m_world->GetParticleCount(), 1);
+	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(m_world->GetParticleCount(), 0);
 }
 
@@ -156,7 +162,8 @@ TEST_F(FunctionTests, CreateParticleGroup) {
 
 TEST_F(FunctionTests, DestroyParticleGroup) {
 	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_world);
-	m_world->DestroyParticleGroup(group);
+	m_world->DestroyParticlesInGroup(group);
+	EXPECT_EQ(m_world->GetParticleGroupCount(), 1);
 	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(m_world->GetParticleGroupCount(), 0);
 	EXPECT_EQ(m_world->GetParticleCount(), 0);
@@ -331,10 +338,10 @@ TEST_F(FunctionTests, GroupBuffer) {
 		ASSERT_EQ(group3, groupBuffer[offset3 + i]);
 	}
 	m_world->JoinParticleGroups(group1, group2);
-	m_world->DestroyParticleGroup(group3);
+	m_world->DestroyParticlesInGroup(group3);
+	m_world->Step(0.001f, 1, 1);
 	groupBuffer = m_world->GetParticleGroupBuffer();
 	int32 count = m_world->GetParticleCount();
-	m_world->Step(0.001f, 1, 1);
 	for (int32 i = 0; i < count; i++) {
 		ASSERT_EQ(group1, groupBuffer[i]);
 	}
