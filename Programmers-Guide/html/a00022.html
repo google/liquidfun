@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>Splash2D Programmer&#39;s Guide: Particle Module</title>
+<title>LiquidFun Programmer&#39;s Guide: Particle Module</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">Splash2D Programmer&#39;s Guide
+   <div id="projectname">LiquidFun Programmer&#39;s Guide
    </div>
   </td>
  </tr>
@@ -68,7 +68,7 @@ $(document).ready(function(){initNavTree('a00022.html','');});
 <p>The Particle module offers the ability to create and manipulate liquid or soft (deformable) bodies. It allows you to create (and destroy) particles with various behaviors and properties, and provides various methods for manipulating them. The module permits you to define particles discretely or as groups. It is designed to allow you to manipulate large numbers of particles efficiently.</p>
 <p><a class="anchor" id="Particles"></a> </p>
 <h2>Particles</h2>
-<p>A particle is round, and the minimal unit of matter in a particle system. By default, a particle behaves as a liquid. You can set behavioral flags, however, to assign different behaviors (explained in X.4 to X.10, below) to the particle. You can also set other particle properties including position, velocity, and color.<br/>
+<p>A particle is round, and the minimal unit of matter in a particle system. By default, a particle behaves as a liquid. You can set behavioral flags, however, to assign different behaviors (explained in <a href="#pb">Particle Behaviors</a>) to individual particles or groups of particles. You can also set other particle properties including position, velocity, and color.<br/>
  The <code>b2Particle.h</code> file contains the enumerated behavior values, as well as the variables specifying other particle properties. The corresponding enum is named <code>b2ParticleFlag.</code></p>
 <p><a class="anchor" id="pg"></a> </p>
 <h2>Particle Groups</h2>
@@ -121,7 +121,7 @@ $(document).ready(function(){initNavTree('a00022.html','');});
  &#160;&#160;&#160;<code>while (group)</code><br/>
  &#160;&#160;&#160;<code>{</code><br/>
  &#160;&#160;&#160;&#160;&#160;&#160;<code>b2ParticleGroup* nextGroup = group-&gt;GetNext(); // access this before we destroy the group</code><br/>
- &#160;&#160;&#160;&#160;&#160;&#160;<code>m_world-&gt;DestroyParticleGroup(group);</code><br/>
+ &#160;&#160;&#160;&#160;&#160;&#160;<code>m_world-&gt;DestroyParticleGroup(group);</code> <br/>
  &#160;&#160;&#160;&#160;&#160;&#160;<code>group = nextGroup;</code><br/>
  &#160;&#160;&#160;<code>}</code></p>
 <p>The next several sections provide more information on how to define particle behaviors and properties.</p>
@@ -130,12 +130,19 @@ $(document).ready(function(){initNavTree('a00022.html','');});
 <p>Particle behaviors are defined either for entire groups of, or individual, particles.</p>
 <p>For a group of particles, use the <code>b2ParticleGroupFlag</code> enum, which provides two types of particle groups:</p>
 <h3>Solid</h3>
+<p>A solid particle group prevents other bodies from lodging inside of it. Should anything penetrate it, the solid particle group pushes the offending body back out to its surface.</p>
+<p>You cannot define a particle group as only solid. It must have one of four other behaviors, as well: it must either be combined with the rigid-group behavior, or with the wall, spring, or elastic particle behavior.</p>
+<p>To define a group combining solid- and rigid-group behaviors, use a single statement. For example:</p>
+<p>&#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup;</code></p>
+<p>To define a group combining solid-group behavior with a given particle behavior, use two statements. For example:</p>
+<p>&#160;&#160;&#160;<code>pd.flags = b2_elasticParticle;</code><br/>
+ &#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup;</code><br/>
+</p>
 <p>A solid particle group possesses especially strong repulsive force. It is useful, for example, in a case where:</p>
 <ul>
 <li>Something should be expected to bounce with unusual vigor ** As when a racquetball strikes the wall of a court</li>
 </ul>
 <p>Use the <code>b2_SolidParticleGroup</code> flag of the <code>b2ParticleGroupFlag</code> enum to specify a solid particle group. In many cases, a group will be defined as not only solid, but with additional behaviors, as well. For example, solid and elastic</p>
-<p>[TODO: Flesh out details with Suto-san in TOK]</p>
 <h3>Rigid</h3>
 <p>Rigid particle groups are ones whose shape does not change, even when they collide with other bodies. Working with rigid particle groups confers a few advantages over simply working with rigid bodies: With a rigid particle group, you can:<br/>
 </p>
@@ -149,10 +156,9 @@ $(document).ready(function(){initNavTree('a00022.html','');});
 </ul>
 </li>
 </ul>
-<p>For individual particles, use the b2ParticleFlag enum.</p>
-<p>&#160;&#160;&#160;<code>pd.flags = b2_elasticParticle | b2_viscousParticle;</code></p>
-<p>Use the <code>b2_rigidParticleGroup</code> flag of the <code>b2ParticleGroupFlag</code> enum to specify a rigid particle group.</p>
-<p>The b2ParticleFlag enum provides the following flags. Note that different particle behaviors may exact different performance costs.</p>
+<p>Use the <code>b2_rigidParticleGroup</code> flag of the <code>b2ParticleGroupFlag</code> enum to specify a rigid particle group. For example:</p>
+<p>&#160;&#160;&#160;<code>pd.groupFlags = b2_rigidParticleGroup;</code></p>
+<p>For individual particles, use the b2ParticleFlag enum. The b2ParticleFlag enum provides the flags described in the following sections. Note that different particle behaviors may exact different performance costs.</p>
 <h3>Elastic</h3>
 <p>Elastic particles deform and may also bounce when they collide with rigid bodies.<br/>
  Set particle behavior as elastic using the statement</p>
@@ -206,14 +212,15 @@ $(document).ready(function(){initNavTree('a00022.html','');});
 <p>&#160;&#160;&#160;<code>pd.flags = b2_wallParticle;</code></p>
 <h3>Zombie Particles</h3>
 <p>Zombie particles are useful when you want efficiently to destroy multiple particles in a single step. All of the particles that you designate as zombies are destroyed at the same time, in a single iteration of the solver. Destroying particles in a batch, after designating them as zombies, yields better performance than destroying them one by one: Whereas destroying particles one-by-one takes (number of particles) * (time per particle) to complete, destroying them all in a batch takes the same time as it would to destroy a single particle.<br/>
- In the following example, every other particle in a group is designated as a zombie, and will be destroyed in the next step of the solver. (For more information on the Splash2D solver, see Chapter 1. Introduction.)</p>
+ In the following example, every other particle in a group is designated as a zombie, and will be destroyed in the next step of the solver. (For more information on the LiquidFun solver, see Chapter 1. Introduction.)</p>
 <p>&#160;&#160;&#160;<code>b2ParticleGroup*group= m_world-&gt;CreateParticleGroup(pd);</code><br/>
  &#160;&#160;&#160;<code>for (int32 i=0;i&lt;group-&gt;GetParticleCount();i+=2)</code><br/>
  &#160;&#160;&#160;<code>{</code><br/>
  &#160;&#160;&#160;&#160;&#160;&#160;<code>group-&gt;GetParticleFlagsBuffer()[i] |=</code> <code>b2_zombieParticle;</code><br/>
  &#160;&#160;&#160;<code>}</code></p>
 <p><a class="anchor" id="pp"></a></p>
-<p>Note that you can assign multiple behaviors to a particle or group. Use the | ("bitwise OR") operator to chain behavior flags. For example: </p>
+<p>Note that you can assign multiple behaviors to a particle or group. Use the | ("bitwise OR") operator to chain behavior flags. For example:</p>
+<p>&#160;&#160;&#160;<code>pd.flags = b2_elasticParticle | b2_viscousParticle;</code></p>
 <h2>Particle Properties</h2>
 <h3>Color</h3>
 <p>Set particle or particle-group color using the statement</p>
@@ -280,7 +287,7 @@ $(document).ready(function(){initNavTree('a00022.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed Nov 27 2013 14:44:45 for Splash2D Programmer&#39;s Guide by
+    <li class="footer">Generated on Tue Dec 3 2013 15:27:47 for LiquidFun Programmer&#39;s Guide by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.5 </li>
   </ul>

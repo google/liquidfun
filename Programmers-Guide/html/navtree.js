@@ -1,6 +1,6 @@
 var NAVTREE =
 [
-  [ "Splash2D Programmer's Guide", "index.html", [
+  [ "LiquidFun Programmer's Guide", "index.html", [
     [ "Introduction", "a00002.html", null ],
     [ "Hello LiquidFun", "a00004.html", null ],
     [ "Common", "a00006.html", null ],
