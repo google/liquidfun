@@ -217,6 +217,8 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithCallback) {
 	m_world->Step(0.001f, 1, 1);
 	destroyed = m_world->DestroyParticlesInShape(shape, xf, true);
 	EXPECT_EQ(destroyed, 1);
+	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
+	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listener.m_destroyedParticles[0], index);
 }
@@ -227,7 +229,9 @@ TEST_F(CallbackTests, DestroyParticleGroupWithCallback) {
 	DestructionListener listener;
 	m_world->SetDestructionListener(&listener);
 	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_world);
-	m_world->DestroyParticleGroup(group);
+	m_world->DestroyParticlesInGroup(group);
+	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 0U);
+	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 1U);
 	EXPECT_EQ(listener.m_destroyedParticleGroups[0], group);
 }

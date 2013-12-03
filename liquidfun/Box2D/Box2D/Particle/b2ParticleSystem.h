@@ -174,13 +174,15 @@ private:
 	// destroyed.
 	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf,
 	                              bool callDestructionListener);
+	void DestroyParticlesInGroup(b2ParticleGroup* group,
+	                             bool callDestructionListener);
 	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
 	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 	void DestroyParticleGroup(b2ParticleGroup* group);
 	void ComputeDepthForGroup(b2ParticleGroup* group);
 
 	void AddContact(int32 a, int32 b);
-	void UpdateContacts();
+	void UpdateContacts(bool exceptZombie);
 	void UpdateBodyContacts();
 
 	void Solve(const b2TimeStep& step);

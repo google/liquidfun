@@ -40,6 +40,8 @@ public:
 		}
 
 		m_world->SetParticleRadius(0.15f);
+		m_world->SetParticleDamping(0.2f);
+
 		{
 			b2PolygonShape shape;
 			shape.SetAsBox(8, 10, b2Vec2(-12, 10.1f), 0);

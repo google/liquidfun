@@ -74,8 +74,8 @@ public:
 	/// @warning This function is locked during callbacks.
 	b2Body* CreateBody(const b2BodyDef* def);
 
-	/// Destroy a rigid body given a definition. No reference to the definition
-	/// is retained. This function is locked during callbacks.
+	/// Destroy a rigid body.
+	/// This function is locked during callbacks.
 	/// @warning This automatically deletes all associated shapes and joints.
 	/// @warning This function is locked during callbacks.
 	void DestroyBody(b2Body* body);
@@ -275,11 +275,23 @@ public:
 	/// @warning This function is locked during callbacks.
 	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 
-	/// Destroy a particle group.
+	/// Destroy particles in a group.
 	/// This function is locked during callbacks.
-	/// @warning This automatically deletes all associated particles.
+	/// @param The particle group to destroy.
+	/// @param Whether to call the world b2DestructionListener for each
+	/// particle is destroyed.
 	/// @warning This function is locked during callbacks.
-	void DestroyParticleGroup(b2ParticleGroup* group);
+	void DestroyParticlesInGroup(b2ParticleGroup* group, bool callDestructionListener);
+
+	/// Destroy particles in a group without enabling the destruction
+	/// callback for destroyed particles.
+	/// This function is locked during callbacks.
+	/// @param The particle group to destroy.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticlesInGroup(b2ParticleGroup* group)
+	{
+		DestroyParticlesInGroup(group, false);
+	}
 
 	/// Get the world particle group list. With the returned group, use
 	/// b2ParticleGroup::GetNext to get the next group in the world list.

@@ -63,6 +63,8 @@ public:
 		}
 
 		m_world->SetParticleRadius(0.35f);
+		m_world->SetParticleDamping(0.2f);
+
 		{
 			b2CircleShape shape;
 			shape.m_p.Set(0, 30);
