@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>LiquidFun Build &amp; Run instructions: Building for Linux</title>
+<title>LiquidFun Build and Run Instructions: Building for Linux</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">LiquidFun Build &amp; Run instructions
+   <div id="projectname">LiquidFun Build and Run Instructions
    </div>
   </td>
  </tr>
@@ -53,16 +53,34 @@ $(document).ready(function(){initNavTree('md__building_linux.html','');});
 <div class="title">Building for Linux </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The Linux build system requires <code>cmake</code> and has been tested with cmake 2.8.7. You can install cmake using the Linux distribution's package manager (e.g Ubuntu - <code>sudo apt-get install cmake</code>) or by downloading the package from <a href="http://www.cmake.org/cmake/resources/software.html">cmake.org</a>. In addition, to build sample applications, the OpenGL and GLU (e.g <code>libglapi-mesa</code> &amp; <code>libglu1-mesa-dev</code>) development libraries need to be installed on the development system.</p>
-<p>Building with <code>cmake</code> requires the generation of makefiles from the cmake project, and then executing <code>make</code> to build the library and sample applications.</p>
-<p>The <code>cmake</code> project directory for liquidfun is located in liquidfun/Box2D. You can build all build targets using the following. </p>
+<div class="textblock"><h3>Before Building</h3>
+<p>Prior to building, install the following components using the <a href="http://en.wikipedia.org/wiki/Linux">Linux</a> distribution's package manager:</p>
+<ul>
+<li>Install <a href="http://www.cmake.org">cmake</a> using the package manager or download and manually install from <a href="http://cmake.org">cmake.org</a>.</li>
+<li>Install OpenGL (<code>libglapi-mesa</code>).</li>
+<li>Install GLU (<code>libglu1-mesa-dev</code>).</li>
+</ul>
+<p>For example on Ubuntu: </p>
+<pre class="fragment">sudo apt-get install cmake
+sudo apt-get install libglapi-mesa
+sudo apt-get install libglu1-mesa-dev
+</pre><p>OpenGL and GLU are required by the sample applications.</p>
+<h3>Building</h3>
+<ul>
+<li>Generate makefiles from the <a href="http://www.cmake.org">cmake</a> project in <code>liquidfun/Box2D</code>.</li>
+<li>Execute <code>make</code> to build the library and sample applications.</li>
+</ul>
+<p>For example: </p>
 <pre class="fragment">cd liquidfun/Box2D
 cmake -G'Unix Makefiles'
 make
-</pre><p>You can configure the build targets using options exposed in <code>liquidfun/Box2D/CMakeLists.txt</code> by using cmake's <code>-D</code> option.</p>
+</pre><p>Build targets can be configured using options exposed in <code>liquidfun/Box2D/CMakeLists.txt</code> by using cmake's <code>-D</code> option.</p>
+<h3>Executing a Sample</h3>
 <p>After building the project, you can execute the samples from the command line. For example: </p>
 <pre class="fragment">./liquidfun/Box2D/Testbed/Testbed
-</pre><p>Use the run_tests.sh script to execute unit tests: </p>
+</pre><h3>Running Unit Tests</h3>
+<p>Developers modifying the LiquidFun library can verify that it still working correctly by executing the provided unit tests.</p>
+<p>Use the run_tests.sh script to execute unit tests: </p>
 <pre class="fragment">./liquidfun/Box2D/Unittests/run_tests.sh
 </pre> </div></div><!-- contents -->
 </div><!-- doc-content -->

@@ -39,13 +39,34 @@ for source_dir in ${doc_dirs}; do
 <meta http-equiv="refresh" content="0;url='"${source_dir}"'/html/index.html">
 </head>
 <body>
-<a href="'"${source_dir}"'/html/index.html">click here if you are not
-redirected</a>
+<a href="'"${source_dir}"'/html/index.html">Click here if you are not
+redirected.</a>
 </body>
 </html>' > "${docs_output_dir}/${source_dir}.html"
-
-
   pushd "${docs_source_dir}/${source_dir}" >/dev/null
   doxygen
   popd >/dev/null
+  # Clean up some of the output html.
+  index_html="${docs_output_dir}/${source_dir}/html/index.html"
+  awk '/ Documentation<\/div>/ { sub(/ Documentation/, ""); } { print $0 }' \
+    "${index_html}" > "${index_html}.new" && \
+    mv "${index_html}.new" "${index_html}"
 done
+
+# Check built documentation.
+if [[ "$(which linklint)" != "" ]]; then
+  results="${root_dir}/linklint_results"
+  # NOTE: -no_anchors is used since linklint generates spurious errors about
+  # missing named anchors where they're present.
+  linklint -no_anchors -orphan -root "${docs_output_dir}" /@ -doc "${results}"
+  if grep -q ERROR "${results}/index.html"; then
+    echo -e "\nlinklink detected errors: results are available for"\
+            "inspection in" \
+            "\n  ${results}" >&2
+    exit 1
+  fi
+else
+  echo "Unable to find linklink, install to validate the" \
+       "generated documentation." >&2
+  exit 1
+fi

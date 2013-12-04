@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>LiquidFun Build &amp; Run instructions: Building for Windows</title>
+<title>LiquidFun Build and Run Instructions: Building for Windows</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">LiquidFun Build &amp; Run instructions
+   <div id="projectname">LiquidFun Build and Run Instructions
    </div>
   </td>
  </tr>
@@ -53,21 +53,24 @@ $(document).ready(function(){initNavTree('md__building_windows.html','');});
 <div class="title">Building for Windows </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The liquidfun distribution includes a Visual Studio solution (<code>liquidfun/Box2D/Box2D.sln</code>) and project files to build the library and examples on Windows. The Visual Studio solution has been generated using cmake, and modified to remove any host-specific dependencies. It has been tested with Microsoft Visual Studio 2012.</p>
-<p>To build with Visual Studio:</p>
+<div class="textblock"><p>LiquidFun releases include a <a href="http://www.visualstudio.com/">Visual Studio</a> solution (<code>liquidfun/Box2D/Box2D.sln</code>) and project files to build the library and examples on <a href="http://windows.microsoft.com/">Windows</a>. The Visual Studio solution has been generated using <a href="http://www.cmake.org">cmake</a>, and modified to remove any host-specific dependencies. It has been tested with Microsoft <a href="http://www.visualstudio.com/">Visual Studio</a> 2012.</p>
+<h3>Building with <a href="http://www.visualstudio.com/">Visual Studio</a></h3>
 <ul>
-<li>Double-click on liquidfun/Box2D/Box2D.sln to open the solution.</li>
-<li>Select "Build-\&gt;Build Solution" from the menu.</li>
+<li>Double-click on <code>liquidfun/Box2D/Box2D.sln</code> to open the solution.</li>
+<li>Select "Build--&gt;Build Solution" from the menu.</li>
 </ul>
-<p>To execute a sample:</p>
+<h3>Executing a Sample</h3>
 <ul>
 <li>Right-click on an example project (e.g Testbed) in the Solution Explorer pane and select "Set as StartUp Project".</li>
-<li>Select "Debug-\&gt;Start Debugging" from the menu.</li>
+<li>Select "Debug--&gt;Start Debugging" from the menu.</li>
 </ul>
-<p>When working with the source distribution, you can use <a href="http://www.cmake.org">cmake</a> to generate the Visual Studio solution and project file. For example, the following generates the Visual Studio solution in the <code>liquidfun/Box2D</code> directory. </p>
+<h3>Building using <a href="http://www.cmake.org">cmake</a></h3>
+<p>When working directly with the source, generate the <a href="http://www.visualstudio.com/">Visual Studio</a> solution and project files using <a href="http://www.cmake.org">cmake</a>. For example, the following generates the <a href="http://www.visualstudio.com/">Visual Studio</a> solution in the <code>liquidfun/Box2D</code> directory. </p>
 <pre class="fragment">cd liquidfun/Box2D
 cmake -G"Visual Studio 11"
-</pre><p>Use the run_tests.bat batch file to execute unit tests: </p>
+</pre><h3>Running Unit Tests</h3>
+<p>Developers modifying the LiquidFun library can verify that it still working correctly by executing the provided unit tests.</p>
+<p>Use the run_tests.bat batch file to execute unit tests: </p>
 <pre class="fragment">liquidfun\Box2D\Unittests\run_tests.bat
 </pre> </div></div><!-- contents -->
 </div><!-- doc-content -->

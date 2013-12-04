@@ -1,23 +1,52 @@
 # Building for Linux
 
-The Linux build system requires `cmake` and has been tested with cmake 2.8.7. You can install cmake using the Linux distribution's package manager (e.g Ubuntu - `sudo apt-get install cmake`) or by downloading the package from [cmake.org][]. In addition, to build sample applications, the OpenGL and GLU (e.g `libglapi-mesa` & `libglu1-mesa-dev`) development libraries need to be installed on the development system.
+### Before Building
 
-Building with `cmake` requires the generation of makefiles from the cmake project, and then executing `make` to build the library and sample applications.
+Prior to building, install the following components using the [Linux][]
+distribution's package manager:
+-    Install [cmake][] using the package manager or download and manually
+     install from [cmake.org](http://cmake.org).
+-    Install OpenGL (`libglapi-mesa`).
+-    Install GLU (`libglu1-mesa-dev`).
 
-The `cmake` project directory for liquidfun is located in liquidfun/Box2D. You can build all build targets using the following.
+For example on Ubuntu:
+
+    sudo apt-get install cmake
+    sudo apt-get install libglapi-mesa
+    sudo apt-get install libglu1-mesa-dev
+
+OpenGL and GLU are required by the sample applications.
+
+### Building
+
+-   Generate makefiles from the [cmake][] project in `liquidfun/Box2D`.
+-   Execute `make` to build the library and sample applications.
+
+For example:
 
     cd liquidfun/Box2D
     cmake -G'Unix Makefiles'
     make
 
-You can configure the build targets using options exposed in `liquidfun/Box2D/CMakeLists.txt` by using cmake's `-D` option.
+Build targets can be configured using options exposed in
+`liquidfun/Box2D/CMakeLists.txt` by using cmake's `-D` option.
 
-After building the project, you can execute the samples from the command line.  For example:
+### Executing a Sample
+
+After building the project, you can execute the samples from the command line.
+For example:
 
     ./liquidfun/Box2D/Testbed/Testbed
+
+### Running Unit Tests
+
+Developers modifying the LiquidFun library can verify that it still working
+correctly by executing the provided unit tests.
 
 Use the run\_tests.sh script to execute unit tests:
 
     ./liquidfun/Box2D/Unittests/run_tests.sh
 
-  [cmake.org]: http://www.cmake.org/cmake/resources/software.html
+  [cmake]: http://www.cmake.org
+  [Linux]: http://en.wikipedia.org/wiki/Linux
+  [Ubuntu]: http://www.ubuntu.com

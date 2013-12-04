@@ -56,3 +56,4 @@ build.xml
 local.properties
 project.properties
 proguard-project.txt
+linklint_results
