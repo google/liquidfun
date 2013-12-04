@@ -36,11 +36,9 @@ struct b2AABB;
 class DebugDraw : public b2Draw
 {
 public:
-	DebugDraw() : num_cached_points(0) {}
-
 	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
 
-    void DrawFlatPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
+	void DrawFlatPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
 
 	void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
 
@@ -50,27 +48,22 @@ public:
 
 	void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color);
 
+	void DrawParticles(const b2Vec2 *centers, float32 radius, const b2ParticleColor *colors, int32 count);
+
 	void DrawTransform(const b2Transform& xf);
 
-    void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color);
+	void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color);
 
-    void DrawString(int x, int y, const char* string, ...); 
+	void DrawString(int x, int y, const char* string, ...);
 
-    void DrawString(const b2Vec2& p, const char* string, ...);
+	void DrawString(const b2Vec2& p, const char* string, ...);
 
-    void DrawAABB(b2AABB* aabb, const b2Color& color);
+	void DrawAABB(b2AABB* aabb, const b2Color& color);
 
-    void OutputFPS();
-
-    void FlushPoints();
-
-    void DrawArrow(const b2Color& color);
-
-private:
-	enum { MAX_CACHED_POINTS = 64 };
-	float pointcache[MAX_CACHED_POINTS][6];
-	int num_cached_points;
+	void DrawArrow(const b2Color& color);
 };
+
+float ComputeFPS();
 
 void LoadOrtho2DMatrix(double left, double right, double bottom, double top);
 

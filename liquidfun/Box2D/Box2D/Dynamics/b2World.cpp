@@ -852,7 +852,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 					{
 						continue;
 					}
-					
+
 					// Add the other body to the island.
 					other->m_flags |= b2Body::e_islandFlag;
 
@@ -936,7 +936,7 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 	step.dtRatio = m_inv_dt0 * dt;
 
 	step.warmStarting = m_warmStarting;
-	
+
 	// Update contacts. This is where some contacts are destroyed.
 	{
 		b2Timer timer;
@@ -1101,9 +1101,9 @@ void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color
 			m_debugDraw->DrawSolidPolygon(vertices, vertexCount, color);
 		}
 		break;
-            
-    default:
-        break;
+
+	default:
+		break;
 	}
 }
 
@@ -1158,26 +1158,11 @@ void b2World::DrawParticleSystem(const b2ParticleSystem& system)
 		if (system.m_colorBuffer.data)
 		{
 			const b2ParticleColor* colorBuffer = system.GetParticleColorBuffer();
-			for (int32 i = 0; i < particleCount; i++)
-			{
-				const b2ParticleColor& color = colorBuffer[i];
-				float32 r = color.r/255.f;
-				float32 g = color.g/255.f;
-				float32 b = color.b/255.f;
-				float32 a = color.a/255.f;
-				m_debugDraw->DrawCircle(
-					positionBuffer[i], particleRadius,
-					b2Color(1 - a + r, 1 - a + g, 1 - a + b));
-			}
+			m_debugDraw->DrawParticles(positionBuffer, particleRadius, colorBuffer, particleCount);
 		}
 		else
 		{
-			for (int32 i = 0; i < particleCount; i++)
-			{
-				m_debugDraw->DrawCircle(
-					positionBuffer[i], particleRadius,
-					b2Color(1, 1, 1));
-			}
+			m_debugDraw->DrawParticles(positionBuffer, particleRadius, NULL, particleCount);
 		}
 	}
 }

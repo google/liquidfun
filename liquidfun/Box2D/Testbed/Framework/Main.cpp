@@ -22,6 +22,7 @@
 #include "glui/glui.h"
 
 #include <cstdio>
+#include <sstream>
 using namespace std;
 
 namespace
@@ -185,6 +186,10 @@ static void SimulationLoop()
 	glPushMatrix();
 	glTranslatef(-20, -4, 0);
 	glScalef(0.015f, 0.015f, 1);
+	float msec = ComputeFPS();
+	std::stringstream ss;
+	ss << int(1000 / msec);
+	msg += " / " + ss.str() + " fps";
 	glutStrokeString(GLUT_STROKE_MONO_ROMAN, (const unsigned char *)msg.c_str());
 	glPopMatrix();
 
@@ -519,11 +524,12 @@ int main(int argc, char** argv)
 	testSelection = testIndex;
 
 	entry = g_testEntries + testIndex;
-    if (entry && entry->createFcn) {
-        test = entry->createFcn();
-    }
+	if (entry && entry->createFcn) {
+		test = entry->createFcn();
+	}
 
 	glutInit(&argc, argv);
+	glutInitContextVersion(2, 0);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowSize(width, height);
 	char title[32];
