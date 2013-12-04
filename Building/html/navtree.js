@@ -1,6 +1,6 @@
 var NAVTREE =
 [
-  [ "LiquidFun Build & Run instructions", "index.html", [
+  [ "LiquidFun Build and Run Instructions", "index.html", [
     [ "Building for Android", "md__building_android.html", null ],
     [ "Building for Linux", "md__building_linux.html", null ],
     [ "Building for OS X", "md__building_o_s_x.html", null ],
