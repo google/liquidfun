@@ -5,4 +5,9 @@ LiquidFun is an extension of Box2D, a 2D physics engine for games (see http://bo
 
 API documentation is located in Documentation/.
 
-Instructions on how to build for a specific platform, see the separate documents "Building for Android / Linux / Windows / OS X" (on the left)
+Instructions on how to build for:
+- [Android](md__building_android.html)
+- [Linux](md__building_linux.html)
+- [Windows](md__building_windows.html)
+- [OS X](md__building_o_s_x.html)
+

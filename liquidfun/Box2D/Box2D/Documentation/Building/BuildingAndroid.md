@@ -25,13 +25,13 @@ For example, to build the liquidfun dynamic and static libraries:
     cd liquidfun/Box2D
     ndk-build
 
-Running an example requires the Android Development Toolkit (ADT) and the [NDK Eclipse plugin][].
+Running an example requires the Android Development Toolkit ([ADT][]) and the [NDK Eclipse plugin][].
 
 ### Running an application using Eclipse:
 
 -   Build a project using `ndk-build` (see above).
 
--   Open ADT Eclipse.
+-   Open [ADT][] Eclipse.
 
 -   Select `File->Import...` from the menu.
 
@@ -39,13 +39,11 @@ Running an example requires the Android Development Toolkit (ADT) and the [NDK E
 
 -   Click the `Browse...` button next to `Root Directory:` and select the project folder (e.g. `liquidfun/Box2D/Testbed`).
 
--   Optionally rename `NativeActivity` to a meaningful project name.
-
 -   Click `Finish` and the project should be imported into Eclipse and visible in the Package Explorer pane.
 
 -   Right-click the project in the Package Explorer pane and select `Run->Run As->Android Application` from the menu.
 
--   If you do not have a physical device, you must define a virtual one. For details about how to define a virtual device, see [here][].
+-   If you do not have a physical device, you must define a virtual one. For details about how to define a virtual device, see [here][]. We don’t recommend a virtual device for development.
 
 -   If the target is a physical device, unlock the device and observe the application executing.
 
@@ -80,3 +78,5 @@ By default code is generated for devices that support the `armeabi-v7a` ABI. To 
   [NDK Eclipse plugin]: http://developer.android.com/sdk/index.html
   [here]: http://developer.android.com/tools/devices/managing-avds.html
   [Cygwin installation]: http://www.cygwin.com/
+  [ADT]: http://developer.android.com/tools/sdk/eclipse-adt.html
+
