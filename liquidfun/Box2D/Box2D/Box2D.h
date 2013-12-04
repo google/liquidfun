@@ -21,7 +21,7 @@
 #define BOX2D_H
 
 /**
-\mainpage Splash2D API Documentation
+\mainpage LiquidFun API Documentation
 
 */
 
