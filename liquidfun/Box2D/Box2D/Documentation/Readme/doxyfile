@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "LiquidFun Programmer's Guide"
+PROJECT_NAME           = "Readme"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -58,7 +58,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = "../../Documentation/Programmers-Guide"
+OUTPUT_DIRECTORY       = "../../../Documentation/Readme"
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -743,21 +743,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = "Chapter01_Introduction.md" \
-                         "Chapter02_Hello_Box2D.md" \
-                         "Chapter03_Common.md" \
-                         "Chapter04_Collision_Module.md" \
-                         "Chapter05_Dynamics_Module.md" \
-                         "Chapter06_Bodies.md" \
-                         "Chapter07_Fixtures.md" \
-                         "Chapter08_Joints.md" \
-                         "Chapter09_Contacts.md" \
-                         "Chapter10_World.md" \
-                         "Chapter11_Particles.md" \
-                         "Chapter12_Loose_Ends.md" \
-                         "Chapter13_Debug_Drawing.md" \
-                         "Chapter14_Limitations.md" \
-                         "Chapter15_References.md"
+INPUT                  = "../../../../Readme.md"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -934,7 +920,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = Chapter01_Introduction.md
+USE_MDFILE_AS_MAINPAGE = Readme.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1119,7 +1105,7 @@ HTML_HEADER            =
 # that doxygen normally uses.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_FOOTER            = 
+HTML_FOOTER            = ../empty_footer.html
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading style
 # sheet that is used by each HTML page. It can be used to fine-tune the look of
@@ -1426,7 +1412,7 @@ DISABLE_INDEX          = YES
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-GENERATE_TREEVIEW      = YES
+GENERATE_TREEVIEW      = NO
 
 # The ENUM_VALUES_PER_LINE tag can be used to set the number of enum values that
 # doxygen will group on one line in the generated HTML documentation.

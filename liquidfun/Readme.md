@@ -1,14 +1,18 @@
-LiquidFun Version 0.9
+LiquidFun Version 0.9.0
 
 # Welcome to LiquidFun!
 
-LiquidFun is a 2D physics engine for games.  Go to our landing page to
-browse our documentation and see some examples [google.github.io/liquidfun][]
+LiquidFun is a 2D physics engine for games.  Go to our
+[landing page][] to browse our documentation and see some examples.
 
 LiquidFun is an extension of Box2D, it adds a particle based fluid and soft
 body simulation to the rigid body functionality in Box2D.  LiquidFun can be
 built for many different systems (Android, Windows, OS X, Linux), see
 `Box2D/Documentation/Building/`
+
+Discuss LiquidFun with other developers and users on the
+[LiquidFun Google Group][].  File issues on the [LiquidFun Issues Tracker][]
+or post your questions to [stackoverflow.com][] tagged with **liquidfun**.
 
 For help with LiquidFun, please visit the [LiquidFun Google Group][] or
 [stackoverflow.com][].  You can post your questions to stackoverflow.com
@@ -28,5 +32,6 @@ we should continue to invest in it.  Since this is open source, you are free
 to remove the version string but we would appreciate if you would leave it in.
 
   [LiquidFun Google Group]: http://group.google.com/group/liquidfun
+  [LiquidFun Issues Tracker]: http://github.com/google/liquidfun/issues
   [stackoverflow.com]: http://www.stackoverflow.com
-  [google.github.io/liquidfun]: http://google.github.io/liquidfun
+  [landing page]: http://google.github.io/liquidfun
