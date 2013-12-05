@@ -179,7 +179,7 @@ private:
 	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
 	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 	void DestroyParticleGroup(b2ParticleGroup* group);
-	void ComputeDepthForGroup(b2ParticleGroup* group);
+	void ComputeDepth();
 
 	void AddContact(int32 a, int32 b);
 	void UpdateContacts(bool exceptZombie);

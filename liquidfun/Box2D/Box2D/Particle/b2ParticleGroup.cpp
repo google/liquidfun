@@ -37,10 +37,6 @@ b2ParticleGroup::b2ParticleGroup()
 	m_angularVelocity = 0;
 	m_transform.SetIdentity();
 
-	m_destroyAutomatically = true;
-	m_toBeDestroyed = false;
-	m_toBeSplit = false;
-
 	m_userData = NULL;
 
 }
@@ -56,12 +52,18 @@ int32 b2ParticleGroup::GetBufferIndex() const
 
 int32 b2ParticleGroup::GetGroupFlags() const
 {
-	return m_groupFlags;
+	return m_groupFlags & ~b2_particleGroupInternalMask;
 }
 
 void b2ParticleGroup::SetGroupFlags(int32 flags)
 {
-	m_groupFlags = flags;
+	b2Assert((flags & b2_particleGroupInternalMask) == 0);
+	if ((flags ^ m_groupFlags) & b2_solidParticleGroup)
+	{
+		// If the b2_solidParticleGroup flag changed schedule depth update.
+		m_groupFlags |= b2_particleGroupNeedsUpdateDepth;
+	}
+	m_groupFlags = flags | (m_groupFlags & ~b2_particleGroupInternalMask);
 }
 
 float32 b2ParticleGroup::GetMass() const

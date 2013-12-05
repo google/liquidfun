@@ -341,7 +341,6 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 	group->m_strength = groupDef.strength;
 	group->m_userData = groupDef.userData;
 	group->m_transform = transform;
-	group->m_destroyAutomatically = groupDef.destroyAutomatically;
 	group->m_prev = NULL;
 	group->m_next = m_groupList;
 	if (m_groupList)
@@ -402,7 +401,7 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 	}
 	if (groupDef.groupFlags & b2_solidParticleGroup)
 	{
-		ComputeDepthForGroup(group);
+		group->m_groupFlags |= b2_particleGroupNeedsUpdateDepth;
 	}
 
 	return group;
@@ -524,7 +523,7 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 
 	if (groupFlags & b2_solidParticleGroup)
 	{
-		ComputeDepthForGroup(groupA);
+		groupA->m_groupFlags |= b2_particleGroupNeedsUpdateDepth;
 	}
 }
 
@@ -614,58 +613,84 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 	m_world->m_blockAllocator.Free(group, sizeof(b2ParticleGroup));
 }
 
-void b2ParticleSystem::ComputeDepthForGroup(b2ParticleGroup* group)
+void b2ParticleSystem::ComputeDepth()
 {
-	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
-	{
-		m_accumulationBuffer[i] = 0;
-	}
+	b2ParticleContact* contactGroups = (b2ParticleContact*) m_world->
+		m_stackAllocator.Allocate(sizeof(b2ParticleContact) * m_contactCount);
+	int32 contactGroupsCount = 0;
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
 		int32 a = contact.indexA;
 		int32 b = contact.indexB;
-		if (a >= group->m_firstIndex && a < group->m_lastIndex &&
-			b >= group->m_firstIndex && b < group->m_lastIndex)
+		const b2ParticleGroup* groupA = m_groupBuffer[a];
+		const b2ParticleGroup* groupB = m_groupBuffer[b];
+		if (groupA && groupA == groupB &&
+			(groupA->m_groupFlags & b2_particleGroupNeedsUpdateDepth))
 		{
-			float32 w = contact.weight;
-			m_accumulationBuffer[a] += w;
-			m_accumulationBuffer[b] += w;
+			contactGroups[contactGroupsCount++] = contact;
 		}
 	}
-	m_depthBuffer = RequestParticleBuffer(m_depthBuffer);
-	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+	b2ParticleGroup** groupsToUpdate = (b2ParticleGroup**) m_world->
+		m_stackAllocator.Allocate(sizeof(b2ParticleGroup*) * m_groupCount);
+	int32 groupsToUpdateCount = 0;
+	for (b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
 	{
-		float32 w = m_accumulationBuffer[i];
-		m_depthBuffer[i] = w < 0.8f ? 0 : b2_maxFloat;
+		if (group->m_groupFlags & b2_particleGroupNeedsUpdateDepth)
+		{
+			groupsToUpdate[groupsToUpdateCount++] = group;
+			group->m_groupFlags &= ~b2_particleGroupNeedsUpdateDepth;
+			for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+			{
+				m_accumulationBuffer[i] = 0;
+			}
+		}
 	}
-	int32 interationCount = group->GetParticleCount();
-	for (int32 t = 0; t < interationCount; t++)
+	for (int32 k = 0; k < contactGroupsCount; k++)
+	{
+		const b2ParticleContact& contact = contactGroups[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		float32 w = contact.weight;
+		m_accumulationBuffer[a] += w;
+		m_accumulationBuffer[b] += w;
+	}
+	m_depthBuffer = RequestParticleBuffer(m_depthBuffer);
+	for (int32 i = 0; i < groupsToUpdateCount; i++)
+	{
+		const b2ParticleGroup* group = groupsToUpdate[i];
+		for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+		{
+			float32 w = m_accumulationBuffer[i];
+			m_depthBuffer[i] = w < 0.8f ? 0 : b2_maxFloat;
+		}
+	}
+	// The number of iterations is equal to particle number from the deepest
+	// particle to the nearest surface particle, and in general it is smaller
+	// than sqrt of total particle number.
+	int32 iterationCount = (int32) b2Sqrt(m_count);
+	for (int32 t = 0; t < iterationCount; t++)
 	{
 		bool updated = false;
-		for (int32 k = 0; k < m_contactCount; k++)
+		for (int32 k = 0; k < contactGroupsCount; k++)
 		{
-			const b2ParticleContact& contact = m_contactBuffer[k];
+			const b2ParticleContact& contact = contactGroups[k];
 			int32 a = contact.indexA;
 			int32 b = contact.indexB;
-			if (a >= group->m_firstIndex && a < group->m_lastIndex &&
-				b >= group->m_firstIndex && b < group->m_lastIndex)
+			float32 r = 1 - contact.weight;
+			float32& ap0 = m_depthBuffer[a];
+			float32& bp0 = m_depthBuffer[b];
+			float32 ap1 = bp0 + r;
+			float32 bp1 = ap0 + r;
+			if (ap0 > ap1)
 			{
-				float32 r = 1 - contact.weight;
-				float32& ap0 = m_depthBuffer[a];
-				float32& bp0 = m_depthBuffer[b];
-				float32 ap1 = bp0 + r;
-				float32 bp1 = ap0 + r;
-				if (ap0 > ap1)
-				{
-					ap0 = ap1;
-					updated = true;
-				}
-				if (bp0 > bp1)
-				{
-					bp0 = bp1;
-					updated = true;
-				}
+				ap0 = ap1;
+				updated = true;
+			}
+			if (bp0 > bp1)
+			{
+				bp0 = bp1;
+				updated = true;
 			}
 		}
 		if (!updated)
@@ -673,19 +698,24 @@ void b2ParticleSystem::ComputeDepthForGroup(b2ParticleGroup* group)
 			break;
 		}
 	}
-	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
+	for (int32 i = 0; i < groupsToUpdateCount; i++)
 	{
-		float32& p = m_depthBuffer[i];
-		if (p < b2_maxFloat)
+		const b2ParticleGroup* group = groupsToUpdate[i];
+		for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 		{
-			p *= m_particleDiameter;
-		}
-		else
-		{
-			p = 0;
+			float32& p = m_depthBuffer[i];
+			if (p < b2_maxFloat)
+			{
+				p *= m_particleDiameter;
+			}
+			else
+			{
+				p = 0;
+			}
 		}
 	}
-
+	m_world->m_stackAllocator.Free(groupsToUpdate);
+	m_world->m_stackAllocator.Free(contactGroups);
 }
 
 inline void b2ParticleSystem::AddContact(int32 a, int32 b)
@@ -997,6 +1027,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	}
 	UpdateBodyContacts();
 	UpdateContacts(false);
+	if (m_allGroupFlags & b2_particleGroupNeedsUpdateDepth)
+	{
+		ComputeDepth();
+	}
 	if (m_allParticleFlags & b2_viscousParticle)
 	{
 		SolveViscous(step);
@@ -1555,19 +1589,20 @@ void b2ParticleSystem::SolveZombie()
 			group->m_lastIndex = lastIndex;
 			if (modified)
 			{
-				if (group->m_groupFlags & b2_rigidParticleGroup)
+				if (group->m_groupFlags & b2_solidParticleGroup)
 				{
-					group->m_toBeSplit = true;
+					group->m_groupFlags |= b2_particleGroupNeedsUpdateDepth;
 				}
+				// TODO: flag to split if needed
 			}
 		}
 		else
 		{
 			group->m_firstIndex = 0;
 			group->m_lastIndex = 0;
-			if (group->m_destroyAutomatically)
+			if (!(group->m_groupFlags & b2_particleGroupCanBeEmpty))
 			{
-				group->m_toBeDestroyed = true;
+				group->m_groupFlags |= b2_particleGroupWillBeDestroyed;
 			}
 		}
 	}
@@ -1580,14 +1615,11 @@ void b2ParticleSystem::SolveZombie()
 	for (b2ParticleGroup* group = m_groupList; group;)
 	{
 		b2ParticleGroup* next = group->GetNext();
-		if (group->m_toBeDestroyed)
+		if (group->m_groupFlags & b2_particleGroupWillBeDestroyed)
 		{
 			DestroyParticleGroup(group);
 		}
-		else if (group->m_toBeSplit)
-		{
-			// TODO: split the group
-		}
+		// TODO: split the group if flagged
 		group = next;
 	}
 }
