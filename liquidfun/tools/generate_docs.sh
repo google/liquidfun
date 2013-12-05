@@ -26,14 +26,32 @@ declare -r docs_output_dir=${root_dir}/Box2D/Documentation
 
 declare -r doc_dirs="API-Ref Building Programmers-Guide Readme"
 
-# Clean output directory.
-for output_dir in ${doc_dirs}; do
-  rm -rf ${docs_output_dir}/${output_dir}/html/*
-done
+usage() {
+  echo "
+Build documentation from markdown using doxygen.
 
-# Build documentation.
-for source_dir in ${doc_dirs}; do
-  echo '
+Usage: $(basename $0) [-h]
+
+-h: Display this help text.
+" >&2
+  exit 1
+}
+
+main() {
+  while getopts "h" options; do
+    case ${options} in
+      h) usage;;
+    esac
+  done
+
+  # Clean output directory.
+  for output_dir in ${doc_dirs}; do
+    rm -rf ${docs_output_dir}/${output_dir}/html/*
+  done
+
+  # Build documentation.
+  for source_dir in ${doc_dirs}; do
+    echo '
 <html>
 <head>
 <meta http-equiv="refresh" content="0;url='"${source_dir}"'/html/index.html">
@@ -43,30 +61,33 @@ for source_dir in ${doc_dirs}; do
 redirected.</a>
 </body>
 </html>' > "${docs_output_dir}/${source_dir}.html"
-  pushd "${docs_source_dir}/${source_dir}" >/dev/null
-  doxygen
-  popd >/dev/null
-  # Clean up some of the output html.
-  index_html="${docs_output_dir}/${source_dir}/html/index.html"
-  awk '/ Documentation<\/div>/ { sub(/ Documentation/, ""); } { print $0 }' \
-    "${index_html}" > "${index_html}.new" && \
-    mv "${index_html}.new" "${index_html}"
-done
+    pushd "${docs_source_dir}/${source_dir}" >/dev/null
+    doxygen
+    popd >/dev/null
+    # Clean up some of the output html.
+    index_html="${docs_output_dir}/${source_dir}/html/index.html"
+    awk '/ Documentation<\/div>/ { sub(/ Documentation/, ""); } { print $0 }' \
+      "${index_html}" > "${index_html}.new" && \
+      mv "${index_html}.new" "${index_html}"
+  done
 
-# Check built documentation.
-if [[ "$(which linklint)" != "" ]]; then
-  results="${root_dir}/linklint_results"
-  # NOTE: -no_anchors is used since linklint generates spurious errors about
-  # missing named anchors where they're present.
-  linklint -no_anchors -orphan -root "${docs_output_dir}" /@ -doc "${results}"
-  if grep -q ERROR "${results}/index.html"; then
-    echo -e "\nlinklink detected errors: results are available for"\
-            "inspection in" \
-            "\n  ${results}" >&2
+  # Check built documentation.
+  if [[ "$(which linklint)" != "" ]]; then
+    results="${root_dir}/linklint_results"
+    # NOTE: -no_anchors is used since linklint generates spurious errors about
+    # missing named anchors where they're present.
+    linklint -no_anchors -orphan -root "${docs_output_dir}" /@ -doc "${results}"
+    if grep -q ERROR "${results}/index.html"; then
+      echo -e "\nlinklink detected errors: results are available for"\
+              "inspection in" \
+              "\n  ${results}" >&2
+      exit 1
+    fi
+  else
+    echo "Unable to find linklink, install to validate the" \
+         "generated documentation." >&2
     exit 1
   fi
-else
-  echo "Unable to find linklink, install to validate the" \
-       "generated documentation." >&2
-  exit 1
-fi
+}
+
+main "${@}"
