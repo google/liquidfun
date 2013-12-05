@@ -62,23 +62,10 @@ for test_dir in ${test_dirs}; do
   test_name=$(get_test_name ${test_dir})
   echo "${test_name} ..." >&2
   pushd "${test_dir}" >/dev/null
-  # The Android framework can cause an application to restart multiple times
-  # so only capture the log from the first instance.
   if [[ $((BUILD_ENABLED)) -eq 1 ]]; then
     build_apk "$@" LAUNCH=0
   fi
   build_apk "$@" BUILD=0 | \
-    awk '/^I\/'"${test_name}"'/ {
-           log_prefix = $0
-           sub(/:.*/, "", log_prefix)
-           if (!current_log_prefix) {
-             current_log_prefix = log_prefix
-           }
-           if (current_log_prefix != log_prefix) {
-             next
-           }
-           print $0
-         }' | \
     tee "${test_log}"
 
   # Scrape the log to determine whether the test failed.
