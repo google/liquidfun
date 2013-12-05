@@ -24,6 +24,8 @@
 #include <Box2D/Dynamics/b2Body.h>
 #include <Box2D/Dynamics/b2Fixture.h>
 #include <Box2D/Collision/Shapes/b2Shape.h>
+#include <Box2D/Collision/Shapes/b2EdgeShape.h>
+#include <Box2D/Collision/Shapes/b2ChainShape.h>
 #include <algorithm>
 
 static const uint32 xTruncBits = 12;
@@ -287,51 +289,96 @@ void b2ParticleSystem::DestroyParticlesInGroup(
 	}
 }
 
-b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef& groupDef)
+int32 b2ParticleSystem::CreateParticleForGroup(
+	const b2ParticleGroupDef& groupDef, const b2Transform& xf, const b2Vec2& p)
 {
+	b2ParticleDef particleDef;
+	particleDef.flags = groupDef.flags;
+	particleDef.position = b2Mul(xf, p);
+	particleDef.velocity =
+		groupDef.linearVelocity +
+		b2Cross(groupDef.angularVelocity, particleDef.position - groupDef.position);
+	particleDef.color = groupDef.color;
+	particleDef.userData = groupDef.userData;
+	return CreateParticle(particleDef);
+}
+
+void b2ParticleSystem::CreateParticlesStrokeShapeForGroup(
+	const b2ParticleGroupDef& groupDef, const b2Transform& xf)
+{
+	const b2Shape *shape = groupDef.shape;
+	float32 stride = GetParticleStride();
+	float32 positionOnEdge = 0;
+	int32 childCount = shape->GetChildCount();
+	for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+	{
+		b2EdgeShape edge;
+		if (shape->GetType() == b2Shape::e_edge)
+		{
+			edge = *(b2EdgeShape*) shape;
+		}
+		else
+		{
+			b2Assert(shape->GetType() == b2Shape::e_chain);
+			((b2ChainShape*) shape)->GetChildEdge(&edge, childIndex);
+		}
+		b2Vec2 d = edge.m_vertex2 - edge.m_vertex1;
+		float32 edgeLength = d.Length();
+		while (positionOnEdge < edgeLength)
+		{
+			b2Vec2 p = edge.m_vertex1 + positionOnEdge / edgeLength * d;
+			CreateParticleForGroup(groupDef, xf, p);
+			positionOnEdge += stride;
+		}
+		positionOnEdge -= edgeLength;
+	}
+}
+
+void b2ParticleSystem::CreateParticlesFillShapeForGroup(
+	const b2ParticleGroupDef& groupDef, const b2Transform& xf)
+{
+	const b2Shape *shape = groupDef.shape;
 	float32 stride = GetParticleStride();
 	b2Transform identity;
 	identity.SetIdentity();
-	b2Transform transform = identity;
+	b2AABB aabb;
+	b2Assert(shape->GetChildCount() == 1);
+	shape->ComputeAABB(&aabb, identity, 0);
+	for (float32 y = floorf(aabb.lowerBound.y / stride) * stride;
+		y < aabb.upperBound.y; y += stride)
+	{
+		for (float32 x = floorf(aabb.lowerBound.x / stride) * stride;
+			x < aabb.upperBound.x; x += stride)
+		{
+			b2Vec2 p(x, y);
+			if (shape->TestPoint(identity, p))
+			{
+				CreateParticleForGroup(groupDef, xf, p);
+			}
+		}
+	}
+}
+
+b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef& groupDef)
+{
+	b2Transform transform;
+	transform.Set(groupDef.position, groupDef.angle);
 	int32 firstIndex = m_count;
 	if (groupDef.shape)
 	{
-		b2ParticleDef particleDef;
-		particleDef.flags = groupDef.flags;
-		particleDef.color = groupDef.color;
-		particleDef.userData = groupDef.userData;
 		const b2Shape *shape = groupDef.shape;
-		transform.Set(groupDef.position, groupDef.angle);
-		b2AABB aabb;
-		int32 childCount = shape->GetChildCount();
-		for (int32 childIndex = 0; childIndex < childCount; childIndex++)
-		{
-			if (childIndex == 0)
-			{
-				shape->ComputeAABB(&aabb, identity, childIndex);
-			}
-			else
-			{
-				b2AABB childAABB;
-				shape->ComputeAABB(&childAABB, identity, childIndex);
-				aabb.Combine(childAABB);
-			}
-		}
-		for (float32 y = floorf(aabb.lowerBound.y / stride) * stride; y < aabb.upperBound.y; y += stride)
-		{
-			for (float32 x = floorf(aabb.lowerBound.x / stride) * stride; x < aabb.upperBound.x; x += stride)
-			{
-				b2Vec2 p(x, y);
-				if (shape->TestPoint(identity, p))
-				{
-					p = b2Mul(transform, p);
-					particleDef.position = p;
-					particleDef.velocity =
-						groupDef.linearVelocity +
-						b2Cross(groupDef.angularVelocity, p - groupDef.position);
-					CreateParticle(particleDef);
-				}
-			}
+		switch (shape->GetType()) {
+		case b2Shape::e_edge:
+		case b2Shape::e_chain:
+			CreateParticlesStrokeShapeForGroup(groupDef, transform);
+			break;
+		case b2Shape::e_polygon:
+		case b2Shape::e_circle:
+			CreateParticlesFillShapeForGroup(groupDef, transform);
+			break;
+		default:
+			b2Assert(false);
+			break;
 		}
 	}
 	int32 lastIndex = m_count;
@@ -396,7 +443,7 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 		{
 			diagram.AddGenerator(m_positionBuffer.data[i], i);
 		}
-		diagram.Generate(stride / 2);
+		diagram.Generate(GetParticleStride() / 2);
 		CreateParticleGroupCallback callback;
 		callback.system = this;
 		callback.def = &groupDef;
@@ -1012,6 +1059,67 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 	m_world->QueryAABB(&callback, aabb);
 }
 
+void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
+{
+	// If a particle is passing between paired barrier particles,
+	// its velocity will be decelerated to avoid passing.
+	Proxy* beginProxy = m_proxyBuffer;
+	Proxy* endProxy = beginProxy + m_proxyCount;
+	for (int32 k = 0; k < m_pairCount; k++)
+	{
+		const Pair& pair = m_pairBuffer[k];
+		if (pair.flags & b2_barrierParticle)
+		{
+			int32 a = pair.indexA;
+			int32 b = pair.indexB;
+			b2Vec2 pa = m_positionBuffer.data[a];
+			b2Vec2 pb = m_positionBuffer.data[b];
+			b2Vec2 lower = b2Min(pa, pb);
+			b2Vec2 upper = b2Max(pa, pb);
+			lower.x -= m_particleDiameter;
+			lower.y -= m_particleDiameter;
+			upper.x += m_particleDiameter;
+			upper.y += m_particleDiameter;
+			Proxy* firstProxy = std::lower_bound(
+				beginProxy, endProxy,
+				computeTag(
+					m_inverseDiameter * lower.x,
+					m_inverseDiameter * lower.y));
+			Proxy* lastProxy = std::upper_bound(
+				firstProxy, endProxy,
+				computeTag(
+					m_inverseDiameter * upper.x,
+					m_inverseDiameter * upper.y));
+			for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
+			{
+				int32 c = proxy->index;
+				b2Vec2 pc = m_positionBuffer.data[c];
+				if (lower.x <= pc.x && pc.x <= upper.x &&
+					lower.y <= pc.y && pc.y <= upper.y)
+				{
+					b2Vec2 vc = 2.5f * step.dt * m_velocityBuffer.data[c];
+					// Solve the equation below:
+					//   (1 - s) * pa + s * pb = pc + t * vc
+					// which expresses that the particle c will pass a line
+					// connecting the particles a and b at the time of t.
+					// if s is between 0 and 1, c will pass between a and b.
+					float32 idet =
+						1 / ((pa.x - pb.x) * vc.y - (pa.y - pb.y) * vc.x);
+					float32 s =
+						((pa.x - pc.x) * vc.y - (pa.y - pc.y) * vc.x) * idet;
+					float32 t =
+						((pa.x - pb.x) * (pa.y - pc.y) -
+						 (pa.y - pb.y) * (pa.x - pc.x)) * idet;
+					if (s >= 0 && s <= 1 && t > 0 && t <= 1)
+					{
+						m_velocityBuffer.data[c] *= t;
+					}
+				}
+			}
+		}
+	}
+}
+
 void b2ParticleSystem::Solve(const b2TimeStep& step)
 {
 	if (m_count == 0)
@@ -1081,6 +1189,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		// SolveCollision, SolveRigid and SolveWall should be called after other
 		// force functions because they may require particles to have specific
 		// velocities.
+		if (m_allParticleFlags & b2_barrierParticle)
+		{
+			SolveBarrier(subStep);
+		}
 		SolveCollision(subStep);
 		if (m_allGroupFlags & b2_rigidParticleGroup)
 		{

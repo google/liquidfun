@@ -111,6 +111,9 @@ public:
 			m_particleFlags = b2_wallParticle;
 			m_groupFlags = b2_solidParticleGroup;
 			break;
+		case 'B':
+			m_particleFlags = b2_barrierParticle | b2_wallParticle;
+			break;
 		case 'Z':
 			m_particleFlags = b2_zombieParticle;
 			break;
@@ -168,7 +171,7 @@ public:
 		m_textLine += DRAW_STRING_NEW_LINE;
 		m_debugDraw.DrawString(5, m_textLine, "(R) rigid, (W) wall, (V) viscous, (T) tensile");
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "(Z) erase, (X) move");
+		m_debugDraw.DrawString(5, m_textLine, "(B) barrier, (Z) erase, (X) move");
 		m_textLine += DRAW_STRING_NEW_LINE;
 	}
 

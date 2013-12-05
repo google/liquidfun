@@ -151,7 +151,8 @@ private:
 
 	/// All particle types that require creating pairs
 	static const int32 k_pairFlags =
-		b2_springParticle;
+		b2_springParticle |
+		b2_barrierParticle;
 	/// All particle types that require creating triads
 	static const int32 k_triadFlags =
 		b2_elasticParticle;
@@ -177,6 +178,13 @@ private:
 	                              bool callDestructionListener);
 	void DestroyParticlesInGroup(b2ParticleGroup* group,
 	                             bool callDestructionListener);
+	int32 CreateParticleForGroup(
+		const b2ParticleGroupDef& groupDef,
+		const b2Transform& xf, const b2Vec2& position);
+	void CreateParticlesStrokeShapeForGroup(
+		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
+	void CreateParticlesFillShapeForGroup(
+		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
 	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
 	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 	void DestroyParticleGroup(b2ParticleGroup* group);
@@ -190,6 +198,7 @@ private:
 	void SolveCollision(const b2TimeStep& step);
 	void LimitVelocity(const b2TimeStep& step);
 	void SolveGravity(const b2TimeStep& step);
+	void SolveBarrier(const b2TimeStep& step);
 	void SolvePressure(const b2TimeStep& step);
 	void SolveDamping(const b2TimeStep& step);
 	void SolveWall(const b2TimeStep& step);
