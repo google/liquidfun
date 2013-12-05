@@ -714,7 +714,7 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 
 static bool b2ParticleContactIsZombie(const b2ParticleContact& contact)
 {
-	return contact.flags & b2_zombieParticle;
+	return (contact.flags & b2_zombieParticle) == b2_zombieParticle;
 }
 
 void b2ParticleSystem::UpdateContacts(bool exceptZombie)
