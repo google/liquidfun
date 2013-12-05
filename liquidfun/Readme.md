@@ -14,10 +14,6 @@ Discuss LiquidFun with other developers and users on the
 [LiquidFun Google Group][].  File issues on the [LiquidFun Issues Tracker][]
 or post your questions to [stackoverflow.com][] tagged with **liquidfun**.
 
-For help with LiquidFun, please visit the [LiquidFun Google Group][] or
-[stackoverflow.com][].  You can post your questions to stackoverflow.com
-tagged with `liquidfun`.
-
 Please see `Box2D/Documentation/Building/` to learn how to build LiquidFun and
 run the testbed.
 
@@ -35,3 +31,4 @@ to remove the version string but we would appreciate if you would leave it in.
   [LiquidFun Issues Tracker]: http://github.com/google/liquidfun/issues
   [stackoverflow.com]: http://www.stackoverflow.com
   [landing page]: http://google.github.io/liquidfun
+
