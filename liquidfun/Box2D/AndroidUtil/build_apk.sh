@@ -335,6 +335,11 @@ if [[ "${ant_target}" == "debug" && $((run_debugger)) -eq 1 ]]; then
   ndk-gdb ${adb_device} --start
 elif [[ $((launch)) -eq 1 ]]; then
   (
+    # Clear logs from previous runs.
+    # Note that logcat does not just 'tail' the logs, it dumps the entire log
+    # history.
+    adb ${adb_device} logcat -c
+
     # Display logcat in the background.
     adb ${adb_device} logcat &
     logcat_pid=$!
