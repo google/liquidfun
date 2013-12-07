@@ -22,14 +22,6 @@
 #include <sstream>
 #include <math.h>
 #include <stdlib.h>
-#ifdef _WIN32
-#include <direct.h>  // _getcwd()
-#define getcwd _getcwd
-#include <windows.h> // For MAX_PATH
-#define PATH_MAX MAX_PATH
-#else
-#include <unistd.h>
-#endif // _WIN32
 
 #define PRINT_PRECISION 8
 
@@ -365,16 +357,11 @@ void BodyTracker::SetWorkingDirectory(const char *argv0)
 	std::string executablePath = argv0;
 	std::string separator = executablePath.rfind('/') != std::string::npos ?
 		"/" : "\\";
-	std::string currentDirectory = "." + separator;
-	std::string relativeExecutablePath =
-		executablePath.compare(0, currentDirectory.length(),
-								currentDirectory) == 0 ?
-		executablePath.substr(currentDirectory.length()) : executablePath;
-
-	char workingDirectory[PATH_MAX];
-	getcwd(workingDirectory, sizeof(workingDirectory));
-	std::string fullPathToExecutable =
-		std::string(workingDirectory) + separator + relativeExecutablePath;
-	s_baselineRootDir = fullPathToExecutable.substr(
-		0, fullPathToExecutable.rfind(separator[0])) + separator;
+	s_baselineRootDir = executablePath.substr(
+		0, executablePath.rfind(separator)) + separator;
+#if defined(_WIN32) || defined(__APPLE__)
+	// MSVC and Xcode put test executables in a subdirectory of the project so
+	// change the baseline directory to the container directory.
+	s_baselineRootDir = s_baselineRootDir + ".." + separator;
+#endif // defined(_WIN32) || defined(__APPLE__)
 }
