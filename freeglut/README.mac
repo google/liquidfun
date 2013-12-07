@@ -1,0 +1,33 @@
+                              January 2011
+To the gentle Mac user,
+
+I realize that this is hardly a full explanation of how to build on a Mac,
+but it will need to suffice for now.
+
+There was an e-mail on the "freeglut" developers mailing list titled
+"Compiling Static freeglut on mac" with a datestamp of 10/12/2010 at
+11:20 AM (possibly corrected for Central time, USA).  Another e-mail
+on the same mailing list from the same person, in reply to his original
+missive, is dated 11/9/2010 at 10:03 PM.  This file is an attempt to
+capture the knowledge in those two e-mails.
+
+The author of the e-mails was trying to compile a static "freeglut"
+library on Mac OSX version 10.5.8.  He tried building both freeglut
+versions 2.4.0 and 2.6.0 with a command ...
+
+./configure --disabled-shared --enable-static
+make
+
+... and got a "non_lazy_ptr" error in both cases.  He was able to fix
+the problem by using the following "configure" command instead:
+
+./configure --disable-warnings --disable-shared --enable-static CPPFLAGS=-I/usr/X11/include -L/usr/X11/lib LDFLAGS=-I/usr/X11/include -L/usr/X11/lib -framework GLUT
+
+
+Any further information on building "freeglut" on a Mac would be deeply
+appreciated.  I believe that much of the information on building it on
+*nix systems also applies to the Mac.
+
+John F. Fay
+1/22/11
+

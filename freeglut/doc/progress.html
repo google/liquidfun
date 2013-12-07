@@ -1,0 +1,137 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="author" content="Pawel W. Olszta">
+   <meta name="copyright" content="Pawel W. Olszta">
+   <meta name="description" content="The freeglut development progress reports">
+   <meta name="keywords" content="freeglut glut OpenGL">
+   <meta name="GENERATOR" content="WebMaker">
+   <title>The freeglut project</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<center><img SRC="freeglut_logo.png" ALT="The freeglut logo" height=106 width=314></center>
+<center><dt><i><font face="Courier New,Courier"><font size=+1>
+I love reports. They are so full of brightness and hope...
+</font></font></i></dt></center>
+
+<center><table WIDTH="620" ><tr><td><hr WIDTH="100%">
+
+<p><i>January the 16th, 2000</i>
+
+<p>It looks like both X11 and Win32 version have reached a comparable usability stage.
+They are still missing many GLUT API 3 features, but the number is getting smaller and
+smaller every day :)
+
+<br><ul><li><b><font size=+2>input devices</font></b></li>
+
+<p>Keyboard and mouse seems to work well. There is a big guess about the mouse buttons 
+count under X11 (always 3) -- I must remember to correct the menu activation code if 
+this shows to be invalid.
+
+<p>None of the bizarre input devices found in GLUT API is supported (and probably won't). 
+
+<p>Steve Baker contributed the joystick code. It should work fine, as it did in PLIB,
+but I haven't tested it out yet. It might not compile under FreeBSD, as I had to 
+convert it from C++ to C and had no possibility to compile it under FreeBSD (the Win32
+version had some typos, but I've already fixed them).
+
+<br><br><li><b><font size=+2>pull-down menus</font></b></li>
+
+<p>Pull down menus seem to work. The menu is displayed using OpenGL, so it requires 
+the window's contents to be refreshed at an interactive rate, which sometimes does not 
+happen. That's why I'll consider adding optional window-system menu navigation later. 
+For now -- extensive testing is what I believe should be done with the menu system.
+
+<br><br><li><b><font size=+2>fonts</font></b></li>
+
+<p>Bitmap fonts support is done. However it would be good to add two more API functions
+-- glutBitmapString() and glutStrokeString(), which should limit the quantity of state
+changes when drawing longer strings. 
+
+<p>Good that somebody finally told me where to get the stroke fonts data from... XFree86
+sources contain the ROMAN and MONO ROMAN stroke fonts data. For now stroke fonts are 
+rendered using the bitmap font GLUT_BITMAP_8_BY_13.
+
+<p>What has changed is the way the fonts are specified. I moved to the GLUT's strange
+way of supplying (fake for freeglut) font data pointers instead of some nice enums.
+Hope it helps in achieving the binary compatibility between freeglut and GLUT.
+
+<p>Added two new API calls: glutBitmapHeight() and glutStrokeHeight(), that return
+a font's height. Hope this doesn't break the GLUT compatibility a lot.
+
+<br><br><li><b><font size=+2>mouse cursor</font></b></li>
+
+<p>Need to have own cursor shapes, so that freeglut can pass them to the windowing
+system, draw them using glBitmap() and/or texture mapping. The cursor shapes are very
+probable to be found in XFree86 sources.
+
+<br><br><li><b><font size=+2>indexed color mode</font></b></li>
+
+<p>This might work, however I have not tested it yet. glutGetColor/glutSetColor is not 
+implemented. Again, looks like a single Xlib call, but there might be some problems 
+with the colormap access. Need to switch into indexed color mode some day and check it 
+out (does Mesa 3.1 work with indexed color mode?)
+
+<br><br><li><b><font size=+2>planes</font></b></li>
+
+<p>Overlays are not supported, but one of the GLUT conformance tests fails due to 
+glutLayerGet( GLUT_NORMAL_DAMAGED ) returning FALSE when the window has actually 
+been damaged.
+
+<p>Layers would be good for drawing the menus and mouse cursor, as they wouldn't force
+the application redraw to update their state.
+
+<br><br><li><b><font size=+2>init display string</font></b></li>
+
+<p>I am in middle of the fight with the init display string. It's parsing OK, now it 
+would be cool to make it impress some effects on the display... 
+
+<br><br><li><b><font size=+2>game mode</font></b></li>
+
+<p>Is the game mode string parsed correctly?
+
+<br><br><li><b><font size=+2>geometry</font></b></li>
+
+<p>Andreas Umbach has contributed the cube and sphere code. The teapot rendering is 
+done using free SGI code. I have also added the cone rendering, however it is missing 
+normal vectors (just as Andrea's wireframed cube does). All of the glut*hedron() 
+functions await to be implemented.
+
+<br><br><li><b><font size=+2>obvious bugs</font></b></li>
+
+<br><br><ol>
+<li>
+the visibility/window status function is a conceptual mess. I had to peer into the GLUT
+source code to see what actually happens inside. It helped me a bit, but still one of 
+the visibility tests fails. This is probably the reason for which a window covered by 
+enlightenment status bar is marked as hidden and does not get redrawn.</li>
+
+<li>
+GLX 1.3 spec states that glXChooseVisual() et consortes are deprecated. Should move to 
+glXFBConfig.</li>
+
+<li>
+need to investigate what happens when initial window position is set to (-1,-1). GLUT 
+specification says, that the window positioning should be left to the window system. 
+And I do not know how to force it do so...</li>
+
+<li>
+I was told it is wrong to have the redisplay forced in the main loop. Is that right?</li>
+
+</ol><br><li><b><font size=+2>not so obvious bugs</font></b></li>
+
+<br><br><ol>
+<li>some of the tests freeze because they do not generate the glutPostRedisplay() call 
+every frame. Again, this is somehow handled by GLUT, but I can't see how. And why.
+
+<p>Looks like I've fixed it (or rather hacked it?) by forcing a redisplay every
+frame, but this is no good and kills interactiveness of my console :D</li>
+
+</ol></ul>
+
+<a href="index.html"><i>Back to the main page</i></a>
+
+</table></center></body></html>
+
