@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: glut
+Description: A freely licensed and improved alternative to the GLUT library
+Version: @VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@
+Libs: -L${libdir} -l@PC_LIBNAME@
+Libs.private: @PC_LIBS_PRIVATE@
+Cflags: -I${includedir} @PC_CFLAGS@

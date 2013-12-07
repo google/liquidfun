@@ -1,0 +1,10 @@
+Koch Snowflake Fractal
+Title of window
+"Koch Snowflake"
+Number of transformations
+4
+  A00       A01       A10       A11     B0        B1
+0.33333     0.0       0.0     0.33333   0.0       0.0
+0.16667   -.28868   0.28868   0.16667   0.33333   0.0
+0.16667   0.28868   -.28868   0.16667   0.5       0.28868
+0.33333     0.0       0.0     0.33333   0.66667   0.0
