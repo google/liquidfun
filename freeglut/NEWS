@@ -1,0 +1,70 @@
+Jan 16th 2000:
+
+  First really functional release of freeglut.
+
+
+Jan 13th 2001:
+
+  Steve Baker takes over as maintainer of freeglut.
+
+
+Jun ??th 2003:
+
+  freeglut 1.4 released.
+
+September 29, 2003:
+
+  freeglut 2.0.0 released.
+
+...
+
+Mar ??, 2009:
+
+  freeglut 2.6.0 released. Changes compared to 2.4.0:
+
+    * Tons of bug fixes
+
+    * Added deprecated, but working Joystick API.
+
+    * Added new constant GLUT_INIT_STATE for glutGet() to check if freeglut is
+      already initialized.
+
+    * Added new API entry for full-screen mode
+
+        void glutFullScreenToggle( void );
+
+      with a related new constant GLUT_FULL_SCREEN for glutGet().
+
+    * Added new API entry to de-initialize freeglut:
+
+        void glutExit( void );
+
+    * Added more special keys: GLUT_KEY_NUM_LOCK, GLUT_KEY_BEGIN GLUT_KEY_DELETE
+
+    * Added support for windows without captions and/or borders via two new
+      constants GLUT_CAPTIONLESS and GLUT_BORDERLESS for glutInitDisplayMode
+      (currently works for Windows only).
+
+    * Added support for multisampling: The number of samples per pixel to use
+      when GLUT_MULTISAMPLE is specified in glutInitDisplayMode() can be set via
+      glutSetOption() with parameter GLUT_MULTISAMPLE now. glutGet() with the
+      same token retrieves that value. The possible number of samples per pixels
+      can be queried via the new API entry
+
+        int *glutGetModeValues( GLenum mode, int *size );
+
+      with mode GLUT_MULTISAMPLE. (glutGetModeValues() currently only works for
+      X11)
+
+    * Added new constant GLUT_AUX for glutSetOption() to set the number of
+      auxiliary buffers. The possible number of auxiliary buffers can be
+      queried via glutGetModeValues with mode GLUT_AUX.
+
+    * Added support for versioned (i.e. 3.0) OpenGL contexts: New API entries
+
+        void glutInitContextVersion( int majorVersion, int minorVersion );
+        void glutInitContextFlags( int flags );
+
+      with related new constants GLUT_DEBUG and GLUT_FORWARD_COMPATIBLE for
+      the latter API entry. Added new constants GLUT_INIT_MAJOR_VERSION,
+      GLUT_INIT_MINOR_VERSION and GLUT_INIT_FLAGS  for glutGet().

@@ -1,0 +1,3775 @@
+2012-01-09  John F. Fay <johnffay@cybertron.com>
+	* Released freeglut 2.8.0 a few days ago and am restarting the ChangeLog
+	* Added 'cmake' support
+	* Moved source files from 'src' directory to 'src/Common' directory with
+	an eye to moving platform-specific code to separate files in separate
+	directories
+ 
+2009-08-10  Sven Panne  <sven.panne@aedion.de>
+
+	* include/GL/freeglut_ext.h,include/GL/freeglut_std.h,src/freeglut_ext.c,
+	src/freeglut_init.c,src/freeglut_internal.h,src/freeglut_state.c,
+	src/freeglut_window.c,src/freeglutdll.def: Added support for sRGB
+	framebuffers via the GLX_ARB_framebuffer_sRGB / WGL_ARB_framebuffer_sRGB
+	extensions. Added support for context profiles via the new parts of the
+	GLX_ARB_create_context / WGL_ARB_create_context extensions.
+
+2009-06-11  Paul Blew  <paul.blew@northgatearinso.com>
+
+	* replaced broken IDE based OpenWatcom build with a makefile based one
+
+2009-06-11  Sven Panne  <sven.panne@aedion.de>
+
+	* include/GL/freeglut_std.h: Disable the ATEXIT_HACK for Watcom, their
+	"exit" function has a different calling convention, leading to
+	compilation errors.
+
+2009-05-24  Sven Panne  <sven.panne@aedion.de>
+
+	* freeglut_static_vs2008.vcproj,freeglut_vs2008.vcproj,
+	  freeglut_vs2008.sln,freeglut_vs2008_static.sln: Move all files related
+	  to Visual Studio 2008 into 2 directories, one for the normal DLL
+	  build, and one for the static build. We should do this for other IDEs,
+	  too.
+
+2009-05-22  Sven Panne  <sven.panne@aedion.de>
+
+	* include/GL/freeglut_std.h: Avoid warnings when the ATEXIT_HACK is used
+	  with GCC, making the hack even uglier.
+
+	* include/GL/freeglut_std.h,src/freeglut_init.c,src/freeglut_internal.h,
+	  src/freeglut_menu.c,src/freeglut_window.c,src/freeglutdll.def: Added the
+	  ugly ATEXIT_HACK from GLUT 3.7, making freeglut binary compatible with the
+	  GLUT DLLs out in the wild.
+
+	* src/freeglutdll.def: Removed obsolete lines. Fixed version number.
+
+	* freeglut_vs2008.vcproj: Use our module definition file, so we get
+	  undecorated names in the resulting DLL, just like the classic GLUT DLL
+	  from Nate Robins.
+
+2009-04-05  Sven Panne  <sven.panne@aedion.de>
+
+	* Makefile.am: Added more project/workspace/... files to distribution.
+	* .cvsignore,doc/.cvsignore,include/.cvsignore,include/GL/.cvsignore,
+	  progs/.cvsignore,progs/demos/.cvsignore,
+	  progs/demos/CallbackMaker/.cvsignore,progs/demos/Fractals/.cvsignore,
+	  progs/demos/Fractals_random/.cvsignore,progs/demos/Lorenz/.cvsignore,
+	  progs/demos/One/.cvsignore,progs/demos/shapes/.cvsignore,
+	  src/.cvsignore: Removed remnants of CVS.
+
+2009-03-30  Sven Panne  <sven.panne@aedion.de>
+
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Make the example fully
+	  OpenGL-3.1-compliant.
+
+2009-03-27  Sven Panne  <sven.panne@aedion.de>
+
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Make Visual C happy by
+	  including stddef.h and explicitly marking some literals as float.
+
+2009-03-26  Sven Panne  <sven.panne@aedion.de>
+
+	* src/freeglut_init.c,src/freeglut_input_devices.c: Unbreak the build:
+	  C++ style comments are not allowed in ISO C90
+
+2009-03-19  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_input_devices.c: Fixing "freeglut_input_devices.c" for
+	  MSVS2005 and later per e-mail from Diederick Niehorster dated Thu
+	  3/19/2009 6:57 AM
+
+2009-03-17  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_init.c, src/freeglut_input_devices.c: Removing some build
+	  warnings from deprecated functions for VS2008 per e-mail from
+	  Diederick Niehorster dated Tue 3/10/2009
+	* freeglut_static_vs2008.vcproj, freeglut_vs2008.sln,
+	  freeglut_vs2008.vcproj,
+	  progs/demos/CallbackMaker/CallbackMakerStatic_vs2008.vcproj,
+	  progs/demos/CallbackMaker/CallbackMaker_vs2008.vcproj,
+	  progs/demos/Fractals/FractalsStatic_vs2008.vcproj,
+	  progs/demos/Fractals/Fractals_vs2008.vcproj,
+	  progs/demos/Fractals_random/Fractals_randomStatic_vs2008.vcproj,
+	  progs/demos/Fractals_random/Fractals_random_vs2008.vcproj,
+	  progs/demos/Lorenz/lorenzStatic_vs2008.vcproj,
+	  progs/demos/Lorenz/lorenz_vs2008.vcproj,
+	  progs/demos/One/oneStatic_vs2008.vcproj,
+	  progs/demos/One/one_vs2008.vcproj, progs/demos/demos_vs2008.sln,
+	  progs/demos/shapes/shapesStatic_vs2008.vcproj,
+	  progs/demos/shapes/shapes_vs2008.vcproj,
+	  progs/demos/smooth_opengl3/smooth_opengl3Static_vs2008.vcproj,
+	  progs/demos/smooth_opengl3/smooth_opengl3_vs2008.vcproj: Adding Visual
+	  Studio 2008 solution and project files
+
+2009-03-16  Sven Panne  <sven.panne@aedion.de>
+
+	* src/freeglut_init.c,src/freeglut_window.c: Set the default number of
+	  samples per pixel to 4 and actually use the value set with
+	  glutSetOption(GLUT_MULTISAMPLE,...) in Windows code. Previously the
+	  Windows code used a hardwired value of 4 and the GLX code had a
+	  default of 0, neither made much sense. Similarly, set the default
+	  number of auxiliary buffers to 1 and use that value when GLUT_AUX is
+	  used. Note: There latter token has the same value as GLUT_AUX1, and
+	  for historical reasons we seem to have 2 APIs to set the number of
+	  auxiliary buffers: Explicitly using GLUT_AUX1 ... GLUT_AUX4, and using
+	  a combination of GLUT_AUX with glutSetOption. The default of 1 ensures
+	  consistent behaviour in both cases.
+	* src/freeglut_state.c: Added GLUT_AUX and GLUT_MULTISAMPLE as possible
+	  parameters for glutGet, making things more symmetric with
+	  glutSetOption.
+	* src/freeglutdll.def: Added missing API entries.
+
+2009-03-10  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* progs/demos/demos.dsw: Adding the "smooth_opengl3" demo
+
+2009-03-09  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* include/GL/freeglut_std.h: Making the definition of
+	  "WIN32_LEAN_AND_MEAN" conditional to enhance compatibility with GLEW
+	  per suggestion by Diederick C. Niehorster in e-mail dated Mon 3/9/2009
+	  8:06 AM
+	* progs/demos/Fractals/fractals.c: Setting the "fractals" demo initial
+	  number of levels to 4 per suggestion from Diederick C. Niehorster
+	  [diederick@niehorster.eu] in e-mail dated Mon 3/9/2009 5:29 AM
+
+2009-03-01  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* progs/demos/CallbackMaker/CallbackMaker.c,
+	  progs/demos/Lorenz/lorenz.c, progs/demos/shapes/shapes.c: Fixing
+	  Microsoft compatibility with the new "vsnprintf" by putting an
+	  underscore in front of it if WIN32 is defined but __CYGWIN__ is not
+
+2009-03-01  Sven Panne <sven.panne@aedion.de>
+
+	* configure.ac: We do not depend on GLU anymore
+	* README.win32: Added notes for building under Cygwin
+	* src/Makefile.am: To build shared libraries on Windows, one has to
+	  declare explicitly that there are no undefined symbols during linking.
+	  No idea why, but this seems to be the only way to enable this on
+	  Cygwin via -mno-cygwin. Hopefully this won't cause problems on other
+	  platforms (which has to be tested).
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Windows fun again: Use
+	  the correct calling convention for OpenGL extension entries.
+
+2009-02-28  Sven Panne <sven.panne@aedion.de>
+
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: When -mno-cygwin is used,
+	  we get ancient GL headers, so be a bit more conservative.
+	* progs/demos/Fractals_random/fractals_random.c,
+	  progs/demos/Lorenz/lorenz.c, progs/demos/shapes/shapes.c:
+	  _CrtDumpMemoryLeaks and its header are Microsoft-specific, e.g. Cygwin
+	  doesn't provide them.
+	* src/freeglut_window.c: Do not try to destroy a GLX context when there
+	  is none, e.g. when glXCreateContextAttribsARB is not there.
+	* src/freeglut_joystick.c: Use snprintf or _snprintf instead of the
+	  potentially dangerous sprintf to avoid warnings.
+	  
+	  NOTE: Due to excessive use of #ifdefs, the joystick code is on the
+	  border of being unmaintainable! I could only check that it compiles
+	  cleanly on my Linux box. Others should test this on their platforms
+	  (Windows, Mac OS X, *BSD) to make sure that nothing has been broken.
+	* progs/demos/CallbackMaker/CallbackMaker.c,
+	  progs/demos/Lorenz/lorenz.c, progs/demos/shapes/shapes.c: Use
+	  vsnprintf instead of the potentially dangerous sprintf to avoid
+	  warnings. Using snprintf directly would be a little bit more tricky,
+	  because once again Microsoft decided to avoid followind standards and
+	  provide _snprintf instead. We could use this, too, but this would
+	  require an additional autoconf check, which I'd like to avoid, if
+	  possible.
+	  
+	  Note: If VS *still* issues warnings, but this time about vsnprintf,
+	  somebody should add some pragmas or whatever is needed to shut up that
+	  warning, it would be silly.
+	* progs/demos/Lorenz/lorenz.c: Position the distance message closer to
+	  the middle of the window, it has been far, far off to the upper right.
+	* src/freeglut_internal.h: Synched version number with configure.ac. We
+	  should better remove this redundancy and calculate this from
+	  configure.ac directly.
+
+2009-02-19  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* progs/demos/smooth_opengl3/smooth_opengl3.dsp,
+	  progs/demos/smooth_opengl3/smooth_opengl3Static.dsp: Fixing the
+	  DOS/Linux line ending problems in the progs/demos/smooth_opengl3
+	  project files
+
+2009-02-18  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_window.c: Fixing a build error caused by a variable
+	  declaration being out of place
+
+2009-02-15  Sven Panne <sven.panne@aedion.de>
+
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Final changes to make the
+	  example fully OpenGL-3.0-compliant:
+	  
+	  * Use vertex attribute arrays.
+	  
+	  * Use our own projection matrix.
+	  
+	  * Do not use deprecated vertex/fragment shader variables.
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Use GLSL shaders (still
+	  1.20, though). Dump GL info.
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Added a commandline
+	  option for 'classic' contexts. Aesthetic changes.
+	* progs/demos/smooth_opengl3/smooth_opengl3.c: Use VBOs in new example.
+	  Added a few comments.
+
+2009-02-14  Sven Panne <sven.panne@aedion.de>
+
+	* configure.ac, progs/demos/Makefile.am, progs/demos/smooth_opengl3,
+	  progs/demos/smooth_opengl3/Makefile.am,
+	  progs/demos/smooth_opengl3/smooth_opengl3.c,
+	  progs/demos/smooth_opengl3/smooth_opengl3.dsp,
+	  progs/demos/smooth_opengl3/smooth_opengl3Static.dsp: Initial version
+	  of a fully OpenGL-3.0-compliant of the famous smooth.c from the Red
+	  Book. What has been done already:
+	  
+	  * Explicitly request a forward-compatible 3.0 context
+	  
+	  * Report GL errors, if any, at a few crucial places
+	  
+	  * Replaced gluOrtho2D with a home-grown matrix + glLoadMatrixf
+	  
+	  What remains to be done:
+	  
+	  * Use vertex shaders and fragment shaders
+	  
+	  * Use vertex buffer objects
+
+2009-02-13  Sven Panne <sven.panne@aedion.de>
+
+	* README: Mention autogen.sh
+	* src/freeglut_window.c: Synchronized WGL behavior with GLX
+	  implementation: Do not call the new context creation API when it is
+	  not required. Fixing a bug in a previous commit on the way... :-}
+	* src/freeglut_internal.h, src/freeglut_window.c: More refactorings:
+	  Removed useless return value. Simplified control structures even more.
+	* src/freeglut_window.c: Refactoring only (replace nested conditionals
+	  with guard clauses), making the normal path of execution much clearer.
+	* configure.ac: We have added some API entries, so we have to update
+	  library version information conforming to
+	  http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+	* autogen.sh, configure.ac: Avoid CR\LF vs. LF troubles when using
+	  TortoiseSVN plus Cygwin.
+	* .: Ignore config.lt, too. It seems to be generated by recent
+	  autotools.
+
+2009-02-13  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_window.c:
+	  Adding OpenGL 3.0 context detection for Windows per e-mail from Paul
+	  Martz dated Thu 2/12/2009 9:03 AM (more or less)
+
+2009-02-03  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* README: Adding some instructions about building on a *nix platform to
+	  the 'README' file
+	* include/GL/freeglut_ext.h, src/freeglut_main.c: Removing some errant
+	  tabs, fixing ticket #2137721, and adding special-key capability to
+	  recognizing the NumLock, Delete, and keypad '5' keys
+	* src/freeglut_joystick.c, src/freeglut_main.c: A further response to
+	  bug [ 1804696 ] Warnings when building on OpenSolaris -- per comment
+	  by Nigel Stewart on that bug report
+
+2009-02-02  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_internal.h, src/freeglut_joystick.c: Fixing bug [ 1804696
+	  ] Warnings when building on OpenSolaris as updated 2/2/09 by Nigel
+	  Stewart
+
+2008-11-20  Sven Panne <sven.panne@aedion.de>
+
+	* src/freeglut_glutfont_definitions.c, src/freeglut_internal.h: Yet
+	  another try to make the font definitions compile on all platforms.
+
+2008-11-17  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_glutfont_definitions.c, src/freeglut_internal.h: Allowing
+	  "freeglut" to compile without errors under *nix. Before this, there
+	  were problems with conflicting definitions of the GLUT font
+	  definitions.
+
+2008-11-06  Sven Panne <sven.panne@aedion.de>
+
+	* src/freeglut_main.c: Ooops, forgot one file in the previous commit
+	  (fix for "--without-x").
+	* configure.ac: Use autoconf to detect gettimeofday instead of broken
+	  #ifdef.
+	  
+	  Note: freeglut compiles under Cygwin now, even when "--without-x" is
+	  used for configuration.
+	* configure.ac: We need to link against winmm under Cygwin when
+	  --without-x is used to get timeBeginPeriod, timeEndPeriod, joyGetPosEx
+	  and joyGetDevCaps.
+	* src/freeglut_window.c: Fixed first parameter of CreateWindow call,
+	  used for multisampling on Windows. It compiles, but it is otherwise
+	  untested.
+
+2008-11-05  Sven Panne <sven.panne@aedion.de>
+
+	* src/freeglut_misc.c: Be conservative about the presence of
+	  GL_TABLE_TOO_LARGE.
+	* src/freeglut_glutfont_definitions.c, src/freeglut_stroke_mono_roman.c,
+	  src/freeglut_stroke_roman.c: freeglut_internal.h needs some GL types,
+	  but it is not self-contained. TODO: Move freeglut.h #include into
+	  freeglut_internal.h itself?
+	* src/freeglut_window.c: Removed the annoying "Unable to create direct
+	  context rendering..." warning, it served no real purpose, and on some
+	  platforms there simply is no such thing as a direct context.
+	* progs/demos/CallbackMaker, progs/demos/Fractals,
+	  progs/demos/Fractals_random, progs/demos/Lorenz, progs/demos/One,
+	  progs/demos/shapes: Ignore *.exe
+	* src/freeglut_ext.c: Handle new glutInitContext* API entries in
+	  glutGetProcAddress
+	* src/freeglut_internal.h: Make freeglut compile under Cygwin, which has
+	  an ancient GLX header
+
+2008-11-02  Sven Panne <sven.panne@aedion.de>
+
+	* include/GL/freeglut_ext.h, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_state.c, src/freeglut_window.c:
+	  Added OpenGL 3.0 context creation API entries
+	  
+	  glutInitContextVersion, glutInitContextFlags
+	  
+	  and their related constants
+	  
+	  GLUT_INIT_MAJOR_VERSION GLUT_INIT_MINOR_VERSION GLUT_INIT_FLAGS
+	  
+	  GLUT_DEBUG GLUT_FORWARD_COMPATIBLE
+	  
+	  Note that this works with GLX only currently, the glutInitContext* API
+	  entries have no effect for WGL yet.
+	  
+	  TODO: Centralize the context creation code for WGL (the harder part)
+	  and use the new wglCreateContextAttribsARB API entry (the easy part,
+	  re-use most of the GLX code).
+	* src/freeglut_window.c: Refactored GLX context creation into a single
+	  function, centralizing things to be changed for OpenGL 3.0 context
+	  creation and removing some cut-n-paste.
+	* src/freeglut_ext.c, src/freeglut_internal.h: Make a
+	  wgl/glXGetProcAddress abstraction available internally. We will need
+	  this to get the new context creation function.
+	* src/freeglut_misc.c: Do not depend on GLU, it will vanish in the
+	  future, at least in its current form.
+	* src/freeglut_internal.h: Removed superfluous #includes.
+	* configure.ac: Fix for bug #1709675 ("probably not be so
+	  ISO-conformant"): The C compiler flag -Werror is not used by default
+	  anymore, a separate configure flag --enable-warnings-as-errors has
+	  been introduced for this purpose, which is off by default.
+	* configure.ac: Added AM_PROG_CC_C_O to configure.ac, removing a warning
+	  during autogen.sh. This flag seems to be necessary for per-target
+	  flags (used in demo programs) nowadays.
+
+2008-07-21  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* configure.ac, src/Makefile.am: Implementing a patch from Jocelyn
+	  Frechot (thank you, Jocelyn) that "should enable the XInput extension
+	  management with the autotools." See e-mail of Sun 7/20/2008 12:01 PM.
+
+2008-07-10  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_ext.c: Adding "glutExit" to the functions in
+	  "fghGetProcAddress" in accordance with an e-mail from Jocelyn Frechot
+	  dated Tue 7/8/2008 12:26 PM
+
+2008-04-05  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_main.c: Adding "SC_MONITORPOWER" and other new options to
+	  the "wParam" option list (e-mail from Ron Larkin, 3/17/08, 11:00 AM)
+
+2007-12-02  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* include/GL/freeglut_ext.h, src/freeglut_display.c, src/freeglut_ext.c,
+	  src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_state.c, src/freeglut_window.c: Adding
+	  "glutFullScreenToggle" for X11 -- still needs implementation in
+	  Windows (e-mail by Jocelyn Frechot, Sun 11/25/2007 11:29 AM)
+
+2007-12-01  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_window.c: Fixing the window position for asynchronous X11
+	  implementations (e-mail by Jocelyn Frechot, Sun 11/25/2007 11:29 AM)
+
+2007-11-26  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* progs/demos/Fractals/fractals.c: Making a demo program that uses
+	  "glutMainLoopEvent"
+
+2007-11-12  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* include/GL/freeglut_ext.h, src/freeglut_ext.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_state.c,
+	  src/freeglut_structure.c, src/freeglut_window.c: Implementing Jocelyn
+	  Frechot's changes -- see e-mail of Thursday, 11/8/2007 9:12 AM.
+
+2007-10-02  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_joystick.c: Removing more Win64 build warnings from
+	  joystick code
+
+2007-09-30  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_main.c: Removing the final compiler warning when building
+	  on Win75 -- thank you, Antonio Mattos.
+
+2007-09-29  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_cursor.c: Removing the remaining compiler warnings from
+	  the cursor code, thanks to Antonio Mattos of Brazil. The double
+	  type-casting is needed because of a bug in the new MSVC; there is a
+	  discussion on the web on this subject.
+
+2007-09-25  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_cursor.c: Changing the cursor definition macro for newer
+	  versions of MSVC -- thanks to "Mattos" of Brazil
+	* src/freeglut_window.c: More changes for Jocelyn Frechot's
+	  multisampling changes. The library builds now. It still needs some
+	  testing with sample cases under X11.
+
+2007-09-23  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_window.c: Fixing a remaining bug in the multisampling
+	  change ... there may be more ...
+
+2007-09-22  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_internal.h, src/freeglut_state.c,
+	  src/freeglut_structure.c, src/freeglut_window.c: Putting in Jocelyn
+	  Frechot's X11 visual context changes. THIS WILL BREAK THE BUILD as I
+	  am unable to test it on a Linux machine here. Somebody please test it
+	  for me.
+
+2007-09-21  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_init.c, src/freeglut_main.c, src/freeglut_misc.c:
+	  Removing compiler warnings in MSVC 2005 build
+	* include/GL/freeglut_ext.h, src/freeglut_init.c: Implementing Larry
+	  Ramey's "glutExit" feature (see e-mails from him on 11/9/05, 6/28/06)
+
+2007-09-19  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* include/GL/freeglut_std.h, src/freeglut_window.c: Implementing first
+	  part of Windows version of "GLUT_CAPTIONLESS" and "GLUT_BORDERLESS"
+	  per feature request "[ 1197016 ] need GLUT_CAPTIONLESS window option".
+	  Needs more work; menus are slightly mispositioned, X11 version does
+	  not support it, banner appears at beginning but disappears on window
+	  resize. But this is a start.
+	* src/freeglut_main.c: Fixing Linux key-repeat mode bug reported in "[
+	  1796845 ] Keyboard events are lost when key repeat is enabled."
+	* src/freeglut_joystick.c: Fixing a build error on SuSE described in bug
+	  report "[ 1792047 ] freeglut_joystick.c error"
+
+2007-09-18  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_window.c: Implementing feature request "[ 947118 ] Popup
+	  menu is hidden under the TOPMOST window"
+	* src/freeglut_menu.c: Adding Takeshi Nishimura's Feature Request "[
+	  1045202 ] Cope with a menu with many items" -- sorry it took so long.
+	* src/freeglut_window.c: Addressing Feature Request #1307049 that
+	  "freeglut" should return 0 if "glutGetWindow" is called without a
+	  prior call to "glutInit", rather than terminating on error.
+	* freeglut.dep, freeglut.mak, freeglut_static.dep, freeglut_static.mak:
+	  Added Windows "nmake" Makefiles and dependency files for the two
+	  "freeglut" projects in accordance with Feature Request #1454543
+
+2007-09-16  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_window.c: Fixing bug #1688954, submitted in Marcy '07. I
+	  changed "FREEGLUT" to _T("FREEGLUT") and nothing changed on my Windows
+	  XP system. If this will allow it to work on Vista, then in it goes.
+	* src/freeglut_gamemode.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_state.c, src/freeglut_structure.c, src/freeglut_window.c:
+	  Fixing bug report #1052151 from October 2004.
+
+2006-11-28  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* FrequentlyAskedQuestions: Adding a Frequently Asked Questions file
+
+2006-09-28  Joe Krahn <krahn@niehs.nih.gov>
+
+	* src/freeglut_state.c, src/freeglut_window.c: Removed incorrect comment
+	  about internal WGL/ARB definitions. I actually had put those comments
+	  in because I had meant to go back and re-check the WGL extension. But,
+	  maybe locally defined extensions should be kept in a separate include
+	  file?
+
+2006-09-27  Joe Krahn <krahn@niehs.nih.gov>
+
+	* freeglut.dsp, freeglut.dsw, freeglut_static.dsp,
+	  progs/demos/CallbackMaker/CallbackMaker.dsp,
+	  progs/demos/CallbackMaker/CallbackMakerStatic.dsp,
+	  progs/demos/Fractals/Fractals.dsp,
+	  progs/demos/Fractals/FractalsStatic.dsp,
+	  progs/demos/Fractals_random/Fractals_random.dsp,
+	  progs/demos/Fractals_random/Fractals_randomStatic.dsp,
+	  progs/demos/Lorenz/lorenz.dsp, progs/demos/Lorenz/lorenzStatic.dsp,
+	  progs/demos/One/one.dsp, progs/demos/One/oneStatic.dsp,
+	  progs/demos/demos.dsw, progs/demos/shapes/shapes.dsp,
+	  progs/demos/shapes/shapesStatic.dsp: Undo svn:eol-style=CR/LF for MSVC
+	  project files.
+
+2006-09-26  Joe Krahn <krahn@niehs.nih.gov>
+
+	* include/GL/freeglut_std.h, src/freeglut_joystick.c,
+	  src/freeglut_state.c, src/freeglut_window.c: Added
+	  FREEGLUT_LIB_PRAGMAS to control MS library pragmas, and fixed NOMINMAX
+	  define.
+	* freeglut.dsp, freeglut.dsw, freeglut_static.dsp,
+	  progs/demos/CallbackMaker/CallbackMaker.dsp,
+	  progs/demos/CallbackMaker/CallbackMakerStatic.dsp,
+	  progs/demos/Fractals/Fractals.dsp,
+	  progs/demos/Fractals/FractalsStatic.dsp,
+	  progs/demos/Fractals_random/Fractals_random.dsp,
+	  progs/demos/Fractals_random/Fractals_randomStatic.dsp,
+	  progs/demos/Lorenz/lorenz.dsp, progs/demos/Lorenz/lorenzStatic.dsp,
+	  progs/demos/One/one.dsp, progs/demos/One/oneStatic.dsp,
+	  progs/demos/demos.dsw, progs/demos/shapes/shapes.dsp,
+	  progs/demos/shapes/shapesStatic.dsp: Added svn:eol-style=CRLF property
+	  to MSVC project/workspace files.
+
+2006-09-25  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_window.c: Fixing a typo bug in the display mode checking
+	  (removing multisampling if it is not supported)
+
+2006-09-25  Joe Krahn <krahn@niehs.nih.gov>
+
+	* src/freeglut_state.c: Fixed a small mistake in the previous commit for
+	  glutGet.
+	* src/freeglut_state.c: Added proper support for number of mouse buttons
+	  in X11, and a keyboard in Windows CE. Also, several glutGet results
+	  returning TRUE/FALSE were changed to 1/0, because the actual return
+	  type is int (although they are technically the same in practice).
+
+2006-09-24  Joe Krahn <krahn@niehs.nih.gov>
+
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c:
+	  Converted Time counter to a uniform unsigned long it value. The
+	  initialized flag was redundant with the main Initialized flag, and
+	  conversion of timeval to milliseconds in POSIX makes the code cleaner.
+	  Timeval has a longer range, but the time value is already limited by
+	  the GLUT API.
+
+2006-09-23  Joe Krahn <krahn@niehs.nih.gov>
+
+	* src/freeglut_gamemode.c, src/freeglut_internal.h, src/freeglut_main.c:
+	  Removed WindowState.IsGameMode; it is redundant with
+	  Structure.GameModeWindow
+
+2006-09-21  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_state.c, src/freeglut_window.c: Adding support for the
+	  multisampling query per bug report 1274193
+	* ChangeLog, src/freeglut_main.c: Fixing Bug #1398196 - Windows message
+	  argument
+
+2006-09-21  Joe Krahn <krahn@niehs.nih.gov>
+
+	* src/freeglut_cursor.c: test (comment edited)
+
+2006-09-21  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* ChangeLog, src/freeglut_init.c: Adding temporary fix to
+	  "glutInitDisplayString" to ignore numerical assignments
+	* ChangeLog, src/freeglut_window.c: Adding multisampling to *nix and
+	  Windows; also some other pixel format enhancements to Windows
+	* ChangeLog, progs/demos/CallbackMaker/CallbackMaker.c: Enhancing the
+	  "CallbackMaker" demo
+	* ChangeLog, src/freeglut_cursor.c, src/freeglut_display.c,
+	  src/freeglut_ext.c, src/freeglut_gamemode.c,
+	  src/freeglut_glutfont_definitions.c, src/freeglut_init.c,
+	  src/freeglut_input_devices.c, src/freeglut_internal.h,
+	  src/freeglut_joystick.c, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_misc.c, src/freeglut_state.c, src/freeglut_teapot.c,
+	  src/freeglut_teapot_data.h, src/freeglut_window.c: Joe Krahn's changes
+	  to "TARGET_HOST" defined constants
+	* ChangeLog, src/freeglut_internal.h, src/freeglut_joystick.c,
+	  src/freeglut_main.c, src/freeglut_window.c: Fixing two minor bugs,
+	  adding comments
+	* ChangeLog, src/freeglut_gamemode.c, src/freeglut_internal.h,
+	  src/freeglut_menu.c, src/freeglut_state.c, src/freeglut_structure.c:
+	  Changing "GameMode" to "GameModeWindow ... and testing whether I can
+	  get to SVN directly
+
+2006-08-05  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, progs/demos/Fractals/fractals.c,
+	  progs/demos/Fractals_random/fractals_random.c,
+	  progs/demos/Lorenz/lorenz.c: Check fgets for return value to avoid
+	  warnings.
+	* freeglut.spec: Fixed typo in date
+	* freeglut.spec: Updated build requirements for SuSE 10.1
+
+2005-10-12  Sven Panne <sven.panne@aedion.de>
+
+	* ., .cvsignore: Ooops, forgot to ingore INSTALL and install-sh in
+	  previous commit...
+	* ChangeLog, include/GL/freeglut_ext.h, include/GL/freeglut_std.h: Moved
+	  GLUT_INIT_STATE to <GL/freeglut_ext.h>, it is not part of the original
+	  GLUT.
+	* ., .cvsignore, ChangeLog, INSTALL, autogen.sh, install-sh,
+	  mkinstalldirs: Simply use autoreconf in autogen.sh, it is much simpler
+	  and the recommended way in the autotools documentation. Removed
+	  INSTALL, install-sh and mkinstalldirs, they are either unused or
+	  automatically generated by autogen.sh.
+
+2005-10-06  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* include/GL/freeglut_ext.h: Allowing compilation of Windows version by
+	  removing DLL decorations from deprecated joystick interface extensions
+	* src/freeglut_window.c: Implementing Stereo in Windows
+
+2005-09-07  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/Makefile.am: Use target-specific *_CPPFLAGS, not the
+	  deprecated INCLUDES.
+	* ChangeLog, autogen.sh: Use -Wall for automake to catch some buglets,
+	  deprecated stuff, etc.
+
+2005-09-04  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, autogen.sh: Silenced autogen.sh
+
+2005-08-31  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* freeglut.rc, freeglut.tgt, freeglut.wpj, freeglut_static.tgt:
+	  Necessary files for Open Watcom support
+	* src/freeglut_internal.h: Adding Open Watcom support
+	* ChangeLog, README.win32: Documenting support for Open Watcom
+	* include/GL/freeglut_std.h: Implementing WATCOM support
+
+2005-07-14  Sven Panne <sven.panne@aedion.de>
+
+	* src/freeglut_input_devices.c: Nuked useless bit-fiddling, pointed out
+	  by John. I was a bit too quick to cut-n-paste the cfmakeraw()
+	  definition into our code... :-]
+	* ChangeLog, src/freeglutdll.def: Synched the DLL definitions with
+	  reality.
+	* ChangeLog, src/freeglut_cursor.c: Fixed the GLUT_CURSOR_INHERIT logic
+	  once again...
+	  
+	  Note that this commit is untested, but at least it looks better than
+	  before. We really a need a cursor test program.
+
+2005-07-13  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_cursor.c: Fixing a cursor bug in \"GLUT_CURSOR_INHERIT\"
+
+2005-07-13  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, configure.ac: Improve autoconf magic: To detect headers
+	  like GL/gl.h, it might be necessary to temporarily use the X11 flags
+	  found by AC_PATH_XTRA.
+	* ChangeLog, src/freeglut_joystick.c: Avoid gcc warnings for some
+	  joystick code (e.g. on Solaris).
+	* src/freeglut_input_devices.c: Tiny cleanup only...
+	* ChangeLog, src/freeglut_input_devices.c: Solaris doesn't have
+	  cfmakeraw, but it is only a convenience function for some
+	  bit-fiddling, anyway.
+
+2005-07-08  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, include/GL/freeglut_ext.h, src/freeglut_ext.c,
+	  src/freeglut_internal.h: Made all the "glutJoystickXXX" functions part
+	  of the freeglut extensions. If this is not what we want, we can easily
+	  #ifdef this away again...
+	* ChangeLog, src/freeglut_geometry.c: Made a few global arrays "static",
+	  avoiding namespace pollution. The only externally visible symbols
+	  should either be from the GLUT API ("glutXXX") or internal freeglut
+	  entities ("fgYYY"). Reformatted things a bit on the way.
+
+2005-07-06  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/freeglut_main.c: We only have pending redisplay
+	  callbacks when the window wants to be redisplayed *and* it is visible.
+	  Otherwise we won't redraw, anyway, and immediately discover that
+	  there's still something to do, etc. etc., leading to 100% CPU load.
+	* ChangeLog, src/freeglut_main.c: Removed redundant code.
+	* ChangeLog, src/freeglut_init.c: X11 only: Destroy the global menu
+	  rendering context when deinitializing. The visual/context handling for
+	  menus is still rather obscure, though...
+	* progs/demos/Lorenz/lorenz.c: Reverting previous commit: %lf is a valid
+	  format specifier for the scanf familiy of functions only, not for the
+	  printf family.
+
+2005-07-05  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_main.c: Implementing the new menu context variable names
+	  in Windows ...
+	* src/freeglut_internal.h: Changing a comment ... nothing big.
+	* progs/demos/Lorenz/lorenz.c: Fixing output formats ... nothing big
+
+2005-07-05  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/freeglut_state.c, src/freeglut_window.c: X11 only: Free
+	  XVisualInfo structures when they are not needed anymore, fixing a
+	  space leak. Not perfect for menus yet...
+	* src/freeglut_internal.h, src/freeglut_window.c: Tiny change to make
+	  grep's life easier: Rename the fields of the menu context. Not really
+	  worth a ChangeLog entry...
+	  
+	  IMHO it looks like we could kill the whole MenuContext stuff, it is of
+	  no use currently and some things look strange, like e.g. having a
+	  context per menu. The latter is not OK when a menu is attached to
+	  multiple windows.
+
+2005-07-02  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/freeglut_init.c, src/freeglut_internal.h,
+	  src/freeglut_main.c, src/freeglut_state.c: Handle modifiers in
+	  MotionNotify events, too. This fixes bug #1227920 (glutGetModifiers
+	  not set/allowed in mouse callbacks). In addition, some related cleanup
+	  has been done.
+	* ChangeLog, src/freeglut_joystick.c: Partial fixes for bug #1218900
+	  (freeglut-2.4.0 on FreeBSD).
+	* ChangeLog, Makefile.am: Remove wrong "execute" bits when creating a
+	  distribution. This fixes bug #961938 (Executable bit set on non exe
+	  files).
+	* configure.ac: Tiny cosmetic change, not worth a ChangeLog entry.
+	* ChangeLog: Added John's missing ChangeLog entry.
+
+2005-07-01  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* freeglut.dsp, freeglut_static.dsp: Adding the
+	  \"freeglut_input_devices.c\" file to the Windows project files
+
+2005-07-01  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, configure.ac, src/Makefile.am: Some steps toward
+	  compilation under MinGW. Note that there are still linking troubles
+	  for the examples.
+	* src/freeglut_internal.h: Fixed #ifdef for ChangeDisplaySettingsEx
+	  prototype.
+	* ChangeLog, src/freeglut_input_devices.c: Silenced a signed/unsigned
+	  mismatched via a cast.
+	* ChangeLog, src/freeglut_internal.h: MinGW is lacking a prototype for
+	  ChangeDisplaySettingsEx, so supply one in this case. Note that this
+	  should better be handled via autoconf than via cpp.
+	* ChangeLog, Makefile.am: Removed redundant files from EXTRA_DIST.
+
+2005-06-30  Sven Panne <sven.panne@aedion.de>
+
+	* src/freeglut_main.c: Ooops, forgot to set the current window in the
+	  last commit. I'll have to test better before comitting... :-]
+	* ChangeLog, src/freeglut_main.c: When a window is iconified, only an
+	  UnmapNotify is sent, not a VisibilityNotify, so we have to handle the
+	  window status callback in the former case, too. This fixes bug #763442
+	  (Call the visibility callback when minimizing a window).
+	* ChangeLog, src/freeglut_main.c: Cleaned up
+	  CreateNotify/ConfigureNotify handling.
+	* src/freeglut_main.c: Ooops, forgot to dump a few fields in some
+	  events...
+	* ChangeLog, configure.ac, src/freeglut_main.c: Added --enable-debug
+	  configure flag. Currently it only turns on X11 event tracing, but in
+	  the future we could add more.
+	  
+	  Note: freeglut_main.c could benefit from some restructuring to clean
+	  up the #ifdefs and cut down the sizes of some extremely long
+	  functions.
+	* ., .cvsignore: Ignore files generated during RPM build.
+
+2005-06-23  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* doc/freeglut_user_interface.html: Fixing the documentation regarding
+	  callbacks and geometry shape additions
+	* progs/demos/Fractals/Fractals.dsp,
+	  progs/demos/Fractals/FractalsStatic.dsp,
+	  progs/demos/Fractals_random/Fractals_random.dsp,
+	  progs/demos/Fractals_random/Fractals_randomStatic.dsp,
+	  progs/demos/Lorenz/lorenz.dsp, progs/demos/Lorenz/lorenzStatic.dsp,
+	  progs/demos/One/one.dsp, progs/demos/One/oneStatic.dsp,
+	  progs/demos/shapes/shapes.dsp, progs/demos/shapes/shapesStatic.dsp:
+	  Adding separate static library and DLL demonstration program projects
+	* progs/demos/CallbackMaker/CallbackMaker.dsp,
+	  progs/demos/CallbackMaker/CallbackMakerStatic.dsp: Adding separate
+	  demo program projects for static library and DLL versions
+	* progs/demos/demos.dsw: Adding support for separate static library demo
+	  programs
+	* ChangeLog: Keeping current ...
+	* src/freeglut_input_devices.c: New file for Joe Krahn\'s dials input
+	  device
+
+2005-06-22  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_geometry.c: Fixing a bug in the Sierpinski sponge code
+	  that made the application crash if called with number of levels < 0
+	* src/Makefile.am, src/freeglut_init.c, src/freeglut_internal.h,
+	  src/freeglut_joystick.c, src/freeglut_state.c: Joe Krahn\'s input
+	  (dials) device implementation.
+
+2005-06-14  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, freeglut.spec: Added an RPM spec file based on the one
+	  shipped with SuSE 9.3.
+
+2005-06-10  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog, configure.ac: Release of 2.4.0
+
+2005-06-02  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog, configure.ac, src/freeglut_internal.h: 2.4.0 Release
+	  Candiate 5
+
+2005-05-26  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_main.c: Takeshi Nishimura\'s changes to make the Windows
+	  mouse wheel/button mapping match that of X11; also fixing a typo in
+	  the associated mouse callback argument list
+
+2005-05-26  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog, configure.ac: 2.4.0 RC4 updates
+	* src/freeglut_main.c: Fix joysticks so they are polled by their timer
+	  correctly. (Dan Torop)
+
+2005-05-24  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/freeglut_gamemode.c: The original glutEnterGameMode()
+	  returns the window id of the game mode window, not TRUE/FALSE, we
+	  should better follow that. Note that most man pages claim that this
+	  function returns void, but this is definitely wrong.
+	* ChangeLog, src/freeglut_gamemode.c, src/freeglut_main.c: When
+	  switching to game mode under X11, no ConfigureNotify event will happen
+	  and consequently no reshape callback will ever be called via the
+	  normal mechanism. To fix this, note that the game mode window needs to
+	  be resized and handle this before redraw.
+
+2005-05-22  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/freeglut_ext.c: Guarantee consistency of
+	  names/addresses in glutGetProcAddress by using a macro. In addition,
+	  this avoids any non-constant initializer issues which might be raised
+	  when using WinDoze GCCs. The additional code overhead is negligible,
+	  at least for x86 (a few instructions per name).
+	* ChangeLog, configure.ac: Lowering minimum autoconf version required.
+
+2005-05-20  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog: Tag for 2.4.0 RC3
+	* ChangeLog: Notes
+
+2005-05-19  Sven Panne <sven.panne@aedion.de>
+
+	* src/freeglut_gamemode.c: Fixed SF bug #1204256: Off-by-one error in
+	  X11 mode switching. The code which changes the X11 video mode has an
+	  off-by-one error, resulting in a wrong mode or segfault. I've
+	  refactored the code slighty to make it hopefully clearer what's going
+	  on and corrected some #ifdefs on the way. Now at least the "One" demo
+	  works for me.
+	* src/freeglut_window.c: Fixed SF bug #1204261: Mini space leak when
+	  creating an X11 window (X11 text property values have to be freed
+	  after using them)
+
+2005-05-18  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_gamemode.c: Removing a C++ comment and simplifying the
+	  string handling
+
+2005-05-17  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_gamemode.c: Misiek\'s changes to fix Game Mode--getting
+	  display settings under Windows and setting the window size correctly
+	  on all operating systems.
+
+2005-05-16  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog: Mark for 2.4 RC 2
+
+2005-05-13  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_menu.c: Removing two unused variables so this will
+	  compile on Linux with -Wall
+
+2005-05-12  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* ChangeLog: Updating the ChangeLog ...
+	* src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_menu.c:
+	  Takeshi Nishimura\'s menu changes--menus should now work properly. Use
+	  the GLUT \"GLUTmech\" and \"walker\" demos to test them.
+	* src/freeglut_main.c: Takeshi Nishimura\'s menu fixes
+
+2005-05-09  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog, Makefile.am, configure.ac: Freeglut 2.4.0 Release Candidate
+	  1
+
+2005-05-06  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, progs/demos/shapes/shapes.c: Fixed a cuboctahedron vertex,
+	  implemented wire mode for that shape.
+	* ChangeLog, progs/demos/shapes/shapes.c, src/freeglut_internal.h,
+	  src/freeglut_main.c: Necessary compilation fixes for newer GCCs (e.g.
+	  3.3.5, 4.0). Side effect: The shapes demo has a new 'i' key now.
+
+2005-05-05  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* ChangeLog: Updated the ChangeLog again ...
+
+2005-05-04  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* progs/demos/shapes/shapes.c: Replacing the original \"freeglut\"
+	  \"shapes\" demo with the much snazzier OpenGLUT \"shapes\" demo. Many
+	  thanks to the OpenGLUT community for writing it. The copyright notice
+	  stays in the program.
+	* src/freeglut_main.c: Changing hard-coded constant (number of mouse
+	  buttons = 3) to a \"glutDeviceGet\" call in two places under X11
+	* src/freeglutdll.def: Changing the version number from 2.0 to 2.4.0 ...
+	  do we need to add any new interface functions?
+	* src/freeglut_internal.h: Removing an unused variable
+	* src/freeglut_window.c: Adding a comment on why \"freeglut\" differs
+	  from GLUT in a particular way
+	* src/freeglut_joystick.c: Removing an unused function
+	* src/freeglut_init.c: Making the \"key repeat\" initialization
+	  consistent with the rest of its usage; also making the
+	  \"initDisplayString\" ever-so-slightly mroe general
+	* ChangeLog, TODO, src/freeglut_window.c: Updating the ChangeLog and
+	  TODO files in preparation for the upcoming release
+
+2005-04-29  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_joystick.c: Adding a \"TODO\" comment about dynamically
+	  allocating joystick buttonj and axis arrays
+	* ChangeLog: Updationg the ChangeLog ...
+
+2005-04-28  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* README.win32: Adding a \"README.Win32\" file with instructions on how
+	  to install \"freeglut\" under Windows.
+	* src/freeglut_main.c: Adding Window Exit event handling to the Windows
+	  code; also adding a note that eventually it would be good to handle
+	  the Window Entry event
+
+2005-04-27  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_window.c: Fixing bug [ 1111218 ] fullscreen not working
+	  Better late than never.
+	* src/freeglut_init.c: Fixing Bug Report [ 1160442 ]
+	  glutGet(GLUT_ELAPSED_TIME) is too granular
+
+2005-04-26  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_internal.h, src/freeglut_structure.c: Fixing the
+	  typecasts on the callback fetches and invocations to allow
+	  \"freeglut\" to compile with GCC 4.0
+	* src/freeglut_menu.c: Fixing erroneous implementation of Takeshi\'s fix
+	* src/Makefile.am: Changing include path from relative to absolute to
+	  support off-directory builds (Yuri D\'Elia, March 22, 5:59 PM)
+	* LISEZ_MOI: Adding \"LISEZ-MOI\", the French version of \"README\"
+
+2005-04-25  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* ChangeLog: Updating the ChangeLog ... it seems to be something of a
+	  stepchild if we\'re not careful.
+
+2005-04-22  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* src/freeglut_menu.c: Yuri D\'Elia\'s changes to get the virtual
+	  maximum screen extent instead of the actual screen size.
+	* src/freeglut_gamemode.c: Yuri D\'Elia\'s changes to the game mode
+	  window
+	* src/freeglut_structure.c: Change a hard-coded number to a defined
+	  constant and add some initializations
+	* src/freeglut_cursor.c: Removing duplicate cursor code. This and the
+	  previous change (in freeglut_main.c) apparently got combined.
+	* ChangeLog: Updating the ChangeLog to reflect activity over the past
+	  few months
+	* src/freeglut_callbacks.c, src/freeglut_cursor.c,
+	  src/freeglut_display.c, src/freeglut_gamemode.c,
+	  src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_misc.c, src/freeglut_state.c, src/freeglut_structure.c,
+	  src/freeglut_window.c: Trying again to change \"fgStructure.Window\"
+	  to \"fgStructure.CurrentWindow\" and \"fgStructure.Menu\" to
+	  \"fgStructure.CurrentMenu\" for easier maintenance.
+
+2005-04-15  John F. Fay <john.fay.ctr@eglin.af.mil>
+
+	* ChangeLog: Updating the ChangeLog as a means of testing pCVSc
+	* src/freeglut_internal.h: Testing!
+
+2005-03-23  Brian Paul
+
+	* include/GL/freeglut_ext.h: added comment about AUX flags
+
+2005-02-16  Brian Paul
+
+	* src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_structure.c, src/freeglut_window.c: fixes for menus being
+	  attached to multiple buttons/windows (John Fay)
+	* src/freeglut_callbacks.c: added error check (John Fay)
+
+2005-02-15  Brian Paul
+
+	* src/freeglut_init.c, src/freeglut_window.c: AUX buffers for Windows
+	  (John Fay)
+
+2005-02-11  Brian Paul
+
+	* include/GL/freeglut_ext.h, src/freeglut_init.c, src/freeglut_window.c:
+	  Aux color buffer support. Pass one of GLUT_AUX[1234] to
+	  glutInitDisplayMode. Only implemented/tested on GLX, not Windows.
+	* include/GL/freeglut_ext.h, src/freeglut_ext.c,
+	  src/freeglut_internal.h: Fix object/function pointer inconsistencies
+	  which are a problem for gcc 3.4.2. Added GLUTproc type, returned by
+	  glutGetProcAddress().
+
+2005-01-23  Sven Panne <sven.panne@aedion.de>
+
+	* configure.ac: autoconf 2.58 is enough
+	* src/freeglut_callbacks.c, src/freeglut_internal.h: Stylistic change
+	  only (added "do { ... } while( 0 )" around multi-statement macros)
+	* configure.ac, src/freeglut_joystick.c, src/freeglut_main.c: Testing
+	  for errno.h is overkill. :-)
+	* src/freeglut_cursor.c, src/freeglut_main.c: Windows platforms only:
+	  Merged some cursor-related code from John Fay (with minor changes)
+
+2005-01-05  Sven Panne <sven.panne@aedion.de>
+
+	* src/freeglut_ext.c, src/freeglut_font.c, src/freeglut_main.c,
+	  src/freeglut_state.c, src/freeglut_window.c: Hopefully removed all
+	  damage done by commits without merge
+	* ChangeLog, src/freeglut_cursor.c: Reworked the X11 part of
+	  glutSetCursor, fixing bug #764187 (Variable mouse pointers don't work)
+	  on the way: * Use slightly more compatible cursor shapes for
+	  GLUT_CURSOR_RIGHT_ARROW and GLUT_CURSOR_LEFT_ARROW. * Refactored and
+	  fixed the erroneous code for GLUT_CURSOR_NONE. * Removed the incorrect
+	  use of XFreeCursor and use a cache of cursors instead. Cursors are
+	  never freed now, we could do this e.g. via reference countig if this
+	  is really needed. * Fixed error handling. * Unknown cursor types are
+	  an error now. * Now the window state always corresponds to the wanted
+	  cursorID, even in the case of GLUT_CURSOR_FULL_CROSSHAIR.
+	  
+	  NOTE: I am not sure where the cursor cache should really reside,
+	  currently it is simply a file-local variable.
+
+2005-01-03  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/freeglut_gamemode.c: Fixed part of bug #926883 (Video
+	  mode matching code, memory leaks, fullscreen), i.e. issue warnings
+	  when XF86VidModeFOO fails.
+	* ChangeLog, src/freeglut_gamemode.c: (234) Fixed part of bug #926883
+	  (Video mode matching code, memory leaks, fullscreen): Now we first try
+	  to get an exact mode match, ignoring the refresh rate if none could be
+	  found. This way the X11 part and the WinDoze behave similarly. NOTE:
+	  We still don't behave like GLUT, because it has a wider notion of
+	  "best" match. We have to refactor and extend freeglut quite a bit to
+	  do that.
+	* ChangeLog, src/freeglut_gamemode.c: Fixed part of bug #926883 (Video
+	  mode matching code, memory leaks, fullscreen), i.e. memory leak caused
+	  by not freeing the mode lines returned by XF86VidModeGetAllModeLines
+	* ChangeLog, src/freeglut_window.c: Improved error message a bit when no
+	  suitable visual could be found (X11 only).
+	* configure.ac, src/freeglut_internal.h, src/freeglut_main.c: autoconf'd
+	  vfprintf
+	* src/freeglut_joystick.c: Removed redundant #include
+	* ChangeLog, configure.ac, src/freeglut_joystick.c, src/freeglut_main.c:
+	  autoconf'd <errno.h> handling and removed an unused '#include
+	  <sys/stat.h>'
+	* configure.ac, src/freeglut_joystick.c, src/freeglut_main.c: autoconf'd
+	  <limits.h> and <sys/param.h> handling, removing MIN/MAX macros on the
+	  way.
+	* src/freeglut_internal.h: Cosmetics.
+	* configure.ac, src/freeglut_joystick.c: autoconf'd <fcntl.h> and
+	  <sys/ioctl.h> handling
+	* src/freeglut_internal.h, src/freeglut_joystick.c, src/freeglut_main.c:
+	  Improved <sys/typed.h> / <unistd.h> handling as suggested by the
+	  autoconf docs.
+	* configure.ac, progs/demos/Lorenz/lorenz.c, src/freeglut_internal.h,
+	  src/freeglut_main.c: Fixed <sys/time.h> / <time.h> handling as
+	  suggested by the autoconf docs.
+	* src/freeglut_callbacks.c, src/freeglut_cursor.c,
+	  src/freeglut_display.c, src/freeglut_ext.c, src/freeglut_font.c,
+	  src/freeglut_font_data.c, src/freeglut_gamemode.c,
+	  src/freeglut_geometry.c, src/freeglut_init.c, src/freeglut_internal.h,
+	  src/freeglut_joystick.c, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_misc.c, src/freeglut_overlay.c, src/freeglut_state.c,
+	  src/freeglut_structure.c, src/freeglut_teapot.c,
+	  src/freeglut_videoresize.c, src/freeglut_window.c: Moved '#include
+	  "config.h"' to freeglut_internal.h, we will need it there soon and it
+	  makes everything a bit shorter.
+	* ChangeLog: Resurrected my recent additions which were nuked by the
+	  previous commit, adding the latest change on the way. :-(
+	* acconfig.h: Removed acconfig.h, it is deprecated and we don't need it.
+	* src/freeglut_cursor.c, src/freeglut_font.c, src/freeglut_init.c,
+	  src/freeglut_structure.c: Make it compile again with "-Wall -pedantic
+	  -Werror", redoing quite a few things I've fixed already a few days
+	  ago. Have today's commits been done by copying instead of merging? :-(
+
+2005-01-03  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_window.c: Changes remove duplicate menu code from
+	  "freeglut_window.c" and put it into one place in "freeglut_menu.c"
+	  where it belongs. - John Fay
+	* ChangeLog: General ChangeLog Updates
+	* src/freeglut_callbacks.c, src/freeglut_cursor.c,
+	  src/freeglut_display.c, src/freeglut_ext.c, src/freeglut_font.c,
+	  src/freeglut_gamemode.c, src/freeglut_geometry.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_joystick.c, src/freeglut_main.c,
+	  src/freeglut_menu.c, src/freeglut_misc.c, src/freeglut_state.c,
+	  src/freeglut_structure.c, src/freeglut_teapot.c,
+	  src/freeglut_teapot_data.h, src/freeglut_window.c: Adding
+	  initialization checking to all GLUT interface functions and removing
+	  asserts from the rest of the code - John Fay
+
+2005-01-01  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/Makefile.am: Added missing files from "src"
+	  subdirectory to dist.
+	* AUTHORS: Synched with project member list on SourceForge
+	* ChangeLog, Makefile.am, configure.ac: Modernized configure.ac a bit
+	  and added a rule to Makefile.am to update libtool. Note that all gcc
+	  compiler warnings are now on by default.
+	* ChangeLog, include/GL/freeglut_std.h,
+	  progs/demos/CallbackMaker/CallbackMaker.c,
+	  progs/demos/Fractals_random/fractals_random.c,
+	  progs/demos/Lorenz/lorenz.c, progs/demos/One/one.c,
+	  src/freeglut_cursor.c, src/freeglut_font.c, src/freeglut_init.c,
+	  src/freeglut_teapot_data.h: Make "gcc -Wall -pedantic -Werror" happy.
+	* ., .cvsignore: Ignore files generated by autoscan.
+	* ChangeLog, INSTALL, configure.ac, configure.in: Renamed "configure.in"
+	  to the officially preferred "configure.ac".
+	* stamp-h, stamp-h.in: Removed unused stamp-h* files, configure
+	  generates them (a single stamp-h1, to be exact).
+	* ChangeLog, Makefile.am: Added eMbedded Visual Tools project/workspace
+	  files to distribution.
+	* ., .cvsignore: Ignore distribution tar files
+
+2004-12-31  Sven Panne <sven.panne@aedion.de>
+
+	* ChangeLog, src/freeglut_main.c: Fixed first bug of #1064195 (two
+	  things when using signals): Don't issue a warning about select when a
+	  non-blocked signal was caught. This makes sense and is more compatible
+	  with GLUT.
+	* ChangeLog, src/freeglut_font.c: Fixed bug #1040435 (glutBitmapString()
+	  bug).
+	* ChangeLog: Alas, the ChangeLog has not the usual ChangeLog format, so
+	  tell (X)Emacs about that fact.
+	* ChangeLog, src/freeglut_window.c: Fixed bug #1045054 (KeyReleaseMask
+	  typo).
+	* ChangeLog, src/freeglut_state.c: Fixed bug #1087642
+	  (glutDeviceGet(GLUT_DEVICE_KEY_REPEAT) unimplemented).
+	* ChangeLog, src/freeglut_ext.c: Fixed bug #1079530 (glutGetProcAddress
+	  and geometric objects).
+	* ., .cvsignore, doc, doc/.cvsignore, include, include/.cvsignore,
+	  include/GL, include/GL/.cvsignore, progs, progs/.cvsignore,
+	  progs/demos, progs/demos/.cvsignore, progs/demos/CallbackMaker,
+	  progs/demos/CallbackMaker/.cvsignore, progs/demos/Fractals,
+	  progs/demos/Fractals/.cvsignore, progs/demos/Fractals_random,
+	  progs/demos/Fractals_random/.cvsignore, progs/demos/Lorenz,
+	  progs/demos/Lorenz/.cvsignore, progs/demos/One,
+	  progs/demos/One/.cvsignore, progs/demos/shapes,
+	  progs/demos/shapes/.cvsignore, src, src/.cvsignore: Improved
+	  ignorance.
+
+2004-12-17  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_cursor.c, src/freeglut_display.c,
+	  src/freeglut_internal.h, src/freeglut_menu.c, src/freeglut_misc.c,
+	  src/freeglut_window.c: Some assertion changes / removals from Dr. John
+	  Fay
+
+2004-10-06  Brian Paul
+
+	* src/freeglut_callbacks.c, src/freeglut_internal.h,
+	  src/freeglut_joystick.c, src/freeglut_state.c: joystick init fixes
+	  (John Fay)
+
+2004-10-05  Brian Paul
+
+	* src/freeglut_main.c: updated comments (John Fay)
+	* src/freeglut_init.c, src/freeglut_main.c, src/freeglut_window.c:
+	  improved comments and mouse coord adjustments (John Fay)
+	* src/freeglut_init.c: more clean-ups, fixes from John Fay
+
+2004-09-23  Brian Paul
+
+	* src/freeglut_font.c, src/freeglut_stroke_mono_roman.c,
+	  src/freeglut_stroke_roman.c: font updates from John Fay
+	* src/freeglut_main.c: more updates from John Fay
+	* src/freeglut_geometry.c, src/freeglut_init.c: assorted updates from
+	  John Fay
+
+2004-09-15  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_init.c: Fix to glutInit() command-line argument
+	  compaction - Patch #1027724 from takeshi2
+
+2004-09-13  Brian Paul
+
+	* src/freeglut_callbacks.c, src/freeglut_cursor.c,
+	  src/freeglut_gamemode.c, src/freeglut_init.c, src/freeglut_internal.h,
+	  src/freeglut_joystick.c, src/freeglut_main.c, src/freeglut_state.c,
+	  src/freeglut_window.c: more updates from John Fay
+	* src/freeglut_cursor.c, src/freeglut_gamemode.c,
+	  src/freeglut_geometry.c, src/freeglut_init.c, src/freeglut_internal.h,
+	  src/freeglut_joystick.c, src/freeglut_main.c,
+	  src/freeglut_structure.c, src/freeglut_teapot.c,
+	  src/freeglut_window.c: some function renaming, etc (John Fay)
+
+2004-09-10  Brian Paul
+
+	* src/freeglut_callbacks.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_main.c: joystick updates from
+	  John Fay
+	* src/freeglut_cursor.c, src/freeglut_font_data.c,
+	  src/freeglut_gamemode.c, src/freeglut_geometry.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_joystick.c, src/freeglut_main.c,
+	  src/freeglut_menu.c, src/freeglut_misc.c, src/freeglut_state.c,
+	  src/freeglut_stroke_mono_roman.c, src/freeglut_stroke_roman.c,
+	  src/freeglut_structure.c, src/freeglut_teapot.c,
+	  src/freeglut_window.c: updated comments from John Fay
+
+2004-08-11  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_gamemode.c, src/freeglut_internal.h, src/freeglut_main.c:
+	  Fix a game mode crashing bug, conditional compilation for Windows, and
+	  comment out some diagnostic prints (John Fay)
+
+2004-08-05  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_window.c: Implements Richard Rauch's request that the
+	  warning about indirect rendering contexts be suppressed for his BSD
+	  operating systems.
+	* src/freeglut_teapot_data.h: Someone used C++ style comments in a C
+	  file... tisk tisk...
+	* src/freeglut_font.c: Bugfix for "glutBitmapString" so that it now
+	  handles end-of-line characters properly (Richard Rauch)
+	* README: Incremental update ... (John Fay)
+
+2004-06-29  Brian Paul
+
+	* src/freeglut_structure.c: give menu windows the title 'freeglut menu'
+	  (helps Chromium)
+	* src/freeglut_window.c: move glXMakeCurrent() to after the point where
+	  the window's title is set (helps Chromium)
+
+2004-05-13  James Jones <puggles@users.sourceforge.net>
+
+	* freeglut.dsp, freeglut_static.dsp: Add one more header file to MSVC
+	  files
+
+2004-05-12  James Jones <puggles@users.sourceforge.net>
+
+	* include/GL/freeglut_ext.h, include/GL/freeglut_std.h: John Fay:
+	  Direct/indirect rendering context change, fix a bug that somebody
+	  reported (about needing "GLUT_XLIB_IMPLEMENTATION" defined) and remove
+	  a false deprecation of a function.
+	* src/freeglut_main.c: John Fay: A bug fix re: behavior of the code when
+	  the user clicks the "x" to close a window, and commentary to a message
+	  type with fixes for a Windows event processing bug.
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_state.c,
+	  src/freeglut_window.c: John Fay: Implement the modified logic of the
+	  direct/indirect rendering context.
+	* src/freeglut_font.c, src/freeglut_font_data.c: John Fay: Implement the
+	  upper end of the bitmapped fonts (beyond ASCII code 127). The fonts
+	  are very close to the GLUT fonts.
+	* src/freeglut_teapot.c, src/freeglut_teapot_data.h: John Fay: These
+	  files implement the teapot for WINCE.
+	* src/freeglut_internal.h: John Fay: Remove some obsolete defined
+	  symbols.
+	* freeglut.dsp, freeglut_static.dsp: John Fay: Add
+	  "freeglut_glutfont_definitions.c" to the build and tell it to look in
+	  the "include" directory for the <GL/freeglut.h> file.
+
+2004-03-28  Steve Baker <steve@sjbaker.org>
+
+	* progs/demos/shapes/shapes.c: Removed unnecessary initialisation.
+	* progs/demos/shapes/shapes.c: Added a cullface test.
+
+2004-03-22  drgoldie
+
+	* freeglut_evc4.vcp, src/freeglut_gx.cpp, src/freeglut_init.c,
+	  src/freeglut_main.c: removed .cpp file (using LoadLibrary() instead)
+	  removed modified gx.h file cleaned up all // and tabs
+
+2004-03-17  nigels
+
+	* src/freeglut_main.c: Prevent exceeding array bounds in X11 key-repeat
+	  detection
+
+2004-03-16  drgoldie
+
+	* freeglut_evc4.vcp, src/freeglut_ext.c, src/freeglut_gx.cpp,
+	  src/freeglut_init.c, src/freeglut_main.c, src/freeglut_misc.c,
+	  src/freeglut_state.c, src/freeglut_window.c: replaced all tabs with 4
+	  spaces replaced all // with /* */ block fixed freeglut_gx.cpp file
+	  with #if TARGET_HOST_WINCE
+
+2004-03-16  nigels
+
+	* src/freeglut_init.c, src/freeglut_main.c, src/freeglut_state.c:
+	  Whitespace conversion - tabs to 4 spaces
+	* src/freeglut_window.c: Revert X11 fgCloseWindow to 1.38 pre-offscreen
+	  implementation.
+
+2004-03-15  drgoldie
+
+	* freeglut_evc4.vcp, src/freeglut_gx.cpp, src/freeglut_main.c: fixed
+	  mouse position and keyboard mapping. added c-wrapper cpp file for
+	  GAPI.
+	* freeglut_evc4.vcp, freeglut_evc4.vcw, include/GL/freeglut_std.h,
+	  src/freeglut_cursor.c, src/freeglut_display.c, src/freeglut_ext.c,
+	  src/freeglut_gamemode.c, src/freeglut_init.c, src/freeglut_internal.h,
+	  src/freeglut_main.c, src/freeglut_menu.c, src/freeglut_misc.c,
+	  src/freeglut_state.c, src/freeglut_window.c: added support for
+	  WindowsCE (building on top of klimt)
+
+2004-03-15  nigels
+
+	* src/freeglut_main.c: Repeat-key handling for Win32 Utilise both
+	  FreeGLUT state and per-window filtering modes
+
+2004-03-15  rkrolib
+
+	* ChangeLog: Forgot to update the ChangeLog for the benefit of those who
+	  do not have CVS or Web access.
+	* configure.in, include/GL/freeglut_ext.h, src/freeglut_internal.h,
+	  src/freeglut_window.c: Completed removal of all support for the
+	  offscreen rendering.
+	  
+	  If you wish to do offscreen supportin a portable manner, you will no
+	  longer be able to do so with current versions of freeglut.
+	* progs/demos/Makefile.am: Removed Makefile support for the offscreen
+	  demo.
+	* progs/demos/One/one.c, progs/demos/offscreen: Removed offscreen demo
+	  program.
+
+2004-03-15  nigels
+
+	* src/Makefile.am: Provide local include path to automake for
+	  GL/freeglut.h etc
+
+2004-03-14  nigels
+
+	* src/freeglut_window.c: Code formatting tweak
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_misc.c, src/freeglut_state.c, src/freeglut_structure.c:
+	  Resolution of X11 key-repeat handling
+	  
+	  glutSetKeyRepeat is global to all FreeGLUT windows in the application
+	  glutIgnoreKeyRepeat is a per-window over-ride
+	  
+	  To avoid nasty global X11 state interaction, or GLUT-style event queue
+	  filtering - the approach in FreeGLUT is to use the current key state
+	  XQueryKeymap to detect and ignore KeyRelease/KeyPress pairs that are
+	  auto-generated.
+	  
+	  See also:
+	  http://pyopengl.sourceforge.net/documentation/manual/glutSetKeyRepeat.3GLUT.xml
+	  http://pyopengl.sourceforge.net/documentation/manual/glutIgnoreKeyRepeat.3GLUT.xml
+	* src/freeglut_callbacks.c, src/freeglut_cursor.c, src/freeglut_ext.c,
+	  src/freeglut_font.c, src/freeglut_font_data.c,
+	  src/freeglut_gamemode.c, src/freeglut_geometry.c,
+	  src/freeglut_glutfont_definitions.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_joystick.c, src/freeglut_main.c,
+	  src/freeglut_state.c, src/freeglut_structure.c, src/freeglut_window.c:
+	  Stripped out tabs and end-of-line whitespace Differences are in
+	  whitespace only
+
+2004-03-10  nigels
+
+	* src/freeglut_window.c: Resolve [ 853044 ] FreeGLUT menus on Win32 in
+	  task bar and ALT-TAB list CreateWindowEx(WS_EX_TOOLWINDOW,...)
+	  extended style suppresses the popup menu window from the taskbar or
+	  ALT-TAB list
+
+2004-03-08  nigels
+
+	* src/freeglut_init.c: ignoreKeyRepeat mode in FreeGLUT is TRUE by
+	  default For compatibility with GLUT, the mode should be FALSE by
+	  default This issues was probably undetected until now because
+	  ignoreKeyRepeat didn't yet work.
+	* src/freeglut_main.c: Resolved bug #869765 glutIgnoreKeyRepeat() Fix
+	  (Win32) glutIgnoreKeyRepeat now behaves correctly on Win32
+	* src/freeglut_internal.h: C++ style comment converted to C style
+	  comment
+	* src/freeglut_callbacks.c, src/freeglut_cursor.c,
+	  src/freeglut_display.c, src/freeglut_ext.c, src/freeglut_font.c,
+	  src/freeglut_font_data.c, src/freeglut_gamemode.c,
+	  src/freeglut_geometry.c, src/freeglut_init.c, src/freeglut_joystick.c,
+	  src/freeglut_main.c, src/freeglut_menu.c, src/freeglut_misc.c,
+	  src/freeglut_overlay.c, src/freeglut_state.c,
+	  src/freeglut_structure.c, src/freeglut_teapot.c,
+	  src/freeglut_videoresize.c, src/freeglut_window.c: Include freeglut
+	  header via <GL/freeglut.h> rather than "../include/GL/freeglut.h" This
+	  allows some additional flexibility with file layout. It should be the
+	  responsibility of the build environment, rather than at source level.
+	  This change tested on MSVC 6, cygwin and mingw32 gcc and Linux gcc.
+
+2004-03-03  nigels
+
+	* src/freeglut_joystick.c: According to John F. Fay: The variable
+	  "num_axes" should be "joy->num_axes".
+
+2004-02-20  rkrolib
+
+	* src/freeglut_gamemode.c: Removed nonstandard #warning constructs.
+	  Converted to XXX comments. (These are warnings about gamemode features
+	  not working the same on some systems as on others. The semantics of
+	  gamemode are dubious, since it was never formally documented, and has
+	  for a long time worked in different ways on different systems, so it
+	  is arguable that there is nothing really wrong with systems that don't
+	  support resolution-changes.)
+	* src/freeglut_callbacks.c: Fixed the bug where glutDisplayFunc() was
+	  effectively invoking glutPostRedsiplay(). This is wrong on the face of
+	  it, and may be at root for some of the annoying "timing" issues we've
+	  had with redisplay events being called inappopriately.
+
+2004-02-19  rkrolib
+
+	* progs/demos/offscreen/Makefile.am: I had rubbed the
+	  offscreen/Makefile.am off from the shapes demo. I forgot to remove a
+	  couple of references to the shapes.c and shapes.dsp (.dsw?) files.
+	* configure.in, include/GL/freeglut_ext.h, progs/demos/Makefile.am,
+	  progs/demos/offscreen, progs/demos/offscreen/Makefile.am,
+	  progs/demos/offscreen/offscreen.c: Added "offscreen" demo, a very
+	  simple program that produces an onscreen window and, upon command,
+	  renders a similar offscreen display and writes the result to disk.
+	  
+	  Also, modified the build structure for UNIX_X11 to autobuild the demo.
+	  (Not done for WIN32 at this time.)
+	  
+	  Also, forgot to previously commit the updated freeglut_ext.h include.
+	  Eeep.
+
+2004-02-18  rkrolib
+
+	* src/freeglut_window.c: Minor comment adjustments.
+
+2004-02-18  nigels
+
+	* src/freeglut_geometry.c: Refinements to comments
+
+2004-02-14  rkrolib
+
+	* src/freeglut_joystick.c: Normalized the style of the new joystick a
+	  bit.
+	* src/freeglut_main.c: For some reason, the X "expose" event handler was
+	  *directly* calling the display handler in the client. (Okay, it was
+	  calling a function that operates on the window handle.)
+	  
+	  If you have any complexity to the display code, this can be painful to
+	  watch. I can't think of a good reason to do the display immediately,
+	  so I fixed the code to do a glutPostRedisplay().
+	* src/freeglut_joystick.c: A commit on behalf of John (in turn, and in
+	  part, also on behalf of Thierry).
+	  
+	  * Renamed some of the old PLIB functions to have glut* prefixes. (I
+	  guess that there is some thought about exporting them to the API.)
+	  
+	  * Changes from Thierry for FreeBSD support, and/or results of testing?
+	  
+	  * I re-merged an XXX comment re. NetBSD/amd64 and propogated a comment
+	  on a duplicated #define for FreeBSD. We need the GNU autoconfig stuff
+	  to be updated by someone who groks it, now.
+
+2004-02-09  rkrolib
+
+	* src/freeglut_init.c: Commit of John's tidying-up of a comment, closing
+	  out an XXX comment that I wrote. Thanks, John.
+
+2004-02-07  rkrolib
+
+	* src/freeglut_window.c: ...AND a tab snuck into my changes for
+	  GLUT_OFFSCREEN support. Mea culpa.
+	* src/freeglut_joystick.c: Removed a ^M that snuck into the #pragma for
+	  the new joystick code.
+	* src/freeglut_window.c: Ooops. We don't want people to be able to
+	  create a subwindow of an offscreen window. (^& This is no longer
+	  permitted.
+	  
+	  (Actually, it would be nice if it would work, but I don't think that
+	  you can subwindow a pixmap in UNIX_X11, and assume that subwindowing
+	  offscreen doesn't work on WIN32, either.)
+	* ChangeLog: Added entries for the joystick updates and the offscreen
+	  experimental support.
+	* src/freeglut_joystick.c: Changed a couple of XXX comments. Added a new
+	  one. These all the nest of #ifs in the BSD section of the new joystick
+	  code.
+	* progs/demos/CallbackMaker/CallbackMaker.c: "Heavy editing" by John to
+	  his CallbackMaker demo.
+	* src/freeglut_joystick.c: John added a #pragma to the joystick code for
+	  WIN32 users.
+	* src/freeglut_internal.h, src/freeglut_window.c: Adds GLUT_OFFSCREEN as
+	  a display mode option. This includes:
+	  
+	  * Recognizing the mode when you call glutCreateWindow(). (Offscreen
+	  looks and acts like a top-level window in many ways.)
+	  
+	  * During the life of the offscreen "window", various window-management
+	  functions are modified to respect offscreen status.
+	  
+	  (Excepting reshaping windows, there is not much useful interpretation
+	  for managment of offscreen areas. Reshaping is possibly more work than
+	  it's worth to support, and GLUT specs allow us to ignore the request.)
+	  
+	  * Cleanup for "offscreen" windows is a little different than for
+	  regular windows.
+	  
+	  Windows still don't start up quite ideally. Offscreen windows should
+	  probably get a reshape event, but not a display.
+
+2004-02-05  rkrolib
+
+	* src/freeglut_init.c, src/freeglut_joystick.c: Big import of updated
+	  joystick code from PLIB, with permission from Steve Baker. Most of the
+	  adaptation done by John, with a little bit of testing and changes by
+	  Thierry Thomas and myself. Seems to compile on:
+	  
+	  WIN32 Red Hat LINUX FreeBSD NetBSD/amd64
+
+2004-02-01  rkrolib
+
+	* src/freeglut_main.c: Close a bug whereby events can be delayed
+	  arbitrarily long if they get caught between the socket and the
+	  client-side queue on X, sometime after glutMainLoopEvent()'s loop
+	  quits and before the sleep code is invoked.
+
+2004-01-16  rkrolib
+
+	* src/freeglut_main.c: Ammended a comment on fgCheckJoystickCallback().
+	* src/freeglut_main.c: Minor style normalizations to minimize the diffs
+	  between *now* and from before John's changes. No functional changes:
+	  
+	  * Removed some hard TABs introduced. * Removed some
+	  spaces-at-end-of-line introduced. * A couple of function calls were
+	  touched up.
+	  
+	  I did this separately only because I don't like messing with other
+	  people's commits. (I don't like feeling like the style police, either,
+	  but when I mess with the commit, there's no room for reverting my
+	  interference if it is deemed undesirable...)
+	* src/freeglut_main.c: Some changes from John.
+	  
+	  The main attraction seems to be correcting a bug with the action-on-
+	  window-close.
+
+2004-01-05  nigels
+
+	* src/freeglut_main.c, src/freeglut_window.c: Win32 glutIconifyWindow()
+	  patch contributed by John F. Fay Restrict resize callbacks to visible
+	  windows When iconified via glutIconifyWindow(), don't pass (0,0) to
+	  resize callback Note that minimising the window via the menu or
+	  minimise button is not yet resolved.
+
+2003-12-30  rkrolib
+
+	* src/freeglut_main.c, src/freeglut_menu.c, src/freeglut_structure.c:
+	  Split a few overlong lines.
+	  
+	  Adjusted some spacing in a few spots to be more consistant with
+	  freeglut style. Including one unindented if() body.
+	  
+	  Eliminated a dead variable.
+	* src/freeglut_joystick.c: Changed several #ifdef's to proper #if's.
+	  Eeek. Oook.
+	* src/freeglut_main.c: Hm... I thought that I committed this last night.
+	  What's up?
+	  
+	  This is Nigel's modified fgSleepForEvents(), essentially. Take 2.
+
+2003-12-30  nigels
+
+	* include/GL/freeglut_std.h: Three supported win32 compilation
+	  environments: MSVC, Cygwin and MingW32 #pragma is specific to MS
+	  compiler
+	* src/freeglut_internal.h: Explicitly cast function pointer to (void *)
+	  in SET_WCB since all callbacks stored as void pointers suppress gcc
+	  -Wall -pendantic "noise"
+	* src/freeglut_structure.c: Typesafe handling of temporary window
+	  destroy callback Move assignment out of while test, scope temporary
+	  inside loop Be explicit about assignment/comparison in if test for gcc
+	  peace of mind suppress gcc -Wall -pendantic "noise"
+	* src/freeglut_internal.h: Three supported win32 compilation
+	  environments: MSVC, Cygwin and MingW32 The windows mmsystem header
+	  need only be included internally to freeglut strdup vs _strdup is
+	  specific to the MS compiler
+	* src/freeglut_font.c: strlen expects (char *), rather than (unsigned
+	  char *) suppress gcc -Wall -pendantic "noise"
+	* src/freeglut_cursor.c: Replace assignment of array to struct with
+	  field-by-field assignment suppress gcc -Wall -pendantic "noise"
+	* src/freeglut_menu.c: glutBitmapString and glutBitmapLength expect
+	  (unsigned char *) rather than (char *) suppress gcc in -Wall
+	  -pendantic "noise"
+	* src/freeglut_joystick.c: Replace #ifdef WIN32 with #ifdef
+	  TARGET_HOST_WIN32, as per FreeGLUT convention
+	* src/freeglut_init.c: fgState.FPSInterval is unsigned int (GLuint),
+	  environment variable GLUT_FPS can be negative
+	* src/freeglut_window.c: OpenGL context is not made current on Win32
+	  until fgSetWindow is called. This resolves severe problems observed in
+	  GLUI applications.
+	* src/freeglut_window.c: #pragma message is only understood my MS
+	  compiler #if defined(_MSC_VER) .. #endif
+	* src/freeglut_state.c: Resolve bug 864978 - GLUT_OWNS_JOYSTICK
+	  unhandled
+	* src/freeglut_main.c: Tidy nested if/else to suppress gcc -Wall
+	  -pedantic noise gcc suggests explicit braces to avoid ambiguous `else'
+
+2003-12-25  rkrolib
+
+	* progs/demos/CallbackMaker/CallbackMaker.c,
+	  progs/demos/Fractals/fractals.c,
+	  progs/demos/Fractals_random/fractals_random.c: Configuring with
+	  "--enable-warnings" broke three demos: * CallbackMaker defined, but
+	  did not use, the Joystick() function (a callback for the freeglut
+	  joystick interface). I uncommented the callback-registration. I assume
+	  that it was commented out because it was spammy. (freeglut does
+	  joysticks by polling with a timer.) Perhaps a longer interval than
+	  10ms would be advisable?
+	  
+	  * fractals.c used strcpy() without getting the prototype. Added
+	  #include <string.h> at the top.
+	  
+	  * fractals_random.c had the same problem as fractals.c.
+
+2003-12-23  rkrolib
+
+	* src/freeglut_main.c: Moved the window-resize code so that it happens
+	  whenever there is a pending resize for the window, whether or not the
+	  window is visible or in need of a redisplay. The resize is now done
+	  before the visibility and need-to-redisplay checks.
+
+2003-12-22  rkrolib
+
+	* src/freeglut_structure.c: Got rid of those int/ptr warnings on AMD64.
+	  (The code was casting an {int} to a pointer, and later retrieving the
+	  int by another cast. It should be safe provided that pointers are at
+	  least as big as {int}, but GCC was giving warnings on my system,
+	  so...fixed.)
+	* src/freeglut_main.c, src/freeglut_structure.c: Several
+	  test-on-assignment cases have been converted to stop GCC from
+	  complaining about if( a = get_a_value_for_a( ) ) type code.
+
+2003-12-19  rkrolib
+
+	* src/freeglut_internal.h: Ooops, left some cruft in a comment in the
+	  header when committing the last patch. Cleaned up.
+	* src/freeglut_callbacks.c, src/freeglut_internal.h,
+	  src/freeglut_structure.c: Wrote SET_WCB() to set a window callback.
+	  This lets us out of using the FETCH_WCB() as an lvalue (which it
+	  shouldn't, since the value of the FETCH is cast to the correct
+	  function-pointer type).
+
+2003-12-15  James Jones <puggles@users.sourceforge.net>
+
+	* progs/demos/Fractals/Fractals.dsp: Change the destination directory of
+	  the debug version to "Debug" (John Fay)
+
+2003-12-13  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog: Release 2.2.0
+
+2003-12-11  rkrolib
+
+	* src/freeglut_main.c, src/freeglut_window.c: Stripped out TABs that got
+	  reintroduced.
+	  
+	  There were no changes other than replacing about 10 to 12 TABs with a
+	  visually-suitable number of spaces, so this can probably be blindly
+	  treated as equivalent to the previous versions of the two affected
+	  files.
+
+2003-12-11  Christopher John Purnell
+
+	* src/freeglut_internal.h, src/freeglut_structure.c: The deferred window
+	  destruction code was destroying the windows in reverse order. This
+	  cased a crash when the call to glutDestroyWindow() for a sub windows
+	  was immediately followed by a call to glutDestroyWindow() for it's
+	  parent. fgCloseWindows() would call fgDestroyWindow() for the parent
+	  first fgDestroyWindws() would recurse over the children and then
+	  fgCloseWindows() would call fgDestroyWindow() again for the child.
+	  
+	  I've replaced the single linked list with one of our two way link list
+	  structures. I've also moved it into fgStructure because that seemed
+	  the consistent thing to do.
+	  
+	  I said the the deferred windows destruction causes more problems then
+	  it solves.
+
+2003-12-11  James Jones <puggles@users.sourceforge.net>
+
+	* progs/demos/CallbackMaker/Makefile.am: Include project file in the
+	  distribution.
+	* ChangeLog: Updates for 2.2.0 RC2
+	* progs/demos/demos.dsw: Add shapes to the Visual C workspace.
+	* progs/demos/shapes/Makefile.am: Package the visual C project file with
+	  the distribution
+	* configure.in: Set the version to 2.2.0
+	* src/freeglut_gamemode.c, src/freeglut_main.c, src/freeglut_window.c:
+	  Nigel Stewart's Win32 window-sizing fix for game mode
+	* progs/demos/One/one.c: Disable/enable lighting in the "one.c" demo
+	  (John Fay)
+	* progs/demos/CallbackMaker/CallbackMaker.dsp: Add some essentials to
+	  get this program to compile (Nigel)
+	* src/freeglut_internal.h: Update to reflect 2.2.0 release
+	* ChangeLog: Note the release of 2.2.0 RC1
+
+2003-12-11  rkrolib
+
+	* src/freeglut_structure.c, src/freeglut_window.c: John correctly
+	  observed that the initialization {OldHeight} and {OldWidth} in the
+	  window structure should be done for both windows and sub-windows, and
+	  the easiest way to do this is in the
+	  freeglut_structure.c:fgCreateWindow() code. So, transplant one line.
+
+2003-12-10  rkrolib
+
+	* src/freeglut_main.c: Commit of John's change to stop an infinite-loop
+	  condition when the only windows left are freeglut menu windows, and
+	  correctly calls exit() if we drop out of the main loop without having
+	  requested any freeglut extensions to glutMainLoop() handling.
+
+2003-12-07  rkrolib
+
+	* progs/demos/shapes/shapes.c, progs/demos/shapes/shapes.dsp: Two from
+	  Nigel:
+	  
+	  * Updated shapes.c. I think that it's just reformatting and the
+	  addition of some comments.
+	  
+	  * Added shapes.dsp, a Microsoft Visual C++ Developer Studio Project
+	  file for building shapes on WIN32 with MSVC++.
+
+2003-12-03  Christopher John Purnell
+
+	* configure.in: Added an option to enable gcc compiler warnings. I've
+	  explicitly excluded the one about adding parentheses.
+
+2003-12-03  rkrolib
+
+	* src/freeglut_main.c: Touched up several comments, pointing up things
+	  that may be worth reflect- ing upon in the future.
+	* src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_window.c:
+	  Hrm. I misunderstood the purpose of {window->State.Width} and
+	  {...Height}. Those are *not* records of the old values, but rather of
+	  the *desired* *new* values, hence it was inappropriate to use them in
+	  ConfigureNotify X11 event handling. Doing so introduced some new
+	  problems.
+	  
+	  So, I created OldHeight and OldWidth in the window State structure,
+	  and *those* do what I require.
+	  
+	  I also stripped out the obsolete comment about getting extra/bogus
+	  reshape events. (Though I maintain that an application should be
+	  robust against them, freeglut should no longer generate them if the
+	  window has not changed size since last reported.)
+
+2003-12-02  rkrolib
+
+	* src/freeglut_main.c: Changed Create/ConfigureNotify handling in
+	  UNIX_X11:
+	  
+	  * Just need to call GETWINDOW() once. Ooops. Heh. * Update
+	  {window->State} with the new size of the window. * If the window-size
+	  has NOT changed, then do NOT call the Reshape event.
+	* src/freeglut_main.c: Added an "XXX" earmark for post-release
+	  contemplation. (The point is definitely in need of consideration, I
+	  believe, but is not immediately a major bug, so I'd rather not mess
+	  with it at the risk of postponing a release "soon".)
+	* src/freeglut_main.c: Ensure that the time-out for sleeping is never
+	  negative.
+	* src/freeglut_main.c: Fixed a bug for UNIX_X11 where window reshape
+	  events were causing freeglut to mark the window as *needing* a reshape
+	  (which during general display callback handling would result in
+	  effectively a glutReshapeWindow()).
+	  
+	  The code is now system-dependant. It should be abstracted to a
+	  function, but is presently copied in two places. Sorry.
+	  
+	  Also, inverted the order of the associated if()/else check (in both
+	  WIN32 and UNIX_X11 branches) since the former "else" part was a
+	  one-line callback invocation.
+	  
+	  This fixes two seemingly unrelated bugs that I was seeing in UNIX_X11.
+
+2003-12-01  Christopher John Purnell
+
+	* src/freeglut_internal.h: Added missing prototype for new list
+	  function.
+
+2003-11-28  Christopher John Purnell
+
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_structure.c: Timer optimizations. Made the list of
+	  pendinig timers ordered. Added a free list of used timer structures.
+	* src/freeglut_callbacks.c: Timer optimizations.
+	* src/freeglut_window.c: Fixed windows compilation problem with last
+	  update.
+
+2003-11-27  Christopher John Purnell
+
+	* src/freeglut_gamemode.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_structure.c, src/freeglut_window.c: Window close fix. The
+	  default behaiour should now be the same as with glut.
+
+2003-11-26  rkrolib
+
+	* src/freeglut_init.c: Added change from Nigel to have resize events
+	  cause redraw events in WIN32. Also slightly reshuffled comments to
+	  deal with line-wrap issues.
+
+2003-11-25  rkrolib
+
+	* src/freeglut_main.c: John reported, and fixed, a problem that recent
+	  changes caused for the Lorenz demo (seems to be WIN32 specific).
+	* src/freeglut_structure.c: Update from John: Removed the freeglut hack
+	  of decrementing the highst-window-ID marker when the highest window is
+	  deleted. (This was a half-way measure for an idea that was decided to
+	  be dubious in the first place.)
+	* configure.in, progs/demos/Makefile.am, progs/demos/shapes,
+	  progs/demos/shapes/Makefile.am, progs/demos/shapes/shapes.c: Added a
+	  new demo (from Nigel) showing some of the basic GLUT geometry shapes.
+	  "shapes" is the name of the demo.
+	* include/GL/freeglut_ext.h, src/freeglut_geometry.c: Commit of work
+	  from Nigel:
+	  
+	  Massive rework of the geometric primitive code. Includes a new
+	  primitive (cylinder; solid and wireframe) and corresponding update to
+	  freeglut_ext.h for the prototype.
+	* src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_structure.c: More work from John (sorry for
+	  procrastinating):
+	  
+	  * We forgot to bump our version number in freeglut_internal.h It is
+	  now at 2.0.2 (actually, I think that 2.1.0 might be a better choice),
+	  which is presumably going to be our next formal release. 2.0.1 is
+	  incorrectly identified as 2.0.0 in the header.
+	  
+	  * A typo in a comment has been corrected ("than"/"that").
+	  
+	  * Numerous "manual" checks for callbacks are omitted now, since
+	  INVOKE_WCB() does this for us. These were holdovers from the
+	  pre-INVOKE_WCB() days. There may be some very subtle changes in
+	  freeglut behavior, since freeglut used to test the callbacks a little
+	  earlier in some cases and may have skipped some minor things (like
+	  changes to the current window) in some special cases, otherwise. It is
+	  not believed that any documented behavior is broken, and it is
+	  unlikely---not to say impossible---that any extant applications will
+	  detect the change. It is even possible that there is no external
+	  behavioral change in freeglut.
+	  
+	  This also significantly simplifies some sections of code that used to
+	  have conditional execution. "Unconditional code is simpler code" as
+	  one of the comments used to say.
+	  
+	  * Lots of XXX commentary is now removed. Some of it was obsoleted by
+	  other changes, some by changes from John.
+	* src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_structure.c: Change from John (I removed a couple of
+	  spaces from a couple of lines in his freeglut_internal.h file where
+	  they were wrapping in EMACS; otherwise, the files are exactly as he
+	  sent them to me).
+	  
+	  The change unifies the WIN32 and UNIX_X11 code by defining our own
+	  window-handle-type in freeglut_internal.h. This let John rip out some
+	  #if garbage in several places. The result is clearer code.
+	  
+	  Thanks, John!
+
+2003-11-21  rkrolib
+
+	* src/freeglut_font.c, src/freeglut_geometry.c,
+	  src/freeglut_glutfont_definitions.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_misc.c, src/freeglut_state.c, src/freeglut_structure.c,
+	  src/freeglut_window.c: Numerous style normalizations from John:
+	  
+	  * Convert "return( value );" to "return value;" * Normalize spacing
+	  around semicolons. * Remove extraneous parens. * Split multi-statement
+	  lines into multiple lines. (Mostly things of the form: "if( condition
+	  ) return;".)
+	* src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_window.c:
+	  All changes are from John, except for: (a) I re-inserted the meat of a
+	  comment that I still feel is relavent. (b) I fixed a compile-time
+	  error in the UNIX_X11 code where a variable is declared after
+	  executable code in a block without creating a new sub-block for the
+	  declaration.
+	  
+	  Changes from John include: (a) Style revision. (b) Changes to postpone
+	  the handling of window resizes.
+	  
+	  Lots of lines were changed, but I think that thos two cover the ground
+	  that he hit. See the diffs for details.
+
+2003-11-18  Christopher John Purnell
+
+	* src/freeglut_cursor.c, src/freeglut_ext.c, src/freeglut_geometry.c,
+	  src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_menu.c, src/freeglut_state.c, src/freeglut_structure.c:
+	  Lots of stuff that John F. Fay pointed out. Plus some changes to
+	  remove gcc warnings.
+
+2003-11-17  Christopher John Purnell
+
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_state.c, src/freeglut_structure.c: Fix spelling mistake
+	  in a variable name. Added a comment for John Fay. Added the copyright
+	  notice for XParseGeometry source.
+
+2003-11-16  Christopher John Purnell
+
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_state.c, src/freeglut_structure.c: Made Modifers variable
+	  global as per glut classic.
+	* src/freeglut_init.c: Removed old unused glutInitDisplayString code.
+	  Reformated new glutInitDisplayString and XParseGeometry code.
+	* src/freeglut_init.c: Use XParseGeometry for better geometry parsing.
+	  Moved geometry parsing to after fgInitialize() so we can use the
+	  screen size to correctly calculate negative positions in the geometry
+	  string. Copied the code for XParseGeometry from the X11 sources for
+	  use in the Win32 version. freeglut now passes test1 of the glut test
+	  suite.
+
+2003-11-15  Christopher John Purnell
+
+	* src/freeglut_gamemode.c, src/freeglut_init.c, src/freeglut_internal.h,
+	  src/freeglut_main.c, src/freeglut_structure.c, src/freeglut_window.c:
+	  Removed the state variable BuildingAMenu. Instead pass a new parameter
+	  isMenu to fgCreateWindow(). Elsewhere use window->IsMenu.
+	* src/freeglut_init.c: freeglut_assert_ready is going to have to go at
+	  some point. But for now I've moved setting fgState.Initalized to
+	  GL_FALSE.
+	* src/freeglut_callbacks.c, src/freeglut_display.c,
+	  src/freeglut_gamemode.c, src/freeglut_init.c, src/freeglut_internal.h,
+	  src/freeglut_joystick.c, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_misc.c, src/freeglut_state.c, src/freeglut_structure.c,
+	  src/freeglut_window.c: Replace TRUE with GL_TRUE and FALSE with
+	  GL_FALSE where the type is GLboolean.
+
+2003-11-15  rkrolib
+
+	* src/freeglut_main.c, src/freeglut_menu.c: Normalized the spacing
+	  around symbols, for the most part. Ho-hum.
+
+2003-11-15  Christopher John Purnell
+
+	* src/freeglut_main.c: Added a call to fgDeinitialize() before the call
+	  to exit() in fgError().
+
+2003-11-15  rkrolib
+
+	* src/freeglut_joystick.c: Style normalizations to the joystick code.
+
+2003-11-15  Christopher John Purnell
+
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_state.c, src/freeglut_structure.c, src/freeglut_window.c:
+	  Added a new state variable "Initalized". Replaced referenced to
+	  Time.Set with this new variable where appropriate. fgElapsedTime() now
+	  set the start time if Time.Set is false. Moved
+	  glutGet(GLUT_ELAPSED_TIME) handling to before the assert.
+
+2003-11-14  rkrolib
+
+	* src/freeglut_internal.h: Normalized the internal header's style a bit.
+	* src/freeglut_init.c: Plowed one more file this morning. Still just
+	  trivial formatting issues.
+	  
+	  And I left alone the "INIT DISPLAY STRING PARSING" section, since it
+	  still appears to be in flux.
+	* src/freeglut_font.c, src/freeglut_gamemode.c: Yet more trivial style
+	  normalizations.
+	  
+	  Sorry, but that's all that I'm up to at the moment. On the plus,
+	  excepting the font_data file (which I've been skipping), up through
+	  this file, I think that the code style is pretty close to uniform.
+	* src/freeglut_font.c: Minor style corrections.
+	* src/freeglut_display.c: Minor spacing quibble.
+	* src/freeglut_cursor.c: Added a brief explanatory note to the X code
+	  for GLUT_CURSOR_NONE.
+	  
+	  Corrected the indentation of a block of code.
+	* src/freeglut_window.c: Noted one of a few cases where we do something
+	  immediately that could more efficiently be postponed, quite
+	  easily---and which GLUT promises *is* to be postponed. (It is unlikely
+	  that the difference will break any apps, but postponing should be
+	  easy...)
+	  
+	  No real change, just a comment in the code.
+
+2003-11-11  rkrolib
+
+	* ChangeLog: Updated ChangeLog for the day.
+	* include/GL/freeglut_std.h, progs/demos/One/one.c, src/freeglut_ext.c,
+	  src/freeglut_font.c: Removal of all remaining TABs in the freeglut
+	  *.[ch] files. (I missed a few in the "one" demo, it seems, and some
+	  more crept back into freeglut_(ext|font).c, presumably due to my own
+	  edits when I forgot to use the "freeglut-c-mode" in EMACS.)
+	* progs/demos/One/one.c: Moved glutInit*() functions ahead of
+	  glutInit(). (This is proper use of glutInit() in general, since it
+	  allows the user to override settings via {argc, argv} command-line
+	  params.)
+	* progs/demos/One/one.c: Style normalizations: Removed CRs and hard TABs
+	  mostly.
+	* ChangeLog, src/freeglut_structure.c: Corrected the numbering of the
+	  ChangeLog (there were two (110)s).
+	  
+	  Added entries summarizing my commits since September or late August,
+	  for the benefit of those lacking both CVS and web access.
+	* progs/demos/demos.dsw: Added CRs to the ends of all lines in MS
+	  developer studio demos.dsw file..
+
+2003-11-10  rkrolib
+
+	* src/freeglut_main.c: John's fix for the minimize/close/maximize
+	  controls no longer working. WIN32 expected us to pass the message on
+	  up the chain (or do something else with it), rather than just throwing
+	  away the event, for a certain class of events. (See the diffs for more
+	  details.)
+	  
+	  The code is also slightly reformatted from what was previously in the
+	  repository.
+	* freeglut.dsp, freeglut_static.dsp,
+	  progs/demos/CallbackMaker/CallbackMaker.dsp, progs/demos/demos.dsw: A
+	  *.dsp file for CallbackMaker in the demos.
+	  
+	  Plus updated *.dsp and *.dsw files to reflect the new freeglut header
+	  file.
+	  
+	  NOTE: The prior version of the *.dsw file does not in fact have CRs. I
+	  thought that it did. For consistancy, I am not putting them in in this
+	  version, either. (At least one person said that his MSVC++ system is
+	  happy with the current files. If there are problems, we can easily add
+	  the CRs, but that should be a separate commit...)
+	* configure.in, progs/demos/CallbackMaker,
+	  progs/demos/CallbackMaker/CallbackMaker.c,
+	  progs/demos/CallbackMaker/Makefile.am,
+	  progs/demos/Fractals_random/fractals_random.c,
+	  progs/demos/Makefile.am: New demo from John: CallbackMaker.
+	  
+	  This demo shows the use of every callback that you can register with
+	  freeglut, and also generates event reports so that you can see what is
+	  happening to the program as it runs.
+	  
+	  Not much to look at, but both utilitarian and a practical example.
+	  
+	  Please double-check that I updated everything that needs to be
+	  updated. I reran autogen.sh and ./configure, and it built okay for me.
+	  (^&
+	* src/freeglut_structure.c: Hm. I thought that I already hit this file
+	  for style normalization. Oh well... Should be no functional changes.
+	  Should be pretty close to in-line with the style of changes that I've
+	  been making else- where.
+	* src/freeglut_structure.c: Ooops. Forgot that we already had a call to
+	  fgClearCallBacks() in the code and added a second one. I just deleted
+	  the new one. Sorry.
+	* src/freeglut_structure.c: Added Nigel's suggested code to clear all
+	  but the destroy callback early on, leaving Destroy to be cleared later
+	  after the last possible point where it should be invoked.
+	* src/freeglut_menu.c: Modified the menus to refer to {border} rather
+	  than {FREEGLUT_MENU_BORDER}, in fghDisplayMenuBox(). The local
+	  variable was already defined and used for some purposes, so we might
+	  as well use it throughout. It does serve to shorten and clarify the
+	  code a bit---though I have mixed feelings about creating aliases that
+	  way.
+	  
+	  Still, the variable already existed and was already used in places.
+	  (We could even move it into the freeglut state, or make it a {const
+	  static} value...)
+	  
+	  Oh well. Stuff to ponder.
+	* src/freeglut_cursor.c: Well, a couple of days have gone by, so I
+	  assume that items (a) and (b) in the freeglut_cursor.c file's "Open
+	  issues" comment are now satisfactor- ily closed.
+	  
+	  I also partially implemented some error-checking, using my limited
+	  understanding of how Xlib users are supposed to do this. (No one
+	  commented about the lack of error-checking, pro or con. Perhaps
+	  someone will care to comment now?)
+	  
+	  At present, it just will print out a warning, via fgWarning(). In part
+	  because I'm not sure what is best to do, and in part because failure
+	  to set the cursor type is probably not a fatal problem.
+
+2003-11-08  Christopher John Purnell
+
+	* progs/demos/Fractals/Makefile.am,
+	  progs/demos/Fractals_random/Makefile.am,
+	  progs/demos/Lorenz/Makefile.am, progs/demos/One/Makefile.am: Applied
+	  Braden McDaniel's non-srcdir build patch.
+
+2003-11-08  rkrolib
+
+	* src/freeglut_menu.c: A first pass over freeglut_menu.c to bring it in
+	  line with the rest of freeglut's style. Mostly re-indenting and
+	  splitting long lines. For those that may be concerned: No, I didn't do
+	  any more arrangments of the form (CONST == a) rather than (a ==
+	  CONST). (^&
+	* progs/demos/Fractals_random/fractals_random.c: Altered the way that
+	  the {random} value (from 0..3) is chosen.
+	  
+	  Previously, it picked out two adjacent bits in the result of rand().
+	  Unfortunately, these adjacent bits (at least on NetBSD) have a certain
+	  amount of dependance. After a period (perhaps a thousand or so?), it
+	  starts to repeat the pattern of those two bits. (I think; I haven't
+	  actually tested that directly.) This presumably is locking it into a
+	  an an N-way attractor on the "snowflake", such that if you zoom in a
+	  ways, you will start to see some spots *quickly* are colored, and
+	  others are *never* colored.
+	  
+	  What I've done now is to pick up two widely-spaced bits in a single
+	  rand() call. (Perhaps we would do as well to pick up something like
+	  bit #16 from two consecutive rand() calls?) These widely-spaced bits
+	  have a lower statistical dependance on one another (if I can get away
+	  with using that term for an arithmetic operation; though since stats
+	  has more to do with sampling and less to do with true randomness, I
+	  may be safe).
+	  
+	  The net effect, at leats on NetBSD, is far better snowflake if you
+	  zoom in on it.
+
+2003-11-07  rkrolib
+
+	* src/freeglut_main.c: From John:
+	  
+	  [This] implements the visible/invisible for Windows. It does NOT call
+	  the visibility callback, though.
+	* src/freeglut_main.c: Stripped out the now truly extraneous {braces} in
+	  such forms as:
+	  
+	  if( ... ) { INVOKE_WCB( ... ); }
+	  
+	  Check for compiling on WIN32.
+	* src/freeglut_internal.h: Adopted Eero Pajarre's suggestion of using a
+	  do { ... } while rather than { ... } for the INVOKE_WCB() macro. This
+	  lets it be used "more like a function", in that:
+	  
+	  if( ... ) INVOKE_WCB( ... ); else ...
+	  
+	  ...is now legal.
+	* src/freeglut_main.c: Pure code janitoring: Shuffled the order of some
+	  of the case statements in the UNIX_X11 X event processing loop. (In
+	  general, it's nice to have case statements sorted, especially when you
+	  have a *huge* switch statement like this. That makes it easier to find
+	  the one that you're looking for, and to see if a certain case is
+	  defined...)
+	* src/freeglut_main.c: Combined EnterNotify and LeaveNotify event
+	  processing in the UNIX_X11 event loop.
+	* src/freeglut_main.c: Added ReparentNotify case to UNIX_X11 event loop,
+	  to catch the extraneous ReparentNotify event types (type 21).
+	* src/freeglut_internal.h, src/freeglut_structure.c: Oh well, I might as
+	  well add the call to clear callbacks on window destruction. Also
+	  renamed the function to do this: fgClearCallBacks(). Ho-hum.
+	* src/freeglut_internal.h, src/freeglut_structure.c: Added
+	  fgInitCallBacks() to freeglut_structure.c. (The function takes an
+	  {SFG_Window *}.) Added prototype to freeglut_internal.h. Added use of
+	  the function to the window initialization. (Don't count on calloc(),
+	  which sets all bits to 0.)
+	* src/freeglut_gamemode.c: Style normalization; removal of
+	  say-nothing-useful comments.
+	* src/freeglut_font.c: Normalized the style of freeglut_font.c No
+	  substantial alterations.
+	* src/freeglut_ext.c: Somewhat normalized the style of this file.
+	  
+	  Also moved the "glutMouseWheelFunc" extension down into the
+	  "extensions" part of the table. (Purely internal organization. It will
+	  still be found.)
+	* src/freeglut_display.c: Further normalization of the code's style. No
+	  substantial changes.
+	* src/freeglut_cursor.c: Split one last overlong line in
+	  freeglut_cursor.c.
+	* src/freeglut_cursor.c: Added GLUT_CURSOR_NONE support in UNIX_X11
+	  (well, NetBSD; you lot need to try it on others; (^&).
+	  
+	  Deallocated some resources that we are creating. VERY slight memory
+	  leak, but plugged now.
+	  
+	  These two complete the first two "Open issues" ( (a) and (b) ). The
+	  first one also completes X support for glutSetCursor(). If others can
+	  verify, we can fully demote the outstanding bug over this to
+	  WIN32-specific.
+	  
+	  I'll delete the dead Open issues and re-letter the others if someone
+	  will cross-check me. Or if no one says anything in a day or two. (^&
+	* src/freeglut_cursor.c: Further normalized the style of the cursor
+	  code.
+	* src/freeglut_callbacks.c: Slight style improvements. Two rules of
+	  thumb that are almost always good to apply:
+	  
+	  * Don't write a == CONST. Instead, write CONST == a. Or, more
+	  generally (in C like languages): Avoid putting an lvalue on the
+	  left-hand side of an == comparison. (For consistancy, I try to avoid
+	  lvalues on the left- hand side of any comparison---but == is the most
+	  notorious.)
+	  
+	  (An "lvalue" is a value that can safely go on the left side of an "="
+	  assignment, of course. (^&)
+	  
+	  * Do not write if( !condition ) return; other_thing; return;
+	  
+	  (See page 18 of K&P's _The Elements of Programming Style_.)
+	  
+	  Instead, it is better to just write:
+	  
+	  if( condition ) other_thing; return;
+	  
+	  There are times when sacrificing structured programming (e.g., via
+	  multiple return statements) is okay. But, here, there is no apparent
+	  gain---indeed, there seems only loss---in the non-structured code.
+	* src/freeglut_main.c: Grr. Forgot to enable the "freeglut" C
+	  programming mode in EMACS, and had a few TABs in the last commit. This
+	  fixes that. Sorry.
+	* src/freeglut_main.c: Minor corrections to the UNIX_X11 mouse-wheel
+	  support. In part this reflects that {button} is already shifted to the
+	  GLUT numbering, and hence should be counted as 3&4, 5&6, etc.
+	  
+	  The other change was simply to clarify the computation of {direction}.
+	  The original code did some clever arithmetic. The new code is more
+	  straightforward, even if it requires more lines to express.
+
+2003-11-06  rkrolib
+
+	* src/freeglut_main.c: Ooops. I screwed up on part of John's fixes.
+	  Sorry.
+	  
+	  I think that I have his fix properly committed now. Mea culpa.
+	* src/freeglut_callbacks.c, src/freeglut_internal.h,
+	  src/freeglut_main.c, src/freeglut_structure.c: Cleanup pass after
+	  committing callback conversion (from structure to array-of-pointers).
+	  Mostly deleted commented-out struct-based code. Also added some XXX
+	  comments that I though should be pondered. (My own pair of eyes, and
+	  one brain cell, were not sufficient at this time to decide what to do
+	  for those ponderables. (^&)
+	* src/freeglut_callbacks.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_joystick.c, src/freeglut_main.c,
+	  src/freeglut_misc.c, src/freeglut_structure.c: Converted the
+	  "Callbacks" structure (with named members holding individual callback
+	  pointers) to a "CallBacks" array in fgState. (This is to allow us to
+	  write a loop to clear all callbacks from windows when the window is
+	  dead/dying. Using this, we can safely assign NULL to each in a loop.)
+	  
+	  Support includes two new macros, FETCH_WCB() and INVOKE_WCB(). See
+	  freeglut_internal.h for more details there.
+	  
+	  Some typedefs of function pointer types were altered to make them more
+	  uniform (necessary for the macros).
+	  
+	  All references to window-based callbacks in freeglut are updated to
+	  use the new macros.
+	  
+	  Old usages will cause compile-time errors.
+	  
+	  As a side bonus, the new invocation macro sets the current window and
+	  checks pointers so that these common steps can be uniformly done on
+	  every window-based callback. This makes it easier to do things right.
+	  At the same time, the array notation (and now required associated
+	  casts) make it harder to bypass the macros and abuse the function
+	  pointers, in general.
+	  
+	  After this commit, I will go through the code and clean up dangling
+	  issues about formatting. This commit is just a "it now works, let's
+	  checkpoint it" type of affair.
+	* src/freeglut_main.c: From John, a couple of lines needed to be changed
+	  to fix the mouse wheel support on WIN32.
+	* progs/demos/Fractals_random/fractals_random.c: Update from John:
+	  Includes mouse button, mouse motion, and mouse wheel support.
+
+2003-11-04  rkrolib
+
+	* src/freeglut_menu.c: Multiple changes from John. Style issues, plus a
+	  bug-fix to check a pointer before deallocating some memory.
+	  
+	  He also removed one obsolete comment, and added some more comments.
+	* src/freeglut_main.c: Some changes, mostly from John. Mostly style
+	  changes.
+	  
+	  One bug fix from John: Execution state bug-fix in glutMainLoop(), per
+	  his post yesterday.
+	  
+	  One fix from me: Changed "if( ButtonPress )" to "if( pressed )".
+	  {ButtonPress} is a constant.
+	* progs/demos/Fractals_random/fractals_random.c: Per John's emailed
+	  desire to have all files obey UNIX EOL conventions, I have stripped
+	  out carriage returns from this file.
+	  
+	  This is the *only* change, but every line is touched. If you want to
+	  see the real differences between older and newer versions, you will
+	  have to get local copies of each and first match their EOL
+	  convnetions.
+	* progs/demos/Lorenz/lorenz.c: Update from John:
+	  
+	  I [John] added a feature to check for memory leaks under Windows.
+	* progs/demos/Fractals_random/fractals_random.c: Update from John:
+	  
+	  I [John] converted everything to double precision to avoid compiler
+	  warnings. I also added a feature to check for memory leaks under
+	  Windows and removed a memory leak (surprise!).
+	* src/freeglut_callbacks.c, src/freeglut_cursor.c,
+	  src/freeglut_display.c, src/freeglut_ext.c, src/freeglut_font.c,
+	  src/freeglut_gamemode.c, src/freeglut_geometry.c,
+	  src/freeglut_glutfont_definitions.c, src/freeglut_init.c,
+	  src/freeglut_joystick.c, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_misc.c, src/freeglut_overlay.c, src/freeglut_state.c,
+	  src/freeglut_structure.c, src/freeglut_teapot.c,
+	  src/freeglut_videoresize.c, src/freeglut_window.c: Got rid of the
+	  G_LOG_DOMAIN junk, per discussion on the mailing list.
+	* src/freeglut_callbacks.c: Minor formatting quibbles. (The brain isn't
+	  up to anything more serious at the moment.)
+	* src/freeglut_main.c: Missed a block where one level was 2-space
+	  indented.
+	  
+	  Nit-picked a few other lines for consistancy.
+
+2003-11-03  rkrolib
+
+	* src/freeglut_init.c: Fixed a memory leak (thanks for the correction,
+	  John!).
+	  
+	  Smoothed over some code style issues while I was here, but left the
+	  init-string parsing alone for now.
+	* freeglut13.dsp, freeglutdll.dsp, freeglutstatic.dsw: Deleted 3 files
+	  (again?) from CVS, on John's request. Old/obsolete MSVC++ project
+	  files. (freeglut13.dsp, freeglutdll.dsp, freeglutstatic.dsw)
+	* src/freeglut_main.c, src/freeglut_structure.c: * Indentation issues. *
+	  Pulled some common code into a nicely packaged function. * Found some
+	  pointer/int issues.
+	* src/freeglut_main.c: Heh.
+	  
+	  Forgot to wrap the fgGetXModifiers() in a #if. Fixed.
+	* src/freeglut_main.c: Extracted some common code to a subroutine, in
+	  glutMainLoopEvent(). (The common code was a snippet to compute X
+	  keyboard modifiers as a bit-mask of GLUT symbols.)
+	* src/freeglut_main.c: Caught a few more little style issues.
+	* src/freeglut_main.c: Added a "case" for an X event that we turn on but
+	  do not use. ({MapNotify}). We already caught {MappingNotify} and
+	  {UnmapNotify}.
+	* src/freeglut_main.c: * Fixed a bug in the X11 handling of
+	  scrollwheel/mouse. The old code, I believe, checked if *either* a
+	  wheel or button callback was set, and then decided which to use---and
+	  unconditionally called it. I left the "either" check in, but added
+	  additional checks before actually doing the invocation. * Lots of
+	  reformatting. Massive. The usual suspects, though, and fairly trivial:
+	  Re-indenting to standard size, shuffling some spaces to match the
+	  freeglut "standard" of: if( ... ) ...and: func( ... )
+
+2003-10-31  rkrolib
+
+	* src/freeglut_callbacks.c: Cleaned up one macro definition.
+	  
+	  Picked up an over-long line that I missed before.
+	* src/freeglut_callbacks.c: Fit some long lines to 80 columns.
+	* src/freeglut_cursor.c, src/freeglut_display.c,
+	  src/freeglut_gamemode.c, src/freeglut_geometry.c: Last of the hard
+	  TABs in the src/*.c files.
+	* src/freeglut_init.c, src/freeglut_joystick.c, src/freeglut_main.c,
+	  src/freeglut_menu.c, src/freeglut_state.c: En masse removal of most (I
+	  think) of the remaining hard TABs in files. There are still a couple
+	  of files that need to be hit.
+	* src/freeglut_window.c: Picked up some stray TABs scattered in this
+	  file.
+	* src/freeglut_window.c: Noted by XXX comments that the XFlush() calls
+	  probably shouldn't be there. Flushing the X protocol stack every
+	  little bit both adds clutter to the code and may impede performance.
+	  
+	  It seems that we should be able to get rid of these, though allowing
+	  client code to directly call glutMainLoopEvent() does make it a little
+	  more complicated.
+	  
+	  Something to ponder.
+	* src/freeglut_window.c: Polished off the say-nothing-new comments and
+	  lines-over-80-columns in freeglut_window.c
+	  
+	  There should be no functional changes.
+	* src/freeglut_window.c: Missed a few say-nothing-new comments in
+	  fgOpenWindow(). Eeep. Should be better now. (^&
+	* src/freeglut_window.c: Cleansed fgCloseWindow(): * say-nothing-new
+	  comments axed. * de-TABbed. * Made the white-space to be consistant.
+	* src/freeglut_window.c: Cleaned up fgOpenWindow(): * Removed TABs. *
+	  Made indentation consistant. * Deleted say-nothing-new comments. *
+	  Changed an *error*check* from an assert to an if(). (The error-check
+	  was on window creation; we don't want to lose that if the user
+	  compiles with asserts deactivated. Also, assert()s really tell us more
+	  about programming errors, rather than run-time errors, so it is a
+	  little misleading to use assert() for error-checks, even if you can
+	  depend upon assert()s never being compiled away to null statements.) *
+	  Added some XXX comments for things that bear some rumination.
+	* src/freeglut_window.c: Cleanup to fgSetWindow(). The usual suspects: *
+	  Removed tabs. * Made indentation consistant. * Killed off
+	  say-nothing-new comments.
+	* src/freeglut_window.c: Cleanup to fgSetupixelFormat(). Should be no
+	  functional changes.
+	  
+	  Code facelift included:
+	  
+	  * Consistant indentation. * Removal of all TABs (there were a bunch).
+	  * Fit to 80 columns.
+	* src/freeglut_window.c: There should be no changes to code
+	  functionality, though a fair bit of little changes to the code
+	  appearance.
+	  
+	  * Fit the comments at the start of the file to fit 80 columns. * Noted
+	  an unusual feature of the ATTRIB() macro. * Added ATTRIB_VAL() macro
+	  which is really just two ATTRIB()s. This lets us put things like
+	  {ATTRIB (GLX_RED_SIZE); ATTRIB (1);} on one statement: {ATTRIB_VAL
+	  (GLX_RED_SIZE, 1);}. I did this to preserve some of the layout of
+	  information while also avoiding the nasty semi-visible ";" in the
+	  middle of a line of code. And by putting the {braces} in the macro
+	  definition, I was able to visually clean code of the form: if
+	  (condition) { ATTRIB( X ); ATTRIB( 1 ); } ...rewriting as: if
+	  (condition) ATTRIB_VAL( X, 1 ); * Eliminated a bunch of
+	  say-nothing-new comments in fgChooseVisual(). * Combined some
+	  semi-useful comments into a block comment summarizing a loop.
+
+2003-10-30  rkrolib
+
+	* src/freeglut_structure.c: Finished off most of the issues with
+	  freeglut_structure.c, from a stylistic point of view (at least,
+	  insofar as: The original file's code was INCON- SISTANT. I did not
+	  remove the "!= NULL" stuff, did not address the shortest-branch-first
+	  issue for if-else statements, and left some rather ugly "if (x) {...
+	  return y} /* else do this */ return NULL;" garbage. This should, I
+	  think, be re-written as "if (x) return y; else return NULL;" or even
+	  better, "ret = NULL; if (x) ret = y; return ret;"
+	  
+	  In short, the code still has some issues, but I think that it's a bit
+	  better.
+	  
+	  (Oh, I also got rid of oustanding TABs.)
+	* src/freeglut_structure.c: Eliminated most of the say-nothing-new
+	  comments.
+	  
+	  Fit most of the code to no more than 80 columns.
+	  
+	  Raised some issues about completeness/correctness of trying to
+	  decrement the max-window-ID (apparently in order to partially recycle
+	  some window IDs to slightly slow the rate of growth of window IDs). (I
+	  didn't change what the code does, though.)
+	  
+	  The functionality of the code should be unchanged.
+	* src/freeglut_main.c: Forgot to set {direction} explicitly to +/- 1 for
+	  freeglut mouse-wheel API on MS-WINDOWS. Oops.
+	  
+	  Now it should always report +/- 1 on MS-WINDOWS, per the spec.
+	* src/freeglut_main.c: Minor fix to allow for multiple ticks to be
+	  received at one time by the WIN32 code. Take abs(direction) as the
+	  number of ticks, and count it down.
+	  
+	  <stdlib.h> *should* be included by freeglut_internal.h, I think, so it
+	  should be okay; otherwise add a suitable #include.
+	* src/freeglut_main.c: Grrr. My attempt to commit got aborted, and the
+	  commit message was lost. Now I've lost track of what I said I'd done.
+	  Something like:
+	  
+	  * Fixed some issues with multiple wheels. * Noted in comments some
+	  issues about other-than-3-real-buttons. * Fixed formatting to fit 80
+	  columns. * Removed some BCPL/C++ style comments (//) that are not
+	  legal, and which, if memory servers, are not even strictly legal when
+	  disabled by preprocessor directives. E.g.,
+	  
+	  #if 0 not-syntactically-valid-C #endif
+	  
+	  ...is not legal. Though most cpp's will discard the bracketed material
+	  completely before the main C compiler pass has a chance to analyze the
+	  syntax. (MSVC++ and GCC both don't seem to mind the BCPL style
+	  comments in plain C, but let's keep the sources clean, eh?) * Fixed a
+	  problem that would have caused freeglut to report doubled wheel events
+	  under XFree86.
+	  
+	  Not tested other than compiling. Personally, I think that the
+	  interface is inherently broken at this point unless you are willing to
+	  get user- configuration. (Which would then solve the complaint that
+	  Steve had about computing the tick-size on behalf of applications.)
+	  I.e., there is NO WAY to know if we have the right buttons to start
+	  wheels at, or if there are any buttons after the first wheel(s), etc.
+	  We just have to guess---and if we are wrong, we can get varying
+	  degrees of brokeness.
+
+2003-10-29  Christopher John Purnell
+
+	* src/freeglut_window.c: There is a problem with the way I did
+	  glutFullscreen() in my last commit. So I've copied the way the game
+	  mode does it. It's not ideal but it works. The glutGet() for the
+	  window border sizes will also have to be fixed at some point.
+	* src/freeglut_window.c: Rewrote glutFullscreen(). It now correctly
+	  places the window in X11. It now uses system dependant code for more
+	  efficient use of windowing system calls.
+
+2003-10-29  rkrolib
+
+	* src/freeglut_joystick.c: Should be no real changes to the code
+	  function.
+	  
+	  I missed a few lines that went past 80 columns. (^&
+	  
+	  Also made formatting more consistant.
+	  
+	  Added a couple of XXX comments re. FreeBSD vs. general BSD #ifdef's.
+	* src/freeglut_joystick.c: Should be entirely superficial changes to
+	  code style:
+	  
+	  * Fit lines to 80 columns. (It does get tiresome seeing long lines
+	  forced to break by the right-hand border of windows...(^&) *
+	  Eliminated say-nothing-new comments. * Made formatting more consistant
+	  in spots. * Eliminated some hard TAB characters.
+	* src/freeglut_joystick.c: Added Thierry's change to include
+	  sys/param.h. This lets us pick out version numbers for OS releases
+	  corresponding to system headers.
+	  
+	  I modified it to also work with NetBSD; I cannot confirm if it is safe
+	  with any other systems, so it remains protected by a #if.
+	* src/freeglut_state.c: Deleted some say-nothing-new comments.
+	  
+	  Added some XXX's where comments seemed to require future attention.
+	  
+	  Added some new comments with XXX's where future attention seems
+	  profitable.
+	* src/freeglut_state.c: Deleted a bunch of say-nothing-new comments.
+	  Someday, there shall be an end to them.
+	* src/freeglut_state.c: Previous changes were made without the freeglut
+	  major mode in EMACS. Re-tweaked some lines (mostly got rid of some
+	  TABs, but also resulted in some changed indentation).
+	  
+	  Reformatted a big comment to fit to 80 columns.
+	  
+	  Removed bogus references to "Linux". (UNIX, and/or X11 were relavent,
+	  and "UNIX/X11" was substituted for "Linux" in those places. This
+	  includes UNIX-alike systems.)
+	* src/freeglut_state.c: Rewrote the TODO BEFORE THE STABLE RELEASE
+	  comment to fit to 80 columns.
+	  
+	  Cleanup of fghGetConfig(). (One return statement, simpler code.)
+	  
+	  Made glutSetOption() have a more consistant style---and also got its
+	  lines to stay under 80 columns.
+	* src/freeglut_misc.c: Got the last of the say-nothing-new comments in
+	  freeglut_misc.c.
+	  
+	  (I would have picked them up before, but wanted the bug-fix and
+	  conversion-to-error-message changes to go in before I did more
+	  superficial stuff.)
+	* src/freeglut_cursor.c, src/freeglut_main.c, src/freeglut_misc.c: *
+	  Fixed a bug that I introduced in fgWarning()/fgError(): I thought that
+	  ((a) || (b)) was defined to have value as: (a) if (a) != 0 (b) if (a)
+	  == 0
+	  
+	  ...instead, it has value 0/1. This was causing a bug. It's probably
+	  just as well, since what I was trying to do definitely fell into the
+	  category of "clever code" rather than "clear code".
+	  
+	  Sorry.
+	  
+	  * Made glutSetKeyRepeat() call fgError() if you go out of range. (The
+	  old code silently did nothing---not even a warning.)
+	  
+	  If it is really desirable to keep running, we should probably at least
+	  generate an fgWarning().
+	  
+	  * Deleted some say-nothing-new comments.
+	  
+	  * XXX added: Is glutSetKeyRepeat() deprecated?
+
+2003-10-28  rkrolib
+
+	* include/GL/freeglut_ext.h, src/freeglut_callbacks.c,
+	  src/freeglut_ext.c, src/freeglut_internal.h, src/freeglut_main.c:
+	  Commit, mostly of work from John:
+	  
+	  * Removed some say-nothing-useful comments. * Added some tentative
+	  mouse-wheel support. * Fairly massive reformatting of code.
+	  
+	  I made some secondary changes to his changes:
+	  
+	  * One compilation error was fixed (missing close-paren + semicolon). *
+	  Deleted a few ore say-nothing-useful comments. * Some of John's code
+	  was strangely formatted to the point that it seemed completely out of
+	  place, so I took the liberty of reformatting it. Since I used GNU
+	  EMACS's <tab> key (which re-indents rather than inserts TAB
+	  characters), I had to propogate some indentation changes a little
+	  further than the bare necessity to match up with John's changes. (John
+	  seems to shoot for 2-space indents, while EMACS (and I, I confess)
+	  strongly prefer 4-space indents. The code that I was re-indenting had
+	  been put to 8-space indents, however.)
+	  
+	  I have *not* tested the code beyond compiling. I assume that John did
+	  (and that the compilation error was a result a minor change just
+	  before asking me to commit).
+	* src/freeglut_cursor.c: Re-indentation style changes from John.
+	  
+	  There should be no alterations to how the code performs.
+	  
+	  (I modified how the X11 section of the set-cursor code is indented to
+	  slightly better match (IMHO) the rest of his changes.)
+
+2003-10-27  rkrolib
+
+	* src/freeglut_menu.c: Converted a few "x != NULL" tests to "x" for
+	  clarity.
+	  
+	  I think that I've touched enough lines of source for one morning.
+	* src/freeglut_menu.c: Cleaned up a little redundancy in a comment on
+	  the {menu_pen_*} variables.
+	* src/freeglut_menu.c: Removed about 90 lines of say-nothing-new
+	  comments.
+	  
+	  The code should be functionally unaltered by these changes.
+	* src/freeglut_menu.c: Propogated a pointer-check from menu-attach to
+	  menu-detach. (Apparently, in some cases, the Menu member variable can
+	  be NULL.)
+	  
+	  Corrected the menu-attach code to make sure that both Window and Menu
+	  pointers are non-NULL (rather than "at least one").
+	  
+	  Rewrote button-checks to more simply and more clearly assert that the
+	  "menu button" is a valid button for menu actions: Instead of
+	  laboriously comparing against the three valid buttons (0, 1, 2 or
+	  GLUT_BUTTON_*), we do a simpler range-check and the upper bound is
+	  {FREEGLUT_MAX_MENUS}, allowing us to change the number of menuable
+	  buttons fairly easily in the future.
+	  
+	  Also deleted a few say-nothing-new comments.
+	* src/freeglut_menu.c: Cosmetic changes (mostly deleted a few more
+	  say-nothing-new comments). The functionality of the code should be
+	  unchanged.
+	* src/freeglut_menu.c: Changed an "#elif TARGET_HOST_UNIX_X11" to
+	  "#else", since this simply governed menu aesthetics. I think that it's
+	  better to have a default that works than to break completely, should
+	  freeglut ever be ported to a new (non-WIN32, non-UNIX/X11) target.
+	* src/freeglut_menu.c: Minor modifications to the menus:
+	  
+	  * Updated an old "TODO BEFORE STABLE" comment.
+	  
+	  * Expanded a comment re. some #define macros.
+	  
+	  * Made colors and font choice system dependant. The UNIX freeglut
+	  menus look more like UNIX GLUT menus, now. (This is PURELY a cosmetic
+	  change. But it achieves better compatibility visually.)
+	* src/freeglut_main.c: Cleaned up glutMainLoop() a bit:
+	  
+	  * Deleted numerous say-nothing-new comments. * Reformatted a
+	  say-something-useful comment to fit on an 80-column display.
+	* src/freeglut_main.c: Partially (re-?)unified some of the
+	  glutMainLoopEvent() code. The only code that really needs to be
+	  system-specific is the window event handling, which in MS-WINDOWS is
+	  tucked into a separate function. In UNIX/X11, it's all spilled out
+	  into glutMainLoopEvent() for some reason.
+	  
+	  If the X11 code could be tucked into another function,
+	  glutMainLoopEvent() could be platform-independant.
+
+2003-10-26  rkrolib
+
+	* src/freeglut_main.c: Moved the idle callback out of
+	  glutMainLoopEvent() and into glutMainLoop(), per discussion on the
+	  list. The code looks okay, to me, though I remain less than wholly
+	  convinced that treating idles as special cases is the best way to go.
+	  Still, a case can be made for taking "non-event" idle callbacks out of
+	  the "event loop". From an organizational perspective, I think that
+	  it's an improvement, and it fixes a bug for at least one program.
+	* src/freeglut_menu.c: Added John's text-positioning modification.
+	  
+	  The lines that he was altering were very oddly-split, so while I was
+	  at it, I repaired the line-break damage.
+	* src/freeglut_joystick.c: Committed change from Nigel to fix the
+	  joystick bug. (The joystick code was not setting the GLUT window prior
+	  to calling callbacks.)
+	  
+	  Please verify. If so, this closes out, I think, the latter half of
+	  that bug report, so anyone with the means to modify/close bug reports
+	  should do so upon verification of the fix.
+	* src/freeglut_main.c: Superficial cleanup of the code. Mostly taking
+	  lines such as:
+	  
+	  ...
+	  
+	  /* * <Enslish recapituation of the single following C statement> */
+	  <single C statement>
+	  
+	  ...and rewrote as:
+	  
+	  ... <single C statement>
+	  
+	  freeglut_main.c still has a lot of that in it, but it looks a bit
+	  better, now.
+	* src/freeglut_init.c: Added some error-checking (particularly w.r.t.
+	  strdup()).
+	  
+	  Deleted numerous 4-line "padding" sequences of C-as-English trans-
+	  literation comments.
+	  
+	  Re-indented some (but not all) code that is using 2-space indentation.
+	  (Most of the freeglut code seems to be using 4-space indentation.)
+	  
+	  I did not touch the "INIT DISPLAY STRING PARSING" code, since it is
+	  filled with a ton of over-long lines and also appears to be in more
+	  flux than the rest of the code. (Well, I added one error-check to a
+	  strdup().)
+	* src/freeglut_font.c: Removed two more bogus "carriage return"
+	  references where the comments were in fact talking about a line feed
+	  (a.k.a. newline, LF, ^J, \n, ...).
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c:
+	  Fixed the buglet about failing to report the program's name on error-
+	  messages. Please test. (Modified glutInit(), the state structure, and
+	  the warn/err functions.)
+
+2003-10-23  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog: Released 2.0.1
+
+2003-10-21  Christopher John Purnell
+
+	* configure.in, include/GL/Makefile.am, include/GL/freeglut.h,
+	  include/GL/freeglut_std.h, include/GL/glut.h,
+	  progs/demos/Fractals/Makefile.am,
+	  progs/demos/Fractals_random/Makefile.am,
+	  progs/demos/Lorenz/Makefile.am, progs/demos/One/Makefile.am,
+	  src/Makefile.am: Added --disable-replace-glut option to autoconf
+	  configure.
+
+2003-10-15  James Jones <puggles@users.sourceforge.net>
+
+	* NEWS: Noted the release of 2.0.0
+	* configure.in: Version bump
+
+2003-10-14  rkrolib
+
+	* src/freeglut_font.c: Swept the freeglut_font.c for comment cleanup: *
+	  Got rid of the "rewrite C as English" comments. * Corrected several
+	  bogus references to "carriage returns" (in strings). The symbols were
+	  newlines or EOLs or LFs (\n). They were *not* carriage returns or CRs
+	  (\r). * Clarified the comments on glBitmap() calls.
+
+2003-10-13  rkrolib
+
+	* progs/demos/Fractals/fractals.c,
+	  progs/demos/Fractals_random/fractals_random.c: Small bug-fix that's
+	  been on my mind:
+	  
+	  Modified the two Fractals* demos so that they only clear (for the
+	  random one) or redraw (for the non-random one) if there is need to do
+	  so. (E.g., pressing the space bar should not clear and redraw the
+	  random fractal since no parameters are altered.)
+	* src/freeglut_cursor.c, src/freeglut_display.c: Removed the obsolete
+	  hack (or very ill-conceived dream), fgDisplayCursor().
+	* src/freeglut_display.c: Cleaned up some of the style issues (mostly
+	  "fluff" comments) in freeglut_display.c.
+	* src/freeglut_cursor.c: Comment-cleaning sweep.
+	  
+	  Mostly got rid of the say-it-in-English comments that were adding 1
+	  line of English and 2 or 3 lines of filler for each of several lines
+	  of C code. Updated a couple of other comments, and tweaked some
+	  white-space.
+	* src/freeglut_callbacks.c: Cleaned up the comments a bit in the
+	  callbacks.c file (mostly removed some of the
+	  kill-4-lines-to-translate-one-line-of-C-into-English comments).
+
+2003-10-12  rkrolib
+
+	* src/freeglut_cursor.c: Added all missing GLUT cursor types for X11.
+	  
+	  (Type NONE is not properly supported, yet.)
+	  
+	  Corrected behavior for the several old types: * Wrong glyphs. *
+	  Reversed glyphs (left/right confusion!)
+	  
+	  There are some remaining imperfections, but it's a lot closer to GLUT
+	  comformity, now.
+
+2003-10-11  rkrolib
+
+	* src/freeglut_callbacks.c: Three tidying-up changes to the code of
+	  freeglut_callbacks.c; none of them are Earth-shattering, but as I
+	  swept through looking somewhat more systematically for errors, I
+	  picked these off. See the diff's for details.
+	* src/freeglut_callbacks.c: Fixed a basic readability/style error in the
+	  code. (Two statements per line are almost never a good idea; in this
+	  case the combined line was past 80 columns.)
+	* src/freeglut_callbacks.c: Added a safety-check on a memory allocation.
+	  (Timers were using dynamic memory allocation but NOT checking the
+	  result!)
+	* src/freeglut_menu.c: Committed two lines from John to help fix the
+	  menus a bit.
+	* src/freeglut_callbacks.c: Check the glutDisplayFunc() callback for
+	  being a NULL pointer. This is illegal and is disallowed in GLUT 3.0+,
+	  so we disallow it too in freeglut 2.0.1+
+
+2003-10-09  rkrolib
+
+	* progs/demos/Fractals/fractals.c,
+	  progs/demos/Fractals_random/fractals_random.c: Applied John's updated
+	  ReadConfigFile() changes to the fractals demos.
+	* progs/demos/Fractals_random/fractals_random.c: Fixed: * glutInit()
+	  ordering w.r.t. glutInit*() and {argv} processing. * Aspect ratio. *
+	  Removed depth-buffer usage. (Also done for Fractals in previous
+	  commit...)
+	* progs/demos/Fractals/fractals.c: A few minor changes: * glutInit*()
+	  calls should preceed glutInit(), per se, generally. This is so that
+	  glutInit()'s configuration (which picks up on user parameters) can
+	  override application defaults. * glutInit() should be called before
+	  ANY attempt to process {argv, argc}. This is because there may be
+	  GLUT/freeglut parameters (such as "-display" on X11). * If the window
+	  is tall and skinny, rather than short and squat, we need to handle
+	  aspect ratios differently.
+	  
+	  The first is a user-interface bug. The second is a serious bug
+	  (especially since the demo assumes that argv[1] contains a filename).
+	  The third is a display bug.
+
+2003-10-08  rkrolib
+
+	* src/freeglut_main.c: Changed CreateNotify (in X11 ONLY) to act like a
+	  ConfigureNotify event.
+	  
+	  This is done so that subwindows on X11 will get "resize" events when
+	  they are created. Old GLUT did this---presumably by design in order to
+	  ensure that (a) All windows get notified of their size as soon as the
+	  window exists, and (b) probably more importantly, so that windows and
+	  sub-windows behave as much alike as possible. I believe that GLUT was
+	  right to do this, and I believe that compatibility requires this (I
+	  have a sample program that breaks in freeglut but not GLUT without
+	  this fix).
+	  
+	  I did not touch the Microsoft side, because I don't know what their OS
+	  does---nor if old GLUT was historically system-dependant about this.
+
+2003-10-08  Eric Sandall
+
+	* ChangeLog, src/freeglut_menu.c: freeglut_menu.c:217,519,532: Fix menus
+	  to stay in the window (John Fay)
+
+2003-10-08  rkrolib
+
+	* src/freeglut_menu.c: Several updates from John and myself.
+	  
+	  The broad outlines are:
+	  
+	  * Color schemes are now in variables, are closer to old GLUT, and are
+	  system dependant (as old GLUT did). * You can change the font to any
+	  bitmapped font more easily, which can aid in finding a better
+	  approximation. (Old GLUT does not seem to have used a GLUT font for
+	  the menus, which causes problems for us.) The menus rescale
+	  automatically, including the triangle "arrow" for sub-menus. * Menus
+	  have real borders, and the placement of highlighting is much improved.
+	* src/freeglut_main.c: Fixed a bug in the menu callback behavior. Menus
+	  were not setting the current window correctly.
+
+2003-10-06  Eric Sandall
+
+	* ChangeLog, src/freeglut_menu.c: freeglut_menu.c:328 Fix submenu
+	  triangle (John Fay)
+
+2003-10-04  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog, src/freeglut_main.c, src/freeglut_structure.c: Tweaking for
+	  menu behavior in Linux regarding mouse whatnot - John Fay
+
+2003-10-01  rkrolib
+
+	* src/freeglut_joystick.c: Applied a patch from "extraeme@netbsd.org" to
+	  add joystick support. Untested, but it compiles for me.
+	  
+	  Should also add Joystick support for older FreeBSD systems. Also
+	  untested.
+	* src/freeglut_main.c: Added support for more arbitrary number of mouse
+	  buttons (though only the first three can work with menus), in X. This
+	  closes a compatibility gap with old GLUT, and leaves us the option of
+	  supporting scroll-wheels properly.
+
+2003-09-27  Christopher John Purnell
+
+	* progs/demos/Fractals/Makefile.am,
+	  progs/demos/Fractals_random/Makefile.am,
+	  progs/demos/Lorenz/Makefile.am, progs/demos/One/Makefile.am: Don't
+	  install the demos.
+
+2003-09-26  James Jones <puggles@users.sourceforge.net>
+
+	* progs/demos/Makefile.am: Package the demos.dsw file.
+	* progs/demos/demos.dsw: Demos workspace for MSVC users
+
+2003-09-24  rkrolib
+
+	* src/freeglut_main.c: Corrected a bug w.r.t. display and joystick
+	  events. When getting ready to sleep, we need to go through ALL windows
+	  to check for pending joysticks and to check for pending redisplays. I
+	  was just going through all TOP- LEVEL windows. Eeek. This won't do.
+
+2003-09-23  Brian Paul
+
+	* progs/demos/Fractals_random/fractals_random.c: added needClear flag to
+	  take care of initial window clear and window resize clears
+
+2003-09-23  rkrolib
+
+	* src/freeglut_init.c: Per Nigel Stewart's comments, converted
+	  
+	  #ifdef TARGET_HOST_...
+	  
+	  to:
+	  
+	  #if TARGET_HOST_...
+	  
+	  in src/freeglut_init.c. These changes should not have any functional
+	  impact at this time, but you don't want bad examples lying around to
+	  trip people up later.
+	* progs/demos/Fractals_random/fractals_random.c, src/freeglut_main.c,
+	  src/freeglut_window.c: Fixed: * GLUT_SINGLE now should behave more or
+	  less correctly. Thanks to Brian Paul!
+	  
+	  * Sleeping is now cognizant of outstanding redisplays.
+	  
+	  * Fractals_random has been restored more or less to as-before, save
+	  that it uses the more minimal glFlush() rather than glutSwapBuffers().
+	  glutSwapBuffers() was only required when freeglut was incorrectly
+	  handling promotion to double-buffering.
+
+2003-09-22  rkrolib
+
+	* src/freeglut_main.c: Moved the #include/#ifdef/#define stuff up to the
+	  top.
+	  
+	  Changed #ifdef to #if, per Nigel(?)'s comment. Ooops.
+
+2003-09-22  Christopher John Purnell
+
+	* progs/demos/Fractals/Makefile.am,
+	  progs/demos/Fractals_random/Makefile.am,
+	  progs/demos/Lorenz/Makefile.am, progs/demos/One/Makefile.am: Fix to
+	  allow demos to compile before freeglut has been installed.
+
+2003-09-22  James Jones <puggles@users.sourceforge.net>
+
+	* progs/demos/Fractals_random/fractals_random.c: Add an idle function to
+	  ensure that the screen gets drawn even when callbacks are not
+	  generated by the mouse/keyboard.
+
+2003-09-21  James Jones <puggles@users.sourceforge.net>
+
+	* progs/demos/Fractals/fractals.c,
+	  progs/demos/Fractals_random/fractals_random.c: Note the possible
+	  buffer overflow in window_title
+	* progs/demos/Fractals/fractals.c: Fix the window title.
+	* progs/demos/Fractals_random/fractals_random.c: Fix window title, and
+	  ensure that the random integer is not forced to be zero (Thanks
+	  Richard Rauch!)
+
+2003-09-20  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_main.c: Richard Rauch's patch to ensure that freeglut
+	  does not use 100% CPU even while idling.
+	* src/freeglut_font.c: Resolution for bug 809561 reported by Nigel
+	  Stewart, regarding a possible array underflow error of -1 in the event
+	  of "character" being zero.
+
+2003-09-14  Christopher John Purnell
+
+	* configure.in, progs/demos/Fractals/Makefile.am,
+	  progs/demos/Fractals_random/Makefile.am,
+	  progs/demos/Lorenz/Makefile.am, progs/demos/One/Makefile.am,
+	  src/Makefile.am: Removed unused AC_PROG_RANLIB from configure.in Added
+	  passing of $(X_CFLAGS) to compiler.
+
+2003-09-14  James Jones <puggles@users.sourceforge.net>
+
+	* include/GL/glut.h: Resolve bug 806008 -- let Microsoft's compiler know
+	  to use Windows libraries even if not using our project files.
+
+2003-09-13  James Jones <puggles@users.sourceforge.net>
+
+	* ChangeLog: Taking care of keeping things mostly up-to-date
+	* TODO: Most everything's been resolved for the 2.0.0 release.
+	* src/freeglut_joystick.c: Thierry Thomas said that FreeBSD has no
+	  machine/joystick.h, instead a sys/joystick.h. I've made the change --
+	  here's hoping it works.
+	* progs/demos/One/one.c: Removed the incorrect relative path for
+	  including freeglut.h
+	* progs/demos/Fractals/Makefile.am,
+	  progs/demos/Fractals_random/Makefile.am,
+	  progs/demos/Lorenz/Makefile.am, progs/demos/One/Makefile.am: Made all
+	  demos compile. Thanks to Thierry Thomas for reporting bug 802809,
+	  which alerted that *none* of the demos compiled automatically!
+	* src/freeglut_main.c: Nigel Stewart's joystick fix (for hopefully all
+	  platforms), SourceForge bug 805481
+	* progs/demos/Lorenz/lorenz.dsp, progs/demos/One/one.dsp: Fix location
+	  of the include files from a fixed to relative path. Closes bug 805477
+	* freeglut.dsp, freeglut.dsw, freeglut_static.dsp, freeglutstatic.dsw:
+	  Add dos line endings. Fixes bug 805476
+
+2003-09-10  Christopher John Purnell
+
+	* src/freeglut_joystick.c: A minor fix to that last commit.
+	* src/freeglut_joystick.c: Removed some remaining glib depandancy.
+
+2003-09-10  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_main.c: Re-add catches for the case in which a menu
+	  callback destroys the menu. - John Fay
+
+2003-09-09  Christopher John Purnell
+
+	* src/freeglut_main.c: More to fix a deinitialization related crash.
+	* src/freeglut_structure.c: Fix for a deinitialization related crash.
+
+2003-09-08  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_main.c, src/freeglut_structure.c: Menus should deallocate
+	  better now - John Fay
+
+2003-09-05  James Jones <puggles@users.sourceforge.net>
+
+	* Makefile.am: Add freeglut_static.dsp to the releases
+
+2003-09-03  Christopher John Purnell
+
+	* src/freeglut_gamemode.c: Moved #ifdef for non XFree86 X11 compile.
+
+2003-09-02  Christopher John Purnell
+
+	* src/freeglut_window.c: Fix to stop fgSetWindow(NULL) crashing on X11.
+
+2003-08-29  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_main.c, src/freeglut_menu.c, src/freeglut_structure.c:
+	  These change a bunch of assignments to calls to set the current window
+	  correctly, and also (possibly) fixes most of the remaining menu
+	  problem. - John Fay
+	* src/freeglut_main.c: Another typecast bugfix from John Fay
+
+2003-08-28  Christopher John Purnell
+
+	* src/freeglut_init.c: Changed #ifdef to #if
+
+2003-08-28  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_font.c: change the GLUT stroke function arguments from
+	  "const char *" to "const unsigned char *" - John Fay
+	* include/GL/freeglut_ext.h, include/GL/glut.h: Changes stroke function
+	  arguments from "const char*" to "const unsigned char *" - John Fay
+
+2003-08-28  Christopher John Purnell
+
+	* freeglut-1.3: Removing files from old freeglut-1.3 directory.
+
+2003-08-28  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_callbacks.c, src/freeglut_geometry.c,
+	  src/freeglut_init.c, src/freeglut_joystick.c, src/freeglut_main.c,
+	  src/freeglut_menu.c, src/freeglut_structure.c: Casting changes, John
+	  Fay
+
+2003-08-27  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_init.c, src/freeglut_internal.h, src/freeglut_main.c,
+	  src/freeglut_menu.c: Major overhaul to the menu system, by John Fay
+
+2003-08-27  Christopher John Purnell
+
+	* include/GL/freeglut.h, include/GL/freeglut_ext.h, include/GL/glut.h:
+	  Added double underscores to the header included macros.
+
+2003-08-20  Christopher John Purnell
+
+	* src/freeglut_gamemode.c: Minor typo fix
+
+2003-08-19  Christopher John Purnell
+
+	* src/freeglut_gamemode.c: Moving that "#if TARGET_HOST_UNIX_X11" to the
+	  correct place.
+
+2003-08-17  Christopher John Purnell
+
+	* ChangeLog, src/freeglut_gamemode.c, src/freeglut_internal.h,
+	  src/freeglut_window.c: Game mode fixes from Bernhard Kaindl and Eric
+	  Espie.
+
+2003-08-05  Christopher John Purnell
+
+	* src/Makefile.am, src/freeglut_menu.c, src/freeglut_window.c,
+	  src/mwmborder.c: Using override_redirect instead of motif wm hints. It
+	  now rasies the menu windows before showing them. Move the show to
+	  after the reshape and position so we don't get a flash of the menu
+	  window at it's old size and position.
+	* src/mwmborder.c: I suspect a lot of people will not have motif
+	  installed.
+
+2003-08-05  Eric Sandall
+
+	* ChangeLog, src/Makefile.am, src/freeglut_window.c: (98)
+	  src/Makefile.am:34 Added mwmborder.c (99) src/freeglut_window.c:67
+	  Removed #included "mwmborder.c"
+	* ChangeLog, src/freeglut_main.c: src/freeglut_main.c:816 and :1571, set
+	  the current window (John F. Fay)
+
+2003-08-04  Christopher John Purnell
+
+	* src/freeglut_state.c: Added X11 code for
+	  glutGet(GLUT_WINDOW_BORDER_WIDTH) and
+	  glutGet(GLUT_WINDOW_HEADER_HEIGHT).
+	* src/freeglut_internal.h, src/freeglut_state.c: Replacing
+	  glutGet(GLUT_WINDOW_X) and glutGet(GLUT_WINDOW_Y) on X11 with
+	  something that works. Also a minor correction to the xf86vidmode
+	  autoconf stuff.
+
+2003-08-04  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_window.c: Keep the X11 decoration-zapping code confined
+	  to X11-using platforms! Oops!
+	* src/freeglut_window.c, src/mwmborder.c: Menus' decorations are removed
+	  on Linux. Not sure if we want the mwmborder.c a separate file or not;
+	  doing it separate for right now. Makefile was not updated, since the
+	  .c is just #included.
+
+2003-08-03  Christopher John Purnell
+
+	* configure.in: Got rid of configure warnings when using a newer
+	  autoconf
+
+2003-08-02  Christopher John Purnell
+
+	* src/freeglut_glutfont_definitions.c, src/freeglut_internal.h: Putting
+	  stuff back that was undone with the menu code committed.
+
+2003-08-02  James Jones <puggles@users.sourceforge.net>
+
+	* src/freeglut_callbacks.c, src/freeglut_display.c,
+	  src/freeglut_glutfont_definitions.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_menu.c,
+	  src/freeglut_state.c, src/freeglut_structure.c, src/freeglut_window.c:
+	  Major menu changes (they appear in their own window, have own
+	  rendering context) by John Fay and a little by James C. Jones. They
+	  work perfectly on Win32, and work... on Linux.
+
+2003-08-01  Christopher John Purnell
+
+	* configure.in, src/Makefile.am, src/freeglut_glutfont_definitions.c,
+	  src/freeglut_internal.h: Added autoconf detection for the xf86 vid
+	  mode extentions.
+
+2003-08-01  Eric Sandall
+
+	* ChangeLog, src/freeglut_window.c: src/freeglut_window.c:551 Removed
+	  extra carriage return for Windows users (John F. Fay)
+	* ChangeLog: Credit Dave Reed for fix
+	* ChangeLog, src/freeglut_internal.h: src/freeglut_initial.c:91 Added
+	  check for SOLARIS OS
+
+2003-07-23  Christopher John Purnell
+
+	* include/GL/glut.h, src/Makefile.am, src/freeglut_font.c,
+	  src/freeglut_glutfont_definitions.c: This should put an end to the
+	  font binary compatibility issue.
+
+2003-07-23  Eric Sandall
+
+	* ChangeLog, src/freeglut_window.c: src/freeglut_window.c Windowing
+	  fixes from John F.
+	* ChangeLog, doc/Makefile.am: doc/Makefile.am:4 Removed trailing
+	  backslash and added an empty last line
+
+2003-07-23  Brian Paul
+
+	* doc/download.html: no change, testing CVS
+
+2003-07-22  Brian Paul
+
+	* doc/download.html: no change, just testing CVS
+
+2003-07-22  Eric Sandall
+
+	* ChangeLog, freeglut.lsm: freeglut.lsm:3 Removed 'beta' label for next
+	  release, thanks to Bernhard Kaindl.
+
+2003-07-21  Christopher John Purnell
+
+	* src/Makefile.am: The version info had the revision and the age
+	  transposed.
+
+2003-07-21  Eric Sandall
+
+	* ChangeLog, src/Makefile.am: src/Makefile.am:38 Changed versioning to
+	  11:0:8 thanks to Bernhard Kaindl
+
+2003-07-17  Eric Sandall
+
+	* ChangeLog, freeglut.dsp, freeglut_static.dsp: Applied John F. Fay's
+	  fixes to freeglut.dsp and freeglut_static.dsp
+	* ChangeLog, src/freeglut_state.c: Changed the overlay
+	  (freeglut_state.c:662) to return FALSE, as it's not imp lemented yet
+
+2003-07-12  Andreas Umbach <marvin@dataway.ch>
+
+	* src/Makefile.am: renamed freeglut library to glut, bumped version info
+	  to 3:8:0
+	* configure.in: bumped version number to 2.0.0
+	* Makefile.am, configure.in, doc/Makefile.am, include/GL/Makefile.am,
+	  progs/Makefile.am, progs/demos/Fractals/Makefile.am,
+	  progs/demos/Fractals_random/Makefile.am,
+	  progs/demos/Lorenz/Makefile.am, progs/demos/Makefile.am,
+	  progs/demos/One/Makefile.am, src/Makefile.am: changes for make dist
+	* freeglut13.plg: MSVC generated file
+
+2003-07-11  Christopher John Purnell
+
+	* include/GL/glut.h, src/freeglut_font.c: Fix for the font binary
+	  compatibility problem.
+
+2003-07-10  Christopher John Purnell
+
+	* src/Makefile.am: Changed to build libfreeglut.so.2.0.0
+
+2003-07-10  James Jones <puggles@users.sourceforge.net>
+
+	* TODO, freeglut.dsp, freeglut_static.dsp: Changes to TODO, Windows
+	  files - from John Fay
+	* progs/demos/Fractals_random/Fractals_random.dsp: Changes by John Fay
+	* progs/demos/Fractals/Fractals.dsp, progs/demos/Fractals/fractals.c:
+	  Changes to the Fractals demo by John Fay
+	* progs/demos/One/one.dsp: Initial project file from John Fay
+	* progs/demos/Lorenz/lorenz.c, progs/demos/Lorenz/lorenz.dsp:
+	  Modifications from John Fay
+
+2003-07-07  Christopher John Purnell
+
+	* src/freeglut_main.c: glutMainLoopEvent() was not closing windows
+	  properly. Moved call to fgCloseWindows() from glutMainLoop() to the
+	  end of glutMainLoopEvent().
+
+2003-07-03  Eric Sandall
+
+	* ChangeLog, src/freeglut_misc.c: Removed unused char *ptr from
+	  freeglut_misc.c
+
+2003-07-02  Christopher John Purnell
+
+	* src/freeglut_main.c: It was crashing on and event for a unknown
+	  window.
+
+2003-07-02  Brian Paul
+
+	* src/freeglut_misc.c: rewrite of glutExtensionSupported - works
+	  correctly now
+
+2003-07-02  Eric Sandall
+
+	* ChangeLog: * Removed tests directory
+	* ChangeLog, Makefile.am, configure.in, progs/demos/One,
+	  progs/demos/One/Makefile.am, progs/demos/One/one.c, tests: * Removed
+	  genfonts/genstrokes code, updated configure.in and Makefile.in
+	  
+	  * Moved tests/one.c into progs/demos/One/one.c, updated configure.in
+	  and Makefile.in
+	* genfonts: Removed genfonts
+
+2003-07-02  Christopher John Purnell
+
+	* genfonts/to_stroke.y: Added some semicolons that yacc was warning
+	  about.
+
+2003-07-01  James Jones <puggles@users.sourceforge.net>
+
+	* AUTHORS: John Fay commanded me to add my name to the file. He's crazy,
+	  but that's okay.
+
+2003-07-01  Eric Sandall
+
+	* ChangeLog, src/freeglut_misc.c: Fixed the 'ptr + len' problem in
+	  freeglut_misc.c:90
+
+2003-07-01  Brian Paul
+
+	* doc/freeglut_user_interface.html: version bumps
+	* tests/Makefile.am: bump version to 2.0
+	* src/Makefile.am, src/freeglutdll.def: bump versions to 2.0
+	* src/freeglut_gamemode.c: xf86VidMode error checking (Andrew
+	  Lentvorski)
+
+2003-06-30  Brian Paul
+
+	* progs/demos/Lorenz, progs/demos/Lorenz/lorenz.c,
+	  progs/demos/Lorenz/lorenz.dsp: Lorenz attractor demo (John Fay)
+	* freeglut.dsp, freeglut_static.dsp: updates from John Fay
+
+2003-06-28  Eric Sandall
+
+	* ChangeLog, include/GL/Makefile.am: Now installs freeglut_ext.h and
+	  glut.h to /usr/include/GL (was missing before)
+
+2003-06-27  Brian Paul
+
+	* include/GL/freeglut_ext.h, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_main.c, src/freeglut_state.c,
+	  src/freeglut_stroke_mono_roman.c: XF86 game mode fixes, context
+	  sharing option. (John Fay)
+
+2003-06-25  Eric Sandall
+
+	* ChangeLog: Added another of my changes (freeglut.kdevelop) and fixed
+	  the version number for my MS VS change (*.dsp)
+
+2003-06-25  Brian Paul
+
+	* src/freeglut_internal.h: version bumps
+	* freeglut.lsm, include/GL/glut.h, src/freeglut_stroke_mono_roman.c,
+	  src/freeglut_stroke_roman.c: Assorted version 2.0.0 updates (John
+	  Fay).
+	* doc/freeglut_user_interface.html: updated version, italicize freeglut
+	  (John Fay)
+
+2003-06-25  Eric Sandall
+
+	* ChangeLog, freeglut.dsp, freeglut_static.dsp: Added 'freeglut_ext.c'
+	  to the project files 'freeglut.dsp' and 'freeglut_static.dsp' (New
+	  list #10)
+
+2003-06-24  Andreas Umbach <marvin@dataway.ch>
+
+	* ChangeLog: Fixed autogen.sh and removed aclocal.m4
+	* aclocal.m4: this file is autogenerated by aclocal
+	* autogen.sh: fixed aclocal / autoheader order; some cosmetics
+
+2003-06-24  Eric Sandall
+
+	* freeglut.kdevelop: Project file for Gideon (KDevelop 3.0)
+
+2003-06-23  Eric Sandall
+
+	* ChangeLog, Makefile.am, TODO, configure.in, freeglut.dsp,
+	  freeglut.kdevprj, freeglut13.dsp, freeglut13.plg, freeglut_static.dsp,
+	  freeglutdll.dsp, src, src/Makefile.am, src/freeglut_callbacks.c,
+	  src/freeglut_cursor.c, src/freeglut_display.c, src/freeglut_ext.c,
+	  src/freeglut_font.c, src/freeglut_font_data.c,
+	  src/freeglut_gamemode.c, src/freeglut_geometry.c, src/freeglut_init.c,
+	  src/freeglut_internal.h, src/freeglut_joystick.c, src/freeglut_main.c,
+	  src/freeglut_menu.c, src/freeglut_misc.c, src/freeglut_overlay.c,
+	  src/freeglut_state.c, src/freeglut_stroke_mono_roman.c,
+	  src/freeglut_stroke_roman.c, src/freeglut_structure.c,
+	  src/freeglut_teapot.c, src/freeglut_videoresize.c,
+	  src/freeglut_window.c, src/freeglutdll.def, src/templates,
+	  src/templates/cpp_template, src/templates/header_template,
+	  tests/Makefile.am: Changed all references to the 'freeglut-1.3'
+	  directory to 'src', copied 'freeglut-1.3' to 'src' and added all files
+	  from 'src' to the repository (TODO #34).
+	* ChangeLog: Updated ChangeLog with my aclocal.m4 change
+	* aclocal.m4: Updated aclocal.m4 with aclocal 1.7.3 (was created with
+	  aclocal 1.5)
+
+2003-06-23  Brian Paul
+
+	* freeglut-1.3/freeglut_geometry.c: adjusted precision (John Fay)
+	* doc/freeglut_user_interface.html, freeglut-1.3/freeglut_display.c,
+	  freeglut-1.3/freeglut_gamemode.c, freeglut-1.3/freeglut_geometry.c,
+	  freeglut-1.3/freeglut_teapot.c, include/GL/freeglut_ext.h,
+	  include/GL/glut.h: Assorted updates from John Fay.
+
+2003-06-20  Eric Sandall
+
+	* TODO: Updated TODO from John Fay
+
+2003-06-20  Brian Paul
+
+	* progs, progs/demos, progs/demos/Fractals,
+	  progs/demos/Fractals/Fractals.dsp, progs/demos/Fractals/fractals.c,
+	  progs/demos/Fractals/fractals.dat, progs/demos/Fractals_random,
+	  progs/demos/Fractals_random/Fractals_random.dsp,
+	  progs/demos/Fractals_random/fractals.dat,
+	  progs/demos/Fractals_random/fractals_random.c: Fractal demo (John Fay)
+
+2003-06-20  Eric Sandall
+
+	* ChangeLog: Added the autogen.sh addition to ChangeLog
+	* autogen.sh: Initial version of autogen.sh, tested here and creates the
+	  correct files
+
+2003-06-20  Brian Paul
+
+	* freeglut-1.3/freeglut_gamemode.c, freeglut-1.3/freeglut_state.c:
+	  Windows patches (Eero Pajarre)
+	* NEWS: list the 1.4 release (fill in date) - this is a cvs check-in
+	  test
+
+2003-06-19  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglut_joystick.c: Oops, missed the
+	  fghJoystickRawRead() fix for FreeBSD.
+
+2003-06-19  Brian Paul
+
+	* doc/freeglut_user_interface.html, freeglut-1.3/freeglut_display.c,
+	  freeglut-1.3/freeglut_ext.c, freeglut-1.3/freeglut_internal.h,
+	  freeglut-1.3/freeglut_main.c: s/FreeGLUT/freeglut/
+
+2003-06-19  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglut_joystick.c: Applied tthierry's patch to fix
+	  compiling on FreeBSD.
+
+2003-06-19  Brian Paul
+
+	* freeglut-1.3/freeglut_internal.h: added VERSION_MAJOR/MINOR/PATCH
+	* doc/freeglut_user_interface.html: restore text lost from previous
+	  check-in
+	* include/GL/glut.h: s/FREEGLUT_VERSION_1_3/FREEGLUT_VERSION_1_4/
+
+2003-06-19  Eric Sandall
+
+	* include/GL/freeglut_ext.h, include/GL/glut.h: GLUT_VERSION updates
+	  from John Fay
+
+2003-06-18  Eric Sandall
+
+	* AUTHORS: Forgot a file...looked so innocous just sitting there... :)
+	* ChangeLog, doc/freeglut_user_interface.html,
+	  freeglut-1.3/freeglut_callbacks.c, freeglut-1.3/freeglut_ext.c,
+	  freeglut-1.3/freeglut_internal.h, freeglut-1.3/freeglut_menu.c,
+	  freeglut-1.3/freeglut_structure.c, freeglut-1.3/freeglut_teapot.c,
+	  freeglut-1.3/freeglut_window.c, include/GL/freeglut_ext.h: * Hopefully
+	  I did THIS one right (used 'cvs update' to Merge)
+	  
+	  Authors - The first update in quite a while
+	  
+	  ChangeLog - Added the recent changes
+	  
+	  freeglut_callbacks.c - Added Aleksandar Donev's menu destruction
+	  callback
+	  
+	  freeglut_internal.h - Added the user data to the structures and made
+	  the menu state/status callbacks window-independent
+	  
+	  freeglut_menu.c - Removed several OpenGL compiler warnings and added
+	  A. Donev's menu user data functions
+	  
+	  freeglut_structure.c - Added Aleksandar Donev's menu destruction
+	  callback
+	  
+	  freeglut_teapot.c - Removed or suppressed several compiler warnings
+	  
+	  freeglut_window.c - Updated the window positioning code and added A.
+	  Donev's window user data
+	  
+	  freeglut_ext.h - Added the menu destruction callback and user data
+	  functions
+	* freeglut-1.3/freeglut_ext.h: * Removed freeglut_ext.h (wasn't supposed
+	  to be added)
+
+2003-06-18  Brian Paul
+
+	* doc/freeglut_user_interface.html, freeglut-1.3/freeglut_internal.h,
+	  freeglut-1.3/freeglut_state.c, include/GL/freeglut_ext.h,
+	  include/GL/glut.h: Added FREEGLUT_VERSION_1_3. Added GLUT_VERSION for
+	  glutGet(). Added glutGet() documentation.
+	* freeglut-1.3/freeglut_display.c, freeglut-1.3/freeglut_ext.h,
+	  freeglut-1.3/freeglut_init.c, freeglut-1.3/freeglut_internal.h,
+	  freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_state.c,
+	  freeglut-1.3/freeglut_structure.c, freeglut-1.3/freeglut_window.c:
+	  remove DOS-style CR characters
+	* doc/freeglut_user_interface.html: added glutGetProcAddress and
+	  GLUT_FPS info
+	* ChangeLog: added glutGetProcAddress() and GLUT_FPS
+
+2003-06-17  Brian Paul
+
+	* freeglut-1.3/freeglut_display.c, freeglut-1.3/freeglut_init.c,
+	  freeglut-1.3/freeglut_internal.h: restore GLUT_FPS env var feature
+	  lost in previous check-in
+
+2003-06-17  Eric Sandall
+
+	* ChangeLog: * Updated ChangeLog
+	* freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_structure.c: Set
+	  #4: * Fixes a couple of compiler warnings and other bugs. *
+	  freeglut_main.c: Removes a compiler warning * freeglut_structure.c:
+	  Sets the current window before calling the window closure callback *
+	  Possibly other changes
+	* freeglut-1.3/freeglut_ext.h: * Rest of Set #3
+	* freeglut-1.3/freeglut_state.c: Set #3: Fixes for window positioning
+	  problem Windows
+	* freeglut-1.3/freeglut_init.c: Eero Pajarre's GLUT_ICON code for
+	  Windows
+	* freeglut-1.3/freeglut_display.c, freeglut-1.3/freeglut_internal.h,
+	  freeglut-1.3/freeglut_window.c: First group of patches: Adds
+	  single-buffered rendering (or its emulation) in Windows.
+
+2003-06-17  Brian Paul
+
+	* freeglut-1.3/freeglut_display.c, freeglut-1.3/freeglut_init.c,
+	  freeglut-1.3/freeglut_internal.h: added GLUT_FPS env var option
+	* freeglut-1.3/Makefile.am, freeglut-1.3/freeglut_ext.c,
+	  include/GL/freeglut_ext.h: added glutGetProcAddress()
+
+2003-06-12  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglut_main.c: Fix the keyboard up callback and a
+	  compiler warning.
+	* freeglut-1.3/freeglut_structure.c: Set the current window before
+	  calling the window closure callback.
+	* freeglut-1.3/freeglut_state.c, include/GL/freeglut_ext.h: John's
+	  window positioning corrections.
+	* freeglut-1.3/freeglut_init.c: Eero Pajarre's icon code.
+	* freeglut-1.3/freeglut_display.c, freeglut-1.3/freeglut_internal.h,
+	  freeglut-1.3/freeglut_window.c: Single buffered rendering for Windows.
+
+2003-06-02  Don Heyse <dheyse@hotmail.com>
+
+	* doc/freeglut_user_interface.html: John Documented InitWindowPosition
+	  extensions and added some kbd fn info.
+	* ChangeLog: Documented Johns changes from May 03.
+	* freeglut-1.3/freeglut_state.c: Do not allow glutGet to reposition the
+	  window 1 pixel toward bottom right.
+	* freeglut-1.3/freeglut_main.c: Pass mouse pos to Windows kbd callback.
+	  Resequenced a few things for UNIX.
+
+2003-03-23  Christopher John Purnell
+
+	* freeglut-1.3/freeglut_gamemode.c: Applied patch to fix GameMode issues
+	  supplied by Bernhard Kaindl.
+
+2003-03-12  Don Heyse <dheyse@hotmail.com>
+
+	* include/GL/glut.h: Switch to ANSI C comments.
+	* freeglut-1.3/freeglut_cursor.c, freeglut-1.3/freeglut_display.c,
+	  freeglut-1.3/freeglut_font.c, freeglut-1.3/freeglut_geometry.c,
+	  freeglut-1.3/freeglut_internal.h, freeglut-1.3/freeglut_joystick.c,
+	  freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_structure.c,
+	  freeglut-1.3/freeglut_window.c: Switch to ANSI C comments. Removed
+	  always true tests on unsigned char. Single buffering fix..
+
+2003-02-13  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut.dsp, freeglut.dsw, freeglut_static.dsp: Switching to John
+	  Fays version of the VC++ project files.
+
+2003-02-08  Steve Baker <steve@sjbaker.org>
+
+	* freeglut-1.3/freeglut_display.c, freeglut-1.3/freeglut_joystick.c:
+	  Removed erroneous GPL license comments.
+
+2003-02-07  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglut_callbacks.c, freeglut-1.3/freeglut_cursor.c,
+	  freeglut-1.3/freeglut_display.c, freeglut-1.3/freeglut_font_data.c,
+	  freeglut-1.3/freeglut_gamemode.c, freeglut-1.3/freeglut_geometry.c,
+	  freeglut-1.3/freeglut_init.c, freeglut-1.3/freeglut_joystick.c,
+	  freeglut-1.3/freeglut_misc.c, freeglut-1.3/freeglut_overlay.c,
+	  freeglut-1.3/freeglut_stroke_mono_roman.c,
+	  freeglut-1.3/freeglut_stroke_roman.c, freeglut-1.3/freeglut_teapot.c,
+	  freeglut-1.3/freeglut_videoresize.c: Moved freeglut_internal.h to the
+	  freeglut source code private directory.
+	* freeglut-1.3/freeglut_structure.c: SubWindow border thickness fix.
+	  Overlay changes in glutGet.
+	* freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_menu.c,
+	  freeglut-1.3/freeglut_state.c, freeglut-1.3/freeglut_window.c: Johns
+	  changes for layers, fgSetWindow, and fgSetupPixelFormat.
+	* freeglut-1.3/freeglut_font.c: John fixed a bug that make bitmap font
+	  one pixel wider than its drawn.
+	* freeglut-1.3/freeglut_internal.h, include/GL/freeglut_internal.h:
+	  Moved freeglut_internal.h to the private directory with the other
+	  freeglut sources.
+	* include/GL/freeglut.h, include/GL/freeglut_ext.h, include/GL/glut.h:
+	  Broke freeglut.h into glut.h and freeglut_ext.h
+
+2003-01-06  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglutdll.def: Exports file for Win32 dll. One EXPORT
+	  for each FGAPI line in freeglut.h
+
+2003-01-04  Steve Baker <steve@sjbaker.org>
+
+	* aclocal.m4, freeglut-1.3/freeglut_joystick.c: Cleanup joystick
+	  deallocation.
+
+2002-12-10  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut.dsw, freeglutdll.dsp: Allow DLL and static library build on
+	  Windows.
+	* include/GL/freeglut.h: Added check for FREEGLUT_DLL to allow static &
+	  DLL build on Windows.
+
+2002-12-04  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglut_font_data.c: More bitmap font spacing fixes from
+	  John.
+
+2002-11-29  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglut_init.c: Fixed Win95 crash when getenv("DISPLAY")
+	  returned NULL ptr.
+	* freeglut-1.3/freeglut_font_data.c: The lowercase t in helvetica12 was
+	  too skinny.
+	* freeglut-1.3/freeglut_font.c, freeglut-1.3/freeglut_font_data.c:
+	  Adjusted character spacing on a few fonts.
+	* ChangeLog: Many updates from John Fay.
+	* freeglutstatic.dsw: Added Visual C++ 6 Static library project for John
+	  Fay.
+
+2002-11-28  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut.dsp: Visual C++ 6 project file for static freeglut lib.
+	* include/GL/freeglut.h, include/GL/freeglut_internal.h: Many updates
+	  from John Fay. (freeglut.h may need a small change to allow Win32 DLL
+	  build again)
+	* freeglut-1.3/freeglut_geometry.c: Many updates from John Fay.
+	* freeglut-1.3/freeglut_callbacks.c, freeglut-1.3/freeglut_cursor.c,
+	  freeglut-1.3/freeglut_font.c, freeglut-1.3/freeglut_font_data.c,
+	  freeglut-1.3/freeglut_gamemode.c, freeglut-1.3/freeglut_init.c,
+	  freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_menu.c,
+	  freeglut-1.3/freeglut_misc.c, freeglut-1.3/freeglut_state.c,
+	  freeglut-1.3/freeglut_stroke_mono_roman.c,
+	  freeglut-1.3/freeglut_stroke_roman.c,
+	  freeglut-1.3/freeglut_structure.c, freeglut-1.3/freeglut_window.c:
+	  Many updates from John Fay.
+	* freeglut-1.3/freeglut_joystick.c: Fixes from freeglut_portable patch.
+	  Memory leak fix from John. Return_if_fail fix.
+
+2002-11-26  Don Heyse <dheyse@hotmail.com>
+
+	* doc/freeglut_user_interface.html: Added on behalf of John Fay.
+
+2002-10-22  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglut_geometry.c: Implemented tetrahedra, octahedra,
+	  dodecahedra, and icosahedra. Checked in on behalf of John F. Fay
+	  <john.fay@eglin.af.mil>.
+
+2002-05-20  Don Heyse <dheyse@hotmail.com>
+
+	* freeglut-1.3/freeglut_font.c: Fixed previous fix so it compiles.
+
+2002-05-20  Christopher John Purnell
+
+	* freeglut-1.3/freeglut_font.c: My bad.
+
+2002-05-18  Christopher John Purnell
+
+	* freeglut-1.3/Makefile.am, freeglut-1.3/freeglut_font.c,
+	  freeglut-1.3/freeglut_stroke_mono_roman.c,
+	  freeglut-1.3/freeglut_stroke_roman.c, genfonts/Roman_M.src,
+	  genfonts/lex.l, genfonts/to_stroke.y, genfonts/wfont.h,
+	  include/GL/freeglut.h, include/GL/freeglut_internal.h: Added stroke
+	  fonts.
+
+2002-05-17  Christopher John Purnell
+
+	* freeglut-1.3/freeglut_cursor.c, freeglut-1.3/freeglut_display.c,
+	  freeglut-1.3/freeglut_overlay.c, freeglut-1.3/freeglut_teapot.c,
+	  freeglut-1.3/freeglut_videoresize.c, tests/one.c: Removed some DOS
+	  line ends.
+
+2002-05-16  Christopher John Purnell
+
+	* freeglut-1.3/freeglut_main.c: Removed one last glib call.
+
+2002-01-20  Steve Baker <steve@sjbaker.org>
+
+	* README, freeglut-1.3/.deps/freeglut_callbacks.P,
+	  freeglut-1.3/.deps/freeglut_cursor.P,
+	  freeglut-1.3/.deps/freeglut_display.P,
+	  freeglut-1.3/.deps/freeglut_font.P,
+	  freeglut-1.3/.deps/freeglut_font_data.P,
+	  freeglut-1.3/.deps/freeglut_gamemode.P,
+	  freeglut-1.3/.deps/freeglut_geometry.P,
+	  freeglut-1.3/.deps/freeglut_init.P,
+	  freeglut-1.3/.deps/freeglut_joystick.P,
+	  freeglut-1.3/.deps/freeglut_main.P,
+	  freeglut-1.3/.deps/freeglut_menu.P,
+	  freeglut-1.3/.deps/freeglut_misc.P,
+	  freeglut-1.3/.deps/freeglut_overlay.P,
+	  freeglut-1.3/.deps/freeglut_state.P,
+	  freeglut-1.3/.deps/freeglut_structure.P,
+	  freeglut-1.3/.deps/freeglut_teapot.P: Removed a bunch of '.P' files
+	  that don't belong in the CVS archive.
+
+2001-08-05  Christopher John Purnell
+
+	* freeglut-1.3/freeglut_callbacks.c, freeglut-1.3/freeglut_main.c,
+	  freeglut-1.3/freeglut_window.c, include/GL/freeglut_internal.h: Added
+	  keyup events code. Added missing specal keys. Made menu callbacks
+	  global.
+	* freeglut-1.3/freeglut_window.c: More position tweeks.
+
+2001-08-04  Christopher John Purnell
+
+	* freeglut-1.3/freeglut_main.c, include/GL/freeglut.h: Fixed redisplay
+	  bug. Fixed modifier values.
+	* freeglut-1.3/freeglut_window.c: Improved window positioning.
+
+2001-07-30  Christopher John Purnell
+
+	* freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_structure.c: A
+	  stupid bug fixed.
+
+2001-07-30  Andreas Umbach <marvin@dataway.ch>
+
+	* freeglut-1.3/freeglut_init.c, freeglut-1.3/freeglut_main.c: one more
+	  g_assert removed
+	* include/GL/freeglut_internal.h: removed glib dependencies from win32
+	* freeglut-1.3/freeglut_gamemode.c, freeglut-1.3/freeglut_init.c,
+	  freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_window.c: -
+	  removed glib dependencies from win32 code
+
+2001-07-29  Christopher John Purnell
+
+	* freeglut-1.3/freeglut_structure.c: Fixed bug list code.
+	* freeglut-1.3/Makefile.am, freeglut-1.3/freeglut_callbacks.c,
+	  freeglut-1.3/freeglut_font.c, freeglut-1.3/freeglut_font_data.c,
+	  freeglut-1.3/freeglut_gamemode.c, freeglut-1.3/freeglut_geometry.c,
+	  freeglut-1.3/freeglut_init.c, freeglut-1.3/freeglut_joystick.c,
+	  freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_menu.c,
+	  freeglut-1.3/freeglut_misc.c, freeglut-1.3/freeglut_state.c,
+	  freeglut-1.3/freeglut_structure.c, freeglut-1.3/freeglut_window.c,
+	  genfonts/Makefile.am, genfonts/genfonts.c, genfonts/genstroke.c,
+	  include/GL/freeglut.h, include/GL/freeglut_internal.h: Removed glib
+	  dependancy
+	* configure.in, freeglut-1.3/Makefile.am, genfonts/Makefile.am: The
+	  build system now looks for X.
+
+2001-07-27  Steve Baker <steve@sjbaker.org>
+
+	* doc, doc/download.html, doc/freeglut.html, doc/freeglut_logo.png,
+	  doc/index.html, doc/ogl_sm.png, doc/progress.html, doc/structure.html:
+	  Added documents.
+	* genfonts/.deps, tests/.deps: Removed some more files that don't belong
+	  in CVS
+	* configure, freeglut-1.3/Makefile, freeglut-1.3/Makefile.in,
+	  genfonts/Makefile, genfonts/Makefile.in, include/GL/Makefile,
+	  include/GL/Makefile.in, include/Makefile, include/Makefile.in,
+	  tests/Makefile, tests/Makefile.in: Removed files checked in in error.
+	* freeglut-1.3/.deps, freeglut-1.3/.deps/freeglut_callbacks.P,
+	  freeglut-1.3/.deps/freeglut_cursor.P,
+	  freeglut-1.3/.deps/freeglut_display.P,
+	  freeglut-1.3/.deps/freeglut_font.P,
+	  freeglut-1.3/.deps/freeglut_font_data.P,
+	  freeglut-1.3/.deps/freeglut_gamemode.P,
+	  freeglut-1.3/.deps/freeglut_geometry.P,
+	  freeglut-1.3/.deps/freeglut_init.P,
+	  freeglut-1.3/.deps/freeglut_joystick.P,
+	  freeglut-1.3/.deps/freeglut_main.P,
+	  freeglut-1.3/.deps/freeglut_menu.P,
+	  freeglut-1.3/.deps/freeglut_misc.P,
+	  freeglut-1.3/.deps/freeglut_overlay.P,
+	  freeglut-1.3/.deps/freeglut_state.P,
+	  freeglut-1.3/.deps/freeglut_structure.P,
+	  freeglut-1.3/.deps/freeglut_teapot.P,
+	  freeglut-1.3/.deps/freeglut_videoresize.P,
+	  freeglut-1.3/.deps/freeglut_window.P, freeglut-1.3/Makefile,
+	  freeglut-1.3/Makefile.in: Initial revision
+	* ., AUTHORS, COPYING, ChangeLog, INSTALL, Makefile.am, NEWS, README,
+	  TODO, acconfig.h, aclocal.m4, configure, configure.in, freeglut-1.3,
+	  freeglut-1.3/Makefile.am, freeglut-1.3/freeglut_callbacks.c,
+	  freeglut-1.3/freeglut_cursor.c, freeglut-1.3/freeglut_display.c,
+	  freeglut-1.3/freeglut_font.c, freeglut-1.3/freeglut_font_data.c,
+	  freeglut-1.3/freeglut_gamemode.c, freeglut-1.3/freeglut_geometry.c,
+	  freeglut-1.3/freeglut_init.c, freeglut-1.3/freeglut_joystick.c,
+	  freeglut-1.3/freeglut_main.c, freeglut-1.3/freeglut_menu.c,
+	  freeglut-1.3/freeglut_misc.c, freeglut-1.3/freeglut_overlay.c,
+	  freeglut-1.3/freeglut_state.c, freeglut-1.3/freeglut_structure.c,
+	  freeglut-1.3/freeglut_teapot.c, freeglut-1.3/freeglut_videoresize.c,
+	  freeglut-1.3/freeglut_window.c, freeglut-1.3/templates,
+	  freeglut-1.3/templates/cpp_template,
+	  freeglut-1.3/templates/header_template, freeglut.dsw,
+	  freeglut.kdevprj, freeglut.lsm, freeglut13.dsp, freeglut13.plg,
+	  genfonts, genfonts/.deps, genfonts/.deps/genfonts.P,
+	  genfonts/.deps/genstroke.P, genfonts/Makefile, genfonts/Makefile.am,
+	  genfonts/Makefile.in, genfonts/Roman.src, genfonts/Roman_M.src,
+	  genfonts/genfonts.c, genfonts/genstroke.c, include, include/GL,
+	  include/GL/Makefile, include/GL/Makefile.am, include/GL/Makefile.in,
+	  include/GL/freeglut.h, include/GL/freeglut_internal.h,
+	  include/Makefile, include/Makefile.am, include/Makefile.in,
+	  install-sh, mkinstalldirs, stamp-h, stamp-h.in, tests, tests/.deps,
+	  tests/.deps/one.P, tests/Makefile, tests/Makefile.am,
+	  tests/Makefile.in, tests/one.c: Initial revision
+

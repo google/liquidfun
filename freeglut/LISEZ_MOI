@@ -1,0 +1,86 @@
+Brève Vue d'ensemble
+====================
+
+C'est le paquet de freeglut.
+
+Freeglut, le toolkit de service d'openGL ("OpenGL Utility Toolkit") libre, est censé pour être
+un libre changent l'indigène à la bibliothèque de GLUT de Mark Kilgard.  Il est distribué sous
+un permis de modèle de X-Consortium (voyez COPIER pour des détails), de vous offrir une chance
+d'employer et/ou modifier la source.
+
+Il se sert de bibliothèques OpenGL, GLU, GLib, et pthreads-win32. La bibliothèque ne se sert
+d'aucun code de SURABONDANCE et n'est pas 100% compatible. La recompilation de code et/ou les
+légères modifications pourraient être exigées pour vos applications pour fonctionner avec le
+freeglut.
+
+
+PORTS
+=====
+
+X11 et les ports Win32 sont à une étape avançée d'alpha, qui signifie qu'elles fournissent la fonctionnalité limitée de la SURABONDANCE api 3. Il y a un cours d'en de recherche pour vérifier si le port de BeOS pourrait être facilement fait en utilisant la structure courante de freeglut.
+
+ INSTALLATION
+============
+
+Voyez le dossier d'INSTALLATION.  Pour le Windows:
+
+1)Téléchargez Freeglut.tar.gz
+
+2)Renommez en Freeglut.tar
+
+3)Décompressez avec WINZIP
+
+4)Dans MSVC,vous obtenez un répertoire FREEGLUT\DEBUG ou se trouve FREEGLUT.DLL
+
+5)Si vous n'avez pas FEEGLUT.LIB,il faut la construire:
+    Ouvrez FREEGLUT.DSW(C'est un workspace)
+    ouvrez le projet et cliquez sur "BUILD" puis "SET ACTIVE CONFIGURATION"
+    ajoutez "FREEGLUT-DEBUG".
+
+6)Pour votre propre projet,apres la compilation,appuyer sur ALT-F7.Cliquez sur LINK,puis sur
+    CATEGORIES et selectionnez "INPUT".Plus bas dans la fenetre,il y a un champ appelé
+    "ADDITIONNAL LIBRARY PATH",ajoutez:C:\MSVC\FREEGLUT\DEBUG pour que le programme trouve la
+    FREEGLUT.LIB.
+
+7)Copiez(NE PAS DEPLACER) la FREEGLUT.DLL de DEBUG vers le répertoire qui contient votre fichier
+    EXE.
+
+8)Pour une installation globale copier FREEGLUT.DLL dans C:\WINNT\SYSTEM32.
+
+
+
+CONTRIBUTION
+============
+
+Le bogue et les pièces rapportées absentes de dispositifs sont certainement bienvenus. Juste
+comme des commentaires et des propositions de FREEGLUT api 1 soyez. Veuillez juste pour rendre
+le regard de difficultés visuellement juste comme le reste du code (les étiquettes ont converti
+les 4 espaces blancs). Les commentaires sont vraiment bienvenus, comme je crois qu'il ferait
+beau pour des personnes nouveaux que frais à OpenGL voient comment les choses sont faites...
+
+
+EMPLACEMENT DE WEB ET ENTRER EN CONTACT AVEC LE D'AUTEUR
+========================================================
+
+Le projet de Freeglut s'est déplacé au SourceForge :
+http://freeglut.sourceforge.net
+
+
+LE D'ESPOIR 
+===========
+Espoir vous trouvez mon travail de façon ou d'autre utile.
+Pawel W. Olszta, <olszta@sourceforge.net>
+
+
+DÉPASSEMENT DU BATON====================
+
+En décembre 2000, Pawel a décidé qu'il n'a plus souhaité maintenir le freeglut parce qu'il s'est
+déplacé hors du champ de graphiques. J'ai offert pour succéder de lui et avoir couru le projet
+depuis 2001 le 13 janv.. I'm également l'auteur et le défenseur de la suite de bibliothèque de
+PLIB et du 'freeglut' ; vraiment ajustements dedans bien avec ce travail. J'espère juste que je
+peux vivre jusqu'aux niveaux élevés de Pawel's. Pawel reste sur la liste active de réalisateurs.
+Steve Baker <sjbaker1@airmail.net>
+            http://plib.sourceforge.net
+
+
+
