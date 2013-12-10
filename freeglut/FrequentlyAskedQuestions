@@ -1,0 +1,70 @@
+========== ===== ========= ===== ========
+FREQUENTLY ASKED QUESTIONS ABOUT freeglut
+========== ===== ========= ===== ========
+
+Last updated on November 28, 2006
+
+
+General Questions
+======= =========
+(1)  Will "freeglut" ever support (fill in the blank)?
+
+   If the GLUT library supports the feature, "freeglut" should support it.  If "freeglut" does not support it and there is a call for it, then we are certainly open to adding it.
+
+   If the GLUT library does not support the feature, "freeglut" is probably not going to.  The "freeglut" library was designed to be a drop-in replacement for GLUT, a lightweight and simple windowing system for the OpenGL Red Book demonstration programs and no more.  If you want a more functional windowing system we suggest that you look elsewhere.
+
+(#)  I have a question that is not answered here.  What do I do to get an answer?
+
+   Check the "README" files that came with the distribution.  If the question is not addressed there, please post it on the "freeglut-developer" mailing list on the Source Forge web site.
+
+
+
+
+
+*nix Questions
+==== =========
+
+(1)  How I can build "freeglut" with debugging symbols and traces?
+
+   CFLAGS="-g $CFLAGS" LDFLAGS="-g $LDFLAGS" ./configure \
+           --enable-debug
+
+
+(2)  How can I have both a normal, and a debug-enabled version of "freeglut"?
+
+   cd ..
+   mkdir freeglut-normal
+   cd freeglut-normal
+   ../freeglut-2.x/configure
+   make
+   cd ..
+   mkdir freeglut-debug
+   CFLAGS="-g $CFLAGS" LDFLAGS="-g $LDFLAGS" \
+          ../freeglut-2.x/ configure --enable-debug [*]
+   make
+
+   [*] optionally use --program-suffix=dbg to have them coexist when installing
+
+
+(3)  My linking fails due to undefined symbols.  What libraries do I need to link?
+
+   Look at the generated libfreeglut.la or use libtool --link (see the libtool manual).
+
+
+
+
+
+Windows Questions
+======= =========
+
+(1)  My linking fails due to undefined symbols.  What libraries do I need to link?
+
+  All the required libraries (and a couple of unnecessary ones) should be automatically included thanks to the "#pragma comment (lib" statements in "freeglut_std.h".  If your linking fails due to undefined symbols, there is an excellent chance that "freeglut" is not the culprit.
+
+
+
+
+
+Other Operating System Questions
+===== ========= ====== =========
+
