@@ -12,6 +12,7 @@ var searchData=
   ['destroyproxy',['DestroyProxy',['../classb2_broad_phase.html#a84f0fb227dc01a9b9baa55c7b8c68984',1,'b2BroadPhase::DestroyProxy()'],['../classb2_dynamic_tree.html#a62aa451e7d7fe029818dd05f76ea9cdc',1,'b2DynamicTree::DestroyProxy()']]],
   ['drawcircle',['DrawCircle',['../classb2_draw.html#ae2effe9bca87c8d7cb90e860d13b7e9e',1,'b2Draw']]],
   ['drawdebugdata',['DrawDebugData',['../classb2_world.html#a293d9865e407fd463e168b0a29856acc',1,'b2World']]],
+  ['drawparticles',['DrawParticles',['../classb2_draw.html#a650dc6b8d2d097497d1a956db1d9561a',1,'b2Draw']]],
   ['drawpolygon',['DrawPolygon',['../classb2_draw.html#acd5427d1d2e7d19f1b34ad3620134d28',1,'b2Draw']]],
   ['drawsegment',['DrawSegment',['../classb2_draw.html#a1de5aaf50db875d1c644c596832af57d',1,'b2Draw']]],
   ['drawsolidcircle',['DrawSolidCircle',['../classb2_draw.html#a775a1d0472c5980d597904c7b596a0a6',1,'b2Draw']]],
