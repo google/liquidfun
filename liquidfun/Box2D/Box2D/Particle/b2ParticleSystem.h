@@ -187,6 +187,8 @@ private:
 
 	void Solve(const b2TimeStep& step);
 	void SolveCollision(const b2TimeStep& step);
+	void LimitVelocity(const b2TimeStep& step);
+	void SolveGravity(const b2TimeStep& step);
 	void SolvePressure(const b2TimeStep& step);
 	void SolveDamping(const b2TimeStep& step);
 	void SolveWall(const b2TimeStep& step);

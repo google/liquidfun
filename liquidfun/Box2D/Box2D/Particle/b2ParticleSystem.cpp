@@ -892,6 +892,10 @@ void b2ParticleSystem::UpdateBodyContacts()
 
 void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 {
+	// This function detects particles which are crossing boundary of bodies
+	// and modifies velocities of them so that they will move just in front of
+	// boundary. This function function also applies the reaction force to
+	// bodies as precisely as the numerical stability is kept.
 	b2AABB aabb;
 	aabb.lowerBound.x = +b2_maxFloat;
 	aabb.lowerBound.y = +b2_maxFloat;
@@ -918,6 +922,7 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 			Proxy* beginProxy = m_system->m_proxyBuffer;
 			Proxy* endProxy = beginProxy + m_system->m_proxyCount;
 			int32 childCount = shape->GetChildCount();
+			bool limitBodyVelocity = false;
 			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
 			{
 				b2AABB aabb = fixture->GetAABB(childIndex);
@@ -959,8 +964,25 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 							b2Vec2 f = m_system->GetParticleMass() * (av - v);
 							f = b2Dot(f, output.normal) * output.normal;
 							body->ApplyLinearImpulse(f, p, true);
+							limitBodyVelocity = true;
 						}
 					}
+				}
+			}
+			if (limitBodyVelocity)
+			{
+				b2Vec2 lc = body->GetLocalCenter();
+				float32 m = body->GetMass();
+				float32 I = body->GetInertia() - m * b2Dot(lc, lc);
+				b2Vec2 v = body->GetLinearVelocity();
+				float32 w = body->GetAngularVelocity();
+				float32 E = 0.5f * m * b2Dot(v, v) + 0.5f * I * w * w;
+				float32 E0 = m * m_system->GetCriticalVelocitySquared(m_step);
+				if (E > E0)
+				{
+					float32 s = E0 / E;
+					body->SetLinearVelocity(s * v);
+					body->SetAngularVelocity(s * w);
 				}
 			}
 			return true;
@@ -1000,31 +1022,6 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	{
 		m_allGroupFlags |= group->m_groupFlags;
 	}
-	b2Vec2 gravity = step.dt * m_gravityScale * m_world->GetGravity();
-	float32 criticalVelocytySquared = GetCriticalVelocitySquared(step);
-	for (int32 i = 0; i < m_count; i++)
-	{
-		b2Vec2& v = m_velocityBuffer.data[i];
-		v += gravity;
-		float32 v2 = b2Dot(v, v);
-		if (v2 > criticalVelocytySquared)
-		{
-			v *= b2Sqrt(criticalVelocytySquared / v2);
-		}
-	}
-	SolveCollision(step);
-	if (m_allGroupFlags & b2_rigidParticleGroup)
-	{
-		SolveRigid(step);
-	}
-	if (m_allParticleFlags & b2_wallParticle)
-	{
-		SolveWall(step);
-	}
-	for (int32 i = 0; i < m_count; i++)
-	{
-		m_positionBuffer.data[i] += step.dt * m_velocityBuffer.data[i];
-	}
 	UpdateBodyContacts();
 	UpdateContacts(false);
 	if (m_allGroupFlags & b2_particleGroupNeedsUpdateDepth)
@@ -1059,8 +1056,50 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	{
 		SolveColorMixing(step);
 	}
+	SolveGravity(step);
 	SolvePressure(step);
 	SolveDamping(step);
+	LimitVelocity(step);
+	// SolveCollision, SolveRigid and SolveWall should be called after other
+	// force functions because they may require particles to have specific
+	// velocities.
+	SolveCollision(step);
+	if (m_allGroupFlags & b2_rigidParticleGroup)
+	{
+		SolveRigid(step);
+	}
+	if (m_allParticleFlags & b2_wallParticle)
+	{
+		SolveWall(step);
+	}
+	// The particle positions can be updated only once, at the end of function.
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_positionBuffer.data[i] += step.dt * m_velocityBuffer.data[i];
+	}
+}
+
+void b2ParticleSystem::LimitVelocity(const b2TimeStep& step)
+{
+	float32 criticalVelocitySquared = GetCriticalVelocitySquared(step);
+	for (int32 i = 0; i < m_count; i++)
+	{
+		b2Vec2& v = m_velocityBuffer.data[i];
+		float32 v2 = b2Dot(v, v);
+		if (v2 > criticalVelocitySquared)
+		{
+			v *= b2Sqrt(criticalVelocitySquared / v2);
+		}
+	}
+}
+
+void b2ParticleSystem::SolveGravity(const b2TimeStep& step)
+{
+	b2Vec2 gravity = step.dt * m_gravityScale * m_world->GetGravity();
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_velocityBuffer.data[i] += gravity;
+	}
 }
 
 void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
