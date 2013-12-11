@@ -17,15 +17,14 @@ or post your questions to [stackoverflow.com][] tagged with **liquidfun**.
 Please see `Box2D/Documentation/Building/` to learn how to build LiquidFun and
 run the testbed.
 
-The Fun Propulsion Group wants to help you make games.  To do this well, we
-need to focus our limited resources where they are most beneficial.  To figure
-out which of our projects are most useful, we would like to track usage in
-applications on Google Play.  This tracking is done automatically using the
-embedded version string (b2_liquidFunVersionString).  Aside from consuming a
-few extra bytes in your application binary, it doesn't affect your application
-at all.  We use this information to let us know if LiquidFun is useful and if
-we should continue to invest in it.  Since this is open source, you are free
-to remove the version string but we would appreciate if you would leave it in.
+For applications on Google Play that integrate this tool, usage is tracked.
+This tracking is done automatically using the embedded version string
+(b2_liquidFunVersionString), and helps us continue to optimize it. Aside from
+consuming a few extra bytes in your application binary, it shouldn't affect
+your application at all.  We use this information to let us know if LiquidFun
+is useful and if we should continue to invest in it.  Since this is open
+source, you are free to remove the version string but we would appreciate if
+you would leave it in.
 
   [LiquidFun Google Group]: http://group.google.com/group/liquidfun
   [LiquidFun Issues Tracker]: http://github.com/google/liquidfun/issues
