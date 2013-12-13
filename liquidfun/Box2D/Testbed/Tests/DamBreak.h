@@ -46,6 +46,7 @@ public:
 			b2PolygonShape shape;
 			shape.SetAsBox(8, 10, b2Vec2(-12, 10.1f), 0);
 			b2ParticleGroupDef pd;
+			pd.flags = TestParticleType();
 			pd.shape = &shape;
 			m_world->CreateParticleGroup(pd);
 		}

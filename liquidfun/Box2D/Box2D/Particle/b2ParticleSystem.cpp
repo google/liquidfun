@@ -91,16 +91,18 @@ b2ParticleSystem::b2ParticleSystem()
 	m_groupCount = 0;
 	m_groupList = NULL;
 
-	m_pressureStrength = 0.05f;
-	m_dampingStrength = 1.0f;
-	m_elasticStrength = 0.25f;
-	m_springStrength = 0.25f;
-	m_viscousStrength = 0.25f;
-	m_surfaceTensionStrengthA = 0.1f;
-	m_surfaceTensionStrengthB = 0.2f;
-	m_powderStrength = 0.5f;
-	m_ejectionStrength = 0.5f;
-	m_colorMixingStrength = 0.5f;
+	// Initialize the physical coefficients.
+	// Each is set at the maximum value that keeps numerical stability.
+	m_pressureStrength = 0.05f; // produces pressure in response to compression
+	m_dampingStrength = 1.0f; // reduces normal velocity
+	m_elasticStrength = 0.25f; // restores shapes of elastic particle groups
+	m_springStrength = 0.25f; // restores lengths of spring particle groups
+	m_viscousStrength = 0.25f; // reduces relative velocity of viscous particles
+	m_surfaceTensionStrengthA = 0.2f; // produces pressure for tensile particles
+	m_surfaceTensionStrengthB = 0.2f; // smoothes outline of tensile particles
+	m_powderStrength = 0.5f; // produces repulsion between powder particles
+	m_ejectionStrength = 0.5f; // pushes particles out of solid particle group
+	m_colorMixingStrength = 0.5f; // mixes color of color mixing particles
 
 	m_world = NULL;
 
@@ -1178,7 +1180,8 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 {
 	// reduces normal velocity of each contact
-	float32 damping = m_dampingStrength;
+	float32 linearDamping = m_dampingStrength;
+	float32 quadraticDamping = 1 / GetCriticalVelocity(step);
 	for (int32 k = 0; k < m_bodyContactCount; k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
@@ -1192,7 +1195,9 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 		float32 vn = b2Dot(v, n);
 		if (vn < 0)
 		{
-			b2Vec2 f = damping * w * m * vn * n;
+			float32 damping =
+				b2Max(linearDamping * w, b2Min(- quadraticDamping * vn, 0.5f));
+			b2Vec2 f = damping * m * vn * n;
 			m_velocityBuffer.data[a] += GetParticleInvMass() * f;
 			b->ApplyLinearImpulse(-f, p, true);
 		}
@@ -1208,7 +1213,9 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 		float32 vn = b2Dot(v, n);
 		if (vn < 0)
 		{
-			b2Vec2 f = damping * w * vn * n;
+			float32 damping =
+				b2Max(linearDamping * w, b2Min(- quadraticDamping * vn, 0.5f));
+			b2Vec2 f = damping * vn * n;
 			m_velocityBuffer.data[a] += f;
 			m_velocityBuffer.data[b] -= f;
 		}
