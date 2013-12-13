@@ -28,8 +28,14 @@ struct b2ParticleColor;
 
 enum b2ParticleGroupFlag
 {
-	b2_solidParticleGroup =   1 << 0, // resists penetration
-	b2_rigidParticleGroup =   1 << 1, // keeps its shape
+	b2_solidParticleGroup = 1 << 0, // prevents overlapping or leaking
+	b2_rigidParticleGroup = 1 << 1, // keeps its shape
+	b2_particleGroupCanBeEmpty = 1 << 2, // won't be destroyed if it gets empty
+	b2_particleGroupWillBeDestroyed = 1 << 3, // will be destroyed on next step
+	b2_particleGroupNeedsUpdateDepth = 1 << 4, // updates depth data on next step
+	b2_particleGroupInternalMask =
+		b2_particleGroupWillBeDestroyed |
+		b2_particleGroupNeedsUpdateDepth,
 };
 
 /// A particle group definition holds all the data needed to construct a particle group.
@@ -48,7 +54,6 @@ struct b2ParticleGroupDef
 		color = b2ParticleColor_zero;
 		strength = 1;
 		shape = NULL;
-		destroyAutomatically = true;
 		userData = NULL;
 	}
 
@@ -80,9 +85,6 @@ struct b2ParticleGroupDef
 
 	/// Shape containing the particle group.
 	const b2Shape* shape;
-
-	/// If true, destroy the group automatically after its last particle has been destroyed.
-	bool destroyAutomatically;
 
 	/// Use this to store application-specific group data.
 	void* userData;
@@ -162,10 +164,6 @@ private:
 	mutable b2Vec2 m_linearVelocity;
 	mutable float32 m_angularVelocity;
 	mutable b2Transform m_transform;
-
-	unsigned m_destroyAutomatically:1;
-	unsigned m_toBeDestroyed:1;
-	unsigned m_toBeSplit:1;
 
 	void* m_userData;
 
