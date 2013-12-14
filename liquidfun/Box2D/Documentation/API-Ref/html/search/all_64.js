@@ -2,7 +2,6 @@ var searchData=
 [
   ['dampingratio',['dampingRatio',['../structb2_distance_joint_def.html#ad009b24ff211158eb4e1db4815a63b94',1,'b2DistanceJointDef::dampingRatio()'],['../structb2_mouse_joint_def.html#aee42888dab204a5c5745ba61acbfb7d6',1,'b2MouseJointDef::dampingRatio()'],['../structb2_weld_joint_def.html#ace1f0131610f14558f3dbaaed7b10e24',1,'b2WeldJointDef::dampingRatio()'],['../structb2_wheel_joint_def.html#a9976584bfee18b46dec355764797ce54',1,'b2WheelJointDef::dampingRatio()']]],
   ['density',['density',['../structb2_fixture_def.html#a6e27d733789a35aa689af2b30a1de0ff',1,'b2FixtureDef']]],
-  ['destroyautomatically',['destroyAutomatically',['../structb2_particle_group_def.html#a108f0e92bbe333a644338d1cd0c92c50',1,'b2ParticleGroupDef']]],
   ['destroybody',['DestroyBody',['../classb2_world.html#ad52231ad7a9556ef5735ac79cbcd8fcf',1,'b2World']]],
   ['destroyfixture',['DestroyFixture',['../classb2_body.html#a856d1df86b7bded91f02d8cfcaea1c2f',1,'b2Body']]],
   ['destroyjoint',['DestroyJoint',['../classb2_world.html#add5942aef171e54cfa384c8975746dca',1,'b2World']]],
