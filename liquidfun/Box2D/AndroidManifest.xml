@@ -18,7 +18,7 @@
 <!-- Empty Manifest so the NDK build process can find the project
      directory. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.google.fpg.liquidfun"
+          package="com.google.fpl.liquidfun"
           android:versionCode="1"
           android:versionName="1.0">
     <!-- Empty application since this project just builds the liquidfun

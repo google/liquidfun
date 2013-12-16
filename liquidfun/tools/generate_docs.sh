@@ -26,6 +26,8 @@ declare -r docs_output_dir=${root_dir}/Box2D/Documentation
 
 declare -r doc_dirs="API-Ref Building Programmers-Guide Readme"
 
+declare -r footer_file="${root_dir}/Box2D/Box2D/Documentation/footer.html"
+
 usage() {
   echo "
 Build documentation from markdown using doxygen.
@@ -59,8 +61,8 @@ main() {
 <body>
 <a href="'"${source_dir}"'/html/index.html">Click here if you are not
 redirected.</a>
-</body>
-</html>' > "${docs_output_dir}/${source_dir}.html"
+' > "${docs_output_dir}/${source_dir}.html"
+    cat "${footer_file}" >> "${docs_output_dir}/${source_dir}.html"
     pushd "${docs_source_dir}/${source_dir}" >/dev/null
     doxygen
     popd >/dev/null

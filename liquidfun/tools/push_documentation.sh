@@ -92,12 +92,18 @@ main() {
   git checkout "${master_branch}"
   git filter-branch --prune-empty --subdirectory-filter "${docs_subdir}"
   git checkout "${docs_branch}"
-  git merge "${master_branch}"
+  git merge \
+    -m "Merge branch ${upstream_master/*|/} into ${upstream_docs/*|/}" \
+    "${master_branch}"
   echo "
-Run the following command to push the current branch to
+The documentation branch has been staged in ${temp_dir}
+for inspection.
+
+When everything looks good, run the following command from
+${temp_dir} to push the current branch to
 ${upstream_master}:
 
-git push upstream_master HEAD:${master_branch}
+git push upstream_docs HEAD:${upstream_master/*|/}
 " >&2
 }
 

@@ -40,10 +40,7 @@ public:
 		}
 
 		m_world->SetParticleRadius(0.15f);
-		if (TestParticleType() == b2_waterParticle)
-		{
-			m_world->SetParticleDamping(0.2f);
-		}
+		m_world->SetParticleDamping(0.2f);
 
 		{
 			b2PolygonShape shape;
