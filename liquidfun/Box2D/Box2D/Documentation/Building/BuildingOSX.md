@@ -44,6 +44,6 @@ Use the run\_tests.sh script to execute unit tests:
 
   [Xquartz]: http://xquartz.macosforge.org/
   [cmake]: http://www.cmake.org
-  [Xcode]: https://developer.apple.com/xcode/
+  [Xcode]: http://developer.apple.com/xcode/
   [OS X]: http://www.apple.com/osx/
   [freeglut]: http://freeglut.sourceforge.net/

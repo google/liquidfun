@@ -85,6 +85,13 @@ redirected.</a>
               "\n  ${results}" >&2
       exit 1
     fi
+    # Report an error if an https link has been added.
+    # github does not support https links
+    if grep -r https "${results}"; then
+      echo -e "\nERROR linklint detected https links: "\
+              "github does not support https." >&2
+      exit 1
+    fi
   else
     echo "Unable to find linklint, install to validate the" \
          "generated documentation." >&2
