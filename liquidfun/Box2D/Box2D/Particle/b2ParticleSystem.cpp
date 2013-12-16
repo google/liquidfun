@@ -668,7 +668,7 @@ void b2ParticleSystem::ComputeDepth()
 	// The number of iterations is equal to particle number from the deepest
 	// particle to the nearest surface particle, and in general it is smaller
 	// than sqrt of total particle number.
-	int32 iterationCount = (int32) b2Sqrt(m_count);
+	int32 iterationCount = (int32)b2Sqrt((float)m_count);
 	for (int32 t = 0; t < iterationCount; t++)
 	{
 		bool updated = false;
