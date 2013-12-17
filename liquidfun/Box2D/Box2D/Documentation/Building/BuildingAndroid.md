@@ -98,7 +98,7 @@ connected device using `build_apk.sh`.  `run_tests_android.sh` makes use of
 `build_apk.sh` which has setup requirements as described in the
 "Build and Run from the Command Line" section above.
 
-  [Android SDK]: https://developer.android.com/sdk/index.html
+  [Android SDK]: http://developer.android.com/sdk/index.html
   [Android NDK]: http://developer.android.com/tools/sdk/ndk/index.html
   [NDK Eclipse plugin]: http://developer.android.com/sdk/index.html
   [managing avds]: http://developer.android.com/tools/devices/managing-avds.html
