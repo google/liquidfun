@@ -1205,6 +1205,10 @@ void b2World::DrawDebugData()
 				}
 			}
 		}
+	}
+
+	if (flags & b2Draw::e_particleBit)
+	{
 		DrawParticleSystem(m_particleSystem);
 	}
 
@@ -1212,6 +1216,7 @@ void b2World::DrawDebugData()
 	{
 		for (b2Joint* j = m_jointList; j; j = j->GetNext())
 		{
+
 			DrawJoint(j);
 		}
 	}

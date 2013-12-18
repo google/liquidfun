@@ -46,7 +46,8 @@ public:
 		e_jointBit				= 0x0002,	///< draw joint connections
 		e_aabbBit				= 0x0004,	///< draw axis aligned bounding boxes
 		e_pairBit				= 0x0008,	///< draw broad-phase pairs
-		e_centerOfMassBit		= 0x0010	///< draw center of mass frame
+		e_centerOfMassBit			= 0x0010,	///< draw center of mass frame
+		e_particleBit				= 0x0020  ///< draw particles
 	};
 
 	/// Set the drawing flags.
