@@ -88,6 +88,7 @@ using namespace std;
 #include "DamBreak.h"
 #include "Soup.h"
 #include "LiquidTimer.h"
+#include "Sparky.h"
 
 TestEntry g_testEntries[] =
 {
@@ -100,6 +101,7 @@ TestEntry g_testEntries[] =
 	{"Rigid Particles", RigidParticles::Create},
 	{"Elastic Particles", ElasticParticles::Create},
 	{"Surface Tension", ParticlesSurfaceTension::Create},
+	{"Sparky", Sparky::Create},
 
 	{"Continuous Test", ContinuousTest::Create},
 	{"Time of Impact", TimeOfImpact::Create},
