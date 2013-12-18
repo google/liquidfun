@@ -60,6 +60,7 @@ struct Settings
 		hz = 60.0f;
 		velocityIterations = 8;
 		positionIterations = 3;
+		particleIterations = 1;
 		drawShapes = 1;
 		drawParticles = 1;
 		drawJoints = 1;
@@ -85,6 +86,7 @@ struct Settings
 	float32 hz;
 	int32 velocityIterations;
 	int32 positionIterations;
+	int32 particleIterations;
 	int32 drawShapes;
 	int32 drawParticles;
 	int32 drawJoints;

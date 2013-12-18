@@ -251,6 +251,7 @@ private:
 	int32 m_timestamp;
 	int32 m_allParticleFlags;
 	int32 m_allGroupFlags;
+	int32 m_iterationIndex;
 	float32 m_density;
 	float32 m_inverseDensity;
 	float32 m_gravityScale;

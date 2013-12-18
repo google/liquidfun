@@ -587,6 +587,10 @@ int main(int argc, char** argv)
 		glui->add_spinner("Pos Iters", GLUI_SPINNER_INT, &settings.positionIterations);
 	positionIterationSpinner->set_int_limits(0, 100);
 
+	GLUI_Spinner* particleIterationSpinner =
+		glui->add_spinner("Pcl Iters", GLUI_SPINNER_INT, &settings.particleIterations);
+	particleIterationSpinner->set_int_limits(1, 100);
+
 	GLUI_Spinner* hertzSpinner =
 		glui->add_spinner("Hertz", GLUI_SPINNER_FLOAT, &settingsHz);
 
