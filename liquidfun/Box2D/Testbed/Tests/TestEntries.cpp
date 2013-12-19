@@ -86,6 +86,7 @@
 #include "Soup.h"
 #include "LiquidTimer.h"
 #include "Sparky.h"
+#include "Sandbox.h"
 
 TestEntry g_testEntries[] =
 {
@@ -99,6 +100,7 @@ TestEntry g_testEntries[] =
 	{"Elastic Particles", ElasticParticles::Create},
 	{"Surface Tension", ParticlesSurfaceTension::Create},
 	{"Sparky", Sparky::Create},
+	{"Sandbox", Sandbox::Create},
 
 	{"Ray-Cast", RayCast::Create},
 	{"Dump Shell", DumpShell::Create},
