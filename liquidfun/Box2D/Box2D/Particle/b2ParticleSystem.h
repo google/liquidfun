@@ -155,9 +155,10 @@ private:
 	/// All particle types that require creating triads
 	static const int32 k_triadFlags =
 		b2_elasticParticle;
-	/// All particle types that require computing depth
+	/// All particle types that do not produce pressure
 	static const int32 k_noPressureFlags =
-		b2_powderParticle;
+		b2_powderParticle |
+		b2_tensileParticle;
 
 	b2ParticleSystem();
 	~b2ParticleSystem();
