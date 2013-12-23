@@ -37,14 +37,13 @@ public:
 	float32 GetMilliseconds() const;
 
 private:
+	/// Get platform specific tick count
+	static int64 GetTicks();
 
 #if defined(_WIN32)
-	float64 m_start;
 	static float64 s_invFrequency;
-#elif defined(__linux__) || defined (__APPLE__)
-	unsigned long m_start_sec;
-	unsigned long m_start_usec;
 #endif
+	int64 m_start;
 };
 
 #endif

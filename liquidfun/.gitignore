@@ -8,6 +8,7 @@
 *.vcxproj.user
 *.sln
 *.suo
+*.keystore
 Box2D/**/MinSizeRel/**
 Box2D/**/RelWithDebInfo/**
 Box2D/*.def

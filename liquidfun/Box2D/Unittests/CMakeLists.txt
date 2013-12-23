@@ -64,6 +64,7 @@ function(test_executable name)
 endfunction()
 
 test_executable(Callback)
+test_executable(Common)
 test_executable(Confinement)
 test_executable(Conservation)
 test_executable(Function)

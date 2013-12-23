@@ -62,3 +62,14 @@ void b2Log(const char* string, ...)
 	va_end(args);
 #endif
 }
+
+class Validator
+{
+public:
+	Validator()
+	{
+		b2Assert(sizeof(uint64)==8);
+		b2Assert(sizeof(int64)==8);
+	}
+} validate;
+

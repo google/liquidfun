@@ -76,6 +76,8 @@ struct Settings
 		enableSleep = 1;
 		pause = 0;
 		singleStep = 0;
+		printStepTimeStats = 1;
+		stepTimeOut = 0;
 	}
 
 	b2Vec2 viewCenter;
@@ -98,6 +100,10 @@ struct Settings
 	int32 enableSleep;
 	int32 pause;
 	int32 singleStep;
+	int32 printStepTimeStats;
+
+	/// Measures how long did the world step took, in ms
+	float32 stepTimeOut;
 };
 
 struct TestEntry
