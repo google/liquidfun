@@ -1110,6 +1110,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 									m_system->GetParticleInvMass();
 							b2Vec2 rp = ap - bp;
 							float32 rpn = b2Cross(rp, n);
+							float32 invM = invAm + invBm + invBI * rpn * rpn;
 							if (m_system->m_bodyContactCount >=
 								m_system->m_bodyContactCapacity)
 							{
@@ -1134,8 +1135,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 							contact.weight = 
 								1 - d * m_system->m_inverseDiameter;
 							contact.normal = -n;
-							contact.mass =
-								1 / (invAm + invBm + invBI * rpn * rpn);
+							contact.mass = invM > 0 ? 1 / invM : 0;
 							m_system->m_bodyContactCount++;
 						}
 					}
@@ -1285,6 +1285,15 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 							m_system->m_velocityBuffer.data[a] = v;
 							b2Vec2 f = m_system->GetParticleMass() * (av - v);
 							f = b2Dot(f, output.normal) * output.normal;
+							// If density of the body is smaller than particle,
+							// the reactive force to it will be discounted.
+							float32 densityRatio =
+								fixture->GetDensity() *
+								m_system->m_inverseDensity;
+							if (densityRatio < 1)
+							{
+								f *= densityRatio;
+							}
 							body->ApplyLinearImpulse(f, p, true);
 							limitBodyVelocity = true;
 						}
@@ -1502,6 +1511,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		}
 		SolvePressure(subStep);
 		SolveDamping(subStep);
+		if (m_allParticleFlags & k_extraDampingFlags)
+		{
+			SolveExtraDamping(subStep);
+		}
 		// SolveElastic and SolveSpring refer the current velocities for
 		// numerical stability, they should be called as late as possible.
 		if (m_allParticleFlags & b2_elasticParticle)
@@ -1602,16 +1615,6 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 	{
 		memset(m_accumulationBuffer, 0,
 			   sizeof(*m_accumulationBuffer) * m_count);
-		for (int32 k = 0; k < m_bodyContactCount; k++)
-		{
-			const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
-			int32 a = contact.index;
-			if (m_flagsBuffer.data[a] & b2_staticPressureParticle)
-			{
-				float32 w = contact.weight;
-				m_accumulationBuffer[a] += w * m_staticPressureBuffer[a];
-			}
-		}
 		for (int32 k = 0; k < m_contactCount; k++)
 		{
 			const b2ParticleContact& contact = m_contactBuffer[k];
@@ -1629,14 +1632,13 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 		for (int32 i = 0; i < m_count; i++)
 		{
 			float32 w = m_weightBuffer[i];
-			if ((m_flagsBuffer.data[i] & b2_staticPressureParticle) &&
-				w > b2_minParticleWeight)
+			if (m_flagsBuffer.data[i] & b2_staticPressureParticle)
 			{
 				float32 wh = m_accumulationBuffer[i];
 				float32 h =
 					(wh + pressurePerWeight * (w - b2_minParticleWeight)) /
 					(w + relaxation);
-				m_staticPressureBuffer[i] = b2Min(h, maxPressure);
+				m_staticPressureBuffer[i] = b2Clamp(h, 0.0f, maxPressure);
 			}
 			else
 			{
@@ -1753,6 +1755,35 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 			b2Vec2 f = damping * vn * n;
 			m_velocityBuffer.data[a] += f;
 			m_velocityBuffer.data[b] -= f;
+		}
+	}
+}
+
+void b2ParticleSystem::SolveExtraDamping(const b2TimeStep& step)
+{
+	// Applies additional damping force between bodies and particles which can
+	// produce strong repulsive force. Applying damping force multiple times
+	// is effective in suppressing vibration.
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		int32 a = contact.index;
+		if (m_flagsBuffer.data[a] & k_extraDampingFlags)
+		{
+			b2Body* b = contact.body;
+			float32 m = contact.mass;
+			b2Vec2 n = contact.normal;
+			b2Vec2 p = m_positionBuffer.data[a];
+			b2Vec2 v =
+				b->GetLinearVelocityFromWorldPoint(p) -
+				m_velocityBuffer.data[a];
+			float32 vn = b2Dot(v, n);
+			if (vn < 0)
+			{
+				b2Vec2 f = 0.5f * m * vn * n;
+				m_velocityBuffer.data[a] += GetParticleInvMass() * f;
+				b->ApplyLinearImpulse(-f, p, true);
+			}
 		}
 	}
 }
@@ -1944,25 +1975,6 @@ void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 {
 	float32 powderStrength = m_powderStrength * GetCriticalVelocity(step);
 	float32 minWeight = 1.0f - b2_particleStride;
-	for (int32 k = 0; k < m_bodyContactCount; k++)
-	{
-		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
-		int32 a = contact.index;
-		if (m_flagsBuffer.data[a] & b2_powderParticle)
-		{
-			float32 w = contact.weight;
-			if (w > minWeight)
-			{
-				b2Body* b = contact.body;
-				float32 m = contact.mass;
-				b2Vec2 p = m_positionBuffer.data[a];
-				b2Vec2 n = contact.normal;
-				b2Vec2 f = powderStrength * m * (w - minWeight) * n;
-				m_velocityBuffer.data[a] -= GetParticleInvMass() * f;
-				b->ApplyLinearImpulse(f, p, true);
-			}
-		}
-	}
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];

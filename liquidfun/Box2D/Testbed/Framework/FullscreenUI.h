@@ -79,7 +79,7 @@ private:
 	void DrawArrows();
 
 	// Draw text at the bottom of the screen.
-	static void DrawFooterText(const std::string &text);
+	void DrawFooterText(const std::string &text);
 
 private:
 	// Whether the UI is enabled.
@@ -88,6 +88,8 @@ private:
 	uint32 m_selection;
 	// Whether particle parameters are enabled.
 	bool m_particleParameterSelectionEnabled;
+	// Ratio of width to height.
+	float32 m_aspectRatio;
 
 	// Whether the full screen UI is enabled by default.
 	static const bool k_enabledDefault;

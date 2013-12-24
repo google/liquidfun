@@ -91,6 +91,11 @@ public:
 
 	/// Take a time step. This performs collision detection, integration,
 	/// and constraint solution.
+	/// For the numerical stability of particles, minimize the following
+	/// dimensionless gravity acceleration:
+	///     gravity / particleRadius * (timeStep / particleIterations)^2
+	/// b2CalculateParticleIterations() helps to determine the optimal
+	/// particleIterations.
 	/// @param timeStep the amount of time to simulate, this should not vary.
 	/// @param velocityIterations for the velocity constraint solver.
 	/// @param positionIterations for the position constraint solver.

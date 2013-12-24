@@ -63,6 +63,7 @@ void FullscreenUI::Reset()
 {
 	m_selection = e_SelectionNone;
 	m_particleParameterSelectionEnabled = false;
+	m_aspectRatio = 1;
 }
 
 // Process mouse events and perform arrow selection returning the
@@ -116,6 +117,7 @@ void FullscreenUI::SetViewParameters(const b2Vec2 *viewCenter,
 		Arrow &arrow = s_arrows[i];
 		arrow.SetViewParameters(viewCenter, extents);
 	}
+	m_aspectRatio = extents->y > 0 ? extents->x / extents->y : 1;
 }
 
 // Draw s_arrows.
@@ -139,6 +141,17 @@ void FullscreenUI::DrawFooterText(const std::string &text)
 {
 	glColor4f(1, 1, 1, 1);
 	glPushMatrix();
+	glLoadIdentity();
+	if (m_aspectRatio > 1)
+	{
+		glScalef(1 / m_aspectRatio, 1, 1);
+	}
+	else
+	{
+		glScalef(1, m_aspectRatio, 1);
+	}
+	glScalef(0.04f, 0.04f, 1);
+	glTranslatef(0, -20, 0);
 	glTranslatef(text.length() * -0.75f, -4, 0);
 	glScalef(0.015f, 0.015f, 1);
 	glutStrokeString(GLUT_STROKE_MONO_ROMAN,

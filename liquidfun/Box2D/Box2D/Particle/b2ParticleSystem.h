@@ -388,6 +388,9 @@ private:
 	static const int32 k_noPressureFlags =
 		b2_powderParticle |
 		b2_tensileParticle;
+	/// All particle types that apply extra damping force with bodies
+	static const int32 k_extraDampingFlags =
+		b2_staticPressureParticle;
 
 	b2ParticleSystem();
 	~b2ParticleSystem();
@@ -427,6 +430,7 @@ private:
 	void ComputeWeight();
 	void SolvePressure(const b2TimeStep& step);
 	void SolveDamping(const b2TimeStep& step);
+	void SolveExtraDamping(const b2TimeStep& step);
 	void SolveWall();
 	void SolveRigid(const b2TimeStep& step);
 	void SolveElastic(const b2TimeStep& step);
