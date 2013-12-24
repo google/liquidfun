@@ -369,7 +369,7 @@ void Test::Step(Settings* settings)
 
 		int32 particleCount = m_world->GetParticleCount();
 		int32 groupCount = m_world->GetParticleGroupCount();
-		m_debugDraw.DrawString(5, m_textLine, "bodies/contacts/joints/particles/groups = %d/%d/%d/%d/%d", bodyCount, contactCount, jointCount, particleCount, groupCount);
+		m_debugDraw.DrawString(5, m_textLine, "particles/groups = %d/%d", particleCount, groupCount);
 		m_textLine += DRAW_STRING_NEW_LINE;
 
 		int32 proxyCount = m_world->GetProxyCount();
