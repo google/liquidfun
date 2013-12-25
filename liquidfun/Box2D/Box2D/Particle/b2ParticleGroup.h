@@ -54,6 +54,9 @@ struct b2ParticleGroupDef
 		color = b2ParticleColor_zero;
 		strength = 1;
 		shape = NULL;
+		stride = 0;
+		particleCount = 0;
+		positionData = NULL;
 		userData = NULL;
 	}
 
@@ -83,8 +86,18 @@ struct b2ParticleGroupDef
 	/// The strength of cohesion among the particles in a group with flag b2_elasticParticle or b2_springParticle.
 	float32 strength;
 
-	/// Shape containing the particle group.
+	/// The shape where particles will be added.
 	const b2Shape* shape;
+
+	/// The interval of particles in the shape.
+	/// If it is 0, b2_particleStride * particleDiameter is used instead.
+	float32 stride;
+
+	/// The number of particles in addition to ones added in the shape.
+	int32 particleCount;
+
+	/// The initial positions of the particleCount particles.
+	const b2Vec2* positionData;
 
 	/// Use this to store application-specific group data.
 	void* userData;

@@ -160,6 +160,42 @@ TEST_F(FunctionTests, CreateParticleGroup) {
 	EXPECT_EQ(m_world->GetParticleCount(), group->GetParticleCount());
 }
 
+TEST_F(FunctionTests, CreateParticleGroupWithCustomStride) {
+	b2ParticleGroupDef def;
+	b2PolygonShape shape;
+	shape.SetAsBox(10, 10);
+	def.shape = &shape;
+	def.stride = 1 * m_world->GetParticleRadius();
+	b2ParticleGroup *group1 = m_world->CreateParticleGroup(def);
+	def.stride = 2 * m_world->GetParticleRadius();
+	b2ParticleGroup *group2 = m_world->CreateParticleGroup(def);
+	def.stride = 3 * m_world->GetParticleRadius();
+	b2ParticleGroup *group3 = m_world->CreateParticleGroup(def);
+	EXPECT_GT(group1->GetParticleCount(), group2->GetParticleCount());
+	EXPECT_GT(group2->GetParticleCount(), group3->GetParticleCount());
+}
+
+TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
+	static const int32 particleCount = 100;
+	b2Vec2 positionData[particleCount];
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		positionData[i].Set(i, i);
+	}
+	b2ParticleGroupDef def;
+	def.particleCount = particleCount;
+	def.positionData = positionData;
+	b2ParticleGroup *group = m_world->CreateParticleGroup(def);
+	EXPECT_EQ(m_world->GetParticleCount(), particleCount);
+	EXPECT_EQ(group->GetParticleCount(), particleCount);
+	const b2Vec2 *positionBuffer = m_world->GetParticlePositionBuffer();
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ASSERT_EQ(positionBuffer[i].x, (float32) i);
+		ASSERT_EQ(positionBuffer[i].y, (float32) i);
+	}
+}
+
 TEST_F(FunctionTests, DestroyParticleGroup) {
 	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_world);
 	m_world->DestroyParticlesInGroup(group);

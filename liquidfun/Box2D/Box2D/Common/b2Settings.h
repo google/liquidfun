@@ -142,7 +142,7 @@ typedef unsigned long long uint64;
 /// A symbolic constant that stands for particle allocation error.
 #define b2_invalidParticleIndex		(-1)
 
-/// The standard distance between particles, divided by the particle radius.
+/// The standard distance between particles, divided by the particle diameter.
 #define b2_particleStride			0.75f
 
 /// The minimum particle weight that produces pressure.
@@ -151,7 +151,7 @@ typedef unsigned long long uint64;
 /// The upper limit for particle weight used in pressure calculation.
 #define b2_maxParticleWeight		5.0f
 
-/// The maximum distance between particles in a triad, divided by the particle radius.
+/// The maximum distance between particles in a triad, divided by the particle diameter.
 #define b2_maxTriadDistance			2
 #define b2_maxTriadDistanceSquared		(b2_maxTriadDistance * b2_maxTriadDistance)
 

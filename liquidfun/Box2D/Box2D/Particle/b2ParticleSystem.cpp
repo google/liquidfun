@@ -307,7 +307,11 @@ void b2ParticleSystem::CreateParticlesStrokeShapeForGroup(
 	const b2ParticleGroupDef& groupDef, const b2Transform& xf)
 {
 	const b2Shape *shape = groupDef.shape;
-	float32 stride = GetParticleStride();
+	float32 stride = groupDef.stride;
+	if (stride == 0)
+	{
+		stride = GetParticleStride();
+	}
 	float32 positionOnEdge = 0;
 	int32 childCount = shape->GetChildCount();
 	for (int32 childIndex = 0; childIndex < childCount; childIndex++)
@@ -338,7 +342,11 @@ void b2ParticleSystem::CreateParticlesFillShapeForGroup(
 	const b2ParticleGroupDef& groupDef, const b2Transform& xf)
 {
 	const b2Shape *shape = groupDef.shape;
-	float32 stride = GetParticleStride();
+	float32 stride = groupDef.stride;
+	if (stride == 0)
+	{
+		stride = GetParticleStride();
+	}
 	b2Transform identity;
 	identity.SetIdentity();
 	b2AABB aabb;
@@ -379,6 +387,15 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 		default:
 			b2Assert(false);
 			break;
+		}
+	}
+	if (groupDef.particleCount)
+	{
+		b2Assert(groupDef.positionData);
+		for (int32 i = 0; i < groupDef.particleCount; i++)
+		{
+			b2Vec2 p = groupDef.positionData[i];
+			CreateParticleForGroup(groupDef, transform, p);
 		}
 	}
 	int32 lastIndex = m_count;
