@@ -20,6 +20,7 @@
 #include "Render.h"
 #include "Test.h"
 #include "glui/glui.h"
+#include "AndroidUtil/AndroidLogPrint.h"
 
 #include <cstdio>
 #include <sstream>
@@ -164,7 +165,8 @@ static void SimulationLoop()
 
 	settings.hz = settingsHz;
 
-	// call this each frame, to function correctly with devices that may recreate the GL Context without us asking for it
+	// call this each frame, to function correctly with devices that may recreate
+	// the GL Context without us asking for it
 	Resize(width, height);
 
 	test->Step(&settings);
@@ -209,6 +211,22 @@ static void SimulationLoop()
 		viewZoom = 1.0f;
 		settings.viewCenter.Set(0.0f, 20.0f);
 		Resize(width, height);
+	}
+
+	// print world step time stats every 600 frames
+	static int s_printCount = 0;
+	static b2Stat st;
+	st.Record(settings.stepTimeOut);
+
+	const int STAT_PRINT_INTERVAL = 600;
+	if ( settings.printStepTimeStats && st.GetCount() == STAT_PRINT_INTERVAL )
+	{
+		printf("World Step Time samples %i-%i: %fmin %fmax %favg (ms)\n",
+			s_printCount*STAT_PRINT_INTERVAL,
+			(s_printCount+1)*STAT_PRINT_INTERVAL-1,
+			st.GetMin(), st.GetMax(), st.GetMean());
+		st.Clear();
+		s_printCount++;
 	}
 }
 

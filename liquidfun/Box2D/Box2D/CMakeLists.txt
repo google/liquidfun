@@ -34,6 +34,7 @@ set(BOX2D_Common_SRCS
 	Common/b2Math.cpp
 	Common/b2Settings.cpp
 	Common/b2StackAllocator.cpp
+	Common/b2Stat.cpp
 	Common/b2Timer.cpp
 )
 set(BOX2D_Common_HDRS
@@ -43,6 +44,7 @@ set(BOX2D_Common_HDRS
 	Common/b2Math.h
 	Common/b2Settings.h
 	Common/b2StackAllocator.h
+	Common/b2Stat.h
 	Common/b2Timer.h
 )
 set(BOX2D_Dynamics_SRCS

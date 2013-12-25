@@ -20,6 +20,7 @@
 #include "AndroidUtil/AndroidMainWrapper.h"
 
 #include <stdio.h>
+#include <math.h>
 
 class CommonTests : public ::testing::Test {
     protected:
@@ -126,6 +127,33 @@ TEST_F(CommonTests, b2Timer) {
 
 	timer.Reset();
 	EXPECT_FLOAT_EQ(0.0f,timer.GetMilliseconds());
+}
+
+TEST_F(CommonTests, b2Stat) {
+	b2Stat stat;
+	EXPECT_EQ(0,stat.GetCount());
+	EXPECT_TRUE(isnan(stat.GetMin()));
+	EXPECT_TRUE(isnan(stat.GetMax()));
+	EXPECT_TRUE(isnan(stat.GetMean()));
+
+	stat.Record(10.0f);
+	EXPECT_EQ(1,stat.GetCount());
+	EXPECT_FLOAT_EQ(10.0f,stat.GetMin());
+	EXPECT_FLOAT_EQ(10.0f,stat.GetMax());
+	EXPECT_FLOAT_EQ(10.0f,stat.GetMean());
+
+	stat.Record(1.0f);
+	stat.Record(100.0f);
+	EXPECT_EQ(3,stat.GetCount());
+	EXPECT_FLOAT_EQ(1.0f,stat.GetMin());
+	EXPECT_FLOAT_EQ(100.0f,stat.GetMax());
+	EXPECT_FLOAT_EQ(111.0f/3.0f,stat.GetMean());
+
+	stat.Clear();
+	EXPECT_EQ(0,stat.GetCount());
+	EXPECT_TRUE(isnan(stat.GetMin()));
+	EXPECT_TRUE(isnan(stat.GetMax()));
+	EXPECT_TRUE(isnan(stat.GetMean()));
 }
 
 int
