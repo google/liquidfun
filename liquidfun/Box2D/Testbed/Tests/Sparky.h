@@ -270,9 +270,9 @@ private:
 	static const int c_maxVFX = 50;
 
 	// How high to start the stack of sparky shapes.
-	static const float32 SHAPE_HEIGHT_OFFSET = 7;
+	static const float32 SHAPE_HEIGHT_OFFSET;
 	// Starting offset between sparky shapes.
-	static const float32 SHAPE_OFFSET = 4.5;
+	static const float32 SHAPE_OFFSET;
 
 	ParticleVFX *m_VFX[c_maxVFX];
 	// Was there a contact this frame?
@@ -280,5 +280,8 @@ private:
 	// Where was the contact?
 	b2Vec2 m_contactPoint;
 };
+
+const float32 Sparky::SHAPE_HEIGHT_OFFSET = 7;
+const float32 Sparky::SHAPE_OFFSET = 4.5;
 
 #endif
