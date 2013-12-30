@@ -350,7 +350,9 @@ void Test::Step(Settings* settings)
 
 	m_pointCount = 0;
 
+	b2Timer timer;
 	m_world->Step(timeStep, settings->velocityIterations, settings->positionIterations);
+	settings->stepTimeOut = timer.GetMilliseconds();
 
 	m_world->DrawDebugData();
 
