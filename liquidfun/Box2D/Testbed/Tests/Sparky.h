@@ -48,7 +48,7 @@ public:
 		m_pg = m_world->CreateParticleGroup(pd);
 
 		m_initialLifetime = m_remainingLifetime = lifetime;
-		m_halfLifetime = m_initialLifetime * 0.5;
+		m_halfLifetime = m_initialLifetime * 0.5f;
 
 		// Set particle initial velocity based on how far away it is from origin,
 		// exploding outwards.
@@ -93,7 +93,9 @@ public:
 			for (int i = bufferIndex; i < bufferIndex + m_pg->GetParticleCount(); i++)
 			{
 				b2ParticleColor &c = colors[i];
-				c.Set(m_origColor.r * coeff, m_origColor.g * coeff, m_origColor.b * coeff, m_origColor.a);
+				c.Set((int32)(m_origColor.r * coeff),
+				      (int32)(m_origColor.g * coeff),
+				      (int32)(m_origColor.b * coeff), m_origColor.a);
 			}
 		}
 	}

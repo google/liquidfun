@@ -27,10 +27,12 @@ LOCAL_SRC_FILES:=\
 	  $(wildcard $(LOCAL_PATH)/../glui/*.cpp) \
 	  $(wildcard $(LOCAL_PATH)/../GLEmu/*cpp))
 LOCAL_CFLAGS:=-DFREEGLUT_GLES1
-LOCAL_STATIC_LIBRARIES:=liquidfun_static freeglut-gles1_static
+LOCAL_STATIC_LIBRARIES:=liquidfun_static libandroidutil_static \
+                        freeglut-gles1_static
 LOCAL_LDLIBS:=-llog -landroid -lEGL -lGLESv1_CM
 LOCAL_ARM_MODE:=arm
 include $(BUILD_SHARED_LIBRARY)
 # Import liquidfun libraries and freeglut.
 $(call import-module,Box2D/jni)
+$(call import-module,Box2D/AndroidUtil/jni)
 $(call import-module,freeglut/jni)

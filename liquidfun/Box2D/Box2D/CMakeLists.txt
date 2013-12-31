@@ -162,6 +162,10 @@ if(BOX2D_BUILD_SHARED)
 		CLEAN_DIRECT_OUTPUT 1
 		VERSION ${BOX2D_VERSION}
 	)
+
+	if(UNIX AND NOT APPLE)
+		target_link_libraries(Box2D_shared rt)
+	endif(UNIX AND NOT APPLE)
 endif()
 
 if(BOX2D_BUILD_STATIC)
@@ -189,6 +193,10 @@ if(BOX2D_BUILD_STATIC)
 		CLEAN_DIRECT_OUTPUT 1
 		VERSION ${BOX2D_VERSION}
 	)
+
+	if(UNIX AND NOT APPLE)
+		target_link_libraries(Box2D rt)
+	endif(UNIX AND NOT APPLE)
 endif()
 
 # These are used to create visual studio folders.

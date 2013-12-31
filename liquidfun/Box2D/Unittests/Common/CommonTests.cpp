@@ -22,6 +22,11 @@
 #include <stdio.h>
 #include <math.h>
 
+#if defined(_WIN32) && !defined(isnan)
+#include <float.h>
+#define isnan(_x) (_isnan(_x) != 0)
+#endif // defined(_WIN32) && !defined(isnan)
+
 class CommonTests : public ::testing::Test {
     protected:
 	virtual void SetUp();
