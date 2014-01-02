@@ -18,8 +18,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include <cstdio>
-using namespace std;
+#include <stdio.h>
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #include <android/log.h>

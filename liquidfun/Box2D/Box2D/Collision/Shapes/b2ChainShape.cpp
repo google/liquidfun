@@ -19,8 +19,7 @@
 #include <Box2D/Collision/Shapes/b2ChainShape.h>
 #include <Box2D/Collision/Shapes/b2EdgeShape.h>
 #include <new>
-#include <cstring>
-using namespace std;
+#include <memory.h>
 
 b2ChainShape::~b2ChainShape()
 {
@@ -69,6 +68,9 @@ void b2ChainShape::CreateChain(const b2Vec2* vertices, int32 count)
 
 	m_hasPrevVertex = false;
 	m_hasNextVertex = false;
+
+	m_prevVertex.SetZero();
+	m_nextVertex.SetZero();
 }
 
 void b2ChainShape::SetPrevVertex(const b2Vec2& prevVertex)

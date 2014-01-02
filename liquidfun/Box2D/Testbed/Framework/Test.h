@@ -22,7 +22,7 @@
 #include <Box2D/Box2D.h>
 #include "Render.h"
 
-#include <cstdlib>
+#include <stdlib.h>
 
 class Test;
 struct Settings;
@@ -129,6 +129,7 @@ struct ContactPoint
 	b2PointState state;
 	float32 normalImpulse;
 	float32 tangentImpulse;
+	float32 separation;
 };
 
 class Test : public b2ContactListener

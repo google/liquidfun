@@ -17,8 +17,7 @@
 */
 
 #include "Test.h"
-#include <cstdio>
-using namespace std;
+#include <stdio.h>
 
 void DestructionListener::SayGoodbye(b2Joint* joint)
 {
@@ -93,6 +92,7 @@ void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
 		cp->state = state2[i];
 		cp->normalImpulse = manifold->points[i].normalImpulse;
 		cp->tangentImpulse = manifold->points[i].tangentImpulse;
+		cp->separation = worldManifold.separations[i];
 		++m_pointCount;
 	}
 }
