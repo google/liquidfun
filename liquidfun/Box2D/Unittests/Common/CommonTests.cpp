@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <math.h>
 
+using namespace std;
+
 #if defined(_WIN32) && !defined(isnan)
 #include <float.h>
 #define isnan(_x) (_isnan(_x) != 0)
