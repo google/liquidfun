@@ -61,6 +61,7 @@ struct Settings
 		velocityIterations = 8;
 		positionIterations = 3;
 		drawShapes = 1;
+		drawParticles = 1;
 		drawJoints = 1;
 		drawAABBs = 0;
 		drawContactPoints = 0;
@@ -85,6 +86,7 @@ struct Settings
 	int32 velocityIterations;
 	int32 positionIterations;
 	int32 drawShapes;
+	int32 drawParticles;
 	int32 drawJoints;
 	int32 drawAABBs;
 	int32 drawContactPoints;
