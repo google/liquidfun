@@ -62,7 +62,12 @@ main() {
     process rm ${f}
   done
 
-  local -r dirs=$(find . -type d -a \( -name CMakeFiles -o -name \
+  # -depth option is necessary to ensure that 
+  # .../CMakeFiles/CMakeTmp/CMakeFiles
+  # is output before
+  # .../CMakeFiles
+  # so that all rm operations succeed
+  local -r dirs=$(find . -depth -type d -a \( -name CMakeFiles -o -name \
     CMakeScripts \))
   for d in $dirs; do
     process rm -r ${d}
