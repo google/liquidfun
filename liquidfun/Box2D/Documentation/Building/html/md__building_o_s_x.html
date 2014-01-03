@@ -53,11 +53,11 @@ $(document).ready(function(){initNavTree('md__building_o_s_x.html','');});
 <div class="title">Building for OS X </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>LiquidFun releases contain a <a href="http://developer.apple.com/xcode/">Xcode</a> project to build the library and samples on <a href="http://www.apple.com/osx/">OS X</a>. The <a href="http://developer.apple.com/xcode/">Xcode</a> project has been generated using <a href="http://www.cmake.org">cmake</a>, and is modified to remove any host-specific dependencies.</p>
+<div class="textblock"><p>LiquidFun releases contain an <a href="http://developer.apple.com/xcode/">Xcode</a> project to build the library and samples on <a href="http://www.apple.com/osx/">OS X</a>. The <a href="http://developer.apple.com/xcode/">Xcode</a> project has been generated using <a href="http://www.cmake.org">cmake</a>, and is free of any host-specific dependencies.</p>
 <h3>Before Building</h3>
 <ul>
-<li>Install <a href="http://xquartz.macosforge.org/">Xquartz</a> to run LiquidFun sample applications. <a href="http://xquartz.macosforge.org/">Xquartz</a> is required by <a href="http://freeglut.sourceforge.net/">freeglut</a></li>
-<li>Reboot your machine. This sets the <code>DISPLAY</code> environment variable for <a href="http://xquartz.macosforge.org/">Xquartz</a> which enables sample applications to run correctly.</li>
+<li>Install <a href="http://xquartz.macosforge.org/">Xquartz</a> to run LiquidFun sample applications. <a href="http://freeglut.sourceforge.net/">freeglut</a> requires <a href="http://xquartz.macosforge.org/">Xquartz</a>.</li>
+<li>Reboot your machine. Rebooting sets the <code>DISPLAY</code> environment variable for <a href="http://xquartz.macosforge.org/">Xquartz</a>, which enables sample applications to run correctly.</li>
 </ul>
 <h3>Building with <a href="http://developer.apple.com/xcode/">Xcode</a></h3>
 <ul>
@@ -66,15 +66,15 @@ $(document).ready(function(){initNavTree('md__building_o_s_x.html','');});
 </ul>
 <h3>Executing a Sample</h3>
 <ul>
-<li>Select a sample <code>Scheme</code>, for example "Testbed--&gt;My Mac 64-bit" from the combo box to the right of the "Run" button.</li>
+<li>Select a sample <code>Scheme</code>, for example "Testbed--&gt;My Mac 64-bit", from the combo box to the right of the "Run" button.</li>
 <li>Click the "Run" button.</li>
 </ul>
 <h3>Building using <a href="http://www.cmake.org">cmake</a></h3>
 <p>When working directly with the source, you can generate the <a href="http://developer.apple.com/xcode/">Xcode</a> project using <a href="http://www.cmake.org">cmake</a>. <a href="http://www.cmake.org">cmake</a> version 2.8.12.1 or above is required to build this project on <a href="http://www.apple.com/osx/">OS X</a> 10.9 (Mavericks). For example, the following generates the Xcode project in the liquidfun/Box2D directory. </p>
 <pre class="fragment">cd liquidfun/Box2D
-cmake -G"Xcode"
+cmake -G "Xcode"
 </pre><h3>Running Unit Tests</h3>
-<p>Developers modifying the LiquidFun library can verify that it still working correctly by executing the provided unit tests.</p>
+<p>Developers modifying the LiquidFun library can verify that it is still working correctly by executing the provided unit tests.</p>
 <p>Use the run_tests.sh script to execute unit tests: </p>
 <pre class="fragment">./liquidfun/Box2D/Unittests/run_tests.sh
 </pre> </div></div><!-- contents -->

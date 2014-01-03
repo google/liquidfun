@@ -92,6 +92,7 @@ var searchData=
   ['b2stackallocator',['b2StackAllocator',['../classb2_stack_allocator.html',1,'']]],
   ['b2stackentry',['b2StackEntry',['../structb2_stack_entry.html',1,'']]],
   ['b2stackqueue',['b2StackQueue',['../classb2_stack_queue.html',1,'']]],
+  ['b2stat',['b2Stat',['../classb2_stat.html',1,'']]],
   ['b2sweep',['b2Sweep',['../structb2_sweep.html',1,'']]],
   ['b2timer',['b2Timer',['../classb2_timer.html',1,'']]],
   ['b2timestep',['b2TimeStep',['../structb2_time_step.html',1,'']]],

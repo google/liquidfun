@@ -3,7 +3,7 @@
 LiquidFun releases include a [Visual Studio][] solution
 (`liquidfun/Box2D/Box2D.sln`) and project files to build the library and
 examples on [Windows][].  The Visual Studio solution has been generated using
-[cmake][], and modified to remove any host-specific dependencies.  It has been
+[cmake][], and is free of any host-specific dependencies.  It has been
 tested with Microsoft [Visual Studio][] 2012.
 
 ### Building with [Visual Studio][]
@@ -14,21 +14,21 @@ tested with Microsoft [Visual Studio][] 2012.
 ### Executing a Sample
 
 -   Right-click on an example project (e.g Testbed) in the Solution Explorer
-    pane and select "Set as StartUp Project".
+    pane, and select "Set as StartUp Project".
 -   Select "Debug-->Start Debugging" from the menu.
 
 ### Building using [cmake][]
 
-When working directly with the source, generate the [Visual Studio][] solution
-and project files using [cmake][].  For example, the following generates the
-[Visual Studio][] solution in the `liquidfun/Box2D` directory.
+When working directly with the source, use [cmake][] to generate the
+[Visual Studio][] solution and project files.  For example, the following
+generates the [Visual Studio][] solution in the `liquidfun/Box2D` directory:
 
     cd liquidfun/Box2D
-    cmake -G"Visual Studio 11"
+    cmake -G "Visual Studio 11"
 
 ### Running Unit Tests
 
-Developers modifying the LiquidFun library can verify that it still working
+Developers modifying the LiquidFun library can verify that it is still working
 correctly by executing the provided unit tests.
 
 Use the run\_tests.bat batch file to execute unit tests:

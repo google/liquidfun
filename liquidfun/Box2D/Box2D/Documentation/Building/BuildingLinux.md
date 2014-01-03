@@ -4,18 +4,18 @@
 
 Prior to building, install the following components using the [Linux][]
 distribution's package manager:
--    Install [cmake][] using the package manager or download and manually
-     install from [cmake.org](http://cmake.org).
--    Install OpenGL (`libglapi-mesa`).
--    Install GLU (`libglu1-mesa-dev`).
+-    [cmake][]. You can also manually install from [cmake.org]
+     (http://cmake.org).
+-    OpenGL (`libglapi-mesa`).
+-    GLU (`libglu1-mesa-dev`).
 
-For example on Ubuntu:
+For example, on Ubuntu:
 
     sudo apt-get install cmake
     sudo apt-get install libglapi-mesa
     sudo apt-get install libglu1-mesa-dev
 
-OpenGL and GLU are required by the sample applications.
+The sample applications require OpenGL and GLU.
 
 ### Building
 
