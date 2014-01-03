@@ -80,13 +80,20 @@ redirected.</a>
     # missing named anchors where they're present.
     linklint -no_anchors -orphan -root "${docs_output_dir}" /@ -doc "${results}"
     if grep -q ERROR "${results}/index.html"; then
-      echo -e "\nlinklink detected errors: results are available for"\
+      echo -e "\nlinklint detected errors: results are available for"\
               "inspection in" \
               "\n  ${results}" >&2
       exit 1
     fi
+    # Report an error if an https link has been added.
+    # github does not support https links
+    if grep -r https "${results}"; then
+      echo -e "\nERROR linklint detected https links: "\
+              "github does not support https." >&2
+      exit 1
+    fi
   else
-    echo "Unable to find linklink, install to validate the" \
+    echo "Unable to find linklint, install to validate the" \
          "generated documentation." >&2
     exit 1
   fi
