@@ -15,8 +15,8 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef B2_STATLOG
-#define B2_STATLOG
+#ifndef B2_STAT
+#define B2_STAT
 
 #include <Box2D/Common/b2Settings.h>
 
@@ -29,12 +29,22 @@ public:
 	/// Record a sample
 	void Record( float32 t );
 
-	int GetCount();
-	float32 GetMean();
-	float32 GetMin();
-	float32 GetMax();
+	/// Returns the number of recorded samples
+	int GetCount() const;
 
-	/// Clear stat buffer
+	/// Returns the mean of all recorded samples,
+	/// Returns 0 if there are no recorded samples
+	float32 GetMean() const;
+
+	/// Returns the min of all recorded samples,
+	/// FLT_MAX if there are no recorded samples
+	float32 GetMin() const;
+
+	/// Returns the max of all recorded samples,
+	/// -FLT_MAX if there are no recorded samples
+	float32 GetMax() const;
+
+	/// Erase all recorded samples
 	void Clear();
 private:
 

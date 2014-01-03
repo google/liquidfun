@@ -19,16 +19,6 @@
 #include "Box2D/Box2D.h"
 #include "AndroidUtil/AndroidMainWrapper.h"
 
-#include <stdio.h>
-#include <math.h>
-
-using namespace std;
-
-#if defined(_WIN32) && !defined(isnan)
-#include <float.h>
-#define isnan(_x) (_isnan(_x) != 0)
-#endif // defined(_WIN32) && !defined(isnan)
-
 class CommonTests : public ::testing::Test {
     protected:
 	virtual void SetUp();
@@ -139,9 +129,9 @@ TEST_F(CommonTests, b2Timer) {
 TEST_F(CommonTests, b2Stat) {
 	b2Stat stat;
 	EXPECT_EQ(0,stat.GetCount());
-	EXPECT_TRUE(isnan(stat.GetMin()));
-	EXPECT_TRUE(isnan(stat.GetMax()));
-	EXPECT_TRUE(isnan(stat.GetMean()));
+	EXPECT_EQ(FLT_MAX,stat.GetMin());
+	EXPECT_EQ(-FLT_MAX,stat.GetMax());
+	EXPECT_EQ(0.0f,stat.GetMean());
 
 	stat.Record(10.0f);
 	EXPECT_EQ(1,stat.GetCount());
@@ -158,9 +148,9 @@ TEST_F(CommonTests, b2Stat) {
 
 	stat.Clear();
 	EXPECT_EQ(0,stat.GetCount());
-	EXPECT_TRUE(isnan(stat.GetMin()));
-	EXPECT_TRUE(isnan(stat.GetMax()));
-	EXPECT_TRUE(isnan(stat.GetMean()));
+	EXPECT_EQ(FLT_MAX,stat.GetMin());
+	EXPECT_EQ(-FLT_MAX,stat.GetMax());
+	EXPECT_EQ(0.0f,stat.GetMean());
 }
 
 int

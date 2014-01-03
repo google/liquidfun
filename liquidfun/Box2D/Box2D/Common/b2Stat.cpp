@@ -20,11 +20,6 @@
 #include <algorithm>
 #include <cfloat>
 
-#if defined(_WIN32) && !defined(NAN)
-static const unsigned long __nan[] = {0xffffffff};
-#define NAN (*(const float *)__nan)
-#endif // defined(_WIN32) && !defined(NAN)
-
 b2Stat::b2Stat()
 {
 	Clear();
@@ -38,35 +33,27 @@ void b2Stat::Record( float32 t )
 	m_count++;
 }
 
-int b2Stat::GetCount()
+int b2Stat::GetCount() const
 {
 	return m_count;
 }
 
-float32 b2Stat::GetMean()
+float32 b2Stat::GetMean() const
 {
 	if (m_count == 0)
 	{
-		return NAN;
+		return 0.0f;
 	}
 	return (float32)(m_total / m_count);
 }
 
-float32 b2Stat::GetMin()
+float32 b2Stat::GetMin() const
 {
-	if (m_count == 0)
-	{
-		return NAN;
-	}
 	return m_min;
 }
 
-float32 b2Stat::GetMax()
+float32 b2Stat::GetMax() const
 {
-	if (m_count == 0)
-	{
-		return NAN;
-	}
 	return m_max;
 }
 
