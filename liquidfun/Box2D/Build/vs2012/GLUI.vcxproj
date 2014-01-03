@@ -19,30 +19,34 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3FC8974C-9179-4D4E-A5E0-79E3C836548F}</ProjectGuid>
-    <RootNamespace>Testbed</RootNamespace>
+    <ProjectGuid>{6F01DB00-32F0-A842-9B60-3ABA75A2D458}</ProjectGuid>
+    <RootNamespace>GLUI</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -63,24 +67,21 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\Debug\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">obj\x32\Debug\Testbed\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Testbed</TargetName>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">obj\x32\Debug\GLUI\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GLUI</TargetName>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\Debug\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\x64\Debug\Testbed\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Testbed</TargetName>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\x64\Debug\GLUI\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">GLUI</TargetName>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\Release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">obj\x32\Release\Testbed\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Testbed</TargetName>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">obj\x32\Release\GLUI\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">GLUI</TargetName>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\Release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\x64\Release\Testbed\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Testbed</TargetName>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\x64\Release\GLUI\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">GLUI</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
+      <AdditionalOptions>/W1 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -92,24 +93,24 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <ProgramDataBaseFileName>$(OutDir)Testbed.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)GLUI.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-    <Link>
-      <AdditionalDependencies>bin\Debug\Box2D.lib;bin\Debug\FreeGLUT.lib;bin\Debug\GLUI.lib;glu32.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)Testbed.exe</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+    <Lib>
+      <OutputFile>$(OutDir)GLUI.lib</OutputFile>
       <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
+      <AdditionalOptions>/W1 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -121,24 +122,24 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ProgramDataBaseFileName>$(OutDir)Testbed.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(OutDir)GLUI.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-    <Link>
-      <AdditionalDependencies>bin\Debug\Box2D.lib;bin\Debug\FreeGLUT.lib;bin\Debug\GLUI.lib;glu32.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)Testbed.exe</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+    <Lib>
+      <OutputFile>$(OutDir)GLUI.lib</OutputFile>
       <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
+      <AdditionalOptions>/W1 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Full</Optimization>
       <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -156,20 +157,20 @@
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)GLUI.lib</OutputFile>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
     <Link>
-      <AdditionalDependencies>bin\Release\Box2D.lib;bin\Release\FreeGLUT.lib;bin\Release\GLUI.lib;glu32.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)Testbed.exe</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
+      <AdditionalOptions>/W1 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Full</Optimization>
       <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -180,85 +181,96 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)GLUI.lib</OutputFile>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
     <Link>
-      <AdditionalDependencies>bin\Release\Box2D.lib;bin\Release\FreeGLUT.lib;bin\Release\GLUI.lib;glu32.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)Testbed.exe</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Testbed\Framework\Render.h" />
-    <ClInclude Include="..\..\Testbed\Framework\Test.h" />
-    <ClInclude Include="..\..\Testbed\Tests\AddPair.h" />
-    <ClInclude Include="..\..\Testbed\Tests\ApplyForce.h" />
-    <ClInclude Include="..\..\Testbed\Tests\BodyTypes.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Breakable.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Bridge.h" />
-    <ClInclude Include="..\..\Testbed\Tests\BulletTest.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Cantilever.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Car.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Chain.h" />
-    <ClInclude Include="..\..\Testbed\Tests\CharacterCollision.h" />
-    <ClInclude Include="..\..\Testbed\Tests\CollisionFiltering.h" />
-    <ClInclude Include="..\..\Testbed\Tests\CollisionProcessing.h" />
-    <ClInclude Include="..\..\Testbed\Tests\CompoundShapes.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Confined.h" />
-    <ClInclude Include="..\..\Testbed\Tests\ContinuousTest.h" />
-    <ClInclude Include="..\..\Testbed\Tests\ConveyorBelt.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Cord.h" />
-    <ClInclude Include="..\..\Testbed\Tests\DistanceTest.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Dominos.h" />
-    <ClInclude Include="..\..\Testbed\Tests\DumpShell.h" />
-    <ClInclude Include="..\..\Testbed\Tests\DynamicTreeTest.h" />
-    <ClInclude Include="..\..\Testbed\Tests\EdgeShapes.h" />
-    <ClInclude Include="..\..\Testbed\Tests\EdgeTest.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Gears.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Mobile.h" />
-    <ClInclude Include="..\..\Testbed\Tests\MobileBalanced.h" />
-    <ClInclude Include="..\..\Testbed\Tests\MotorJoint.h" />
-    <ClInclude Include="..\..\Testbed\Tests\OneSidedPlatform.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Pinball.h" />
-    <ClInclude Include="..\..\Testbed\Tests\PolyCollision.h" />
-    <ClInclude Include="..\..\Testbed\Tests\PolyShapes.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Prismatic.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Pulleys.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Pyramid.h" />
-    <ClInclude Include="..\..\Testbed\Tests\RayCast.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Revolute.h" />
-    <ClInclude Include="..\..\Testbed\Tests\RopeJoint.h" />
-    <ClInclude Include="..\..\Testbed\Tests\SensorTest.h" />
-    <ClInclude Include="..\..\Testbed\Tests\ShapeEditing.h" />
-    <ClInclude Include="..\..\Testbed\Tests\SliderCrank.h" />
-    <ClInclude Include="..\..\Testbed\Tests\SphereStack.h" />
-    <ClInclude Include="..\..\Testbed\Tests\TheoJansen.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Tiles.h" />
-    <ClInclude Include="..\..\Testbed\Tests\TimeOfImpact.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Tumbler.h" />
-    <ClInclude Include="..\..\Testbed\Tests\VaryingFriction.h" />
-    <ClInclude Include="..\..\Testbed\Tests\VaryingRestitution.h" />
-    <ClInclude Include="..\..\Testbed\Tests\VerticalStack.h" />
-    <ClInclude Include="..\..\Testbed\Tests\Web.h" />
+    <ClInclude Include="..\..\glui\algebra3.h" />
+    <ClInclude Include="..\..\glui\arcball.h" />
+    <ClInclude Include="..\..\glui\glui.h" />
+    <ClInclude Include="..\..\glui\glui_internal.h" />
+    <ClInclude Include="..\..\glui\glui_internal_control.h" />
+    <ClInclude Include="..\..\glui\quaternion.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Testbed\Framework\Main.cpp">
+    <ClCompile Include="..\..\glui\algebra3.cpp">
     </ClCompile>
-    <ClCompile Include="..\..\Testbed\Framework\Render.cpp">
+    <ClCompile Include="..\..\glui\arcball.cpp">
     </ClCompile>
-    <ClCompile Include="..\..\Testbed\Framework\Test.cpp">
+    <ClCompile Include="..\..\glui\glui.cpp">
     </ClCompile>
-    <ClCompile Include="..\..\Testbed\Tests\TestEntries.cpp">
+    <ClCompile Include="..\..\glui\glui_add_controls.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_bitmaps.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_bitmap_img_data.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_button.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_checkbox.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_column.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_commandline.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_control.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_edittext.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_filebrowser.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_list.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_listbox.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_mouse_iaction.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_node.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_panel.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_radio.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_rollout.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_rotation.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_scrollbar.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_separator.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_spinner.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_statictext.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_string.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_textbox.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_translation.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_tree.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_treepanel.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\glui_window.cpp">
+    </ClCompile>
+    <ClCompile Include="..\..\glui\quaternion.cpp">
     </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
