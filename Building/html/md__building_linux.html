@@ -56,15 +56,15 @@ $(document).ready(function(){initNavTree('md__building_linux.html','');});
 <div class="textblock"><h3>Before Building</h3>
 <p>Prior to building, install the following components using the <a href="http://en.wikipedia.org/wiki/Linux">Linux</a> distribution's package manager:</p>
 <ul>
-<li>Install <a href="http://www.cmake.org">cmake</a> using the package manager or download and manually install from <a href="http://cmake.org">cmake.org</a>.</li>
-<li>Install OpenGL (<code>libglapi-mesa</code>).</li>
-<li>Install GLU (<code>libglu1-mesa-dev</code>).</li>
+<li><a href="http://www.cmake.org">cmake</a>. You can also manually install from <a href="http://cmake.org">cmake.org</a>.</li>
+<li>OpenGL (<code>libglapi-mesa</code>).</li>
+<li>GLU (<code>libglu1-mesa-dev</code>).</li>
 </ul>
-<p>For example on Ubuntu: </p>
+<p>For example, on Ubuntu: </p>
 <pre class="fragment">sudo apt-get install cmake
 sudo apt-get install libglapi-mesa
 sudo apt-get install libglu1-mesa-dev
-</pre><p>OpenGL and GLU are required by the sample applications.</p>
+</pre><p>The sample applications require OpenGL and GLU.</p>
 <h3>Building</h3>
 <ul>
 <li>Generate makefiles from the <a href="http://www.cmake.org">cmake</a> project in <code>liquidfun/Box2D</code>.</li>

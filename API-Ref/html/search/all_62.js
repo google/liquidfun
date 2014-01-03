@@ -136,6 +136,7 @@ var searchData=
   ['b2stackallocator',['b2StackAllocator',['../classb2_stack_allocator.html',1,'']]],
   ['b2stackentry',['b2StackEntry',['../structb2_stack_entry.html',1,'']]],
   ['b2stackqueue',['b2StackQueue',['../classb2_stack_queue.html',1,'']]],
+  ['b2stat',['b2Stat',['../classb2_stat.html',1,'']]],
   ['b2sweep',['b2Sweep',['../structb2_sweep.html',1,'']]],
   ['b2testoverlap',['b2TestOverlap',['../b2_collision_8h.html#ae7601420d0b42c1ee494e879dd2009a5',1,'b2Collision.cpp']]],
   ['b2timer',['b2Timer',['../classb2_timer.html',1,'b2Timer'],['../classb2_timer.html#afcc159032a8edeaa9febdf2b6cbd49a5',1,'b2Timer::b2Timer()']]],

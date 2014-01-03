@@ -121,21 +121,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    float32 <a class="code" href="classb2_timer.html#a354e020ec583a067b8f3b90a42a88e53">GetMilliseconds</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#if defined(_WIN32)</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor"></span>    float64 m_start;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">static</span> float64 s_invFrequency;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#elif defined(__linux__) || defined (__APPLE__)</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor"></span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> m_start_sec;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> m_start_usec;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor"></span>};</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classb2_timer_html_a367388794588e9283600437be82f2889"><div class="ttname"><a href="classb2_timer.html#a367388794588e9283600437be82f2889">b2Timer::Reset</a></div><div class="ttdeci">void Reset()</div><div class="ttdoc">Reset the timer. </div><div class="ttdef"><b>Definition:</b> b2Timer.cpp:91</div></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">static</span> int64 GetTicks();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#if defined(_WIN32)</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor"></span>    <span class="keyword">static</span> float64 s_invFrequency;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor"></span>    int64 m_start;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classb2_timer_html_a367388794588e9283600437be82f2889"><div class="ttname"><a href="classb2_timer.html#a367388794588e9283600437be82f2889">b2Timer::Reset</a></div><div class="ttdeci">void Reset()</div><div class="ttdoc">Reset the timer. </div><div class="ttdef"><b>Definition:</b> b2Timer.cpp:123</div></div>
 <div class="ttc" id="classb2_timer_html"><div class="ttname"><a href="classb2_timer.html">b2Timer</a></div><div class="ttdef"><b>Definition:</b> b2Timer.h:26</div></div>
-<div class="ttc" id="classb2_timer_html_a354e020ec583a067b8f3b90a42a88e53"><div class="ttname"><a href="classb2_timer.html#a354e020ec583a067b8f3b90a42a88e53">b2Timer::GetMilliseconds</a></div><div class="ttdeci">float32 GetMilliseconds() const </div><div class="ttdoc">Get the time since construction or the last reset. </div><div class="ttdef"><b>Definition:</b> b2Timer.cpp:95</div></div>
-<div class="ttc" id="classb2_timer_html_afcc159032a8edeaa9febdf2b6cbd49a5"><div class="ttname"><a href="classb2_timer.html#afcc159032a8edeaa9febdf2b6cbd49a5">b2Timer::b2Timer</a></div><div class="ttdeci">b2Timer()</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> b2Timer.cpp:87</div></div>
+<div class="ttc" id="classb2_timer_html_a354e020ec583a067b8f3b90a42a88e53"><div class="ttname"><a href="classb2_timer.html#a354e020ec583a067b8f3b90a42a88e53">b2Timer::GetMilliseconds</a></div><div class="ttdeci">float32 GetMilliseconds() const </div><div class="ttdoc">Get the time since construction or the last reset. </div><div class="ttdef"><b>Definition:</b> b2Timer.cpp:127</div></div>
+<div class="ttc" id="classb2_timer_html_afcc159032a8edeaa9febdf2b6cbd49a5"><div class="ttname"><a href="classb2_timer.html#afcc159032a8edeaa9febdf2b6cbd49a5">b2Timer::b2Timer</a></div><div class="ttdeci">b2Timer()</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> b2Timer.cpp:119</div></div>
 <div class="ttc" id="b2_settings_8h_html"><div class="ttname"><a href="b2_settings_8h.html">b2Settings.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Google Analytics -->
