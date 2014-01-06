@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['clear',['Clear',['../classb2_stat.html#af1c7d03978872cd967b085c2ce9144b0',1,'b2Stat']]],
   ['clearflags',['ClearFlags',['../classb2_draw.html#afc240b71f4ba8c17440d6ed526d4e22e',1,'b2Draw']]],
   ['clearforces',['ClearForces',['../classb2_world.html#ac082ab4c4ad0b1c5ec4674315eeec643',1,'b2World']]],
   ['clone',['Clone',['../classb2_chain_shape.html#a651a039aa4584e48df91db8108729bfa',1,'b2ChainShape::Clone()'],['../classb2_circle_shape.html#a895ba8656a146d26a0c531e9dbea2e14',1,'b2CircleShape::Clone()'],['../classb2_edge_shape.html#a70ce8532bab35dce4367d3717ae024b3',1,'b2EdgeShape::Clone()'],['../classb2_polygon_shape.html#a38cf6a915a85691746465c9dbfc5aeb6',1,'b2PolygonShape::Clone()'],['../classb2_shape.html#a4716243454bb9cf7c7ee1d9cb23ae634',1,'b2Shape::Clone()']]],
