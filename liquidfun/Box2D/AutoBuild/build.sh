@@ -15,6 +15,7 @@
 # misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 #
+
 # Build this project on Linux or OSX.
 
 declare -r project_name=LiquidFun
@@ -25,16 +26,29 @@ declare -r arch=$(uname -m)
 declare -r os_name=$(uname -s)
 declare -r os_name_lower=$(echo ${os_name} | tr 'A-Z' 'a-z')
 declare -r cmake_minversion_minmaj=2.8
+# Set this to "echo" to only display the build commands.
+declare dryrun=
 
 usage() {
   echo "\
 Generate Makefiles or Xcode project for ${project_name} and build the specified
 configuration.
 
-Usage: ${script_name} [build_configuration]
+Usage: ${script_name} [-h] [-n] [-b build_configuration] [build_configuration]
 
-build_configuration: Project configuration to build.  Can be either \"debug\"
-or \"release\".  If not specified, defaults to \"${build_config}\".
+-h:
+  Display this help message.
+-n:
+  Do not clean before building the project.
+-d:
+  Display the build commands this script would run without building.
+-b build_configuration:
+  build_configuration specifies the project configuration to build.
+  Can be either \"debug\" or \"release\".  If not specified, defaults to
+  \"${build_config}\".
+
+build_configuration:
+  Legacy form of '-b build_configuration'.
 " >&2
   exit 1
 }
@@ -66,12 +80,29 @@ current/*.app/Contents/bin/cmake)
 
 # Parse arguments.
 build_config=release
-if [[ $# -gt 0 ]]; then
-  case "${1}" in
-    debug|release) build_config=${1} ;;
+clean=1
+
+while getopts 'hndb:' option; do
+  case ${option} in
+    h) usage ;;
+    n) clean=0 ;;
+    b) build_config=${OPTARG};;
+    d) dryrun=echo ;;
     *) usage ;;
   esac
+done
+# Manually parse legacy build config option.
+shift $((OPTIND-1))
+if [[ $# -gt 0 ]]; then
+  build_config="${1}"
 fi
+
+# Validate the build configuration.
+case ${build_config} in
+  debug|release) ;;
+  * ) echo "Invalid build config \"${build_config}\"." >&2
+      exit 1 ;;
+esac
 
 declare -r cmake=$(find_cmake)
 
@@ -83,19 +114,41 @@ if [[ "${os_name}" == "Darwin" ]]; then
     debug) xcodebuild_config="-configuration Debug" ;;
     release) xcodebuild_config="-configuration Release" ;;
   esac
-  "${cmake}" -G'Xcode'
+  # Only rebuild the xcode project if the CMakeLists.txt file is newer.
+  # Xcode will rebuild a big chunk of a project if the project file is
+  # modified by cmake.
+  # NOTE: This will incorrectly *not* result in the xcode project not being
+  # rebuilt if any files CMakeLists.txt depends upon are modified.
+  [[ $((clean)) -eq 1 || \
+     ! -e Box2D.xcodeproj || \
+     $(stat -f%m CMakeLists.txt) -gt $(stat -f%m Box2D.xcodeproj) ]] && \
+    "${cmake}" -G'Xcode'
   eval "\
-    xcodebuild ${xcodebuild_config} clean
-    xcodebuild ${xcodebuild_config}"
+    [[ $((clean)) -ne 0 ]] && ${dryrun} xcodebuild ${xcodebuild_config} clean
+    ${dryrun} xcodebuild ${xcodebuild_config}"
 else
   declare makefile_config=
+  declare cmake_config=
   case ${build_config} in
-    debug) makefile_config="DEBUG=1" ;;
-    release) makefile_config= ;;
+    debug)
+      cmake_config='-DCMAKE_BUILD_TYPE=Debug'
+      makefile_config="DEBUG=1"
+      ;;
+    release)
+      cmake_config=
+      makefile_config=
+      ;;
   esac
-  "${cmake}" -G'Unix Makefiles'
+  # Only rebuild the makefiles if the CMakeLists.txt file is newer than the
+  # top level makefile.
+  # NOTE: This will result in the xcode project not being rebuilt if any
+  # files CMakeLists.txt depends upon are modified.
+  [[ $((clean)) -eq 1 || \
+     ! -e Makefile || \
+     $(stat -c%Y CMakeLists.txt) -gt $(stat -c%Y Makefile) ]] && \
+    "${cmake}" -G'Unix Makefiles' ${cmake_config}
   eval "\
-    make ${makefile_config} clean
-    make -j$(awk '/^processor/ { n=$3 } END { print n + 1 }' /proc/cpuinfo) \
-           ${makefile_config}"
+    [[ $((clean)) -ne 0 ]] && ${dryrun} make ${makefile_config} clean
+    ${dryrun} make -j$(awk '/^processor/ { n=$3 } END { print n + 1 }' \
+                       /proc/cpuinfo) ${makefile_config}"
 fi
