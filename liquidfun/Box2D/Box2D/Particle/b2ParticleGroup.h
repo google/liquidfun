@@ -24,7 +24,7 @@ class b2Shape;
 class b2World;
 class b2ParticleSystem;
 class b2ParticleGroup;
-struct b2ParticleColor;
+class b2ParticleColor;
 
 enum b2ParticleGroupFlag
 {

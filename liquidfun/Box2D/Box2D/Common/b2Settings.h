@@ -53,6 +53,14 @@ typedef unsigned long long uint64;
 #define	b2_epsilon		FLT_EPSILON
 #define b2_pi			3.14159265359f
 
+#if !defined(b2Inline)
+#if defined(__GNUC__)
+#define b2Inline __attribute__((always_inline))
+#else
+#define b2Inline inline
+#endif // defined(__GNUC__)
+#endif // !defined(b2Inline)
+
 /// @file
 /// Global tuning constants based on meters-kilograms-seconds (MKS) units.
 ///
