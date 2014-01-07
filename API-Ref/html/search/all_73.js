@@ -70,6 +70,6 @@ var searchData=
   ['solve',['Solve',['../structb2_mat22.html#ab511ad33f5abf87351581842628a9dc3',1,'b2Mat22']]],
   ['solve22',['Solve22',['../structb2_mat33.html#a2580ac2afadc48028a63ed4c8a1f16bc',1,'b2Mat33']]],
   ['solve33',['Solve33',['../structb2_mat33.html#a478872c7b6a3bedd13fbedd3ec7a2edb',1,'b2Mat33']]],
-  ['step',['Step',['../classb2_world.html#a7a8eff61af98461f978fe43f3af7be90',1,'b2World']]],
+  ['step',['Step',['../classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420',1,'b2World::Step(float32 timeStep, int32 velocityIterations, int32 positionIterations, int32 particleIterations)'],['../classb2_world.html#a7a8eff61af98461f978fe43f3af7be90',1,'b2World::Step(float32 timeStep, int32 velocityIterations, int32 positionIterations)']]],
   ['strength',['strength',['../structb2_particle_group_def.html#a77c3ac47ae906e34e7f3fecf7b8f7aad',1,'b2ParticleGroupDef']]]
 ];
