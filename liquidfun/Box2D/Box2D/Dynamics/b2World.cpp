@@ -872,6 +872,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 		subStep.dtRatio = 1.0f;
 		subStep.positionIterations = 20;
 		subStep.velocityIterations = step.velocityIterations;
+		subStep.particleIterations = step.particleIterations;
 		subStep.warmStarting = false;
 		island.SolveTOI(subStep, bA->m_islandIndex, bB->m_islandIndex);
 
@@ -907,7 +908,11 @@ void b2World::SolveTOI(const b2TimeStep& step)
 	}
 }
 
-void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIterations)
+void b2World::Step(
+	float32 dt,
+	int32 velocityIterations,
+	int32 positionIterations,
+	int32 particleIterations)
 {
 	b2Timer stepTimer;
 
@@ -924,6 +929,7 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 	step.dt = dt;
 	step.velocityIterations	= velocityIterations;
 	step.positionIterations = positionIterations;
+	step.particleIterations = particleIterations;
 	if (dt > 0.0f)
 	{
 		step.inv_dt = 1.0f / dt;

@@ -53,6 +53,8 @@ b2ParticleSystem::b2ParticleSystem()
 	m_timestamp = 0;
 	m_allParticleFlags = 0;
 	m_allGroupFlags = 0;
+	m_iterationIndex = 0;
+
 	m_density = 1;
 	m_inverseDensity = 1;
 	m_gravityScale = 1;
@@ -952,7 +954,14 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 						b2Vec2 av = m_system->m_velocityBuffer.data[a];
 						b2RayCastOutput output;
 						b2RayCastInput input;
-						input.p1 = b2Mul(body->m_xf, b2MulT(body->m_xf0, ap));
+						if (m_system->m_iterationIndex == 0)
+						{
+							input.p1 = b2Mul(body->m_xf, b2MulT(body->m_xf0, ap));
+						}
+						else
+						{
+							input.p1 = ap;
+						}
 						input.p2 = ap + m_step.dt * av;
 						input.maxFraction = 1;
 						if (fixture->RayCast(&output, input, childIndex))
@@ -1005,7 +1014,6 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 
 void b2ParticleSystem::Solve(const b2TimeStep& step)
 {
-	++m_timestamp;
 	if (m_count == 0)
 	{
 		return;
@@ -1024,60 +1032,69 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	{
 		m_allGroupFlags |= group->m_groupFlags;
 	}
-	UpdateBodyContacts();
-	UpdateContacts(false);
-	if (m_allGroupFlags & b2_particleGroupNeedsUpdateDepth)
+	for (m_iterationIndex = 0;
+		m_iterationIndex < step.particleIterations;
+		m_iterationIndex++)
 	{
-		ComputeDepth();
-	}
-	if (m_allParticleFlags & b2_viscousParticle)
-	{
-		SolveViscous(step);
-	}
-	if (m_allParticleFlags & b2_powderParticle)
-	{
-		SolvePowder(step);
-	}
-	if (m_allParticleFlags & b2_tensileParticle)
-	{
-		SolveTensile(step);
-	}
-	if (m_allParticleFlags & b2_elasticParticle)
-	{
-		SolveElastic(step);
-	}
-	if (m_allParticleFlags & b2_springParticle)
-	{
-		SolveSpring(step);
-	}
-	if (m_allGroupFlags & b2_solidParticleGroup)
-	{
-		SolveSolid(step);
-	}
-	if (m_allParticleFlags & b2_colorMixingParticle)
-	{
-		SolveColorMixing(step);
-	}
-	SolveGravity(step);
-	SolvePressure(step);
-	SolveDamping(step);
-	LimitVelocity(step);
-	// SolveCollision, SolveRigid and SolveWall should be called after other
-	// force functions because they may require particles to have specific
-	// velocities.
-	SolveCollision(step);
-	if (m_allGroupFlags & b2_rigidParticleGroup)
-	{
-		SolveRigid(step);
-	}
-	if (m_allParticleFlags & b2_wallParticle)
-	{
-		SolveWall(step);
-	}
-	// The particle positions can be updated only once, at the end of function.
-	for (int32 i = 0; i < m_count; i++)
-	{
-		m_positionBuffer.data[i] += step.dt * m_velocityBuffer.data[i];
+		++m_timestamp;
+		b2TimeStep subStep = step;
+		subStep.dt /= step.particleIterations;
+		subStep.inv_dt *= step.particleIterations;
+		UpdateBodyContacts();
+		UpdateContacts(false);
+		if (m_allGroupFlags & b2_particleGroupNeedsUpdateDepth)
+		{
+			ComputeDepth();
+		}
+		if (m_allParticleFlags & b2_viscousParticle)
+		{
+			SolveViscous(subStep);
+		}
+		if (m_allParticleFlags & b2_powderParticle)
+		{
+			SolvePowder(subStep);
+		}
+		if (m_allParticleFlags & b2_tensileParticle)
+		{
+			SolveTensile(subStep);
+		}
+		if (m_allParticleFlags & b2_elasticParticle)
+		{
+			SolveElastic(subStep);
+		}
+		if (m_allParticleFlags & b2_springParticle)
+		{
+			SolveSpring(subStep);
+		}
+		if (m_allGroupFlags & b2_solidParticleGroup)
+		{
+			SolveSolid(subStep);
+		}
+		if (m_allParticleFlags & b2_colorMixingParticle)
+		{
+			SolveColorMixing(subStep);
+		}
+		SolveGravity(subStep);
+		SolvePressure(subStep);
+		SolveDamping(subStep);
+		LimitVelocity(subStep);
+		// SolveCollision, SolveRigid and SolveWall should be called after other
+		// force functions because they may require particles to have specific
+		// velocities.
+		SolveCollision(subStep);
+		if (m_allGroupFlags & b2_rigidParticleGroup)
+		{
+			SolveRigid(subStep);
+		}
+		if (m_allParticleFlags & b2_wallParticle)
+		{
+			SolveWall(subStep);
+		}
+		// The particle positions can be updated only at the end of substep.
+		for (int32 i = 0; i < m_count; i++)
+		{
+			m_positionBuffer.data[i] += subStep.dt * m_velocityBuffer.data[i];
+		}
 	}
 }
 
