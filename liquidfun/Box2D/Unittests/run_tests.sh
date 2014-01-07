@@ -19,12 +19,24 @@
 # NOTE: This does not use 'readlink -f' as it's not available on OSX.
 declare -r script_directory="$(cd "$(dirname "$0")"; pwd)"
 cd "${script_directory}"
+declare lcovInstalled=0
+which lcov 2>&1 && lcovInstalled=1
+
 declare islinux=0
 [[ "$(uname -s)" == "Linux" ]] && islinux=1
 if [[ $((islinux)) -eq 1 ]]; then
   declare -r test_executable_directories=.
+  declare -r codeCoverage_script_directories="${script_directory}/CMakeFiles"
 else
   declare -r test_executable_directories="Debug Release"
+  declare -r codeCoverage_script_directories="${script_directory}/Box2D.build"
+fi
+
+# Reset all execution counters to zero and cature initial coverage
+if [[ -d "${codeCoverage_script_directories}" &&  $((lcovInstalled)) == 1 ]]; then
+  lcov --zerocounters --directory "${codeCoverage_script_directories}"
+  lcov --capture --initial --directory "${codeCoverage_script_directories}" \
+    --output-file codeCoverage.info
 fi
 
 usage() {
@@ -87,3 +99,17 @@ if [[ "${failed}" != "" ]]; then
     echo "  ${test_executable}"
   done
 fi
+
+# Capture the gcov data after the tests are run
+if [[ $((lcovInstalled)) == 1 ]]; then
+  mkdir -p "${script_directory}/CodeCoverage"
+  lcov --no-checksum --directory "${script_directory}" --capture \
+    --output-file codeCoverage.info
+  genhtml -o "${script_directory}/CodeCoverage" codeCoverage.info
+  coverageLocation="file://${script_directory}/CodeCoverage/index.html"
+  echo "Check the code coverage data: ${coverageLocation}"
+else
+  echo "Warning: You need to have LCOV installed in order to generate" \
+       "the test coverage report!" >&2
+fi
+

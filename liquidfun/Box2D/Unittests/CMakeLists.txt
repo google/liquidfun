@@ -42,6 +42,15 @@ include_directories(${GUNIT_INCDIR} ${CMAKE_CURRENT_SOURCE_DIR}
 # These are support sources that are used for unit tests.
 set(SUPPORT_SRCS BodyTracker.cpp)
 
+# These commands set the flags for gcov
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+  set(GCOV_FLAGS "-fprofile-arcs -ftest-coverage")
+  set(GCOV_COMPILER_FLAGS "-g ${GCOV_FLAGS}")
+  set(CMAKE_C_FLAGS ${GCOV_COMPILER_FLAGS})
+  set(CMAKE_CXX_FLAGS ${GCOV_COMPILER_FLAGS})
+  set(CMAKE_EXE_LINKER_FLAGS ${GCOV_FLAGS})
+endif()
+
 # Common libraries for tests.
 if(NOT MSVC)
   find_package(Threads)
