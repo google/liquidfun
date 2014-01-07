@@ -69,7 +69,7 @@ struct b2Vec2
 
 	/// Negate this vector.
 	b2Vec2 operator -() const { b2Vec2 v; v.Set(-x, -y); return v; }
-	
+
 	/// Read from and indexed element.
 	float32 operator () (int32 i) const
 	{
@@ -87,7 +87,7 @@ struct b2Vec2
 	{
 		x += v.x; y += v.y;
 	}
-	
+
 	/// Subtract a vector from this vector.
 	void operator -= (const b2Vec2& v)
 	{
@@ -177,6 +177,28 @@ struct b2Vec3
 	void operator *= (float32 s)
 	{
 		x *= s; y *= s; z *= s;
+	}
+
+		/// Get the length of this vector (the norm).
+	float32 Length() const
+	{
+		return b2Sqrt(x * x + y * y + z * z);
+	}
+
+	/// Convert this vector into a unit vector. Returns the length.
+	float32 Normalize()
+	{
+		float32 length = Length();
+		if (length < b2_epsilon)
+		{
+			return 0.0f;
+		}
+		float32 invLength = 1.0f / length;
+		x *= invLength;
+		y *= invLength;
+		z *= invLength;
+
+		return length;
 	}
 
 	float32 x, y, z;
