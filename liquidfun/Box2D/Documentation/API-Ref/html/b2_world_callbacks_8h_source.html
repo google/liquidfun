@@ -203,11 +203,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00180"></a><span class="lineno"><a class="line" href="classb2_ray_cast_callback.html#a1295ba8c577a1d295f6ea0d69b8762ab">  180</a></span>&#160;    <span class="keyword">virtual</span> float32 <a class="code" href="classb2_ray_cast_callback.html#a1295ba8c577a1d295f6ea0d69b8762ab">ReportParticle</a>( int32 index, <span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; point,</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;                                    <span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; normal, float32 fraction)</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    {</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    }</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;};</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;                <span class="comment">// Parameters unused in default callback.</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;                (void) index;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;                (void) point;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;                (void) normal;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                (void) fraction;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    }</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;};</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="structb2_transform_html"><div class="ttname"><a href="structb2_transform.html">b2Transform</a></div><div class="ttdef"><b>Definition:</b> b2Math.h:361</div></div>
 <div class="ttc" id="classb2_destruction_listener_html"><div class="ttname"><a href="classb2_destruction_listener.html">b2DestructionListener</a></div><div class="ttdef"><b>Definition:</b> b2WorldCallbacks.h:38</div></div>
 <div class="ttc" id="classb2_destruction_listener_html_a5e468eeabbadcd7e55f673e545b49959"><div class="ttname"><a href="classb2_destruction_listener.html#a5e468eeabbadcd7e55f673e545b49959">b2DestructionListener::SayGoodbye</a></div><div class="ttdeci">virtual void SayGoodbye(b2ParticleGroup *group)</div><div class="ttdoc">Called when any particle group is about to be destroyed. </div><div class="ttdef"><b>Definition:</b> b2WorldCallbacks.h:52</div></div>

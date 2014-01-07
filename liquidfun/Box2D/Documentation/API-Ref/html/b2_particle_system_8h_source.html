@@ -314,84 +314,85 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    int32 m_timestamp;</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    int32 m_allParticleFlags;</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    int32 m_allGroupFlags;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    float32 m_density;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    float32 m_inverseDensity;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    float32 m_gravityScale;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    float32 m_particleDiameter;</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    float32 m_inverseDiameter;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    float32 m_squaredDiameter;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    int32 m_count;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    int32 m_internalAllocatedCapacity;</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    int32 m_maxCount;</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    ParticleBuffer&lt;uint32&gt; m_flagsBuffer;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    ParticleBuffer&lt;b2Vec2&gt; m_positionBuffer;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    ParticleBuffer&lt;b2Vec2&gt; m_velocityBuffer;</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    float32* m_accumulationBuffer; <span class="comment">// temporary values</span></div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a>* m_accumulation2Buffer; <span class="comment">// temporary vector values</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    float32* m_depthBuffer; <span class="comment">// distance from the surface</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    ParticleBuffer&lt;b2ParticleColor&gt; m_colorBuffer;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>** m_groupBuffer;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    ParticleBuffer&lt;void*&gt; m_userDataBuffer;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    int32 m_proxyCount;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    int32 m_proxyCapacity;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    Proxy* m_proxyBuffer;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    int32 m_contactCount;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    int32 m_contactCapacity;</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <a class="code" href="structb2_particle_contact.html">b2ParticleContact</a>* m_contactBuffer;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    int32 m_bodyContactCount;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    int32 m_bodyContactCapacity;</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <a class="code" href="structb2_particle_body_contact.html">b2ParticleBodyContact</a>* m_bodyContactBuffer;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    int32 m_pairCount;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    int32 m_pairCapacity;</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    Pair* m_pairBuffer;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    int32 m_triadCount;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    int32 m_triadCapacity;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    Triad* m_triadBuffer;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    int32 m_groupCount;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* m_groupList;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    float32 m_pressureStrength;</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    float32 m_dampingStrength;</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    float32 m_elasticStrength;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    float32 m_springStrength;</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    float32 m_viscousStrength;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    float32 m_surfaceTensionStrengthA;</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    float32 m_surfaceTensionStrengthB;</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    float32 m_powderStrength;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    float32 m_ejectionStrength;</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    float32 m_colorMixingStrength;</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <a class="code" href="classb2_world.html">b2World</a>* m_world;</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;};</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="keyword">inline</span> <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* b2ParticleSystem::GetParticleGroupList()</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;{</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <span class="keywordflow">return</span> m_groupList;</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;}</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* b2ParticleSystem::GetParticleGroupList()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordflow">return</span> m_groupList;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;}</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="keyword">inline</span> int32 b2ParticleSystem::GetParticleGroupCount()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="keywordflow">return</span> m_groupCount;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;}</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="keyword">inline</span> int32 b2ParticleSystem::GetParticleCount()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordflow">return</span> m_count;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;}</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    int32 m_iterationIndex;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    float32 m_density;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    float32 m_inverseDensity;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    float32 m_gravityScale;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    float32 m_particleDiameter;</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    float32 m_inverseDiameter;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    float32 m_squaredDiameter;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    int32 m_count;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    int32 m_internalAllocatedCapacity;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    int32 m_maxCount;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    ParticleBuffer&lt;uint32&gt; m_flagsBuffer;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    ParticleBuffer&lt;b2Vec2&gt; m_positionBuffer;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    ParticleBuffer&lt;b2Vec2&gt; m_velocityBuffer;</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    float32* m_accumulationBuffer; <span class="comment">// temporary values</span></div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a>* m_accumulation2Buffer; <span class="comment">// temporary vector values</span></div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    float32* m_depthBuffer; <span class="comment">// distance from the surface</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    ParticleBuffer&lt;b2ParticleColor&gt; m_colorBuffer;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>** m_groupBuffer;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    ParticleBuffer&lt;void*&gt; m_userDataBuffer;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    int32 m_proxyCount;</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    int32 m_proxyCapacity;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    Proxy* m_proxyBuffer;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    int32 m_contactCount;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    int32 m_contactCapacity;</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <a class="code" href="structb2_particle_contact.html">b2ParticleContact</a>* m_contactBuffer;</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    int32 m_bodyContactCount;</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    int32 m_bodyContactCapacity;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <a class="code" href="structb2_particle_body_contact.html">b2ParticleBodyContact</a>* m_bodyContactBuffer;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    int32 m_pairCount;</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    int32 m_pairCapacity;</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    Pair* m_pairBuffer;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    int32 m_triadCount;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    int32 m_triadCapacity;</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    Triad* m_triadBuffer;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    int32 m_groupCount;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* m_groupList;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    float32 m_pressureStrength;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    float32 m_dampingStrength;</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    float32 m_elasticStrength;</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    float32 m_springStrength;</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    float32 m_viscousStrength;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    float32 m_surfaceTensionStrengthA;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    float32 m_surfaceTensionStrengthB;</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    float32 m_powderStrength;</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    float32 m_ejectionStrength;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    float32 m_colorMixingStrength;</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <a class="code" href="classb2_world.html">b2World</a>* m_world;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;};</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="keyword">inline</span> <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* b2ParticleSystem::GetParticleGroupList()</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;{</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="keywordflow">return</span> m_groupList;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;}</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* b2ParticleSystem::GetParticleGroupList()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keywordflow">return</span> m_groupList;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;}</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="keyword">inline</span> int32 b2ParticleSystem::GetParticleGroupCount()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">return</span> m_groupCount;</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;}</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="keyword">inline</span> int32 b2ParticleSystem::GetParticleCount()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="keywordflow">return</span> m_count;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;}</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="structb2_transform_html"><div class="ttname"><a href="structb2_transform.html">b2Transform</a></div><div class="ttdef"><b>Definition:</b> b2Math.h:361</div></div>
 <div class="ttc" id="structb2_particle_group_def_html"><div class="ttname"><a href="structb2_particle_group_def.html">b2ParticleGroupDef</a></div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:43</div></div>
 <div class="ttc" id="structb2_particle_contact_html_a3890fc65968cc2abd1b90cd1772ef54a"><div class="ttname"><a href="structb2_particle_contact.html#a3890fc65968cc2abd1b90cd1772ef54a">b2ParticleContact::flags</a></div><div class="ttdeci">uint32 flags</div><div class="ttdef"><b>Definition:</b> b2ParticleSystem.h:46</div></div>

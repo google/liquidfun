@@ -116,6 +116,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5cba9d0653149eb62504154e6fb35021"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add5942aef171e54cfa384c8975746dca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#add5942aef171e54cfa384c8975746dca">DestroyJoint</a> (<a class="el" href="classb2_joint.html">b2Joint</a> *joint)</td></tr>
 <tr class="separator:add5942aef171e54cfa384c8975746dca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2e8f623c5bae23fd47ae234a0e96420"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">Step</a> (float32 timeStep, int32 velocityIterations, int32 positionIterations, int32 particleIterations)</td></tr>
+<tr class="separator:aa2e8f623c5bae23fd47ae234a0e96420"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a8eff61af98461f978fe43f3af7be90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a7a8eff61af98461f978fe43f3af7be90">Step</a> (float32 timeStep, int32 velocityIterations, int32 positionIterations)</td></tr>
 <tr class="separator:a7a8eff61af98461f978fe43f3af7be90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac082ab4c4ad0b1c5ec4674315eeec643"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ac082ab4c4ad0b1c5ec4674315eeec643">ClearForces</a> ()</td></tr>
@@ -481,7 +483,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create a particle whose properties have been defined. No reference to the definition is retained. A simulation step must occur before it's possible to interact with a newly created particle. For example, DestroyParticleInShape() will not destroy a particle until <a class="el" href="classb2_world.html#a7a8eff61af98461f978fe43f3af7be90">Step()</a> has been called. </p>
+<p>Create a particle whose properties have been defined. No reference to the definition is retained. A simulation step must occur before it's possible to interact with a newly created particle. For example, DestroyParticleInShape() will not destroy a particle until <a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">Step()</a> has been called. </p>
 <dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>the index of the particle. </dd></dl>
 
@@ -1193,9 +1195,60 @@ This function is locked during callbacks. </dd></dl>
 
 </div>
 </div>
+<a class="anchor" id="aa2e8f623c5bae23fd47ae234a0e96420"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2World::Step </td>
+          <td>(</td>
+          <td class="paramtype">float32&#160;</td>
+          <td class="paramname"><em>timeStep</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>velocityIterations</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>positionIterations</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>particleIterations</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Take a time step. This performs collision detection, integration, and constraint solution. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timeStep</td><td>the amount of time to simulate, this should not vary. </td></tr>
+    <tr><td class="paramname">velocityIterations</td><td>for the velocity constraint solver. </td></tr>
+    <tr><td class="paramname">positionIterations</td><td>for the position constraint solver. </td></tr>
+    <tr><td class="paramname">particleIterations</td><td>for the particle simulation. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a7a8eff61af98461f978fe43f3af7be90"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2World::Step </td>
@@ -1221,6 +1274,11 @@ This function is locked during callbacks. </dd></dl>
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Take a time step. This performs collision detection, integration, and constraint solution. </p>
 <dl class="params"><dt>Parameters</dt><dd>
