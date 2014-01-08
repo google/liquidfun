@@ -25,6 +25,7 @@ Box2D/Makefile
 Box2D/Testbed/Makefile
 Box2D/Testbed/Testbed
 Box2D/Unittests/CallbackTests
+Box2D/Unittests/ColorTests
 Box2D/Unittests/ConfinementTests
 Box2D/Unittests/ConservationTests
 Box2D/Unittests/FunctionTests

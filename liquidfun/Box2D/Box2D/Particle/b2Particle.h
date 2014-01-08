@@ -19,6 +19,7 @@
 #define B2_PARTICLE
 
 #include <Box2D/Common/b2Math.h>
+#include <Box2D/Common/b2Settings.h>
 
 struct b2Color;
 
@@ -39,20 +40,24 @@ enum b2ParticleFlag
 };
 
 /// Small color object for each particle
-struct b2ParticleColor
+class b2ParticleColor
 {
-	uint8 r,g,b,a;
+public:
 	b2ParticleColor() {}
-	/// Constructor with four elements: r (red), g (green), b (blue), and a (opacity).
+	/// Constructor with four elements: r (red), g (green), b (blue), and a
+	/// (opacity).
 	/// Each element can be specified 0 to 255.
-	b2ParticleColor(int32 r, int32 g, int32 b, int32 a) : r(r), g(g), b(b), a(a)
-	{}
+	b2Inline b2ParticleColor(uint8 r, uint8 g, uint8 b, uint8 a)
+	{
+		Set(r, g, b, a);
+	}
 
-	/// Constructor that initializes the above four elements with the value of the b2Color object
-	///
+	/// Constructor that initializes the above four elements with the value of
+	/// the b2Color object.
 	b2ParticleColor(const b2Color& color);
 
-	/// True when all four color elements equal 0. When true, no memory is used for particle color.
+	/// True when all four color elements equal 0. When true, a particle color
+	/// buffer isn't allocated by CreateParticle().
 	///
 	bool IsZero() const
 	{
@@ -65,7 +70,7 @@ struct b2ParticleColor
 
 	/// Sets color for current object using the four elements described above.
 	///
-	void Set(int32 r_, int32 g_, int32 b_, int32 a_)
+	b2Inline void Set(int32 r_, int32 g_, int32 b_, int32 a_)
 	{
 		r = r_;
 		g = g_;
@@ -73,9 +78,153 @@ struct b2ParticleColor
 		a = a_;
 	}
 
-	/// Initializes the above four elements with the value of the b2Color object
+	/// Initializes the object with the value of the b2Color.
 	///
 	void Set(const b2Color& color);
+
+	/// Assign a b2ParticleColor to this instance.
+	b2ParticleColor& operator = (const b2ParticleColor &color)
+	{
+		Set(color.r, color.g, color.b, color.a);
+		return *this;
+	}
+
+	/// Multiplies r, g, b, a members by s where s is a value between 0.0
+	/// and 1.0.
+	b2ParticleColor& operator *= (float32 s)
+	{
+		Set((uint8)(r * s), (uint8)(g * s), (uint8)(b * s), (uint8)(a * s));
+		return *this;
+	}
+
+	/// Scales r, g, b, a members by s where s is a value between 0 and 255.
+	b2ParticleColor& operator *= (uint8 s)
+	{
+		// 1..256 to maintain the complete dynamic range.
+		const int32 scale = (int32)s + 1;
+		Set((uint8)(((int32)r * scale) >> k_bitsPerComponent),
+			(uint8)(((int32)g * scale) >> k_bitsPerComponent),
+			(uint8)(((int32)b * scale) >> k_bitsPerComponent),
+			(uint8)(((int32)a * scale) >> k_bitsPerComponent));
+		return *this;
+	}
+
+	/// Scales r, g, b, a members by s returning the modified b2ParticleColor.
+	b2ParticleColor operator * (float32 s) const
+	{
+		return MultiplyByScalar(s);
+	}
+
+	/// Scales r, g, b, a members by s returning the modified b2ParticleColor.
+	b2ParticleColor operator * (uint8 s) const
+	{
+		return MultiplyByScalar(s);
+	}
+
+	/// Add two colors.  This is a non-saturating addition so values
+	/// overflows will wrap.
+	b2Inline b2ParticleColor& operator += (const b2ParticleColor &color)
+	{
+		r += color.r;
+		g += color.g;
+		b += color.b;
+		a += color.a;
+		return *this;
+	}
+
+	/// Add two colors.  This is a non-saturating addition so values
+	/// overflows will wrap.
+	b2ParticleColor operator + (const b2ParticleColor &color) const
+	{
+		b2ParticleColor newColor(*this);
+		newColor += color;
+		return newColor;
+	}
+
+	/// Subtract a color from this color.  This is a subtraction without
+	/// saturation so underflows will wrap.
+	b2Inline b2ParticleColor& operator -= (const b2ParticleColor &color)
+	{
+		r -= color.r;
+		g -= color.g;
+		b -= color.b;
+		a -= color.a;
+		return *this;
+	}
+
+	/// Subtract a color from this color returning the result.  This is a
+	/// subtraction without saturation so underflows will wrap.
+	b2ParticleColor operator - (const b2ParticleColor &color) const
+	{
+		b2ParticleColor newColor(*this);
+		newColor -= color;
+		return newColor;
+	}
+
+	/// Compare this color with the specified color.
+	bool operator == (const b2ParticleColor &color) const
+	{
+		return r == color.r && g == color.g && b == color.b && a == color.a;
+	}
+
+	/// Mix mixColor with this color using strength to control how much of
+	/// mixColor is mixed with this color and vice versa.  The range of
+	/// strength is 0..128 where 0 results in no color mixing and 128 results
+	/// in an equal mix of both colors.  strength 0..128 is analogous to an
+	/// alpha channel value between 0.0f..0.5f.
+	b2Inline void Mix(b2ParticleColor * const mixColor, const int32 strength)
+	{
+		Mix(this, mixColor, strength);
+	}
+
+	/// Mix colorA with colorB using strength to control how much of
+	/// colorA is mixed with colorB and vice versa.  The range of
+	/// strength is 0..128 where 0 results in no color mixing and 128 results
+	/// in an equal mix of both colors.  strength 0..128 is analogous to an
+	/// alpha channel value between 0.0f..0.5f.
+	static b2Inline void Mix(b2ParticleColor * const colorA,
+							 b2ParticleColor * const colorB,
+							 const int32 strength)
+	{
+		const uint8 dr = (strength * (colorB->r - colorA->r)) >>
+			   			 k_bitsPerComponent;
+		const uint8 dg = (strength * (colorB->g - colorA->g)) >>
+			   			 k_bitsPerComponent;
+		const uint8 db = (strength * (colorB->b - colorA->b)) >>
+			   			 k_bitsPerComponent;
+		const uint8 da = (strength * (colorB->a - colorA->a)) >>
+			   			 k_bitsPerComponent;
+		colorA->r += dr;
+		colorA->g += dg;
+		colorA->b += db;
+		colorA->a += da;
+		colorB->r -= dr;
+		colorB->g -= dg;
+		colorB->b -= db;
+		colorB->a -= da;
+	}
+
+private:
+	/// Generalization of the multiply operator using a scalar in-place
+	/// multiplication.
+	template <typename T>
+	b2ParticleColor MultiplyByScalar(T s) const
+	{
+		b2ParticleColor color(*this);
+		color *= s;
+		return color;
+	}
+
+public:
+	uint8 r, g, b, a;
+
+protected:
+	/// Maximum value of a b2ParticleColor component.
+	static const float32 k_maxValue;
+	/// 1.0 / k_maxValue.
+	static const float32 k_inverseMaxValue;
+	/// Number of bits used to store each b2ParticleColor component.
+	static const uint8 k_bitsPerComponent;
 };
 
 extern b2ParticleColor b2ParticleColor_zero;

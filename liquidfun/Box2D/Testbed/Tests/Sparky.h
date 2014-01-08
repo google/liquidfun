@@ -28,7 +28,8 @@ public:
 	// Size is how big of a particle splash to make (in meters)
 	// Speed is the scale of how fast to make the particles shoot out
 	// Lifetime in seconds.
-	ParticleVFX(b2World *world, const b2Vec2 &origin, float size, float speed, float lifetime)
+	ParticleVFX(b2World *world, const b2Vec2 &origin, float32 size,
+				float32 speed, float32 lifetime)
 	{
 
 		// Create a circle to house the particles of size size
@@ -50,12 +51,13 @@ public:
 		m_initialLifetime = m_remainingLifetime = lifetime;
 		m_halfLifetime = m_initialLifetime * 0.5f;
 
-		// Set particle initial velocity based on how far away it is from origin,
-		// exploding outwards.
+		// Set particle initial velocity based on how far away it is from
+		// origin, exploding outwards.
 		int32 bufferIndex = m_pg->GetBufferIndex();
 		b2Vec2 *pos = m_world->GetParticlePositionBuffer();
 		b2Vec2 *vel = m_world->GetParticleVelocityBuffer();
-		for (int i = bufferIndex; i < bufferIndex + m_pg->GetParticleCount(); i++)
+		for (int i = bufferIndex; i < bufferIndex + m_pg->GetParticleCount();
+			 i++)
 		{
 			vel[i] = pos[i] - origin;
 			vel[i] *= speed;
@@ -68,34 +70,36 @@ public:
 	}
 
 	// Calculates the brightness of the particles.
-	// Piecewise linear function where particle is at 1.0 brightness until t = lifetime/2,
-	// then linear falloff until t = 0, scaled by m_halfLifetime.
-	float ColorCoeff()
+	// Piecewise linear function where particle is at 1.0 brightness until
+	// t = lifetime/2, then linear falloff until t = 0, scaled by
+	// m_halfLifetime.
+	float32 ColorCoeff()
 	{
 		if (m_remainingLifetime >= m_halfLifetime)
 		{
 			return 1.0f;
 		}
-		return 1.0f - ((m_halfLifetime - m_remainingLifetime) / m_halfLifetime);
+		return 1.0f - ((m_halfLifetime - m_remainingLifetime) /
+					   m_halfLifetime);
 	}
 
-	void Step(float dt)
+	void Step(float32 dt)
 	{
 		if (m_remainingLifetime > 0.0f)
 		{
 			m_remainingLifetime = max(m_remainingLifetime - dt, 0.0f);
-			float coeff = ColorCoeff();
+			float32 coeff = ColorCoeff();
 
 			b2ParticleColor *colors = m_world->GetParticleColorBuffer();
 			int bufferIndex = m_pg->GetBufferIndex();
 
 			// Set particle colors all at once.
-			for (int i = bufferIndex; i < bufferIndex + m_pg->GetParticleCount(); i++)
+			for (int i = bufferIndex;
+				 i < bufferIndex + m_pg->GetParticleCount(); i++)
 			{
 				b2ParticleColor &c = colors[i];
-				c.Set((int32)(m_origColor.r * coeff),
-				      (int32)(m_origColor.g * coeff),
-				      (int32)(m_origColor.b * coeff), m_origColor.a);
+				c *= coeff;
+				c.a = m_origColor.a;
 			}
 		}
 	}
@@ -138,7 +142,8 @@ public:
 			bd.type = b2_dynamicBody;
 			b2Body *body = m_world->CreateBody(&bd);
 			b2CircleShape shape;
-			shape.m_p.Set(3.0f * RandomFloat(), SHAPE_HEIGHT_OFFSET + SHAPE_OFFSET * i);
+			shape.m_p.Set(3.0f * RandomFloat(),
+						  SHAPE_HEIGHT_OFFSET + SHAPE_OFFSET * i);
 			shape.m_radius = 2;
 			b2Fixture *f = body->CreateFixture(&shape, 0.5f);
 			// Tag this as a sparkable body.
@@ -151,14 +156,16 @@ public:
 	{
 		Test::BeginContact(contact);
 		// Check to see if these are two circles hitting one another.
-		if (contact->GetFixtureA()->GetUserData() != NULL || contact->GetFixtureB()->GetUserData() != NULL)
+		if (contact->GetFixtureA()->GetUserData() != NULL ||
+			contact->GetFixtureB()->GetUserData() != NULL)
 		{
 			b2WorldManifold worldManifold;
 			contact->GetWorldManifold(&worldManifold);
 
-			// Note that we overwrite any contact; if there are two collisions on the same frame,
-			// only the last one showers sparks.  Two collisions are rare, and this also guarantees
-			// we will not run out of places to store ParticleVFX explosions.
+			// Note that we overwrite any contact; if there are two collisions
+			// on the same frame, only the last one showers sparks.
+			// Two collisions are rare, and this also guarantees we will not
+			// run out of places to store ParticleVFX explosions.
 			m_contactPoint = worldManifold.points[0];
 			m_contact = true;
 		}
@@ -200,7 +207,9 @@ public:
 			delete vfx;
 			m_VFX[m_VFXIndex] = NULL;
 		}
-		m_VFX[m_VFXIndex] = new ParticleVFX(m_world, p, RandomFloat(1.0f, 2.0f), RandomFloat(10.0f, 20.0f), RandomFloat(0.5f, 1.0f));
+		m_VFX[m_VFXIndex] = new ParticleVFX(
+			m_world, p, RandomFloat(1.0f, 2.0f), RandomFloat(10.0f, 20.0f),
+			RandomFloat(0.5f, 1.0f));
 		if (++m_VFXIndex >= c_maxVFX)
 		{
 			m_VFXIndex = 0;

@@ -1476,28 +1476,22 @@ void b2ParticleSystem::SolveColorMixing(const b2TimeStep& step)
 {
 	// mixes color between contacting particles
 	m_colorBuffer.data = RequestParticleBuffer(m_colorBuffer.data);
-	int32 colorMixing256 = (int32) (256 * m_colorMixingStrength);
-	for (int32 k = 0; k < m_contactCount; k++)
-	{
-		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		if (m_flagsBuffer.data[a] & m_flagsBuffer.data[b] & b2_colorMixingParticle)
+	const int32 colorMixing128 = (int32) (128 * m_colorMixingStrength);
+	if (colorMixing128) {
+		for (int32 k = 0; k < m_contactCount; k++)
 		{
-			b2ParticleColor& colorA = m_colorBuffer.data[a];
-			b2ParticleColor& colorB = m_colorBuffer.data[b];
-			int32 dr = (colorMixing256 * (colorB.r - colorA.r)) >> 8;
-			int32 dg = (colorMixing256 * (colorB.g - colorA.g)) >> 8;
-			int32 db = (colorMixing256 * (colorB.b - colorA.b)) >> 8;
-			int32 da = (colorMixing256 * (colorB.a - colorA.a)) >> 8;
-			colorA.r += dr;
-			colorA.g += dg;
-			colorA.b += db;
-			colorA.a += da;
-			colorB.r -= dr;
-			colorB.g -= dg;
-			colorB.b -= db;
-			colorB.a -= da;
+			const b2ParticleContact& contact = m_contactBuffer[k];
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			if (m_flagsBuffer.data[a] & m_flagsBuffer.data[b] &
+				b2_colorMixingParticle)
+			{
+				b2ParticleColor& colorA = m_colorBuffer.data[a];
+				b2ParticleColor& colorB = m_colorBuffer.data[b];
+				// Use the static method to ensure certain compilers inline
+				// this correctly.
+				b2ParticleColor::Mix(&colorA, &colorB, colorMixing128);
+			}
 		}
 	}
 }
