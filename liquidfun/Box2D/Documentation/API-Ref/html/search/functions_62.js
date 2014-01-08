@@ -15,7 +15,7 @@ var searchData=
   ['b2log',['b2Log',['../b2_settings_8h.html#a9f10095d05c74eebfe535931c9061ab2',1,'b2Settings.cpp']]],
   ['b2mat22',['b2Mat22',['../structb2_mat22.html#ac3e10f6d457c8dab9062ba378f66bc4d',1,'b2Mat22::b2Mat22()'],['../structb2_mat22.html#abd674c6d92e26962977f34bcd92ff24d',1,'b2Mat22::b2Mat22(const b2Vec2 &amp;c1, const b2Vec2 &amp;c2)'],['../structb2_mat22.html#a41d5d8743bda32cb8c6e212528934810',1,'b2Mat22::b2Mat22(float32 a11, float32 a12, float32 a21, float32 a22)']]],
   ['b2mat33',['b2Mat33',['../structb2_mat33.html#a1f4d7ddf1c8a202fc08ec64dfe191463',1,'b2Mat33::b2Mat33()'],['../structb2_mat33.html#a36d99a037008776c8d09fe0aeb5c759c',1,'b2Mat33::b2Mat33(const b2Vec3 &amp;c1, const b2Vec3 &amp;c2, const b2Vec3 &amp;c3)']]],
-  ['b2particlecolor',['b2ParticleColor',['../structb2_particle_color.html#a2e557aec9f9e660107aa13806b6882c5',1,'b2ParticleColor::b2ParticleColor(int32 r, int32 g, int32 b, int32 a)'],['../structb2_particle_color.html#a393030bdcfaf454de488a1cdc1304859',1,'b2ParticleColor::b2ParticleColor(const b2Color &amp;color)']]],
+  ['b2particlecolor',['b2ParticleColor',['../classb2_particle_color.html#ad8d2e94a330bdacc7fcf88e4faa5b2a6',1,'b2ParticleColor::b2ParticleColor(uint8 r, uint8 g, uint8 b, uint8 a)'],['../classb2_particle_color.html#a393030bdcfaf454de488a1cdc1304859',1,'b2ParticleColor::b2ParticleColor(const b2Color &amp;color)']]],
   ['b2rot',['b2Rot',['../structb2_rot.html#aa40dda6d390a2f54c793c63027a9b46e',1,'b2Rot']]],
   ['b2testoverlap',['b2TestOverlap',['../b2_collision_8h.html#ae7601420d0b42c1ee494e879dd2009a5',1,'b2Collision.cpp']]],
   ['b2timer',['b2Timer',['../classb2_timer.html#afcc159032a8edeaa9febdf2b6cbd49a5',1,'b2Timer']]],

@@ -20,7 +20,7 @@ var searchData=
   ['getchildindexa',['GetChildIndexA',['../classb2_contact.html#ab0c9c059c776f315ae62abb5c978afcc',1,'b2Contact']]],
   ['getchildindexb',['GetChildIndexB',['../classb2_contact.html#a9edc26022c3d1a9cf1dab9d79d639b3f',1,'b2Contact']]],
   ['getcollideconnected',['GetCollideConnected',['../classb2_joint.html#a09c6bdfa5842522ba381bac8dd559f4d',1,'b2Joint']]],
-  ['getcolor',['GetColor',['../structb2_particle_color.html#a7e844b191956c1f6fa3279b4a6cb1b71',1,'b2ParticleColor']]],
+  ['getcolor',['GetColor',['../classb2_particle_color.html#a7e844b191956c1f6fa3279b4a6cb1b71',1,'b2ParticleColor']]],
   ['getcontactcount',['GetContactCount',['../classb2_world.html#abcc976f1755f9bb94a8650f5f4219a8d',1,'b2World']]],
   ['getcontactlist',['GetContactList',['../classb2_body.html#a16bdbfb266c82a0ef51be351a8928bc5',1,'b2Body::GetContactList()'],['../classb2_world.html#ab1e1c59fd7534c0268c2a3e31370a425',1,'b2World::GetContactList()']]],
   ['getcontactmanager',['GetContactManager',['../classb2_world.html#a16259159ae1719c30808561c990a8c05',1,'b2World']]],

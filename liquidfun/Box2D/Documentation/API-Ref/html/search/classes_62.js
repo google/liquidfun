@@ -60,7 +60,7 @@ var searchData=
   ['b2mousejointdef',['b2MouseJointDef',['../structb2_mouse_joint_def.html',1,'']]],
   ['b2pair',['b2Pair',['../structb2_pair.html',1,'']]],
   ['b2particlebodycontact',['b2ParticleBodyContact',['../structb2_particle_body_contact.html',1,'']]],
-  ['b2particlecolor',['b2ParticleColor',['../structb2_particle_color.html',1,'']]],
+  ['b2particlecolor',['b2ParticleColor',['../classb2_particle_color.html',1,'']]],
   ['b2particlecontact',['b2ParticleContact',['../structb2_particle_contact.html',1,'']]],
   ['b2particledef',['b2ParticleDef',['../structb2_particle_def.html',1,'']]],
   ['b2particlegroup',['b2ParticleGroup',['../classb2_particle_group.html',1,'']]],

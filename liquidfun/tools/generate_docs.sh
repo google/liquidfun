@@ -24,7 +24,7 @@ declare -r root_dir="$(cd $(dirname $0)/.. ; pwd)"
 declare -r docs_source_dir=${root_dir}/Box2D/Box2D/Documentation
 declare -r docs_output_dir=${root_dir}/Box2D/Documentation
 
-declare -r doc_dirs="API-Ref Building Programmers-Guide Readme"
+declare -r doc_dirs="API-Ref Building Programmers-Guide Readme ReleaseNotes"
 
 declare -r footer_file="${root_dir}/Box2D/Box2D/Documentation/footer.html"
 

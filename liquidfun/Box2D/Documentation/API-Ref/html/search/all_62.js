@@ -102,7 +102,7 @@ var searchData=
   ['b2mousejointdef',['b2MouseJointDef',['../structb2_mouse_joint_def.html',1,'']]],
   ['b2pair',['b2Pair',['../structb2_pair.html',1,'']]],
   ['b2particlebodycontact',['b2ParticleBodyContact',['../structb2_particle_body_contact.html',1,'']]],
-  ['b2particlecolor',['b2ParticleColor',['../structb2_particle_color.html',1,'b2ParticleColor'],['../structb2_particle_color.html#a2e557aec9f9e660107aa13806b6882c5',1,'b2ParticleColor::b2ParticleColor(int32 r, int32 g, int32 b, int32 a)'],['../structb2_particle_color.html#a393030bdcfaf454de488a1cdc1304859',1,'b2ParticleColor::b2ParticleColor(const b2Color &amp;color)']]],
+  ['b2particlecolor',['b2ParticleColor',['../classb2_particle_color.html',1,'b2ParticleColor'],['../classb2_particle_color.html#ad8d2e94a330bdacc7fcf88e4faa5b2a6',1,'b2ParticleColor::b2ParticleColor(uint8 r, uint8 g, uint8 b, uint8 a)'],['../classb2_particle_color.html#a393030bdcfaf454de488a1cdc1304859',1,'b2ParticleColor::b2ParticleColor(const b2Color &amp;color)']]],
   ['b2particlecontact',['b2ParticleContact',['../structb2_particle_contact.html',1,'']]],
   ['b2particledef',['b2ParticleDef',['../structb2_particle_def.html',1,'']]],
   ['b2particlegroup',['b2ParticleGroup',['../classb2_particle_group.html',1,'']]],

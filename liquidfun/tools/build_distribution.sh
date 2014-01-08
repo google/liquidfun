@@ -339,7 +339,7 @@ main() {
   done
 
   release_version=$(head -n1 "${project_dir}/Readme.md" | \
-                    sed 's/.* Version //')
+                    sed -r 's/.* Version \[([^]]*)\].*/\1/')
   if [[ "${release_version}" == "" ]]; then
     echo "Unable to parse version number from Readme.md" >&2
     exit 1
