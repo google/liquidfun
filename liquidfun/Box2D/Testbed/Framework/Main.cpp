@@ -20,11 +20,13 @@
 #include "Render.h"
 #include "Test.h"
 #include "glui/glui.h"
+#include <stdio.h>
 #include "AndroidUtil/AndroidLogPrint.h"
-
-#include <cstdio>
+#ifdef __ANDROID__
+#include <algorithm>
+#include <string>
 #include <sstream>
-using namespace std;
+#endif // __ANDROID__
 
 namespace
 {
@@ -175,7 +177,7 @@ static void SimulationLoop()
 	// special purpose code for Android: draw navigational arrows to browse test cases, since we don't have the full desktop UI
 	Arrow(e_ArrowSelectionRight, 1, 0, 1, 0);
 	Arrow(e_ArrowSelectionLeft, -1, 180, 1, 0);
-	string msg = entry->name;
+	std::string msg = entry->name;
 	if (extraArrows)
 	{
 		Arrow(e_ArrowParameterRight, 1, 0, smallerArrowFactor, arrowOffset * smallerArrowFactor + arrowGap);
@@ -423,7 +425,7 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 			whichArrow = e_ArrowSelectionLeft;
 			if (state == GLUT_UP)
 			{
-				testSelection = max(0, testSelection - 1);
+				testSelection = std::max(0, testSelection - 1);
 				extraArrows = false;
 				parameterIndex = 0;
 			}
@@ -486,6 +488,7 @@ static void MouseMotion(int32 x, int32 y)
 	}
 }
 
+#ifdef FREEGLUT
 static void MouseWheel(int wheel, int direction, int x, int y)
 {
 	B2_NOT_USED(wheel);
@@ -501,6 +504,7 @@ static void MouseWheel(int wheel, int direction, int x, int y)
 	}
 	Resize(width, height);
 }
+#endif
 
 static void Restart(int)
 {

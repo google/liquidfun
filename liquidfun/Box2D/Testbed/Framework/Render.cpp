@@ -26,10 +26,8 @@
 #include <android/log.h>
 #endif // __ANDROID__
 
-#include <cstdio>
-#include <cstdarg>
-#include <cstring>
-using namespace std;
+#include <stdio.h>
+#include <stdarg.h>
 
 float currentscale = 1;	// amount of pixels that corresponds to one world unit, needed to use glPointSize correctly
 

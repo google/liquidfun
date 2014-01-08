@@ -18,6 +18,7 @@
 #include "gtest/gtest.h"
 #include "Box2D/Box2D.h"
 #include <stdio.h>
+#include <complex>
 #include "BodyTracker.h"
 #include "AndroidUtil/AndroidMainWrapper.h"
 #define EPSILON 0.001f
@@ -85,8 +86,10 @@ TEST_F(ConservationTests, GravityCenter) {
 	}
 	afterX /= particleCount;
 	afterY /= particleCount;
-	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON && std::abs(beforeY - afterY) < EPSILON) <<
-		"the gravity center changed from (" << beforeX << "," << beforeY << ") to (" << afterX << "," << afterY << ")";
+	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON &&
+				std::abs(beforeY - afterY) < EPSILON) <<
+		"the gravity center changed from (" << beforeX << "," <<
+		beforeY << ") to (" << afterX << "," << afterY << ")";
 }
 
 TEST_F(ConservationTests, LinearMomentum) {
@@ -107,8 +110,10 @@ TEST_F(ConservationTests, LinearMomentum) {
 		afterX += velocityBuffer[i].x;
 		afterY += velocityBuffer[i].y;
 	}
-	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON && std::abs(beforeY - afterY) < EPSILON) <<
-		"the linear momentum changed from (" << beforeX << "," << beforeY << ") to (" << afterX << "," << afterY << ")";
+	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON &&
+				std::abs(beforeY - afterY) < EPSILON) <<
+		"the linear momentum changed from (" << beforeX << "," <<
+		beforeY << ") to (" << afterX << "," << afterY << ")";
 }
 
 TEST_F(ConservationTests, AngularMomentum) {

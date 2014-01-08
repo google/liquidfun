@@ -18,6 +18,7 @@
 #include "gtest/gtest.h"
 #include "Box2D/Box2D.h"
 #include <stdio.h>
+#include <complex>
 #include "BodyTracker.h"
 #include "AndroidUtil/AndroidMainWrapper.h"
 #define EPSILON 0.001f

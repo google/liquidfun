@@ -18,6 +18,7 @@
 
 #ifndef SPARKY_H
 #define SPARKY_H
+#include <algorithm>
 
 // ParticleVFX tracks the particle system that's created whenever two of the
 // circular rigid bodies collide.
@@ -87,7 +88,7 @@ public:
 	{
 		if (m_remainingLifetime > 0.0f)
 		{
-			m_remainingLifetime = max(m_remainingLifetime - dt, 0.0f);
+          m_remainingLifetime = std::max(m_remainingLifetime - dt, 0.0f);
 			float32 coeff = ColorCoeff();
 
 			b2ParticleColor *colors = m_world->GetParticleColorBuffer();

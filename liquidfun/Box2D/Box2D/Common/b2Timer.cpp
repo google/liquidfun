@@ -22,6 +22,7 @@
 
 float64 b2Timer::s_invFrequency = 0.0f;
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 typedef BOOL (WINAPI *SystemGetTimeFunc)(_Out_ LARGE_INTEGER *lpFrequency);

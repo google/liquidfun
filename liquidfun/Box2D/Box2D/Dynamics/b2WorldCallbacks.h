@@ -180,11 +180,11 @@ public:
 	virtual float32 ReportParticle(	int32 index, const b2Vec2& point,
 									const b2Vec2& normal, float32 fraction)
 	{
-                // Parameters unused in default callback.
-                (void) index;
-                (void) point;
-                (void) normal;
-                (void) fraction;
+		// Parameters unused in default callback.
+		B2_NOT_USED(index);
+		B2_NOT_USED(&point);
+		B2_NOT_USED(&normal);
+		B2_NOT_USED(fraction);
 		return 0;
 	}
 };
