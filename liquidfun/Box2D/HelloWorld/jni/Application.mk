@@ -19,3 +19,4 @@ APP_ABI:=armeabi-v7a
 APP_STL:=stlport_static
 NDK_MODULE_PATH+=$(abspath $(NDK_PROJECT_PATH)/../../)
 APP_MODULES:=HelloWorld
+APP_CFLAGS+=-Wall -Werror -Wno-long-long -Wno-variadic-macros

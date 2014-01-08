@@ -15,3 +15,4 @@
 # 3. This notice may not be removed or altered from any source distribution.
 include $(NDK_PROJECT_PATH)/../application_common.mk
 APP_MODULES:=HelloWorldTests
+APP_CFLAGS+=-Wall -Werror -Wno-long-long -Wno-variadic-macros

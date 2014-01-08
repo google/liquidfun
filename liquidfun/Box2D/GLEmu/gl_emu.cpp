@@ -92,7 +92,7 @@ void glEnd() {
 
   glDrawArrays(curmode, 0, vertbuf.size());
 
-  glDisableClientState(GL_VERTEX_ARRAY); 
+  glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
@@ -129,8 +129,9 @@ void glDrawPixels(int width, int height, int format, int type, const void* data)
 
 int gluBuild2DMipmaps(int target, int internal, int width, int height, int format, int type, const void* data) {
   assert(0);
+  return 0;
 }
- 	
+
 void glFrustum(double left, double right, double bottom, double top, double near, double far) { glFrustumf(left, right, bottom, top, near, far); }
 void glOrtho(double left, double right, double bottom, double top, double near, double far) { glOrthof(left, right, bottom, top, near, far); }
 void gluOrtho2D(double left, double right, double bottom, double top) { glOrthof(left, right, bottom, top, -1, 1); }

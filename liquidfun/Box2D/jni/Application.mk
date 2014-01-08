@@ -22,3 +22,4 @@ APP_STL:=stlport_static
 APP_MODULES:=\
 	libliquidfun \
 	libliquidfun_static
+APP_CFLAGS+=-Wall -Werror -Wno-long-long -Wno-variadic-macros

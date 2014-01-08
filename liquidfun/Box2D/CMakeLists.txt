@@ -28,6 +28,11 @@ option(BOX2D_BUILD_UNITTESTS "Build Box2D Unit Tests" ON)
 set(BOX2D_VERSION 2.3.0)
 set(LIB_INSTALL_DIR lib${LIB_SUFFIX})
 
+# Detect clang
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGXX 1)
+endif()
+
 # Enable / disable debug code depending upon the build configuration.
 set(DEBUG_FLAGS "-DDEBUG=1")
 set(RELEASE_FLAGS "-DDEBUG=0")
@@ -53,6 +58,36 @@ foreach(FLAGS_TYPE C CXX)
 endforeach(FLAGS_TYPE)
 include("flags.cmake")
 
+set(C_FLAGS_WARNINGS "")
+if(MSVC)
+  # Set /W3 for MSVC, there are still a lot of warnings to be cleaned up for
+  # /W4.
+  set(C_FLAGS_WARNINGS "/W3 /WX")
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
+       CMAKE_COMPILER_IS_CLANGXX)
+  # Set the maximum warning level for gcc.
+  set(C_FLAGS_WARNINGS "-Wall -Werror -Wno-long-long -Wno-variadic-macros")
+endif()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS_WARNINGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS_WARNINGS}")
+
+# The XCode generator ignores CMAKE_C_FLAGS AND CMAKE_CXX_FLAGS so flags
+# need to be added with target properties.
+# The following functions track the list of targets so that it's possible to
+# add flags to all targets using target properties.
+set(ALL_TARGETS "" CACHE INTERNAL "")
+# Override add_library() and adding the target to the ALL_TARGETS variable.
+function(add_library name)
+  _add_library(${name} ${ARGN})
+  set(ALL_TARGETS "${ALL_TARGETS}" "${name}" CACHE INTERNAL "")
+endfunction(add_library)
+
+# Override add_executable() and adding the target to the ALL_TARGETS variable.
+function(add_executable name)
+  _add_executable(${name} ${ARGN})
+  set(ALL_TARGETS "${ALL_TARGETS}" "${name}" CACHE INTERNAL "")
+endfunction(add_executable)
+
 # The Box2D library.
 add_subdirectory(Box2D)
 
@@ -75,3 +110,11 @@ endif(BOX2D_BUILD_UNITTESTS)
 if(BOX2D_INSTALL_DOC)
   install(DIRECTORY Documentation DESTINATION share/doc/Box2D PATTERN ".svn" EXCLUDE)
 endif(BOX2D_INSTALL_DOC)
+
+# Set the warning flags for all targets when using the Xcode generator.
+if(CMAKE_COMPILER_IS_CLANGXX)
+  foreach(target ${ALL_TARGETS})
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_WARNING_CFLAGS
+                          "${C_FLAGS_WARNINGS}")
+  endforeach(target)
+endif()

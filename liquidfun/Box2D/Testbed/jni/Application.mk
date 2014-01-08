@@ -20,3 +20,6 @@ NDK_MODULE_PATH+=$(subst $(space),,\
   $(abspath $(NDK_PROJECT_PATH)/../../)$(HOST_DIRSEP) \
   $(abspath $(NDK_PROJECT_PATH)/../../../))
 APP_MODULES:=Testbed
+# NOTE: -Warray-bounds is disabled to workaround a spurious warning with the
+# use of std::sort() in Tests/CollisionProcessing.h.
+APP_CFLAGS+=-Wall -Werror -Wno-long-long -Wno-variadic-macros -Wno-array-bounds

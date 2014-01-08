@@ -506,6 +506,7 @@ static void MouseWheel(int wheel, int direction, int x, int y)
 }
 #endif
 
+#ifndef __ANDROID__
 static void Restart(int)
 {
 	delete test;
@@ -513,12 +514,16 @@ static void Restart(int)
 	test = entry->createFcn();
 	Resize(width, height);
 }
+#endif // __ANDROID__
 
+#ifndef __ANDROID__
 static void Pause(int)
 {
 	settings.pause = !settings.pause;
 }
+#endif // __ANDROID__
 
+#ifndef __ANDROID__
 static void Exit(int code)
 {
 	// TODO: freeglut is not building on OSX
@@ -527,12 +532,15 @@ static void Exit(int code)
 #endif
 	exit(code);
 }
+#endif // __ANDROID__
 
+#ifndef __ANDROID__
 static void SingleStep(int)
 {
 	settings.pause = 1;
 	settings.singleStep = 1;
 }
+#endif // __ANDROID__
 
 int main(int argc, char** argv)
 {

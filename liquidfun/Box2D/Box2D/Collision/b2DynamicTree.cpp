@@ -635,10 +635,12 @@ void b2DynamicTree::ValidateMetrics(int32 index) const
 	b2Assert(0 <= child1 && child1 < m_nodeCapacity);
 	b2Assert(0 <= child2 && child2 < m_nodeCapacity);
 
+#if DEBUG
 	int32 height1 = m_nodes[child1].height;
 	int32 height2 = m_nodes[child2].height;
 	int32 height;
 	height = 1 + b2Max(height1, height2);
+#endif // DEBUG
 	b2Assert(node->height == height);
 
 	b2AABB aabb;
