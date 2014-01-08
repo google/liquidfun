@@ -614,7 +614,7 @@ static GLubyte   vert5Decomp[9] = {0,1,2, 0,2,4, 4,2,3};      /* pentagon: 5 inp
 
 static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, GLfloat *vertices, GLubyte *vertIndices, GLfloat *normals, GLfloat *vertOut, GLfloat *normOut, GLushort *vertIdxOut)
 {
-    int i,j,numEdgeIdxPerFace;
+    int i,j,numEdgeIdxPerFace = 0;
     GLubyte   *vertSamps = NULL;
     switch (numEdgePerFace)
     {

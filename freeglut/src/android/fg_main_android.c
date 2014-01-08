@@ -29,6 +29,7 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 #include "egl/fg_window_egl.h"
+#include "fg_main_android.h"
 
 #include <android/log.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))

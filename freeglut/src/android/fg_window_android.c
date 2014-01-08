@@ -59,6 +59,7 @@ void fgAndroidTryCreateContextAndSurface(SFG_Window* window)
     eglGetConfigAttrib(display, window->Window.pContext.egl.Config, EGL_NATIVE_VISUAL_ID, &vid);
     int32_t err = ANativeWindow_setBuffersGeometry(*window->Window.Handle, 0, 0, vid);
     assert(!err);
+    (void)err;
 
     fghPlatformOpenWindowEGL(window);
 
