@@ -13,5 +13,5 @@ var searchData=
   ['issleepingallowed',['IsSleepingAllowed',['../classb2_body.html#ac0b0c558008bda8cf7984dbaf2ee3aea',1,'b2Body']]],
   ['istouching',['IsTouching',['../classb2_contact.html#a367dc9a563ad7db5547f4247777a33c9',1,'b2Contact']]],
   ['isvalid',['IsValid',['../structb2_a_a_b_b.html#a8d170a2de7a267c3e19f5365685b713d',1,'b2AABB::IsValid()'],['../structb2_vec2.html#aafb971cf7cc726f91fc3a8215fb0aa17',1,'b2Vec2::IsValid()']]],
-  ['iszero',['IsZero',['../structb2_particle_color.html#a4a33a8b8437747ad3b2e5955ae69bd9b',1,'b2ParticleColor']]]
+  ['iszero',['IsZero',['../classb2_particle_color.html#a4a33a8b8437747ad3b2e5955ae69bd9b',1,'b2ParticleColor']]]
 ];
