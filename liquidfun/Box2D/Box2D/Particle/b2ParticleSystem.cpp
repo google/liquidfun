@@ -1183,14 +1183,6 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		{
 			SolveTensile(subStep);
 		}
-		if (m_allParticleFlags & b2_elasticParticle)
-		{
-			SolveElastic(subStep);
-		}
-		if (m_allParticleFlags & b2_springParticle)
-		{
-			SolveSpring(subStep);
-		}
 		if (m_allGroupFlags & b2_solidParticleGroup)
 		{
 			SolveSolid(subStep);
@@ -1202,6 +1194,16 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		SolveGravity(subStep);
 		SolvePressure(subStep);
 		SolveDamping(subStep);
+		// SolveElastic and SolveSpring refer the current velocities for
+		// numerical stability, they should be called as late as possible.
+		if (m_allParticleFlags & b2_elasticParticle)
+		{
+			SolveElastic(subStep);
+		}
+		if (m_allParticleFlags & b2_springParticle)
+		{
+			SolveSpring(subStep);
+		}
 		LimitVelocity(subStep);
 		// SolveCollision, SolveRigid and SolveWall should be called after other
 		// force functions because they may require particles to have specific
@@ -1418,10 +1420,19 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 			const b2Vec2& oa = triad.pa;
 			const b2Vec2& ob = triad.pb;
 			const b2Vec2& oc = triad.pc;
-			const b2Vec2& pa = m_positionBuffer.data[a];
-			const b2Vec2& pb = m_positionBuffer.data[b];
-			const b2Vec2& pc = m_positionBuffer.data[c];
-			b2Vec2 p = (float32) 1 / 3 * (pa + pb + pc);
+			b2Vec2 pa = m_positionBuffer.data[a];
+			b2Vec2 pb = m_positionBuffer.data[b];
+			b2Vec2 pc = m_positionBuffer.data[c];
+			b2Vec2& va = m_velocityBuffer.data[a];
+			b2Vec2& vb = m_velocityBuffer.data[b];
+			b2Vec2& vc = m_velocityBuffer.data[c];
+			pa += step.dt * va;
+			pb += step.dt * vb;
+			pc += step.dt * vc;
+			b2Vec2 midPoint = (float32) 1 / 3 * (pa + pb + pc);
+			pa -= midPoint;
+			pb -= midPoint;
+			pc -= midPoint;
 			b2Rot r;
 			r.s = b2Cross(oa, pa) + b2Cross(ob, pb) + b2Cross(oc, pc);
 			r.c = b2Dot(oa, pa) + b2Dot(ob, pb) + b2Dot(oc, pc);
@@ -1430,9 +1441,9 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 			r.s *= invR;
 			r.c *= invR;
 			float32 strength = elasticStrength * triad.strength;
-			m_velocityBuffer.data[a] += strength * (b2Mul(r, oa) - (pa - p));
-			m_velocityBuffer.data[b] += strength * (b2Mul(r, ob) - (pb - p));
-			m_velocityBuffer.data[c] += strength * (b2Mul(r, oc) - (pc - p));
+			va += strength * (b2Mul(r, oa) - pa);
+			vb += strength * (b2Mul(r, ob) - pb);
+			vc += strength * (b2Mul(r, oc) - pc);
 		}
 	}
 }
@@ -1447,13 +1458,19 @@ void b2ParticleSystem::SolveSpring(const b2TimeStep& step)
 		{
 			int32 a = pair.indexA;
 			int32 b = pair.indexB;
-			b2Vec2 d = m_positionBuffer.data[b] - m_positionBuffer.data[a];
+			b2Vec2 pa = m_positionBuffer.data[a];
+			b2Vec2 pb = m_positionBuffer.data[b];
+			b2Vec2& va = m_velocityBuffer.data[a];
+			b2Vec2& vb = m_velocityBuffer.data[b];
+			pa += step.dt * va;
+			pb += step.dt * vb;
+			b2Vec2 d = pb - pa;
 			float32 r0 = pair.distance;
 			float32 r1 = d.Length();
 			float32 strength = springStrength * pair.strength;
 			b2Vec2 f = strength * (r0 - r1) / r1 * d;
-			m_velocityBuffer.data[a] -= f;
-			m_velocityBuffer.data[b] += f;
+			va -= f;
+			vb += f;
 		}
 	}
 }
