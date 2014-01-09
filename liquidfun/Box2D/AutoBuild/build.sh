@@ -34,7 +34,8 @@ usage() {
 Generate Makefiles or Xcode project for ${project_name} and build the specified
 configuration.
 
-Usage: ${script_name} [-h] [-n] [-b build_configuration] [build_configuration]
+Usage: ${script_name} [-h] [-n] [-o output_directory] [-v]
+         [-b build_configuration] [build_configuration]
 
 -h:
   Display this help message.
@@ -43,9 +44,15 @@ Usage: ${script_name} [-h] [-n] [-b build_configuration] [build_configuration]
 -d:
   Display the build commands this script would run without building.
 -b build_configuration:
-  build_configuration specifies the project configuration to build.
-  Can be either \"debug\" or \"release\".  If not specified, defaults to
-  \"${build_config}\".
+  build_configuration specifies the project configuration to build using a
+  whitespace separated list of the following:
+    * \"debug\"
+    * \"release\"
+  If not specified, defaults to \"${build_configs}\".
+-o output_directory:
+  Directory to copy build artifacts to.
+-v:
+  Display verbose output.
 
 build_configuration:
   Legacy form of '-b build_configuration'.
@@ -68,9 +75,9 @@ current/*.app/Contents/bin/cmake)
     echo "cmake not found ${cmake}." >&2
     exit 1
   fi
-  declare -r cmake_version_minmaj=$("${cmake}" --version | \
+  local -r cmake_version_minmaj=$("${cmake}" --version | \
                                     awk -F. '{ print $1 "." $2; }')
-  if [[ ${cmake_version_minmaj} < 2.8 ]]; then
+  if [[ ${cmake_version_minmaj} < ${cmake_minversion_minmaj} ]]; then
     echo "Found cmake ${cmake_version_minmaj}, ${project_name} requires" \
          "${cmake_minversion_minmaj} or above." >&2
     exit 1
@@ -78,67 +85,92 @@ current/*.app/Contents/bin/cmake)
   echo "${cmake}"
 }
 
-# Parse arguments.
-build_config=release
-clean=1
+# Capitalize the string ${1}.
+capitalize() {
+  local -r string="${1}"
+  # Capitalize the first letter (${string^} doesn't work with bash that
+  # ships with OSX).
+  echo $(echo ${string:0:1} | tr '[a-z]' '[A-Z]')${string:1}
+}
 
-while getopts 'hndb:' option; do
-  case ${option} in
-    h) usage ;;
-    n) clean=0 ;;
-    b) build_config=${OPTARG};;
-    d) dryrun=echo ;;
-    *) usage ;;
-  esac
-done
-# Manually parse legacy build config option.
-shift $((OPTIND-1))
-if [[ $# -gt 0 ]]; then
-  build_config="${1}"
-fi
+# Filter xcodebuild output (stdin) to make it less verbose.
+xcodebuild_verbose_filter() {
+  grep -Ev '(cd |setenv |/bin/clang|Check dependencies|^$)'
+}
 
-# Validate the build configuration.
-case ${build_config} in
-  debug|release) ;;
-  * ) echo "Invalid build config \"${build_config}\"." >&2
-      exit 1 ;;
-esac
-
-declare -r cmake=$(find_cmake)
-
-# Build the project.
-cd "${script_directory}/.."
-if [[ "${os_name}" == "Darwin" ]]; then
-  declare xcodebuild_config=
-  case ${build_config} in
-    debug) xcodebuild_config="-configuration Debug" ;;
-    release) xcodebuild_config="-configuration Release" ;;
-  esac
+# Build the project for OSX.
+# $1: build configuration (title case).
+# $2: cmake binary path.
+# $3: whether to clean the project (1 = clean).
+# $4: whether to print verbose output (1 = enable).
+build_osx() {
+  local -r title_case_build_config="${1}"
+  local -r cmake="${2}"
+  local -r clean="${3}"
+  local -r verbose="${4}"
+  local verbose_filter=xcodebuild_verbose_filter
+  if [[ $((verbose)) -eq 1 ]]; then
+    verbose_filter=cat
+  fi
   # Only rebuild the xcode project if the CMakeLists.txt file is newer.
   # Xcode will rebuild a big chunk of a project if the project file is
   # modified by cmake.
-  # NOTE: This will incorrectly *not* result in the xcode project not being
+  # NOTE: This will *not* result in the xcode project being
   # rebuilt if any files CMakeLists.txt depends upon are modified.
   [[ $((clean)) -eq 1 || \
      ! -e Box2D.xcodeproj || \
      $(stat -f%m CMakeLists.txt) -gt $(stat -f%m Box2D.xcodeproj) ]] && \
     "${cmake}" -G'Xcode'
-  eval "\
-    [[ $((clean)) -ne 0 ]] && ${dryrun} xcodebuild ${xcodebuild_config} clean
-    ${dryrun} xcodebuild ${xcodebuild_config}"
-else
-  declare makefile_config=
-  declare cmake_config=
-  case ${build_config} in
-    debug)
-      cmake_config='-DCMAKE_BUILD_TYPE=Debug'
-      makefile_config="DEBUG=1"
-      ;;
-    release)
-      cmake_config=
-      makefile_config=
-      ;;
-  esac
+  [[ $((clean)) -ne 0 ]] && \
+    ${dryrun} xcodebuild -configuration ${title_case_build_config} clean | \
+      ${verbose_filter}
+  ${dryrun} xcodebuild -configuration ${title_case_build_config} | \
+      ${verbose_filter}
+}
+
+# Get a list of OSX build artifact base directories.
+get_osx_build_artifact_dirs() {
+  find . -type d -name Box2D.build | sed 's@/[^/]*$@@'
+}
+
+# Build the project for Linux.
+# $1: build configuration (title case).
+# $2: cmake binary path.
+# $3: whether to clean the project (1 = clean).
+# $4: whether to print verbose output (1 = enable).
+build_linux() {
+  local -r title_case_build_config="${1}"
+  local -r cmake="${2}"
+  local -r clean="${3}"
+  local -r verbose="${4}"
+  local -r cmake_config="-DCMAKE_BUILD_TYPE=${title_case_build_config}"
+  local verbose_arg=
+
+  if [[ $((verbose)) -eq 1 ]]; then
+    verbose_arg="VERBOSE=1"
+  fi
+
+  # The cmake makefile generator places intermediate files for different build
+  # configurations in the same output directories which prevents the user from
+  # building multiple configurations in the same directory.
+  # To work around this issue the following renames the intermediate files
+  # to a name based upon the config after the build.  Then in
+  # subsequent builds the names of the intermediate files are restored prior
+  # to building the project.
+  local -r intermediate_files="\
+    cmake_install.cmake CMakeCache.txt CMakeFiles Makefile \
+    config-linux.h config.h flags.cmake freeglut.pc"
+
+  # Restore intermediate files for this build configuration if they're present.
+  find -depth '(' $(echo "${intermediate_files}" | \
+            sed -E 's@([^ ]+)@-name \1'"_${title_case_build_config}"' -o @g;
+                    s@ -o $@@') ')' \
+       -exec ${SHELL} -c \
+         'target="$(echo "{}" | \
+                    sed -E '\''s@(.*)_'"${title_case_build_config}"'@\1@'\'')";
+          rm -rf "${target}"; \
+          mv "{}" "${target}"' ';'
+
   # Only rebuild the makefiles if the CMakeLists.txt file is newer than the
   # top level makefile.
   # NOTE: This will result in the xcode project not being rebuilt if any
@@ -147,8 +179,107 @@ else
      ! -e Makefile || \
      $(stat -c%Y CMakeLists.txt) -gt $(stat -c%Y Makefile) ]] && \
     "${cmake}" -G'Unix Makefiles' ${cmake_config}
-  eval "\
-    [[ $((clean)) -ne 0 ]] && ${dryrun} make ${makefile_config} clean
-    ${dryrun} make -j$(awk '/^processor/ { n=$3 } END { print n + 1 }' \
-                       /proc/cpuinfo) ${makefile_config}"
-fi
+
+  [[ $((clean)) -ne 0 ]] && ${dryrun} make clean ${verbose_arg}
+  ${dryrun} make -j$(awk '/^processor/ { n=$3 } END { print n + 1 }' \
+                       /proc/cpuinfo) ${verbose_arg}
+
+  # Rename intermediate files for this build configuration.
+  find -depth '(' $(echo "${intermediate_files}" | \
+                   sed -E 's@([^ ]+)@-name \1 -o @g;s@ -o $@@') ')' \
+       -exec ${SHELL} -c 'mv "{}" "{}_'"${title_case_build_config}"'"' ';'
+}
+
+# Get a list of Linux build artifact base directories.
+get_linux_build_artifact_dirs() {
+  find . -type d -path '*/CMakeFiles_*/*.dir' | \
+    sed 's@/CMakeFiles_.*@@' | \
+    sort | \
+    uniq
+}
+
+# Copy build artifacts to an output directory.
+# $1: build configuration (title case).
+# $2: Newline separated list of build artifact base directories.
+# $3: Output directory.
+copy_to_output() {
+  local -r title_case_build_config="${1}"
+  local -r base_artifact_dirs="${2}"
+  local -r output_dir="${3}"
+  mkdir -p "${output_dir}"
+  (
+    IFS=$'\n'
+    for base_dir in ${base_artifact_dirs}; do
+      local artifact_dir="${base_dir}/${title_case_build_config}"
+      if [[ -d "${artifact_dir}" ]]; then
+        # NOTE: This requires that ${artifact_dir} is a relative
+        # path underneath the current directory.
+        artifact_output="${output_dir}/${artifact_dir}"
+        artifact_output_dir="$(dirname "${artifact_output}")"
+        mkdir -p "${artifact_output_dir}"
+        cp -a "${artifact_dir}" "${artifact_output_dir}"
+      fi
+    done
+  )
+}
+
+main() {
+  # Parse arguments.
+  local build_configs="debug release"
+  local clean=1
+  local output_dir=
+  local verbose=0
+
+  while getopts 'hndb:o:v' option; do
+    case ${option} in
+      h) usage ;;
+      n) clean=0 ;;
+      b) build_configs="${OPTARG}";;
+      d) dryrun=echo ;;
+      o) mkdir -p "${OPTARG}"
+         output_dir="$(cd ${OPTARG} && pwd)";;
+      v) verbose=1;;
+      *) usage ;;
+    esac
+  done
+  # Manually parse legacy build config option.
+  shift $((OPTIND-1))
+  if [[ $# -gt 0 ]]; then
+    build_configs="${1}"
+  fi
+  # Validate the build configuration argument.
+  if [[ "$(echo "${build_configs}" | tr ' ' '\n' | \
+           grep -vE '(debug|release)')" != "" ]]; then
+    echo "Invalid build config ${build_configs}" >&2
+    exit 1
+  fi
+
+  # Find the cmake binary.
+  local -r cmake=$(find_cmake)
+
+  # Change into the project's root directory for the cmake build.
+  cd "${script_directory}/.."
+
+  for build_config in ${build_configs}; do
+    local title_case_build_config=$(capitalize "${build_config}")
+
+    # Build the project.
+    if [[ "${os_name}" == "Darwin" ]]; then
+      build_osx "${title_case_build_config}" "${cmake}" $((clean)) $((verbose))
+      base_artifact_dirs="$(get_osx_build_artifact_dirs)"
+    else
+      build_linux "${title_case_build_config}" "${cmake}" $((clean)) \
+                  $((verbose))
+      base_artifact_dirs="$(get_linux_build_artifact_dirs)"
+    fi
+
+    # If an output directory was specified, copy the build artifacts there.
+    if [[ "${output_dir}" != "" ]]; then
+      copy_to_output "${title_case_build_config}" "${base_artifact_dirs}" \
+                     "${output_dir}"
+    fi
+  done
+}
+
+main "$@"
+
