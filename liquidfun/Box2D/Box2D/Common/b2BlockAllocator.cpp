@@ -56,7 +56,7 @@ struct b2Block
 
 b2BlockAllocator::b2BlockAllocator()
 {
-	b2Assert(b2_blockSizes < UCHAR_MAX);
+	b2Assert((uint32)b2_blockSizes < UCHAR_MAX);
 
 	m_chunkSpace = b2_chunkArrayIncrement;
 	m_chunkCount = 0;
