@@ -124,205 +124,206 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    b2_tensileParticle =     1 &lt;&lt; 7, <span class="comment">// with surface tension</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    b2_colorMixingParticle = 1 &lt;&lt; 8, <span class="comment">// mixing color between contacting particles</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    b2_destructionListener = 1 &lt;&lt; 9, <span class="comment">// call b2DestructionListener on destruction</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;};</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="classb2_particle_color.html">   43</a></span>&#160;<span class="keyword">class </span><a class="code" href="classb2_particle_color.html">b2ParticleColor</a></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>() {}</div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ad8d2e94a330bdacc7fcf88e4faa5b2a6">   50</a></span>&#160;    b2Inline <a class="code" href="classb2_particle_color.html#ad8d2e94a330bdacc7fcf88e4faa5b2a6">b2ParticleColor</a>(uint8 r, uint8 g, uint8 b, uint8 a)</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>(r, g, b, a);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>(<span class="keyword">const</span> <a class="code" href="structb2_color.html">b2Color</a>&amp; color);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a4a33a8b8437747ad3b2e5955ae69bd9b">   62</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classb2_particle_color.html#a4a33a8b8437747ad3b2e5955ae69bd9b">IsZero</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">return</span> !r &amp;&amp; !g &amp;&amp; !b &amp;&amp; !a;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    }</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <a class="code" href="structb2_color.html">b2Color</a> <a class="code" href="classb2_particle_color.html#a7e844b191956c1f6fa3279b4a6cb1b71">GetColor</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">   73</a></span>&#160;    b2Inline <span class="keywordtype">void</span> <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>(int32 r_, int32 g_, int32 b_, int32 a_)</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        r = r_;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        g = g_;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        b = b_;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        a = a_;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>(<span class="keyword">const</span> <a class="code" href="structb2_color.html">b2Color</a>&amp; color);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a4895249cb23bb11a30517ca00aa009fc">   86</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#a4895249cb23bb11a30517ca00aa009fc">operator = </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>(color.r, color.g, color.b, color.a);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442">   94</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442">operator *= </a>(float32 s)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>((uint8)(r * s), (uint8)(g * s), (uint8)(b * s), (uint8)(a * s));</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
-<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ad74c0763f4d48d018d60388bf6ddbf89">  101</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442">operator *= </a>(uint8 s)</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    {</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="comment">// 1..256 to maintain the complete dynamic range.</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="keyword">const</span> int32 scale = (int32)s + 1;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>((uint8)(((int32)r * scale) &gt;&gt; <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>),</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            (uint8)(((int32)g * scale) &gt;&gt; <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>),</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            (uint8)(((int32)b * scale) &gt;&gt; <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>),</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            (uint8)(((int32)a * scale) &gt;&gt; <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>));</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    }</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4">  113</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4">operator * </a>(float32 s)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keywordflow">return</span> MultiplyByScalar(s);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    }</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ad6683d23159c5097a4b6b2685ca8d628">  119</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4">operator * </a>(uint8 s)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keywordflow">return</span> MultiplyByScalar(s);</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    }</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00126"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a3fdb6cb76eb8bcdbadd12d5c1ba637a4">  126</a></span>&#160;    b2Inline <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#a3fdb6cb76eb8bcdbadd12d5c1ba637a4">operator += </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        r += color.r;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        g += color.g;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        b += color.b;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        a += color.a;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    }</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
-<div class="line"><a name="l00137"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a9e90091e382b6cdcff1819a59515fea7">  137</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="classb2_particle_color.html#a9e90091e382b6cdcff1819a59515fea7">operator + </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> newColor(*<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        newColor += color;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keywordflow">return</span> newColor;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#adfeeedfb5ad15a51b2354dd1ef64dc4f">  146</a></span>&#160;    b2Inline <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#adfeeedfb5ad15a51b2354dd1ef64dc4f">operator -= </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    {</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        r -= color.r;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        g -= color.g;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        b -= color.b;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        a -= color.a;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    }</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
-<div class="line"><a name="l00157"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a95ab125fa45ca7cf24c231b2ccb2c98e">  157</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="classb2_particle_color.html#a95ab125fa45ca7cf24c231b2ccb2c98e">operator - </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> newColor(*<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        newColor -= color;</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keywordflow">return</span> newColor;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    }</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
-<div class="line"><a name="l00165"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ab84c393584da555a7efe9a0dbd0daddf">  165</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classb2_particle_color.html#ab84c393584da555a7efe9a0dbd0daddf">operator == </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <span class="keywordflow">return</span> r == color.r &amp;&amp; g == color.g &amp;&amp; b == color.b &amp;&amp; a == color.a;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    }</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;</div>
-<div class="line"><a name="l00175"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf">  175</a></span>&#160;    b2Inline <span class="keywordtype">void</span> <a class="code" href="classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf">Mix</a>(<a class="code" href="classb2_particle_color.html">b2ParticleColor</a> * <span class="keyword">const</span> mixColor, <span class="keyword">const</span> int32 strength)</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    {</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <a class="code" href="classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf">Mix</a>(<span class="keyword">this</span>, mixColor, strength);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
-<div class="line"><a name="l00185"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a30b460063f80d93e6a1756fe559105aa">  185</a></span>&#160;    <span class="keyword">static</span> b2Inline <span class="keywordtype">void</span> <a class="code" href="classb2_particle_color.html#a30b460063f80d93e6a1756fe559105aa">Mix</a>(<a class="code" href="classb2_particle_color.html">b2ParticleColor</a> * <span class="keyword">const</span> colorA,</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;                             <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> * <span class="keyword">const</span> colorB,</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                             <span class="keyword">const</span> int32 strength)</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    {</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        <span class="keyword">const</span> uint8 dr = (strength * (colorB-&gt;r - colorA-&gt;r)) &gt;&gt;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;                         <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        <span class="keyword">const</span> uint8 dg = (strength * (colorB-&gt;g - colorA-&gt;g)) &gt;&gt;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                         <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        <span class="keyword">const</span> uint8 db = (strength * (colorB-&gt;b - colorA-&gt;b)) &gt;&gt;</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                         <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        <span class="keyword">const</span> uint8 da = (strength * (colorB-&gt;a - colorA-&gt;a)) &gt;&gt;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;                         <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        colorA-&gt;r += dr;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        colorA-&gt;g += dg;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        colorA-&gt;b += db;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        colorA-&gt;a += da;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        colorB-&gt;r -= dr;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        colorB-&gt;g -= dg;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        colorB-&gt;b -= db;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        colorB-&gt;a -= da;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    }</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> MultiplyByScalar(T s)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> color(*<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        color *= s;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <span class="keywordflow">return</span> color;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    }</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    uint8 r, g, b, a;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00223"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#aea894d9120f90e180f7b8fba59d609df">  223</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> float32 <a class="code" href="classb2_particle_color.html#aea894d9120f90e180f7b8fba59d609df">k_maxValue</a>;</div>
-<div class="line"><a name="l00225"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ac4b1826a9039a2b560bbeeb42a7fe291">  225</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> float32 <a class="code" href="classb2_particle_color.html#ac4b1826a9039a2b560bbeeb42a7fe291">k_inverseMaxValue</a>;</div>
-<div class="line"><a name="l00227"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">  227</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint8 <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;};</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="keyword">extern</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> b2ParticleColor_zero;</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;</div>
-<div class="line"><a name="l00234"></a><span class="lineno"><a class="line" href="structb2_particle_def.html">  234</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structb2_particle_def.html">b2ParticleDef</a></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;{</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <a class="code" href="structb2_particle_def.html">b2ParticleDef</a>()</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    {</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        <a class="code" href="structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3">flags</a> = 0;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        <a class="code" href="structb2_particle_def.html#ae34b248253c7edaeffbb2802c6b75930">position</a> = b2Vec2_zero;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        <a class="code" href="structb2_particle_def.html#a0ffc7f20fb60a05be91cce4393121fd7">velocity</a> = b2Vec2_zero;</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <a class="code" href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">color</a> = b2ParticleColor_zero;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <a class="code" href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">userData</a> = NULL;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    }</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;</div>
-<div class="line"><a name="l00249"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3">  249</a></span>&#160;    uint32 <a class="code" href="structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3">flags</a>;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div>
-<div class="line"><a name="l00252"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#ae34b248253c7edaeffbb2802c6b75930">  252</a></span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="structb2_particle_def.html#ae34b248253c7edaeffbb2802c6b75930">position</a>;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;</div>
-<div class="line"><a name="l00255"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#a0ffc7f20fb60a05be91cce4393121fd7">  255</a></span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="structb2_particle_def.html#a0ffc7f20fb60a05be91cce4393121fd7">velocity</a>;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;</div>
-<div class="line"><a name="l00258"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">  258</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">color</a>;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;</div>
-<div class="line"><a name="l00261"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">  261</a></span>&#160;    <span class="keywordtype">void</span>* <a class="code" href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">userData</a>;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;};</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classb2_particle_color_html_ac4b1826a9039a2b560bbeeb42a7fe291"><div class="ttname"><a href="classb2_particle_color.html#ac4b1826a9039a2b560bbeeb42a7fe291">b2ParticleColor::k_inverseMaxValue</a></div><div class="ttdeci">static const float32 k_inverseMaxValue</div><div class="ttdoc">1.0 / k_maxValue. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:225</div></div>
-<div class="ttc" id="structb2_particle_def_html_a0ffc7f20fb60a05be91cce4393121fd7"><div class="ttname"><a href="structb2_particle_def.html#a0ffc7f20fb60a05be91cce4393121fd7">b2ParticleDef::velocity</a></div><div class="ttdeci">b2Vec2 velocity</div><div class="ttdoc">The linear velocity of the particle in world co-ordinates. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:255</div></div>
-<div class="ttc" id="classb2_particle_color_html_a4895249cb23bb11a30517ca00aa009fc"><div class="ttname"><a href="classb2_particle_color.html#a4895249cb23bb11a30517ca00aa009fc">b2ParticleColor::operator=</a></div><div class="ttdeci">b2ParticleColor &amp; operator=(const b2ParticleColor &amp;color)</div><div class="ttdoc">Assign a b2ParticleColor to this instance. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:86</div></div>
-<div class="ttc" id="classb2_particle_color_html_a3e6f84ca10776e9baa59d5f60d0d8ba4"><div class="ttname"><a href="classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4">b2ParticleColor::operator*</a></div><div class="ttdeci">b2ParticleColor operator*(float32 s) const </div><div class="ttdoc">Scales r, g, b, a members by s returning the modified b2ParticleColor. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:113</div></div>
-<div class="ttc" id="classb2_particle_color_html_a30b460063f80d93e6a1756fe559105aa"><div class="ttname"><a href="classb2_particle_color.html#a30b460063f80d93e6a1756fe559105aa">b2ParticleColor::Mix</a></div><div class="ttdeci">static b2Inline void Mix(b2ParticleColor *const colorA, b2ParticleColor *const colorB, const int32 strength)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:185</div></div>
-<div class="ttc" id="classb2_particle_color_html_ab84c393584da555a7efe9a0dbd0daddf"><div class="ttname"><a href="classb2_particle_color.html#ab84c393584da555a7efe9a0dbd0daddf">b2ParticleColor::operator==</a></div><div class="ttdeci">bool operator==(const b2ParticleColor &amp;color) const </div><div class="ttdoc">Compare this color with the specified color. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:165</div></div>
-<div class="ttc" id="structb2_color_html"><div class="ttname"><a href="structb2_color.html">b2Color</a></div><div class="ttdoc">Color for debug drawing. Each value has the range [0,1]. </div><div class="ttdef"><b>Definition:</b> b2Draw.h:26</div></div>
-<div class="ttc" id="classb2_particle_color_html_a3fdb6cb76eb8bcdbadd12d5c1ba637a4"><div class="ttname"><a href="classb2_particle_color.html#a3fdb6cb76eb8bcdbadd12d5c1ba637a4">b2ParticleColor::operator+=</a></div><div class="ttdeci">b2Inline b2ParticleColor &amp; operator+=(const b2ParticleColor &amp;color)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:126</div></div>
-<div class="ttc" id="structb2_particle_def_html_ae34b248253c7edaeffbb2802c6b75930"><div class="ttname"><a href="structb2_particle_def.html#ae34b248253c7edaeffbb2802c6b75930">b2ParticleDef::position</a></div><div class="ttdeci">b2Vec2 position</div><div class="ttdoc">The world position of the particle. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:252</div></div>
-<div class="ttc" id="structb2_particle_def_html"><div class="ttname"><a href="structb2_particle_def.html">b2ParticleDef</a></div><div class="ttdef"><b>Definition:</b> b2Particle.h:234</div></div>
-<div class="ttc" id="classb2_particle_color_html_ae61287a0be96027fae9a77a4354e4bbf"><div class="ttname"><a href="classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf">b2ParticleColor::Mix</a></div><div class="ttdeci">b2Inline void Mix(b2ParticleColor *const mixColor, const int32 strength)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:175</div></div>
-<div class="ttc" id="classb2_particle_color_html"><div class="ttname"><a href="classb2_particle_color.html">b2ParticleColor</a></div><div class="ttdoc">Small color object for each particle. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:43</div></div>
-<div class="ttc" id="classb2_particle_color_html_a9e90091e382b6cdcff1819a59515fea7"><div class="ttname"><a href="classb2_particle_color.html#a9e90091e382b6cdcff1819a59515fea7">b2ParticleColor::operator+</a></div><div class="ttdeci">b2ParticleColor operator+(const b2ParticleColor &amp;color) const </div><div class="ttdef"><b>Definition:</b> b2Particle.h:137</div></div>
-<div class="ttc" id="classb2_particle_color_html_ad8d2e94a330bdacc7fcf88e4faa5b2a6"><div class="ttname"><a href="classb2_particle_color.html#ad8d2e94a330bdacc7fcf88e4faa5b2a6">b2ParticleColor::b2ParticleColor</a></div><div class="ttdeci">b2Inline b2ParticleColor(uint8 r, uint8 g, uint8 b, uint8 a)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:50</div></div>
-<div class="ttc" id="classb2_particle_color_html_acfaa29e177342af7fc01e25602d83781"><div class="ttname"><a href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">b2ParticleColor::Set</a></div><div class="ttdeci">b2Inline void Set(int32 r_, int32 g_, int32 b_, int32 a_)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:73</div></div>
-<div class="ttc" id="structb2_particle_def_html_af293c58640b3b403746d861b0b04e2f8"><div class="ttname"><a href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">b2ParticleDef::userData</a></div><div class="ttdeci">void * userData</div><div class="ttdoc">Use this to store application-specific body data. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:261</div></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    b2_barrierParticle     = 1 &lt;&lt; 10, <span class="comment">// prevents other particles from leaking</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;};</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classb2_particle_color.html">   44</a></span>&#160;<span class="keyword">class </span><a class="code" href="classb2_particle_color.html">b2ParticleColor</a></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;{</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>() {}</div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ad8d2e94a330bdacc7fcf88e4faa5b2a6">   51</a></span>&#160;    b2Inline <a class="code" href="classb2_particle_color.html#ad8d2e94a330bdacc7fcf88e4faa5b2a6">b2ParticleColor</a>(uint8 r, uint8 g, uint8 b, uint8 a)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>(r, g, b, a);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>(<span class="keyword">const</span> <a class="code" href="structb2_color.html">b2Color</a>&amp; color);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a4a33a8b8437747ad3b2e5955ae69bd9b">   63</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classb2_particle_color.html#a4a33a8b8437747ad3b2e5955ae69bd9b">IsZero</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordflow">return</span> !r &amp;&amp; !g &amp;&amp; !b &amp;&amp; !a;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="structb2_color.html">b2Color</a> <a class="code" href="classb2_particle_color.html#a7e844b191956c1f6fa3279b4a6cb1b71">GetColor</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">   74</a></span>&#160;    b2Inline <span class="keywordtype">void</span> <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>(int32 r_, int32 g_, int32 b_, int32 a_)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    {</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        r = r_;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        g = g_;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        b = b_;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        a = a_;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    }</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>(<span class="keyword">const</span> <a class="code" href="structb2_color.html">b2Color</a>&amp; color);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a4895249cb23bb11a30517ca00aa009fc">   87</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#a4895249cb23bb11a30517ca00aa009fc">operator = </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>(color.r, color.g, color.b, color.a);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442">   95</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442">operator *= </a>(float32 s)</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>((uint8)(r * s), (uint8)(g * s), (uint8)(b * s), (uint8)(a * s));</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    }</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ad74c0763f4d48d018d60388bf6ddbf89">  102</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442">operator *= </a>(uint8 s)</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    {</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="comment">// 1..256 to maintain the complete dynamic range.</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="keyword">const</span> int32 scale = (int32)s + 1;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <a class="code" href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">Set</a>((uint8)(((int32)r * scale) &gt;&gt; <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>),</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            (uint8)(((int32)g * scale) &gt;&gt; <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>),</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            (uint8)(((int32)b * scale) &gt;&gt; <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>),</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            (uint8)(((int32)a * scale) &gt;&gt; <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>));</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    }</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4">  114</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4">operator * </a>(float32 s)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keywordflow">return</span> MultiplyByScalar(s);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    }</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00120"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ad6683d23159c5097a4b6b2685ca8d628">  120</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4">operator * </a>(uint8 s)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordflow">return</span> MultiplyByScalar(s);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
+<div class="line"><a name="l00127"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a3fdb6cb76eb8bcdbadd12d5c1ba637a4">  127</a></span>&#160;    b2Inline <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#a3fdb6cb76eb8bcdbadd12d5c1ba637a4">operator += </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        r += color.r;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        g += color.g;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        b += color.b;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        a += color.a;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    }</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
+<div class="line"><a name="l00138"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a9e90091e382b6cdcff1819a59515fea7">  138</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="classb2_particle_color.html#a9e90091e382b6cdcff1819a59515fea7">operator + </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> newColor(*<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        newColor += color;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">return</span> newColor;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    }</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
+<div class="line"><a name="l00147"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#adfeeedfb5ad15a51b2354dd1ef64dc4f">  147</a></span>&#160;    b2Inline <a class="code" href="classb2_particle_color.html">b2ParticleColor</a>&amp; <a class="code" href="classb2_particle_color.html#adfeeedfb5ad15a51b2354dd1ef64dc4f">operator -= </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        r -= color.r;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        g -= color.g;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        b -= color.b;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        a -= color.a;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    }</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
+<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a95ab125fa45ca7cf24c231b2ccb2c98e">  158</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="classb2_particle_color.html#a95ab125fa45ca7cf24c231b2ccb2c98e">operator - </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> newColor(*<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        newColor -= color;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="keywordflow">return</span> newColor;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    }</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00166"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ab84c393584da555a7efe9a0dbd0daddf">  166</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classb2_particle_color.html#ab84c393584da555a7efe9a0dbd0daddf">operator == </a>(<span class="keyword">const</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> &amp;color)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <span class="keywordflow">return</span> r == color.r &amp;&amp; g == color.g &amp;&amp; b == color.b &amp;&amp; a == color.a;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    }</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
+<div class="line"><a name="l00176"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf">  176</a></span>&#160;    b2Inline <span class="keywordtype">void</span> <a class="code" href="classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf">Mix</a>(<a class="code" href="classb2_particle_color.html">b2ParticleColor</a> * <span class="keyword">const</span> mixColor, <span class="keyword">const</span> int32 strength)</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    {</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        <a class="code" href="classb2_particle_color.html#a31eb4241de8148393c4a69d81ed1d78d">MixColors</a>(<span class="keyword">this</span>, mixColor, strength);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div>
+<div class="line"><a name="l00186"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#a31eb4241de8148393c4a69d81ed1d78d">  186</a></span>&#160;    <span class="keyword">static</span> b2Inline <span class="keywordtype">void</span> <a class="code" href="classb2_particle_color.html#a31eb4241de8148393c4a69d81ed1d78d">MixColors</a>(<a class="code" href="classb2_particle_color.html">b2ParticleColor</a> * <span class="keyword">const</span> colorA,</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                             <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> * <span class="keyword">const</span> colorB,</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;                             <span class="keyword">const</span> int32 strength)</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    {</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        <span class="keyword">const</span> uint8 dr = (strength * (colorB-&gt;r - colorA-&gt;r)) &gt;&gt;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                         <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        <span class="keyword">const</span> uint8 dg = (strength * (colorB-&gt;g - colorA-&gt;g)) &gt;&gt;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;                         <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keyword">const</span> uint8 db = (strength * (colorB-&gt;b - colorA-&gt;b)) &gt;&gt;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;                         <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        <span class="keyword">const</span> uint8 da = (strength * (colorB-&gt;a - colorA-&gt;a)) &gt;&gt;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;                         <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        colorA-&gt;r += dr;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        colorA-&gt;g += dg;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        colorA-&gt;b += db;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        colorA-&gt;a += da;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        colorB-&gt;r -= dr;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        colorB-&gt;g -= dg;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        colorB-&gt;b -= db;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        colorB-&gt;a -= da;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    }</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> MultiplyByScalar(T s)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> color(*<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        color *= s;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordflow">return</span> color;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    }</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    uint8 r, g, b, a;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00224"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#aea894d9120f90e180f7b8fba59d609df">  224</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> float32 <a class="code" href="classb2_particle_color.html#aea894d9120f90e180f7b8fba59d609df">k_maxValue</a>;</div>
+<div class="line"><a name="l00226"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ac4b1826a9039a2b560bbeeb42a7fe291">  226</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> float32 <a class="code" href="classb2_particle_color.html#ac4b1826a9039a2b560bbeeb42a7fe291">k_inverseMaxValue</a>;</div>
+<div class="line"><a name="l00228"></a><span class="lineno"><a class="line" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">  228</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint8 <a class="code" href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">k_bitsPerComponent</a>;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;};</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="keyword">extern</span> <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> b2ParticleColor_zero;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
+<div class="line"><a name="l00235"></a><span class="lineno"><a class="line" href="structb2_particle_def.html">  235</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structb2_particle_def.html">b2ParticleDef</a></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;{</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <a class="code" href="structb2_particle_def.html">b2ParticleDef</a>()</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    {</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        <a class="code" href="structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3">flags</a> = 0;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        <a class="code" href="structb2_particle_def.html#ae34b248253c7edaeffbb2802c6b75930">position</a> = b2Vec2_zero;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <a class="code" href="structb2_particle_def.html#a0ffc7f20fb60a05be91cce4393121fd7">velocity</a> = b2Vec2_zero;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <a class="code" href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">color</a> = b2ParticleColor_zero;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        <a class="code" href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">userData</a> = NULL;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;</div>
+<div class="line"><a name="l00250"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3">  250</a></span>&#160;    uint32 <a class="code" href="structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3">flags</a>;</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;</div>
+<div class="line"><a name="l00253"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#ae34b248253c7edaeffbb2802c6b75930">  253</a></span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="structb2_particle_def.html#ae34b248253c7edaeffbb2802c6b75930">position</a>;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
+<div class="line"><a name="l00256"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#a0ffc7f20fb60a05be91cce4393121fd7">  256</a></span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="structb2_particle_def.html#a0ffc7f20fb60a05be91cce4393121fd7">velocity</a>;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;</div>
+<div class="line"><a name="l00259"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">  259</a></span>&#160;    <a class="code" href="classb2_particle_color.html">b2ParticleColor</a> <a class="code" href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">color</a>;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div>
+<div class="line"><a name="l00262"></a><span class="lineno"><a class="line" href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">  262</a></span>&#160;    <span class="keywordtype">void</span>* <a class="code" href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">userData</a>;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;};</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classb2_particle_color_html_ac4b1826a9039a2b560bbeeb42a7fe291"><div class="ttname"><a href="classb2_particle_color.html#ac4b1826a9039a2b560bbeeb42a7fe291">b2ParticleColor::k_inverseMaxValue</a></div><div class="ttdeci">static const float32 k_inverseMaxValue</div><div class="ttdoc">1.0 / k_maxValue. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:226</div></div>
+<div class="ttc" id="structb2_particle_def_html_a0ffc7f20fb60a05be91cce4393121fd7"><div class="ttname"><a href="structb2_particle_def.html#a0ffc7f20fb60a05be91cce4393121fd7">b2ParticleDef::velocity</a></div><div class="ttdeci">b2Vec2 velocity</div><div class="ttdoc">The linear velocity of the particle in world co-ordinates. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:256</div></div>
+<div class="ttc" id="classb2_particle_color_html_a4895249cb23bb11a30517ca00aa009fc"><div class="ttname"><a href="classb2_particle_color.html#a4895249cb23bb11a30517ca00aa009fc">b2ParticleColor::operator=</a></div><div class="ttdeci">b2ParticleColor &amp; operator=(const b2ParticleColor &amp;color)</div><div class="ttdoc">Assign a b2ParticleColor to this instance. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:87</div></div>
+<div class="ttc" id="classb2_particle_color_html_a3e6f84ca10776e9baa59d5f60d0d8ba4"><div class="ttname"><a href="classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4">b2ParticleColor::operator*</a></div><div class="ttdeci">b2ParticleColor operator*(float32 s) const </div><div class="ttdoc">Scales r, g, b, a members by s returning the modified b2ParticleColor. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:114</div></div>
+<div class="ttc" id="classb2_particle_color_html_ab84c393584da555a7efe9a0dbd0daddf"><div class="ttname"><a href="classb2_particle_color.html#ab84c393584da555a7efe9a0dbd0daddf">b2ParticleColor::operator==</a></div><div class="ttdeci">bool operator==(const b2ParticleColor &amp;color) const </div><div class="ttdoc">Compare this color with the specified color. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:166</div></div>
+<div class="ttc" id="structb2_color_html"><div class="ttname"><a href="structb2_color.html">b2Color</a></div><div class="ttdoc">Color for debug drawing. Each value has the range [0,1]. </div><div class="ttdef"><b>Definition:</b> b2Draw.h:27</div></div>
+<div class="ttc" id="classb2_particle_color_html_a3fdb6cb76eb8bcdbadd12d5c1ba637a4"><div class="ttname"><a href="classb2_particle_color.html#a3fdb6cb76eb8bcdbadd12d5c1ba637a4">b2ParticleColor::operator+=</a></div><div class="ttdeci">b2Inline b2ParticleColor &amp; operator+=(const b2ParticleColor &amp;color)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:127</div></div>
+<div class="ttc" id="structb2_particle_def_html_ae34b248253c7edaeffbb2802c6b75930"><div class="ttname"><a href="structb2_particle_def.html#ae34b248253c7edaeffbb2802c6b75930">b2ParticleDef::position</a></div><div class="ttdeci">b2Vec2 position</div><div class="ttdoc">The world position of the particle. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:253</div></div>
+<div class="ttc" id="structb2_particle_def_html"><div class="ttname"><a href="structb2_particle_def.html">b2ParticleDef</a></div><div class="ttdef"><b>Definition:</b> b2Particle.h:235</div></div>
+<div class="ttc" id="classb2_particle_color_html_ae61287a0be96027fae9a77a4354e4bbf"><div class="ttname"><a href="classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf">b2ParticleColor::Mix</a></div><div class="ttdeci">b2Inline void Mix(b2ParticleColor *const mixColor, const int32 strength)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:176</div></div>
+<div class="ttc" id="classb2_particle_color_html"><div class="ttname"><a href="classb2_particle_color.html">b2ParticleColor</a></div><div class="ttdoc">Small color object for each particle. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:44</div></div>
+<div class="ttc" id="classb2_particle_color_html_a9e90091e382b6cdcff1819a59515fea7"><div class="ttname"><a href="classb2_particle_color.html#a9e90091e382b6cdcff1819a59515fea7">b2ParticleColor::operator+</a></div><div class="ttdeci">b2ParticleColor operator+(const b2ParticleColor &amp;color) const </div><div class="ttdef"><b>Definition:</b> b2Particle.h:138</div></div>
+<div class="ttc" id="classb2_particle_color_html_ad8d2e94a330bdacc7fcf88e4faa5b2a6"><div class="ttname"><a href="classb2_particle_color.html#ad8d2e94a330bdacc7fcf88e4faa5b2a6">b2ParticleColor::b2ParticleColor</a></div><div class="ttdeci">b2Inline b2ParticleColor(uint8 r, uint8 g, uint8 b, uint8 a)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:51</div></div>
+<div class="ttc" id="classb2_particle_color_html_acfaa29e177342af7fc01e25602d83781"><div class="ttname"><a href="classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781">b2ParticleColor::Set</a></div><div class="ttdeci">b2Inline void Set(int32 r_, int32 g_, int32 b_, int32 a_)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:74</div></div>
+<div class="ttc" id="structb2_particle_def_html_af293c58640b3b403746d861b0b04e2f8"><div class="ttname"><a href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">b2ParticleDef::userData</a></div><div class="ttdeci">void * userData</div><div class="ttdoc">Use this to store application-specific body data. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:262</div></div>
 <div class="ttc" id="classb2_particle_color_html_a7e844b191956c1f6fa3279b4a6cb1b71"><div class="ttname"><a href="classb2_particle_color.html#a7e844b191956c1f6fa3279b4a6cb1b71">b2ParticleColor::GetColor</a></div><div class="ttdeci">b2Color GetColor() const </div><div class="ttdef"><b>Definition:</b> b2Particle.cpp:40</div></div>
-<div class="ttc" id="structb2_particle_def_html_af6b2180a2f76fba5f8fc3cff6f9acd91"><div class="ttname"><a href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">b2ParticleDef::color</a></div><div class="ttdeci">b2ParticleColor color</div><div class="ttdoc">The color of the particle. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:258</div></div>
-<div class="ttc" id="classb2_particle_color_html_adfeeedfb5ad15a51b2354dd1ef64dc4f"><div class="ttname"><a href="classb2_particle_color.html#adfeeedfb5ad15a51b2354dd1ef64dc4f">b2ParticleColor::operator-=</a></div><div class="ttdeci">b2Inline b2ParticleColor &amp; operator-=(const b2ParticleColor &amp;color)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:146</div></div>
-<div class="ttc" id="structb2_particle_def_html_a95e89ca53d36d93c03eec4f4b04e69f3"><div class="ttname"><a href="structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3">b2ParticleDef::flags</a></div><div class="ttdeci">uint32 flags</div><div class="ttdef"><b>Definition:</b> b2Particle.h:249</div></div>
-<div class="ttc" id="classb2_particle_color_html_ab1875044d1ac194bf5733053b968f442"><div class="ttname"><a href="classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442">b2ParticleColor::operator*=</a></div><div class="ttdeci">b2ParticleColor &amp; operator*=(float32 s)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:94</div></div>
-<div class="ttc" id="classb2_particle_color_html_a4a33a8b8437747ad3b2e5955ae69bd9b"><div class="ttname"><a href="classb2_particle_color.html#a4a33a8b8437747ad3b2e5955ae69bd9b">b2ParticleColor::IsZero</a></div><div class="ttdeci">bool IsZero() const </div><div class="ttdef"><b>Definition:</b> b2Particle.h:62</div></div>
-<div class="ttc" id="classb2_particle_color_html_a95ab125fa45ca7cf24c231b2ccb2c98e"><div class="ttname"><a href="classb2_particle_color.html#a95ab125fa45ca7cf24c231b2ccb2c98e">b2ParticleColor::operator-</a></div><div class="ttdeci">b2ParticleColor operator-(const b2ParticleColor &amp;color) const </div><div class="ttdef"><b>Definition:</b> b2Particle.h:157</div></div>
+<div class="ttc" id="structb2_particle_def_html_af6b2180a2f76fba5f8fc3cff6f9acd91"><div class="ttname"><a href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">b2ParticleDef::color</a></div><div class="ttdeci">b2ParticleColor color</div><div class="ttdoc">The color of the particle. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:259</div></div>
+<div class="ttc" id="classb2_particle_color_html_adfeeedfb5ad15a51b2354dd1ef64dc4f"><div class="ttname"><a href="classb2_particle_color.html#adfeeedfb5ad15a51b2354dd1ef64dc4f">b2ParticleColor::operator-=</a></div><div class="ttdeci">b2Inline b2ParticleColor &amp; operator-=(const b2ParticleColor &amp;color)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:147</div></div>
+<div class="ttc" id="structb2_particle_def_html_a95e89ca53d36d93c03eec4f4b04e69f3"><div class="ttname"><a href="structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3">b2ParticleDef::flags</a></div><div class="ttdeci">uint32 flags</div><div class="ttdef"><b>Definition:</b> b2Particle.h:250</div></div>
+<div class="ttc" id="classb2_particle_color_html_ab1875044d1ac194bf5733053b968f442"><div class="ttname"><a href="classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442">b2ParticleColor::operator*=</a></div><div class="ttdeci">b2ParticleColor &amp; operator*=(float32 s)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:95</div></div>
+<div class="ttc" id="classb2_particle_color_html_a4a33a8b8437747ad3b2e5955ae69bd9b"><div class="ttname"><a href="classb2_particle_color.html#a4a33a8b8437747ad3b2e5955ae69bd9b">b2ParticleColor::IsZero</a></div><div class="ttdeci">bool IsZero() const </div><div class="ttdef"><b>Definition:</b> b2Particle.h:63</div></div>
+<div class="ttc" id="classb2_particle_color_html_a95ab125fa45ca7cf24c231b2ccb2c98e"><div class="ttname"><a href="classb2_particle_color.html#a95ab125fa45ca7cf24c231b2ccb2c98e">b2ParticleColor::operator-</a></div><div class="ttdeci">b2ParticleColor operator-(const b2ParticleColor &amp;color) const </div><div class="ttdef"><b>Definition:</b> b2Particle.h:158</div></div>
 <div class="ttc" id="b2_settings_8h_html"><div class="ttname"><a href="b2_settings_8h.html">b2Settings.h</a></div></div>
-<div class="ttc" id="classb2_particle_color_html_ac8c2081384421b5ac33c989996745566"><div class="ttname"><a href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">b2ParticleColor::k_bitsPerComponent</a></div><div class="ttdeci">static const uint8 k_bitsPerComponent</div><div class="ttdoc">Number of bits used to store each b2ParticleColor component. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:227</div></div>
-<div class="ttc" id="structb2_vec2_html"><div class="ttname"><a href="structb2_vec2.html">b2Vec2</a></div><div class="ttdoc">A 2D column vector. </div><div class="ttdef"><b>Definition:</b> b2Math.h:64</div></div>
-<div class="ttc" id="classb2_particle_color_html_aea894d9120f90e180f7b8fba59d609df"><div class="ttname"><a href="classb2_particle_color.html#aea894d9120f90e180f7b8fba59d609df">b2ParticleColor::k_maxValue</a></div><div class="ttdeci">static const float32 k_maxValue</div><div class="ttdoc">Maximum value of a b2ParticleColor component. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:223</div></div>
+<div class="ttc" id="classb2_particle_color_html_ac8c2081384421b5ac33c989996745566"><div class="ttname"><a href="classb2_particle_color.html#ac8c2081384421b5ac33c989996745566">b2ParticleColor::k_bitsPerComponent</a></div><div class="ttdeci">static const uint8 k_bitsPerComponent</div><div class="ttdoc">Number of bits used to store each b2ParticleColor component. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:228</div></div>
+<div class="ttc" id="structb2_vec2_html"><div class="ttname"><a href="structb2_vec2.html">b2Vec2</a></div><div class="ttdoc">A 2D column vector. </div><div class="ttdef"><b>Definition:</b> b2Math.h:56</div></div>
+<div class="ttc" id="classb2_particle_color_html_a31eb4241de8148393c4a69d81ed1d78d"><div class="ttname"><a href="classb2_particle_color.html#a31eb4241de8148393c4a69d81ed1d78d">b2ParticleColor::MixColors</a></div><div class="ttdeci">static b2Inline void MixColors(b2ParticleColor *const colorA, b2ParticleColor *const colorB, const int32 strength)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:186</div></div>
+<div class="ttc" id="classb2_particle_color_html_aea894d9120f90e180f7b8fba59d609df"><div class="ttname"><a href="classb2_particle_color.html#aea894d9120f90e180f7b8fba59d609df">b2ParticleColor::k_maxValue</a></div><div class="ttdeci">static const float32 k_maxValue</div><div class="ttdoc">Maximum value of a b2ParticleColor component. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:224</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Google Analytics -->
 <script>
