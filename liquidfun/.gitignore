@@ -32,6 +32,8 @@ Box2D/Unittests/FunctionTests
 Box2D/Unittests/HelloWorldTests
 Box2D/Unittests/CommonTests
 Box2D/Unittests/Makefile
+Box2D/Unittests/CodeCoverage/
+Box2D/Unittests/codeCoverage.info
 Box2D/Win32/**
 Box2D/build.log
 Box2D/flags.cmake
@@ -53,3 +55,4 @@ local.properties
 project.properties
 proguard-project.txt
 linklint_results
+
