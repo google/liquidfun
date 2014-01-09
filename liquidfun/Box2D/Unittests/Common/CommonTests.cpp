@@ -153,6 +153,17 @@ TEST_F(CommonTests, b2Stat) {
 	EXPECT_EQ(0.0f,stat.GetMean());
 }
 
+TEST_F(CommonTests, b2IsValid) {
+	const float one = 1.0f;
+	const float inf = 1.0f / 0.0f;
+	const float neginf = -1.0f * inf;
+	const float nan = inf * 0.0f;
+	EXPECT_TRUE(b2IsValid(one));
+	EXPECT_FALSE(b2IsValid(inf));
+	EXPECT_FALSE(b2IsValid(neginf));
+	EXPECT_FALSE(b2IsValid(nan));
+}
+
 int
 main(int argc, char **argv)
 {
