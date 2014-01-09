@@ -8,6 +8,7 @@
           --------------------------------------------------
 
   Copyright (c) 1998 Paul Rademacher
+* Copyright (c) 2014 Google, Inc.
 
   WWW:    http://sourceforge.net/projects/glui/
   Forums: http://sourceforge.net/forum/?group_id=92496
