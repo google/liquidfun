@@ -1073,7 +1073,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleGroup</b><
 </table>
 </div><div class="memdoc">
 <p>Get the sleeping state of this body. </p>
-<dl class="section return"><dt>Returns</dt><dd>true if the body is sleeping. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the body is awake. </dd></dl>
 
 </div>
 </div>
@@ -1291,7 +1291,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleGroup</b><
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Set the position of the body's origin and rotation. This breaks any contacts and wakes the other bodies. Manipulating a body's transform may cause non-physical behavior. </p>
+<p>Set the position of the body's origin and rotation. Manipulating a body's transform may cause non-physical behavior. Note: contacts are updated on the next call to <a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">b2World::Step</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">position</td><td>the world position of the body's local origin. </td></tr>

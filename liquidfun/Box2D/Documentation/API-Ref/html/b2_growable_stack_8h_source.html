@@ -108,7 +108,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#ifndef B2_GROWABLE_STACK_H</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define B2_GROWABLE_STACK_H</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#include &lt;<a class="code" href="b2_settings_8h.html">Box2D/Common/b2Settings.h</a>&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;cstring&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;memory.h&gt;</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span>32 N&gt;</div>
 <div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classb2_growable_stack.html">   28</a></span>&#160;<span class="keyword">class </span><a class="code" href="classb2_growable_stack.html">b2GrowableStack</a></div>
@@ -137,7 +137,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            T* old = m_stack;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            m_capacity *= 2;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            m_stack = (T*)<a class="code" href="b2_settings_8h.html#a2dca9b286e9b9d6d022055fd61534bd7">b2Alloc</a>(m_capacity * <span class="keyword">sizeof</span>(T));</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            std::memcpy(m_stack, old, m_count * <span class="keyword">sizeof</span>(T));</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            memcpy(m_stack, old, m_count * <span class="keyword">sizeof</span>(T));</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            <span class="keywordflow">if</span> (old != m_array)</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            {</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                <a class="code" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d">b2Free</a>(old);</div>

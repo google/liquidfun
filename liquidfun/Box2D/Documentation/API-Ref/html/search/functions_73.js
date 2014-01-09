@@ -14,6 +14,7 @@ var searchData=
   ['setcontactfilter',['SetContactFilter',['../classb2_world.html#a85e6e1e911c7d6366f8c7d57a12b72ff',1,'b2World']]],
   ['setcontactlistener',['SetContactListener',['../classb2_world.html#a614549967fb8a1584b61c11e2d553d42',1,'b2World']]],
   ['setcontinuousphysics',['SetContinuousPhysics',['../classb2_world.html#a536dd9181c2e20096073e3cfe2c8530a',1,'b2World']]],
+  ['setcorrectionfactor',['SetCorrectionFactor',['../classb2_motor_joint.html#ae59e624b8a7b6f869ab5e6148352cb52',1,'b2MotorJoint']]],
   ['setdampingratio',['SetDampingRatio',['../classb2_distance_joint.html#a58da61301a1f1398a715107b76649923',1,'b2DistanceJoint::SetDampingRatio()'],['../classb2_mouse_joint.html#a648c8f3ecb82f4887c0eefcfe48cbd37',1,'b2MouseJoint::SetDampingRatio()'],['../classb2_weld_joint.html#aea79865e590edba09eff9d2243689967',1,'b2WeldJoint::SetDampingRatio()']]],
   ['setdebugdraw',['SetDebugDraw',['../classb2_world.html#a6976d2c67400df03c0d44174ffcfb7ee',1,'b2World']]],
   ['setdensity',['SetDensity',['../classb2_fixture.html#ad4e1d9323103975c8931d022b952d04a',1,'b2Fixture']]],
