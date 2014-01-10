@@ -50,7 +50,9 @@
 <p>TODO describe the cool new stuff we have in this release TODO</p>
 <h4>New Features</h4>
 <ul>
-<li>TODO describe the new large features in this release TODO</li>
+<li>Added option to substep particle simulation independently of <code>b2World</code>.</li>
+<li>Added barrier particles which can be used to prevent particle tunneling due to large particle velocities or simulation steps.</li>
+<li>Added "Sparky" and "Sandbox" tests to the Testbed example to demonstrate particle and rigid body interaction.</li>
 </ul>
 <h4>API Modifications</h4>
 <ul>
@@ -61,16 +63,17 @@
 </ul>
 <h4>Other Changes</h4>
 <ul>
+<li>Integrated <a href="http://box2d.org">Box2D</a> 2.3.0 release from <a href="http://code.google.com/p/box2d/source/detail?r=280">Box2D revision 280</a>.</li>
 <li>Improved damping force to prevent particle explosions.</li>
-<li>Added option to substep particle simulation independently of <code>b2World</code>.</li>
-<li>Added "Sparky" test to the Testbed example to demonstrate particle and rigid body interaction.</li>
 <li>Fixed <code>b2Timer</code> bug that occurs when the usec component wraps.</li>
 <li>Added <code>b2Stat</code> to calculate min/max/mean of a set of samples, and integrated this functionality into Testbed to measure performance.</li>
 <li>Added operators to <code>b2ParticleColor</code>.</li>
-<li>Added build step to unit test execution scripts.</li>
 <li>Cleaned up statistics display in Testbed.</li>
+<li>Added build step to unit-test execution scripts.</li>
+<li>Added generation of code coverage report for unit-tests.</li>
 <li>Added a script to clean up temporary cmake files.</li>
-<li>Fixed compiler warnings.</li>
+<li>Increased warning level and enabled conversion of warnings to errors.</li>
+<li>Added unit-test for b2IsValid().</li>
 </ul>
 <h3>0.9.0 <a class="anchor" id="0.9.0"></a></h3>
 <h4>Overview</h4>
@@ -86,8 +89,8 @@
 </ul>
 <h4>Other Changes</h4>
 <ul>
-<li>Integrated <a href="http://box2d.org">Box2D</a> 2.3.0 pre-release from <a href="http://code.google.com/p/box2d/source/detail?r=255">Box2D revision 255</a></li>
-<li>Unit tests implemented for the particle system.</li>
+<li>Integrated <a href="http://box2d.org">Box2D</a> 2.3.0 pre-release from <a href="http://code.google.com/p/box2d/source/detail?r=255">Box2D revision 255</a>.</li>
+<li>Unit-tests implemented for the particle system.</li>
 <li>Particle system tests added to the Testbed example application.</li>
 <li>Build-system support for Android.</li>
 <li>Moved documentation to Markdown/HTML. </li>
