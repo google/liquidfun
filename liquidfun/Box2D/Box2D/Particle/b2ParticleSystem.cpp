@@ -1602,7 +1602,7 @@ void b2ParticleSystem::SolveColorMixing(const b2TimeStep& step)
 				b2ParticleColor& colorB = m_colorBuffer.data[b];
 				// Use the static method to ensure certain compilers inline
 				// this correctly.
-				b2ParticleColor::Mix(&colorA, &colorB, colorMixing128);
+				b2ParticleColor::MixColors(&colorA, &colorB, colorMixing128);
 			}
 		}
 	}

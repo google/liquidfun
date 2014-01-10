@@ -232,10 +232,10 @@ TEST_F(ColorTests, MixFullMixing) {
 }
 
 // Test color mixing with full mixing using the static method.
-TEST_F(ColorTests, MixFullMixingStatic) {
+TEST_F(ColorTests, MixColorsFullMixing) {
 	b2ParticleColor colorA(0xff, 0x10, 0x44, 0xff);
 	b2ParticleColor colorB(0x01, 0x40, 0xff, 0x80);
-	b2ParticleColor::Mix(&colorA, &colorB, 128);
+	b2ParticleColor::MixColors(&colorA, &colorB, 128);
 	EXPECT_EQ(0x80, colorA.r);
 	EXPECT_EQ(0x28, colorA.g);
 	EXPECT_EQ(0xa1, colorA.b);
