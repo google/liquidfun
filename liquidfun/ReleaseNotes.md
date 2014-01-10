@@ -61,6 +61,8 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added a script to clean up temporary cmake files.
 *   Increased warning level and enabled conversion of warnings to errors.
 *   Added unit-test for b2IsValid().
+*   Added `b2World::QueryShapeAABB()` convenience function to query the world
+    for objects in the AABB which encloses a shape.
 
 ### 0.9.0 <a name="0.9.0"></a>
 

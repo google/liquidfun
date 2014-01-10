@@ -1012,6 +1012,14 @@ void b2World::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const
 	m_particleSystem.QueryAABB(callback, aabb);
 }
 
+void b2World::QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
+                             const b2Transform& xf) const
+{
+	b2AABB aabb;
+	shape.ComputeAABB(&aabb, xf, 0);
+	QueryAABB(callback, aabb);
+}
+
 struct b2WorldRayCastWrapper
 {
 	float32 RayCastCallback(const b2RayCastInput& input, int32 proxyId)

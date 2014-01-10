@@ -57,7 +57,7 @@ public:
 
 	/// Register a contact filter to provide specific control over collision.
 	/// Otherwise the default filter is used (b2_defaultFilter). The listener is
-	/// owned by you and must remain in scope. 
+	/// owned by you and must remain in scope.
 	void SetContactFilter(b2ContactFilter* filter);
 
 	/// Register a contact event listener. The listener is owned by you and must
@@ -130,6 +130,13 @@ public:
 	/// @param aabb the query box.
 	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
 
+	/// Query the world for all fixtures that potentially overlap the
+	/// provided shape's AABB. Calls QueryAABB internally.
+	/// @param callback a user implemented callback class.
+	/// @param shape the query shape
+	void QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
+	                    const b2Transform& xf) const;
+
 	/// Ray-cast the world for all fixtures in the path of the ray. Your callback
 	/// controls whether you get the closest point, any point, or n-points.
 	/// The ray-cast ignores shapes that contain the starting point.
@@ -198,7 +205,7 @@ public:
 
 	/// Change the global gravity vector.
 	void SetGravity(const b2Vec2& gravity);
-	
+
 	/// Get the global gravity vector.
 	b2Vec2 GetGravity() const;
 
