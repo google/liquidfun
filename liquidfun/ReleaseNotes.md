@@ -28,7 +28,11 @@ TODO describe the cool new stuff we have in this release TODO
 
 #### New Features
 
-*   TODO describe the new large features in this release TODO
+*   Added option to substep particle simulation independently of `b2World`.
+*   Added barrier particles which can be used to prevent particle tunneling
+    due to large particle velocities or simulation steps.
+*   Added "Sparky" and "Sandbox" tests to the Testbed example to demonstrate
+    particle and rigid body interaction.
 
 #### API Modifications
 
@@ -45,18 +49,18 @@ TODO describe the cool new stuff we have in this release TODO
 
 #### Other Changes
 
+*   Integrated [Box2D][] 2.3.0 release from [Box2D revision 280][].
 *   Improved damping force to prevent particle explosions.
-*   Added option to substep particle simulation independently of `b2World`.
-*   Added "Sparky" test to the Testbed example to demonstrate particle and
-    rigid body interaction.
 *   Fixed `b2Timer` bug that occurs when the usec component wraps.
 *   Added `b2Stat` to calculate min/max/mean of a set of samples, and
     integrated this functionality into Testbed to measure performance.
 *   Added operators to `b2ParticleColor`.
-*   Added build step to unit test execution scripts.
 *   Cleaned up statistics display in Testbed.
+*   Added build step to unit-test execution scripts.
+*   Added generation of code coverage report for unit-tests.
 *   Added a script to clean up temporary cmake files.
-*   Fixed compiler warnings.
+*   Increased warning level and enabled conversion of warnings to errors.
+*   Added unit-test for b2IsValid().
 
 ### 0.9.0 <a name="0.9.0"></a>
 
@@ -76,8 +80,8 @@ The initial release of LiquidFun is available for download from the
 
 #### Other Changes
 
-*   Integrated [Box2D][] 2.3.0 pre-release from [Box2D revision 255][]
-*   Unit tests implemented for the particle system.
+*   Integrated [Box2D][] 2.3.0 pre-release from [Box2D revision 255][].
+*   Unit-tests implemented for the particle system.
 *   Particle system tests added to the Testbed example application.
 *   Build-system support for Android.
 *   Moved documentation to Markdown/HTML.
@@ -87,4 +91,5 @@ The initial release of LiquidFun is available for download from the
   [0.9.0]: #0.9.0
   [0.9.0 release]: http://github.com/google/liquidfun/releases/tag/v0.9.0
   [Box2D]: http://box2d.org
+  [Box2D revision 280]: http://code.google.com/p/box2d/source/detail?r=280
   [Box2D revision 255]: http://code.google.com/p/box2d/source/detail?r=255
