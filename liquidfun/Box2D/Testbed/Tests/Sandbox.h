@@ -29,7 +29,7 @@ public:
 	// emitRate is particles/second
 	// color is the particle color you want
 	FaucetEmitter(b2World *world, const b2Vec2 &origin,
-				  b2Vec2 &startingVelocity, float size, float emitRate,
+				  b2Vec2 &startingVelocity, float32 size, float32 emitRate,
 				  b2ParticleColor color) :
 		m_startingVelocity(startingVelocity), m_origin(origin), m_size(size),
 		m_emitRate(emitRate), m_world(world), m_color(color)
@@ -39,7 +39,7 @@ public:
 
 	// dt is seconds that have passed, flags are the particle flags that you
 	// want set on each particle.
-	void Step(float dt, uint32 flags)
+	void Step(float32 dt, uint32 flags)
 	{
 		// How many (fractional) particles should we have emitted this frame?
 		m_counter += m_emitRate * dt;
@@ -69,9 +69,9 @@ public:
 	// Center of particle emitter
 	b2Vec2 m_origin;
 	// Total width of particle emitter
-	float m_size;
+	float32 m_size;
 	// Particles per second
-	float m_emitRate;
+	float32 m_emitRate;
 
 	// Pointer to global world
 	b2World *m_world;
@@ -79,7 +79,7 @@ public:
 	b2ParticleColor m_color;
 
 	// Number particles I need to emit on the next frame
-	float m_counter;
+	float32 m_counter;
 };
 
 // The following parameters are not static const members of the Sandbox class
@@ -97,7 +97,7 @@ static const float32 TILE_RADIUS = 2;
 // Diameter of a tile
 static const float32 TILE_DIAMETER = 4;
 // Pump radius; slightly smaller than a tile
-static const float32 PUMP_RADIUS = 2 - 0.05;
+static const float32 PUMP_RADIUS = 2.0f - 0.05f;
 
 static const float32 PLAYFIELD_LEFT_EDGE = -20;
 static const float32 PLAYFIELD_RIGHT_EDGE = 20;
@@ -108,13 +108,13 @@ static const int TILE_WIDTH = 10;
 static const int TILE_HEIGHT = 11;
 
 // Particles/second
-static const float DEFAULT_EMITTER_RATE = 30;
+static const float32 DEFAULT_EMITTER_RATE = 30;
 // Fit cleanly inside one block
-static const float DEFAULT_EMITTER_SIZE = 3;
+static const float32 DEFAULT_EMITTER_SIZE = 3;
 // How fast particles coming out of the particles should drop
-static const float32 PARTICLE_EXIT_Y_SPEED = -9.8;
+static const float32 PARTICLE_EXIT_Y_SPEED = -9.8f;
 // How hard the pumps can push
-static const float PUMP_FORCE = 600;
+static const float32 PUMP_FORCE = 600;
 
 }  // namespace SandboxParams
 

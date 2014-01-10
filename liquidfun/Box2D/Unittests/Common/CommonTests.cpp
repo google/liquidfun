@@ -18,6 +18,7 @@
 #include "gtest/gtest.h"
 #include "Box2D/Box2D.h"
 #include "AndroidUtil/AndroidMainWrapper.h"
+#include <limits>
 
 class CommonTests : public ::testing::Test {
     protected:
@@ -154,10 +155,10 @@ TEST_F(CommonTests, b2Stat) {
 }
 
 TEST_F(CommonTests, b2IsValid) {
-	const float one = 1.0f;
-	const float inf = 1.0f / 0.0f;
-	const float neginf = -1.0f * inf;
-	const float nan = inf * 0.0f;
+	const float32 one = 1.0f;
+	const float32 inf = std::numeric_limits<float32>::infinity();
+	const float32 neginf = -1.0f * inf;
+	const float32 nan = inf * 0.0f;
 	EXPECT_TRUE(b2IsValid(one));
 	EXPECT_FALSE(b2IsValid(inf));
 	EXPECT_FALSE(b2IsValid(neginf));

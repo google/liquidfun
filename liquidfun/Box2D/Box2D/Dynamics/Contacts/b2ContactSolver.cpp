@@ -653,6 +653,15 @@ struct b2PositionSolverManifold
 				normal = -normal;
 			}
 			break;
+		default:
+			{
+				// This shouldn't be executed if pc->type is valid.
+				separation = 0.0f;
+				normal = b2Vec2_zero;
+				point = b2Vec2_zero;
+				b2Assert(false);
+			}
+			break;
 		}
 	}
 
