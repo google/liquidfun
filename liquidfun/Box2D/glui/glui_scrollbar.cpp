@@ -8,6 +8,7 @@
           --------------------------------------------------
 
   Copyright (c) 2004 John Kew, 1998 Paul Rademacher
+* Copyright (c) 2014 Google, Inc.
 
   This program is freely distributable without licensing fees and is
   provided without guarantee or warrantee expressed or implied. This
@@ -824,6 +825,3 @@ void    GLUI_Scrollbar::increase_growth( void )
     growth *= growth_exp;
   return;
 }
-
-
-
