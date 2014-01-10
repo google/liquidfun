@@ -175,7 +175,7 @@ public:
 	/// alpha channel value between 0.0f..0.5f.
 	b2Inline void Mix(b2ParticleColor * const mixColor, const int32 strength)
 	{
-		Mix(this, mixColor, strength);
+		MixColors(this, mixColor, strength);
 	}
 
 	/// Mix colorA with colorB using strength to control how much of
@@ -183,7 +183,7 @@ public:
 	/// strength is 0..128 where 0 results in no color mixing and 128 results
 	/// in an equal mix of both colors.  strength 0..128 is analogous to an
 	/// alpha channel value between 0.0f..0.5f.
-	static b2Inline void Mix(b2ParticleColor * const colorA,
+	static b2Inline void MixColors(b2ParticleColor * const colorA,
 							 b2ParticleColor * const colorB,
 							 const int32 strength)
 	{
