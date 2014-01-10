@@ -131,18 +131,12 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>For a group of particles, use the <code>b2ParticleGroupFlag</code> enum, which provides two types of particle groups:</p>
 <h3>Solid</h3>
 <p>A solid particle group prevents other bodies from lodging inside of it. Should anything penetrate it, the solid particle group pushes the offending body back out to its surface.</p>
-<p>You cannot define a particle group as only solid. It must have one of four other behaviors, as well: it must either be combined with the rigid-group behavior, or with the wall, spring, or elastic particle behavior.</p>
-<p>To define a group combining solid- and rigid-group behaviors, use a single statement. For example:</p>
-<p>&#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup;</code></p>
-<p>To define a group combining solid-group behavior with a given particle behavior, use two statements. For example:</p>
-<p>&#160;&#160;&#160;<code>pd.flags = b2_elasticParticle;</code><br/>
- &#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup;</code><br/>
-</p>
-<p>A solid particle group possesses especially strong repulsive force. It is useful, for example, in a case where:</p>
+<p>A solid particle group also possesses an especially strong repulsive force. It is useful, for example, in a case where:</p>
 <ul>
 <li>Something should be expected to bounce with unusual vigor ** As when a racquetball strikes the wall of a court</li>
 </ul>
-<p>Use the <code>b2_SolidParticleGroup</code> flag of the <code>b2ParticleGroupFlag</code> enum to specify a solid particle group. In many cases, a group will be defined as not only solid, but with additional behaviors, as well. For example, solid and elastic</p>
+<p>Use the <code>b2_SolidParticleGroup</code> flag of the <code>b2ParticleGroupFlag</code> enum to specify a solid particle group. For example:</p>
+<p>&#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup;</code></p>
 <h3>Rigid</h3>
 <p>Rigid particle groups are ones whose shape does not change, even when they collide with other bodies. Working with rigid particle groups confers a few advantages over simply working with rigid bodies: With a rigid particle group, you can:<br/>
 </p>
@@ -163,6 +157,7 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>Elastic particles deform and may also bounce when they collide with rigid bodies.<br/>
  Set particle behavior as elastic using the statement</p>
 <p>&#160;&#160;&#160;<code>pd.flags = b2_elasticParticle;</code></p>
+<p>The green circle and the blue box in the "Elastic Particles" demo of the Testbed application comprise elastic particles.</p>
 <h3>Color-mixing</h3>
 <p>Color-mixing particles take on some of the color of other particles with which they collide. If only one of the two colliding particles is a color-mixing one, the other particle retains its pre-collision color.<br/>
  <br/>
@@ -187,25 +182,30 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
  &#160;&#160;&#160;<code>pd.flags = b2_colorMixingParticle;</code></p>
 </li>
 </ol>
+<p>The "Surface Tension" demo of the Testbed application uses color-mixing particles.</p>
 <h3>Powder</h3>
 <p>Powder particles produce a scattering effect such as you might see with sand or dust.<br/>
  Set particle behavior as powder using the statement<br/>
 </p>
 <p>&#160;&#160;&#160;<code>pd.flags = b2_powderParticle;</code></p>
+<p>The "Sparky" demo of the Testbed application uses powder particles.</p>
 <h3>Spring</h3>
 <p>Spring particles produce the effect of being attached to one another, as by a spring. Particles are "connected" in pairs. Each particle is connected to the one that was closest to it at time of creation. Once paired, particles do not change "partners." The farther an external force pulls them from one another, the greater the power with which they collide when that external force is removed. No matter how far particles get from one another, the connection between them does not "snap."<br/>
  Set spring behavior using the statement<br/>
 </p>
 <p>&#160;&#160;&#160;<code>pd.flags = b2_springParticle;</code></p>
+<p>The red circle in the "Elastic Particles" demo of the Testbed application comprises spring particles.</p>
 <h3>Tensile</h3>
 <p>Tensile particles are used to produce the effect of surface tension, or the taut curvature on the surface of a body of liquid. They might be used, for example, to create the surface tension you would see on a drop of water.<br/>
  Once the tension is broken, the particles bounce as if they were elastic, but also continue to attract each other. As a result, particles tend to form clusters as they bounce.<br/>
  Set tensile behavior using the statement</p>
 <p>&#160;&#160;&#160;<code>pd.flags = b2_tensileParticle;</code></p>
+<p>The "Surface Tension" demo of the Testbed application uses tensile particles.</p>
 <h3>Viscous</h3>
 <p>Viscous particles exhibit clinginess or stickiness, like oil.<br/>
  Set viscous behavior using the statement</p>
 <p>&#160;&#160;&#160;<code>pd.flags = b2_viscousParticle;</code></p>
+<p>The "Liquid Timer" demo of the Testbed application uses viscous particles.</p>
 <h3>Wall</h3>
 <p>Wall particles are static. They are permanently stationary, even if something collides with them. <br/>
  Set wall behavior using the statement</p>
@@ -218,9 +218,15 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
  &#160;&#160;&#160;<code>{</code><br/>
  &#160;&#160;&#160;&#160;&#160;&#160;<code>group-&gt;GetParticleFlagsBuffer()[i] |=</code> <code>b2_zombieParticle;</code><br/>
  &#160;&#160;&#160;<code>}</code></p>
-<p><a class="anchor" id="pp"></a></p>
-<p>Note that you can assign multiple behaviors to a particle or group. Use the | ("bitwise OR") operator to chain behavior flags. For example:</p>
+<p>Note that you can assign multiple behaviors to a group or particle. Use the | ("bitwise OR") operator to chain behavior flags. For example, for a group:</p>
+<p>&#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup;</code></p>
+<p>And for particles:</p>
 <p>&#160;&#160;&#160;<code>pd.flags = b2_elasticParticle | b2_viscousParticle;</code></p>
+<p>To define a group combining a specific group behavior with a specific particle behavior, use two statements. For example:</p>
+<p>&#160;&#160;&#160;<code>pd.flags = b2_elasticParticle;</code><br/>
+ &#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup;</code><br/>
+</p>
+<p><a class="anchor" id="pp"></a> </p>
 <h2>Particle Properties</h2>
 <h3>Color</h3>
 <p>Set particle or particle-group color using the statement</p>
