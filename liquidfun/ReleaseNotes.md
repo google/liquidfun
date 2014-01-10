@@ -55,6 +55,7 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added `b2Stat` to calculate min/max/mean of a set of samples, and
     integrated this functionality into Testbed to measure performance.
 *   Added operators to `b2ParticleColor`.
+*   Improved parameter selection in Testbed with the fullscreen UI.
 *   Cleaned up statistics display in Testbed.
 *   Added build step to unit-test execution scripts.
 *   Added generation of code coverage report for unit-tests.

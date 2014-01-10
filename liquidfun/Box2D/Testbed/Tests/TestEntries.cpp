@@ -19,6 +19,8 @@
 
 #include "../Framework/Test.h"
 #include "../Framework/Render.h"
+#include "../Framework/Main.h"
+#include "../Framework/ParticleParameter.h"
 
 #ifdef __APPLE__
 	#include <GLUT/glut.h>

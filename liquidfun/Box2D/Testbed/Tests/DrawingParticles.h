@@ -20,6 +20,14 @@
 
 class DrawingParticles : public Test
 {
+private:
+	// Set bit 31 to distiguish these values from particle flags.
+	enum Parameters {
+		e_parameterBegin = (1 << 31), // Start of this parameter namespace.
+		e_parameterMove = e_parameterBegin | (1 << 0),
+		e_parameterRigid = e_parameterBegin | (1 << 1),
+	};
+
 public:
 
 	DrawingParticles()
@@ -73,11 +81,33 @@ public:
 			}
 		}
 
+		m_colorIndex = 0;
 		m_world->SetParticleRadius(0.5f);
 		m_lastGroup = NULL;
 		m_drawing = true;
-		m_particleFlags = 0;
+
+		b2Assert((k_paramDef[0].CalculateValueMask() & e_parameterBegin) == 0);
+		TestMain::SetParticleParameters(k_paramDef, k_paramDefCount);
+		TestMain::SetRestartOnParticleParameterChange(false);
+
+		m_particleFlags = TestMain::GetParticleParameterValue();
 		m_groupFlags = 0;
+	}
+
+	// Determine the current particle parameter from the drawing state and
+	// group flags.
+	uint32 DetermineParticleParameter() const
+	{
+		if (m_drawing)
+		{
+			if (m_groupFlags == (b2_rigidParticleGroup |
+								 b2_solidParticleGroup))
+			{
+				return e_parameterRigid;
+			}
+			return m_particleFlags;
+		}
+		return e_parameterMove;
 	}
 
 	void Keyboard(unsigned char key)
@@ -114,10 +144,16 @@ public:
 		case 'B':
 			m_particleFlags = b2_barrierParticle | b2_wallParticle;
 			break;
+		case 'C':
+			m_particleFlags = b2_colorMixingParticle;
+			break;
 		case 'Z':
 			m_particleFlags = b2_zombieParticle;
 			break;
+		default:
+			break;
 		}
+		TestMain::SetParticleParameterValue(DetermineParticleParameter());
 	}
 
 	void MouseMove(const b2Vec2& p)
@@ -133,12 +169,19 @@ public:
 
 			m_world->DestroyParticlesInShape(shape, xf);
 
+			const bool joinGroup =
+				m_lastGroup && m_groupFlags == m_lastGroup->GetGroupFlags();
+			if (!joinGroup)
+			{
+				m_colorIndex = (m_colorIndex + 1) % k_ParticleColorsCount;
+			}
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
 			pd.flags = m_particleFlags;
 			pd.groupFlags = m_groupFlags;
+			pd.color = k_ParticleColors[m_colorIndex];
 			b2ParticleGroup* group = m_world->CreateParticleGroup(pd);
-			if (m_lastGroup && group->GetGroupFlags() == m_lastGroup->GetGroupFlags())
+			if (joinGroup)
 			{
 				m_world->JoinParticleGroups(m_lastGroup, group);
 			}
@@ -166,12 +209,44 @@ public:
 
 	void Step(Settings* settings)
 	{
+		const uint32 parameterValue = TestMain::GetParticleParameterValue();
+		m_drawing = (parameterValue & e_parameterMove) != e_parameterMove;
+		if (m_drawing)
+		{
+			switch (parameterValue)
+			{
+				case b2_elasticParticle:
+				case b2_springParticle:
+				case b2_wallParticle:
+					m_particleFlags = parameterValue;
+					m_groupFlags = b2_solidParticleGroup;
+					break;
+				case e_parameterRigid:
+					// b2_waterParticle is the default particle type in
+					// LiquidFun.
+					m_particleFlags = b2_waterParticle;
+					m_groupFlags = b2_rigidParticleGroup |
+					               b2_solidParticleGroup;
+					break;
+				default:
+					m_particleFlags = parameterValue;
+					m_groupFlags = 0;
+					break;
+			}
+		}
+
 		Test::Step(settings);
-		m_debugDraw.DrawString(5, m_textLine, "Keys: (L) liquid, (E) elastic, (S) spring");
+		m_debugDraw.DrawString(
+			5, m_textLine, "Keys: (L) liquid, (E) elastic, (S) spring");
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "(R) rigid, (W) wall, (V) viscous, (T) tensile");
+		m_debugDraw.DrawString(
+			5, m_textLine, "(R) rigid, (W) wall, (V) viscous, (T) tensile");
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "(B) barrier, (Z) erase, (X) move");
+		m_debugDraw.DrawString(
+			5, m_textLine, "(C) color mixing, (B) barrier, (Z) erase");
+		m_textLine += DRAW_STRING_NEW_LINE;
+		m_debugDraw.DrawString(
+			5, m_textLine, "(X) move");
 		m_textLine += DRAW_STRING_NEW_LINE;
 	}
 
@@ -184,7 +259,33 @@ public:
 	bool m_drawing;
 	int32 m_particleFlags;
 	int32 m_groupFlags;
+	uint32 m_colorIndex;
 
+	static const ParticleParameter::Value k_paramValues[];
+	static const ParticleParameter::Definition k_paramDef[];
+	static const uint32 k_paramDefCount;
 };
+
+const ParticleParameter::Value DrawingParticles::k_paramValues[] =
+{
+	{b2_zombieParticle, "erase"},
+	{e_parameterMove, "move"},
+	{e_parameterRigid, "rigid"},
+};
+
+const ParticleParameter::Definition DrawingParticles::k_paramDef[] =
+{
+	{
+		ParticleParameter::k_particleTypesPtr,
+		ParticleParameter::k_particleTypesCount
+	},
+	{
+		DrawingParticles::k_paramValues,
+		B2_ARRAY_SIZE(DrawingParticles::k_paramValues)
+	},
+};
+const uint32 DrawingParticles::k_paramDefCount =
+	B2_ARRAY_SIZE(DrawingParticles::k_paramDef);
+
 
 #endif

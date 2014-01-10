@@ -197,7 +197,10 @@ public:
 		b2Vec2 loc = b2Vec2(-20, 1);
 		m_killfieldTransform.Set(loc, 0);
 
-		m_particleFlags = TestParticleType();
+		// Setup particle parameters.
+		TestMain::SetParticleParameters(k_paramDef, k_paramDefCount);
+		m_particleFlags = TestMain::GetParticleParameterValue();
+		TestMain::SetRestartOnParticleParameterChange(false);
 	}
 
 	~Sandbox()
@@ -385,6 +388,8 @@ public:
 
 		Test::Step(settings);
 
+		m_particleFlags = TestMain::GetParticleParameterValue();
+
 		float32 dt = 1.0f/settings->hz;
 
 		// Step all the emitters
@@ -454,6 +459,7 @@ public:
 				m_particleFlags = m_particleFlags | toggle;
 			}
 		}
+		TestMain::SetParticleParameterValue(m_particleFlags);
 	}
 
 	static Test* Create()
@@ -483,6 +489,31 @@ private:
 	// Pumps and emitters
 	b2Body* m_pumps[SandboxParams::MAX_PUMPS];
 	FaucetEmitter *m_emitters[SandboxParams::MAX_EMITTERS];
+
+	static const ParticleParameter::Value k_paramValues[];
+	static const ParticleParameter::Definition k_paramDef[];
+	static const uint32 k_paramDefCount;
 };
+
+const ParticleParameter::Value Sandbox::k_paramValues[] =
+{
+	{b2_waterParticle, "water"},
+	{b2_powderParticle, "powder"},
+	{b2_tensileParticle, "tensile"},
+	{b2_viscousParticle, "viscous"},
+	{b2_tensileParticle | b2_powderParticle, "tensile powder"},
+	{b2_viscousParticle | b2_powderParticle, "viscous powder"},
+	{b2_viscousParticle | b2_tensileParticle | b2_powderParticle,
+	 "viscous tensile powder"},
+	{b2_viscousParticle | b2_tensileParticle, "tensile viscous water"},
+};
+
+const ParticleParameter::Definition Sandbox::k_paramDef[] =
+{
+	{ Sandbox::k_paramValues, B2_ARRAY_SIZE(Sandbox::k_paramValues) },
+};
+const uint32 Sandbox::k_paramDefCount =
+	B2_ARRAY_SIZE(Sandbox::k_paramDef);
+
 
 #endif

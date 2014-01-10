@@ -4,10 +4,17 @@ add_definitions( -DFREEGLUT_EXPORTS -DFREEGLUT_STATIC -D_CRT_SECURE_NO_WARNINGS 
 # Define the framework files.
 set(Testbed_Framework_SRCS
 	Framework/Main.cpp
+	Framework/Main.h
 	Framework/Render.cpp
 	Framework/Render.h
 	Framework/Test.cpp
 	Framework/Test.h
+	Framework/Arrow.cpp
+	Framework/Arrow.h
+	Framework/FullscreenUI.cpp
+	Framework/FullscreenUI.h
+	Framework/ParticleParameter.cpp
+	Framework/ParticleParameter.h
 )
 
 #define the test files.

@@ -183,6 +183,14 @@ public:
 
 	void ShiftOrigin(const b2Vec2& newOrigin);
 
+	// Apply a preset range of colors to a particle group.
+	// A different color out of k_ParticleColors is applied to each
+	// particlesPerColor particles in the specified group.
+	// If particlesPerColor is 0, the particles in the group are divided into
+	// k_ParticleColorsCount equal sets of colored particles.
+	void ColorParticleGroup(b2ParticleGroup * const group,
+							uint32 particlesPerColor);
+
 protected:
 	friend class DestructionListener;
 	friend class BoundaryListener;
@@ -208,8 +216,9 @@ protected:
 
 	b2Profile m_maxProfile;
 	b2Profile m_totalProfile;
-};
 
-extern int TestParticleType();
+	static const b2ParticleColor k_ParticleColors[];
+	static const uint32 k_ParticleColorsCount;
+};
 
 #endif

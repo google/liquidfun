@@ -30,7 +30,7 @@ public:
 	// Speed is the scale of how fast to make the particles shoot out
 	// Lifetime in seconds.
 	ParticleVFX(b2World *world, const b2Vec2 &origin, float32 size,
-				float32 speed, float32 lifetime)
+				float32 speed, float32 lifetime, uint32 particleFlags)
 	{
 
 		// Create a circle to house the particles of size size
@@ -38,9 +38,9 @@ public:
 		shape.m_p = origin;
 		shape.m_radius = size;
 
-		// Create powder particle def of random color.
+		// Create particle def of random color.
 		b2ParticleGroupDef pd;
-		pd.flags = b2_powderParticle;
+		pd.flags = particleFlags;
 		pd.shape = &shape;
 		m_origColor.Set(rand() % 256, rand() % 256, rand() % 256, 255);
 		pd.color = m_origColor;
@@ -150,6 +150,9 @@ public:
 			// Tag this as a sparkable body.
 			f->SetUserData((void*)1);
 		}
+
+		TestMain::SetRestartOnParticleParameterChange(false);
+		TestMain::SetParticleParameterValue(b2_powderParticle);
 	}
 
 	// Handles bodies colliding.
@@ -174,13 +177,14 @@ public:
 
 	virtual void Step(Settings *settings)
 	{
+		const uint32 particleFlags = TestMain::GetParticleParameterValue();
 		Test::Step(settings);
 
 		// If there was a contacts...
 		if (m_contact)
 		{
 			// ...explode!
-			AddVFX(m_contactPoint);
+			AddVFX(m_contactPoint, particleFlags);
 			m_contact = false;
 		}
 
@@ -200,7 +204,7 @@ public:
 	}
 
 	// Create an explosion of particles at origin=p
-	void AddVFX(const b2Vec2 &p)
+	void AddVFX(const b2Vec2 &p, uint32 particleFlags)
 	{
 		ParticleVFX *vfx = m_VFX[m_VFXIndex];
 		if (vfx != NULL)
@@ -210,7 +214,7 @@ public:
 		}
 		m_VFX[m_VFXIndex] = new ParticleVFX(
 			m_world, p, RandomFloat(1.0f, 2.0f), RandomFloat(10.0f, 20.0f),
-			RandomFloat(0.5f, 1.0f));
+			RandomFloat(0.5f, 1.0f), particleFlags);
 		if (++m_VFXIndex >= c_maxVFX)
 		{
 			m_VFXIndex = 0;
