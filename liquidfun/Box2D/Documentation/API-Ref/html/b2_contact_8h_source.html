@@ -123,7 +123,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">inline</span> float32 b2MixFriction(float32 friction1, float32 friction2)</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordflow">return</span> std::sqrt(friction1 * friction2);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordflow">return</span> b2Sqrt(friction1 * friction2);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">inline</span> float32 b2MixRestitution(float32 restitution1, float32 restitution2)</div>
@@ -399,7 +399,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;}</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
 <div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="structb2_transform_html"><div class="ttname"><a href="structb2_transform.html">b2Transform</a></div><div class="ttdef"><b>Definition:</b> b2Math.h:361</div></div>
+<div class="ttc" id="structb2_transform_html"><div class="ttname"><a href="structb2_transform.html">b2Transform</a></div><div class="ttdef"><b>Definition:</b> b2Math.h:353</div></div>
 <div class="ttc" id="classb2_contact_html_a9edc26022c3d1a9cf1dab9d79d639b3f"><div class="ttname"><a href="classb2_contact.html#a9edc26022c3d1a9cf1dab9d79d639b3f">b2Contact::GetChildIndexB</a></div><div class="ttdeci">int32 GetChildIndexB() const </div><div class="ttdoc">Get the child primitive index for fixture B. </div><div class="ttdef"><b>Definition:</b> b2Contact.h:299</div></div>
 <div class="ttc" id="structb2_contact_edge_html_a69015fc22e064eac04ed74f27a13ae78"><div class="ttname"><a href="structb2_contact_edge.html#a69015fc22e064eac04ed74f27a13ae78">b2ContactEdge::other</a></div><div class="ttdeci">b2Body * other</div><div class="ttdoc">provides quick access to the other body attached. </div><div class="ttdef"><b>Definition:</b> b2Contact.h:68</div></div>
 <div class="ttc" id="structb2_world_manifold_html"><div class="ttname"><a href="structb2_world_manifold.html">b2WorldManifold</a></div><div class="ttdoc">This is used to compute the current state of a contact manifold. </div><div class="ttdef"><b>Definition:</b> b2Collision.h:110</div></div>

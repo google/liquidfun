@@ -24,6 +24,7 @@ var searchData=
   ['getcontactcount',['GetContactCount',['../classb2_world.html#abcc976f1755f9bb94a8650f5f4219a8d',1,'b2World']]],
   ['getcontactlist',['GetContactList',['../classb2_body.html#a16bdbfb266c82a0ef51be351a8928bc5',1,'b2Body::GetContactList()'],['../classb2_world.html#ab1e1c59fd7534c0268c2a3e31370a425',1,'b2World::GetContactList()']]],
   ['getcontactmanager',['GetContactManager',['../classb2_world.html#a16259159ae1719c30808561c990a8c05',1,'b2World']]],
+  ['getcorrectionfactor',['GetCorrectionFactor',['../classb2_motor_joint.html#a9ea99c4280374d85b29d4ab74afd7aff',1,'b2MotorJoint']]],
   ['getcount',['GetCount',['../classb2_stat.html#a539d781535b9f36b5febca4c690b2483',1,'b2Stat']]],
   ['getcurrentlengtha',['GetCurrentLengthA',['../classb2_pulley_joint.html#aa57599ec0d229c3ef95dafa39a277c7b',1,'b2PulleyJoint']]],
   ['getcurrentlengthb',['GetCurrentLengthB',['../classb2_pulley_joint.html#a3b68ad489d726afa74e538331c1f72d8',1,'b2PulleyJoint']]],

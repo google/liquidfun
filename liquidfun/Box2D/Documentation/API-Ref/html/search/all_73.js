@@ -2,6 +2,7 @@ var searchData=
 [
   ['s',['s',['../structb2_rot.html#a15725ce0a89cc735ad90687b4c0f4dce',1,'b2Rot']]],
   ['saygoodbye',['SayGoodbye',['../classb2_destruction_listener.html#a6cd15baa6e5c33118cf7173ab5bf6d58',1,'b2DestructionListener::SayGoodbye(b2Joint *joint)=0'],['../classb2_destruction_listener.html#ab327c0073d162112c38d2fe8f8b9fce3',1,'b2DestructionListener::SayGoodbye(b2Fixture *fixture)=0'],['../classb2_destruction_listener.html#a5e468eeabbadcd7e55f673e545b49959',1,'b2DestructionListener::SayGoodbye(b2ParticleGroup *group)'],['../classb2_destruction_listener.html#a55217878b7554478b23ce7fadf5cdbcd',1,'b2DestructionListener::SayGoodbye(int32 index)']]],
+  ['separations',['separations',['../structb2_world_manifold.html#ac545e60a52d219d53ef1de3e0cad2d84',1,'b2WorldManifold']]],
   ['set',['Set',['../structb2_distance_proxy.html#a80a59a9c9e952482a8fc6db4b883365d',1,'b2DistanceProxy::Set()'],['../classb2_edge_shape.html#a67dd3b17630a600033cb4380697a4e9d',1,'b2EdgeShape::Set()'],['../classb2_polygon_shape.html#a4d7b35550509f570814b97325a68966b',1,'b2PolygonShape::Set()'],['../structb2_vec2.html#a4d61640a645e470a50b451307d8e94c3',1,'b2Vec2::Set()'],['../structb2_vec3.html#a12a1bc14bbe722dfb175a492d2d00a79',1,'b2Vec3::Set()'],['../structb2_mat22.html#aed3bee1de38a0b3f36e21c90faa24112',1,'b2Mat22::Set()'],['../structb2_rot.html#acde9186de0a4a7397bf8ef714408ad60',1,'b2Rot::Set()'],['../structb2_transform.html#a4db696a0b3fada95f95cde3e7e85ced9',1,'b2Transform::Set()'],['../classb2_particle_color.html#acfaa29e177342af7fc01e25602d83781',1,'b2ParticleColor::Set(int32 r_, int32 g_, int32 b_, int32 a_)'],['../classb2_particle_color.html#ab37db15b2c0fac2718e279fb9416d98f',1,'b2ParticleColor::Set(const b2Color &amp;color)']]],
   ['setactive',['SetActive',['../classb2_body.html#ab8059b7b3e3b64aee17b54f68f7dde80',1,'b2Body']]],
   ['setallowsleeping',['SetAllowSleeping',['../classb2_world.html#a6755872564fc3db70c69d2b9d349fa33',1,'b2World']]],
@@ -15,6 +16,7 @@ var searchData=
   ['setcontactfilter',['SetContactFilter',['../classb2_world.html#a85e6e1e911c7d6366f8c7d57a12b72ff',1,'b2World']]],
   ['setcontactlistener',['SetContactListener',['../classb2_world.html#a614549967fb8a1584b61c11e2d553d42',1,'b2World']]],
   ['setcontinuousphysics',['SetContinuousPhysics',['../classb2_world.html#a536dd9181c2e20096073e3cfe2c8530a',1,'b2World']]],
+  ['setcorrectionfactor',['SetCorrectionFactor',['../classb2_motor_joint.html#ae59e624b8a7b6f869ab5e6148352cb52',1,'b2MotorJoint']]],
   ['setdampingratio',['SetDampingRatio',['../classb2_distance_joint.html#a58da61301a1f1398a715107b76649923',1,'b2DistanceJoint::SetDampingRatio()'],['../classb2_mouse_joint.html#a648c8f3ecb82f4887c0eefcfe48cbd37',1,'b2MouseJoint::SetDampingRatio()'],['../classb2_weld_joint.html#aea79865e590edba09eff9d2243689967',1,'b2WeldJoint::SetDampingRatio()']]],
   ['setdebugdraw',['SetDebugDraw',['../classb2_world.html#a6976d2c67400df03c0d44174ffcfb7ee',1,'b2World']]],
   ['setdensity',['SetDensity',['../classb2_fixture.html#ad4e1d9323103975c8931d022b952d04a',1,'b2Fixture']]],

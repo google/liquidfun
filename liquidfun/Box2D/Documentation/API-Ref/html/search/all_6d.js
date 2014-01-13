@@ -15,7 +15,8 @@ var searchData=
   ['maxtorque',['maxTorque',['../structb2_friction_joint_def.html#a61adfb0ee7c0ed4cb8feee8304c16ef6',1,'b2FrictionJointDef::maxTorque()'],['../structb2_motor_joint_def.html#afcf5dd58166917a4574d1f28f6bb3660',1,'b2MotorJointDef::maxTorque()']]],
   ['metric',['metric',['../structb2_simplex_cache.html#a018e0a500b417d79bfed3f21310b15a2',1,'b2SimplexCache']]],
   ['minor',['minor',['../structb2_version.html#a115b8797a6e0b8e53f54502bd20d89da',1,'b2Version']]],
-  ['mix',['Mix',['../classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf',1,'b2ParticleColor::Mix(b2ParticleColor *const mixColor, const int32 strength)'],['../classb2_particle_color.html#a30b460063f80d93e6a1756fe559105aa',1,'b2ParticleColor::Mix(b2ParticleColor *const colorA, b2ParticleColor *const colorB, const int32 strength)']]],
+  ['mix',['Mix',['../classb2_particle_color.html#ae61287a0be96027fae9a77a4354e4bbf',1,'b2ParticleColor']]],
+  ['mixcolors',['MixColors',['../classb2_particle_color.html#a31eb4241de8148393c4a69d81ed1d78d',1,'b2ParticleColor']]],
   ['motorspeed',['motorSpeed',['../structb2_prismatic_joint_def.html#ac4bdaea15653657e724a04fc60f3f235',1,'b2PrismaticJointDef::motorSpeed()'],['../structb2_revolute_joint_def.html#aced7cf768f4dcc3561576a39c7b92ec4',1,'b2RevoluteJointDef::motorSpeed()'],['../structb2_wheel_joint_def.html#a7248e25f2ca6b6c2a5f7079ce16e7748',1,'b2WheelJointDef::motorSpeed()']]],
   ['moveproxy',['MoveProxy',['../classb2_broad_phase.html#a01dc18a19c2b5d0cc1d9cd8c8554234c',1,'b2BroadPhase::MoveProxy()'],['../classb2_dynamic_tree.html#a7748252811f3c575015931399cbe4daa',1,'b2DynamicTree::MoveProxy()']]]
 ];
