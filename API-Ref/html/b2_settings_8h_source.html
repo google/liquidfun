@@ -109,141 +109,142 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#ifndef B2_SETTINGS_H</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define B2_SETTINGS_H</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;cassert&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;cmath&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#define B2_NOT_USED(x) ((void)(x))</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#if DEBUG</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2Assert(A) assert(A)</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define B2_ASSERT_ENABLED 1</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2Assert(A)</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define B2_ASSERT_ENABLED 0</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">signed</span> <span class="keywordtype">char</span> int8;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">signed</span> <span class="keywordtype">short</span> int16;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">signed</span> <span class="keywordtype">int</span> int32;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> uint8;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> uint16;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> uint32;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">float</span> float32;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">double</span> float64;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#ifdef WIN32</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor"></span><span class="keyword">typedef</span> __int64   int64;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> __int64   uint64;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#else // !WIN32</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor"></span><span class="keyword">typedef</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> int64;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> uint64;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#define b2_maxFloat     FLT_MAX</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_epsilon      FLT_EPSILON</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_pi           3.14159265359f</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#if !defined(b2Inline)</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#if defined(__GNUC__)</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2Inline __attribute__((always_inline))</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2Inline inline</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif // defined(__GNUC__)</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif // !defined(b2Inline)</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">// Collision</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#aa5f44cc9edf711433dea2b2ec94f3c42">   72</a></span>&#160;<span class="preprocessor">#define b2_maxManifoldPoints    2</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a09d71ee1993bee28b5b2e6d893b41884">   76</a></span>&#160;<span class="preprocessor">#define b2_maxPolygonVertices   8</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#adb86e231496fdd6ac7795ce58d40c870">   81</a></span>&#160;<span class="preprocessor">#define b2_aabbExtension        0.1f</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a7d1bd1594f20601d4079bccbd0a6a03c">   86</a></span>&#160;<span class="preprocessor">#define b2_aabbMultiplier       2.0f</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a57268ade379c5c3373d0ff558b0350cf">   90</a></span>&#160;<span class="preprocessor">#define b2_linearSlop           0.005f</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a67810fb101bb7a7e0b3afc14845383ee">   94</a></span>&#160;<span class="preprocessor">#define b2_angularSlop          (2.0f / 180.0f * b2_pi)</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#afc0f934dabffb1e83e081249133ad860">   99</a></span>&#160;<span class="preprocessor">#define b2_polygonRadius        (2.0f * b2_linearSlop)</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#ac1fd56e39ab8499f344b6398b7332e55">  102</a></span>&#160;<span class="preprocessor">#define b2_maxSubSteps          8</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment">// Dynamics</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#aad3a54bcae5f7ec0235963403c2fccc9">  108</a></span>&#160;<span class="preprocessor">#define b2_maxTOIContacts           32</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00112"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a690b448aa2dba2a1393781f8c059c22a">  112</a></span>&#160;<span class="preprocessor">#define b2_velocityThreshold        1.0f</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a23ab70e4809f5ee23abcd52018d5eb88">  116</a></span>&#160;<span class="preprocessor">#define b2_maxLinearCorrection      0.2f</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00120"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a823e4f9a6fa4b9de3c97da696571400a">  120</a></span>&#160;<span class="preprocessor">#define b2_maxAngularCorrection     (8.0f / 180.0f * b2_pi)</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00124"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#af2bad257bfbafed3665df3e243ba2b52">  124</a></span>&#160;<span class="preprocessor">#define b2_maxTranslation           2.0f</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_maxTranslationSquared    (b2_maxTranslation * b2_maxTranslation)</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a5808c5f1e946205d8f7458101ccc698e">  129</a></span>&#160;<span class="preprocessor">#define b2_maxRotation              (0.5f * b2_pi)</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_maxRotationSquared       (b2_maxRotation * b2_maxRotation)</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00135"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a88e32539e0f9e69e3832e1321eba3caa">  135</a></span>&#160;<span class="preprocessor">#define b2_baumgarte                0.2f</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_toiBaugarte              0.75f</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="comment">// Particle</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;</div>
-<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#adc056d2ee984ceb388fcd38e257e71b6">  142</a></span>&#160;<span class="preprocessor">#define b2_invalidParticleIndex     (-1)</span></div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00145"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a67092aba35939215cea0213618591031">  145</a></span>&#160;<span class="preprocessor">#define b2_particleStride           0.75f</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a8ca77d20adfeafed68bb71041a68a41f">  148</a></span>&#160;<span class="preprocessor">#define b2_minParticleWeight            1.0f</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00151"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a9e778f4a96009b55da173daddb9c2b59">  151</a></span>&#160;<span class="preprocessor">#define b2_maxParticleWeight        5.0f</span></div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">  154</a></span>&#160;<span class="preprocessor">#define b2_maxTriadDistance         2</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_maxTriadDistanceSquared      (b2_maxTriadDistance * b2_maxTriadDistance)</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#ae9c3e8b6741fe313258a942dd421a4b9">  158</a></span>&#160;<span class="preprocessor">#define b2_minParticleBufferCapacity    256</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="comment">// Sleep</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
-<div class="line"><a name="l00163"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#ab021adb740e4a5e1f5f7d9913ed94781">  163</a></span>&#160;<span class="preprocessor">#define b2_timeToSleep              0.5f</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00166"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a6d882c48142a8c73011b576e20dc6dd8">  166</a></span>&#160;<span class="preprocessor">#define b2_linearSleepTolerance     0.01f</span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00169"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a571f3e7c864aca14141b163205600eef">  169</a></span>&#160;<span class="preprocessor">#define b2_angularSleepTolerance    (2.0f / 180.0f * b2_pi)</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="comment">// Memory Allocation</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="keywordtype">void</span>* <a class="code" href="b2_settings_8h.html#a2dca9b286e9b9d6d022055fd61534bd7">b2Alloc</a>(int32 size);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="keywordtype">void</span> <a class="code" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d">b2Free</a>(<span class="keywordtype">void</span>* mem);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="keywordtype">void</span> <a class="code" href="b2_settings_8h.html#a9f10095d05c74eebfe535931c9061ab2">b2Log</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keywordtype">string</span>, ...);</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;</div>
-<div class="line"><a name="l00184"></a><span class="lineno"><a class="line" href="structb2_version.html">  184</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structb2_version.html">b2Version</a></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;{</div>
-<div class="line"><a name="l00186"></a><span class="lineno"><a class="line" href="structb2_version.html#a720da8e346364d1cb34d176125380b44">  186</a></span>&#160;    int32 <a class="code" href="structb2_version.html#a720da8e346364d1cb34d176125380b44">major</a>;        </div>
-<div class="line"><a name="l00187"></a><span class="lineno"><a class="line" href="structb2_version.html#a115b8797a6e0b8e53f54502bd20d89da">  187</a></span>&#160;    int32 <a class="code" href="structb2_version.html#a115b8797a6e0b8e53f54502bd20d89da">minor</a>;        </div>
-<div class="line"><a name="l00188"></a><span class="lineno"><a class="line" href="structb2_version.html#a395cfe1434e348115d2ead3d72b88847">  188</a></span>&#160;    int32 <a class="code" href="structb2_version.html#a395cfe1434e348115d2ead3d72b88847">revision</a>;     </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;};</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="keyword">extern</span> <a class="code" href="structb2_version.html">b2Version</a> <a class="code" href="b2_settings_8h.html#a3a20e3b6a8b05633d911fea031f7a44f">b2_version</a>;</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="keyword">extern</span> <span class="keyword">const</span> <a class="code" href="structb2_version.html">b2Version</a> <a class="code" href="b2_settings_8h.html#a6d36337c300b30f6f78b9d92ab78ec76">b2_liquidFunVersion</a>;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="keyword">extern</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="b2_settings_8h.html#ad2d708404cc84acb7e8f65de9738a9a5">b2_liquidFunVersionString</a>;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;stddef.h&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;float.h&gt;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#define B2_NOT_USED(x) ((void)(x))</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#if DEBUG</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2Assert(A) assert(A)</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define B2_ASSERT_ENABLED 1</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2Assert(A)</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define B2_ASSERT_ENABLED 0</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">signed</span> <span class="keywordtype">char</span> int8;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">signed</span> <span class="keywordtype">short</span> int16;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">signed</span> <span class="keywordtype">int</span> int32;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> uint8;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> uint16;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> uint32;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">float</span> float32;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">double</span> float64;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#ifdef WIN32</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor"></span><span class="keyword">typedef</span> __int64   int64;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> __int64   uint64;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#else // !WIN32</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor"></span><span class="keyword">typedef</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> int64;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> uint64;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#define b2_maxFloat     FLT_MAX</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_epsilon      FLT_EPSILON</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_pi           3.14159265359f</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#if !defined(b2Inline)</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#if defined(__GNUC__)</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2Inline __attribute__((always_inline))</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2Inline inline</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif // defined(__GNUC__)</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif // !defined(b2Inline)</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">// Collision</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#aa5f44cc9edf711433dea2b2ec94f3c42">   73</a></span>&#160;<span class="preprocessor">#define b2_maxManifoldPoints    2</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a09d71ee1993bee28b5b2e6d893b41884">   77</a></span>&#160;<span class="preprocessor">#define b2_maxPolygonVertices   8</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#adb86e231496fdd6ac7795ce58d40c870">   82</a></span>&#160;<span class="preprocessor">#define b2_aabbExtension        0.1f</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a7d1bd1594f20601d4079bccbd0a6a03c">   87</a></span>&#160;<span class="preprocessor">#define b2_aabbMultiplier       2.0f</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a57268ade379c5c3373d0ff558b0350cf">   91</a></span>&#160;<span class="preprocessor">#define b2_linearSlop           0.005f</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a67810fb101bb7a7e0b3afc14845383ee">   95</a></span>&#160;<span class="preprocessor">#define b2_angularSlop          (2.0f / 180.0f * b2_pi)</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#afc0f934dabffb1e83e081249133ad860">  100</a></span>&#160;<span class="preprocessor">#define b2_polygonRadius        (2.0f * b2_linearSlop)</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#ac1fd56e39ab8499f344b6398b7332e55">  103</a></span>&#160;<span class="preprocessor">#define b2_maxSubSteps          8</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment">// Dynamics</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#aad3a54bcae5f7ec0235963403c2fccc9">  109</a></span>&#160;<span class="preprocessor">#define b2_maxTOIContacts           32</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a690b448aa2dba2a1393781f8c059c22a">  113</a></span>&#160;<span class="preprocessor">#define b2_velocityThreshold        1.0f</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00117"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a23ab70e4809f5ee23abcd52018d5eb88">  117</a></span>&#160;<span class="preprocessor">#define b2_maxLinearCorrection      0.2f</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00121"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a823e4f9a6fa4b9de3c97da696571400a">  121</a></span>&#160;<span class="preprocessor">#define b2_maxAngularCorrection     (8.0f / 180.0f * b2_pi)</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00125"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#af2bad257bfbafed3665df3e243ba2b52">  125</a></span>&#160;<span class="preprocessor">#define b2_maxTranslation           2.0f</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_maxTranslationSquared    (b2_maxTranslation * b2_maxTranslation)</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00130"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a5808c5f1e946205d8f7458101ccc698e">  130</a></span>&#160;<span class="preprocessor">#define b2_maxRotation              (0.5f * b2_pi)</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_maxRotationSquared       (b2_maxRotation * b2_maxRotation)</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a88e32539e0f9e69e3832e1321eba3caa">  136</a></span>&#160;<span class="preprocessor">#define b2_baumgarte                0.2f</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_toiBaugarte              0.75f</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="comment">// Particle</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
+<div class="line"><a name="l00143"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#adc056d2ee984ceb388fcd38e257e71b6">  143</a></span>&#160;<span class="preprocessor">#define b2_invalidParticleIndex     (-1)</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a67092aba35939215cea0213618591031">  146</a></span>&#160;<span class="preprocessor">#define b2_particleStride           0.75f</span></div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00149"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a8ca77d20adfeafed68bb71041a68a41f">  149</a></span>&#160;<span class="preprocessor">#define b2_minParticleWeight            1.0f</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00152"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a9e778f4a96009b55da173daddb9c2b59">  152</a></span>&#160;<span class="preprocessor">#define b2_maxParticleWeight        5.0f</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">  155</a></span>&#160;<span class="preprocessor">#define b2_maxTriadDistance         2</span></div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define b2_maxTriadDistanceSquared      (b2_maxTriadDistance * b2_maxTriadDistance)</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#ae9c3e8b6741fe313258a942dd421a4b9">  159</a></span>&#160;<span class="preprocessor">#define b2_minParticleBufferCapacity    256</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="comment">// Sleep</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
+<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#ab021adb740e4a5e1f5f7d9913ed94781">  164</a></span>&#160;<span class="preprocessor">#define b2_timeToSleep              0.5f</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00167"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a6d882c48142a8c73011b576e20dc6dd8">  167</a></span>&#160;<span class="preprocessor">#define b2_linearSleepTolerance     0.01f</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00170"></a><span class="lineno"><a class="line" href="b2_settings_8h.html#a571f3e7c864aca14141b163205600eef">  170</a></span>&#160;<span class="preprocessor">#define b2_angularSleepTolerance    (2.0f / 180.0f * b2_pi)</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="comment">// Memory Allocation</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="keywordtype">void</span>* <a class="code" href="b2_settings_8h.html#a2dca9b286e9b9d6d022055fd61534bd7">b2Alloc</a>(int32 size);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="keywordtype">void</span> <a class="code" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d">b2Free</a>(<span class="keywordtype">void</span>* mem);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="keywordtype">void</span> <a class="code" href="b2_settings_8h.html#a9f10095d05c74eebfe535931c9061ab2">b2Log</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keywordtype">string</span>, ...);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00185"></a><span class="lineno"><a class="line" href="structb2_version.html">  185</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structb2_version.html">b2Version</a></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;{</div>
+<div class="line"><a name="l00187"></a><span class="lineno"><a class="line" href="structb2_version.html#a720da8e346364d1cb34d176125380b44">  187</a></span>&#160;    int32 <a class="code" href="structb2_version.html#a720da8e346364d1cb34d176125380b44">major</a>;        </div>
+<div class="line"><a name="l00188"></a><span class="lineno"><a class="line" href="structb2_version.html#a115b8797a6e0b8e53f54502bd20d89da">  188</a></span>&#160;    int32 <a class="code" href="structb2_version.html#a115b8797a6e0b8e53f54502bd20d89da">minor</a>;        </div>
+<div class="line"><a name="l00189"></a><span class="lineno"><a class="line" href="structb2_version.html#a395cfe1434e348115d2ead3d72b88847">  189</a></span>&#160;    int32 <a class="code" href="structb2_version.html#a395cfe1434e348115d2ead3d72b88847">revision</a>;     </div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;};</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="keyword">extern</span> <a class="code" href="structb2_version.html">b2Version</a> <a class="code" href="b2_settings_8h.html#a3a20e3b6a8b05633d911fea031f7a44f">b2_version</a>;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="keyword">extern</span> <span class="keyword">const</span> <a class="code" href="structb2_version.html">b2Version</a> <a class="code" href="b2_settings_8h.html#a6d36337c300b30f6f78b9d92ab78ec76">b2_liquidFunVersion</a>;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="keyword">extern</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="b2_settings_8h.html#ad2d708404cc84acb7e8f65de9738a9a5">b2_liquidFunVersionString</a>;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="b2_settings_8h_html_a9f10095d05c74eebfe535931c9061ab2"><div class="ttname"><a href="b2_settings_8h.html#a9f10095d05c74eebfe535931c9061ab2">b2Log</a></div><div class="ttdeci">void b2Log(const char *string,...)</div><div class="ttdoc">Logging function. </div><div class="ttdef"><b>Definition:</b> b2Settings.cpp:56</div></div>
-<div class="ttc" id="structb2_version_html_a115b8797a6e0b8e53f54502bd20d89da"><div class="ttname"><a href="structb2_version.html#a115b8797a6e0b8e53f54502bd20d89da">b2Version::minor</a></div><div class="ttdeci">int32 minor</div><div class="ttdoc">incremental changes </div><div class="ttdef"><b>Definition:</b> b2Settings.h:187</div></div>
+<div class="ttc" id="structb2_version_html_a115b8797a6e0b8e53f54502bd20d89da"><div class="ttname"><a href="structb2_version.html#a115b8797a6e0b8e53f54502bd20d89da">b2Version::minor</a></div><div class="ttdeci">int32 minor</div><div class="ttdoc">incremental changes </div><div class="ttdef"><b>Definition:</b> b2Settings.h:188</div></div>
 <div class="ttc" id="b2_settings_8h_html_a50f4abf5edeabd0300946edbd542e24d"><div class="ttname"><a href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d">b2Free</a></div><div class="ttdeci">void b2Free(void *mem)</div><div class="ttdoc">If you implement b2Alloc, you should also implement this function. </div><div class="ttdef"><b>Definition:</b> b2Settings.cpp:50</div></div>
 <div class="ttc" id="b2_settings_8h_html_a2dca9b286e9b9d6d022055fd61534bd7"><div class="ttname"><a href="b2_settings_8h.html#a2dca9b286e9b9d6d022055fd61534bd7">b2Alloc</a></div><div class="ttdeci">void * b2Alloc(int32 size)</div><div class="ttdoc">Implement this function to use your own memory allocator. </div><div class="ttdef"><b>Definition:</b> b2Settings.cpp:45</div></div>
 <div class="ttc" id="b2_settings_8h_html_a3a20e3b6a8b05633d911fea031f7a44f"><div class="ttname"><a href="b2_settings_8h.html#a3a20e3b6a8b05633d911fea031f7a44f">b2_version</a></div><div class="ttdeci">b2Version b2_version</div><div class="ttdef"><b>Definition:</b> b2Settings.cpp:25</div></div>
-<div class="ttc" id="structb2_version_html"><div class="ttname"><a href="structb2_version.html">b2Version</a></div><div class="ttdef"><b>Definition:</b> b2Settings.h:184</div></div>
+<div class="ttc" id="structb2_version_html"><div class="ttname"><a href="structb2_version.html">b2Version</a></div><div class="ttdef"><b>Definition:</b> b2Settings.h:185</div></div>
 <div class="ttc" id="b2_settings_8h_html_ad2d708404cc84acb7e8f65de9738a9a5"><div class="ttname"><a href="b2_settings_8h.html#ad2d708404cc84acb7e8f65de9738a9a5">b2_liquidFunVersionString</a></div><div class="ttdeci">const char * b2_liquidFunVersionString</div><div class="ttdef"><b>Definition:</b> b2Settings.cpp:38</div></div>
-<div class="ttc" id="structb2_version_html_a720da8e346364d1cb34d176125380b44"><div class="ttname"><a href="structb2_version.html#a720da8e346364d1cb34d176125380b44">b2Version::major</a></div><div class="ttdeci">int32 major</div><div class="ttdoc">significant changes </div><div class="ttdef"><b>Definition:</b> b2Settings.h:186</div></div>
+<div class="ttc" id="structb2_version_html_a720da8e346364d1cb34d176125380b44"><div class="ttname"><a href="structb2_version.html#a720da8e346364d1cb34d176125380b44">b2Version::major</a></div><div class="ttdeci">int32 major</div><div class="ttdoc">significant changes </div><div class="ttdef"><b>Definition:</b> b2Settings.h:187</div></div>
 <div class="ttc" id="b2_settings_8h_html_a6d36337c300b30f6f78b9d92ab78ec76"><div class="ttname"><a href="b2_settings_8h.html#a6d36337c300b30f6f78b9d92ab78ec76">b2_liquidFunVersion</a></div><div class="ttdeci">const b2Version b2_liquidFunVersion</div><div class="ttdoc">Global variable is used to identify the version of LiquidFun. </div><div class="ttdef"><b>Definition:</b> b2Settings.cpp:33</div></div>
-<div class="ttc" id="structb2_version_html_a395cfe1434e348115d2ead3d72b88847"><div class="ttname"><a href="structb2_version.html#a395cfe1434e348115d2ead3d72b88847">b2Version::revision</a></div><div class="ttdeci">int32 revision</div><div class="ttdoc">bug fixes </div><div class="ttdef"><b>Definition:</b> b2Settings.h:188</div></div>
+<div class="ttc" id="structb2_version_html_a395cfe1434e348115d2ead3d72b88847"><div class="ttname"><a href="structb2_version.html#a395cfe1434e348115d2ead3d72b88847">b2Version::revision</a></div><div class="ttdeci">int32 revision</div><div class="ttdoc">bug fixes </div><div class="ttdef"><b>Definition:</b> b2Settings.h:189</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Google Analytics -->
 <script>
