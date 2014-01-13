@@ -16,6 +16,8 @@
 # misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
+# ***** For script usage run "add_copyright.sh -h". ******
+
 # Upstream git repo to compare against.
 : ${GIT_UPSTREAM:=../../../../external/box2d}
 # Name of the git branch from the upstream repo to compare against.
@@ -67,9 +69,49 @@ re="\.xml$"; cs="     "; ce=""; pcs="<!-- "; pce=" -->\n"; skip=1;
 # Display usage of this script.
 usage() {
   echo "\
-Add a copyright header to all Google authored source files.
+Add a copyright header to *all* Google authored and modified source files.
 
-Usage: $(basename $0) [upstream_git_repo] [upstream_git_branch]
+This script adds a copyright header to all files found in...
+  ${project_root}
+... that have been modified in this project's git repository with respect to
+the specified upstream git repository.
+
+This script uses git to perform the diff between the upstream repository and
+this project so it requires this project to be a valid git workspace.
+
+In the case of files with no copyright header the following header is added:
+\"
+${copyright}
+\"
+
+Where files already have a copyright header and have been modified by Google
+the following is inserted in the header:
+\"
+${copyright_title}
+\"
+
+Source files matching the following regular expressions are modified:
+$(echo "${files_comment_regexp}" | sed 's/;.*//;s///g;s/re=/  /')
+
+Usage: $(basename $0) [-g upstream_git_repo] [-b upstream_git_branch]
+
+-g upstream_git_repo:
+  upstream_git_repo is the location of the upstream git repository to compare
+  against.  If this isn't specified it defaults to
+  ${project_root}/${GIT_UPSTREAM}
+
+-b upstream_git_branch:
+  upstream_git_branch specifies the branch in the upstream_git_repo to compare
+  against.  If this isn't specified it defaults to ${GIT_BRANCH}.
+
+For example, assuming we're using the default git upstream repo and branch:
+$ cd ${project_root}
+$ pushd ../../../../external/box2d
+$ git checkout -b master origin/master
+$ popd
+$ ./tools/add_copyright.sh
+$ git status -s
+# Displays a list of modified files.
 " >&2
   exit 1
 }
@@ -78,8 +120,8 @@ main() {
   # Parse arguments.
   while getopts "hg:b:" options; do
     case ${options} in
-      g ) GIT_UPSTREAM="${1}";;
-      b ) GIT_BRANCH="${2}";;
+      g ) GIT_UPSTREAM="${OPTARG}";;
+      b ) GIT_BRANCH="${OPTARG}";;
       h ) usage;;
     esac
   done
