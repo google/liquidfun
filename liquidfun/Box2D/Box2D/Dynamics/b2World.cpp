@@ -1433,6 +1433,16 @@ float32 b2World::GetParticleDamping() const
 	return m_particleSystem.GetParticleDamping();
 }
 
+void b2World::SetParticleStaticPressureIterations(int32 iterations)
+{
+	m_particleSystem.SetParticleStaticPressureIterations(iterations);
+}
+
+int32 b2World::GetParticleStaticPressureIterations() const
+{
+	return m_particleSystem.GetParticleStaticPressureIterations();
+}
+
 void b2World::SetParticleRadius(float32 radius)
 {
 	m_particleSystem.SetParticleRadius(radius);

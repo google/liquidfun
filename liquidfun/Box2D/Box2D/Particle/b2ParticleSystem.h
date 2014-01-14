@@ -156,7 +156,7 @@ private:
 	/// All particle types that require creating triads
 	static const int32 k_triadFlags =
 		b2_elasticParticle;
-	/// All particle types that do not produce pressure
+	/// All particle types that do not produce dynamic pressure
 	static const int32 k_noPressureFlags =
 		b2_powderParticle |
 		b2_tensileParticle;
@@ -199,6 +199,8 @@ private:
 	void LimitVelocity(const b2TimeStep& step);
 	void SolveGravity(const b2TimeStep& step);
 	void SolveBarrier(const b2TimeStep& step);
+	void SolveStaticPressure(const b2TimeStep& step);
+	void ComputeWeight();
 	void SolvePressure(const b2TimeStep& step);
 	void SolveDamping(const b2TimeStep& step);
 	void SolveWall(const b2TimeStep& step);
@@ -221,6 +223,8 @@ private:
 	float32 GetParticleGravityScale() const;
 	void SetParticleDamping(float32 damping);
 	float32 GetParticleDamping() const;
+	void SetParticleStaticPressureIterations(int32 iterations);
+	int32 GetParticleStaticPressureIterations() const;
 	float32 GetCriticalVelocity(const b2TimeStep& step) const;
 	float32 GetCriticalVelocitySquared(const b2TimeStep& step) const;
 	float32 GetCriticalPressure(const b2TimeStep& step) const;
@@ -274,9 +278,27 @@ private:
 	ParticleBuffer<uint32> m_flagsBuffer;
 	ParticleBuffer<b2Vec2> m_positionBuffer;
 	ParticleBuffer<b2Vec2> m_velocityBuffer;
-	float32* m_accumulationBuffer; // temporary values
-	b2Vec2* m_accumulation2Buffer; // temporary vector values
-	float32* m_depthBuffer; // distance from the surface
+	/// m_weightBuffer is populated in ComputeWeight and used in
+	/// ComputeDepth, SolveStaticPressure and SolvePressure.
+	float32* m_weightBuffer;
+	/// When any particles have the flag b2_staticPressureParticle,
+	/// m_staticPressureBuffer is first allocated and used in SolveStaticPressure
+	/// and SolvePressure. It will be reallocated on subsequent CreateParticle()
+	/// calls.
+	float32* m_staticPressureBuffer;
+	/// m_accumulationBuffer is used in many functions as a temporary buffer
+	/// for scalar values.
+	float32* m_accumulationBuffer;
+	/// When any particles have the flag b2_tensileParticle,
+	/// m_accumulation2Buffer is first allocated and used in SolveTensile as a
+	/// temporary buffer for vector values. It will be reallocated on subsequent
+	/// CreateParticle() calls.
+	b2Vec2* m_accumulation2Buffer;
+	/// When any particle groups have the flag b2_solidParticleGroup,
+	/// m_depthBuffer is first allocated and populated in ComputeDepth and used
+	/// in SolveSolid. It will be reallocated on subsequent CreateParticle()
+	/// calls.
+	float32* m_depthBuffer;
 	ParticleBuffer<b2ParticleColor> m_colorBuffer;
 	b2ParticleGroup** m_groupBuffer;
 	ParticleBuffer<void*> m_userDataBuffer;
@@ -304,16 +326,21 @@ private:
 	int32 m_groupCount;
 	b2ParticleGroup* m_groupList;
 
-	float32 m_pressureStrength;
-	float32 m_dampingStrength;
-	float32 m_elasticStrength;
-	float32 m_springStrength;
-	float32 m_viscousStrength;
-	float32 m_surfaceTensionStrengthA;
-	float32 m_surfaceTensionStrengthB;
-	float32 m_powderStrength;
-	float32 m_ejectionStrength;
-	float32 m_colorMixingStrength;
+	// Physical coefficients. Each is initialized to the maximum value that
+	// keeps the numerical stability.
+	float32 m_pressureStrength; // produces pressure in response to compression
+	float32 m_dampingStrength; // reduces normal velocity
+	float32 m_elasticStrength; // restores shapes of elastic particle groups
+	float32 m_springStrength; // restores lengths of spring particle groups
+	float32 m_viscousStrength; // reduces relative velocity of viscous particles
+	float32 m_surfaceTensionStrengthA; // produces pressure for tensile particles
+	float32 m_surfaceTensionStrengthB; // smoothes outline of tensile particles
+	float32 m_powderStrength; // produces repulsion between powder particles
+	float32 m_ejectionStrength; // pushes particles out of solid particle group
+	float32 m_staticPressureStrength; // produces static pressure
+	float32 m_staticPressureRelaxation; // reduces instability of static pressure
+	int32 m_staticPressureIterations; // computes static pressure more precisely
+	float32 m_colorMixingStrength; // mixes colors of color-mixing particles
 
 	b2World* m_world;
 };
