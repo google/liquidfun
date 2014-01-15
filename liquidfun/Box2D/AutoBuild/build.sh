@@ -58,7 +58,7 @@ find_cmake() {
   local cmake=$(which cmake)
   if [[ "${cmake}" == "" ]]; then
     if [[ "${os_name}" == "Darwin" ]]; then
-      cmake=$(echo ${android_root}/prebuilts/cmake/${os_name}-${arch}/\
+      cmake=$(echo ${android_root}/prebuilts/cmake/darwin-${arch}/\
 current/*.app/Contents/bin/cmake)
     else
       cmake=${android_root}/prebuilts/cmake/${os_name}-x86/current/bin/cmake
