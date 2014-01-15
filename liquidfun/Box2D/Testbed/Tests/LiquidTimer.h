@@ -24,6 +24,9 @@ public:
 
 	LiquidTimer()
 	{
+		// Setup particle parameters.
+		TestMain::SetParticleParameters(k_paramDef, k_paramDefCount);
+
 		{
 			b2BodyDef bd;
 			b2Body* ground = m_world->CreateBody(&bd);
@@ -44,9 +47,12 @@ public:
 			b2PolygonShape shape;
 			shape.SetAsBox(20, 4, b2Vec2(0, 36), 0);
 			b2ParticleGroupDef pd;
-			pd.flags = b2_tensileParticle | b2_viscousParticle;
+			pd.flags = TestMain::GetParticleParameterValue();
 			pd.shape = &shape;
-			m_world->CreateParticleGroup(pd);
+			b2ParticleGroup * const group = m_world->CreateParticleGroup(pd);
+			if (pd.flags & b2_colorMixingParticle) {
+				ColorParticleGroup(group, 0);
+			}
 		}
 
 		{
@@ -134,6 +140,29 @@ public:
 	{
 		return new LiquidTimer;
 	}
+
+	static const ParticleParameter::Value k_paramValues[];
+	static const ParticleParameter::Definition k_paramDef[];
+	static const uint32 k_paramDefCount;
 };
+
+const ParticleParameter::Value LiquidTimer::k_paramValues[] =
+{
+	{b2_tensileParticle | b2_viscousParticle, "tensile + viscous"},
+};
+const ParticleParameter::Definition LiquidTimer::k_paramDef[] =
+{
+	{
+		LiquidTimer::k_paramValues,
+		B2_ARRAY_SIZE(LiquidTimer::k_paramValues)
+	},
+	{
+		ParticleParameter::k_particleTypesPtr,
+		ParticleParameter::k_particleTypesCount
+	},
+};
+const uint32 LiquidTimer::k_paramDefCount =
+	B2_ARRAY_SIZE(LiquidTimer::k_paramDef);
+
 
 #endif

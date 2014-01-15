@@ -33,6 +33,9 @@
 #define B2_ASSERT_ENABLED 0
 #endif
 
+// Calculate the size of a static array.
+#define B2_ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
 typedef signed char	int8;
 typedef signed short int16;
 typedef signed int int32;

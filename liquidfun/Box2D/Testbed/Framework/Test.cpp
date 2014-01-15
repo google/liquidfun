@@ -37,6 +37,19 @@ void DestructionListener::SayGoodbye(b2ParticleGroup* group)
 	test->ParticleGroupDestroyed(group);
 }
 
+const b2ParticleColor Test::k_ParticleColors[] = {
+	b2ParticleColor(0xff, 0x00, 0x00, 0xff), // red
+	b2ParticleColor(0x00, 0xff, 0x00, 0xff), // green
+	b2ParticleColor(0x00, 0x00, 0xff, 0xff), // blue
+	b2ParticleColor(0xff, 0x8c, 0x00, 0xff), // orange
+	b2ParticleColor(0x00, 0xce, 0xd1, 0xff), // turquoise
+	b2ParticleColor(0xff, 0x00, 0xff, 0xff), // magenta
+	b2ParticleColor(0xff, 0xd7, 0x00, 0xff), // gold
+	b2ParticleColor(0x00, 0xff, 0xff, 0xff), // cyan
+};
+const uint32 Test::k_ParticleColorsCount =
+	B2_ARRAY_SIZE(Test::k_ParticleColors);
+
 Test::Test()
 {
 	b2Vec2 gravity;
@@ -532,4 +545,32 @@ void Test::Step(Settings* settings)
 void Test::ShiftOrigin(const b2Vec2& newOrigin)
 {
 	m_world->ShiftOrigin(newOrigin);
+}
+
+// Apply a preset range of colors to a particle group.
+// A different color out of k_ParticleColors is applied to each
+// particlesPerColor particles in the specified group.
+// If particlesPerColor is 0, the particles in the group are divided into
+// k_ParticleColorsCount equal sets of colored particles.
+void Test::ColorParticleGroup(b2ParticleGroup * const group,
+							  uint32 particlesPerColor)
+{
+	b2Assert(group);
+	b2ParticleColor * const colorBuffer = m_world->GetParticleColorBuffer();
+	const int32 particleCount = group->GetParticleCount();
+	const int32 groupStart = group->GetBufferIndex();
+	const int32 groupEnd = particleCount + groupStart;
+	const int32 colorCount = (int32)k_ParticleColorsCount;
+	if (!particlesPerColor)
+	{
+		particlesPerColor = particleCount / colorCount;
+		if (!particlesPerColor)
+		{
+			particlesPerColor = 1;
+		}
+	}
+	for (int32 i = groupStart; i < groupEnd; i++)
+	{
+		colorBuffer[i] = k_ParticleColors[i / particlesPerColor];
+	}
 }

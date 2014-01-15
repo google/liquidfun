@@ -19,14 +19,18 @@
 
 #include "Render.h"
 #include "Test.h"
+#include "Arrow.h"
+#include "FullscreenUI.h"
+#include "ParticleParameter.h"
 #include "glui/glui.h"
 #include <stdio.h>
 #include "AndroidUtil/AndroidLogPrint.h"
-#ifdef __ANDROID__
 #include <algorithm>
 #include <string>
 #include <sstream>
-#endif // __ANDROID__
+
+namespace TestMain
+{
 
 namespace
 {
@@ -37,7 +41,7 @@ namespace
 	Test* test;
 	Settings settings;
 	int32 width = 640;
-	int32 height = 480;
+	int32 height = 510;
 	int32 framePeriod = 16;
 	int32 mainWindow;
 	float settingsHz = 60.0;
@@ -45,31 +49,52 @@ namespace
 	float32 viewZoom = 1.0f;
 	int tx, ty, tw, th;
 	bool rMouseDown = false;
-	bool lMouseDown = false;
+	// State of the mouse on the previous call of Mouse().
+	int32 previousMouseState = -1;
 	b2Vec2 lastp;
 	b2Vec2 extents;
-#ifdef __ANDROID__
-	const float arrowScale = 2.5;  // relative to worldspace
-	const float arrowSize = 3.5; // see geometry in DrawArrow()
-	const float arrowOffset = arrowScale * arrowSize; // defines hitbox & position
-	const float smallerArrowFactor = 0.5f;
-	const float arrowGap = 3;
-	enum ArrowSelection
-	{
-		e_ArrowSelectionNone = 0,
-		e_ArrowSelectionLeft,
-		e_ArrowSelectionRight,
-		e_ArrowParameterLeft,
-		e_ArrowParameterRight,
-	};
-	ArrowSelection whichArrow = e_ArrowSelectionNone;
-	int parameterIndex = 0;
-	bool parameterChanged = false;
-	bool extraArrows = false;
-	const char *parameterName = "";
-	const b2Color arrowActiveColor(0, 1, 0);
-	const b2Color arrowPassiveColor(0.5f, 0.5f, 0.5f);
-#endif // __ANDROID__
+
+	// Fullscreen UI object.
+	FullscreenUI fullscreenUI;
+	// Used to control the behavior of particle tests.
+	ParticleParameter particleParameter;
+}
+
+// Set whether to restart the test on particle parameter changes.
+// This parameter is re-enabled when the test changes.
+void SetRestartOnParticleParameterChange(bool enable)
+{
+	particleParameter.SetRestartOnChange(enable);
+}
+
+// Set the currently selected particle parameter value.  This value must
+// match one of the values in TestMain::k_particleTypes or one of the values
+// referenced by particleParameterDef passed to SetParticleParameters().
+uint32 SetParticleParameterValue(uint32 value)
+{
+	const int32 index = particleParameter.FindIndexByValue(value);
+	// If the particle type isn't found, so fallback to the first entry in the
+	// parameter.
+	particleParameter.Set(index >= 0 ? index : 0);
+	return particleParameter.GetValue();
+}
+
+// Get the currently selected particle parameter value and enable particle
+// parameter selection arrows on Android.
+uint32 GetParticleParameterValue()
+{
+	// Enable display of particle type selection arrows.
+	fullscreenUI.SetParticleParameterSelectionEnabled(true);
+	return particleParameter.GetValue();
+}
+
+// Override the default particle parameters for the test.
+void SetParticleParameters(
+	const ParticleParameter::Definition * const particleParameterDef,
+	const uint32 particleParameterDefCount)
+{
+	particleParameter.SetDefinition(particleParameterDef,
+									particleParameterDefCount);
 }
 
 static void Resize(int32 w, int32 h)
@@ -116,48 +141,6 @@ static void Timer(int)
 	glutTimerFunc(framePeriod, Timer, 0);
 }
 
-int TestParticleType()
-{
-#ifdef __ANDROID__
-	extraArrows = true;
-	static int flags[] = {
-		b2_waterParticle,
-		b2_elasticParticle,
-		b2_powderParticle,
-		b2_springParticle,
-		b2_tensileParticle,
-		b2_viscousParticle,
-		b2_wallParticle,
-	};
-	static const char *flagNames[] = {
-		"water",
-		"elastic",
-		"powder",
-		"spring",
-		"tensile",
-		"viscous",
-		"wall",
-	};
-	int whichFlag = parameterIndex % (sizeof(flags) / sizeof(int));
-	parameterName = flagNames[whichFlag];
-	return flags[whichFlag];
-#endif // __ANDROID__
-	return 0;
-}
-
-#ifdef __ANDROID__
-void Arrow(ArrowSelection as, int dir, float angle, float scale, float offset2)
-{
-	DebugDraw dbgDraw;
-	glPushMatrix();
-	glTranslatef(settings.viewCenter.x + (extents.x - arrowOffset + arrowScale - offset2) * dir, settings.viewCenter.y, 0);
-	glRotatef(angle, 0, 0, 1);
-	glScalef(arrowScale * scale, arrowScale * scale, 1);
-	dbgDraw.DrawArrow(lMouseDown && whichArrow == as ? arrowActiveColor : arrowPassiveColor);
-	glPopMatrix();
-}
-#endif // __ANDROID__
-
 static void SimulationLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -173,39 +156,37 @@ static void SimulationLoop()
 
 	test->Step(&settings);
 
-#ifdef __ANDROID__
-	// special purpose code for Android: draw navigational arrows to browse test cases, since we don't have the full desktop UI
-	Arrow(e_ArrowSelectionRight, 1, 0, 1, 0);
-	Arrow(e_ArrowSelectionLeft, -1, 180, 1, 0);
-	std::string msg = entry->name;
-	if (extraArrows)
+	// Update the state of the particle parameter.
+	bool restartTest;
+	const bool changed = particleParameter.Changed(&restartTest);
+	B2_NOT_USED(changed);
+
+	if (fullscreenUI.GetEnabled())
 	{
-		Arrow(e_ArrowParameterRight, 1, 0, smallerArrowFactor, arrowOffset * smallerArrowFactor + arrowGap);
-		Arrow(e_ArrowParameterLeft, -1, 180, smallerArrowFactor, arrowOffset * smallerArrowFactor + arrowGap);
-		msg += " : ";
-		msg += parameterName;
+		// Draw the full screen UI with
+		// "test_name [: particle_parameter] / fps" at the bottom of the
+		// screen.
+		std::string msg = entry->name;
+		if (fullscreenUI.GetParticleParameterSelectionEnabled())
+		{
+			msg += " : ";
+			msg += particleParameter.GetName();
+		}
+		std::stringstream ss;
+		ss << int(1000.0f / ComputeFPS());
+		msg += " / " + ss.str() + " fps";
+		fullscreenUI.Draw(msg);
 	}
-
-	glColor4f(1, 1, 1, 1);
-	glPushMatrix();
-	glTranslatef(-20, -4, 0);
-	glScalef(0.015f, 0.015f, 1);
-	float msec = ComputeFPS();
-	std::stringstream ss;
-	ss << int(1000 / msec);
-	msg += " / " + ss.str() + " fps";
-	glutStrokeString(GLUT_STROKE_MONO_ROMAN, (const unsigned char *)msg.c_str());
-	glPopMatrix();
-
-	if (parameterChanged) { parameterChanged = false; testIndex = -1; } // force test restart below
-#endif // __ANDROID__
 
 	test->DrawTitle(entry->name);
 
 	glutSwapBuffers();
 
-	if (testSelection != testIndex)
+	if (testSelection != testIndex || restartTest)
 	{
+		fullscreenUI.Reset();
+		if (!restartTest) particleParameter.Reset();
+
 		testIndex = testSelection;
 		delete test;
 		entry = g_testEntries + testIndex;
@@ -295,6 +276,21 @@ static void Keyboard(unsigned char key, int x, int y)
 			testSelection = 0;
 		}
 		if (glui) glui->sync_live();
+		break;
+
+		// Press ~ to enable / disable the fullscreen UI.
+	case '~':
+		fullscreenUI.SetEnabled(!fullscreenUI.GetEnabled());
+		break;
+
+		// Press < to select the previous particle parameter setting.
+	case '<':
+		particleParameter.Decrement();
+		break;
+
+		// Press > to select the next particle parameter setting.
+	case '>':
+		particleParameter.Increment();
 		break;
 
 	default:
@@ -397,9 +393,27 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 	{
 		int mod = glutGetModifiers();
 		b2Vec2 p = ConvertScreenToWorld(x, y);
+
+		switch (fullscreenUI.Mouse(button, state, previousMouseState, p))
+		{
+		case FullscreenUI::e_SelectionTestPrevious:
+			testSelection = std::max(0, testSelection - 1);
+			break;
+		case FullscreenUI::e_SelectionTestNext:
+			if (g_testEntries[testSelection + 1].name) testSelection++;
+			break;
+		case FullscreenUI::e_SelectionParameterPrevious:
+			particleParameter.Decrement();
+			break;
+		case FullscreenUI::e_SelectionParameterNext:
+			particleParameter.Increment();
+			break;
+		default:
+			break;
+		}
+
 		if (state == GLUT_DOWN)
 		{
-			lMouseDown = true;
 			b2Vec2 p = ConvertScreenToWorld(x, y);
 			if (mod == GLUT_ACTIVE_SHIFT)
 			{
@@ -413,50 +427,8 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 
 		if (state == GLUT_UP)
 		{
-			lMouseDown = false;
 			test->MouseUp(p);
 		}
-
-#ifdef __ANDROID__
-		// Allow Android to advance to the next test.
-		bool withinYrange = fabs(p.y - settings.viewCenter.y) < arrowScale * 2;
-		if (withinYrange && p.x < -(extents.x - arrowOffset))
-		{
-			whichArrow = e_ArrowSelectionLeft;
-			if (state == GLUT_UP)
-			{
-				testSelection = std::max(0, testSelection - 1);
-				extraArrows = false;
-				parameterIndex = 0;
-			}
-		}
-		else if (withinYrange && p.x >  (extents.x - arrowOffset))
-		{
-			whichArrow = e_ArrowSelectionRight;
-			if (state == GLUT_UP)
-			{
-				testSelection++;
-				if (!g_testEntries[testSelection].name) testSelection--;
-				extraArrows = false;
-				parameterIndex = 0;
-			}
-		}
-		else if (extraArrows && withinYrange && p.x < -(extents.x - arrowOffset - arrowOffset * smallerArrowFactor - arrowGap))
-		{
-			whichArrow = e_ArrowParameterLeft;
-			if (state == GLUT_UP) { parameterIndex--; parameterChanged = true; }
-		}
-		else if (extraArrows && withinYrange && p.x >  (extents.x - arrowOffset - arrowOffset * smallerArrowFactor - arrowGap))
-		{
-			whichArrow = e_ArrowParameterRight;
-			if (state == GLUT_UP) { parameterIndex++; parameterChanged = true; }
-		}
-		else
-		{
-			whichArrow = e_ArrowSelectionNone;
-		}
-#endif // __ANDROID__
-
 	}
 	else if (button == GLUT_RIGHT_BUTTON)
 	{
@@ -471,12 +443,17 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 			rMouseDown = false;
 		}
 	}
+	previousMouseState = state;
 }
 
 static void MouseMotion(int32 x, int32 y)
 {
 	b2Vec2 p = ConvertScreenToWorld(x, y);
-	test->MouseMove(p);
+
+	if (fullscreenUI.GetSelection() == FullscreenUI::e_SelectionNone)
+	{
+		test->MouseMove(p);
+	}
 
 	if (rMouseDown)
 	{
@@ -542,8 +519,12 @@ static void SingleStep(int)
 }
 #endif // __ANDROID__
 
+}  // namespace TestMain
+
 int main(int argc, char** argv)
 {
+	using namespace TestMain;
+
 	testCount = 0;
 	while (g_testEntries[testCount].createFcn != NULL)
 	{
@@ -647,6 +628,9 @@ int main(int argc, char** argv)
 
 #endif // __ANDROID__
 
+	// Configure the fullscreen UI's viewport parameters.
+	fullscreenUI.SetViewParameters(&settings.viewCenter, &extents);
+
 	// Use a timer to control the frame rate.
 	glutTimerFunc(framePeriod, Timer, 0);
 
@@ -654,3 +638,4 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+

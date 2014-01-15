@@ -59,8 +59,6 @@ public:
 	void DrawString(const b2Vec2& p, const char* string, ...);
 
 	void DrawAABB(b2AABB* aabb, const b2Color& color);
-
-	void DrawArrow(const b2Color& color);
 };
 
 float ComputeFPS();

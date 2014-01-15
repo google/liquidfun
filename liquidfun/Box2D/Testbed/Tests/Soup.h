@@ -68,7 +68,12 @@ public:
 			shape.SetAsBox(20, 10, b2Vec2(0, 10), 0);
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
-			m_world->CreateParticleGroup(pd);
+			pd.flags = TestMain::GetParticleParameterValue();
+			b2ParticleGroup * const group = m_world->CreateParticleGroup(pd);
+			if (pd.flags & b2_colorMixingParticle)
+			{
+				ColorParticleGroup(group, 0);
+			}
 		}
 
 		{
