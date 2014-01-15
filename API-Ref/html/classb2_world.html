@@ -128,6 +128,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a293d9865e407fd463e168b0a29856acc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a711e55d2c6e68400f93472f807c3775b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a711e55d2c6e68400f93472f807c3775b">QueryAABB</a> (<a class="el" href="classb2_query_callback.html">b2QueryCallback</a> *callback, const <a class="el" href="structb2_a_a_b_b.html">b2AABB</a> &amp;aabb) const </td></tr>
 <tr class="separator:a711e55d2c6e68400f93472f807c3775b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b05f1812b65fb1540dd2054a10a8da6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a8b05f1812b65fb1540dd2054a10a8da6">QueryShapeAABB</a> (<a class="el" href="classb2_query_callback.html">b2QueryCallback</a> *callback, const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;shape, const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;xf) const </td></tr>
+<tr class="separator:a8b05f1812b65fb1540dd2054a10a8da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad902548be84df9cc36eced0f4c89ab0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ad902548be84df9cc36eced0f4c89ab0a">RayCast</a> (<a class="el" href="classb2_ray_cast_callback.html">b2RayCastCallback</a> *callback, const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;point1, const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;point2) const </td></tr>
 <tr class="separator:ad902548be84df9cc36eced0f4c89ab0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b87c03955e3312d308ddf679adf3c85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classb2_body.html">b2Body</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a1b87c03955e3312d308ddf679adf3c85">GetBodyList</a> ()</td></tr>
@@ -972,6 +974,46 @@ This function is locked during callbacks. </dd></dl>
   <table class="params">
     <tr><td class="paramname">callback</td><td>a user implemented callback class. </td></tr>
     <tr><td class="paramname">aabb</td><td>the query box. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a8b05f1812b65fb1540dd2054a10a8da6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2World::QueryShapeAABB </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_query_callback.html">b2QueryCallback</a> *&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;&#160;</td>
+          <td class="paramname"><em>shape</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;&#160;</td>
+          <td class="paramname"><em>xf</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Query the world for all fixtures that potentially overlap the provided shape's AABB. Calls QueryAABB internally. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>a user implemented callback class. </td></tr>
+    <tr><td class="paramname">shape</td><td>the query shape </td></tr>
   </table>
   </dd>
 </dl>
