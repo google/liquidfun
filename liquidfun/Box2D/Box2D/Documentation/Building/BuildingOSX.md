@@ -4,6 +4,16 @@ LiquidFun releases contain an [Xcode][] project to build the library and
 samples on [OS X][].  The [Xcode][] project has been generated using
 [cmake][], and is free of any host-specific dependencies.
 
+### Version Requirements
+
+Following are the minimum required versions for the tools and libraries you
+need for building LiquidFun for OS X:
+
+-   OS X: Mavericks 10.9.1.
+-   Xcode: 5.0.1
+-   Xquartz: 2.7.5 (xorg-server 1.14.4)
+-   cmake (when building from source) 2.8.12.1
+
 ### Before Building
 
 -   Install [Xquartz][] to run LiquidFun sample applications.
