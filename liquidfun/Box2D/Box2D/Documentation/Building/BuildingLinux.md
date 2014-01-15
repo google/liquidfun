@@ -1,5 +1,14 @@
 # Building for Linux
 
+### Version Requirements
+
+Following are the minimum required versions for the tools and libraries you
+need for building LiquidFun for Linux:
+
+-   OpenGL: libglapi-mesa 8.0.4 (tested with libglapi-mesa 8.0.4-0ubuntu0)
+-   GLU: libglu1-mesa-dev 8.0.4 (tested with libglu1-mesa-dev 8.0.4.0ubuntu0)
+-   cmake (when building from source): 2.8.12.1
+
 ### Before Building
 
 Prior to building, install the following components using the [Linux][]

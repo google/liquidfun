@@ -6,6 +6,15 @@ examples on [Windows][].  The Visual Studio solution has been generated using
 [cmake][], and is free of any host-specific dependencies.  It has been
 tested with Microsoft [Visual Studio][] 2012.
 
+### Version Requirements
+
+Following are the minimum required versions for the tools and libraries you
+need for building LiquidFun for Windows:
+
+-   Windows: 7
+-   Visual Studio: 2012
+-   cmake: 2.8.12.1
+
 ### Building with [Visual Studio][]
 
 -   Double-click on `liquidfun/Box2D/Box2D.sln` to open the solution.

@@ -53,7 +53,14 @@ $(document).ready(function(){initNavTree('md__building_linux.html','');});
 <div class="title">Building for Linux </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h3>Before Building</h3>
+<div class="textblock"><h3>Version Requirements</h3>
+<p>Following are the minimum required versions for the tools and libraries you need for building LiquidFun for Linux:</p>
+<ul>
+<li>OpenGL: libglapi-mesa 8.0.4 (tested with libglapi-mesa 8.0.4-0ubuntu0)</li>
+<li>GLU: libglu1-mesa-dev 8.0.4 (tested with libglu1-mesa-dev 8.0.4.0ubuntu0)</li>
+<li>cmake (when building from source): 2.8.12.1</li>
+</ul>
+<h3>Before Building</h3>
 <p>Prior to building, install the following components using the <a href="http://en.wikipedia.org/wiki/Linux">Linux</a> distribution's package manager:</p>
 <ul>
 <li><a href="http://www.cmake.org">cmake</a>. You can also manually install from <a href="http://cmake.org">cmake.org</a>.</li>

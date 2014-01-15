@@ -1,5 +1,16 @@
 # Building for Android
 
+### Version Requirements
+
+Following are the minimum required versions for the tools and libraries you
+need for building LiquidFun for Android:
+
+-   Android SDK:  Android 2.3.3 (API Level 10)
+-   ADT: 20130917
+-   NDK: android-ndk-r9
+-   NDK plugn for Eclipse: bundled with ADT
+-   cmake (when building from source): 2.8.12.1
+
 ### Before Building
 
 -   Install the [Android SDK].
