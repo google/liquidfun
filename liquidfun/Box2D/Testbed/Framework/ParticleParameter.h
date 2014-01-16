@@ -99,7 +99,7 @@ public:
 	void SetRestartOnChange(bool enable) { m_restartOnChange = enable; }
 
 	// Get whether to restart the test when changing this parameter.
-	uint32 GetRestartOnChange() const { return m_restartOnChange; }
+	bool GetRestartOnChange() const { return m_restartOnChange; }
 
 	// Find index by value falling back to -1 if the value isn't found.
 	int32 FindIndexByValue(uint32 value) const;
