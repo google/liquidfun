@@ -72,9 +72,23 @@ void ParticleParameter::SetDefinition(const Definition *definition,
 void ParticleParameter::Set(uint32 index)
 {
 	m_changed = m_index != index;
-	m_index = index;
+	m_index = m_valueCount ? index % m_valueCount : index;
 	m_value = FindParticleParameterValue();
 	b2Assert(m_value);
+}
+
+// Increment the parameter index.
+void ParticleParameter::Increment()
+{
+	uint32 index = Get();
+	Set(index >= m_valueCount ? 0 : index + 1);
+}
+
+// Decrement the parameter index.
+void ParticleParameter::Decrement()
+{
+	uint32 index = Get();
+	Set(index == 0 ? m_valueCount - 1 : index - 1);
 }
 
 // Determine whether the parameter changed and reset the changed flag.
@@ -110,7 +124,7 @@ const ParticleParameter::Value*
 	ParticleParameter::FindParticleParameterValue() const
 {
 	uint32 start = 0;
-	const uint32 index = Get() % m_valueCount;
+	const uint32 index = Get();
 	for (uint32 i = 0; i < m_definitionCount; ++i)
 	{
 		const Definition &definition = m_definition[i];

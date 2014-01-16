@@ -71,9 +71,9 @@ public:
 	void Set(uint32 index);
 
 	// Increment the parameter index.
-	void Increment() { Set(Get() + 1); }
+	void Increment();
 	// Decrement the parameter index.
-	void Decrement() { Set(Get() - 1); }
+	void Decrement();
 
 	// Determine whether the parameter changed, reset the changed flag and
 	// optionally determine whether the current test should be restarted if
