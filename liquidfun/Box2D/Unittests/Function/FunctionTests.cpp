@@ -180,7 +180,7 @@ TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
 	b2Vec2 positionData[particleCount];
 	for (int32 i = 0; i < particleCount; i++)
 	{
-		positionData[i].Set(i, i);
+		positionData[i].Set((float32)i, (float32)i);
 	}
 	b2ParticleGroupDef def;
 	def.particleCount = particleCount;
