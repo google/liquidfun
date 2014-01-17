@@ -153,33 +153,17 @@ A solid particle group prevents other bodies from lodging inside of it. Should
 anything penetrate it, the solid particle group pushes the offending body back
 out to its surface.
 
-You cannot define a particle group as only solid. It must have one of four
-other behaviors, as well: it must either be combined with the rigid-group
-behavior, or with the wall, spring, or elastic particle behavior.
-
-To define a group combining solid- and rigid-group behaviors, use a single
-statement. For example:
-
-&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup;`
-
-To define a group combining solid-group behavior with a given particle
-behavior, use two statements. For example:
-
-&nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`<br/>
-&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`<br/>
-
-A solid particle group possesses especially strong repulsive force. It is
+A solid particle group also possesses an especially strong repulsive force. It 
+is
 useful, for example, in a case where:
 
 * Something should be expected to bounce with unusual vigor
 ** As when a racquetball strikes the wall of a court
 
 Use the `b2_SolidParticleGroup` flag of the `b2ParticleGroupFlag` enum to
-specify a solid particle group. In many cases, a group will be defined as not
-only solid, but with additional behaviors, as well. For example, solid and
-elastic
+specify a solid particle group. For example:
 
-
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`
 
 ###Rigid
 
@@ -212,6 +196,9 @@ bodies.<br/>
 Set particle behavior as elastic using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`
+
+The green circle and the blue box in the "Elastic Particles" demo of the 
+Testbed application comprise elastic particles.
 
 ### Color-mixing
 
@@ -248,6 +235,8 @@ system uses the absolute value of that number. When it results in a value over
 Set particle behavior as color-mixing using the statement<br/>
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_colorMixingParticle;`
 
+The "Surface Tension" demo of the Testbed application uses color-mixing 
+particles.
 
 ### Powder
 
@@ -257,6 +246,8 @@ dust.<br/>
 Set particle behavior as powder using the statement<br/>
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_powderParticle;`
+
+The "Sparky" demo of the Testbed application uses powder particles.
 
 ### Spring
 
@@ -271,6 +262,9 @@ Set spring behavior using the statement<br/>
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_springParticle;`
 
+The red circle in the "Elastic Particles" demo of the Testbed application 
+comprises spring particles.
+
 ### Tensile
 
 Tensile particles are used to produce the effect of surface tension, or the
@@ -284,12 +278,16 @@ Set tensile behavior using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_tensileParticle;`
 
+The "Surface Tension" demo of the Testbed application uses tensile particles.
+
 ### Viscous
 
 Viscous particles exhibit clinginess or stickiness, like oil.<br/>
 Set viscous behavior using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_viscousParticle;`
+
+The "Liquid Timer" demo of the Testbed application uses viscous particles.
 
 ### Wall
 
@@ -322,13 +320,23 @@ m_world->CreateParticleGroup(pd);`<br/>
 `b2_zombieParticle;`<br/>
 &nbsp;&nbsp;&nbsp;`}`
 
-<a name="pp">
+Note that you can assign multiple behaviors to a group or particle. Use
+the | ("bitwise OR") operator to chain behavior flags. For example, for a group:
 
-Note that you can assign multiple behaviors to a particle or group. Use
-the | ("bitwise OR") operator to chain behavior flags. For example:
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup | 
+b2_rigidParticleGroup;`
+
+And for particles:
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle | b2_viscousParticle;`
 
+To define a group combining a specific group behavior with a specific particle
+behavior, use two statements. For example:
+
+&nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`<br/>
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`<br/>
+
+<a name="pp">
 ## Particle Properties
 
 ### Color
