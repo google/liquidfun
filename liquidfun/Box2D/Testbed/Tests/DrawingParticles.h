@@ -23,9 +23,9 @@ class DrawingParticles : public Test
 private:
 	// Set bit 31 to distiguish these values from particle flags.
 	enum Parameters {
-		e_parameterBegin = (1 << 31), // Start of this parameter namespace.
-		e_parameterMove = e_parameterBegin | (1 << 0),
-		e_parameterRigid = e_parameterBegin | (1 << 1),
+		e_parameterBegin = (1UL << 31), // Start of this parameter namespace.
+		e_parameterMove = e_parameterBegin | (1UL << 0),
+		e_parameterRigid = e_parameterBegin | (1UL << 1),
 	};
 
 public:
