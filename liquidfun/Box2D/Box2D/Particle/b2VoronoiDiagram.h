@@ -88,6 +88,7 @@ private:
 
 	b2StackAllocator *m_allocator;
 	Generator* m_generatorBuffer;
+	int32 m_generatorCapacity;
 	int32 m_generatorCount;
 	int32 m_countX, m_countY;
 	Generator** m_diagram;

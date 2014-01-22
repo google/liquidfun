@@ -30,37 +30,42 @@ public:
 	{
 		m_allocator = allocator;
 		m_buffer = (T*) m_allocator->Allocate(sizeof(T) * capacity);
-		m_front = m_buffer;
-		m_back = m_buffer;
-		m_end = m_buffer + capacity;
+		m_front = 0;
+		m_back = 0;
+		m_capacity = capacity;
 	}
 
 	~b2StackQueue()
 	{
 		m_allocator->Free(m_buffer);
-		m_buffer = NULL;
-		m_front = NULL;
-		m_back = NULL;
-		m_end = NULL;
 	}
 
 	void Push(const T &item)
 	{
-		if (m_back >= m_end)
+		if (m_back >= m_capacity)
 		{
-			ptrdiff_t diff = m_front - m_buffer;
-			for (T *it = m_front; it < m_back; ++it)
+			for (int32 i = m_front; i < m_back; i++)
 			{
-				*(it - diff) = *it;
+				m_buffer[i - m_front] = m_buffer[i];
 			}
-			m_front -= diff;
-			m_back -= diff;
-			if (m_back >= m_end)
+			m_back -= m_front;
+			m_front = 0;
+			if (m_back >= m_capacity)
 			{
-				return;
+				if (m_capacity > 0)
+				{
+					m_capacity *= 2;
+				}
+				else
+				{
+					m_capacity = 1;
+				}
+				m_buffer = (T*) m_allocator->Reallocate(m_buffer,
+														sizeof(T) * m_capacity);
 			}
 		}
-		*m_back++ = item;
+		m_buffer[m_back] = item;
+		m_back++;
 	}
 
 	void Pop()
@@ -71,21 +76,22 @@ public:
 
 	bool Empty() const
 	{
-		return m_front >= m_back;
+		b2Assert(m_front <= m_back);
+		return m_front == m_back;
 	}
 
 	const T &Front() const
 	{
-		return *m_front;
+		return m_buffer[m_front];
 	}
 
 private:
 
 	b2StackAllocator *m_allocator;
 	T* m_buffer;
-	T* m_front;
-	T* m_back;
-	T* m_end;
+	int32 m_front;
+	int32 m_back;
+	int32 m_capacity;
 
 };
 

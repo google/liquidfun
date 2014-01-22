@@ -41,6 +41,7 @@ public:
 	~b2StackAllocator();
 
 	void* Allocate(int32 size);
+	void* Reallocate(void* p, int32 size);
 	void Free(void* p);
 
 	int32 GetMaxAllocation() const;

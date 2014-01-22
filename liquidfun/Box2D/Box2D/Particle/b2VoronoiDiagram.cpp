@@ -26,6 +26,7 @@ b2VoronoiDiagram::b2VoronoiDiagram(
 	m_generatorBuffer =
 		(Generator*) allocator->Allocate(
 			sizeof(Generator) * generatorCapacity);
+	m_generatorCapacity = generatorCapacity;
 	m_generatorCount = 0;
 	m_countX = 0;
 	m_countY = 0;
@@ -43,6 +44,7 @@ b2VoronoiDiagram::~b2VoronoiDiagram()
 
 void b2VoronoiDiagram::AddGenerator(const b2Vec2& center, int32 tag)
 {
+	b2Assert(m_generatorCount < m_generatorCapacity);
 	Generator& g = m_generatorBuffer[m_generatorCount++];
 	g.center = center;
 	g.tag = tag;
@@ -68,8 +70,10 @@ void b2VoronoiDiagram::Generate(float32 radius)
 	{
 		m_diagram[i] = NULL;
 	}
+	// (4 * m_countX * m_countY) is the queue capacity that is experimentally
+	// known to be necessary and sufficient for general particle distributions.
 	b2StackQueue<b2VoronoiDiagramTask> queue(
-		m_allocator, 4 * m_countX * m_countX);
+		m_allocator, 4 * m_countX * m_countY);
 	for (int32 k = 0; k < m_generatorCount; k++)
 	{
 		Generator& g = m_generatorBuffer[k];
@@ -106,84 +110,72 @@ void b2VoronoiDiagram::Generate(float32 radius)
 			}
 		}
 	}
-	int32 maxIteration = m_countX + m_countY;
-	for (int32 iteration = 0; iteration < maxIteration; iteration++)
+	for (int32 y = 0; y < m_countY; y++)
 	{
-		for (int32 y = 0; y < m_countY; y++)
+		for (int32 x = 0; x < m_countX - 1; x++)
 		{
-			for (int32 x = 0; x < m_countX - 1; x++)
-			{
-				int32 i = x + y * m_countX;
-				Generator* a = m_diagram[i];
-				Generator* b = m_diagram[i + 1];
-				if (a != b)
-				{
-					queue.Push(b2VoronoiDiagramTask(x, y, i, b));
-					queue.Push(b2VoronoiDiagramTask(x + 1, y, i + 1, a));
-				}
-			}
-		}
-		for (int32 y = 0; y < m_countY - 1; y++)
-		{
-			for (int32 x = 0; x < m_countX; x++)
-			{
-				int32 i = x + y * m_countX;
-				Generator* a = m_diagram[i];
-				Generator* b = m_diagram[i + m_countX];
-				if (a != b)
-				{
-					queue.Push(b2VoronoiDiagramTask(x, y, i, b));
-					queue.Push(b2VoronoiDiagramTask(x, y + 1,
-													i + m_countX, a));
-				}
-			}
-		}
-		bool updated = false;
-		while (!queue.Empty())
-		{
-			int32 x = queue.Front().m_x;
-			int32 y = queue.Front().m_y;
-			int32 i = queue.Front().m_i;
-			Generator* k = queue.Front().m_generator;
-			queue.Pop();
+			int32 i = x + y * m_countX;
 			Generator* a = m_diagram[i];
-			Generator* b = k;
+			Generator* b = m_diagram[i + 1];
 			if (a != b)
 			{
-				float32 ax = a->center.x - x;
-				float32 ay = a->center.y - y;
-				float32 bx = b->center.x - x;
-				float32 by = b->center.y - y;
-				float32 a2 = ax * ax + ay * ay;
-				float32 b2 = bx * bx + by * by;
-				if (a2 > b2)
-				{
-					m_diagram[i] = b;
-					if (x > 0)
-					{
-						queue.Push(b2VoronoiDiagramTask(x - 1, y, i - 1, b));
-					}
-					if (y > 0)
-					{
-						queue.Push(b2VoronoiDiagramTask(x, y - 1,
-														i - m_countX, b));
-					}
-					if (x < m_countX - 1)
-					{
-						queue.Push(b2VoronoiDiagramTask(x + 1, y, i + 1, b));
-					}
-					if (y < m_countY - 1)
-					{
-						queue.Push(b2VoronoiDiagramTask(x, y + 1,
-														i + m_countX, b));
-					}
-					updated = true;
-				}
+				queue.Push(b2VoronoiDiagramTask(x, y, i, b));
+				queue.Push(b2VoronoiDiagramTask(x + 1, y, i + 1, a));
 			}
 		}
-		if (!updated)
+	}
+	for (int32 y = 0; y < m_countY - 1; y++)
+	{
+		for (int32 x = 0; x < m_countX; x++)
 		{
-			break;
+			int32 i = x + y * m_countX;
+			Generator* a = m_diagram[i];
+			Generator* b = m_diagram[i + m_countX];
+			if (a != b)
+			{
+				queue.Push(b2VoronoiDiagramTask(x, y, i, b));
+				queue.Push(b2VoronoiDiagramTask(x, y + 1, i + m_countX, a));
+			}
+		}
+	}
+	while (!queue.Empty())
+	{
+		const b2VoronoiDiagramTask& task = queue.Front();
+		int32 x = task.m_x;
+		int32 y = task.m_y;
+		int32 i = task.m_i;
+		Generator* k = task.m_generator;
+		queue.Pop();
+		Generator* a = m_diagram[i];
+		Generator* b = k;
+		if (a != b)
+		{
+			float32 ax = a->center.x - x;
+			float32 ay = a->center.y - y;
+			float32 bx = b->center.x - x;
+			float32 by = b->center.y - y;
+			float32 a2 = ax * ax + ay * ay;
+			float32 b2 = bx * bx + by * by;
+			if (a2 > b2)
+			{
+				m_diagram[i] = b;
+				if (x > 0)
+				{
+					queue.Push(b2VoronoiDiagramTask(x - 1, y, i - 1, b));
+				}
+				if (y > 0)
+				{
+					queue.Push(b2VoronoiDiagramTask(x, y - 1, i - m_countX, b));
+				}
+				if (x < m_countX - 1)
+				{
+					queue.Push(b2VoronoiDiagramTask(x + 1, y, i + 1, b));
+				}
+				if (y < m_countY - 1)
+				{
+					queue.Push(b2VoronoiDiagramTask(x, y + 1, i + m_countX, b));
+				}
+			}
 		}
 	}
 }
