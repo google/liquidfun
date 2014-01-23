@@ -26,6 +26,9 @@ private:
 		e_parameterBegin = (1UL << 31), // Start of this parameter namespace.
 		e_parameterMove = e_parameterBegin | (1UL << 0),
 		e_parameterRigid = e_parameterBegin | (1UL << 1),
+		e_parameterRigidBarrier = e_parameterBegin | (1UL << 2),
+		e_parameterElasticBarrier = e_parameterBegin | (1UL << 3),
+		e_parameterSpringBarrier = e_parameterBegin | (1UL << 4),
 	};
 
 public:
@@ -105,6 +108,19 @@ public:
 			{
 				return e_parameterRigid;
 			}
+			if (m_groupFlags == b2_rigidParticleGroup &&
+				m_particleFlags == b2_barrierParticle)
+			{
+				return e_parameterRigidBarrier;
+			}
+			if (m_particleFlags == (b2_elasticParticle | b2_barrierParticle))
+			{
+				return e_parameterElasticBarrier;
+			}
+			if (m_particleFlags == (b2_springParticle | b2_barrierParticle))
+			{
+				return e_parameterSpringBarrier;
+			}
 			return m_particleFlags;
 		}
 		return e_parameterMove;
@@ -143,6 +159,18 @@ public:
 			break;
 		case 'B':
 			m_particleFlags = b2_barrierParticle | b2_wallParticle;
+			break;
+		case 'H':
+			m_particleFlags = b2_barrierParticle;
+			m_groupFlags = b2_rigidParticleGroup;
+			break;
+		case 'N':
+			m_particleFlags = b2_barrierParticle | b2_elasticParticle;
+			m_groupFlags = b2_solidParticleGroup;
+			break;
+		case 'M':
+			m_particleFlags = b2_barrierParticle | b2_springParticle;
+			m_groupFlags = b2_solidParticleGroup;
 			break;
 		case 'C':
 			m_particleFlags = b2_colorMixingParticle;
@@ -228,6 +256,18 @@ public:
 					m_groupFlags = b2_rigidParticleGroup |
 					               b2_solidParticleGroup;
 					break;
+				case e_parameterRigidBarrier:
+					m_particleFlags = b2_barrierParticle;
+					m_groupFlags = b2_rigidParticleGroup;
+					break;
+				case e_parameterElasticBarrier:
+					m_particleFlags = b2_barrierParticle | b2_elasticParticle;
+					m_groupFlags = 0;
+					break;
+				case e_parameterSpringBarrier:
+					m_particleFlags = b2_barrierParticle | b2_springParticle;
+					m_groupFlags = 0;
+					break;
 				default:
 					m_particleFlags = parameterValue;
 					m_groupFlags = 0;
@@ -243,10 +283,13 @@ public:
 			5, m_textLine, "(R) rigid, (W) wall, (V) viscous, (T) tensile");
 		m_textLine += DRAW_STRING_NEW_LINE;
 		m_debugDraw.DrawString(
-			5, m_textLine, "(C) color mixing, (B) barrier, (Z) erase");
+			5, m_textLine, "(B) wall barrier, (H) rigid barrier");
 		m_textLine += DRAW_STRING_NEW_LINE;
 		m_debugDraw.DrawString(
-			5, m_textLine, "(X) move");
+			5, m_textLine, "(N) elastic barrier, (M) spring barrier");
+		m_textLine += DRAW_STRING_NEW_LINE;
+		m_debugDraw.DrawString(
+			5, m_textLine, "(C) color mixing, (Z) erase, (X) move");
 		m_textLine += DRAW_STRING_NEW_LINE;
 	}
 
@@ -271,6 +314,9 @@ const ParticleParameter::Value DrawingParticles::k_paramValues[] =
 	{b2_zombieParticle, "erase"},
 	{e_parameterMove, "move"},
 	{e_parameterRigid, "rigid"},
+	{e_parameterRigidBarrier, "rigid barrier"},
+	{e_parameterElasticBarrier, "elastic barrier"},
+	{e_parameterSpringBarrier, "spring barrier"},
 };
 
 const ParticleParameter::Definition DrawingParticles::k_paramDef[] =
@@ -286,6 +332,5 @@ const ParticleParameter::Definition DrawingParticles::k_paramDef[] =
 };
 const uint32 DrawingParticles::k_paramDefCount =
 	B2_ARRAY_SIZE(DrawingParticles::k_paramDef);
-
 
 #endif

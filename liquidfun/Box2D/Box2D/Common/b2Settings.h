@@ -161,6 +161,9 @@ typedef unsigned long long uint64;
 /// The initial size of particle data buffers.
 #define b2_minParticleBufferCapacity	256
 
+/// The time into the future that collisions against barrier particles will be detected.
+#define b2_barrierCollisionTime 2.5f
+
 // Sleep
 
 /// The time that a body must be still before it will go to sleep.
