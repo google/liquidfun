@@ -54,7 +54,9 @@ b2ParticleSystem::b2ParticleSystem()
 
 	m_timestamp = 0;
 	m_allParticleFlags = 0;
+	m_needsUpdateAllParticleFlags = false;
 	m_allGroupFlags = 0;
+	m_needsUpdateAllGroupFlags = false;
 	m_iterationIndex = 0;
 
 	m_density = 1;
@@ -197,7 +199,7 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 		return b2_invalidParticleIndex;
 	}
 	int32 index = m_count++;
-	m_flagsBuffer.data[index] = def.flags;
+	m_flagsBuffer.data[index] = 0;
 	m_positionBuffer.data[index] = def.position;
 	m_velocityBuffer.data[index] = def.velocity;
 	m_weightBuffer[index] = 0;
@@ -228,6 +230,7 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 		m_proxyCapacity = newCapacity;
 	}
 	m_proxyBuffer[m_proxyCount++].index = index;
+	SetParticleFlags(index, def.flags);
 	return index;
 }
 
@@ -239,7 +242,7 @@ void b2ParticleSystem::DestroyParticle(
 	{
 		flags |= b2_destructionListener;
 	}
-	m_flagsBuffer.data[index] |= flags;
+	SetParticleFlags(index, m_flagsBuffer.data[index] | flags);
 }
 
 int32 b2ParticleSystem::DestroyParticlesInShape(
@@ -415,7 +418,6 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 	group->m_system = this;
 	group->m_firstIndex = firstIndex;
 	group->m_lastIndex = lastIndex;
-	group->m_groupFlags = groupDef.groupFlags;
 	group->m_strength = groupDef.strength;
 	group->m_userData = groupDef.userData;
 	group->m_transform = transform;
@@ -431,6 +433,7 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 	{
 		m_groupBuffer[i] = group;
 	}
+	SetParticleGroupFlags(group, groupDef.groupFlags);
 
 	UpdateContacts(true);
 	if (groupDef.flags & k_pairFlags)
@@ -476,10 +479,6 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 		callback.def = &groupDef;
 		callback.firstIndex = firstIndex;
 		diagram.GetNodes(callback);
-	}
-	if (groupDef.groupFlags & b2_solidParticleGroup)
-	{
-		group->m_groupFlags |= b2_particleGroupNeedsUpdateDepth;
 	}
 
 	return group;
@@ -594,15 +593,10 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 		m_groupBuffer[i] = groupA;
 	}
 	uint32 groupFlags = groupA->m_groupFlags | groupB->m_groupFlags;
-	groupA->m_groupFlags = groupFlags;
+	SetParticleGroupFlags(groupA, groupFlags);
 	groupA->m_lastIndex = groupB->m_lastIndex;
 	groupB->m_firstIndex = groupB->m_lastIndex;
 	DestroyParticleGroup(groupB);
-
-	if (groupFlags & b2_solidParticleGroup)
-	{
-		groupA->m_groupFlags |= b2_particleGroupNeedsUpdateDepth;
-	}
 }
 
 void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b, int32 c) const
@@ -689,6 +683,7 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 	--m_groupCount;
 	group->~b2ParticleGroup();
 	m_world->m_blockAllocator.Free(group, sizeof(b2ParticleGroup));
+	m_needsUpdateAllGroupFlags = true;
 }
 
 void b2ParticleSystem::ComputeWeight()
@@ -740,14 +735,15 @@ void b2ParticleSystem::ComputeDepth()
 		if (group->m_groupFlags & b2_particleGroupNeedsUpdateDepth)
 		{
 			groupsToUpdate[groupsToUpdateCount++] = group;
-			group->m_groupFlags &= ~b2_particleGroupNeedsUpdateDepth;
+			SetParticleGroupFlags(
+				group, group->m_groupFlags & ~b2_particleGroupNeedsUpdateDepth);
 			for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 			{
 				m_accumulationBuffer[i] = 0;
 			}
 		}
 	}
-	m_depthBuffer = RequestParticleBuffer(m_depthBuffer);
+	b2Assert(m_depthBuffer);
 	for (int32 i = 0; i < groupsToUpdateCount; i++)
 	{
 		const b2ParticleGroup* group = groupsToUpdate[i];
@@ -1167,19 +1163,17 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	{
 		return;
 	}
-	m_allParticleFlags = 0;
-	for (int32 i = 0; i < m_count; i++)
-	{
-		m_allParticleFlags |= m_flagsBuffer.data[i];
-	}
 	if (m_allParticleFlags & b2_zombieParticle)
 	{
 		SolveZombie();
 	}
-	m_allGroupFlags = 0;
-	for (const b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
+	if (m_needsUpdateAllParticleFlags)
 	{
-		m_allGroupFlags |= group->m_groupFlags;
+		UpdateAllParticleFlags();
+	}
+	if (m_needsUpdateAllGroupFlags)
+	{
+		UpdateAllGroupFlags();
 	}
 	for (m_iterationIndex = 0;
 		m_iterationIndex < step.particleIterations;
@@ -1256,6 +1250,26 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 			m_positionBuffer.data[i] += subStep.dt * m_velocityBuffer.data[i];
 		}
 	}
+}
+
+void b2ParticleSystem::UpdateAllParticleFlags()
+{
+	m_allParticleFlags = 0;
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_allParticleFlags |= m_flagsBuffer.data[i];
+	}
+	m_needsUpdateAllParticleFlags = false;
+}
+
+void b2ParticleSystem::UpdateAllGroupFlags()
+{
+	m_allGroupFlags = 0;
+	for (const b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
+	{
+		m_allGroupFlags |= group->m_groupFlags;
+	}
+	m_needsUpdateAllGroupFlags = false;
 }
 
 void b2ParticleSystem::LimitVelocity(const b2TimeStep& step)
@@ -1560,7 +1574,7 @@ void b2ParticleSystem::SolveSpring(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 {
-	m_accumulation2Buffer = RequestParticleBuffer(m_accumulation2Buffer);
+	b2Assert(m_accumulation2Buffer);
 	for (int32 i = 0; i < m_count; i++)
 	{
 		m_accumulation2Buffer[i] = b2Vec2_zero;
@@ -1679,7 +1693,7 @@ void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 {
 	// applies extra repulsive force from solid particle groups
-	m_depthBuffer = RequestParticleBuffer(m_depthBuffer);
+	b2Assert(m_depthBuffer);
 	float32 ejectionStrength = step.inv_dt * m_ejectionStrength;
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
@@ -1701,7 +1715,7 @@ void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 void b2ParticleSystem::SolveColorMixing(const b2TimeStep& step)
 {
 	// mixes color between contacting particles
-	m_colorBuffer.data = RequestParticleBuffer(m_colorBuffer.data);
+	b2Assert(m_colorBuffer.data);
 	const int32 colorMixing128 = (int32) (128 * m_colorMixingStrength);
 	if (colorMixing128) {
 		for (int32 k = 0; k < m_contactCount; k++)
@@ -1727,6 +1741,7 @@ void b2ParticleSystem::SolveZombie()
 	// removes particles with zombie flag
 	int32 newCount = 0;
 	int32* newIndices = (int32*) m_world->m_stackAllocator.Allocate(sizeof(int32) * m_count);
+	uint32 allParticleFlags = 0;
 	for (int32 i = 0; i < m_count; i++)
 	{
 		int32 flags = m_flagsBuffer.data[i];
@@ -1768,6 +1783,7 @@ void b2ParticleSystem::SolveZombie()
 				}
 			}
 			newCount++;
+			allParticleFlags |= flags;
 		}
 	}
 
@@ -1878,7 +1894,8 @@ void b2ParticleSystem::SolveZombie()
 			{
 				if (group->m_groupFlags & b2_solidParticleGroup)
 				{
-					group->m_groupFlags |= b2_particleGroupNeedsUpdateDepth;
+					SetParticleGroupFlags(group,
+						group->m_groupFlags | b2_particleGroupNeedsUpdateDepth);
 				}
 				// TODO: flag to split if needed
 			}
@@ -1889,7 +1906,8 @@ void b2ParticleSystem::SolveZombie()
 			group->m_lastIndex = 0;
 			if (!(group->m_groupFlags & b2_particleGroupCanBeEmpty))
 			{
-				group->m_groupFlags |= b2_particleGroupWillBeDestroyed;
+				SetParticleGroupFlags(group,
+					group->m_groupFlags | b2_particleGroupWillBeDestroyed);
 			}
 		}
 	}
@@ -1897,6 +1915,8 @@ void b2ParticleSystem::SolveZombie()
 	// update particle count
 	m_count = newCount;
 	m_world->m_stackAllocator.Free(newIndices);
+	m_allParticleFlags = allParticleFlags;
+	m_needsUpdateAllParticleFlags = false;
 
 	// destroy bodies with no particles
 	for (b2ParticleGroup* group = m_groupList; group;)
@@ -2098,11 +2118,6 @@ float32 b2ParticleSystem::GetParticleInvMass() const
 	return 1.777777f * m_inverseDensity * m_inverseDiameter * m_inverseDiameter;
 }
 
-uint32* b2ParticleSystem::GetParticleFlagsBuffer()
-{
-	return m_flagsBuffer.data;
-}
-
 b2Vec2* b2ParticleSystem::GetParticlePositionBuffer()
 {
 	return m_positionBuffer.data;
@@ -2204,6 +2219,56 @@ b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer()
 void b2ParticleSystem::SetParticleUserDataBuffer(void** buffer, int32 capacity)
 {
 	SetParticleBuffer(&m_userDataBuffer, buffer, capacity);
+}
+
+void b2ParticleSystem::SetParticleFlags(int32 index, uint32 newFlags)
+{
+	uint32* oldFlags = &m_flagsBuffer.data[index];
+	if (*oldFlags & ~newFlags)
+	{
+		// If any flags might be removed
+		m_needsUpdateAllParticleFlags = true;
+	}
+	if (~m_allParticleFlags & newFlags)
+	{
+		// If any flags were added
+		if (newFlags & b2_tensileParticle)
+		{
+			m_accumulation2Buffer = RequestParticleBuffer(m_accumulation2Buffer);
+		}
+		if (newFlags & b2_colorMixingParticle)
+		{
+			m_colorBuffer.data = RequestParticleBuffer(m_colorBuffer.data);
+		}
+		m_allParticleFlags |= newFlags;
+	}
+	*oldFlags = newFlags;
+}
+
+void b2ParticleSystem::SetParticleGroupFlags(
+	b2ParticleGroup* group, uint32 newFlags)
+{
+	uint32* oldFlags = &group->m_groupFlags;
+	if ((*oldFlags ^ newFlags) & b2_solidParticleGroup)
+	{
+		// If the b2_solidParticleGroup flag changed schedule depth update.
+		newFlags |= b2_particleGroupNeedsUpdateDepth;
+	}
+	if (*oldFlags & ~newFlags)
+	{
+		// If any flags might be removed
+		m_needsUpdateAllGroupFlags = true;
+	}
+	if (~m_allGroupFlags & newFlags)
+	{
+		// If any flags were added
+		if (newFlags & b2_solidParticleGroup)
+		{
+			m_depthBuffer = RequestParticleBuffer(m_depthBuffer);
+		}
+		m_allGroupFlags |= newFlags;
+	}
+	*oldFlags = newFlags;
 }
 
 void b2ParticleSystem::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const

@@ -190,6 +190,8 @@ private:
 	void DestroyParticleGroup(b2ParticleGroup* group);
 	void ComputeDepth();
 
+	void UpdateAllParticleFlags();
+	void UpdateAllGroupFlags();
 	void AddContact(int32 a, int32 b);
 	void UpdateContacts(bool exceptZombie);
 	void UpdateBodyContacts();
@@ -238,7 +240,7 @@ private:
 	int32 GetParticleCount() const;
 	int32 GetParticleMaxCount() const;
 	void SetParticleMaxCount(int32 count);
-	uint32* GetParticleFlagsBuffer();
+
 	b2Vec2* GetParticlePositionBuffer();
 	b2Vec2* GetParticleVelocityBuffer();
 	b2ParticleColor* GetParticleColorBuffer();
@@ -250,6 +252,7 @@ private:
 	const b2ParticleGroup* const* GetParticleGroupBuffer() const;
 	void* const* GetParticleUserDataBuffer() const;
 	template <typename T> void SetParticleBuffer(ParticleBuffer<T>* buffer, T* newBufferData, int32 newCapacity);
+
 	void SetParticleFlagsBuffer(uint32* buffer, int32 capacity);
 	void SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity);
 	void SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity);
@@ -257,13 +260,18 @@ private:
 	b2ParticleGroup* const* GetParticleGroupBuffer();
 	void SetParticleUserDataBuffer(void** buffer, int32 capacity);
 
+	void SetParticleFlags(int32 index, uint32 flags);
+	void SetParticleGroupFlags(b2ParticleGroup* group, uint32 flags);
+
 	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
 	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b2Vec2& point2) const;
 	float32 ComputeParticleCollisionEnergy() const;
 
 	int32 m_timestamp;
 	int32 m_allParticleFlags;
+	bool m_needsUpdateAllParticleFlags;
 	int32 m_allGroupFlags;
+	bool m_needsUpdateAllGroupFlags;
 	int32 m_iterationIndex;
 	float32 m_density;
 	float32 m_inverseDensity;

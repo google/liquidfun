@@ -370,7 +370,6 @@ public:
 
 	/// Get the particle data.
 	/// @return the pointer to the head of the particle data.
-	uint32* GetParticleFlagsBuffer();
 	b2Vec2* GetParticlePositionBuffer();
 	b2Vec2* GetParticleVelocityBuffer();
 	b2ParticleColor* GetParticleColorBuffer();
@@ -382,6 +381,9 @@ public:
 	const b2ParticleColor* GetParticleColorBuffer() const;
 	const b2ParticleGroup* const* GetParticleGroupBuffer() const;
 	void* const* GetParticleUserDataBuffer() const;
+
+	/// Set flags for a particle.
+	void SetParticleFlags(int32 index, uint32 flags);
 
 	/// Set a buffer for particle data.
 	/// @param buffer is a pointer to a block of memory.

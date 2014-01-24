@@ -1512,11 +1512,6 @@ void b2World::DestroyParticlesInGroup(b2ParticleGroup* group, bool callDestructi
 	m_particleSystem.DestroyParticlesInGroup(group, callDestructionListener);
 }
 
-uint32* b2World::GetParticleFlagsBuffer()
-{
-	return m_particleSystem.GetParticleFlagsBuffer();
-}
-
 b2Vec2* b2World::GetParticlePositionBuffer()
 {
 	return m_particleSystem.GetParticlePositionBuffer();
@@ -1565,6 +1560,11 @@ const b2ParticleGroup* const* b2World::GetParticleGroupBuffer() const
 void* const* b2World::GetParticleUserDataBuffer() const
 {
 	return m_particleSystem.GetParticleUserDataBuffer();
+}
+
+void b2World::SetParticleFlags(int32 index, uint32 flags)
+{
+	m_particleSystem.SetParticleFlags(index, flags);
 }
 
 void b2World::SetParticleFlagsBuffer(uint32* buffer, int32 capacity)

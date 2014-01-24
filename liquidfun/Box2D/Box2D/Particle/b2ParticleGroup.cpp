@@ -58,12 +58,8 @@ int32 b2ParticleGroup::GetGroupFlags() const
 void b2ParticleGroup::SetGroupFlags(int32 flags)
 {
 	b2Assert((flags & b2_particleGroupInternalMask) == 0);
-	if ((flags ^ m_groupFlags) & b2_solidParticleGroup)
-	{
-		// If the b2_solidParticleGroup flag changed schedule depth update.
-		m_groupFlags |= b2_particleGroupNeedsUpdateDepth;
-	}
-	m_groupFlags = flags | (m_groupFlags & ~b2_particleGroupInternalMask);
+	flags |= m_groupFlags & ~b2_particleGroupInternalMask;
+	m_system->SetParticleGroupFlags(this, flags);
 }
 
 float32 b2ParticleGroup::GetMass() const
