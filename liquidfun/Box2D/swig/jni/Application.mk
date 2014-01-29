@@ -1,5 +1,4 @@
-#!/bin/bash -eu
-# Copyright (c) 2014 Google, Inc.
+# Copyright (c) 2013 Google, Inc.
 #
 # This software is provided 'as-is', without any express or implied
 # warranty.  In no event will the authors be held liable for any damages
@@ -15,9 +14,10 @@
 # misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# Bash wrapper around build_android.bat to enable command line builds from
-# Cygwin  without having to translate from Cygwin to Windows native paths.
-
-declare -r script_directory="$(cd "$(dirname "$0")"; pwd)"
-PATH_ARGS="-o -v -p" EXECUTABLE=${script_directory}/build_android.bat \
-  "${script_directory}/build_windows.sh" "$@"
+APP_PLATFORM:=android-10
+APP_ABI:=armeabi-v7a
+APP_STL:=stlport_static
+NDK_MODULE_PATH+=$(abspath $(NDK_PROJECT_PATH)/../../)
+APP_MODULES:=libliquidfun_jni
+APP_CFLAGS+=-Wall -Werror -Wno-long-long -Wno-variadic-macros \
+            -Wno-strict-aliasing

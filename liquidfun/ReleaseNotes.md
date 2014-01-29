@@ -75,6 +75,8 @@ TODO describe the cool new stuff we have in this release TODO
     of particle velocities.
 *   Added "Fracker" test to demonstrate particle viscous fluids and particle
     destruction callbacks.
+*   Added Java Native Interface support via SWIG. It covers a subset of the
+    API.
 
 #### API Modifications
 

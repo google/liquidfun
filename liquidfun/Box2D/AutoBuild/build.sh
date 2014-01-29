@@ -288,7 +288,8 @@ main() {
   fi
 
   # Find the cmake binary.
-  local -r cmake=$(find_cmake)
+  local cmake
+  cmake=$(find_cmake)
 
   # Change into the project's root directory for the cmake build.
   cd "${script_directory}/.."

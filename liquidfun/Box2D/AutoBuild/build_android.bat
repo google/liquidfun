@@ -47,7 +47,7 @@ rem List of projects to build relative to the root dir
 set projects=
 rem The directory this script was executed from.
 set execution_dir=%cd%
-
+rem Get the absolute path of the AOSP root directory.
 set android_root=%script_directory%\..\..\..\..\..\..
 for %%a in (%android_root%) do set android_root=%%~fa
 
@@ -272,12 +272,49 @@ if "%projects%"=="" call :find_projects
 rem Initialize the list of failed builds.
 set failed_build=
 
+rem Search the path for swig.
+set swig_prebuilt=%android_root%\prebuilts\misc\windows\swig\swig.exe
+set swig_bin=
+set swig_lib=
+rem Look for a prebuilt swig in the tree.
+if exist %swig_prebuilt% (
+  set swig_bin=%swig_prebuilt%
+  goto found_swig_prebuilt
+)
+
+echo Searching PATH for swig. >&2
+for /F "delims=;" %%a in ('where swig') do set swig_bin=%%a
+if not "%swig_bin%"=="" (
+  goto found_swig_in_path
+)
+
+echo Unable to find swig on this machine.>&2
+exit /B -1
+
+:found_swig_prebuilt
+set swig_version=
+set swig_temp_file=swig_version_%RANDOM%
+%swig_bin% -version > %swig_temp_file%
+for /F "tokens=3" %%a in ('findstr /C:"SWIG Version" %swig_temp_file%') do (
+  set swig_version=%%a
+)
+del %swig_temp_file%
+set swig_lib=%android_root%\prebuilts\misc\common\swig\include\%swig_version%
+goto find_swig_end
+
+:found_swig_in_path
+for /F %%a in ('%swig_bin% -swiglib') do set swig_lib=%%a
+goto find_swig_end
+:find_swig_end
+
+set ndk_common_args=APP_ABI=%build_abi%
+set ndk_common_args=%ndk_common_args% SWIG_BIN=%swig_bin% SWIG_LIB=%swig_lib%
 for %%a in (%build_configuration%) do (
   echo Building %%a configuration >&2
   rem Configure ndk-build arguments.
   if "%%a"=="debug" set ndk_debug=NDK_DEBUG=1
   if "%%a"=="release" set ndk_debug=
-  set ndk_build_args=!ndk_debug! APP_ABI=%build_abi%
+  set ndk_build_args=!ndk_debug! %ndk_common_args%
 
   rem Build all projects.
   for %%b in (%projects%) do (

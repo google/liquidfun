@@ -21,6 +21,12 @@ declare -r project_name=LiquidFun
 declare -r script_name=$(basename $0)
 declare -r script_directory="$(cd "$(dirname "$0")"; pwd)"
 declare -r project_root="$(cd "${script_directory}/../.."; pwd)"
+declare -r android_root=${script_directory}/../../../../../../
+
+declare -r arch=$(uname -m)
+declare -r os_name=$(uname -s)
+declare -r os_name_lower=$(echo ${os_name} | tr 'A-Z' 'a-z')
+declare -r swig_root=${android_root}/prebuilts/misc
 
 # Set this to "echo" to only display the build commands.
 declare dryrun=
@@ -61,9 +67,39 @@ build_configuration:
   exit 1
 }
 
+# Outputs the swig binary and include dirs with a separator.
+find_swig() {
+  local swig_bin=$(which swig)
+  local swig_lib=""
+  if [[ "${swig_bin}" == "" ]]; then
+    if [[ "${os_name_lower}" == "darwin" ]]; then
+      swig_bin=${swig_root}/darwin-${arch}/swig/swig
+    else
+      swig_bin=${swig_root}/${os_name_lower}-x86_64/swig/swig
+    fi
+    swig_lib=${swig_root}/common/swig/include/
+    swig_lib+=$(${swig_bin} -version | awk '/SWIG Version/ { print $3 }')
+  fi
+  if [[ ! -e "${swig_bin}" ]]; then
+    echo "swig not found ${swig_bin}." >&2
+    exit 1
+  fi
+  # If no libs are set, we set to the default
+  if [[ "${swig_lib}" == "" ]]; then
+    swig_lib=$("${swig_bin}" -swiglib)
+  fi
+  echo "${swig_bin}:${swig_lib}"
+}
+
 # Build the project in the current working directory.
 build_apk() {
-  ${project_root}/Box2D/AndroidUtil/build_apk.sh DEPLOY=0 LAUNCH=0 "$@"
+  # Find the swig binary.
+  local swig
+  swig=$(find_swig)
+  local -r swig_bin=${swig/:*/}
+  local -r swig_lib=${swig/*:/}
+  ${dryrun} ${project_root}/Box2D/AndroidUtil/build_apk.sh DEPLOY=0 LAUNCH=0 \
+    "$@" "SWIG_BIN=${swig_bin}" "SWIG_LIB=${swig_lib}"
 }
 
 # Find all projects to build relative to ${project_root}.
@@ -159,7 +195,7 @@ main() {
         # can execute to 1.
         for target_dir in ${projects_to_build}; do
           pushd "${target_dir}" >/dev/null
-          ${dryrun} build_apk clean ${ndk_debug} ${ndk_verbose} \
+          build_apk clean ${ndk_debug} ${ndk_verbose} \
                                     APP_ABI=${build_abi} -j1
           popd >/dev/null
         done
@@ -169,7 +205,7 @@ main() {
       for target_dir in ${projects_to_build}; do
         pushd "${target_dir}" >/dev/null
         echo "Building ${target_dir}..." >&2
-        if ! ${dryrun} build_apk ${ndk_debug} ${ndk_verbose} \
+        if ! build_apk ${ndk_debug} ${ndk_verbose} \
                                  APP_ABI=${build_abi}; then
           failed_builds="${failed_builds} ${target_dir}"
           build_failed=1

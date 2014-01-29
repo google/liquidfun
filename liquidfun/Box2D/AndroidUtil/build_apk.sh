@@ -22,6 +22,7 @@ declare -r script_directory=$(dirname $0)
 declare -r android_root=${script_directory}/../../../../../../
 declare -r script_name=$(basename $0)
 declare -r android_manifest=AndroidManifest.xml
+declare -r os_name=$(uname -s)
 
 # Minimum Android target version supported by this project.
 : ${BUILDAPK_ANDROID_TARGET_MINVERSION:=10}
@@ -40,7 +41,7 @@ connected device.
 
 Usage: ${script_name} \\
          [ADB_DEVICE=serial_number] [BUILD=0] [DEPLOY=0] [RUN_DEBUGGER=1] \
-         [LAUNCH=0] [ndk-build arguments ...]
+         [LAUNCH=0] [SWIG_BIN=swig_binary_directory] [SWIG_LIB=swig_include_directory] [ndk-build arguments ...]
 
 ADB_DEVICE=serial_number:
   serial_number specifies the device to deploy the built apk to if multiple
@@ -55,6 +56,13 @@ RUN_DEBUGGER=1:
   debug apk.
 LAUNCH=0:
   Disable the launch of the apk on the Android device.
+SWIG_BIN=swig_binary_directory:
+  The directory where the SWIG binary lives. No need to set this if SWIG is
+  installed and point to from your PATH variable.
+SWIG_LIB=swig_include_directory:
+  The directory where SWIG shared include files are, usually obtainable from
+  commandline with \"swig -swiglib\". No need to set this if SWIG is installed
+  and point to from your PATH variable.
 ndk-build arguments...:
   Additional arguments for ndk-build.  See ndk-build -h for more information.
 " >&2
@@ -63,7 +71,7 @@ ndk-build arguments...:
 
 # Get the number of CPU cores present on the host.
 get_number_of_cores() {
-  case $(uname -s) in
+  case ${os_name} in
     Darwin)
       sysctl hw.ncpu | awk '{ print $2 }'
       ;;
@@ -135,7 +143,7 @@ adb() {
 # Find and run "android".
 android() {
   local android_executable=android
-  if echo "$(uname -s)" | grep -q CYGWIN; then
+  if echo "${os_name}" | grep -q CYGWIN; then
     android_executable=android.bat
   fi
   local android_path=
@@ -184,7 +192,7 @@ ndkbuild() {
 # Get file modification time of $1 in seconds since the epoch.
 stat_mtime() {
   local filename="${1}"
-  case $(uname -s) in
+  case ${os_name} in
     Darwin) stat -f%m "${filename}" 2>/dev/null || echo 0 ;;
     *) stat -c%Y "${filename}" 2>/dev/null || echo 0 ;;
   esac
