@@ -151,8 +151,8 @@ typedef unsigned long long uint64;
 /// The minimum particle weight that produces pressure.
 #define b2_minParticleWeight			1.0f
 
-/// The upper limit for particle weight used in pressure calculation.
-#define b2_maxParticleWeight		5.0f
+/// The upper limit for particle pressure.
+#define b2_maxParticlePressure		0.25f
 
 /// The maximum distance between particles in a triad, divided by the particle diameter.
 #define b2_maxTriadDistance			2

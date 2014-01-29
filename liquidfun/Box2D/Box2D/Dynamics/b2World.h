@@ -354,6 +354,12 @@ public:
 	/// Get damping for particles
 	float32 GetParticleDamping() const;
 
+	/// Change the number of iterations for static pressure of particles.
+	void SetParticleStaticPressureIterations(int32 iterations);
+
+	/// Get the number of iterations for static pressure of particles.
+	int32 GetParticleStaticPressureIterations() const;
+
 	/// Change the particle radius.
 	/// You should set this only once, on world start.
 	/// If you change the radius during execution, existing particles may explode, shrink, or behave unexpectedly.

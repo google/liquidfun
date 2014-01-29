@@ -83,6 +83,12 @@ TEST_F(FunctionTests, ParticleDamping) {
 	EXPECT_EQ(m_world->GetParticleDamping(), r);
 }
 
+TEST_F(FunctionTests, ParticleStaticPressureItearations) {
+	int n = 123;
+	m_world->SetParticleStaticPressureIterations(n);
+	EXPECT_EQ(m_world->GetParticleStaticPressureIterations(), n);
+}
+
 // Verify that it's possible to destroy a particle using
 // DestroyParticle(int32) and DestroyParticle(int32, bool).
 TEST_F(FunctionTests, DestroyParticle) {

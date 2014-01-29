@@ -29,6 +29,7 @@ const ParticleParameter::Value ParticleParameter::k_particleTypes[] =
 	{ b2_colorMixingParticle, "color mixing" },
 	{ b2_wallParticle, "wall" },
 	{ b2_barrierParticle | b2_wallParticle, "barrier" },
+	{ b2_staticPressureParticle, "static pressure" },
 };
 const ParticleParameter::Value *ParticleParameter::k_particleTypesPtr =
 	ParticleParameter::k_particleTypes;
