@@ -32,6 +32,7 @@ class b2BlockAllocator;
 class b2StackAllocator;
 class b2QueryCallback;
 class b2RayCastCallback;
+class b2Fixture;
 struct b2ParticleGroupDef;
 struct b2Vec2;
 struct b2AABB;
@@ -61,7 +62,10 @@ struct b2ParticleBodyContact
 	/// The body making contact.
 	///
 	b2Body* body;
-	/// Weight of the contact. A value between 0.0f and 1.0f.
+	/// The specific fixture making contact
+	///
+	b2Fixture* fixture;
+	///Weight of the contact. A value between 0.0f and 1.0f.
 	///
 	float32 weight;
 	/// The normalized direction from the particle to the body.
@@ -301,6 +305,7 @@ private:
 
 	friend class b2World;
 	friend class b2ParticleGroup;
+	friend class b2ParticleBodyContactRemovePredicate;
 
 	template <typename T>
 	struct ParticleBuffer
@@ -434,6 +439,9 @@ private:
 	void SolveZombie();
 	void RotateBuffer(int32 start, int32 mid, int32 end);
 
+	void SetStrictContactCheck(bool enabled);
+	bool GetStrictContactCheck() const;
+
 	float32 GetCriticalVelocity(const b2TimeStep& step) const;
 	float32 GetCriticalVelocitySquared(const b2TimeStep& step) const;
 	float32 GetCriticalPressure(const b2TimeStep& step) const;
@@ -451,6 +459,9 @@ private:
 	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1,
 				 const b2Vec2& point2) const;
 
+	void RemoveSpuriousBodyContacts();
+	static bool BodyContactCompare(const b2ParticleBodyContact& lhs, const b2ParticleBodyContact& rhs);
+
 	int32 m_timestamp;
 	int32 m_allParticleFlags;
 	bool m_needsUpdateAllParticleFlags;
@@ -463,6 +474,7 @@ private:
 	float32 m_particleDiameter;
 	float32 m_inverseDiameter;
 	float32 m_squaredDiameter;
+	bool m_strictContactCheck;
 
 	int32 m_count;
 	int32 m_internalAllocatedCapacity;

@@ -13,8 +13,6 @@
 # 2. Altered source versions must be plainly marked as such, and must not be
 # misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
-LOCAL_PATH:=$(call my-dir)/..
-LOCAL_TEST_NAME:=TEST_NAME_TO_REPLACE
-LOCAL_ARM_MODE:=arm
-include $(LOCAL_PATH)/../android_common.mk
-
+include $(NDK_PROJECT_PATH)/../application_common.mk
+APP_MODULES:=BodyContactsTests
+APP_CFLAGS+=-Wall -Werror -Wno-long-long -Wno-variadic-macros

@@ -89,6 +89,9 @@
 #include "LiquidTimer.h"
 #include "Sparky.h"
 #include "Sandbox.h"
+#include "AntiPointy.h"
+#include "Pointy.h"
+#include "Ramp.h"
 
 TestEntry g_testEntries[] =
 {
@@ -103,6 +106,10 @@ TestEntry g_testEntries[] =
 	{"Surface Tension", ParticlesSurfaceTension::Create},
 	{"Sparky", Sparky::Create},
 	{"Sandbox", Sandbox::Create},
+	{"Ramp", Ramp::Create},
+	{"Pointy", Pointy::Create},
+	{"AntiPointy", AntiPointy::Create},
+
 
 	{"Ray-Cast", RayCast::Create},
 	{"Dump Shell", DumpShell::Create},

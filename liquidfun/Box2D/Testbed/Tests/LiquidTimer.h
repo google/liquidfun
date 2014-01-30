@@ -148,7 +148,8 @@ public:
 
 const ParticleParameter::Value LiquidTimer::k_paramValues[] =
 {
-	{b2_tensileParticle | b2_viscousParticle, "tensile + viscous"},
+	{b2_tensileParticle | b2_viscousParticle,
+		ParticleParameter::k_DefaultOptions, "tensile + viscous"},
 };
 const ParticleParameter::Definition LiquidTimer::k_paramDef[] =
 {

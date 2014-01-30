@@ -368,6 +368,17 @@ public:
 	/// Get the particle radius.
 	float32 GetParticleRadius() const;
 
+	/// Set strict Particle/Body contact check.
+	/// This is an option that will help ensure correct behavior if there are
+	/// corners in the world model where Particle/Body contact is ambiguous.
+	/// This option scales at n*log(n) of the number of Particle/Body contacts,
+	/// so it is best to only enable if it is necessary for your geometry.
+	/// Enable if you see strange particle behavior around b2Body intersections.
+	void SetStrictParticleContactCheck(bool enabled);
+
+	/// Get the status of the strict contact check.
+	bool GetStrictParticleContactCheck() const;
+
 	/// Get the particle data.
 	/// @return the pointer to the head of the particle data.
 	b2Vec2* GetParticlePositionBuffer();

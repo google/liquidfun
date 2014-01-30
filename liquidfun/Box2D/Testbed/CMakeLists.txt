@@ -83,6 +83,9 @@ set(Testbed_Tests_SRCS
 	Tests/LiquidTimer.h
 	Tests/Sparky.h
 	Tests/Sandbox.h
+	Tests/AntiPointy.h
+	Tests/Pointy.h
+	Tests/Ramp.h
 )
 
 # These are used to create visual studio folders.

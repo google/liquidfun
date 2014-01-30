@@ -39,6 +39,74 @@ static const uint32 xOffset = xScale * (1 << (xTruncBits - 1));
 static const uint32 xMask = (1 << xTruncBits) - 1;
 static const uint32 yMask = (1 << yTruncBits) - 1;
 
+
+// This functor is passed to std::remove_if in RemoveSpuriousBodyContacts
+// to implement the algorithm described there.  It was hoisted out and friended
+// as it would not compile with g++ 4.6.3 as a local class.  It is only used in
+// that function.
+class b2ParticleBodyContactRemovePredicate
+{
+public:
+	b2ParticleBodyContactRemovePredicate(b2ParticleSystem* system,
+										 int32* discarded)
+		: m_system(system), m_lastIndex(-1), m_currentContacts(0),
+		  m_discarded(discarded) {}
+
+	bool operator()(const b2ParticleBodyContact& contact)
+	{
+		// This implements the selection criteria described in
+		// RemoveSpuriousBodyContacts().
+		// This functor is iterating through a list of Body contacts per
+		// Particle, ordered from near to far.  For up to the maximum number of
+		// contacts we allow per point per step, we verify that the contact
+		// normal of the Body that genenerated the contact makes physical sense
+		// by projecting a point back along that normal and seeing if it
+		// intersects the fixture generating the contact.
+
+		if (contact.index != m_lastIndex)
+		{
+			m_currentContacts = 0;
+			m_lastIndex = contact.index;
+		}
+
+		if (m_currentContacts++ > k_maxContactsPerPoint)
+		{
+			++(*m_discarded);
+			return true;
+		}
+
+		// Project along inverse normal (as returned in the contact) to get the
+		// point to check.
+		b2Vec2 n = contact.normal;
+		// weight is 1-(inv(diameter) * distance)
+		n *= m_system->m_particleDiameter * (1 - contact.weight);
+		b2Vec2 pos = m_system->m_positionBuffer.data[contact.index] + n;
+
+		// pos is now a point projected back along the contact normal to the
+		// contact distance. If the surface makes sense for a contact, pos will
+		// now lie on or in the fixture generating
+		if (!contact.fixture->TestPoint(pos))
+		{
+			++(*m_discarded);
+			return true;
+		}
+
+		return false;
+	}
+private:
+	// Max number of contacts processed per particle, from nearest to farthest.
+	// This must be at least 2 for correctness with concave shapes; 3 was
+	// experimentally arrived at as looking reasonable.
+	static const int32 k_maxContactsPerPoint = 3;
+	const b2ParticleSystem* m_system;
+	// Index of last particle processed.
+	int32 m_lastIndex;
+	// Number of contacts processed for the current particle.
+	int32 m_currentContacts;
+	// Output the number of discarded contacts.
+	int32* m_discarded;
+};
+
 static inline uint32 computeTag(float32 x, float32 y)
 {
 	return ((uint32)(y + yOffset) << yShift) + (uint32)(xScale * x + xOffset);
@@ -58,6 +126,7 @@ b2ParticleSystem::b2ParticleSystem()
 	m_allGroupFlags = 0;
 	m_needsUpdateAllGroupFlags = false;
 	m_iterationIndex = 0;
+	m_strictContactCheck = false;
 
 	m_density = 1;
 	m_inverseDensity = 1;
@@ -984,6 +1053,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 	aabb.upperBound.x += m_particleDiameter;
 	aabb.upperBound.y += m_particleDiameter;
 	m_bodyContactCount = 0;
+
 	class UpdateBodyContactsCallback : public b2QueryCallback
 	{
 		bool ReportFixture(b2Fixture* fixture)
@@ -1060,7 +1130,8 @@ void b2ParticleSystem::UpdateBodyContacts()
 									m_system->m_bodyContactCount];
 							contact.index = a;
 							contact.body = b;
-							contact.weight =
+							contact.fixture = fixture;
+							contact.weight = 
 								1 - d * m_system->m_inverseDiameter;
 							contact.normal = -n;
 							contact.mass =
@@ -1081,8 +1152,55 @@ void b2ParticleSystem::UpdateBodyContacts()
 			m_system = system;
 		}
 	} callback(this);
+
 	m_world->QueryAABB(&callback, aabb);
+
+	if (m_strictContactCheck)
+	{
+		RemoveSpuriousBodyContacts();
+	}
 }
+
+void b2ParticleSystem::RemoveSpuriousBodyContacts()
+{
+	// At this point we have a list of contact candidates based on AABB
+	// overlap.The AABB query that  generated this returns all collidable
+	// fixtures overlapping particle bounding boxes.  This breaks down around
+	// vertices where two shapes intersect, such as a "ground" surface made
+	// of multiple b2PolygonShapes; it potentially applies a lot of spurious
+	// impulses from normals that should not actually contribute.  See the
+	// Ramp example in Testbed.
+	//
+	// To correct for this, we apply this algorithm:
+	//   * sort contacts by particle and subsort by weight (nearest to farthest)
+	//   * for each contact per particle:
+	//      - project a point at the contact distance along the inverse of the
+	//        contact normal
+	//      - if this intersects the fixture that generated the contact, apply
+	//         it, otherwise discard as impossible
+	//      - repeat for up to n nearest contacts, currently we get good results
+	//        from n=3.
+	std::sort(m_bodyContactBuffer, m_bodyContactBuffer + m_bodyContactCount,
+			  b2ParticleSystem::BodyContactCompare);
+
+	int32 discarded = 0;
+	std::remove_if(m_bodyContactBuffer, m_bodyContactBuffer + m_bodyContactCount,
+				   b2ParticleBodyContactRemovePredicate(this, &discarded));
+
+	m_bodyContactCount -= discarded;
+}
+
+bool b2ParticleSystem::BodyContactCompare(const b2ParticleBodyContact &lhs,
+										  const b2ParticleBodyContact &rhs)
+{
+	if (lhs.index == rhs.index)
+	{
+		// Subsort by weight, decreasing.
+		return lhs.weight > rhs.weight;
+	}
+	return lhs.index < rhs.index;
+}
+
 
 void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 {
@@ -2217,6 +2335,16 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 		group->m_firstIndex = newIndices[group->m_firstIndex];
 		group->m_lastIndex = newIndices[group->m_lastIndex - 1] + 1;
 	}
+}
+
+void b2ParticleSystem::SetStrictContactCheck(bool enabled)
+{
+	m_strictContactCheck = enabled;
+}
+
+bool b2ParticleSystem::GetStrictContactCheck() const
+{
+	return m_strictContactCheck;
 }
 
 void b2ParticleSystem::SetParticleRadius(float32 radius)

@@ -31,8 +31,12 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added option to substep particle simulation independently of `b2World`.
 *   Added barrier particles which can be used to prevent particle tunneling
     due to large particle velocities or simulation steps.
+*   Added option to enable a more strict check for Particle/Body interactions
+    in cases where complex world geometry may cause false positive contacts.
 *   Added "Sparky" and "Sandbox" tests to the Testbed example to demonstrate
     particle and rigid body interaction.
+*   Added "Ramp", "Pointy", and "AntiPointy" tests to the Testbed example to
+    illustrate the difference with strict contact checking.
 
 #### API Modifications
 
@@ -61,7 +65,7 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added `b2Stat` to calculate min/max/mean of a set of samples, and
     integrated this functionality into Testbed to measure performance.
 *   Added operators to `b2ParticleColor`.
-*   Improved parameter selection in Testbed with the fullscreen UI.
+*   Improved parameter and option selection in Testbed with the fullscreen UI.
 *   Cleaned up statistics display in Testbed.
 *   Added build step to unit-test execution scripts.
 *   Added generation of code coverage report for unit-tests.

@@ -24,11 +24,35 @@
 class ParticleParameter
 {
 public:
+
+	enum Options
+	{
+		OptionStrictContacts = 1 << 0,
+		OptionDrawShapes = 1 << 1,
+		OptionDrawParticles = 1 << 2,
+		OptionDrawJoints = 1 << 3,
+		OptionDrawAABBs = 1 << 4,
+		OptionDrawContactPoints = 1 << 5,
+		OptionDrawContactNormals = 1 << 6,
+		OptionDrawContactImpulse = 1 << 7,
+		OptionDrawFrictionImpulse = 1 << 8,
+		OptionDrawCOMs = 1 << 9,
+		OptionDrawStats = 1 << 10,
+		OptionDrawProfile = 1 << 11
+	};
+
+	static const uint32 k_DefaultOptions = OptionDrawShapes |
+										   OptionDrawParticles |
+										   OptionDrawJoints;
+
 	// Value of a particle parameter.
 	struct Value
 	{
 		// Value associated with the parameter.
 		uint32 value;
+		// Any global (non particle-specific) options associated with this
+		// parameter
+		uint32 options;
 		// Name to display when this parameter is selected.
 		const char *name;
 	};
@@ -92,6 +116,13 @@ public:
 	{
 		b2Assert(m_value);
 		return m_value->name;
+	}
+
+	// Get the selected parameter value.
+	uint32 GetOptions() const
+	{
+		b2Assert(m_value);
+		return m_value->options;
 	}
 
 	// Set whether to restart the test when changing this parameter,

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2014 Google, Inc.
 
      This software is provided 'as-is', without any express or implied
@@ -15,6 +15,6 @@
      misrepresented as being the original software.
      3. This notice may not be removed or altered from any source distribution.
  -->
-<projectDescription>
-    <name>TEST_NAME_TO_REPLACE</name>
-</projectDescription>
+<resources>
+    <string name="app_name">BodyContactsTests</string>
+</resources>

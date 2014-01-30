@@ -1393,6 +1393,16 @@ void b2World::Dump()
 	b2Log("bodies = NULL;\n");
 }
 
+void b2World::SetStrictParticleContactCheck(bool enabled)
+{
+	m_particleSystem.SetStrictContactCheck(enabled);
+}
+
+bool b2World::GetStrictParticleContactCheck() const
+{
+	return m_particleSystem.GetStrictContactCheck();
+}
+
 int32 b2World::GetParticleMaxCount() const
 {
 	return m_particleSystem.GetParticleMaxCount();

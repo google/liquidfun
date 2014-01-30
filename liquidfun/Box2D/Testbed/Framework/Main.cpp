@@ -49,7 +49,7 @@ namespace
 	Test* test;
 	Settings settings;
 	int32 width = 640;
-	int32 height = 510;
+	int32 height = 540;
 	int32 framePeriod = 16;
 	int32 mainWindow;
 	float settingsHz = 60.0;
@@ -178,8 +178,27 @@ static void SimulationLoop()
 	const bool changed = particleParameter.Changed(&restartTest);
 	B2_NOT_USED(changed);
 
+
 	if (fullscreenUI.GetEnabled())
 	{
+		// Set framework settings options based on parameters
+		const uint32 options = particleParameter.GetOptions();
+
+		settings.strictContacts 	= options & ParticleParameter::OptionStrictContacts;
+		settings.drawContactPoints	= options & ParticleParameter::OptionDrawContactPoints;
+		settings.drawContactNormals	= options & ParticleParameter::OptionDrawContactNormals;
+		settings.drawContactImpulse	= options & ParticleParameter::OptionDrawContactImpulse;
+		settings.drawFrictionImpulse = options & ParticleParameter::OptionDrawFrictionImpulse;
+		settings.drawStats 			 = options & ParticleParameter::OptionDrawStats;
+		settings.drawProfile		 = options & ParticleParameter::OptionDrawProfile;
+
+		// The b2Draw based flags must be exactly 0 or 1 currently.
+		settings.drawShapes 	= options & ParticleParameter::OptionDrawShapes ? 1 : 0;
+		settings.drawParticles 	= options & ParticleParameter::OptionDrawParticles ? 1 : 0;
+		settings.drawJoints		= options & ParticleParameter::OptionDrawJoints ? 1 : 0;
+		settings.drawAABBs		= options & ParticleParameter::OptionDrawAABBs ? 1 : 0;
+		settings.drawCOMs 		= options & ParticleParameter::OptionDrawCOMs ? 1 : 0;
+
 		// Draw the full screen UI with
 		// "test_name [: particle_parameter] / fps" at the bottom of the
 		// screen.
@@ -189,6 +208,7 @@ static void SimulationLoop()
 			msg += " : ";
 			msg += particleParameter.GetName();
 		}
+
 		std::stringstream ss;
 		ss << int(1000.0f / ComputeFPS());
 		msg += " / " + ss.str() + " fps";
@@ -623,6 +643,7 @@ int main(int argc, char** argv)
 	glui->add_checkbox("Warm Starting", &settings.enableWarmStarting);
 	glui->add_checkbox("Time of Impact", &settings.enableContinuous);
 	glui->add_checkbox("Sub-Stepping", &settings.enableSubStepping);
+	glui->add_checkbox("Strict Particle/Body Contacts", &settings.strictContacts);
 
 	//glui->add_separator();
 

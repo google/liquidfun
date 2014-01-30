@@ -17,7 +17,7 @@
  -->
 <!-- BEGIN_INCLUDE(manifest) -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.google.fpl.liquidfun.TEST_NAME_TO_REPLACE_LOWER"
+          package="com.google.fpl.liquidfun.bodycontactstests"
           android:versionCode="1"
           android:versionName="1.0">
 
@@ -35,7 +35,7 @@
                   android:configChanges="orientation|keyboardHidden">
             <!-- Tell NativeActivity the name of the .so -->
             <meta-data android:name="android.app.lib_name"
-                       android:value="TEST_NAME_TO_REPLACE" />
+                       android:value="BodyContactsTests" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

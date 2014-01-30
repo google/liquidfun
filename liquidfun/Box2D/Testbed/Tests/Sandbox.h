@@ -497,15 +497,23 @@ private:
 
 const ParticleParameter::Value Sandbox::k_paramValues[] =
 {
-	{b2_waterParticle, "water"},
-	{b2_powderParticle, "powder"},
-	{b2_tensileParticle, "tensile"},
-	{b2_viscousParticle, "viscous"},
-	{b2_tensileParticle | b2_powderParticle, "tensile powder"},
-	{b2_viscousParticle | b2_powderParticle, "viscous powder"},
+	{b2_waterParticle, ParticleParameter::k_DefaultOptions, "water"},
+	{b2_waterParticle, ParticleParameter::k_DefaultOptions |
+				ParticleParameter::OptionStrictContacts, "water (strict)" },
+	{b2_powderParticle, ParticleParameter::k_DefaultOptions, "powder"},
+	{b2_tensileParticle, ParticleParameter::k_DefaultOptions, "tensile"},
+	{b2_viscousParticle, ParticleParameter::k_DefaultOptions, "viscous"},
+	{b2_tensileParticle | b2_powderParticle,
+		ParticleParameter::k_DefaultOptions,
+		"tensile powder"},
+	{b2_viscousParticle | b2_powderParticle,
+		ParticleParameter::k_DefaultOptions,
+		"viscous powder"},
 	{b2_viscousParticle | b2_tensileParticle | b2_powderParticle,
-	 "viscous tensile powder"},
-	{b2_viscousParticle | b2_tensileParticle, "tensile viscous water"},
+		ParticleParameter::k_DefaultOptions, "viscous tensile powder"},
+	{b2_viscousParticle | b2_tensileParticle,
+		ParticleParameter::k_DefaultOptions,
+		"tensile viscous water"}
 };
 
 const ParticleParameter::Definition Sandbox::k_paramDef[] =

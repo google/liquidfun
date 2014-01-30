@@ -80,6 +80,7 @@ struct Settings
 		singleStep = 0;
 		printStepTimeStats = 1;
 		stepTimeOut = 0;
+		strictContacts = 0;
 	}
 
 	b2Vec2 viewCenter;
@@ -105,6 +106,7 @@ struct Settings
 	int32 pause;
 	int32 singleStep;
 	int32 printStepTimeStats;
+	int32 strictContacts;
 
 	/// Measures how long did the world step took, in ms
 	float32 stepTimeOut;

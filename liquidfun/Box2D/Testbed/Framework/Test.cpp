@@ -361,6 +361,7 @@ void Test::Step(Settings* settings)
 	m_world->SetWarmStarting(settings->enableWarmStarting > 0);
 	m_world->SetContinuousPhysics(settings->enableContinuous > 0);
 	m_world->SetSubStepping(settings->enableSubStepping > 0);
+	m_world->SetStrictParticleContactCheck(settings->strictContacts > 0);
 
 	m_pointCount = 0;
 
@@ -519,20 +520,20 @@ void Test::Step(Settings* settings)
 				m_debugDraw.DrawPoint(point->position, 5.0f, b2Color(0.3f, 0.3f, 0.95f));
 			}
 
-			if (settings->drawContactNormals == 1)
+			if (settings->drawContactNormals)
 			{
 				b2Vec2 p1 = point->position;
 				b2Vec2 p2 = p1 + k_axisScale * point->normal;
 				m_debugDraw.DrawSegment(p1, p2, b2Color(0.9f, 0.9f, 0.9f));
 			}
-			else if (settings->drawContactImpulse == 1)
+			else if (settings->drawContactImpulse)
 			{
 				b2Vec2 p1 = point->position;
 				b2Vec2 p2 = p1 + k_impulseScale * point->normalImpulse * point->normal;
 				m_debugDraw.DrawSegment(p1, p2, b2Color(0.9f, 0.9f, 0.3f));
 			}
 
-			if (settings->drawFrictionImpulse == 1)
+			if (settings->drawFrictionImpulse)
 			{
 				b2Vec2 tangent = b2Cross(point->normal, 1.0f);
 				b2Vec2 p1 = point->position;

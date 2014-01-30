@@ -72,6 +72,7 @@ function(test_executable name)
                             ${name}/${name}Tests.cpp ${SUPPORT_SRCS})
 endfunction()
 
+test_executable(BodyContacts)
 test_executable(Callback)
 test_executable(Color)
 test_executable(Common)

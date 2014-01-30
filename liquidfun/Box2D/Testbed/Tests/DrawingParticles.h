@@ -311,12 +311,18 @@ public:
 
 const ParticleParameter::Value DrawingParticles::k_paramValues[] =
 {
-	{b2_zombieParticle, "erase"},
-	{(uint32)e_parameterMove, "move"},
-	{(uint32)e_parameterRigid, "rigid"},
-	{(uint32)e_parameterRigidBarrier, "rigid barrier"},
-	{(uint32)e_parameterElasticBarrier, "elastic barrier"},
-	{(uint32)e_parameterSpringBarrier, "spring barrier"},
+	{b2_zombieParticle,
+		ParticleParameter::k_DefaultOptions, "erase"},
+	{(uint32)e_parameterMove,
+		ParticleParameter::k_DefaultOptions, "move"},
+	{(uint32)e_parameterRigid,
+		ParticleParameter::k_DefaultOptions, "rigid"},
+	{(uint32)e_parameterRigidBarrier,
+		ParticleParameter::k_DefaultOptions, "rigid barrier"},
+	{(uint32)e_parameterElasticBarrier,
+		ParticleParameter::k_DefaultOptions, "elastic barrier"},
+	{(uint32)e_parameterSpringBarrier,
+		ParticleParameter::k_DefaultOptions, "spring barrier"}
 };
 
 const ParticleParameter::Definition DrawingParticles::k_paramDef[] =
