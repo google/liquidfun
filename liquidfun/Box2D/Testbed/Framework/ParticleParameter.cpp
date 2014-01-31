@@ -97,9 +97,9 @@ bool ParticleParameter::Changed(bool * const restart)
 {
 	bool changed = m_changed;
 	m_changed = false;
-	if (changed && restart)
+	if (restart)
 	{
-		*restart = GetRestartOnChange();
+		*restart = changed && GetRestartOnChange();
 	}
 	return changed;
 }
