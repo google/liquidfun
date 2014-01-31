@@ -60,6 +60,9 @@
 <p class="startli">To render the particle system using <code>b2World::DrawDebugData()</code>, the <code>b2Draw::e_particleBit</code> flag must be set on the <code>b2Draw</code> object passed to <code>b2World::SetDebugDraw()</code>. It is possible to set flags on <code>b2Draw</code> objects using <code>b2Draw::SetFlags()</code>.</p>
 <p class="startli">Release <a href="#0.9.0">0.9.0</a> unconditionally called <code>b2Draw::DrawParticles()</code> from <code>b2World::DrawDebugData()</code>.</p>
 </li>
+<li><p class="startli">Building LiquidFun on Linux, using <code>cmake -G"Unix Makefiles"</code>, now places output files in a build type sub-directory.</p>
+<p class="startli">For example, the output executable of the Testbed example is now written to Box2D/Testbed/Release/Testbed when building using the Release configuration.</p>
+</li>
 </ul>
 <h4>Other Changes</h4>
 <ul>

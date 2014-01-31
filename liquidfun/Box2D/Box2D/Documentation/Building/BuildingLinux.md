@@ -37,15 +37,33 @@ For example:
     cmake -G'Unix Makefiles'
     make
 
+To perform a debug build:
+
+    cd liquidfun/Box2D
+    cmake -G'Unix Makefiles' -DCMAKE_BUILD_TYPE=Debug
+    make
+
 Build targets can be configured using options exposed in
 `liquidfun/Box2D/CMakeLists.txt` by using cmake's `-D` option.
+Build configuration set using the `-D` option is sticky across subsequent
+builds.
+
+For example, if a build is performed using:
+
+    cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
+    make
+
+to switch to a release build CMAKE_BUILD_TYPE must be explicitly specified:
+
+    cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+    make
 
 ### Executing a Sample
 
 After building the project, you can execute the samples from the command line.
 For example:
 
-    ./liquidfun/Box2D/Testbed/Testbed
+    ./liquidfun/Box2D/Testbed/Release/Testbed
 
 ### Running Unit Tests
 

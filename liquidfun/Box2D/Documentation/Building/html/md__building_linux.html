@@ -81,10 +81,20 @@ sudo apt-get install libglu1-mesa-dev
 <pre class="fragment">cd liquidfun/Box2D
 cmake -G'Unix Makefiles'
 make
-</pre><p>Build targets can be configured using options exposed in <code>liquidfun/Box2D/CMakeLists.txt</code> by using cmake's <code>-D</code> option.</p>
-<h3>Executing a Sample</h3>
+</pre><p>To perform a debug build: </p>
+<pre class="fragment">cd liquidfun/Box2D
+cmake -G'Unix Makefiles' -DCMAKE_BUILD_TYPE=Debug
+make
+</pre><p>Build targets can be configured using options exposed in <code>liquidfun/Box2D/CMakeLists.txt</code> by using cmake's <code>-D</code> option. Build configuration set using the <code>-D</code> option is sticky across subsequent builds.</p>
+<p>For example, if a build is performed using: </p>
+<pre class="fragment">cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
+make
+</pre><p>to switch to a release build CMAKE_BUILD_TYPE must be explicitly specified: </p>
+<pre class="fragment">cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+make
+</pre><h3>Executing a Sample</h3>
 <p>After building the project, you can execute the samples from the command line. For example: </p>
-<pre class="fragment">./liquidfun/Box2D/Testbed/Testbed
+<pre class="fragment">./liquidfun/Box2D/Testbed/Release/Testbed
 </pre><h3>Running Unit Tests</h3>
 <p>Developers modifying the LiquidFun library can verify that it still working correctly by executing the provided unit tests.</p>
 <p>Use the run_tests.sh script to execute unit tests: </p>

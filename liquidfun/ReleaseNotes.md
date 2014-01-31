@@ -46,6 +46,12 @@ TODO describe the cool new stuff we have in this release TODO
     
     Release [0.9.0][] unconditionally called `b2Draw::DrawParticles()` from
     `b2World::DrawDebugData()`.
+*   Building LiquidFun on Linux, using `cmake -G"Unix Makefiles"`, now places
+    output files in a build type sub-directory.
+
+    For example, the output executable of the Testbed example is now
+    written to Box2D/Testbed/Release/Testbed when building using the Release
+    configuration.
 
 #### Other Changes
 
