@@ -17,12 +17,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef __ANDROID__
+#define ENABLE_GLUI 1
+#endif  // __ANDROID__
+
 #include "Render.h"
 #include "Test.h"
 #include "Arrow.h"
 #include "FullscreenUI.h"
 #include "ParticleParameter.h"
+#if ENABLE_GLUI
 #include "glui/glui.h"
+#else
+#include "GL/freeglut.h"
+#endif  // ENABLE_GLUI
 #include <stdio.h>
 #include "AndroidUtil/AndroidLogPrint.h"
 #include <algorithm>
@@ -45,7 +53,9 @@ namespace
 	int32 framePeriod = 16;
 	int32 mainWindow;
 	float settingsHz = 60.0;
+#if ENABLE_GLUI
 	GLUI *glui = NULL;
+#endif  // ENABLE_GLUI
 	float32 viewZoom = 1.0f;
 	int tx, ty, tw, th;
 	bool rMouseDown = false;
@@ -102,7 +112,14 @@ static void Resize(int32 w, int32 h)
 	width = w;
 	height = h;
 
+#if ENABLE_GLUI
 	GLUI_Master.get_viewport_area(&tx, &ty, &tw, &th);
+#else
+	tx = 0;
+	ty = 0;
+	tw = glutGet(GLUT_WINDOW_WIDTH);
+	th = glutGet(GLUT_WINDOW_HEIGHT);
+#endif  // ENABLE_GLUI
 	glViewport(tx, ty, tw, th);
 
 	glMatrixMode(GL_PROJECTION);
@@ -265,7 +282,9 @@ static void Keyboard(unsigned char key, int x, int y)
 		{
 			testSelection = testCount - 1;
 		}
+#if ENABLE_GLUI
 		if (glui) glui->sync_live();
+#endif  // ENABLE_GLUI
 		break;
 
 		// Press ] to next test.
@@ -275,7 +294,9 @@ static void Keyboard(unsigned char key, int x, int y)
 		{
 			testSelection = 0;
 		}
+#if ENABLE_GLUI
 		if (glui) glui->sync_live();
+#endif  // ENABLE_GLUI
 		break;
 
 		// Press ~ to enable / disable the fullscreen UI.
@@ -483,7 +504,7 @@ static void MouseWheel(int wheel, int direction, int x, int y)
 }
 #endif
 
-#ifndef __ANDROID__
+#if ENABLE_GLUI
 static void Restart(int)
 {
 	delete test;
@@ -491,16 +512,16 @@ static void Restart(int)
 	test = entry->createFcn();
 	Resize(width, height);
 }
-#endif // __ANDROID__
+#endif  // ENABLE_GLUI
 
-#ifndef __ANDROID__
+#if ENABLE_GLUI
 static void Pause(int)
 {
 	settings.pause = !settings.pause;
 }
-#endif // __ANDROID__
+#endif  // ENABLE_GLUI
 
-#ifndef __ANDROID__
+#if ENABLE_GLUI
 static void Exit(int code)
 {
 	// TODO: freeglut is not building on OSX
@@ -509,15 +530,15 @@ static void Exit(int code)
 #endif
 	exit(code);
 }
-#endif // __ANDROID__
+#endif  // ENABLE_GLUI
 
-#ifndef __ANDROID__
+#if ENABLE_GLUI
 static void SingleStep(int)
 {
 	settings.pause = 1;
 	settings.singleStep = 1;
 }
-#endif // __ANDROID__
+#endif  // ENABLE_GLUI
 
 }  // namespace TestMain
 
@@ -550,10 +571,20 @@ int main(int argc, char** argv)
 
 	glutDisplayFunc(SimulationLoop);
 
+#if ENABLE_GLUI
 	GLUI_Master.set_glutReshapeFunc(Resize);
 	GLUI_Master.set_glutKeyboardFunc(Keyboard);
 	GLUI_Master.set_glutSpecialFunc(KeyboardSpecial);
 	GLUI_Master.set_glutMouseFunc(Mouse);
+#else
+	{
+		glutReshapeFunc(Resize);
+		glutKeyboardFunc(Keyboard);
+		glutSpecialUpFunc(KeyboardSpecial);
+		glutMouseFunc(Mouse);
+	}
+#endif  // ENABLE_GLUI
+
 #ifdef FREEGLUT
 	glutMouseWheelFunc(MouseWheel);
 #endif
@@ -561,8 +592,7 @@ int main(int argc, char** argv)
 
 	glutKeyboardUpFunc(KeyboardUp);
 
-#ifndef __ANDROID__
-
+#if ENABLE_GLUI
 	glui = GLUI_Master.create_glui_subwindow( mainWindow,
 		GLUI_SUBWINDOW_RIGHT );
 
@@ -626,7 +656,7 @@ int main(int argc, char** argv)
 
 	glui->set_main_gfx_window( mainWindow );
 
-#endif // __ANDROID__
+#endif  // ENABLE_GLUI
 
 	// Configure the fullscreen UI's viewport parameters.
 	fullscreenUI.SetViewParameters(&settings.viewCenter, &extents);
@@ -638,4 +668,3 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-
