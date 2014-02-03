@@ -24,7 +24,6 @@ LOCAL_SRC_FILES:=\
 	$(subst $(LOCAL_PATH)/,,\
 	  $(wildcard $(LOCAL_PATH)/Framework/*.cpp) \
 	  $(wildcard $(LOCAL_PATH)/Tests/*.cpp) \
-	  $(wildcard $(LOCAL_PATH)/../glui/*.cpp) \
 	  $(wildcard $(LOCAL_PATH)/../GLEmu/*cpp))
 LOCAL_CFLAGS:=-DFREEGLUT_GLES1
 LOCAL_STATIC_LIBRARIES:=liquidfun_static libandroidutil_static \
