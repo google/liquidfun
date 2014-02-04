@@ -1100,8 +1100,30 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 {
 	// If a particle is passing between paired barrier particles,
 	// its velocity will be decelerated to avoid passing.
+	for (int32 i = 0; i < m_count; i++)
+	{
+		uint32 flags = m_flagsBuffer.data[i];
+		if (flags & b2_barrierParticle)
+		{
+			if (flags & b2_wallParticle)
+			{
+				m_velocityBuffer.data[i].SetZero();
+				continue;
+			}
+			const b2ParticleGroup* group = m_groupBuffer[i];
+			if (group->m_groupFlags & b2_rigidParticleGroup)
+			{
+				m_velocityBuffer.data[i] =
+					group->GetLinearVelocity() +
+					b2Cross(
+						group->GetAngularVelocity(),
+						m_positionBuffer.data[i] - group->GetCenter());
+			}
+		}
+	}
 	Proxy* beginProxy = m_proxyBuffer;
 	Proxy* endProxy = beginProxy + m_proxyCount;
+	float32 tmax = b2_barrierCollisionTime * step.dt;
 	for (int32 k = 0; k < m_pairCount; k++)
 	{
 		const Pair& pair = m_pairBuffer[k];
@@ -1127,30 +1149,65 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 				computeTag(
 					m_inverseDiameter * upper.x,
 					m_inverseDiameter * upper.y));
+			b2Vec2 va = m_velocityBuffer.data[a];
+			b2Vec2 vb = m_velocityBuffer.data[b];
+			b2Vec2 pba = pb - pa;
+			b2Vec2 vba = vb - va;
 			for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
 			{
 				int32 c = proxy->index;
 				b2Vec2 pc = m_positionBuffer.data[c];
 				if (lower.x <= pc.x && pc.x <= upper.x &&
-					lower.y <= pc.y && pc.y <= upper.y)
+					lower.y <= pc.y && pc.y <= upper.y &&
+					m_groupBuffer[a] != m_groupBuffer[c] &&
+					m_groupBuffer[b] != m_groupBuffer[c])
 				{
-					b2Vec2 vc = 2.5f * step.dt * m_velocityBuffer.data[c];
+					b2Vec2& vc = m_velocityBuffer.data[c];
 					// Solve the equation below:
-					//   (1 - s) * pa + s * pb = pc + t * vc
+					//   (1-s)*(pa+t*va)+s*(pb+t*vb) = pc+t*vc
 					// which expresses that the particle c will pass a line
 					// connecting the particles a and b at the time of t.
 					// if s is between 0 and 1, c will pass between a and b.
-					float32 idet =
-						1 / ((pa.x - pb.x) * vc.y - (pa.y - pb.y) * vc.x);
-					float32 s =
-						((pa.x - pc.x) * vc.y - (pa.y - pc.y) * vc.x) * idet;
-					float32 t =
-						((pa.x - pb.x) * (pa.y - pc.y) -
-						 (pa.y - pb.y) * (pa.x - pc.x)) * idet;
-					if (s >= 0 && s <= 1 && t > 0 && t <= 1)
+					b2Vec2 pca = pc - pa;
+					b2Vec2 vca = vc - va;
+					float32 e2 = b2Cross(vba, vca);
+					float32 e1 = b2Cross(pba, vca) - b2Cross(pca, vba);
+					float32 e0 = b2Cross(pba, pca);
+					float32 s, t;
+					b2Vec2 qba, qca;
+					if (e2 == 0)
 					{
-						m_velocityBuffer.data[c] *= t;
+						if (e1 == 0) continue;
+						t = - e0 / e1;
+						if (t < 0 || t > tmax) continue;
+						qba = pba + t * vba;
+						qca = pca + t * vca;
+						s = b2Dot(qba, qca) / b2Dot(qba, qba);
+						if (s < 0 || s > 1) continue;
 					}
+					else
+					{
+						float32 det = e1 * e1 - 4 * e0 * e2;
+						if (det < 0) continue;
+						float32 sqrtDet = b2Sqrt(det);
+						float32 t1 = (- e1 - sqrtDet) / (2 * e2);
+						float32 t2 = (- e1 + sqrtDet) / (2 * e2);
+						if (t1 > t2) b2Swap(t1, t2);
+						t = t1;
+						qba = pba + t * vba;
+						qca = pca + t * vca;
+						s = b2Dot(qba, qca) / b2Dot(qba, qba);
+						if (t < 0 || t > tmax || s < 0 || s > 1)
+						{
+							t = t2;
+							if (t < 0 || t > tmax) continue;
+							qba = pba + t * vba;
+							qca = pca + t * vca;
+							s = b2Dot(qba, qca) / b2Dot(qba, qba);
+							if (s < 0 || s > 1) continue;
+						}
+					}
+					vc = va + s * vba;
 				}
 			}
 		}
@@ -1228,13 +1285,13 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 			SolveSpring(subStep);
 		}
 		LimitVelocity(subStep);
-		// SolveCollision, SolveRigid and SolveWall should be called after other
-		// force functions because they may require particles to have specific
-		// velocities.
 		if (m_allParticleFlags & b2_barrierParticle)
 		{
 			SolveBarrier(subStep);
 		}
+		// SolveCollision, SolveRigid and SolveWall should be called after other
+		// force functions because they may require particles to have specific
+		// velocities.
 		SolveCollision(subStep);
 		if (m_allGroupFlags & b2_rigidParticleGroup)
 		{
