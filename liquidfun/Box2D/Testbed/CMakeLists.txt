@@ -1,5 +1,6 @@
 # Some flags for Freeglut and GLUI.
-add_definitions( -DFREEGLUT_EXPORTS -DFREEGLUT_STATIC -D_CRT_SECURE_NO_WARNINGS )
+add_definitions( -DFREEGLUT_EXPORTS -DFREEGLUT_STATIC
+                 -DGLUT_DISABLE_ATEXIT_HACK -D_CRT_SECURE_NO_WARNINGS )
 
 # Define the framework files.
 set(Testbed_Framework_SRCS

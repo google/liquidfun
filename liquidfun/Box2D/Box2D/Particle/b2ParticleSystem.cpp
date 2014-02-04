@@ -265,6 +265,7 @@ int32 b2ParticleSystem::DestroyParticlesInShape(
 
 		bool ReportFixture(b2Fixture* fixture)
 		{
+			B2_NOT_USED(fixture);
 			return false;
 		}
 
@@ -1249,7 +1250,7 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		}
 		if (m_allParticleFlags & b2_viscousParticle)
 		{
-			SolveViscous(subStep);
+			SolveViscous();
 		}
 		if (m_allParticleFlags & b2_powderParticle)
 		{
@@ -1265,7 +1266,7 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		}
 		if (m_allParticleFlags & b2_colorMixingParticle)
 		{
-			SolveColorMixing(subStep);
+			SolveColorMixing();
 		}
 		SolveGravity(subStep);
 		if (m_allParticleFlags & b2_staticPressureParticle)
@@ -1299,7 +1300,7 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		}
 		if (m_allParticleFlags & b2_wallParticle)
 		{
-			SolveWall(subStep);
+			SolveWall();
 		}
 		// The particle positions can be updated only at the end of substep.
 		for (int32 i = 0; i < m_count; i++)
@@ -1524,7 +1525,7 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 	}
 }
 
-void b2ParticleSystem::SolveWall(const b2TimeStep& step)
+void b2ParticleSystem::SolveWall()
 {
 	for (int32 i = 0; i < m_count; i++)
 	{
@@ -1670,7 +1671,7 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 	}
 }
 
-void b2ParticleSystem::SolveViscous(const b2TimeStep& step)
+void b2ParticleSystem::SolveViscous()
 {
 	float32 viscousStrength = m_viscousStrength;
 	for (int32 k = 0; k < m_bodyContactCount; k++)
@@ -1769,7 +1770,7 @@ void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 	}
 }
 
-void b2ParticleSystem::SolveColorMixing(const b2TimeStep& step)
+void b2ParticleSystem::SolveColorMixing()
 {
 	// mixes color between contacting particles
 	b2Assert(m_colorBuffer.data);

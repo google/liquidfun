@@ -57,10 +57,12 @@ public:
 	}
 	bool ReportFixture(b2Fixture* fixture)
 	{
+		B2_NOT_USED(fixture);
 		return false;
 	}
 	bool ReportParticle(int32 index)
 	{
+		B2_NOT_USED(index);
 		m_count++;
 		return true;
 	}
@@ -97,11 +99,19 @@ public:
 	float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 	                      const b2Vec2& normal, float32 fraction)
 	{
+		B2_NOT_USED(fixture);
+		B2_NOT_USED(point);
+		B2_NOT_USED(normal);
+		B2_NOT_USED(fraction);
 		return 0;
 	}
 	float32 ReportParticle(int32 index, const b2Vec2& point,
 	                       const b2Vec2& normal, float32 fraction)
 	{
+		B2_NOT_USED(index);
+		B2_NOT_USED(point);
+		B2_NOT_USED(normal);
+		B2_NOT_USED(fraction);
 		m_count++;
 		return 0;
 	}
@@ -127,8 +137,8 @@ class DestructionListener : public b2DestructionListener {
 public:
 	virtual ~DestructionListener() {}
 
-	virtual void SayGoodbye(b2Joint* joint) {}
-	virtual void SayGoodbye(b2Fixture* fixture) {}
+	virtual void SayGoodbye(b2Joint* joint) { B2_NOT_USED(joint); }
+	virtual void SayGoodbye(b2Fixture* fixture) { B2_NOT_USED(fixture); }
 
 	virtual void SayGoodbye(b2ParticleGroup* group) {
 		m_destroyedParticleGroups.push_back(group);

@@ -60,6 +60,8 @@ void b2Log(const char* string, ...)
 	va_start(args, string);
 	vprintf(string, args);
 	va_end(args);
+#else
+	B2_NOT_USED(string);
 #endif
 }
 
@@ -72,4 +74,3 @@ public:
 		b2Assert(sizeof(int64)==8);
 	}
 } validate;
-

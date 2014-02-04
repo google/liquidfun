@@ -60,9 +60,7 @@ include("flags.cmake")
 
 set(C_FLAGS_WARNINGS "")
 if(MSVC)
-  # Set /W3 for MSVC, there are still a lot of warnings to be cleaned up for
-  # /W4.
-  set(C_FLAGS_WARNINGS "/W3 /WX")
+  set(C_FLAGS_WARNINGS "/W4 /WX")
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
        CMAKE_COMPILER_IS_CLANGXX)
   # Set the maximum warning level for gcc.

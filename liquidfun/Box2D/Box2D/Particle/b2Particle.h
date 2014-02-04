@@ -72,7 +72,7 @@ public:
 
 	/// Sets color for current object using the four elements described above.
 	///
-	b2Inline void Set(int32 r_, int32 g_, int32 b_, int32 a_)
+	b2Inline void Set(uint8 r_, uint8 g_, uint8 b_, uint8 a_)
 	{
 		r = r_;
 		g = g_;
@@ -188,14 +188,14 @@ public:
 							 b2ParticleColor * const colorB,
 							 const int32 strength)
 	{
-		const uint8 dr = (strength * (colorB->r - colorA->r)) >>
-			   			 k_bitsPerComponent;
-		const uint8 dg = (strength * (colorB->g - colorA->g)) >>
-			   			 k_bitsPerComponent;
-		const uint8 db = (strength * (colorB->b - colorA->b)) >>
-			   			 k_bitsPerComponent;
-		const uint8 da = (strength * (colorB->a - colorA->a)) >>
-			   			 k_bitsPerComponent;
+		const uint8 dr = (uint8)((strength * (colorB->r - colorA->r)) >>
+								 k_bitsPerComponent);
+		const uint8 dg = (uint8)((strength * (colorB->g - colorA->g)) >>
+								 k_bitsPerComponent);
+		const uint8 db = (uint8)((strength * (colorB->b - colorA->b)) >>
+								 k_bitsPerComponent);
+		const uint8 da = (uint8)((strength * (colorB->a - colorA->a)) >>
+								 k_bitsPerComponent);
 		colorA->r += dr;
 		colorA->g += dg;
 		colorA->b += db;

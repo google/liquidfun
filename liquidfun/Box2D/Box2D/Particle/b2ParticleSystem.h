@@ -205,15 +205,15 @@ private:
 	void ComputeWeight();
 	void SolvePressure(const b2TimeStep& step);
 	void SolveDamping(const b2TimeStep& step);
-	void SolveWall(const b2TimeStep& step);
+	void SolveWall();
 	void SolveRigid(const b2TimeStep& step);
 	void SolveElastic(const b2TimeStep& step);
 	void SolveSpring(const b2TimeStep& step);
 	void SolveTensile(const b2TimeStep& step);
-	void SolveViscous(const b2TimeStep& step);
+	void SolveViscous();
 	void SolvePowder(const b2TimeStep& step);
 	void SolveSolid(const b2TimeStep& step);
-	void SolveColorMixing(const b2TimeStep& step);
+	void SolveColorMixing();
 	void SolveZombie();
 	void RotateBuffer(int32 start, int32 mid, int32 end);
 

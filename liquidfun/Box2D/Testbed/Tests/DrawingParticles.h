@@ -106,24 +106,24 @@ public:
 			if (m_groupFlags == (b2_rigidParticleGroup |
 								 b2_solidParticleGroup))
 			{
-				return e_parameterRigid;
+				return (uint32)e_parameterRigid;
 			}
 			if (m_groupFlags == b2_rigidParticleGroup &&
 				m_particleFlags == b2_barrierParticle)
 			{
-				return e_parameterRigidBarrier;
+				return (uint32)e_parameterRigidBarrier;
 			}
 			if (m_particleFlags == (b2_elasticParticle | b2_barrierParticle))
 			{
-				return e_parameterElasticBarrier;
+				return (uint32)e_parameterElasticBarrier;
 			}
 			if (m_particleFlags == (b2_springParticle | b2_barrierParticle))
 			{
-				return e_parameterSpringBarrier;
+				return (uint32)e_parameterSpringBarrier;
 			}
 			return m_particleFlags;
 		}
-		return e_parameterMove;
+		return (uint32)e_parameterMove;
 	}
 
 	void Keyboard(unsigned char key)
@@ -312,11 +312,11 @@ public:
 const ParticleParameter::Value DrawingParticles::k_paramValues[] =
 {
 	{b2_zombieParticle, "erase"},
-	{e_parameterMove, "move"},
-	{e_parameterRigid, "rigid"},
-	{e_parameterRigidBarrier, "rigid barrier"},
-	{e_parameterElasticBarrier, "elastic barrier"},
-	{e_parameterSpringBarrier, "spring barrier"},
+	{(uint32)e_parameterMove, "move"},
+	{(uint32)e_parameterRigid, "rigid"},
+	{(uint32)e_parameterRigidBarrier, "rigid barrier"},
+	{(uint32)e_parameterElasticBarrier, "elastic barrier"},
+	{(uint32)e_parameterSpringBarrier, "spring barrier"},
 };
 
 const ParticleParameter::Definition DrawingParticles::k_paramDef[] =

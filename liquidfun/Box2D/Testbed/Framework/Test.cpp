@@ -174,6 +174,7 @@ public:
 
 	bool ReportFixture(b2Fixture* fixture)
 	{
+		B2_NOT_USED(fixture);
 		return false;
 	}
 

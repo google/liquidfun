@@ -35,10 +35,11 @@ class b2Body;
 /// directory.
 ///
 class BodyTracker {
-    public:
+public:
 	// Track flags to state what properties to track.
 	// Note to developers: If you make an addition to this, you must also
-	// make an addition to internal function that matches this flag to a string.
+	// make an addition to internal function that matches this flag to a
+	// string.
 	enum TrackFlags {
 		TRACK_POSITION = 1 << 0,
 		TRACK_ANGLE =    1 << 1,
@@ -49,10 +50,13 @@ class BodyTracker {
 	};
 
 	// Constructor
-	// @param baselineFile The name of the file in which are the results to be compared.
+	// @param baselineFile The name of the file in which are the results to be
+	// compared.
 	// @param outputFile The output file in which the data is always written.
-	// @param flags The sum of TrackFlags values specifying the properties to track..
-	BodyTracker(const std::string &baselineFile, const std::string &outputFile, int32 flags);
+	// @param flags The sum of TrackFlags values specifying the properties to
+	// track.
+	BodyTracker(const std::string &baselineFile, const std::string &outputFile,
+				int32 flags);
 	virtual ~BodyTracker();
 
 	// Called to register that we will be tracking a body
@@ -68,19 +72,27 @@ class BodyTracker {
 	bool EndTracking();
 
 	// This call will check ALL the tracked values against the baseline's
-	bool CompareToBaseline(const b2Body *body, int32 flag, float32 epsilon) const;
+	bool CompareToBaseline(const b2Body *body, int32 flag,
+						   float32 epsilon) const;
 
-	// Get strings representing the errors if any of the Compare() functions return false.
+	// Get strings representing the errors if any of the Compare() functions
+	// return false.
 	const std::vector<std::string> &GetErrors() const;
 
-    public:
+public:
 	// Set the root directory for baseline and output files using argv[0]
 	// (the program's path).
 	static void SetWorkingDirectory(const char *argv0);
 
-    private:
+private:
 	bool ReadBaseline();
 	std::string TrackFlagsToString(int32 flag) const;
+
+	// Disable the assignment operator.
+	BodyTracker& operator = (BodyTracker& rhs)
+	{
+		B2_NOT_USED(rhs); return *this;
+    }
 
 	bool m_tracking;
 	bool m_baselineRead;

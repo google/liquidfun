@@ -592,8 +592,10 @@ void b2DynamicTree::ValidateStructure(int32 index) const
 
 	const b2TreeNode* node = m_nodes + index;
 
+#if B2_ASSERT_ENABLED
 	int32 child1 = node->child1;
 	int32 child2 = node->child2;
+#endif  // B2_ASSERT_ENABLED
 
 	if (node->IsLeaf())
 	{
@@ -609,8 +611,8 @@ void b2DynamicTree::ValidateStructure(int32 index) const
 	b2Assert(m_nodes[child1].parent == index);
 	b2Assert(m_nodes[child2].parent == index);
 
-	ValidateStructure(child1);
-	ValidateStructure(child2);
+	B2_DEBUG_STATEMENT(ValidateStructure(child1));
+	B2_DEBUG_STATEMENT(ValidateStructure(child2));
 }
 
 void b2DynamicTree::ValidateMetrics(int32 index) const
@@ -656,8 +658,8 @@ void b2DynamicTree::ValidateMetrics(int32 index) const
 
 void b2DynamicTree::Validate() const
 {
-	ValidateStructure(m_root);
-	ValidateMetrics(m_root);
+	B2_DEBUG_STATEMENT(ValidateStructure(m_root));
+	B2_DEBUG_STATEMENT(ValidateMetrics(m_root));
 
 	int32 freeCount = 0;
 	int32 freeIndex = m_freeList;
@@ -768,7 +770,7 @@ void b2DynamicTree::RebuildBottomUp()
 	m_root = nodes[0];
 	b2Free(nodes);
 
-	Validate();
+	B2_DEBUG_STATEMENT(Validate());
 }
 
 void b2DynamicTree::ShiftOrigin(const b2Vec2& newOrigin)

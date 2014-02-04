@@ -71,7 +71,7 @@ uint32 FullscreenUI::Mouse(const int32 button, const int32 state,
 						   const int32 previousState,
 						   const b2Vec2 &mousePosition)
 {
-	if (GetEnabled())
+	if (GetEnabled() && button == GLUT_LEFT_BUTTON)
 	{
 		// If the mouse button is being pressed, update the current
 		// arrow selection.
