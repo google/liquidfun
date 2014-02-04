@@ -38,16 +38,17 @@ struct b2AABB;
 
 struct b2ParticleContact
 {
-	///Indices of the respective particles making contact.
+	/// Indices of the respective particles making contact.
 	///
 	int32 indexA, indexB;
-	///The logical sum of the particle behaviors that have been set.
+	/// The logical sum of the particle behaviors that have been set.
+	/// See the b2ParticleFlag enum.
 	///
 	uint32 flags;
 	/// Weight of the contact. A value between 0.0f and 1.0f.
 	///
 	float32 weight;
-	///The normalized direction from A to B.
+	/// The normalized direction from A to B.
 	///
 	b2Vec2 normal;
 };
@@ -60,7 +61,7 @@ struct b2ParticleBodyContact
 	/// The body making contact.
 	///
 	b2Body* body;
-	///Weight of the contact. A value between 0.0f and 1.0f.
+	/// Weight of the contact. A value between 0.0f and 1.0f.
 	///
 	float32 weight;
 	/// The normalized direction from the particle to the body.
@@ -73,6 +74,228 @@ struct b2ParticleBodyContact
 
 class b2ParticleSystem
 {
+public:
+	/// Create a particle whose properties have been defined.
+	/// No reference to the definition is retained.
+	/// A simulation step must occur before it's possible to interact with a
+	/// newly created particle.  For example, DestroyParticleInShape() will
+	/// not destroy a particle until Step() has been called.
+	/// @warning This function is locked during callbacks.
+	/// @return the index of the particle.
+	int32 CreateParticle(const b2ParticleDef& def);
+
+	/// Destroy a particle.
+	/// The particle is removed after the next simulation step (see Step()).
+	void DestroyParticle(int32 index)
+	{
+		DestroyParticle(index, false);
+	}
+
+	/// Destroy a particle.
+	/// The particle is removed after the next step.
+	/// @param Index of the particle to destroy.
+	/// @param Whether to call the destruction listener just before the
+	/// particle is destroyed.
+	void DestroyParticle(int32 index, bool callDestructionListener);
+
+	/// Destroy particles inside a shape without enabling the destruction
+	/// callback for destroyed particles.
+	/// This function is locked during callbacks.
+	/// For more information see
+	/// DestroyParticleInShape(const b2Shape&, const b2Transform&,bool).
+	/// @param Shape which encloses particles that should be destroyed.
+	/// @param Transform applied to the shape.
+	/// @warning This function is locked during callbacks.
+	/// @return Number of particles destroyed.
+	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf)
+	{
+		return DestroyParticlesInShape(shape, xf, false);
+	}
+
+	/// Destroy particles inside a shape.
+	/// This function is locked during callbacks.
+	/// In addition, this function immediately destroys particles in the shape
+	/// in constrast to DestroyParticle() which defers the destruction until
+	/// the next simulation step.
+	/// @param Shape which encloses particles that should be destroyed.
+	/// @param Transform applied to the shape.
+	/// @param Whether to call the world b2DestructionListener for each
+	/// particle destroyed.
+	/// @warning This function is locked during callbacks.
+	/// @return Number of particles destroyed.
+	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf,
+	                              bool callDestructionListener);
+
+
+	/// Create a particle group whose properties have been defined. No reference
+	/// to the definition is retained.
+	/// @warning This function is locked during callbacks.
+	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
+
+	/// Join two particle groups.
+	/// @param the first group. Expands to encompass the second group.
+	/// @param the second group. It is destroyed.
+	/// @warning This function is locked during callbacks.
+	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
+
+	/// Destroy particles in a group.
+	/// This function is locked during callbacks.
+	/// @param The particle group to destroy.
+	/// @param Whether to call the world b2DestructionListener for each
+	/// particle is destroyed.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticlesInGroup(b2ParticleGroup* group,
+								 bool callDestructionListener);
+
+	/// Destroy particles in a group without enabling the destruction
+	/// callback for destroyed particles.
+	/// This function is locked during callbacks.
+	/// @param The particle group to destroy.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticlesInGroup(b2ParticleGroup* group)
+	{
+		DestroyParticlesInGroup(group, false);
+	}
+
+	/// Get the world particle group list. With the returned group, use
+	/// b2ParticleGroup::GetNext to get the next group in the world list.
+	/// A NULL group indicates the end of the list.
+	/// @return the head of the world particle group list.
+	b2ParticleGroup* GetParticleGroupList();
+	const b2ParticleGroup* GetParticleGroupList() const;
+
+	/// Get the number of particle groups.
+	int32 GetParticleGroupCount() const;
+
+	/// Get the number of particles.
+	int32 GetParticleCount() const;
+
+	/// Get the maximum number of particles.
+	int32 GetParticleMaxCount() const;
+
+	/// Set the maximum number of particles.
+	/// By default, there is no maximum. The particle buffers can continue to
+	/// grow while b2World's block allocator still has memory.
+	/// Note: If you try to CreateParticle() with more than this count,
+	/// b2_invalidParticleIndex is returned.
+	void SetParticleMaxCount(int32 count);
+
+	/// Change the particle density.
+	/// Particle density affects the mass of the particles, which in turn
+	/// affects how the partcles interact with b2Bodies. Note that the density
+	/// does not affect how the particles interact with each other.
+	void SetParticleDensity(float32 density);
+
+	/// Get the particle density.
+	float32 GetParticleDensity() const;
+
+	/// Change the particle gravity scale. Adjusts the effect of the global
+	/// gravity vector on particles. Default value is 1.0f.
+	void SetParticleGravityScale(float32 gravityScale);
+
+	/// Get the particle gravity scale.
+	float32 GetParticleGravityScale() const;
+
+	/// Damping is used to reduce the velocity of particles. The damping
+	/// parameter can be larger than 1.0f but the damping effect becomes
+	/// sensitive to the time step when the damping parameter is large.
+	void SetParticleDamping(float32 damping);
+
+	/// Get damping for particles
+	float32 GetParticleDamping() const;
+
+	/// Change the number of iterations when calculating the static pressure of
+	/// particles. By default, 8 iterations. You can reduce the number of
+	/// iterations down to 1 in some situations, but this may cause
+	/// instabilities when many particles come together. If you see particles
+	/// popping away from each other like popcorn, you may have to increase the
+	/// number of iterations.
+	/// For a description of static pressure, see
+	/// http://en.wikipedia.org/wiki/Static_pressure#Static_pressure_in_fluid_dynamics
+	void SetParticleStaticPressureIterations(int32 iterations);
+
+	/// Get the number of iterations for static pressure of particles.
+	int32 GetParticleStaticPressureIterations() const;
+
+	/// Change the particle radius.
+	/// You should set this only once, on world start.
+	/// If you change the radius during execution, existing particles may
+	/// explode, shrink, or behave unexpectedly.
+	void SetParticleRadius(float32 radius);
+
+	/// Get the particle radius.
+	float32 GetParticleRadius() const;
+
+	/// Get the position of each particle
+	/// Array is length GetParticleCount()
+	/// @return the pointer to the head of the particle positions array.
+	b2Vec2* GetParticlePositionBuffer();
+	const b2Vec2* GetParticlePositionBuffer() const;
+
+	/// Get the velocity of each particle
+	/// Array is length GetParticleCount()
+	/// @return the pointer to the head of the particle velocities array.
+	b2Vec2* GetParticleVelocityBuffer();
+	const b2Vec2* GetParticleVelocityBuffer() const;
+
+	/// Get the color of each particle
+	/// Array is length GetParticleCount()
+	/// @return the pointer to the head of the particle colors array.
+	b2ParticleColor* GetParticleColorBuffer();
+	const b2ParticleColor* GetParticleColorBuffer() const;
+
+	/// Get the particle-group of each particle.
+	/// Array is length GetParticleCount()
+	/// @return the pointer to the head of the particle group array.
+	b2ParticleGroup* const* GetParticleGroupBuffer();
+	const b2ParticleGroup* const* GetParticleGroupBuffer() const;
+
+	/// Get the user-specified data of each particle.
+	/// Array is length GetParticleCount()
+	/// @return the pointer to the head of the particle user-data array.
+	void** GetParticleUserDataBuffer();
+	void* const* GetParticleUserDataBuffer() const;
+
+	/// Get the flags for each particle. See the b2ParticleFlag enum.
+	/// Array is length GetParticleCount()
+	/// @return the pointer to the head of the particle-flags array.
+	const uint32* GetParticleFlagsBuffer() const;
+
+	/// Set flags for a particle. See the b2ParticleFlag enum.
+	void SetParticleFlags(int32 index, uint32 flags);
+
+	/// Set an external buffer for particle data.
+	/// Normally, the b2World's block allocator is used for particle data.
+	/// However, sometimes you may have an OpenGL or Java buffer for particle
+	/// data. To avoid data duplication, you may supply this external buffer.
+	///
+	/// Note that, when b2World's block allocator is used, the particle data
+	/// buffers can grow as required. However, when external buffers are used,
+	/// the maximum number of particles is clamped to the size of the smallest
+	/// external buffer.
+	///
+	/// @param buffer is a pointer to a block of memory.
+	/// @param size is the number of values in the block.
+	void SetParticleFlagsBuffer(uint32* buffer, int32 capacity);
+	void SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity);
+	void SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity);
+	void SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity);
+	void SetParticleUserDataBuffer(void** buffer, int32 capacity);
+
+	/// Get contacts between particles
+	/// Contact data can be used for many reasons, for example to trigger
+	/// rendering or audio effects.
+	const b2ParticleContact* GetParticleContacts();
+	int32 GetParticleContactCount();
+
+	/// Get contacts between particles and bodies
+	/// Contact data can be used for many reasons, for example to trigger
+	/// rendering or audio effects.
+	const b2ParticleBodyContact* GetParticleBodyContacts();
+	int32 GetParticleBodyContactCount();
+
+	/// Compute the kinetic energy that can be lost by damping force
+	float32 ComputeParticleCollisionEnergy() const;
 
 private:
 
@@ -169,15 +392,6 @@ private:
 	template <typename T> T* ReallocateBuffer(ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity, bool deferred);
 	template <typename T> T* RequestParticleBuffer(T* buffer);
 
-	int32 CreateParticle(const b2ParticleDef& def);
-	void DestroyParticle(int32 index, bool callDestructionListener);
-	// Destroy particles in the specified shape with the transform xf applied
-	// optionally calling the destruction listener for particles that are
-	// destroyed.
-	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf,
-	                              bool callDestructionListener);
-	void DestroyParticlesInGroup(b2ParticleGroup* group,
-	                             bool callDestructionListener);
 	int32 CreateParticleForGroup(
 		const b2ParticleGroupDef& groupDef,
 		const b2Transform& xf, const b2Vec2& position);
@@ -185,8 +399,6 @@ private:
 		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
 	void CreateParticlesFillShapeForGroup(
 		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
-	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
-	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 	void DestroyParticleGroup(b2ParticleGroup* group);
 	void ComputeDepth();
 
@@ -217,16 +429,6 @@ private:
 	void SolveZombie();
 	void RotateBuffer(int32 start, int32 mid, int32 end);
 
-	void SetParticleRadius(float32 radius);
-	float32 GetParticleRadius() const;
-	void SetParticleDensity(float32 density);
-	float32 GetParticleDensity() const;
-	void SetParticleGravityScale(float32 gravityScale);
-	float32 GetParticleGravityScale() const;
-	void SetParticleDamping(float32 damping);
-	float32 GetParticleDamping() const;
-	void SetParticleStaticPressureIterations(int32 iterations);
-	int32 GetParticleStaticPressureIterations() const;
 	float32 GetCriticalVelocity(const b2TimeStep& step) const;
 	float32 GetCriticalVelocitySquared(const b2TimeStep& step) const;
 	float32 GetCriticalPressure(const b2TimeStep& step) const;
@@ -234,38 +436,12 @@ private:
 	float32 GetParticleMass() const;
 	float32 GetParticleInvMass() const;
 
-	b2ParticleGroup* GetParticleGroupList();
-	const b2ParticleGroup* GetParticleGroupList() const;
-	int32 GetParticleGroupCount() const;
-	int32 GetParticleCount() const;
-	int32 GetParticleMaxCount() const;
-	void SetParticleMaxCount(int32 count);
-
-	b2Vec2* GetParticlePositionBuffer();
-	b2Vec2* GetParticleVelocityBuffer();
-	b2ParticleColor* GetParticleColorBuffer();
-	void** GetParticleUserDataBuffer();
-	const uint32* GetParticleFlagsBuffer() const;
-	const b2Vec2* GetParticlePositionBuffer() const;
-	const b2Vec2* GetParticleVelocityBuffer() const;
-	const b2ParticleColor* GetParticleColorBuffer() const;
-	const b2ParticleGroup* const* GetParticleGroupBuffer() const;
-	void* const* GetParticleUserDataBuffer() const;
 	template <typename T> void SetParticleBuffer(ParticleBuffer<T>* buffer, T* newBufferData, int32 newCapacity);
 
-	void SetParticleFlagsBuffer(uint32* buffer, int32 capacity);
-	void SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity);
-	void SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity);
-	void SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity);
-	b2ParticleGroup* const* GetParticleGroupBuffer();
-	void SetParticleUserDataBuffer(void** buffer, int32 capacity);
-
-	void SetParticleFlags(int32 index, uint32 flags);
 	void SetParticleGroupFlags(b2ParticleGroup* group, uint32 flags);
 
 	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
 	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b2Vec2& point2) const;
-	float32 ComputeParticleCollisionEnergy() const;
 
 	int32 m_timestamp;
 	int32 m_allParticleFlags;
@@ -371,6 +547,26 @@ inline int32 b2ParticleSystem::GetParticleGroupCount() const
 inline int32 b2ParticleSystem::GetParticleCount() const
 {
 	return m_count;
+}
+
+inline const b2ParticleContact* b2ParticleSystem::GetParticleContacts()
+{
+	return m_contactBuffer;
+}
+
+inline int32 b2ParticleSystem::GetParticleContactCount()
+{
+	return m_contactCount;
+}
+
+inline const b2ParticleBodyContact* b2ParticleSystem::GetParticleBodyContacts()
+{
+	return m_bodyContactBuffer;
+}
+
+inline int32 b2ParticleSystem::GetParticleBodyContactCount()
+{
+	return m_bodyContactCount;
 }
 
 #endif

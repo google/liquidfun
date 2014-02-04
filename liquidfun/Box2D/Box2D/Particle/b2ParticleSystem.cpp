@@ -169,8 +169,16 @@ static int32 LimitCapacity(int32 capacity, int32 maxCount)
 
 int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 {
+	b2Assert(m_world->IsLocked() == false);
+	if (m_world->IsLocked())
+	{
+		return 0;
+	}
+
 	if (m_count >= m_internalAllocatedCapacity)
 	{
+		// Double the particle capacity, but don't increase capacity beyond
+		// the smallest user-supplied buffer size.
 		int32 capacity = m_count ? 2 * m_count : b2_minParticleBufferCapacity;
 		capacity = LimitCapacity(capacity, m_maxCount);
 		capacity = LimitCapacity(capacity, m_flagsBuffer.userSuppliedCapacity);
@@ -249,6 +257,12 @@ int32 b2ParticleSystem::DestroyParticlesInShape(
 	const b2Shape& shape, const b2Transform& xf,
 	bool callDestructionListener)
 {
+	b2Assert(m_world->IsLocked() == false);
+	if (m_world->IsLocked())
+	{
+		return 0;
+	}
+
 	class DestroyParticlesInShapeCallback : public b2QueryCallback
 	{
 	public:
@@ -297,6 +311,12 @@ int32 b2ParticleSystem::DestroyParticlesInShape(
 void b2ParticleSystem::DestroyParticlesInGroup(
 	b2ParticleGroup* group, bool callDestructionListener)
 {
+	b2Assert(m_world->IsLocked() == false);
+	if (m_world->IsLocked())
+	{
+		return;
+	}
+
 	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++) {
 		DestroyParticle(i, callDestructionListener);
 	}
@@ -382,6 +402,12 @@ void b2ParticleSystem::CreateParticlesFillShapeForGroup(
 
 b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef& groupDef)
 {
+	b2Assert(m_world->IsLocked() == false);
+	if (m_world->IsLocked())
+	{
+		return 0;
+	}
+
 	b2Transform transform;
 	transform.Set(groupDef.position, groupDef.angle);
 	int32 firstIndex = m_count;
@@ -527,6 +553,12 @@ void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b,
 
 void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB)
 {
+	b2Assert(m_world->IsLocked() == false);
+	if (m_world->IsLocked())
+	{
+		return;
+	}
+
 	b2Assert(groupA != groupB);
 	RotateBuffer(groupB->m_firstIndex, groupB->m_lastIndex, m_count);
 	b2Assert(groupB->m_lastIndex == m_count);
@@ -2246,7 +2278,8 @@ template <typename T> void b2ParticleSystem::SetParticleBuffer(ParticleBuffer<T>
 		m_world->m_blockAllocator.Free(buffer->data, sizeof(T) * m_internalAllocatedCapacity);
 	}
 	buffer->data = newData;
-	buffer->userSuppliedCapacity = newCapacity;}
+	buffer->userSuppliedCapacity = newCapacity;
+}
 
 void b2ParticleSystem::SetParticleFlagsBuffer(uint32* buffer, int32 capacity)
 {
