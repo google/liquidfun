@@ -59,7 +59,8 @@ static BOOL WINAPI MockSystemTime(_Out_ LARGE_INTEGER *lpFrequency)
 
 static BOOL WINAPI MockSystemFreq(_Out_ LARGE_INTEGER *lpFrequency)
 {
-	lpFrequency->QuadPart = NSEC_PER_SEC; // mock frequency 1,000,000,000 ticks per second
+	// mock frequency 1,000,000,000 ticks per second
+	lpFrequency->QuadPart = NSEC_PER_SEC;
 	return TRUE;
 }
 

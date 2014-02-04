@@ -122,21 +122,26 @@ b2ParticleSystem::~b2ParticleSystem()
 }
 
 // Reallocate a buffer
-template <typename T> T* b2ParticleSystem::ReallocateBuffer(T* oldBuffer, int32 oldCapacity, int32 newCapacity)
+template <typename T> T* b2ParticleSystem::ReallocateBuffer(
+	T* oldBuffer, int32 oldCapacity, int32 newCapacity)
 {
 	b2Assert(newCapacity > oldCapacity);
-	T* newBuffer = (T*) m_world->m_blockAllocator.Allocate(sizeof(T) * newCapacity);
+	T* newBuffer = (T*) m_world->m_blockAllocator.Allocate(
+		sizeof(T) * newCapacity);
 	memcpy(newBuffer, oldBuffer, sizeof(T) * oldCapacity);
 	m_world->m_blockAllocator.Free(oldBuffer, sizeof(T) * oldCapacity);
 	return newBuffer;
 }
 
 // Reallocate a buffer
-template <typename T> T* b2ParticleSystem::ReallocateBuffer(T* buffer, int32 userSuppliedCapacity, int32 oldCapacity, int32 newCapacity, bool deferred)
+template <typename T> T* b2ParticleSystem::ReallocateBuffer(
+	T* buffer, int32 userSuppliedCapacity, int32 oldCapacity,
+	int32 newCapacity, bool deferred)
 {
 	b2Assert(newCapacity > oldCapacity);
 	// A 'deferred' buffer is reallocated only if it is not NULL.
-	// If 'userSuppliedCapacity' is not zero, buffer is user supplied and must be kept.
+	// If 'userSuppliedCapacity' is not zero, buffer is user supplied and must
+	// be kept.
 	b2Assert(!userSuppliedCapacity || newCapacity <= userSuppliedCapacity);
 	if ((!deferred || buffer) && !userSuppliedCapacity)
 	{
@@ -146,17 +151,21 @@ template <typename T> T* b2ParticleSystem::ReallocateBuffer(T* buffer, int32 use
 }
 
 // Reallocate a buffer
-template <typename T> T* b2ParticleSystem::ReallocateBuffer(ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity, bool deferred)
+template <typename T> T* b2ParticleSystem::ReallocateBuffer(
+	ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity,
+	bool deferred)
 {
 	b2Assert(newCapacity > oldCapacity);
-	return ReallocateBuffer(buffer->data, buffer->userSuppliedCapacity, oldCapacity, newCapacity, deferred);
+	return ReallocateBuffer(buffer->data, buffer->userSuppliedCapacity,
+							oldCapacity, newCapacity, deferred);
 }
 
 template <typename T> T* b2ParticleSystem::RequestParticleBuffer(T* buffer)
 {
 	if (!buffer)
 	{
-		buffer = (T*) (m_world->m_blockAllocator.Allocate(sizeof(T) * m_internalAllocatedCapacity));
+		buffer = (T*) (m_world->m_blockAllocator.Allocate(
+						   sizeof(T) * m_internalAllocatedCapacity));
 		memset(buffer, 0, sizeof(T) * m_internalAllocatedCapacity);
 	}
 	return buffer;
@@ -182,23 +191,46 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 		int32 capacity = m_count ? 2 * m_count : b2_minParticleBufferCapacity;
 		capacity = LimitCapacity(capacity, m_maxCount);
 		capacity = LimitCapacity(capacity, m_flagsBuffer.userSuppliedCapacity);
-		capacity = LimitCapacity(capacity, m_positionBuffer.userSuppliedCapacity);
-		capacity = LimitCapacity(capacity, m_velocityBuffer.userSuppliedCapacity);
-		capacity = LimitCapacity(capacity, m_colorBuffer.userSuppliedCapacity);
-		capacity = LimitCapacity(capacity, m_userDataBuffer.userSuppliedCapacity);
+		capacity = LimitCapacity(capacity,
+								 m_positionBuffer.userSuppliedCapacity);
+		capacity = LimitCapacity(capacity,
+								 m_velocityBuffer.userSuppliedCapacity);
+		capacity = LimitCapacity(capacity,
+								 m_colorBuffer.userSuppliedCapacity);
+		capacity = LimitCapacity(capacity,
+								 m_userDataBuffer.userSuppliedCapacity);
 		if (m_internalAllocatedCapacity < capacity)
 		{
-			m_flagsBuffer.data = ReallocateBuffer(&m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
-			m_positionBuffer.data = ReallocateBuffer(&m_positionBuffer, m_internalAllocatedCapacity, capacity, false);
-			m_velocityBuffer.data = ReallocateBuffer(&m_velocityBuffer, m_internalAllocatedCapacity, capacity, false);
-			m_weightBuffer = ReallocateBuffer(m_weightBuffer, 0, m_internalAllocatedCapacity, capacity, false);
-			m_staticPressureBuffer = ReallocateBuffer(m_staticPressureBuffer, 0, m_internalAllocatedCapacity, capacity, true);
-			m_accumulationBuffer = ReallocateBuffer(m_accumulationBuffer, 0, m_internalAllocatedCapacity, capacity, false);
-			m_accumulation2Buffer = ReallocateBuffer(m_accumulation2Buffer, 0, m_internalAllocatedCapacity, capacity, true);
-			m_depthBuffer = ReallocateBuffer(m_depthBuffer, 0, m_internalAllocatedCapacity, capacity, true);
-			m_colorBuffer.data = ReallocateBuffer(&m_colorBuffer, m_internalAllocatedCapacity, capacity, true);
-			m_groupBuffer = ReallocateBuffer(m_groupBuffer, 0, m_internalAllocatedCapacity, capacity, false);
-			m_userDataBuffer.data = ReallocateBuffer(&m_userDataBuffer, m_internalAllocatedCapacity, capacity, true);
+			m_flagsBuffer.data = ReallocateBuffer(
+				&m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
+			m_positionBuffer.data = ReallocateBuffer(
+				&m_positionBuffer, m_internalAllocatedCapacity, capacity,
+				false);
+			m_velocityBuffer.data = ReallocateBuffer(
+				&m_velocityBuffer, m_internalAllocatedCapacity, capacity,
+				false);
+			m_weightBuffer = ReallocateBuffer(
+				m_weightBuffer, 0, m_internalAllocatedCapacity, capacity,
+				false);
+			m_staticPressureBuffer = ReallocateBuffer(
+				m_staticPressureBuffer, 0, m_internalAllocatedCapacity,
+				capacity, true);
+			m_accumulationBuffer = ReallocateBuffer(
+				m_accumulationBuffer, 0, m_internalAllocatedCapacity,
+				capacity, false);
+			m_accumulation2Buffer = ReallocateBuffer(
+				m_accumulation2Buffer, 0, m_internalAllocatedCapacity,
+				capacity, true);
+			m_depthBuffer = ReallocateBuffer(
+				m_depthBuffer, 0, m_internalAllocatedCapacity, capacity, true);
+			m_colorBuffer.data = ReallocateBuffer(
+				&m_colorBuffer, m_internalAllocatedCapacity, capacity, true);
+			m_groupBuffer = ReallocateBuffer(
+				m_groupBuffer, 0, m_internalAllocatedCapacity, capacity,
+				false);
+			m_userDataBuffer.data = ReallocateBuffer(
+				&m_userDataBuffer, m_internalAllocatedCapacity,
+				capacity, true);
 			m_internalAllocatedCapacity = capacity;
 		}
 	}
@@ -233,8 +265,10 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	if (m_proxyCount >= m_proxyCapacity)
 	{
 		int32 oldCapacity = m_proxyCapacity;
-		int32 newCapacity = m_proxyCount ? 2 * m_proxyCount : b2_minParticleBufferCapacity;
-		m_proxyBuffer = ReallocateBuffer(m_proxyBuffer, oldCapacity, newCapacity);
+		int32 newCapacity = m_proxyCount ?
+			2 * m_proxyCount : b2_minParticleBufferCapacity;
+		m_proxyBuffer = ReallocateBuffer(m_proxyBuffer, oldCapacity,
+										 newCapacity);
 		m_proxyCapacity = newCapacity;
 	}
 	m_proxyBuffer[m_proxyCount++].index = index;
@@ -286,7 +320,8 @@ int32 b2ParticleSystem::DestroyParticlesInShape(
 		bool ReportParticle(int32 index)
 		{
 			b2Assert(index >=0 && index < m_system->m_count);
-			if (m_shape->TestPoint(m_xf, m_system->m_positionBuffer.data[index]))
+			if (m_shape->TestPoint(m_xf,
+								   m_system->m_positionBuffer.data[index]))
 			{
 				m_system->DestroyParticle(index, m_callDestructionListener);
 				m_destroyed++;
@@ -331,7 +366,8 @@ int32 b2ParticleSystem::CreateParticleForGroup(
 	particleDef.position = b2Mul(xf, p);
 	particleDef.velocity =
 		groupDef.linearVelocity +
-		b2Cross(groupDef.angularVelocity, particleDef.position - groupDef.position);
+		b2Cross(groupDef.angularVelocity,
+				particleDef.position - groupDef.position);
 	particleDef.color = groupDef.color;
 	particleDef.userData = groupDef.userData;
 	return CreateParticle(particleDef);
@@ -401,7 +437,8 @@ void b2ParticleSystem::CreateParticlesFillShapeForGroup(
 	}
 }
 
-b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef& groupDef)
+b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
+	const b2ParticleGroupDef& groupDef)
 {
 	b2Assert(m_world->IsLocked() == false);
 	if (m_world->IsLocked())
@@ -476,8 +513,10 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 				if (m_pairCount >= m_pairCapacity)
 				{
 					int32 oldCapacity = m_pairCapacity;
-					int32 newCapacity = m_pairCount ? 2 * m_pairCount : b2_minParticleBufferCapacity;
-					m_pairBuffer = ReallocateBuffer(m_pairBuffer, oldCapacity, newCapacity);
+					int32 newCapacity = m_pairCount ?
+						2 * m_pairCount : b2_minParticleBufferCapacity;
+					m_pairBuffer = ReallocateBuffer(m_pairBuffer, oldCapacity,
+													newCapacity);
 					m_pairCapacity = newCapacity;
 				}
 				Pair& pair = m_pairBuffer[m_pairCount];
@@ -511,7 +550,8 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(const b2ParticleGroupDef&
 	return group;
 }
 
-void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b, int32 c) const
+void b2ParticleSystem::CreateParticleGroupCallback::operator()(
+	int32 a, int32 b, int32 c) const
 {
 	const b2Vec2& pa = system->m_positionBuffer.data[a];
 	const b2Vec2& pb = system->m_positionBuffer.data[b];
@@ -519,7 +559,8 @@ void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b,
 	b2Vec2 dab = pa - pb;
 	b2Vec2 dbc = pb - pc;
 	b2Vec2 dca = pc - pa;
-	float32 maxDistanceSquared = b2_maxTriadDistanceSquared * system->m_squaredDiameter;
+	float32 maxDistanceSquared = b2_maxTriadDistanceSquared *
+								 system->m_squaredDiameter;
 	if (b2Dot(dab, dab) < maxDistanceSquared &&
 		b2Dot(dbc, dbc) < maxDistanceSquared &&
 		b2Dot(dca, dca) < maxDistanceSquared)
@@ -527,8 +568,10 @@ void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b,
 		if (system->m_triadCount >= system->m_triadCapacity)
 		{
 			int32 oldCapacity = system->m_triadCapacity;
-			int32 newCapacity = system->m_triadCount ? 2 * system->m_triadCount : b2_minParticleBufferCapacity;
-			system->m_triadBuffer = system->ReallocateBuffer(system->m_triadBuffer, oldCapacity, newCapacity);
+			int32 newCapacity = system->m_triadCount ?
+				2 * system->m_triadCount : b2_minParticleBufferCapacity;
+			system->m_triadBuffer = system->ReallocateBuffer(
+				system->m_triadBuffer, oldCapacity, newCapacity);
 			system->m_triadCapacity = newCapacity;
 		}
 		Triad& triad = system->m_triadBuffer[system->m_triadCount];
@@ -552,7 +595,8 @@ void b2ParticleSystem::CreateParticleGroupCallback::operator()(int32 a, int32 b,
 	}
 };
 
-void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB)
+void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
+										  b2ParticleGroup* groupB)
 {
 	b2Assert(m_world->IsLocked() == false);
 	if (m_world->IsLocked())
@@ -563,7 +607,8 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 	b2Assert(groupA != groupB);
 	RotateBuffer(groupB->m_firstIndex, groupB->m_lastIndex, m_count);
 	b2Assert(groupB->m_lastIndex == m_count);
-	RotateBuffer(groupA->m_firstIndex, groupA->m_lastIndex, groupB->m_firstIndex);
+	RotateBuffer(groupA->m_firstIndex, groupA->m_lastIndex,
+				 groupB->m_firstIndex);
 	b2Assert(groupA->m_lastIndex == groupB->m_firstIndex);
 
 	uint32 particleFlags = 0;
@@ -587,8 +632,10 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 				if (m_pairCount >= m_pairCapacity)
 				{
 					int32 oldCapacity = m_pairCapacity;
-					int32 newCapacity = m_pairCount ? 2 * m_pairCount : b2_minParticleBufferCapacity;
-					m_pairBuffer = ReallocateBuffer(m_pairBuffer, oldCapacity, newCapacity);
+					int32 newCapacity = m_pairCount ? 2 * m_pairCount :
+						b2_minParticleBufferCapacity;
+					m_pairBuffer = ReallocateBuffer(m_pairBuffer, oldCapacity,
+													newCapacity);
 					m_pairCapacity = newCapacity;
 				}
 				Pair& pair = m_pairBuffer[m_pairCount];
@@ -596,7 +643,8 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 				pair.indexB = b;
 				pair.flags = contact.flags;
 				pair.strength = b2Min(groupA->m_strength, groupB->m_strength);
-				pair.distance = b2Distance(m_positionBuffer.data[a], m_positionBuffer.data[b]);
+				pair.distance = b2Distance(m_positionBuffer.data[a],
+										   m_positionBuffer.data[b]);
 				m_pairCount++;
 			}
 		}
@@ -632,7 +680,8 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGro
 	DestroyParticleGroup(groupB);
 }
 
-void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b, int32 c) const
+void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b,
+															  int32 c) const
 {
 	// Create a triad if it will contain particles from both groups.
 	int32 countA =
@@ -652,7 +701,8 @@ void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b, 
 			b2Vec2 dab = pa - pb;
 			b2Vec2 dbc = pb - pc;
 			b2Vec2 dca = pc - pa;
-			float32 maxDistanceSquared = b2_maxTriadDistanceSquared * system->m_squaredDiameter;
+			float32 maxDistanceSquared = b2_maxTriadDistanceSquared *
+										 system->m_squaredDiameter;
 			if (b2Dot(dab, dab) < maxDistanceSquared &&
 				b2Dot(dbc, dbc) < maxDistanceSquared &&
 				b2Dot(dca, dca) < maxDistanceSquared)
@@ -660,8 +710,11 @@ void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b, 
 				if (system->m_triadCount >= system->m_triadCapacity)
 				{
 					int32 oldCapacity = system->m_triadCapacity;
-					int32 newCapacity = system->m_triadCount ? 2 * system->m_triadCount : b2_minParticleBufferCapacity;
-					system->m_triadBuffer = system->ReallocateBuffer(system->m_triadBuffer, oldCapacity, newCapacity);
+					int32 newCapacity = system->m_triadCount ?
+						2 * system->m_triadCount :
+						b2_minParticleBufferCapacity;
+					system->m_triadBuffer = system->ReallocateBuffer(
+						system->m_triadBuffer, oldCapacity, newCapacity);
 					system->m_triadCapacity = newCapacity;
 				}
 				Triad& triad = system->m_triadBuffer[system->m_triadCount];
@@ -768,8 +821,9 @@ void b2ParticleSystem::ComputeDepth()
 		if (group->m_groupFlags & b2_particleGroupNeedsUpdateDepth)
 		{
 			groupsToUpdate[groupsToUpdateCount++] = group;
-			SetParticleGroupFlags(
-				group, group->m_groupFlags & ~b2_particleGroupNeedsUpdateDepth);
+			SetParticleGroupFlags(group,
+								  group->m_groupFlags &
+									~b2_particleGroupNeedsUpdateDepth);
 			for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 			{
 				m_accumulationBuffer[i] = 0;
@@ -848,8 +902,10 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 		if (m_contactCount >= m_contactCapacity)
 		{
 			int32 oldCapacity = m_contactCapacity;
-			int32 newCapacity = m_contactCount ? 2 * m_contactCount : b2_minParticleBufferCapacity;
-			m_contactBuffer = ReallocateBuffer(m_contactBuffer, oldCapacity, newCapacity);
+			int32 newCapacity = m_contactCount ?
+				2 * m_contactCount : b2_minParticleBufferCapacity;
+			m_contactBuffer = ReallocateBuffer(m_contactBuffer, oldCapacity,
+											   newCapacity);
 			m_contactCapacity = newCapacity;
 		}
 		float32 invD = b2InvSqrt(d2);
@@ -876,7 +932,8 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 	{
 		int32 i = proxy->index;
 		b2Vec2 p = m_positionBuffer.data[i];
-		proxy->tag = computeTag(m_inverseDiameter * p.x, m_inverseDiameter * p.y);
+		proxy->tag = computeTag(m_inverseDiameter * p.x,
+								m_inverseDiameter * p.y);
 	}
 	std::sort(beginProxy, endProxy);
 	m_contactCount = 0;
@@ -939,7 +996,8 @@ void b2ParticleSystem::UpdateBodyContacts()
 			b2Body* b = fixture->GetBody();
 			b2Vec2 bp = b->GetWorldCenter();
 			float32 bm = b->GetMass();
-			float32 bI = b->GetInertia() - bm * b->GetLocalCenter().LengthSquared();
+			float32 bI = b->GetInertia() -
+						 bm * b->GetLocalCenter().LengthSquared();
 			float32 invBm = bm > 0 ? 1 / bm : 0;
 			float32 invBI = bI > 0 ? 1 / bI : 0;
 			int32 childCount = shape->GetChildCount();
@@ -966,8 +1024,10 @@ void b2ParticleSystem::UpdateBodyContacts()
 				{
 					int32 a = proxy->index;
 					b2Vec2 ap = m_system->m_positionBuffer.data[a];
-					if (aabb.lowerBound.x <= ap.x && ap.x <= aabb.upperBound.x &&
-						aabb.lowerBound.y <= ap.y && ap.y <= aabb.upperBound.y)
+					if (aabb.lowerBound.x <= ap.x &&
+							ap.x <= aabb.upperBound.x &&
+						aabb.lowerBound.y <= ap.y &&
+							ap.y <= aabb.upperBound.y)
 					{
 						float32 d;
 						b2Vec2 n;
@@ -975,23 +1035,36 @@ void b2ParticleSystem::UpdateBodyContacts()
 						if (d < m_system->m_particleDiameter)
 						{
 							float32 invAm =
-								m_system->m_flagsBuffer.data[a] & b2_wallParticle ?
-								0 : m_system->GetParticleInvMass();
+								m_system->m_flagsBuffer.data[a] &
+								b2_wallParticle ? 0 :
+									m_system->GetParticleInvMass();
 							b2Vec2 rp = ap - bp;
 							float32 rpn = b2Cross(rp, n);
-							if (m_system->m_bodyContactCount >= m_system->m_bodyContactCapacity)
+							if (m_system->m_bodyContactCount >=
+								m_system->m_bodyContactCapacity)
 							{
-								int32 oldCapacity = m_system->m_bodyContactCapacity;
-								int32 newCapacity = m_system->m_bodyContactCount ? 2 * m_system->m_bodyContactCount : b2_minParticleBufferCapacity;
-								m_system->m_bodyContactBuffer = m_system->ReallocateBuffer(m_system->m_bodyContactBuffer, oldCapacity, newCapacity);
+								int32 oldCapacity =
+									m_system->m_bodyContactCapacity;
+								int32 newCapacity =
+									m_system->m_bodyContactCount ?
+										2 * m_system->m_bodyContactCount :
+										b2_minParticleBufferCapacity;
+								m_system->m_bodyContactBuffer =
+									m_system->ReallocateBuffer(
+										m_system->m_bodyContactBuffer,
+										oldCapacity, newCapacity);
 								m_system->m_bodyContactCapacity = newCapacity;
 							}
-							b2ParticleBodyContact& contact = m_system->m_bodyContactBuffer[m_system->m_bodyContactCount];
+							b2ParticleBodyContact& contact =
+								m_system->m_bodyContactBuffer[
+									m_system->m_bodyContactCount];
 							contact.index = a;
 							contact.body = b;
-							contact.weight = 1 - d * m_system->m_inverseDiameter;
+							contact.weight =
+								1 - d * m_system->m_inverseDiameter;
 							contact.normal = -n;
-							contact.mass = 1 / (invAm + invBm + invBI * rpn * rpn);
+							contact.mass =
+								1 / (invAm + invBm + invBI * rpn * rpn);
 							m_system->m_bodyContactCount++;
 						}
 					}
@@ -1065,15 +1138,18 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 				{
 					int32 a = proxy->index;
 					b2Vec2 ap = m_system->m_positionBuffer.data[a];
-					if (aabb.lowerBound.x <= ap.x && ap.x <= aabb.upperBound.x &&
-						aabb.lowerBound.y <= ap.y && ap.y <= aabb.upperBound.y)
+					if (aabb.lowerBound.x <= ap.x &&
+							ap.x <= aabb.upperBound.x &&
+						aabb.lowerBound.y <= ap.y &&
+							ap.y <= aabb.upperBound.y)
 					{
 						b2Vec2 av = m_system->m_velocityBuffer.data[a];
 						b2RayCastOutput output;
 						b2RayCastInput input;
 						if (m_system->m_iterationIndex == 0)
 						{
-							input.p1 = b2Mul(body->m_xf, b2MulT(body->m_xf0, ap));
+							input.p1 = b2Mul(body->m_xf,
+											 b2MulT(body->m_xf0, ap));
 						}
 						else
 						{
@@ -1120,7 +1196,8 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 		b2TimeStep m_step;
 
 	public:
-		SolveCollisionCallback(b2ParticleSystem* system, const b2TimeStep& step)
+		SolveCollisionCallback(b2ParticleSystem* system,
+							   const b2TimeStep& step)
 		{
 			m_system = system;
 			m_step = step;
@@ -1322,9 +1399,9 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		{
 			SolveBarrier(subStep);
 		}
-		// SolveCollision, SolveRigid and SolveWall should be called after other
-		// force functions because they may require particles to have specific
-		// velocities.
+		// SolveCollision, SolveRigid and SolveWall should be called after
+		// other force functions because they may require particles to have
+		// specific velocities.
 		SolveCollision(subStep);
 		if (m_allGroupFlags & b2_rigidParticleGroup)
 		{
@@ -1355,7 +1432,8 @@ void b2ParticleSystem::UpdateAllParticleFlags()
 void b2ParticleSystem::UpdateAllGroupFlags()
 {
 	m_allGroupFlags = 0;
-	for (const b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
+	for (const b2ParticleGroup* group = m_groupList; group;
+		 group = group->GetNext())
 	{
 		m_allGroupFlags |= group->m_groupFlags;
 	}
@@ -1396,7 +1474,7 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 	///     Sum_for_j((p_i - p_j) * w_ij) + relaxation * p_i =
 	///     pressurePerWeight * (w_i - b2_minParticleWeight)
 	/// by iterating the calculation:
-	///	    p_i = (Sum_for_j(p_j * w_ij) + pressurePerWeight *
+	///     p_i = (Sum_for_j(p_j * w_ij) + pressurePerWeight *
 	///           (w_i - b2_minParticleWeight)) / (w_i + relaxation)
 	/// where
 	///     p_i and p_j are static pressure of particle i and j
@@ -1404,7 +1482,8 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 	///     w_i is sum of contact weight of particle i
 	for (int32 t = 0; t < m_staticPressureIterations; t++)
 	{
-		memset(m_accumulationBuffer, 0, sizeof(*m_accumulationBuffer) * m_count);
+		memset(m_accumulationBuffer, 0,
+			   sizeof(*m_accumulationBuffer) * m_count);
 		for (int32 k = 0; k < m_bodyContactCount; k++)
 		{
 			const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
@@ -1423,8 +1502,10 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 				int32 a = contact.indexA;
 				int32 b = contact.indexB;
 				float32 w = contact.weight;
-				m_accumulationBuffer[a] += w * m_staticPressureBuffer[b]; // a <- b
-				m_accumulationBuffer[b] += w * m_staticPressureBuffer[a]; // b <- a
+				m_accumulationBuffer[a] +=
+					w * m_staticPressureBuffer[b]; // a <- b
+				m_accumulationBuffer[b] +=
+					w * m_staticPressureBuffer[a]; // b <- a
 			}
 		}
 		for (int32 i = 0; i < m_count; i++)
@@ -1526,7 +1607,8 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 		float32 m = contact.mass;
 		b2Vec2 n = contact.normal;
 		b2Vec2 p = m_positionBuffer.data[a];
-		b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) - m_velocityBuffer.data[a];
+		b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) -
+				   m_velocityBuffer.data[a];
 		float32 vn = b2Dot(v, n);
 		if (vn < 0)
 		{
@@ -1587,7 +1669,8 @@ void b2ParticleSystem::SolveRigid(const b2TimeStep& step)
 			velocityTransform.q.c = step.inv_dt * (transform.q.c - 1);
 			for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 			{
-				m_velocityBuffer.data[i] = b2Mul(velocityTransform, m_positionBuffer.data[i]);
+				m_velocityBuffer.data[i] = b2Mul(velocityTransform,
+												 m_positionBuffer.data[i]);
 			}
 		}
 	}
@@ -1716,7 +1799,8 @@ void b2ParticleSystem::SolveViscous()
 			float32 w = contact.weight;
 			float32 m = contact.mass;
 			b2Vec2 p = m_positionBuffer.data[a];
-			b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) - m_velocityBuffer.data[a];
+			b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) -
+					   m_velocityBuffer.data[a];
 			b2Vec2 f = viscousStrength * m * w * v;
 			m_velocityBuffer.data[a] += GetParticleInvMass() * f;
 			b->ApplyLinearImpulse(-f, p, true);
@@ -1830,7 +1914,8 @@ void b2ParticleSystem::SolveZombie()
 {
 	// removes particles with zombie flag
 	int32 newCount = 0;
-	int32* newIndices = (int32*) m_world->m_stackAllocator.Allocate(sizeof(int32) * m_count);
+	int32* newIndices = (int32*) m_world->m_stackAllocator.Allocate(
+		sizeof(int32) * m_count);
 	uint32 allParticleFlags = 0;
 	for (int32 i = 0; i < m_count; i++)
 	{
@@ -1857,7 +1942,8 @@ void b2ParticleSystem::SolveZombie()
 				m_groupBuffer[newCount] = m_groupBuffer[i];
 				if (m_staticPressureBuffer)
 				{
-					m_staticPressureBuffer[newCount] = m_staticPressureBuffer[i];
+					m_staticPressureBuffer[newCount] =
+						m_staticPressureBuffer[i];
 				}
 				if (m_depthBuffer)
 				{
@@ -1985,7 +2071,8 @@ void b2ParticleSystem::SolveZombie()
 				if (group->m_groupFlags & b2_solidParticleGroup)
 				{
 					SetParticleGroupFlags(group,
-						group->m_groupFlags | b2_particleGroupNeedsUpdateDepth);
+										  group->m_groupFlags |
+											b2_particleGroupNeedsUpdateDepth);
 				}
 				// TODO: flag to split if needed
 			}
@@ -2055,25 +2142,34 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	newIndices.mid = mid;
 	newIndices.end = end;
 
-	std::rotate(m_flagsBuffer.data + start, m_flagsBuffer.data + mid, m_flagsBuffer.data + end);
-	std::rotate(m_positionBuffer.data + start, m_positionBuffer.data + mid, m_positionBuffer.data + end);
-	std::rotate(m_velocityBuffer.data + start, m_velocityBuffer.data + mid, m_velocityBuffer.data + end);
-	std::rotate(m_groupBuffer + start, m_groupBuffer + mid, m_groupBuffer + end);
+	std::rotate(m_flagsBuffer.data + start, m_flagsBuffer.data + mid,
+				m_flagsBuffer.data + end);
+	std::rotate(m_positionBuffer.data + start, m_positionBuffer.data + mid,
+				m_positionBuffer.data + end);
+	std::rotate(m_velocityBuffer.data + start, m_velocityBuffer.data + mid,
+				m_velocityBuffer.data + end);
+	std::rotate(m_groupBuffer + start, m_groupBuffer + mid,
+				m_groupBuffer + end);
 	if (m_staticPressureBuffer)
 	{
-		std::rotate(m_staticPressureBuffer + start, m_staticPressureBuffer + mid, m_staticPressureBuffer + end);
+		std::rotate(m_staticPressureBuffer + start,
+					m_staticPressureBuffer + mid,
+					m_staticPressureBuffer + end);
 	}
 	if (m_depthBuffer)
 	{
-		std::rotate(m_depthBuffer + start, m_depthBuffer + mid, m_depthBuffer + end);
+		std::rotate(m_depthBuffer + start, m_depthBuffer + mid,
+					m_depthBuffer + end);
 	}
 	if (m_colorBuffer.data)
 	{
-		std::rotate(m_colorBuffer.data + start, m_colorBuffer.data + mid, m_colorBuffer.data + end);
+		std::rotate(m_colorBuffer.data + start,
+					m_colorBuffer.data + mid, m_colorBuffer.data + end);
 	}
 	if (m_userDataBuffer.data)
 	{
-		std::rotate(m_userDataBuffer.data + start, m_userDataBuffer.data + mid, m_userDataBuffer.data + end);
+		std::rotate(m_userDataBuffer.data + start,
+					m_userDataBuffer.data + mid, m_userDataBuffer.data + end);
 	}
 
 	// update proxies
@@ -2181,7 +2277,8 @@ float32 b2ParticleSystem::GetCriticalVelocity(const b2TimeStep& step) const
 	return m_particleDiameter * step.inv_dt;
 }
 
-float32 b2ParticleSystem::GetCriticalVelocitySquared(const b2TimeStep& step) const
+float32 b2ParticleSystem::GetCriticalVelocitySquared(
+	const b2TimeStep& step) const
 {
 	float32 velocity = GetCriticalVelocity(step);
 	return velocity * velocity;
@@ -2205,7 +2302,8 @@ float32 b2ParticleSystem::GetParticleMass() const
 
 float32 b2ParticleSystem::GetParticleInvMass() const
 {
-	return 1.777777f * m_inverseDensity * m_inverseDiameter * m_inverseDiameter;
+	return 1.777777f * m_inverseDensity * m_inverseDiameter *
+			 m_inverseDiameter;
 }
 
 b2Vec2* b2ParticleSystem::GetParticlePositionBuffer()
@@ -2271,12 +2369,14 @@ void* const* b2ParticleSystem::GetParticleUserDataBuffer() const
 	return ((b2ParticleSystem*) this)->GetParticleUserDataBuffer();
 }
 
-template <typename T> void b2ParticleSystem::SetParticleBuffer(ParticleBuffer<T>* buffer, T* newData, int32 newCapacity)
+template <typename T> void b2ParticleSystem::SetParticleBuffer(
+	ParticleBuffer<T>* buffer, T* newData, int32 newCapacity)
 {
 	b2Assert((newData && newCapacity) || (!newData && !newCapacity));
 	if (!buffer->userSuppliedCapacity)
 	{
-		m_world->m_blockAllocator.Free(buffer->data, sizeof(T) * m_internalAllocatedCapacity);
+		m_world->m_blockAllocator.Free(
+			buffer->data, sizeof(T) * m_internalAllocatedCapacity);
 	}
 	buffer->data = newData;
 	buffer->userSuppliedCapacity = newCapacity;
@@ -2287,17 +2387,20 @@ void b2ParticleSystem::SetParticleFlagsBuffer(uint32* buffer, int32 capacity)
 	SetParticleBuffer(&m_flagsBuffer, buffer, capacity);
 }
 
-void b2ParticleSystem::SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity)
+void b2ParticleSystem::SetParticlePositionBuffer(b2Vec2* buffer,
+												 int32 capacity)
 {
 	SetParticleBuffer(&m_positionBuffer, buffer, capacity);
 }
 
-void b2ParticleSystem::SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity)
+void b2ParticleSystem::SetParticleVelocityBuffer(b2Vec2* buffer,
+												 int32 capacity)
 {
 	SetParticleBuffer(&m_velocityBuffer, buffer, capacity);
 }
 
-void b2ParticleSystem::SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity)
+void b2ParticleSystem::SetParticleColorBuffer(b2ParticleColor* buffer,
+											  int32 capacity)
 {
 	SetParticleBuffer(&m_colorBuffer, buffer, capacity);
 }
@@ -2325,7 +2428,8 @@ void b2ParticleSystem::SetParticleFlags(int32 index, uint32 newFlags)
 		// If any flags were added
 		if (newFlags & b2_tensileParticle)
 		{
-			m_accumulation2Buffer = RequestParticleBuffer(m_accumulation2Buffer);
+			m_accumulation2Buffer = RequestParticleBuffer(
+				m_accumulation2Buffer);
 		}
 		if (newFlags & b2_colorMixingParticle)
 		{
@@ -2362,7 +2466,8 @@ void b2ParticleSystem::SetParticleGroupFlags(
 	*oldFlags = newFlags;
 }
 
-void b2ParticleSystem::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const
+void b2ParticleSystem::QueryAABB(b2QueryCallback* callback,
+								 const b2AABB& aabb) const
 {
 	if (m_proxyCount == 0)
 	{
@@ -2395,7 +2500,9 @@ void b2ParticleSystem::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) 
 	}
 }
 
-void b2ParticleSystem::RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b2Vec2& point2) const
+void b2ParticleSystem::RayCast(b2RayCastCallback* callback,
+							   const b2Vec2& point1,
+							   const b2Vec2& point2) const
 {
 	if (m_proxyCount == 0)
 	{

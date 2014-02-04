@@ -15,8 +15,8 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef B2_PARTICLb2_SYSTEM_H
-#define B2_PARTICLb2_SYSTEM_H
+#ifndef B2_PARTICLE_SYSTEM_H
+#define B2_PARTICLE_SYSTEM_H
 
 #include <Box2D/Particle/b2Particle.h>
 #include <Box2D/Dynamics/b2TimeStep.h>
@@ -127,8 +127,8 @@ public:
 	                              bool callDestructionListener);
 
 
-	/// Create a particle group whose properties have been defined. No reference
-	/// to the definition is retained.
+	/// Create a particle group whose properties have been defined. No
+	/// reference to the definition is retained.
 	/// @warning This function is locked during callbacks.
 	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
 
@@ -387,9 +387,14 @@ private:
 	b2ParticleSystem();
 	~b2ParticleSystem();
 
-	template <typename T> T* ReallocateBuffer(T* buffer, int32 oldCapacity, int32 newCapacity);
-	template <typename T> T* ReallocateBuffer(T* buffer, int32 userSuppliedCapacity, int32 oldCapacity, int32 newCapacity, bool deferred);
-	template <typename T> T* ReallocateBuffer(ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity, bool deferred);
+	template <typename T> T* ReallocateBuffer(T* buffer, int32 oldCapacity,
+											  int32 newCapacity);
+	template <typename T> T* ReallocateBuffer(
+		T* buffer, int32 userSuppliedCapacity, int32 oldCapacity,
+		int32 newCapacity, bool deferred);
+	template <typename T> T* ReallocateBuffer(
+		ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity,
+		bool deferred);
 	template <typename T> T* RequestParticleBuffer(T* buffer);
 
 	int32 CreateParticleForGroup(
@@ -436,12 +441,15 @@ private:
 	float32 GetParticleMass() const;
 	float32 GetParticleInvMass() const;
 
-	template <typename T> void SetParticleBuffer(ParticleBuffer<T>* buffer, T* newBufferData, int32 newCapacity);
+	template <typename T> void SetParticleBuffer(
+		ParticleBuffer<T>* buffer, T* newBufferData, int32 newCapacity);
 
 	void SetParticleGroupFlags(b2ParticleGroup* group, uint32 flags);
 
 	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
-	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b2Vec2& point2) const;
+
+	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1,
+				 const b2Vec2& point2) const;
 
 	int32 m_timestamp;
 	int32 m_allParticleFlags;
@@ -463,25 +471,25 @@ private:
 	ParticleBuffer<b2Vec2> m_positionBuffer;
 	ParticleBuffer<b2Vec2> m_velocityBuffer;
 	/// m_weightBuffer is populated in ComputeWeight and used in
-	/// ComputeDepth, SolveStaticPressure and SolvePressure.
+	/// ComputeDepth(), SolveStaticPressure() and SolvePressure().
 	float32* m_weightBuffer;
 	/// When any particles have the flag b2_staticPressureParticle,
-	/// m_staticPressureBuffer is first allocated and used in SolveStaticPressure
-	/// and SolvePressure. It will be reallocated on subsequent CreateParticle()
-	/// calls.
+	/// m_staticPressureBuffer is first allocated and used in
+	/// SolveStaticPressure() and SolvePressure().  It will be reallocated on
+	/// subsequent CreateParticle() calls.
 	float32* m_staticPressureBuffer;
 	/// m_accumulationBuffer is used in many functions as a temporary buffer
 	/// for scalar values.
 	float32* m_accumulationBuffer;
 	/// When any particles have the flag b2_tensileParticle,
-	/// m_accumulation2Buffer is first allocated and used in SolveTensile as a
-	/// temporary buffer for vector values. It will be reallocated on subsequent
-	/// CreateParticle() calls.
+	/// m_accumulation2Buffer is first allocated and used in SolveTensile()
+	/// as a temporary buffer for vector values.  It will be reallocated on
+	/// subsequent CreateParticle() calls.
 	b2Vec2* m_accumulation2Buffer;
 	/// When any particle groups have the flag b2_solidParticleGroup,
-	/// m_depthBuffer is first allocated and populated in ComputeDepth and used
-	/// in SolveSolid. It will be reallocated on subsequent CreateParticle()
-	/// calls.
+	/// m_depthBuffer is first allocated and populated in ComputeDepth() and
+	/// used in SolveSolid(). It will be reallocated on subsequent
+	/// CreateParticle() calls.
 	float32* m_depthBuffer;
 	ParticleBuffer<b2ParticleColor> m_colorBuffer;
 	b2ParticleGroup** m_groupBuffer;
@@ -512,19 +520,33 @@ private:
 
 	// Physical coefficients. Each is initialized to the maximum value that
 	// keeps the numerical stability.
-	float32 m_pressureStrength; // produces pressure in response to compression
-	float32 m_dampingStrength; // reduces normal velocity
-	float32 m_elasticStrength; // restores shapes of elastic particle groups
-	float32 m_springStrength; // restores lengths of spring particle groups
-	float32 m_viscousStrength; // reduces relative velocity of viscous particles
-	float32 m_surfaceTensionStrengthA; // produces pressure for tensile particles
-	float32 m_surfaceTensionStrengthB; // smoothes outline of tensile particles
-	float32 m_powderStrength; // produces repulsion between powder particles
-	float32 m_ejectionStrength; // pushes particles out of solid particle group
-	float32 m_staticPressureStrength; // produces static pressure
-	float32 m_staticPressureRelaxation; // reduces instability of static pressure
-	int32 m_staticPressureIterations; // computes static pressure more precisely
-	float32 m_colorMixingStrength; // mixes colors of color-mixing particles
+
+	/// Produces pressure in response to compression.
+	float32 m_pressureStrength;
+	/// reduces normal velocity
+	float32 m_dampingStrength;
+	// Restores shapes of elastic particle groups.
+	float32 m_elasticStrength;
+	/// Restores lengths of spring particle groups.
+	float32 m_springStrength;
+	/// Reduces relative velocity of viscous particles.
+	float32 m_viscousStrength;
+	/// Produces pressure for tensile particles.
+	float32 m_surfaceTensionStrengthA;
+	/// Smoothes outline of tensile particles.
+	float32 m_surfaceTensionStrengthB;
+	/// Produces repulsion between powder particles.
+	float32 m_powderStrength;
+	/// Pushes particles out of solid particle group.
+	float32 m_ejectionStrength;
+	/// Produces static pressure.
+	float32 m_staticPressureStrength;
+	/// Reduces instability of static pressure.
+	float32 m_staticPressureRelaxation;
+	/// Computes static pressure more precisely.
+	int32 m_staticPressureIterations;
+	/// Mixes colors of color-mixing particles.
+	float32 m_colorMixingStrength;
 
 	b2World* m_world;
 };

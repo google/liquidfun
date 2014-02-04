@@ -24,7 +24,8 @@ b2VoronoiDiagram::b2VoronoiDiagram(
 {
 	m_allocator = allocator;
 	m_generatorBuffer =
-		(Generator*) allocator->Allocate(sizeof(Generator) * generatorCapacity);
+		(Generator*) allocator->Allocate(
+			sizeof(Generator) * generatorCapacity);
 	m_generatorCount = 0;
 	m_countX = 0;
 	m_countY = 0;
@@ -132,7 +133,8 @@ void b2VoronoiDiagram::Generate(float32 radius)
 				if (a != b)
 				{
 					queue.Push(b2VoronoiDiagramTask(x, y, i, b));
-					queue.Push(b2VoronoiDiagramTask(x, y + 1, i + m_countX, a));
+					queue.Push(b2VoronoiDiagramTask(x, y + 1,
+													i + m_countX, a));
 				}
 			}
 		}
@@ -163,7 +165,8 @@ void b2VoronoiDiagram::Generate(float32 radius)
 					}
 					if (y > 0)
 					{
-						queue.Push(b2VoronoiDiagramTask(x, y - 1, i - m_countX, b));
+						queue.Push(b2VoronoiDiagramTask(x, y - 1,
+														i - m_countX, b));
 					}
 					if (x < m_countX - 1)
 					{
@@ -171,7 +174,8 @@ void b2VoronoiDiagram::Generate(float32 radius)
 					}
 					if (y < m_countY - 1)
 					{
-						queue.Push(b2VoronoiDiagramTask(x, y + 1, i + m_countX, b));
+						queue.Push(b2VoronoiDiagramTask(x, y + 1,
+														i + m_countX, b));
 					}
 					updated = true;
 				}

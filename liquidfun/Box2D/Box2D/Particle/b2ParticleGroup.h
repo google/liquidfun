@@ -26,20 +26,28 @@ class b2ParticleSystem;
 class b2ParticleGroup;
 class b2ParticleColor;
 
+/// @file
+
+/// The particle group type.  Can be combined with the | operator.
 enum b2ParticleGroupFlag
 {
-	b2_solidParticleGroup = 1 << 0, // prevents overlapping or leaking
-	b2_rigidParticleGroup = 1 << 1, // keeps its shape
-	b2_particleGroupCanBeEmpty = 1 << 2, // won't be destroyed if it gets empty
-	b2_particleGroupWillBeDestroyed = 1 << 3, // will be destroyed on next step
-	b2_particleGroupNeedsUpdateDepth = 1 << 4, // updates depth data on next step
+	/// Prevents overlapping or leaking.
+	b2_solidParticleGroup = 1 << 0,
+	/// Keeps its shape.
+	b2_rigidParticleGroup = 1 << 1,
+	/// Won't be destroyed if it gets empty.
+	b2_particleGroupCanBeEmpty = 1 << 2,
+	/// Will be destroyed on next simulation step.
+	b2_particleGroupWillBeDestroyed = 1 << 3,
+	/// Updates depth data on next simulation step.
+	b2_particleGroupNeedsUpdateDepth = 1 << 4,
 	b2_particleGroupInternalMask =
 		b2_particleGroupWillBeDestroyed |
 		b2_particleGroupNeedsUpdateDepth,
 };
 
-/// A particle group definition holds all the data needed to construct a particle group.
-/// You can safely re-use these definitions.
+/// A particle group definition holds all the data needed to construct a
+/// particle group.  You can safely re-use these definitions.
 struct b2ParticleGroupDef
 {
 
@@ -60,10 +68,10 @@ struct b2ParticleGroupDef
 		userData = NULL;
 	}
 
-	/// The particle-behavior flags.
+	/// The particle-behavior flags (See #b2ParticleFlag).
 	uint32 flags;
 
-	/// The group-construction flags.
+	/// The group-construction flags (See #b2ParticleGroupFlag).
 	uint32 groupFlags;
 
 	/// The world position of the group.
@@ -83,7 +91,8 @@ struct b2ParticleGroupDef
 	/// The color of all particles in the group.
 	b2ParticleColor color;
 
-	/// The strength of cohesion among the particles in a group with flag b2_elasticParticle or b2_springParticle.
+	/// The strength of cohesion among the particles in a group with flag
+	/// b2_elasticParticle or b2_springParticle.
 	float32 strength;
 
 	/// The shape where particles will be added.

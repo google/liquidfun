@@ -23,22 +23,35 @@
 
 struct b2Color;
 
-/// The particle type. Can be combined with | operator.
-/// Zero means liquid.
+/// @file
+
+/// The particle type. Can be combined with the | operator.
 enum b2ParticleFlag
 {
-	b2_waterParticle =       0,
-	b2_zombieParticle =      1 << 1, // removed after next step
-	b2_wallParticle =        1 << 2, // zero velocity
-	b2_springParticle =      1 << 3, // with restitution from stretching
-	b2_elasticParticle =     1 << 4, // with restitution from deformation
-	b2_viscousParticle =     1 << 5, // with viscosity
-	b2_powderParticle =      1 << 6, // without isotropic pressure
-	b2_tensileParticle =     1 << 7, // with surface tension
-	b2_colorMixingParticle = 1 << 8, // mixing color between contacting particles
-	b2_destructionListener = 1 << 9, // call b2DestructionListener on destruction
-	b2_barrierParticle     = 1 << 10, // prevents other particles from leaking
-	b2_staticPressureParticle = 1 << 11, // less compressibility
+	/// Water particle.
+	b2_waterParticle = 0,
+	/// Removed after next simulation step.
+	b2_zombieParticle = 1 << 1,
+	/// Zero velocity.
+	b2_wallParticle = 1 << 2,
+	/// With restitution from stretching.
+	b2_springParticle = 1 << 3,
+	/// With restitution from deformation.
+	b2_elasticParticle = 1 << 4,
+	/// With viscosity.
+	b2_viscousParticle = 1 << 5,
+	/// Without isotropic pressure.
+	b2_powderParticle = 1 << 6,
+	/// With surface tension.
+	b2_tensileParticle = 1 << 7,
+	/// Mix color between contacting particles.
+	b2_colorMixingParticle = 1 << 8,
+	/// Call b2DestructionListener on destruction.
+	b2_destructionListener = 1 << 9,
+	/// Prevents other particles from leaking.
+	b2_barrierParticle = 1 << 10,
+	/// Less compressibility.
+	b2_staticPressureParticle = 1 << 11,
 };
 
 /// Small color object for each particle
@@ -245,7 +258,9 @@ struct b2ParticleDef
 		userData = NULL;
 	}
 
-	/// Specifies the type of particle. A particle may be more than one type.
+	/// \brief Specifies the type of particle (see #b2ParticleFlag).
+	///
+	/// A particle may be more than one type.
 	/// Multiple types are chained by logical sums, for example:
 	/// pd.flags = b2_elasticParticle | b2_viscousParticle
 	uint32 flags;

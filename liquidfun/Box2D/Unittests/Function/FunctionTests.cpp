@@ -363,7 +363,8 @@ TEST_F(FunctionTests, GroupBuffer) {
 	b2ParticleGroup *group2 = m_world->CreateParticleGroup(def);
 	shape.SetAsBox(10, 30);
 	b2ParticleGroup *group3 = m_world->CreateParticleGroup(def);
-	const b2ParticleGroup *const *groupBuffer = m_world->GetParticleGroupBuffer();
+	const b2ParticleGroup *const *groupBuffer =
+		m_world->GetParticleGroupBuffer();
 	int32 offset1 = group1->GetBufferIndex();
 	int32 count1 = group1->GetParticleCount();
 	for (int32 i = 0; i < count1; i++) {
