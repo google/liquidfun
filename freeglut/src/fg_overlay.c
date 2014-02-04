@@ -36,9 +36,9 @@
 
 void FGAPIENTRY glutEstablishOverlay( void )             { /* Not implemented */ }
 void FGAPIENTRY glutRemoveOverlay( void )                { /* Not implemented */ }
-void FGAPIENTRY glutUseLayer( GLenum layer )             { /* Not implemented */ }
+void FGAPIENTRY glutUseLayer( GLenum layer )             { (void)layer; /* Not implemented */ }
 void FGAPIENTRY glutPostOverlayRedisplay( void )         { /* Not implemented */ }
-void FGAPIENTRY glutPostWindowOverlayRedisplay( int ID ) { /* Not implemented */ }
+void FGAPIENTRY glutPostWindowOverlayRedisplay( int ID ) { (void)ID; /* Not implemented */ }
 void FGAPIENTRY glutShowOverlay( void )                  { /* Not implemented */ }
 void FGAPIENTRY glutHideOverlay( void )                  { /* Not implemented */ }
 

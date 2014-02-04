@@ -419,7 +419,7 @@ static void fghTeaset( GLfloat scale, GLboolean useWireMode,
                     int idx = nSubDivs*nSubDivs*p;
                     for (c=0; c<nSubDivs; c++)
                         for (r=0; r<nSubDivs; r++, o++)
-                            vertIdxs[o] = idx+r*nSubDivs+c;
+                            vertIdxs[o] = (GLushort)(idx+r*nSubDivs+c);
                 }
 
                 /* then strips along increasing v, constant u */
@@ -430,7 +430,7 @@ static void fghTeaset( GLfloat scale, GLboolean useWireMode,
                     {
                         int loc = r*nSubDivs;
                         for (c=0; c<nSubDivs; c++, o++)
-                            vertIdxs[o] = idx+loc+c;
+                            vertIdxs[o] = (GLushort)(idx+loc+c);
                     }
                 }
             }
@@ -449,13 +449,13 @@ static void fghTeaset( GLfloat scale, GLboolean useWireMode,
                             int row1 = idx+loc+c;
                             int row2 = row1+nSubDivs;
 
-                            vertIdxs[o+0] = row1+0;
-                            vertIdxs[o+1] = row2+0;
-                            vertIdxs[o+2] = row2+1;
+                            vertIdxs[o+0] = (GLushort)(row1+0);
+                            vertIdxs[o+1] = (GLushort)(row2+0);
+                            vertIdxs[o+2] = (GLushort)(row2+1);
 
-                            vertIdxs[o+3] = row1+0;
-                            vertIdxs[o+4] = row2+1;
-                            vertIdxs[o+5] = row1+1;
+                            vertIdxs[o+3] = (GLushort)(row1+0);
+                            vertIdxs[o+4] = (GLushort)(row2+1);
+                            vertIdxs[o+5] = (GLushort)(row1+1);
                         }
                     }
                 }

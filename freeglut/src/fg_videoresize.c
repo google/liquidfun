@@ -34,11 +34,11 @@
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
-int  FGAPIENTRY glutVideoResizeGet( GLenum eWhat )            {    return( 0x00 );    }
+int  FGAPIENTRY glutVideoResizeGet( GLenum eWhat )            { (void)eWhat; return( 0x00 );    }
 void FGAPIENTRY glutSetupVideoResizing( void )                { /* Not implemented */ }
 void FGAPIENTRY glutStopVideoResizing( void )                 { /* Not implemented */ }
-void FGAPIENTRY glutVideoResize( int x, int y, int w, int h ) { /* Not implemented */ }
-void FGAPIENTRY glutVideoPan( int x, int y, int w, int h )    { /* Not implemented */ }
+void FGAPIENTRY glutVideoResize( int x, int y, int w, int h ) { (void)x; (void)y; (void)w; (void)h; /* Not implemented */ }
+void FGAPIENTRY glutVideoPan( int x, int y, int w, int h )    { (void)x; (void)y; (void)w; (void)h; /* Not implemented */ }
 
 /*** END OF FILE ***/
 

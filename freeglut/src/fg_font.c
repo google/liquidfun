@@ -159,7 +159,9 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
      * A newline will simply translate the next character's insertion
      * point back to the start of the line and down one line.
      */
-    while( ( c = *string++) )
+    for ( ; *string; string++ )
+    {
+        c = *string;
         if( c == '\n' )
         {
             glBitmap ( 0, 0, 0, 0, -x, (float) -font->Height, NULL );
@@ -178,6 +180,7 @@ void FGAPIENTRY glutBitmapString( void* fontID, const unsigned char *string )
 
             x += ( float )( face[ 0 ] );
         }
+    }
 
     glPopClientAttrib( );
 }
@@ -217,8 +220,9 @@ int FGAPIENTRY glutBitmapLength( void* fontID, const unsigned char* string )
     if ( !string || ! *string )
         return 0;
 
-    while( ( c = *string++) )
+    for ( ; *string; string++ )
     {
+        c = *string;
         if( c != '\n' )/* Not an EOL, increment length of line */
             this_line_length += *( font->Characters[ c ]);
         else  /* EOL; reset the length of this line */
@@ -309,7 +313,9 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    while( ( c = *string++) )
+    for ( ; *string; string++ )
+    {
+        c = *string;
         if( c < font->Quantity )
         {
             if( c == '\n' )
@@ -335,6 +341,7 @@ void FGAPIENTRY glutStrokeString( void* fontID, const unsigned char *string )
                 }
             }
         }
+    }
 
     glDisableClientState(GL_VERTEX_ARRAY);
 }
@@ -382,7 +389,9 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
     if ( !string || ! *string )
         return 0;
 
-    while( ( c = *string++) )
+    for ( ; *string; string++ )
+    {
+        c = *string;
         if( c < font->Quantity )
         {
             if( c == '\n' ) /* EOL; reset the length of this line */
@@ -398,6 +407,7 @@ int FGAPIENTRY glutStrokeLength( void* fontID, const unsigned char* string )
                     this_line_length += schar->Right;
             }
         }
+    }
     if( length < this_line_length )
         length = this_line_length;
     return( int )( length + 0.5 );

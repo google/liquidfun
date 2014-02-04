@@ -526,7 +526,7 @@ static void fghGenerateNormalVisualization(GLfloat *vertices, GLfloat *normals, 
 {
     int i,j;
     numNormalVertices = numVertices * 2;
-    verticesForNormalVisualization = malloc(numNormalVertices*3 * sizeof(GLfloat));
+    verticesForNormalVisualization = (GLfloat*)malloc(numNormalVertices*3 * sizeof(GLfloat));
 
     for (i=0,j=0; i<numNormalVertices*3/2; i+=3, j+=6)
     {
@@ -656,7 +656,7 @@ static void fghGenerateGeometryWithIndexArray(int numFaces, int numEdgePerFace, 
         /* generate vertex indices for each face */
         if (vertSamps)
             for (j=0; j<numEdgeIdxPerFace; j++)
-                vertIdxOut[i*numEdgeIdxPerFace+j] = faceIdxVertIdx + vertSamps[j];
+                vertIdxOut[i*numEdgeIdxPerFace+j] = (GLushort)(faceIdxVertIdx + vertSamps[j]);
     }
 }
 
@@ -1124,8 +1124,8 @@ static void fghCircleTable(GLfloat **sint, GLfloat **cost, const int n, const GL
     const GLfloat angle = (halfCircle?1:2)*(GLfloat)M_PI/(GLfloat)( ( n == 0 ) ? 1 : n );
 
     /* Allocate memory for n samples, plus duplicate of first entry at the end */
-    *sint = calloc(1, sizeof(GLfloat) * (size+1));
-    *cost = calloc(1, sizeof(GLfloat) * (size+1));
+    *sint = (GLfloat*)calloc(1, sizeof(GLfloat) * (size+1));
+    *cost = (GLfloat*)calloc(1, sizeof(GLfloat) * (size+1));
 
     /* Bail out if memory allocation fails, fgError never returns */
     if (!(*sint) || !(*cost))
@@ -1191,8 +1191,8 @@ static void fghGenerateSphere(GLfloat radius, GLint slices, GLint stacks, GLfloa
     fghCircleTable(&sint2,&cost2, stacks,GL_TRUE);
 
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
-    *vertices = malloc((*nVert)*3*sizeof(GLfloat));
-    *normals  = malloc((*nVert)*3*sizeof(GLfloat));
+    *vertices = (GLfloat*)malloc((*nVert)*3*sizeof(GLfloat));
+    *normals  = (GLfloat*)malloc((*nVert)*3*sizeof(GLfloat));
     if (!(*vertices) || !(*normals))
     {
         free(*vertices);
@@ -1290,8 +1290,8 @@ void fghGenerateCone(
     fghCircleTable(&sint,&cost,-slices,GL_FALSE);
 
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
-    *vertices = malloc((*nVert)*3*sizeof(GLfloat));
-    *normals  = malloc((*nVert)*3*sizeof(GLfloat));
+    *vertices = (GLfloat*)malloc((*nVert)*3*sizeof(GLfloat));
+    *normals  = (GLfloat*)malloc((*nVert)*3*sizeof(GLfloat));
     if (!(*vertices) || !(*normals))
     {
         free(*vertices);
@@ -1380,8 +1380,8 @@ void fghGenerateCylinder(
     fghCircleTable(&sint,&cost,-slices,GL_FALSE);
 
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
-    *vertices = malloc((*nVert)*3*sizeof(GLfloat));
-    *normals  = malloc((*nVert)*3*sizeof(GLfloat));
+    *vertices = (GLfloat*)malloc((*nVert)*3*sizeof(GLfloat));
+    *normals  = (GLfloat*)malloc((*nVert)*3*sizeof(GLfloat));
     if (!(*vertices) || !(*normals))
     {
         free(*vertices);
@@ -1486,8 +1486,8 @@ void fghGenerateTorus(
     fghCircleTable(&sphi,&cphi,-nSides,GL_FALSE);
 
     /* Allocate vertex and normal buffers, bail out if memory allocation fails */
-    *vertices = malloc((*nVert)*3*sizeof(GLfloat));
-    *normals  = malloc((*nVert)*3*sizeof(GLfloat));
+    *vertices = (GLfloat*)malloc((*nVert)*3*sizeof(GLfloat));
+    *normals  = (GLfloat*)malloc((*nVert)*3*sizeof(GLfloat));
     if (!(*vertices) || !(*normals) || !(spsi && cpsi && sphi && cphi))
     {
         free(spsi);
@@ -1562,7 +1562,7 @@ static void fghCube( GLfloat dSize, GLboolean useWireMode )
         /* Need to build new vertex list containing vertices for cube of different size */
         int i;
 
-        vertices = malloc(CUBE_VERT_ELEM_PER_OBJ * sizeof(GLfloat));
+        vertices = (GLfloat*)malloc(CUBE_VERT_ELEM_PER_OBJ * sizeof(GLfloat));
 
         /* Bail out if memory allocation fails, fgError never returns */
         if (!vertices)
@@ -1608,8 +1608,8 @@ static void fghSierpinskiSponge ( int numLevels, double offset[3], GLfloat scale
     if (numTetr)
     {
         /* Allocate memory */
-        vertices = malloc(numVert*3 * sizeof(GLfloat));
-        normals  = malloc(numVert*3 * sizeof(GLfloat));
+        vertices = (GLfloat*)malloc(numVert*3 * sizeof(GLfloat));
+        normals  = (GLfloat*)malloc(numVert*3 * sizeof(GLfloat));
         /* Bail out if memory allocation fails, fgError never returns */
         if (!vertices || !normals)
         {
@@ -1659,8 +1659,8 @@ static void fghSphere( GLfloat radius, GLint slices, GLint stacks, GLboolean use
          * bunch for each slice.
          */
 
-        sliceIdx = malloc(slices*(stacks+1)*sizeof(GLushort));
-        stackIdx = malloc(slices*(stacks-1)*sizeof(GLushort));
+        sliceIdx = (GLushort*)malloc(slices*(stacks+1)*sizeof(GLushort));
+        stackIdx = (GLushort*)malloc(slices*(stacks-1)*sizeof(GLushort));
         if (!(stackIdx) || !(sliceIdx))
         {
             free(normals);
@@ -1674,23 +1674,23 @@ static void fghSphere( GLfloat radius, GLint slices, GLint stacks, GLboolean use
         /* generate for each stack */
         for (i=0,idx=0; i<stacks-1; i++)
         {
-            GLushort offset = 1+i*slices;           /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            GLushort offset = (GLushort)(1+i*slices);           /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx++)
             {
-                stackIdx[idx] = offset+j;
+                stackIdx[idx] = (GLushort)(offset+j);
             }
         }
 
         /* generate for each slice */
         for (i=0,idx=0; i<slices; i++)
         {
-            GLushort offset = 1+i;                  /* start at 1 (0 is top vertex), and we advance one slice as we go along */
+            GLushort offset = (GLushort)(1+i);                  /* start at 1 (0 is top vertex), and we advance one slice as we go along */
             sliceIdx[idx++] = 0;                    /* vertex on top */
             for (j=0; j<stacks-1; j++, idx++)
             {
-                sliceIdx[idx] = offset+j*slices;
+                sliceIdx[idx] = (GLushort)(offset+j*slices);
             }
-            sliceIdx[idx++] = nVert-1;              /* zero based index, last element in array... */
+            sliceIdx[idx++] = (GLushort)(nVert-1);              /* zero based index, last element in array... */
         }
 
         /* draw */
@@ -1713,7 +1713,7 @@ static void fghSphere( GLfloat radius, GLint slices, GLint stacks, GLboolean use
         GLushort offset;
 
         /* Allocate buffers for indices, bail out if memory allocation fails */
-        stripIdx = malloc((slices+1)*2*(stacks)*sizeof(GLushort));
+        stripIdx = (GLushort*)malloc((slices+1)*2*(stacks)*sizeof(GLushort));
         if (!(stripIdx))
         {
             free(stripIdx);
@@ -1723,7 +1723,7 @@ static void fghSphere( GLfloat radius, GLint slices, GLint stacks, GLboolean use
         /* top stack */
         for (j=0, idx=0;  j<slices;  j++, idx+=2)
         {
-            stripIdx[idx  ] = j+1;              /* 0 is top vertex, 1 is first for first stack */
+            stripIdx[idx  ] = (GLushort)(j+1);              /* 0 is top vertex, 1 is first for first stack */
             stripIdx[idx+1] = 0;
         }
         stripIdx[idx  ] = 1;                    /* repeat first slice's idx for closing off shape */
@@ -1734,24 +1734,24 @@ static void fghSphere( GLfloat radius, GLint slices, GLint stacks, GLboolean use
         /* Strip indices are relative to first index belonging to strip, NOT relative to first vertex/normal pair in array */
         for (i=0; i<stacks-2; i++, idx+=2)
         {
-            offset = 1+i*slices;                    /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            offset = (GLushort)(1+i*slices);                    /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx+=2)
             {
-                stripIdx[idx  ] = offset+j+slices;
-                stripIdx[idx+1] = offset+j;
+                stripIdx[idx  ] = (GLushort)(offset+j+slices);
+                stripIdx[idx+1] = (GLushort)(offset+j);
             }
-            stripIdx[idx  ] = offset+slices;        /* repeat first slice's idx for closing off shape */
+            stripIdx[idx  ] = (GLushort)(offset+slices);        /* repeat first slice's idx for closing off shape */
             stripIdx[idx+1] = offset;
         }
 
         /* bottom stack */
-        offset = 1+(stacks-2)*slices;               /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
+        offset = (GLushort)(1+(stacks-2)*slices);               /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
         for (j=0; j<slices; j++, idx+=2)
         {
-            stripIdx[idx  ] = nVert-1;              /* zero based index, last element in array (bottom vertex)... */
-            stripIdx[idx+1] = offset+j;
+            stripIdx[idx  ] = (GLushort)(nVert-1);              /* zero based index, last element in array (bottom vertex)... */
+            stripIdx[idx+1] = (GLushort)(offset+j);
         }
-        stripIdx[idx  ] = nVert-1;                  /* repeat first slice's idx for closing off shape */
+        stripIdx[idx  ] = (GLushort)(nVert-1);                  /* repeat first slice's idx for closing off shape */
         stripIdx[idx+1] = offset;
 
 
@@ -1791,8 +1791,8 @@ static void fghCone( GLfloat base, GLfloat height, GLint slices, GLint stacks, G
          * bunch for each slice.
          */
 
-        stackIdx = malloc(slices*stacks*sizeof(GLushort));
-        sliceIdx = malloc(slices*2     *sizeof(GLushort));
+        stackIdx = (GLushort*)malloc(slices*stacks*sizeof(GLushort));
+        sliceIdx = (GLushort*)malloc(slices*2     *sizeof(GLushort));
         if (!(stackIdx) || !(sliceIdx))
         {
             free(normals);
@@ -1806,19 +1806,19 @@ static void fghCone( GLfloat base, GLfloat height, GLint slices, GLint stacks, G
         /* generate for each stack */
         for (i=0,idx=0; i<stacks; i++)
         {
-            GLushort offset = 1+(i+1)*slices;       /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            GLushort offset = (GLushort)(1+(i+1)*slices);       /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx++)
             {
-                stackIdx[idx] = offset+j;
+                stackIdx[idx] = (GLushort)(offset+j);
             }
         }
 
         /* generate for each slice */
         for (i=0,idx=0; i<slices; i++)
         {
-            GLushort offset = 1+i;                  /* start at 1 (0 is top vertex), and we advance one slice as we go along */
-            sliceIdx[idx++] = offset+slices;
-            sliceIdx[idx++] = offset+(stacks+1)*slices;
+            GLushort offset = (GLushort)(1+i);                  /* start at 1 (0 is top vertex), and we advance one slice as we go along */
+            sliceIdx[idx++] = (GLushort)(offset+slices);
+            sliceIdx[idx++] = (GLushort)(offset+(stacks+1)*slices);
         }
 
         /* draw */
@@ -1841,7 +1841,7 @@ static void fghCone( GLfloat base, GLfloat height, GLint slices, GLint stacks, G
         GLushort offset;
 
         /* Allocate buffers for indices, bail out if memory allocation fails */
-        stripIdx = malloc((slices+1)*2*(stacks+1)*sizeof(GLushort));    /*stacks +1 because of closing off bottom */
+        stripIdx = (GLushort*)malloc((slices+1)*2*(stacks+1)*sizeof(GLushort));    /*stacks +1 because of closing off bottom */
         if (!(stripIdx))
         {
             free(stripIdx);
@@ -1852,7 +1852,7 @@ static void fghCone( GLfloat base, GLfloat height, GLint slices, GLint stacks, G
         for (j=0, idx=0;  j<slices;  j++, idx+=2)
         {
             stripIdx[idx  ] = 0;
-            stripIdx[idx+1] = j+1;              /* 0 is top vertex, 1 is first for first stack */
+            stripIdx[idx+1] = (GLushort)(j+1);              /* 0 is top vertex, 1 is first for first stack */
         }
         stripIdx[idx  ] = 0;                    /* repeat first slice's idx for closing off shape */
         stripIdx[idx+1] = 1;
@@ -1862,14 +1862,14 @@ static void fghCone( GLfloat base, GLfloat height, GLint slices, GLint stacks, G
         /* Strip indices are relative to first index belonging to strip, NOT relative to first vertex/normal pair in array */
         for (i=0; i<stacks; i++, idx+=2)
         {
-            offset = 1+(i+1)*slices;                /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            offset = (GLushort)(1+(i+1)*slices);                /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx+=2)
             {
-                stripIdx[idx  ] = offset+j;
-                stripIdx[idx+1] = offset+j+slices;
+                stripIdx[idx  ] = (GLushort)(offset+j);
+                stripIdx[idx+1] = (GLushort)(offset+j+slices);
             }
             stripIdx[idx  ] = offset;               /* repeat first slice's idx for closing off shape */
-            stripIdx[idx+1] = offset+slices;
+            stripIdx[idx+1] = (GLushort)(offset+slices);
         }
 
         /* draw */
@@ -1909,8 +1909,8 @@ static void fghCylinder( GLfloat radius, GLfloat height, GLint slices, GLint sta
          * bunch for each slice.
          */
         GLint allocSize = slices*(stacks+1)*sizeof(GLushort);
-        stackIdx = allocSize > 0 ? malloc(allocSize) : NULL;
-        sliceIdx = slices > 0 ? malloc(slices*2*sizeof(GLushort)) : NULL;
+        stackIdx = (GLushort*)(allocSize > 0 ? malloc(allocSize) : NULL);
+        sliceIdx = (GLushort*)(slices > 0 ? malloc(slices*2*sizeof(GLushort)) : NULL);
         if (!(stackIdx) || !(sliceIdx))
         {
             free(vertices);
@@ -1924,19 +1924,19 @@ static void fghCylinder( GLfloat radius, GLfloat height, GLint slices, GLint sta
         /* generate for each stack */
         for (i=0,idx=0; i<stacks+1; i++)
         {
-            GLushort offset = 1+(i+1)*slices;       /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            GLushort offset = (GLushort)(1+(i+1)*slices);       /* start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx++)
             {
-                stackIdx[idx] = offset+j;
+                stackIdx[idx] = (GLushort)(offset+j);
             }
         }
 
         /* generate for each slice */
         for (i=0,idx=0; i<slices; i++)
         {
-            GLushort offset = 1+i;                  /* start at 1 (0 is top vertex), and we advance one slice as we go along */
-            sliceIdx[idx++] = offset+slices;
-            sliceIdx[idx++] = offset+(stacks+1)*slices;
+            GLushort offset = (GLushort)(1+i);                  /* start at 1 (0 is top vertex), and we advance one slice as we go along */
+            sliceIdx[idx++] = (GLushort)(offset+slices);
+            sliceIdx[idx++] = (GLushort)(offset+(stacks+1)*slices);
         }
 
         /* draw */
@@ -1959,7 +1959,7 @@ static void fghCylinder( GLfloat radius, GLfloat height, GLint slices, GLint sta
         GLushort offset;
 
         /* Allocate buffers for indices, bail out if memory allocation fails */
-        stripIdx = malloc((slices+1)*2*(stacks+2)*sizeof(GLushort));    /*stacks +2 because of closing off bottom and top */
+        stripIdx = (GLushort*)malloc((slices+1)*2*(stacks+2)*sizeof(GLushort));    /*stacks +2 because of closing off bottom and top */
         if (!(stripIdx))
         {
             free(stripIdx);
@@ -1970,7 +1970,7 @@ static void fghCylinder( GLfloat radius, GLfloat height, GLint slices, GLint sta
         for (j=0, idx=0;  j<slices;  j++, idx+=2)
         {
             stripIdx[idx  ] = 0;
-            stripIdx[idx+1] = j+1;              /* 0 is top vertex, 1 is first for first stack */
+            stripIdx[idx+1] = (GLushort)(j+1);              /* 0 is top vertex, 1 is first for first stack */
         }
         stripIdx[idx  ] = 0;                    /* repeat first slice's idx for closing off shape */
         stripIdx[idx+1] = 1;
@@ -1980,25 +1980,25 @@ static void fghCylinder( GLfloat radius, GLfloat height, GLint slices, GLint sta
         /* Strip indices are relative to first index belonging to strip, NOT relative to first vertex/normal pair in array */
         for (i=0; i<stacks; i++, idx+=2)
         {
-            offset = 1+(i+1)*slices;                /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
+            offset = (GLushort)(1+(i+1)*slices);                /* triangle_strip indices start at 1 (0 is top vertex), and we advance one stack down as we go along */
             for (j=0; j<slices; j++, idx+=2)
             {
-                stripIdx[idx  ] = offset+j;
-                stripIdx[idx+1] = offset+j+slices;
+                stripIdx[idx  ] = (GLushort)(offset+j);
+                stripIdx[idx+1] = (GLushort)(offset+j+slices);
             }
             stripIdx[idx  ] = offset;               /* repeat first slice's idx for closing off shape */
-            stripIdx[idx+1] = offset+slices;
+            stripIdx[idx+1] = (GLushort)(offset+slices);
         }
 
         /* top stack */
-        offset = 1+(stacks+2)*slices;
+        offset = (GLushort)(1+(stacks+2)*slices);
         for (j=0; j<slices; j++, idx+=2)
         {
-            stripIdx[idx  ] = offset+j;
-            stripIdx[idx+1] = nVert-1;              /* zero based index, last element in array (bottom vertex)... */
+            stripIdx[idx  ] = (GLushort)(offset+j);
+            stripIdx[idx+1] = (GLushort)(nVert-1);              /* zero based index, last element in array (bottom vertex)... */
         }
         stripIdx[idx  ] = offset;
-        stripIdx[idx+1] = nVert-1;                  /* repeat first slice's idx for closing off shape */
+        stripIdx[idx+1] = (GLushort)(nVert-1);                  /* repeat first slice's idx for closing off shape */
 
         /* draw */
         fghDrawGeometrySolid(vertices,normals,NULL,nVert,stripIdx,stacks+2,(slices+1)*2);
@@ -2032,8 +2032,8 @@ static void fghTorus( GLfloat dInnerRadius, GLfloat dOuterRadius, GLint nSides, 
          * bunch for each ring.
          */
 
-        ringIdx = malloc(nRings*nSides*sizeof(GLushort));
-        sideIdx = malloc(nSides*nRings*sizeof(GLushort));
+        ringIdx = (GLushort*)malloc(nRings*nSides*sizeof(GLushort));
+        sideIdx = (GLushort*)malloc(nSides*nRings*sizeof(GLushort));
         if (!(ringIdx) || !(sideIdx))
         {
             free(ringIdx);
@@ -2044,12 +2044,12 @@ static void fghTorus( GLfloat dInnerRadius, GLfloat dOuterRadius, GLint nSides, 
         /* generate for each ring */
         for( j=0,idx=0; j<nRings; j++ )
             for( i=0; i<nSides; i++, idx++ )
-                ringIdx[idx] = j * nSides + i;
+                ringIdx[idx] = (GLushort)(j * nSides + i);
 
         /* generate for each side */
         for( i=0,idx=0; i<nSides; i++ )
             for( j=0; j<nRings; j++, idx++ )
-                sideIdx[idx] = j * nSides + i;
+                sideIdx[idx] = (GLushort)(j * nSides + i);
 
         /* draw */
         fghDrawGeometryWire(vertices,normals,nVert,
@@ -2069,7 +2069,7 @@ static void fghTorus( GLfloat dInnerRadius, GLfloat dOuterRadius, GLint nSides, 
         GLushort  *stripIdx;
 
         /* Allocate buffers for indices, bail out if memory allocation fails */
-        stripIdx = malloc((nRings+1)*2*nSides*sizeof(GLushort));
+        stripIdx = (GLushort*)malloc((nRings+1)*2*nSides*sizeof(GLushort));
         if (!(stripIdx))
         {
             free(stripIdx);
@@ -2086,12 +2086,12 @@ static void fghTorus( GLfloat dInnerRadius, GLfloat dOuterRadius, GLint nSides, 
             for( j=0; j<nRings; j++, idx+=2 )
             {
                 int offset = j * nSides + i;
-                stripIdx[idx  ] = offset;
-                stripIdx[idx+1] = offset + ioff;
+                stripIdx[idx  ] = (GLushort)offset;
+                stripIdx[idx+1] = (GLushort)(offset + ioff);
             }
             /* repeat first to close off shape */
-            stripIdx[idx  ] = i;
-            stripIdx[idx+1] = i + ioff;
+            stripIdx[idx  ] = (GLushort)i;
+            stripIdx[idx+1] = (GLushort)(i + ioff);
             idx +=2;
         }
 

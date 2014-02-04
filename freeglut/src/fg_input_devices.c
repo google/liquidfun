@@ -118,7 +118,8 @@ void fgInitialiseInputDevices ( void )
 		fgPlatformRegisterDialDevice ( dial_device );
 
         if ( !dial_device ) return;
-        if ( !( dialbox_port = serial_open ( dial_device ) ) ) return;
+        dialbox_port = serial_open ( dial_device );
+        if ( !dialbox_port ) return;
         serial_putchar(dialbox_port,DIAL_INITIALIZE);
         glutTimerFunc ( 10, poll_dials, 0 );
         fgState.InputDevsInitialised = GL_TRUE;
@@ -166,6 +167,7 @@ static void poll_dials ( int id )
     static int dial_state = DIAL_NEW;
     static int dial_which;
     static int dial_value;
+    (void)id;
 
     if ( !dialbox_port ) return;
 
