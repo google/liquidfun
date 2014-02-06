@@ -175,6 +175,46 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def, b2World* worl
 
 b2ParticleSystem::~b2ParticleSystem()
 {
+	while (m_groupList)
+	{
+		DestroyParticleGroup(m_groupList);
+	}
+
+	FreeParticleBuffer(&m_flagsBuffer);
+	FreeParticleBuffer(&m_positionBuffer);
+	FreeParticleBuffer(&m_velocityBuffer);
+	FreeParticleBuffer(&m_colorBuffer);
+	FreeParticleBuffer(&m_userDataBuffer);
+	FreeBuffer(&m_weightBuffer, m_internalAllocatedCapacity);
+	FreeBuffer(&m_staticPressureBuffer, m_internalAllocatedCapacity);
+	FreeBuffer(&m_accumulationBuffer, m_internalAllocatedCapacity);
+	FreeBuffer(&m_accumulation2Buffer, m_internalAllocatedCapacity);
+	FreeBuffer(&m_depthBuffer, m_internalAllocatedCapacity);
+	FreeBuffer(&m_groupBuffer, m_internalAllocatedCapacity);
+	FreeBuffer(&m_proxyBuffer, m_proxyCapacity);
+	FreeBuffer(&m_contactBuffer, m_contactCapacity);
+	FreeBuffer(&m_bodyContactBuffer, m_bodyContactCapacity);
+	FreeBuffer(&m_pairBuffer, m_pairCapacity);
+	FreeBuffer(&m_triadBuffer, m_triadCapacity);
+}
+
+template <typename T> void b2ParticleSystem::FreeBuffer(T** b, int capacity)
+{
+	if (*b == NULL)
+		return;
+
+	m_world->m_blockAllocator.Free(*b, sizeof(**b) * capacity);
+	*b = NULL;
+}
+
+// Free buffer, if it was allocated with b2World's block allocator
+template <typename T> void b2ParticleSystem::FreeParticleBuffer(
+	ParticleBuffer<T>* b)
+{
+	if (b->userSuppliedCapacity == 0)
+	{
+		FreeBuffer(&b->data, m_internalAllocatedCapacity);
+	}
 }
 
 // Reallocate a buffer
