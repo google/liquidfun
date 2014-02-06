@@ -117,7 +117,7 @@ static inline uint32 computeRelativeTag(uint32 tag, int32 x, int32 y)
 	return tag + (y << yShift) + (x << xShift);
 }
 
-b2ParticleSystem::b2ParticleSystem()
+b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def, b2World* world)
 {
 
 	m_timestamp = 0;
@@ -168,22 +168,9 @@ b2ParticleSystem::b2ParticleSystem()
 	m_groupCount = 0;
 	m_groupList = NULL;
 
-	m_pressureStrength = 0.05f;
-	m_dampingStrength = 1.0f;
-	m_elasticStrength = 0.25f;
-	m_springStrength = 0.25f;
-	m_viscousStrength = 0.25f;
-	m_surfaceTensionStrengthA = 0.2f;
-	m_surfaceTensionStrengthB = 0.2f;
-	m_powderStrength = 0.5f;
-	m_ejectionStrength = 0.5f;
-	m_staticPressureStrength = 0.2f;
-	m_staticPressureRelaxation = 0.2f;
-	m_staticPressureIterations = 8;
-	m_colorMixingStrength = 0.5f;
+	m_def = *def;
 
-	m_world = NULL;
-
+	m_world = world;
 }
 
 b2ParticleSystem::~b2ParticleSystem()
@@ -965,8 +952,8 @@ void b2ParticleSystem::ComputeDepth()
 inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 {
 	b2Vec2 d = m_positionBuffer.data[b] - m_positionBuffer.data[a];
-	float32 d2 = b2Dot(d, d);
-	if (d2 < m_squaredDiameter)
+	float32 distBtParticlesSq = b2Dot(d, d);
+	if (distBtParticlesSq < m_squaredDiameter)
 	{
 		if (m_contactCount >= m_contactCapacity)
 		{
@@ -977,12 +964,13 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 											   newCapacity);
 			m_contactCapacity = newCapacity;
 		}
-		float32 invD = b2InvSqrt(d2);
+		float32 invD = b2InvSqrt(distBtParticlesSq);
 		b2ParticleContact& contact = m_contactBuffer[m_contactCount];
 		contact.indexA = a;
 		contact.indexB = b;
 		contact.flags = m_flagsBuffer.data[a] | m_flagsBuffer.data[b];
-		contact.weight = 1 - d2 * invD * m_inverseDiameter;
+		// 1 - distBtParticles / diameter
+		contact.weight = 1 - distBtParticlesSq * invD * m_inverseDiameter;
 		contact.normal = invD * d;
 		m_contactCount++;
 	}
@@ -1598,9 +1586,9 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 {
 	m_staticPressureBuffer = RequestParticleBuffer(m_staticPressureBuffer);
 	float32 criticalPressure = GetCriticalPressure(step);
-	float32 pressurePerWeight = m_staticPressureStrength * criticalPressure;
+	float32 pressurePerWeight = m_def.staticPressureStrength * criticalPressure;
 	float32 maxPressure = b2_maxParticlePressure * criticalPressure;
-	float32 relaxation = m_staticPressureRelaxation;
+	float32 relaxation = m_def.staticPressureRelaxation;
 	/// Compute pressure satisfying the modified Poisson equation:
 	///     Sum_for_j((p_i - p_j) * w_ij) + relaxation * p_i =
 	///     pressurePerWeight * (w_i - b2_minParticleWeight)
@@ -1611,7 +1599,7 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 	///     p_i and p_j are static pressure of particle i and j
 	///     w_ij is contact weight between particle i and j
 	///     w_i is sum of contact weight of particle i
-	for (int32 t = 0; t < m_staticPressureIterations; t++)
+	for (int32 t = 0; t < m_def.staticPressureIterations; t++)
 	{
 		memset(m_accumulationBuffer, 0,
 			   sizeof(*m_accumulationBuffer) * m_count);
@@ -1652,7 +1640,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 {
 	// calculates pressure as a linear function of density
 	float32 criticalPressure = GetCriticalPressure(step);
-	float32 pressurePerWeight = m_pressureStrength * criticalPressure;
+	float32 pressurePerWeight = m_def.pressureStrength * criticalPressure;
 	float32 maxPressure = b2_maxParticlePressure * criticalPressure;
 	for (int32 i = 0; i < m_count; i++)
 	{
@@ -1716,7 +1704,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 {
 	// reduces normal velocity of each contact
-	float32 linearDamping = m_dampingStrength;
+	float32 linearDamping = m_def.dampingStrength;
 	float32 quadraticDamping = 1 / GetCriticalVelocity(step);
 	for (int32 k = 0; k < m_bodyContactCount; k++)
 	{
@@ -1827,7 +1815,7 @@ void b2ParticleSystem::SolveRigid(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 {
-	float32 elasticStrength = step.inv_dt * m_elasticStrength;
+	float32 elasticStrength = step.inv_dt * m_def.elasticStrength;
 	for (int32 k = 0; k < m_triadCount; k++)
 	{
 		const Triad& triad = m_triadBuffer[k];
@@ -1869,7 +1857,7 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveSpring(const b2TimeStep& step)
 {
-	float32 springStrength = step.inv_dt * m_springStrength;
+	float32 springStrength = step.inv_dt * m_def.springStrength;
 	for (int32 k = 0; k < m_pairCount; k++)
 	{
 		const Pair& pair = m_pairBuffer[k];
@@ -1910,12 +1898,16 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 			int32 b = contact.indexB;
 			float32 w = contact.weight;
 			b2Vec2 n = contact.normal;
-			m_accumulation2Buffer[a] -= (1 - w) * w * n;
-			m_accumulation2Buffer[b] += (1 - w) * w * n;
+			b2Vec2 weightedNormal = (1 - w) * w * n;
+			m_accumulation2Buffer[a] -= weightedNormal;
+			m_accumulation2Buffer[b] += weightedNormal;
 		}
 	}
-	float32 strengthA = m_surfaceTensionStrengthA * GetCriticalVelocity(step);
-	float32 strengthB = m_surfaceTensionStrengthB * GetCriticalVelocity(step);
+	float32 criticalVelocity = GetCriticalVelocity(step);
+	float32 pressureStrength = m_def.surfaceTensionPressureStrength
+							 * criticalVelocity;
+	float32 normalStrength = m_def.surfaceTensionNormalStrength
+						   * criticalVelocity;
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
@@ -1927,7 +1919,8 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 			b2Vec2 n = contact.normal;
 			float32 h = m_weightBuffer[a] + m_weightBuffer[b];
 			b2Vec2 s = m_accumulation2Buffer[b] - m_accumulation2Buffer[a];
-			float32 fn = (strengthA * (h - 2) + strengthB * b2Dot(s, n)) * w;
+			float32 fn = (pressureStrength * (h - 2)
+					      + normalStrength * b2Dot(s, n)) * w;
 			b2Vec2 f = fn * n;
 			m_velocityBuffer.data[a] -= f;
 			m_velocityBuffer.data[b] += f;
@@ -1937,7 +1930,7 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveViscous()
 {
-	float32 viscousStrength = m_viscousStrength;
+	float32 viscousStrength = m_def.viscousStrength;
 	for (int32 k = 0; k < m_bodyContactCount; k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
@@ -1973,7 +1966,7 @@ void b2ParticleSystem::SolveViscous()
 
 void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 {
-	float32 powderStrength = m_powderStrength * GetCriticalVelocity(step);
+	float32 powderStrength = m_def.powderStrength * GetCriticalVelocity(step);
 	float32 minWeight = 1.0f - b2_particleStride;
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
@@ -1998,7 +1991,7 @@ void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 {
 	// applies extra repulsive force from solid particle groups
 	b2Assert(m_depthBuffer);
-	float32 ejectionStrength = step.inv_dt * m_ejectionStrength;
+	float32 ejectionStrength = step.inv_dt * m_def.ejectionStrength;
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
@@ -2020,7 +2013,7 @@ void b2ParticleSystem::SolveColorMixing()
 {
 	// mixes color between contacting particles
 	b2Assert(m_colorBuffer.data);
-	const int32 colorMixing128 = (int32) (128 * m_colorMixingStrength);
+	const int32 colorMixing128 = (int32) (128 * m_def.colorMixingStrength);
 	if (colorMixing128) {
 		for (int32 k = 0; k < m_contactCount; k++)
 		{
@@ -2389,22 +2382,22 @@ float32 b2ParticleSystem::GetParticleGravityScale() const
 
 void b2ParticleSystem::SetParticleDamping(float32 damping)
 {
-	m_dampingStrength = damping;
+	m_def.dampingStrength = damping;
 }
 
 float32 b2ParticleSystem::GetParticleDamping() const
 {
-	return m_dampingStrength;
+	return m_def.dampingStrength;
 }
 
 void b2ParticleSystem::SetParticleStaticPressureIterations(int32 iterations)
 {
-	m_staticPressureIterations = iterations;
+	m_def.staticPressureIterations = iterations;
 }
 
 int32 b2ParticleSystem::GetParticleStaticPressureIterations() const
 {
-	return m_staticPressureIterations;
+	return m_def.staticPressureIterations;
 }
 
 float32 b2ParticleSystem::GetParticleRadius() const

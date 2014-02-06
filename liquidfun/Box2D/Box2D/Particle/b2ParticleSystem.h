@@ -40,40 +40,117 @@ struct b2AABB;
 struct b2ParticleContact
 {
 	/// Indices of the respective particles making contact.
-	///
 	int32 indexA, indexB;
+
 	/// The logical sum of the particle behaviors that have been set.
 	/// See the b2ParticleFlag enum.
-	///
 	uint32 flags;
+
 	/// Weight of the contact. A value between 0.0f and 1.0f.
-	///
+	/// 0.0f ==> particles are just barely touching
+	/// 1.0f ==> particles are perfectly on top of each other
 	float32 weight;
+
 	/// The normalized direction from A to B.
-	///
 	b2Vec2 normal;
 };
 
 struct b2ParticleBodyContact
 {
 	/// Index of the particle making contact.
-	///
 	int32 index;
+
 	/// The body making contact.
-	///
 	b2Body* body;
+
 	/// The specific fixture making contact
-	///
 	b2Fixture* fixture;
-	///Weight of the contact. A value between 0.0f and 1.0f.
-	///
+
+	/// Weight of the contact. A value between 0.0f and 1.0f.
 	float32 weight;
+
 	/// The normalized direction from the particle to the body.
-	///
 	b2Vec2 normal;
+
 	/// The effective mass used in calculating force.
-	///
 	float32 mass;
+};
+
+struct b2ParticleSystemDef
+{
+	b2ParticleSystemDef()
+	{
+		// Initialize physical coefficients to the maximum values that
+		// maintain numerical stability.
+		pressureStrength = 0.05f;
+		dampingStrength = 1.0f;
+		elasticStrength = 0.25f;
+		springStrength = 0.25f;
+		viscousStrength = 0.25f;
+		surfaceTensionPressureStrength = 0.2f;
+		surfaceTensionNormalStrength = 0.2f;
+		powderStrength = 0.5f;
+		ejectionStrength = 0.5f;
+		staticPressureStrength = 0.2f;
+		staticPressureRelaxation = 0.2f;
+		staticPressureIterations = 8;
+		colorMixingStrength = 0.5f;
+	}
+
+	/// Increases pressure in response to compression
+	/// Smaller values allow more compression
+	float32 pressureStrength;
+
+	/// Reduces velocity along the collision normal
+	/// Smaller value reduces less
+	float32 dampingStrength;
+
+	/// Restores shape of elastic particle groups
+	/// Larger values increase elastic particle velocity
+	float32 elasticStrength;
+
+	/// Restores length of spring particle groups
+	/// Larger values increase sprint particle velocity
+	float32 springStrength;
+
+	/// Reduces relative velocity of viscous particles
+	/// Larger values slow down viscous particles more
+	float32 viscousStrength;
+
+	/// Produces pressure on tensile particles
+	/// TODO: document further
+	float32 surfaceTensionPressureStrength;
+
+	/// Smoothes outline of tensile particles
+	/// TODO: document further
+	float32 surfaceTensionNormalStrength;
+
+	/// Produces repulsion between powder particles
+	/// Larger values repulse more
+	float32 powderStrength;
+
+	/// Pushes particles out of solid particle group
+	/// Larger values repulse more
+	float32 ejectionStrength;
+
+	/// Produces static pressure
+	/// Larger values increase the pressure on neighboring partilces
+	/// For a description of static pressure, see
+	/// http://en.wikipedia.org/wiki/Static_pressure#Static_pressure_in_fluid_dynamics
+	float32 staticPressureStrength;
+
+	/// Reduces instability in static pressure calculation
+	/// Larger values make stabilize static pressure with fewer iterations
+	float32 staticPressureRelaxation;
+
+	/// Computes static pressure more precisely
+	/// See SetParticleStaticPressureIterations for details
+	int32 staticPressureIterations;
+
+	/// Determines how fast colors are mixed
+	/// 1.0f ==> mixed immediately
+	/// 0.5f ==> mixed half way each simulation step (see Step())
+	float32 colorMixingStrength;
 };
 
 class b2ParticleSystem
@@ -392,9 +469,11 @@ private:
 	static const int32 k_extraDampingFlags =
 		b2_staticPressureParticle;
 
-	b2ParticleSystem();
+	b2ParticleSystem(const b2ParticleSystemDef* def, b2World* world);
 	~b2ParticleSystem();
 
+	template <typename T> void FreeBuffer(T** b, int capacity);
+	template <typename T> void FreeParticleBuffer(ParticleBuffer<T>* b);
 	template <typename T> T* ReallocateBuffer(T* buffer, int32 oldCapacity,
 											  int32 newCapacity);
 	template <typename T> T* ReallocateBuffer(
@@ -534,35 +613,7 @@ private:
 	int32 m_groupCount;
 	b2ParticleGroup* m_groupList;
 
-	// Physical coefficients. Each is initialized to the maximum value that
-	// keeps the numerical stability.
-
-	/// Produces pressure in response to compression.
-	float32 m_pressureStrength;
-	/// reduces normal velocity
-	float32 m_dampingStrength;
-	// Restores shapes of elastic particle groups.
-	float32 m_elasticStrength;
-	/// Restores lengths of spring particle groups.
-	float32 m_springStrength;
-	/// Reduces relative velocity of viscous particles.
-	float32 m_viscousStrength;
-	/// Produces pressure for tensile particles.
-	float32 m_surfaceTensionStrengthA;
-	/// Smoothes outline of tensile particles.
-	float32 m_surfaceTensionStrengthB;
-	/// Produces repulsion between powder particles.
-	float32 m_powderStrength;
-	/// Pushes particles out of solid particle group.
-	float32 m_ejectionStrength;
-	/// Produces static pressure.
-	float32 m_staticPressureStrength;
-	/// Reduces instability of static pressure.
-	float32 m_staticPressureRelaxation;
-	/// Computes static pressure more precisely.
-	int32 m_staticPressureIterations;
-	/// Mixes colors of color-mixing particles.
-	float32 m_colorMixingStrength;
+	b2ParticleSystemDef m_def;
 
 	b2World* m_world;
 };

@@ -35,7 +35,13 @@
 #include <Box2D/Common/b2Timer.h>
 #include <new>
 
+// TODO: This will go away once we allow multiple particle-systems.
+static const b2ParticleSystemDef DEFAULT_PARTICLE_SYSTEM_DEF;
+
 b2World::b2World(const b2Vec2& gravity)
+	// TODO: bad form to pass 'this' before fully constructed.
+	// Will go away once we allow multiple particle-systems.
+	: m_particleSystem(&DEFAULT_PARTICLE_SYSTEM_DEF, this)
 {
 	m_destructionListener = NULL;
 	m_debugDraw = NULL;
@@ -61,11 +67,8 @@ b2World::b2World(const b2Vec2& gravity)
 
 	m_contactManager.m_allocator = &m_blockAllocator;
 
-	m_particleSystem.m_world = this;
-
 	m_liquidFunVersion = &b2_liquidFunVersion;
 	m_liquidFunVersionString = b2_liquidFunVersionString;
-
 
 	memset(&m_profile, 0, sizeof(b2Profile));
 }
