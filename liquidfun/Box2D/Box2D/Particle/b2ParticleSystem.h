@@ -378,6 +378,10 @@ public:
 	/// Compute the kinetic energy that can be lost by damping force
 	float32 ComputeParticleCollisionEnergy() const;
 
+	/// Get the next particle-system in the world's particle-system list.
+	b2ParticleSystem* GetNext();
+	const b2ParticleSystem* GetNext() const;
+
 private:
 
 	friend class b2World;
@@ -616,6 +620,8 @@ private:
 	b2ParticleSystemDef m_def;
 
 	b2World* m_world;
+	b2ParticleSystem* m_prev;
+	b2ParticleSystem* m_next;
 };
 
 inline b2ParticleGroup* b2ParticleSystem::GetParticleGroupList()
@@ -656,6 +662,16 @@ inline const b2ParticleBodyContact* b2ParticleSystem::GetParticleBodyContacts()
 inline int32 b2ParticleSystem::GetParticleBodyContactCount()
 {
 	return m_bodyContactCount;
+}
+
+inline b2ParticleSystem* b2ParticleSystem::GetNext()
+{
+	return m_next;
+}
+
+inline const b2ParticleSystem* b2ParticleSystem::GetNext() const
+{
+	return m_next;
 }
 
 #endif

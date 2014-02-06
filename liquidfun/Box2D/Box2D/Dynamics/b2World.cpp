@@ -35,19 +35,14 @@
 #include <Box2D/Common/b2Timer.h>
 #include <new>
 
-// TODO: This will go away once we allow multiple particle-systems.
-static const b2ParticleSystemDef DEFAULT_PARTICLE_SYSTEM_DEF;
-
 b2World::b2World(const b2Vec2& gravity)
-	// TODO: bad form to pass 'this' before fully constructed.
-	// Will go away once we allow multiple particle-systems.
-	: m_particleSystem(&DEFAULT_PARTICLE_SYSTEM_DEF, this)
 {
 	m_destructionListener = NULL;
 	m_debugDraw = NULL;
 
 	m_bodyList = NULL;
 	m_jointList = NULL;
+	m_particleSystemList = NULL;
 
 	m_bodyCount = 0;
 	m_jointCount = 0;
@@ -71,6 +66,11 @@ b2World::b2World(const b2Vec2& gravity)
 	m_liquidFunVersionString = b2_liquidFunVersionString;
 
 	memset(&m_profile, 0, sizeof(b2Profile));
+
+	// Create the unique particle-system.
+	// TODO: Delete when we eliminate the unique particle system.
+	const b2ParticleSystemDef defaultDef;
+	CreateParticleSystem(&defaultDef);
 }
 
 b2World::~b2World()
@@ -91,6 +91,11 @@ b2World::~b2World()
 		}
 
 		b = bNext;
+	}
+
+	while (m_particleSystemList)
+	{
+		DestroyParticleSystem(m_particleSystemList);
 	}
 }
 
@@ -372,6 +377,58 @@ void b2World::DestroyJoint(b2Joint* j)
 			edge = edge->next;
 		}
 	}
+}
+
+b2ParticleSystem* b2World::CreateParticleSystem(const b2ParticleSystemDef* def)
+{
+	b2Assert(IsLocked() == false);
+	if (IsLocked())
+	{
+		return NULL;
+	}
+
+	void* mem = m_blockAllocator.Allocate(sizeof(b2ParticleSystem));
+	b2ParticleSystem* p = new (mem) b2ParticleSystem(def, this);
+
+	// Add to world doubly linked list.
+	p->m_prev = NULL;
+	p->m_next = m_particleSystemList;
+	if (m_particleSystemList)
+	{
+		m_particleSystemList->m_prev = p;
+	}
+	m_particleSystemList = p;
+
+	return p;
+}
+
+void b2World::DestroyParticleSystem(b2ParticleSystem* p)
+{
+	b2Assert(m_particleSystemList != NULL);
+	b2Assert(IsLocked() == false);
+	if (IsLocked())
+	{
+		return;
+	}
+
+	// Remove world particleSystem list.
+	if (p->m_prev)
+	{
+		p->m_prev->m_next = p->m_next;
+	}
+
+	if (p->m_next)
+	{
+		p->m_next->m_prev = p->m_prev;
+	}
+
+	if (p == m_particleSystemList)
+	{
+		m_particleSystemList = p->m_next;
+	}
+
+	p->~b2ParticleSystem();
+	m_blockAllocator.Free(p, sizeof(b2ParticleSystem));
 }
 
 //
@@ -957,7 +1014,7 @@ void b2World::Step(
 	if (m_stepComplete && step.dt > 0.0f)
 	{
 		b2Timer timer;
-		m_particleSystem.Solve(step); // Particle Simulation
+		DEPRECATED_GetUniqueParticleSystem().Solve(step); // Particle Simulation
 		Solve(step);
 		m_profile.solve = timer.GetMilliseconds();
 	}
@@ -1012,7 +1069,7 @@ void b2World::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const
 	wrapper.broadPhase = &m_contactManager.m_broadPhase;
 	wrapper.callback = callback;
 	m_contactManager.m_broadPhase.Query(&wrapper, aabb);
-	m_particleSystem.QueryAABB(callback, aabb);
+	DEPRECATED_GetUniqueParticleSystem().QueryAABB(callback, aabb);
 }
 
 void b2World::QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
@@ -1058,7 +1115,7 @@ void b2World::RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b
 	input.p1 = point1;
 	input.p2 = point2;
 	m_contactManager.m_broadPhase.RayCast(&wrapper, input);
-	m_particleSystem.RayCast(callback, point1, point2);
+	DEPRECATED_GetUniqueParticleSystem().RayCast(callback, point1, point2);
 }
 
 void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color& color)
@@ -1226,7 +1283,10 @@ void b2World::DrawDebugData()
 
 	if (flags & b2Draw::e_particleBit)
 	{
-		DrawParticleSystem(m_particleSystem);
+		for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+		{
+			DrawParticleSystem(*p);
+		}
 	}
 
 	if (flags & b2Draw::e_jointBit)
@@ -1398,72 +1458,72 @@ void b2World::Dump()
 
 void b2World::SetStrictParticleContactCheck(bool enabled)
 {
-	m_particleSystem.SetStrictContactCheck(enabled);
+	DEPRECATED_GetUniqueParticleSystem().SetStrictContactCheck(enabled);
 }
 
 bool b2World::GetStrictParticleContactCheck() const
 {
-	return m_particleSystem.GetStrictContactCheck();
+	return DEPRECATED_GetUniqueParticleSystem().GetStrictContactCheck();
 }
 
 int32 b2World::GetParticleMaxCount() const
 {
-	return m_particleSystem.GetParticleMaxCount();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleMaxCount();
 }
 
 void b2World::SetParticleMaxCount(int32 count)
 {
-	m_particleSystem.SetParticleMaxCount(count);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleMaxCount(count);
 }
 
 void b2World::SetParticleDensity(float32 density)
 {
-	m_particleSystem.SetParticleDensity(density);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleDensity(density);
 }
 
 float32 b2World::GetParticleDensity() const
 {
-	return m_particleSystem.GetParticleDensity();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleDensity();
 }
 
 void b2World::SetParticleGravityScale(float32 gravityScale)
 {
-	m_particleSystem.SetParticleGravityScale(gravityScale);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleGravityScale(gravityScale);
 }
 
 float32 b2World::GetParticleGravityScale() const
 {
-	return m_particleSystem.GetParticleGravityScale();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleGravityScale();
 }
 
 void b2World::SetParticleDamping(float32 damping)
 {
-	m_particleSystem.SetParticleDamping(damping);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleDamping(damping);
 }
 
 float32 b2World::GetParticleDamping() const
 {
-	return m_particleSystem.GetParticleDamping();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleDamping();
 }
 
 void b2World::SetParticleStaticPressureIterations(int32 iterations)
 {
-	m_particleSystem.SetParticleStaticPressureIterations(iterations);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleStaticPressureIterations(iterations);
 }
 
 int32 b2World::GetParticleStaticPressureIterations() const
 {
-	return m_particleSystem.GetParticleStaticPressureIterations();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleStaticPressureIterations();
 }
 
 void b2World::SetParticleRadius(float32 radius)
 {
-	m_particleSystem.SetParticleRadius(radius);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleRadius(radius);
 }
 
 float32 b2World::GetParticleRadius() const
 {
-	return m_particleSystem.GetParticleRadius();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleRadius();
 }
 
 int32 b2World::CreateParticle(const b2ParticleDef& def)
@@ -1473,13 +1533,13 @@ int32 b2World::CreateParticle(const b2ParticleDef& def)
 	{
 		return 0;
 	}
-	int32 p = m_particleSystem.CreateParticle(def);
+	int32 p = DEPRECATED_GetUniqueParticleSystem().CreateParticle(def);
 	return p;
 }
 
 void b2World::DestroyParticle(int32 index, bool callDestructionListener)
 {
-	m_particleSystem.DestroyParticle(index, callDestructionListener);
+	DEPRECATED_GetUniqueParticleSystem().DestroyParticle(index, callDestructionListener);
 }
 
 int32 b2World::DestroyParticlesInShape(
@@ -1490,7 +1550,7 @@ int32 b2World::DestroyParticlesInShape(
 	{
 		return 0;
 	}
-	return m_particleSystem.DestroyParticlesInShape(shape, xf,
+	return DEPRECATED_GetUniqueParticleSystem().DestroyParticlesInShape(shape, xf,
 													callDestructionListener);
 }
 
@@ -1501,7 +1561,7 @@ b2ParticleGroup* b2World::CreateParticleGroup(const b2ParticleGroupDef& def)
 	{
 		return NULL;
 	}
-	b2ParticleGroup* g = m_particleSystem.CreateParticleGroup(def);
+	b2ParticleGroup* g = DEPRECATED_GetUniqueParticleSystem().CreateParticleGroup(def);
 	return g;
 }
 
@@ -1512,7 +1572,7 @@ void b2World::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* group
 	{
 		return;
 	}
-	m_particleSystem.JoinParticleGroups(groupA, groupB);
+	DEPRECATED_GetUniqueParticleSystem().JoinParticleGroups(groupA, groupB);
 }
 
 void b2World::DestroyParticlesInGroup(b2ParticleGroup* group, bool callDestructionListener)
@@ -1522,115 +1582,115 @@ void b2World::DestroyParticlesInGroup(b2ParticleGroup* group, bool callDestructi
 	{
 		return;
 	}
-	m_particleSystem.DestroyParticlesInGroup(group, callDestructionListener);
+	DEPRECATED_GetUniqueParticleSystem().DestroyParticlesInGroup(group, callDestructionListener);
 }
 
 b2Vec2* b2World::GetParticlePositionBuffer()
 {
-	return m_particleSystem.GetParticlePositionBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticlePositionBuffer();
 }
 
 b2Vec2* b2World::GetParticleVelocityBuffer()
 {
-	return m_particleSystem.GetParticleVelocityBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleVelocityBuffer();
 }
 
 b2ParticleColor* b2World::GetParticleColorBuffer()
 {
-	return m_particleSystem.GetParticleColorBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleColorBuffer();
 }
 
 void** b2World::GetParticleUserDataBuffer()
 {
-	return m_particleSystem.GetParticleUserDataBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleUserDataBuffer();
 }
 
 const uint32* b2World::GetParticleFlagsBuffer() const
 {
-	return m_particleSystem.GetParticleFlagsBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleFlagsBuffer();
 }
 
 const b2Vec2* b2World::GetParticlePositionBuffer() const
 {
-	return m_particleSystem.GetParticlePositionBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticlePositionBuffer();
 }
 
 const b2Vec2* b2World::GetParticleVelocityBuffer() const
 {
-	return m_particleSystem.GetParticleVelocityBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleVelocityBuffer();
 }
 
 const b2ParticleColor* b2World::GetParticleColorBuffer() const
 {
-	return m_particleSystem.GetParticleColorBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleColorBuffer();
 }
 
 const b2ParticleGroup* const* b2World::GetParticleGroupBuffer() const
 {
-	return m_particleSystem.GetParticleGroupBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleGroupBuffer();
 }
 
 void* const* b2World::GetParticleUserDataBuffer() const
 {
-	return m_particleSystem.GetParticleUserDataBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleUserDataBuffer();
 }
 
 void b2World::SetParticleFlags(int32 index, uint32 flags)
 {
-	m_particleSystem.SetParticleFlags(index, flags);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleFlags(index, flags);
 }
 
 void b2World::SetParticleFlagsBuffer(uint32* buffer, int32 capacity)
 {
-	m_particleSystem.SetParticleFlagsBuffer(buffer, capacity);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleFlagsBuffer(buffer, capacity);
 }
 
 void b2World::SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity)
 {
-	m_particleSystem.SetParticlePositionBuffer(buffer, capacity);
+	DEPRECATED_GetUniqueParticleSystem().SetParticlePositionBuffer(buffer, capacity);
 }
 
 void b2World::SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity)
 {
-	m_particleSystem.SetParticleVelocityBuffer(buffer, capacity);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleVelocityBuffer(buffer, capacity);
 }
 
 void b2World::SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity)
 {
-	m_particleSystem.SetParticleColorBuffer(buffer, capacity);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleColorBuffer(buffer, capacity);
 }
 
 b2ParticleGroup* const* b2World::GetParticleGroupBuffer()
 {
-	return m_particleSystem.GetParticleGroupBuffer();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleGroupBuffer();
 }
 
 void b2World::SetParticleUserDataBuffer(void** buffer, int32 capacity)
 {
-	m_particleSystem.SetParticleUserDataBuffer(buffer, capacity);
+	DEPRECATED_GetUniqueParticleSystem().SetParticleUserDataBuffer(buffer, capacity);
 }
 
 const b2ParticleContact* b2World::GetParticleContacts()
 {
-	return m_particleSystem.m_contactBuffer;
+	return DEPRECATED_GetUniqueParticleSystem().m_contactBuffer;
 }
 
 int32 b2World::GetParticleContactCount()
 {
-	return m_particleSystem.m_contactCount;
+	return DEPRECATED_GetUniqueParticleSystem().m_contactCount;
 }
 
 const b2ParticleBodyContact* b2World::GetParticleBodyContacts()
 {
-	return m_particleSystem.m_bodyContactBuffer;
+	return DEPRECATED_GetUniqueParticleSystem().m_bodyContactBuffer;
 }
 
 int32 b2World::GetParticleBodyContactCount()
 {
-	return m_particleSystem.m_bodyContactCount;
+	return DEPRECATED_GetUniqueParticleSystem().m_bodyContactCount;
 }
 
 float32 b2World::ComputeParticleCollisionEnergy() const
 {
-	return m_particleSystem.ComputeParticleCollisionEnergy();
+	return DEPRECATED_GetUniqueParticleSystem().ComputeParticleCollisionEnergy();
 }

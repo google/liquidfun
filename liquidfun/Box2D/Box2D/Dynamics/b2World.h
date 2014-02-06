@@ -89,6 +89,15 @@ public:
 	/// @warning This function is locked during callbacks.
 	void DestroyJoint(b2Joint* joint);
 
+	/// Create a particle system given a definition. No reference to the
+	/// definition is retained.
+	/// @warning This function is locked during callbacks.
+	b2ParticleSystem* CreateParticleSystem(const b2ParticleSystemDef* def);
+
+	/// Destroy a particle system.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticleSystem(b2ParticleSystem* p);
+
 	/// Take a time step. This performs collision detection, integration,
 	/// and constraint solution.
 	/// For the numerical stability of particles, minimize the following
@@ -161,6 +170,13 @@ public:
 	/// @return the head of the world joint list.
 	b2Joint* GetJointList();
 	const b2Joint* GetJointList() const;
+
+	/// Get the world particle-system list. With the returned body, use
+	/// b2ParticleSystem::GetNext to get the next particle-system in the world
+	/// list. A NULL particle-system indicates the end of the list.
+	/// @return the head of the world particle-system list.
+	b2ParticleSystem* GetParticleSystemList();
+	const b2ParticleSystem* GetParticleSystemList() const;
 
 	/// Get the world contact list. With the returned contact, use b2Contact::GetNext to get
 	/// the next contact in the world list. A NULL contact indicates the end of the list.
@@ -455,6 +471,14 @@ private:
 
 	void DrawParticleSystem(const b2ParticleSystem& system);
 
+	// The old API passes calls to b2ParticleSystem through b2World.
+	// It assumes that there is only one, unique, b2ParticleSystem.
+	// We'll delete the old API in a future change, but for now, just assume
+	// the first b2ParticleSystem is the unique one.
+	// TODO: Delete when we eliminate the unique particle system.
+	b2ParticleSystem& DEPRECATED_GetUniqueParticleSystem();
+	const b2ParticleSystem& DEPRECATED_GetUniqueParticleSystem() const;
+
 	b2BlockAllocator m_blockAllocator;
 	b2StackAllocator m_stackAllocator;
 
@@ -464,6 +488,7 @@ private:
 
 	b2Body* m_bodyList;
 	b2Joint* m_jointList;
+	b2ParticleSystem* m_particleSystemList;
 
 	int32 m_bodyCount;
 	int32 m_jointCount;
@@ -486,8 +511,6 @@ private:
 	bool m_stepComplete;
 
 	b2Profile m_profile;
-
-	b2ParticleSystem m_particleSystem;
 
 	/// Used to reference b2_LiquidFunVersion so that it's not stripped from
 	/// the static library.
@@ -513,6 +536,16 @@ inline b2Joint* b2World::GetJointList()
 inline const b2Joint* b2World::GetJointList() const
 {
 	return m_jointList;
+}
+
+inline b2ParticleSystem* b2World::GetParticleSystemList()
+{
+	return m_particleSystemList;
+}
+
+inline const b2ParticleSystem* b2World::GetParticleSystemList() const
+{
+	return m_particleSystemList;
 }
 
 inline b2Contact* b2World::GetContactList()
@@ -585,22 +618,34 @@ inline const b2Profile& b2World::GetProfile() const
 
 inline b2ParticleGroup* b2World::GetParticleGroupList()
 {
-	return m_particleSystem.GetParticleGroupList();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleGroupList();
 }
 
 inline const b2ParticleGroup* b2World::GetParticleGroupList() const
 {
-	return m_particleSystem.GetParticleGroupList();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleGroupList();
 }
 
 inline int32 b2World::GetParticleGroupCount() const
 {
-	return m_particleSystem.GetParticleGroupCount();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleGroupCount();
 }
 
 inline int32 b2World::GetParticleCount() const
 {
-	return m_particleSystem.GetParticleCount();
+	return DEPRECATED_GetUniqueParticleSystem().GetParticleCount();
+}
+
+inline b2ParticleSystem& b2World::DEPRECATED_GetUniqueParticleSystem()
+{
+	b2Assert(m_particleSystemList != NULL);
+	return *m_particleSystemList;
+}
+
+inline const b2ParticleSystem& b2World::DEPRECATED_GetUniqueParticleSystem() const
+{
+	b2Assert(m_particleSystemList != NULL);
+	return *m_particleSystemList;
 }
 
 #endif
