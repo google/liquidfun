@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Google, Inc.
+ * Copyright (c) 2014 Google, Inc.
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -16,12 +16,21 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-// pixel shader to render triangles in a fixed color
+// turns a point sprite into a colored dot with smooth falloff
 
 precision mediump float;
 
 uniform vec4 color;
 
 void main() {
-  gl_FragColor = color;
+
+  // define our cone
+  vec2 p = gl_PointCoord * 2.0 - 1.0;
+  float distsqr = dot(p, p);
+  float falloff = 1.0 - distsqr;
+  float smooth = smoothstep(0.0, 1.0, falloff); // outside circle drops to 0
+
+  gl_FragColor = falloff > 0.0
+    ? vec4(color.xyz * smooth, 1.0)
+    : vec4(0.0, 0.0, 0.0, 0.0);
 }

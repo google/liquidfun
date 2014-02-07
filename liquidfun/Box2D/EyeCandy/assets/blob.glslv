@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Google, Inc.
+ * Copyright (c) 2014 Google, Inc.
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -16,12 +16,15 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-// pixel shader to render triangles in a fixed color
+// Scales the particle to the correct size.
 
-precision mediump float;
+attribute vec4 position;       // in 2d worldspace
+attribute float particlesize;  // scale relative to physical size of 1
 
-uniform vec4 color;
+uniform vec2 extents;          // worldspace -> clipspace scale
+uniform float scale;           // number of pixels of 1 world unit
 
 void main() {
-  gl_FragColor = color;
+  gl_Position = vec4(position.xy / extents, 0.0, 1.0);
+  gl_PointSize = scale * particlesize;
 }

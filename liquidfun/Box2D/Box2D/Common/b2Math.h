@@ -143,7 +143,7 @@ struct b2Vec2
 	float32 x, y;
 };
 
-/// A 2D column vector with 3 elements.
+/// A 3D column vector with 3 elements.
 struct b2Vec3
 {
 	/// Default constructor does nothing (for performance).
@@ -202,6 +202,18 @@ struct b2Vec3
 	}
 
 	float32 x, y, z;
+};
+
+/// A 4D column vector with 4 elements.
+struct b2Vec4
+{
+	/// Default constructor does nothing (for performance).
+	b2Vec4() {}
+
+	/// Construct using coordinates.
+	b2Vec4(float32 x, float32 y, float32 z, float32 w) : x(x), y(y), z(z), w(w) {}
+
+	float32 x, y, z, w;
 };
 
 /// A 2-by-2 matrix. Stored in column-major order.
