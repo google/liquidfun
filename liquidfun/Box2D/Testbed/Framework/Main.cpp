@@ -189,20 +189,32 @@ static void SimulationLoop()
 		// Set framework settings options based on parameters
 		const uint32 options = particleParameter.GetOptions();
 
-		settings.strictContacts 	= options & ParticleParameter::OptionStrictContacts;
-		settings.drawContactPoints	= options & ParticleParameter::OptionDrawContactPoints;
-		settings.drawContactNormals	= options & ParticleParameter::OptionDrawContactNormals;
-		settings.drawContactImpulse	= options & ParticleParameter::OptionDrawContactImpulse;
-		settings.drawFrictionImpulse = options & ParticleParameter::OptionDrawFrictionImpulse;
-		settings.drawStats 			 = options & ParticleParameter::OptionDrawStats;
-		settings.drawProfile		 = options & ParticleParameter::OptionDrawProfile;
+		settings.strictContacts 	= options &
+			ParticleParameter::OptionStrictContacts;
+		settings.drawContactPoints	= options &
+			ParticleParameter::OptionDrawContactPoints;
+		settings.drawContactNormals	= options &
+			ParticleParameter::OptionDrawContactNormals;
+		settings.drawContactImpulse	= options &
+			ParticleParameter::OptionDrawContactImpulse;
+		settings.drawFrictionImpulse = options &
+			ParticleParameter::OptionDrawFrictionImpulse;
+		settings.drawStats 			 = options &
+			ParticleParameter::OptionDrawStats;
+		settings.drawProfile		 = options &
+			ParticleParameter::OptionDrawProfile;
 
 		// The b2Draw based flags must be exactly 0 or 1 currently.
-		settings.drawShapes 	= options & ParticleParameter::OptionDrawShapes ? 1 : 0;
-		settings.drawParticles 	= options & ParticleParameter::OptionDrawParticles ? 1 : 0;
-		settings.drawJoints		= options & ParticleParameter::OptionDrawJoints ? 1 : 0;
-		settings.drawAABBs		= options & ParticleParameter::OptionDrawAABBs ? 1 : 0;
-		settings.drawCOMs 		= options & ParticleParameter::OptionDrawCOMs ? 1 : 0;
+		settings.drawShapes 	= options &
+			ParticleParameter::OptionDrawShapes ? 1 : 0;
+		settings.drawParticles 	= options &
+			ParticleParameter::OptionDrawParticles ? 1 : 0;
+		settings.drawJoints		= options &
+			ParticleParameter::OptionDrawJoints ? 1 : 0;
+		settings.drawAABBs		= options &
+			ParticleParameter::OptionDrawAABBs ? 1 : 0;
+		settings.drawCOMs 		= options &
+			ParticleParameter::OptionDrawCOMs ? 1 : 0;
 
 		// Draw the full screen UI with
 		// "test_name [: particle_parameter] / fps" at the bottom of the
