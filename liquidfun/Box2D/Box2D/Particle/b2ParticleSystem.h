@@ -405,6 +405,7 @@ private:
 		bool deferred);
 	template <typename T> T* RequestParticleBuffer(T* buffer);
 
+	void ReallocateInternalAllocatedBuffers(int32 capacity);
 	int32 CreateParticleForGroup(
 		const b2ParticleGroupDef& groupDef,
 		const b2Transform& xf, const b2Vec2& position);

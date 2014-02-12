@@ -181,6 +181,25 @@ TEST_F(FunctionTests, CreateParticleGroupWithCustomStride) {
 	EXPECT_GT(group2->GetParticleCount(), group3->GetParticleCount());
 }
 
+TEST_F(FunctionTests, CreateEmptyParticleGroupWithNoShape) {
+	b2ParticleGroupDef def;
+	def.groupFlags = b2_solidParticleGroup | b2_particleGroupCanBeEmpty;
+	b2ParticleGroup *group = m_world->CreateParticleGroup(def);
+	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	EXPECT_EQ(group->GetParticleCount(), 0);
+	b2PolygonShape shape;
+	shape.SetAsBox(10, 10);
+	def.shape = &shape;
+	m_world->JoinParticleGroups(group, m_world->CreateParticleGroup(def));
+	EXPECT_GT(m_world->GetParticleCount(), 0);
+	EXPECT_GT(group->GetParticleCount(), 0);
+	m_world->Step(0.01f, 1, 1, 1);
+	m_world->DestroyParticlesInGroup(group, true);
+	m_world->Step(0.01f, 1, 1, 1);
+	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	EXPECT_EQ(group->GetParticleCount(), 0);
+}
+
 TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
 	static const int32 particleCount = 100;
 	b2Vec2 positionData[particleCount];
