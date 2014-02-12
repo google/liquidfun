@@ -22,6 +22,7 @@
 #include <Box2D/Common/b2Settings.h>
 
 struct b2Color;
+class b2ParticleGroup;
 
 /// @file
 
@@ -256,6 +257,7 @@ struct b2ParticleDef
 		velocity = b2Vec2_zero;
 		color = b2ParticleColor_zero;
 		userData = NULL;
+		group = NULL;
 	}
 
 	/// \brief Specifies the type of particle (see #b2ParticleFlag).
@@ -276,6 +278,9 @@ struct b2ParticleDef
 
 	/// Use this to store application-specific body data.
 	void* userData;
+
+	/// An existing particle group to which the particle will be added.
+	b2ParticleGroup* group;
 
 };
 

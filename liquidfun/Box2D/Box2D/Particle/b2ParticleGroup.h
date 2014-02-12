@@ -66,6 +66,7 @@ struct b2ParticleGroupDef
 		particleCount = 0;
 		positionData = NULL;
 		userData = NULL;
+		group = NULL;
 	}
 
 	/// The particle-behavior flags (See #b2ParticleFlag).
@@ -110,6 +111,9 @@ struct b2ParticleGroupDef
 
 	/// Use this to store application-specific group data.
 	void* userData;
+
+	/// An existing particle group to which the particles will be added.
+	b2ParticleGroup* group;
 
 };
 
