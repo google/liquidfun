@@ -42,10 +42,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(-40, -20),
-					b2Vec2(40, -20),
-					b2Vec2(40, 0),
-					b2Vec2(-40, 0)};
+					b2Vec2(-4, -2),
+					b2Vec2(4, -2),
+					b2Vec2(4, 0),
+					b2Vec2(-4, 0)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -53,10 +53,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(-40, -20),
-					b2Vec2(-20, -20),
-					b2Vec2(-20, 60),
-					b2Vec2(-40, 60)};
+					b2Vec2(-4, -2),
+					b2Vec2(-2, -2),
+					b2Vec2(-2, 6),
+					b2Vec2(-4, 6)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -64,10 +64,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(20, -20),
-					b2Vec2(40, -20),
-					b2Vec2(40, 60),
-					b2Vec2(20, 60)};
+					b2Vec2(2, -2),
+					b2Vec2(4, -2),
+					b2Vec2(4, 6),
+					b2Vec2(2, 6)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -75,17 +75,17 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(-40, 40),
-					b2Vec2(40, 40),
-					b2Vec2(40, 60),
-					b2Vec2(-40, 60)};
+					b2Vec2(-4, 4),
+					b2Vec2(4, 4),
+					b2Vec2(4, 6),
+					b2Vec2(-4, 6)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
 		}
 
 		m_colorIndex = 0;
-		m_world->SetParticleRadius(0.5f);
+		m_world->SetParticleRadius(0.05f);
 		m_lastGroup = NULL;
 		m_drawing = true;
 
@@ -191,7 +191,7 @@ public:
 		{
 			b2CircleShape shape;
 			shape.m_p = p;
-			shape.m_radius = 2.0f;
+			shape.m_radius = 0.2f;
 			b2Transform xf;
 			xf.SetIdentity();
 
@@ -291,6 +291,11 @@ public:
 		m_debugDraw.DrawString(
 			5, m_textLine, "(C) color mixing, (Z) erase, (X) move");
 		m_textLine += DRAW_STRING_NEW_LINE;
+	}
+
+	float32 GetDefaultViewZoom() const
+	{
+		return 0.1f;
 	}
 
 	static Test* Create()

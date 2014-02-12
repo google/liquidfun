@@ -51,3 +51,10 @@ void b2ParticleColor::Set(const b2Color& color)
 		(uint8)(k_maxValue * color.b),
 		B2PARTICLECOLOR_MAX_VALUE);
 }
+
+int32 b2CalculateParticleIterations(
+	float32 gravity, float32 radius, float32 timeStep)
+{
+	float32 threshold = 0.01f;
+	return (int32) ceilf(b2Sqrt(gravity / (threshold * radius)) * timeStep);
+}

@@ -134,6 +134,11 @@ static void Resize(int32 w, int32 h)
 
 	// L/R/B/T
 	LoadOrtho2DMatrix(lower.x, upper.x, lower.y, upper.y);
+
+	if (fullscreenUI.GetEnabled())
+	{
+		fullscreenUI.SetViewParameters(&settings.viewCenter, &extents);
+	}
 }
 
 static b2Vec2 ConvertScreenToWorld(int32 x, int32 y)
@@ -228,8 +233,8 @@ static void SimulationLoop()
 		delete test;
 		entry = g_testEntries + testIndex;
 		test = entry->createFcn();
-		viewZoom = 1.0f;
-		settings.viewCenter.Set(0.0f, 20.0f);
+		viewZoom = test->GetDefaultViewZoom();
+		settings.viewCenter.Set(0.0f, 20.0f * viewZoom);
 		Resize(width, height);
 	}
 
@@ -578,6 +583,8 @@ int main(int argc, char** argv)
 	entry = g_testEntries + testIndex;
 	if (entry && entry->createFcn) {
 		test = entry->createFcn();
+		testSelection = testIndex;
+		testIndex = -1;
 	}
 
 	glutInit(&argc, argv);

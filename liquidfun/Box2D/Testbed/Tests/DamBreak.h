@@ -24,27 +24,28 @@ public:
 
 	DamBreak()
 	{
+
 		{
 			b2BodyDef bd;
 			b2Body* ground = m_world->CreateBody(&bd);
 
 			b2ChainShape shape;
 			const b2Vec2 vertices[4] = {
-				b2Vec2(-20, 0),
-				b2Vec2(20, 0),
-				b2Vec2(20, 40),
-				b2Vec2(-20, 40)};
+				b2Vec2(-2, 0),
+				b2Vec2(2, 0),
+				b2Vec2(2, 4),
+				b2Vec2(-2, 4)};
 			shape.CreateLoop(vertices, 4);
 			ground->CreateFixture(&shape, 0.0f);
 
 		}
 
-		m_world->SetParticleRadius(0.15f);
+		m_world->SetParticleRadius(0.025f);
 		m_world->SetParticleDamping(0.2f);
 
 		{
 			b2PolygonShape shape;
-			shape.SetAsBox(8, 10, b2Vec2(-12, 10.1f), 0);
+			shape.SetAsBox(0.8f, 1.0f, b2Vec2(-1.2f, 1.01f), 0);
 			b2ParticleGroupDef pd;
 			pd.flags = TestMain::GetParticleParameterValue();
 			pd.shape = &shape;
@@ -55,6 +56,11 @@ public:
 			}
 		}
 
+	}
+
+	float32 GetDefaultViewZoom() const
+	{
+		return 0.1f;
 	}
 
 	static Test* Create()

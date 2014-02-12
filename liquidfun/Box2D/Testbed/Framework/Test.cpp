@@ -467,7 +467,7 @@ void Test::Step(Settings* settings)
 		m_mouseTracerPosition += timeStep * m_mouseTracerVelocity;
 		b2CircleShape shape;
 		shape.m_p = m_mouseTracerPosition;
-		shape.m_radius = 2;
+		shape.m_radius = 2 * GetDefaultViewZoom();
 		QueryCallback2 callback(m_world, &shape, m_mouseTracerVelocity);
 		b2AABB aabb;
 		b2Transform xf;
@@ -547,6 +547,11 @@ void Test::Step(Settings* settings)
 void Test::ShiftOrigin(const b2Vec2& newOrigin)
 {
 	m_world->ShiftOrigin(newOrigin);
+}
+
+float32 Test::GetDefaultViewZoom() const
+{
+	return 1.0f;
 }
 
 // Apply a preset range of colors to a particle group.

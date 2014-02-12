@@ -24,6 +24,7 @@ public:
 
 	Soup()
 	{
+
 		{
 			b2BodyDef bd;
 			b2Body* ground = m_world->CreateBody(&bd);
@@ -31,10 +32,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(-40, -10),
-					b2Vec2(40, -10),
-					b2Vec2(40, 0),
-					b2Vec2(-40, 0)};
+					b2Vec2(-4, -1),
+					b2Vec2(4, -1),
+					b2Vec2(4, 0),
+					b2Vec2(-4, 0)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -42,10 +43,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(-40, -1),
-					b2Vec2(-20, -1),
-					b2Vec2(-20, 20),
-					b2Vec2(-40, 30)};
+					b2Vec2(-4, -0.1f),
+					b2Vec2(-2, -0.1f),
+					b2Vec2(-2, 2),
+					b2Vec2(-4, 3)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -53,19 +54,19 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(20, -1),
-					b2Vec2(40, -1),
-					b2Vec2(40, 30),
-					b2Vec2(20, 20)};
+					b2Vec2(2, -0.1f),
+					b2Vec2(4, -0.1f),
+					b2Vec2(4, 3),
+					b2Vec2(2, 2)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
 		}
 
-		m_world->SetParticleRadius(0.2f);
+		m_world->SetParticleRadius(0.035f);
 		{
 			b2PolygonShape shape;
-			shape.SetAsBox(20, 10, b2Vec2(0, 10), 0);
+			shape.SetAsBox(2, 1, b2Vec2(0, 1), 0);
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
 			pd.flags = TestMain::GetParticleParameterValue();
@@ -81,9 +82,10 @@ public:
 			bd.type = b2_dynamicBody;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2CircleShape shape;
-			shape.m_p.Set(0, 5);
-			shape.m_radius = 1;
+			shape.m_p.Set(0, 0.5f);
+			shape.m_radius = 0.1f;
 			body->CreateFixture(&shape, 0.1f);
+			m_world->DestroyParticlesInShape(shape, body->GetTransform());
 		}
 
 		{
@@ -91,8 +93,9 @@ public:
 			bd.type = b2_dynamicBody;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2PolygonShape shape;
-			shape.SetAsBox(1, 1, b2Vec2(-10, 5), 0);
+			shape.SetAsBox(0.1f, 0.1f, b2Vec2(-1, 0.5f), 0);
 			body->CreateFixture(&shape, 0.1f);
+			m_world->DestroyParticlesInShape(shape, body->GetTransform());
 		}
 
 		{
@@ -100,8 +103,9 @@ public:
 			bd.type = b2_dynamicBody;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2PolygonShape shape;
-			shape.SetAsBox(1, 1, b2Vec2(10, 5), 0.5f);
+			shape.SetAsBox(0.1f, 0.1f, b2Vec2(1, 0.5f), 0.5f);
 			body->CreateFixture(&shape, 0.1f);
+			m_world->DestroyParticlesInShape(shape, body->GetTransform());
 		}
 
 		{
@@ -109,8 +113,11 @@ public:
 			bd.type = b2_dynamicBody;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(0, 20), b2Vec2(1, 21));
-			body->CreateFixture(&shape, 0.1f);
+			shape.Set(b2Vec2(0, 2), b2Vec2(0.1f, 2.1f));
+			body->CreateFixture(&shape, 1);
+			b2MassData massData =
+				{0.1f, 0.5f * (shape.m_vertex1 + shape.m_vertex2), 0.0f};
+			body->SetMassData(&massData);
 		}
 
 		{
@@ -118,8 +125,11 @@ public:
 			bd.type = b2_dynamicBody;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(3, 20), b2Vec2(4, 21));
-			body->CreateFixture(&shape, 0.1f);
+			shape.Set(b2Vec2(0.3f, 2.0f), b2Vec2(0.4f, 2.1f));
+			body->CreateFixture(&shape, 1);
+			b2MassData massData =
+				{0.1f, 0.5f * (shape.m_vertex1 + shape.m_vertex2), 0.0f};
+			body->SetMassData(&massData);
 		}
 
 		{
@@ -127,9 +137,17 @@ public:
 			bd.type = b2_dynamicBody;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(-3, 21), b2Vec2(-2, 20));
-			body->CreateFixture(&shape, 0.1f);
+			shape.Set(b2Vec2(-0.3f, 2.1f), b2Vec2(-0.2f, 2.0f));
+			body->CreateFixture(&shape, 1);
+			b2MassData massData =
+				{0.1f, 0.5f * (shape.m_vertex1 + shape.m_vertex2), 0.0f};
+			body->SetMassData(&massData);
 		}
+	}
+
+	float32 GetDefaultViewZoom() const
+	{
+		return 0.1f;
 	}
 
 	static Test* Create()

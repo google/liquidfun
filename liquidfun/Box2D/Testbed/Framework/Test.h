@@ -60,7 +60,10 @@ struct Settings
 		hz = 60.0f;
 		velocityIterations = 8;
 		positionIterations = 3;
-		particleIterations = 1;
+		// Particle iterations are needed for numerical stability in particle
+		// simulations with small particles and relatively high gravity.
+		// b2CalculateParticleIterations helps to determine the number.
+		particleIterations = b2CalculateParticleIterations(10, 0.04f, 1 / hz);
 		drawShapes = 1;
 		drawParticles = 1;
 		drawJoints = 1;
@@ -184,6 +187,7 @@ public:
 	}
 
 	void ShiftOrigin(const b2Vec2& newOrigin);
+	virtual float32 GetDefaultViewZoom() const;
 
 	// Apply a preset range of colors to a particle group.
 	// A different color out of k_ParticleColors is applied to each

@@ -279,4 +279,8 @@ struct b2ParticleDef
 
 };
 
+/// A helper function to calculate the optimal number of iterations.
+int32 b2CalculateParticleIterations(
+	float32 gravity, float32 radius, float32 timeStep);
+
 #endif
