@@ -289,6 +289,20 @@ Set viscous behavior using the statement
 
 The "Liquid Timer" demo of the Testbed application uses viscous particles.
 
+### Static Pressure
+
+Particles are subject to compression when pressure acts upon them. For example, 
+when particles pour into a container, the ones at the bottom of the container 
+are "crushed" under the weight of those above them and packed more tightly 
+together than the ones at the top of the pile.
+
+The static-pressure particle eliminates this differential; the same amount of 
+pressure acts upon each particle in the group.
+
+The following example sets static-pressure behavior.
+
+&nbsp;&nbsp;&nbsp;`pd.flags = b2_staticPressureParticle;`
+
 ### Wall
 
 Wall particles are static. They are permanently stationary, even if something
