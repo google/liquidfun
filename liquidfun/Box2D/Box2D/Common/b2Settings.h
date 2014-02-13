@@ -191,6 +191,9 @@ void* b2Alloc(int32 size);
 /// If you implement b2Alloc, you should also implement this function.
 void b2Free(void* mem);
 
+/// Get number of calls to b2Alloc minus number of calls to b2Free.
+int32 b2GetNumAllocs();
+
 /// Logging function.
 void b2Log(const char* string, ...);
 
