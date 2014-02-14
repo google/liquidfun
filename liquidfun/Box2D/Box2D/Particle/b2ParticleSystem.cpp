@@ -260,8 +260,13 @@ template <typename T> T* b2ParticleSystem::RequestParticleBuffer(T* buffer)
 {
 	if (!buffer)
 	{
+		if (m_internalAllocatedCapacity == 0)
+		{
+			ReallocateInternalAllocatedBuffers(b2_minParticleBufferCapacity);
+		}
 		buffer = (T*) (m_world->m_blockAllocator.Allocate(
 						   sizeof(T) * m_internalAllocatedCapacity));
+		b2Assert(buffer);
 		memset(buffer, 0, sizeof(T) * m_internalAllocatedCapacity);
 	}
 	return buffer;
@@ -270,6 +275,46 @@ template <typename T> T* b2ParticleSystem::RequestParticleBuffer(T* buffer)
 static int32 LimitCapacity(int32 capacity, int32 maxCount)
 {
 	return maxCount && capacity > maxCount ? maxCount : capacity;
+}
+
+void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
+{
+	// Don't increase capacity beyond the smallest user-supplied buffer size.
+	capacity = LimitCapacity(capacity, m_maxCount);
+	capacity = LimitCapacity(capacity, m_flagsBuffer.userSuppliedCapacity);
+	capacity = LimitCapacity(capacity, m_positionBuffer.userSuppliedCapacity);
+	capacity = LimitCapacity(capacity, m_velocityBuffer.userSuppliedCapacity);
+	capacity = LimitCapacity(capacity, m_colorBuffer.userSuppliedCapacity);
+	capacity = LimitCapacity(capacity, m_userDataBuffer.userSuppliedCapacity);
+	if (m_internalAllocatedCapacity < capacity)
+	{
+		m_flagsBuffer.data = ReallocateBuffer(
+			&m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
+		m_positionBuffer.data = ReallocateBuffer(
+			&m_positionBuffer, m_internalAllocatedCapacity, capacity, false);
+		m_velocityBuffer.data = ReallocateBuffer(
+			&m_velocityBuffer, m_internalAllocatedCapacity, capacity, false);
+		m_weightBuffer = ReallocateBuffer(
+			m_weightBuffer, 0, m_internalAllocatedCapacity, capacity, false);
+		m_staticPressureBuffer = ReallocateBuffer(
+			m_staticPressureBuffer, 0, m_internalAllocatedCapacity, capacity,
+			true);
+		m_accumulationBuffer = ReallocateBuffer(
+			m_accumulationBuffer, 0, m_internalAllocatedCapacity, capacity,
+			false);
+		m_accumulation2Buffer = ReallocateBuffer(
+			m_accumulation2Buffer, 0, m_internalAllocatedCapacity, capacity,
+			true);
+		m_depthBuffer = ReallocateBuffer(
+			m_depthBuffer, 0, m_internalAllocatedCapacity, capacity, true);
+		m_colorBuffer.data = ReallocateBuffer(
+			&m_colorBuffer, m_internalAllocatedCapacity, capacity, true);
+		m_groupBuffer = ReallocateBuffer(
+			m_groupBuffer, 0, m_internalAllocatedCapacity, capacity, false);
+		m_userDataBuffer.data = ReallocateBuffer(
+			&m_userDataBuffer, m_internalAllocatedCapacity, capacity, true);
+		m_internalAllocatedCapacity = capacity;
+	}
 }
 
 int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
@@ -282,53 +327,9 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 
 	if (m_count >= m_internalAllocatedCapacity)
 	{
-		// Double the particle capacity, but don't increase capacity beyond
-		// the smallest user-supplied buffer size.
+		// Double the particle capacity.
 		int32 capacity = m_count ? 2 * m_count : b2_minParticleBufferCapacity;
-		capacity = LimitCapacity(capacity, m_maxCount);
-		capacity = LimitCapacity(capacity, m_flagsBuffer.userSuppliedCapacity);
-		capacity = LimitCapacity(capacity,
-								 m_positionBuffer.userSuppliedCapacity);
-		capacity = LimitCapacity(capacity,
-								 m_velocityBuffer.userSuppliedCapacity);
-		capacity = LimitCapacity(capacity,
-								 m_colorBuffer.userSuppliedCapacity);
-		capacity = LimitCapacity(capacity,
-								 m_userDataBuffer.userSuppliedCapacity);
-		if (m_internalAllocatedCapacity < capacity)
-		{
-			m_flagsBuffer.data = ReallocateBuffer(
-				&m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
-			m_positionBuffer.data = ReallocateBuffer(
-				&m_positionBuffer, m_internalAllocatedCapacity, capacity,
-				false);
-			m_velocityBuffer.data = ReallocateBuffer(
-				&m_velocityBuffer, m_internalAllocatedCapacity, capacity,
-				false);
-			m_weightBuffer = ReallocateBuffer(
-				m_weightBuffer, 0, m_internalAllocatedCapacity, capacity,
-				false);
-			m_staticPressureBuffer = ReallocateBuffer(
-				m_staticPressureBuffer, 0, m_internalAllocatedCapacity,
-				capacity, true);
-			m_accumulationBuffer = ReallocateBuffer(
-				m_accumulationBuffer, 0, m_internalAllocatedCapacity,
-				capacity, false);
-			m_accumulation2Buffer = ReallocateBuffer(
-				m_accumulation2Buffer, 0, m_internalAllocatedCapacity,
-				capacity, true);
-			m_depthBuffer = ReallocateBuffer(
-				m_depthBuffer, 0, m_internalAllocatedCapacity, capacity, true);
-			m_colorBuffer.data = ReallocateBuffer(
-				&m_colorBuffer, m_internalAllocatedCapacity, capacity, true);
-			m_groupBuffer = ReallocateBuffer(
-				m_groupBuffer, 0, m_internalAllocatedCapacity, capacity,
-				false);
-			m_userDataBuffer.data = ReallocateBuffer(
-				&m_userDataBuffer, m_internalAllocatedCapacity,
-				capacity, true);
-			m_internalAllocatedCapacity = capacity;
-		}
+		ReallocateInternalAllocatedBuffers(capacity);
 	}
 	if (m_count >= m_internalAllocatedCapacity)
 	{
@@ -844,6 +845,7 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 		m_world->m_destructionListener->SayGoodbye(group);
 	}
 
+	SetParticleGroupFlags(group, 0);
 	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 	{
 		m_groupBuffer[i] = NULL;
@@ -865,7 +867,6 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 	--m_groupCount;
 	group->~b2ParticleGroup();
 	m_world->m_blockAllocator.Free(group, sizeof(b2ParticleGroup));
-	m_needsUpdateAllGroupFlags = true;
 }
 
 void b2ParticleSystem::ComputeWeight()
