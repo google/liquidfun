@@ -311,7 +311,27 @@ Set wall behavior using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_wallParticle;`
 
-### Zombie Particles
+### Barrier
+
+Solid or rigid particle groups are not inherently tunneling-proof. Particles 
+traveling at high enough velocities may penetrate them. Barrier particles, 
+used in conjunction with other particle types, provide particle groups 
+with protection against tunneling. This functionality is useful when, for 
+example, you want to ensure that liquid particles will not leak out of a 
+container formed of wall particles.
+
+Barrier particles only prevent penetration of the particle groups they inhabit. 
+They cannot prevent particles from getting between groups of particles, even if 
+the groups' positions make them look as if they are contiguous.
+
+You can use barrier particles with elastic, spring, or wall particles.
+
+The following example creates an impermeable group of wall particles:
+
+&nbsp;&nbsp;&nbsp;`pd.flags = b2_wallParticle | b_barrierParticle;`
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`
+
+### Zombie
 
 Zombie particles are useful when you want efficiently to destroy multiple
 particles in a single step. All of the particles that you designate as zombies
@@ -319,7 +339,7 @@ are destroyed at the same time, in a single iteration of the solver.
 Destroying
 particles in a batch, after designating them as zombies, yields better
 performance than destroying them one by one: Whereas destroying particles
-one-by-one takes (number of particles) * (time per particle) to complete,
+one-by-one takes (number of parti`cles) * (time per particle) to complete,
 destroying them all in a batch takes the same time as it would to destroy a
 single particle.<br/>
 In the following example, every other particle in a group is designated as a
