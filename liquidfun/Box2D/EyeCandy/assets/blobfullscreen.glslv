@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Google, Inc.
+ * Copyright (c) 2014 Google, Inc.
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -16,12 +16,12 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-// pixel shader to render triangles in a fixed color
+// set up a full screen quad
 
-precision mediump float;
-
-uniform vec4 color;
+attribute vec4 position;  // already in clipspace (-1..1)
+varying vec2 texcoord;    // 0..1 across the screen
 
 void main() {
-  gl_FragColor = color;
+  gl_Position = position;
+  texcoord = (position.xy + 1.0) / 2.0;
 }

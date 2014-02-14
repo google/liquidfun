@@ -25,6 +25,6 @@ uniform vec2 extents;          // worldspace -> clipspace scale
 uniform float scale;           // number of pixels of 1 world unit
 
 void main() {
-  gl_Position = vec4(position.xy / extents, 0, 1);
+  gl_Position = vec4(position.xy / extents, 0.0, 1.0);
   gl_PointSize = scale * particlesize;
 }

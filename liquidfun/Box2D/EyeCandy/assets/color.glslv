@@ -22,5 +22,5 @@ attribute vec4 position;  // in 2d worldspace
 uniform vec2 extents;     // worldspace -> clipspace scale
 
 void main() {
-  gl_Position = vec4(position.xy / extents, 0, 1);
+  gl_Position = vec4(position.xy / extents, 0.0, 1.0);
 }
