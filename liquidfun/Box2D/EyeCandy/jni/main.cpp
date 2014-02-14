@@ -130,7 +130,8 @@ struct EyeCandyShader {
       position_handle(0),
       particlesize_handle(0),
       extents_handle(0),
-      scale_handle(0)
+      scale_handle(0),
+      tex_coord_handle(0)
   {}
 
   void SetWorld(float scale, float width, float height) {
@@ -176,6 +177,8 @@ struct EyeCandyShader {
     extents_handle = glGetUniformLocation(program, "extents");
     scale_handle = glGetUniformLocation(program, "scale");
 
+    tex_coord_handle = glGetAttribLocation(program, "tex_coord");
+
     char texname[] = "tex0";
     for (int i = 0; i < 8; i++) {
       texname[3] = '0' + i;
@@ -191,6 +194,7 @@ struct EyeCandyShader {
   GLint particlesize_handle;
   GLint extents_handle;
   GLint scale_handle;
+  GLint tex_coord_handle;
 };
 
 // loading / creating textures
@@ -327,15 +331,41 @@ public:
     virtual void DrawPolygon(const b2Vec2* vertices,
                              int32 vertex_count,
                              const b2Color& color) {
-      engine->sh_color_.SetWorld(engine->scale_,
+      static const GLfloat texture_coordinates[] = {
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f
+      };
+      GLfloat * const per_vertex_texture_coordinates = new GLfloat[
+          B2_ARRAY_SIZE(texture_coordinates) * vertex_count];
+      uint32 texture_coordinate_index = 0;
+      // Really lame texture coordinate generation.
+      for (int32 i = 0; i < vertex_count; ++i,
+           texture_coordinate_index += B2_ARRAY_SIZE(texture_coordinates)) {
+        memcpy(&per_vertex_texture_coordinates[texture_coordinate_index],
+               &texture_coordinates[texture_coordinate_index],
+               sizeof(texture_coordinates));
+      }
+
+      engine->sh_texture_.SetWorld(engine->scale_,
                                  engine->width_,
                                  engine->height_);
-      engine->sh_color_.Set4f("color", b2Vec4(0.5f, 0.5f, 0.5f, 1.0f));
-      glVertexAttribPointer(engine->sh_color_.position_handle, 2, GL_FLOAT,
+      engine->sh_texture_.Set4f("color", b2Vec4(0.5f, 0.5f, 0.5f, 1.0f));
+      glVertexAttribPointer(engine->sh_texture_.position_handle, 2, GL_FLOAT,
                             GL_FALSE, 0, vertices);
-      glEnableVertexAttribArray(engine->sh_color_.position_handle);
+      glVertexAttribPointer(engine->sh_texture_.tex_coord_handle, 2, GL_FLOAT,
+                            GL_FALSE, 0, per_vertex_texture_coordinates);
+      glBindTexture(GL_TEXTURE_2D, engine->mover_tex_);
+      glActiveTexture(GL_TEXTURE0);
+      glEnableVertexAttribArray(engine->sh_texture_.position_handle);
+      glEnableVertexAttribArray(engine->sh_texture_.tex_coord_handle);
       glDrawArrays(GL_TRIANGLE_FAN, 0, vertex_count);
-      glDisableVertexAttribArray(engine->sh_color_.position_handle);
+      glDisableVertexAttribArray(engine->sh_texture_.tex_coord_handle);
+      glDisableVertexAttribArray(engine->sh_texture_.position_handle);
+      glBindTexture(GL_TEXTURE_2D, 0);
+
+      delete [] per_vertex_texture_coordinates;
     };
 
     virtual void DrawSolidPolygon(const b2Vec2* vertices,
@@ -447,6 +477,9 @@ public:
     if (!CreateShaderFromAssets(app, sh_color_, "color.glslv",
                                                "color.glslf"))
       return false;
+    if (!CreateShaderFromAssets(app, sh_texture_, "texture.glslv",
+                                                  "texture.glslf"))
+      return false;
     if (!CreateShaderFromAssets(app, sh_point_, "point.glslv",
                                                "point.glslf"))
       return false;
@@ -472,6 +505,10 @@ public:
 
     background_tex_ = LoadTextureFromTGAAsset(app, "background_s.tga");
     if (!background_tex_)
+      return false;
+
+    mover_tex_ = LoadTextureFromTGAAsset(app, "mover_s.tga");
+    if (!mover_tex_)
       return false;
 
     InitPhysics();
@@ -843,14 +880,16 @@ private:
   SavedState state_;
   bool landscape_device_;
 
-  EyeCandyShader sh_color_;  // simple single color polygons
-  EyeCandyShader sh_point_;  // render particles into FBO
-  EyeCandyShader sh_fulls_;  // use FBO to render water effect
-  EyeCandyShader sh_blob_;   // generic particle blob
-  EyeCandyShader sh_blobfs_; // blob fullscreen quantizer
+  EyeCandyShader sh_color_;   // simple single color polygons
+  EyeCandyShader sh_texture_; // simple single textured polygons
+  EyeCandyShader sh_point_;   // render particles into FBO
+  EyeCandyShader sh_fulls_;   // use FBO to render water effect
+  EyeCandyShader sh_blob_;    // generic particle blob
+  EyeCandyShader sh_blobfs_;  // blob fullscreen quantizer
 
   GLuint fbo_, fbo_tex_;
   GLuint background_tex_;
+  GLuint mover_tex_;
 
   b2World *world_;
   b2RevoluteJoint *joint_;
@@ -919,4 +958,3 @@ void android_main(android_app *app) {
     engine.DrawFrame();
   }
 }
-
