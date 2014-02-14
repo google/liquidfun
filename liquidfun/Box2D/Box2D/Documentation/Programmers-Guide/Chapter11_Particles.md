@@ -320,6 +320,10 @@ with protection against tunneling. This functionality is useful when, for
 example, you want to ensure that liquid particles will not leak out of a 
 container formed of wall particles.
 
+Barrier particles only prevent penetration of the particle groups they inhabit. 
+They cannot prevent particles from getting between groups of particles, even if 
+the groups' positions make them look as if they are contiguous.
+
 You can use barrier particles with elastic, spring, or wall particles.
 
 The following example creates an impermeable group of wall particles:
