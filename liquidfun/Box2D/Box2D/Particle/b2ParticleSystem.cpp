@@ -597,100 +597,10 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
 	SetParticleGroupFlags(group, groupDef.groupFlags);
 
 	UpdateContacts(true);
-	if (groupDef.flags & k_pairFlags)
-	{
-		for (int32 k = 0; k < m_contactCount; k++)
-		{
-			const b2ParticleContact& contact = m_contactBuffer[k];
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			if (a > b) b2Swap(a, b);
-			if (firstIndex <= a && b < lastIndex)
-			{
-				if (m_pairCount >= m_pairCapacity)
-				{
-					int32 oldCapacity = m_pairCapacity;
-					int32 newCapacity = m_pairCount ?
-						2 * m_pairCount : b2_minParticleBufferCapacity;
-					m_pairBuffer = ReallocateBuffer(m_pairBuffer, oldCapacity,
-													newCapacity);
-					m_pairCapacity = newCapacity;
-				}
-				Pair& pair = m_pairBuffer[m_pairCount];
-				pair.indexA = a;
-				pair.indexB = b;
-				pair.flags = contact.flags;
-				pair.strength = groupDef.strength;
-				pair.distance = b2Distance(
-					m_positionBuffer.data[a],
-					m_positionBuffer.data[b]);
-				m_pairCount++;
-			}
-		}
-	}
-	if (groupDef.flags & k_triadFlags)
-	{
-		b2VoronoiDiagram diagram(
-			&m_world->m_stackAllocator, lastIndex - firstIndex);
-		for (int32 i = firstIndex; i < lastIndex; i++)
-		{
-			diagram.AddGenerator(m_positionBuffer.data[i], i);
-		}
-		diagram.Generate(GetParticleStride() / 2);
-		CreateParticleGroupCallback callback;
-		callback.system = this;
-		callback.def = &groupDef;
-		callback.firstIndex = firstIndex;
-		diagram.GetNodes(callback);
-	}
+	UpdatePairsAndTriads(firstIndex, lastIndex, group, group);
 
 	return group;
 }
-
-void b2ParticleSystem::CreateParticleGroupCallback::operator()(
-	int32 a, int32 b, int32 c) const
-{
-	const b2Vec2& pa = system->m_positionBuffer.data[a];
-	const b2Vec2& pb = system->m_positionBuffer.data[b];
-	const b2Vec2& pc = system->m_positionBuffer.data[c];
-	b2Vec2 dab = pa - pb;
-	b2Vec2 dbc = pb - pc;
-	b2Vec2 dca = pc - pa;
-	float32 maxDistanceSquared = b2_maxTriadDistanceSquared *
-								 system->m_squaredDiameter;
-	if (b2Dot(dab, dab) < maxDistanceSquared &&
-		b2Dot(dbc, dbc) < maxDistanceSquared &&
-		b2Dot(dca, dca) < maxDistanceSquared)
-	{
-		if (system->m_triadCount >= system->m_triadCapacity)
-		{
-			int32 oldCapacity = system->m_triadCapacity;
-			int32 newCapacity = system->m_triadCount ?
-				2 * system->m_triadCount : b2_minParticleBufferCapacity;
-			system->m_triadBuffer = system->ReallocateBuffer(
-				system->m_triadBuffer, oldCapacity, newCapacity);
-			system->m_triadCapacity = newCapacity;
-		}
-		Triad& triad = system->m_triadBuffer[system->m_triadCount];
-		triad.indexA = a;
-		triad.indexB = b;
-		triad.indexC = c;
-		triad.flags =
-			system->m_flagsBuffer.data[a] |
-			system->m_flagsBuffer.data[b] |
-			system->m_flagsBuffer.data[c];
-		triad.strength = def->strength;
-		b2Vec2 midPoint = (float32) 1 / 3 * (pa + pb + pc);
-		triad.pa = pa - midPoint;
-		triad.pb = pb - midPoint;
-		triad.pc = pc - midPoint;
-		triad.ka = -b2Dot(dca, dab);
-		triad.kb = -b2Dot(dab, dbc);
-		triad.kc = -b2Dot(dbc, dca);
-		triad.s = b2Cross(pa, pb) + b2Cross(pb, pc) + b2Cross(pc, pa);
-		system->m_triadCount++;
-	}
-};
 
 void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 										  b2ParticleGroup* groupB)
@@ -708,13 +618,30 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 				 groupB->m_firstIndex);
 	b2Assert(groupA->m_lastIndex == groupB->m_firstIndex);
 
+	UpdateContacts(true);
+	UpdatePairsAndTriads(
+		groupA->m_firstIndex, groupB->m_lastIndex, groupA, groupB);
+
+	for (int32 i = groupB->m_firstIndex; i < groupB->m_lastIndex; i++)
+	{
+		m_groupBuffer[i] = groupA;
+	}
+	uint32 groupFlags = groupA->m_groupFlags | groupB->m_groupFlags;
+	SetParticleGroupFlags(groupA, groupFlags);
+	groupA->m_lastIndex = groupB->m_lastIndex;
+	groupB->m_firstIndex = groupB->m_lastIndex;
+	DestroyParticleGroup(groupB);
+}
+
+void b2ParticleSystem::UpdatePairsAndTriads(
+	int32 firstIndex, int32 lastIndex,
+	b2ParticleGroup* groupA, b2ParticleGroup* groupB)
+{
 	uint32 particleFlags = 0;
-	for (int32 i = groupA->m_firstIndex; i < groupB->m_lastIndex; i++)
+	for (int32 i = firstIndex; i < lastIndex; i++)
 	{
 		particleFlags |= m_flagsBuffer.data[i];
 	}
-
-	UpdateContacts(true);
 	if (particleFlags & k_pairFlags)
 	{
 		for (int32 k = 0; k < m_contactCount; k++)
@@ -723,8 +650,8 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 			int32 a = contact.indexA;
 			int32 b = contact.indexB;
 			if (a > b) b2Swap(a, b);
-			if (groupA->m_firstIndex <= a && a < groupA->m_lastIndex &&
-				groupB->m_firstIndex <= b && b < groupB->m_lastIndex)
+			if ((groupA->ContainsParticle(a) || groupB->ContainsParticle(b)) &&
+				(groupA->ContainsParticle(b) || groupB->ContainsParticle(a)))
 			{
 				if (m_pairCount >= m_pairCapacity)
 				{
@@ -749,43 +676,32 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 	if (particleFlags & k_triadFlags)
 	{
 		b2VoronoiDiagram diagram(
-			&m_world->m_stackAllocator,
-			groupB->m_lastIndex - groupA->m_firstIndex);
-		for (int32 i = groupA->m_firstIndex; i < groupB->m_lastIndex; i++)
+			&m_world->m_stackAllocator, lastIndex - firstIndex);
+		for (int32 i = firstIndex; i < lastIndex; i++)
 		{
-			if (!(m_flagsBuffer.data[i] & b2_zombieParticle))
+			if (!(m_flagsBuffer.data[i] & b2_zombieParticle) &&
+				(groupA->ContainsParticle(i) || groupB->ContainsParticle(i)))
 			{
 				diagram.AddGenerator(m_positionBuffer.data[i], i);
 			}
 		}
 		diagram.Generate(GetParticleStride() / 2);
-		JoinParticleGroupsCallback callback;
+		UpdateTriadsCallback callback;
 		callback.system = this;
 		callback.groupA = groupA;
 		callback.groupB = groupB;
 		diagram.GetNodes(callback);
 	}
-
-	for (int32 i = groupB->m_firstIndex; i < groupB->m_lastIndex; i++)
-	{
-		m_groupBuffer[i] = groupA;
-	}
-	uint32 groupFlags = groupA->m_groupFlags | groupB->m_groupFlags;
-	SetParticleGroupFlags(groupA, groupFlags);
-	groupA->m_lastIndex = groupB->m_lastIndex;
-	groupB->m_firstIndex = groupB->m_lastIndex;
-	DestroyParticleGroup(groupB);
 }
 
-void b2ParticleSystem::JoinParticleGroupsCallback::operator()(int32 a, int32 b,
+void b2ParticleSystem::UpdateTriadsCallback::operator()(int32 a, int32 b,
 															  int32 c) const
 {
 	// Create a triad if it will contain particles from both groups.
-	int32 countA =
-		(a < groupB->m_firstIndex) +
-		(b < groupB->m_firstIndex) +
-		(c < groupB->m_firstIndex);
-	if (countA > 0 && countA < 3)
+	if ((groupA->ContainsParticle(a) || groupA->ContainsParticle(b) ||
+		groupA->ContainsParticle(c))  &&
+		(groupB->ContainsParticle(a) || groupB->ContainsParticle(b)  ||
+		groupB->ContainsParticle(c)))
 	{
 		uint32 af = system->m_flagsBuffer.data[a];
 		uint32 bf = system->m_flagsBuffer.data[b];
