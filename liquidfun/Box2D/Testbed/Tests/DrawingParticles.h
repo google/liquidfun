@@ -29,6 +29,7 @@ private:
 		e_parameterRigidBarrier = e_parameterBegin | (1UL << 2),
 		e_parameterElasticBarrier = e_parameterBegin | (1UL << 3),
 		e_parameterSpringBarrier = e_parameterBegin | (1UL << 4),
+		e_parameterRepulsive = e_parameterBegin | (1UL << 5),
 	};
 
 public:
@@ -121,6 +122,10 @@ public:
 			{
 				return (uint32)e_parameterSpringBarrier;
 			}
+			if (m_particleFlags == (b2_wallParticle | b2_repulsiveParticle))
+			{
+				return (uint32)e_parameterRepulsive;
+			}
 			return m_particleFlags;
 		}
 		return (uint32)e_parameterMove;
@@ -171,6 +176,9 @@ public:
 		case 'M':
 			m_particleFlags = b2_barrierParticle | b2_springParticle;
 			m_groupFlags = b2_solidParticleGroup;
+			break;
+		case 'F':
+			m_particleFlags = b2_wallParticle | b2_repulsiveParticle;
 			break;
 		case 'C':
 			m_particleFlags = b2_colorMixingParticle;
@@ -267,6 +275,10 @@ public:
 					m_particleFlags = b2_barrierParticle | b2_springParticle;
 					m_groupFlags = 0;
 					break;
+				case e_parameterRepulsive:
+					m_particleFlags = b2_repulsiveParticle | b2_wallParticle;
+					m_groupFlags = b2_solidParticleGroup;
+					break;
 				default:
 					m_particleFlags = parameterValue;
 					m_groupFlags = 0;
@@ -282,10 +294,10 @@ public:
 			5, m_textLine, "(R) rigid, (W) wall, (V) viscous, (T) tensile");
 		m_textLine += DRAW_STRING_NEW_LINE;
 		m_debugDraw.DrawString(
-			5, m_textLine, "(B) wall barrier, (H) rigid barrier");
+			5, m_textLine, "(F) repulsive wall, (B) wall barrier");
 		m_textLine += DRAW_STRING_NEW_LINE;
 		m_debugDraw.DrawString(
-			5, m_textLine, "(N) elastic barrier, (M) spring barrier");
+			5, m_textLine, "(H) rigid barrier, (N) elastic barrier, (M) spring barrier");
 		m_textLine += DRAW_STRING_NEW_LINE;
 		m_debugDraw.DrawString(
 			5, m_textLine, "(C) color mixing, (Z) erase, (X) move");
@@ -326,7 +338,9 @@ const ParticleParameter::Value DrawingParticles::k_paramValues[] =
 	{(uint32)e_parameterElasticBarrier,
 		ParticleParameter::k_DefaultOptions, "elastic barrier"},
 	{(uint32)e_parameterSpringBarrier,
-		ParticleParameter::k_DefaultOptions, "spring barrier"}
+		ParticleParameter::k_DefaultOptions, "spring barrier"},
+	{(uint32)e_parameterRepulsive,
+		ParticleParameter::k_DefaultOptions, "repulsive wall"}
 };
 
 const ParticleParameter::Definition DrawingParticles::k_paramDef[] =

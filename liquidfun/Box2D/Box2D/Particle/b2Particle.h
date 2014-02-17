@@ -56,6 +56,8 @@ enum b2ParticleFlag
 	b2_staticPressureParticle = 1 << 11,
 	/// Makes pairs or triads with other particles.
 	b2_reactiveParticle = 1 << 12,
+	/// With high repulsive force.
+	b2_repulsiveParticle = 1 << 13,
 };
 
 /// Small color object for each particle

@@ -32,6 +32,7 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added barrier particles which can be used to prevent particle tunneling
     due to large particle velocities or simulation steps.
 *   Added static pressure particles to reduce compression of fluids.
+*   Added repulsive particles to separate particle groups from each other.
 *   Added support for multiple independent particle systems.
 *   Added option to create particles in an existing particle group.
 *   Added option to detect stuck particles.
