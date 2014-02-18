@@ -1542,7 +1542,7 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		SolveDamping(subStep);
 		if (m_allParticleFlags & k_extraDampingFlags)
 		{
-			SolveExtraDamping(subStep);
+			SolveExtraDamping();
 		}
 		// SolveElastic and SolveSpring refer the current velocities for
 		// numerical stability, they should be called as late as possible.
@@ -1788,7 +1788,7 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 	}
 }
 
-void b2ParticleSystem::SolveExtraDamping(const b2TimeStep& step)
+void b2ParticleSystem::SolveExtraDamping()
 {
 	// Applies additional damping force between bodies and particles which can
 	// produce strong repulsive force. Applying damping force multiple times
