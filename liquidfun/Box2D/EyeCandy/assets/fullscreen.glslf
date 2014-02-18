@@ -37,7 +37,7 @@ void main() {
     // This pixel contains no fluid at all.
     // We sample the background texture to just display it, but artificially
     // darken it a bit to make the fluid pop out a bit more.
-    const float darkenbg = 0.6;
+    const float darkenbg = 0.7;
     gl_FragColor = vec4(texture2D(tex1, texcoord).xyz
                         * lightdir.z
                         * darkenbg, 1);

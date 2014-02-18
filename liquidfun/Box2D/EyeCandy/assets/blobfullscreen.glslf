@@ -22,21 +22,27 @@ precision mediump float;
 
 varying vec2 texcoord;  // spanning the entire screen 0..1
 uniform sampler2D tex0; // the fullscreen FBO
+uniform sampler2D tex1; // background texture
 
 void main() {
   vec3 color = texture2D(tex0, texcoord).xyz;
-  // Add additional foam curve to outer edges of water.
-  // Outer edges defined by a range in blue's intensity.
-  const float minfoam = 0.02;
-  const float maxfoam = 0.40;
-  if (color.b < maxfoam && color.b > minfoam) {
-    float midfoam = (minfoam + maxfoam) / 2.0;
-    vec3 foamcolor = vec3(0.8, 0.8, 1.0);
-    float foamintensity = smoothstep(1.0, 0.0, abs(color.b - midfoam) * 5.0);
-    color += foamcolor * foamintensity;
+  if (dot(color, color) < 0.001) {
+    const float darkenbg = 0.7;
+    gl_FragColor = vec4(texture2D(tex1, texcoord).xyz * darkenbg / sqrt(2.0), 1.0);
+  } else {
+    // Add additional foam curve to outer edges of water.
+    // Outer edges defined by a range in blue's intensity.
+    const float minfoam = 0.02;
+    const float maxfoam = 0.40;
+    if (color.b < maxfoam && color.b > minfoam) {
+      float midfoam = (minfoam + maxfoam) / 2.0;
+      vec3 foamcolor = vec3(0.8, 0.8, 1.0);
+      float foamintensity = smoothstep(1.0, 0.0, abs(color.b - midfoam) * 5.0);
+      color += foamcolor * foamintensity;
+    }
+    const float levels = 8.0; // amount of discrete levels to divide the range in
+    // round color range to closest level
+    color = floor(color * levels + 0.5) / levels;
+    gl_FragColor = vec4(color, 1.0);
   }
-  const float levels = 8.0; // amount of discrete levels to divide the range in
-  // round color range to closest level
-  color = floor(color * levels + 0.5) / levels;
-  gl_FragColor = vec4(color, 1.0);
 }

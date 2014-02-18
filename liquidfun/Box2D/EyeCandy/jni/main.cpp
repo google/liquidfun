@@ -331,22 +331,21 @@ public:
     virtual void DrawPolygon(const b2Vec2* vertices,
                              int32 vertex_count,
                              const b2Color& color) {
-      static const GLfloat texture_coordinates[] = {
-        0.0f, 0.0f,
-        0.0f, 1.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f
-      };
-      GLfloat * const per_vertex_texture_coordinates = new GLfloat[
-          B2_ARRAY_SIZE(texture_coordinates) * vertex_count];
-      uint32 texture_coordinate_index = 0;
-      // Really lame texture coordinate generation.
-      for (int32 i = 0; i < vertex_count; ++i,
-           texture_coordinate_index += B2_ARRAY_SIZE(texture_coordinates)) {
-        memcpy(&per_vertex_texture_coordinates[texture_coordinate_index],
-               &texture_coordinates[texture_coordinate_index],
-               sizeof(texture_coordinates));
+      assert(vertex_count == 4); // All our poly's are rectangles.
+
+      float x_dist = vertices[1].x - vertices[0].x;
+      float y_dist = vertices[2].y - vertices[1].y;
+      if (fabsf(x_dist) < 0.01f) { // Are we horizontal?
+        y_dist = vertices[2].x - vertices[1].x;
+        x_dist = vertices[3].y - vertices[2].y;
       }
+      float tc_ratio = y_dist / x_dist / 2;
+      GLfloat texture_coordinates[] = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, tc_ratio,
+        0.0f, tc_ratio,
+      };
 
       engine->sh_texture_.SetWorld(engine->scale_,
                                  engine->width_,
@@ -355,7 +354,7 @@ public:
       glVertexAttribPointer(engine->sh_texture_.position_handle, 2, GL_FLOAT,
                             GL_FALSE, 0, vertices);
       glVertexAttribPointer(engine->sh_texture_.tex_coord_handle, 2, GL_FLOAT,
-                            GL_FALSE, 0, per_vertex_texture_coordinates);
+                            GL_FALSE, 0, texture_coordinates);
       glBindTexture(GL_TEXTURE_2D, engine->mover_tex_);
       glActiveTexture(GL_TEXTURE0);
       glEnableVertexAttribArray(engine->sh_texture_.position_handle);
@@ -364,8 +363,6 @@ public:
       glDisableVertexAttribArray(engine->sh_texture_.tex_coord_handle);
       glDisableVertexAttribArray(engine->sh_texture_.position_handle);
       glBindTexture(GL_TEXTURE_2D, 0);
-
-      delete [] per_vertex_texture_coordinates;
     };
 
     virtual void DrawSolidPolygon(const b2Vec2* vertices,
@@ -536,13 +533,13 @@ public:
     b2Body* body = world_->CreateBody(&bd);
 
     b2PolygonShape shape;
-    shape.SetAsBox(0.5f, 10.0f, b2Vec2( 20.0f, 0.0f), 0.0);
+    shape.SetAsBox(0.5f, 10.0f, b2Vec2( 20.0f, 0.0f), 0.0f);
     body->CreateFixture(&shape, 5.0f);
-    shape.SetAsBox(0.5f, 10.0f, b2Vec2(-20.0f, 0.0f), 0.0);
+    shape.SetAsBox(0.5f, 10.0f, b2Vec2(-20.0f, 0.0f), 0.0f);
     body->CreateFixture(&shape, 5.0f);
-    shape.SetAsBox(20.0f, 0.5f, b2Vec2(0.0f, 10.0f), 0.0);
+    shape.SetAsBox(0.5f, 20.0f, b2Vec2(0.0f, 10.0f), M_PI/2.0f);
     body->CreateFixture(&shape, 5.0f);
-    shape.SetAsBox(20.0f, 0.5f, b2Vec2(0.0f, -10.0f), 0.0);
+    shape.SetAsBox(0.5f, 20.0f, b2Vec2(0.0f, -10.0f), M_PI/2.0f);
     body->CreateFixture(&shape, 5.0f);
 
     bd.type = b2_dynamicBody;
@@ -726,6 +723,9 @@ public:
 
     sh_blobfs_.SetWorld(1, 1, 1);
     glBindTexture(GL_TEXTURE_2D, fbo_tex_);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, background_tex_);
+    glActiveTexture(GL_TEXTURE0);
     DrawUnitQuad(sh_blobfs_);
     glBindTexture(GL_TEXTURE_2D, 0);
   }
