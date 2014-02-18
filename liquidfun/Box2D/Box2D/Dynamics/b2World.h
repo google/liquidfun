@@ -148,6 +148,7 @@ public:
 	/// provided shape's AABB. Calls QueryAABB internally.
 	/// @param callback a user implemented callback class.
 	/// @param shape the query shape
+	/// @param xf the transform of the AABB
 	void QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
 	                    const b2Transform& xf) const;
 

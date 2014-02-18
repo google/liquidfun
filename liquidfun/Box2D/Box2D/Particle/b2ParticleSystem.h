@@ -80,6 +80,8 @@ struct b2ParticleSystemDef
 {
 	b2ParticleSystemDef()
 	{
+		// Initialize particle radius
+		particleRadius = 1.0f;
 		// Initialize physical coefficients to the maximum values that
 		// maintain numerical stability.
 		pressureStrength = 0.05f;
@@ -96,6 +98,9 @@ struct b2ParticleSystemDef
 		staticPressureIterations = 8;
 		colorMixingStrength = 0.5f;
 	}
+
+	/// Particle radius
+	float32 particleRadius;
 
 	/// Increases pressure in response to compression
 	/// Smaller values allow more compression
@@ -382,6 +387,20 @@ public:
 	b2ParticleSystem* GetNext();
 	const b2ParticleSystem* GetNext() const;
 
+	/// Query the particle system for all particles that potentially overlap
+	/// the provided AABB.
+	/// @param callback a user implemented callback class.
+	/// @param aabb the query box.
+	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
+
+	/// Query the particle system for all particles that potentially overlap
+	/// the provided shape's AABB. Calls QueryAABB internally.
+	/// @param callback a user implemented callback class.
+	/// @param shape the query shape
+	/// @param xf the transform of the AABB
+	void QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
+						const b2Transform& xf) const;
+
 private:
 
 	friend class b2World;
@@ -541,8 +560,6 @@ private:
 		ParticleBuffer<T>* buffer, T* newBufferData, int32 newCapacity);
 
 	void SetParticleGroupFlags(b2ParticleGroup* group, uint32 flags);
-
-	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
 
 	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1,
 				 const b2Vec2& point2) const;
