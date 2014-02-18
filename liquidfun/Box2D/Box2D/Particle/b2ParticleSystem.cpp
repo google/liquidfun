@@ -169,6 +169,11 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def, b2World* worl
 	m_def = *def;
 
 	m_world = world;
+
+	m_stuckThreshold = 0;
+	m_stuckParticleCount = 0;
+	m_stuckParticleCapacity = 0;
+	m_stuckParticleBuffer = NULL;
 }
 
 b2ParticleSystem::~b2ParticleSystem()
@@ -179,6 +184,9 @@ b2ParticleSystem::~b2ParticleSystem()
 	}
 
 	FreeParticleBuffer(&m_flagsBuffer);
+	FreeParticleBuffer(&m_lastBodyContactStepBuffer);
+	FreeParticleBuffer(&m_bodyContactCountBuffer);
+	FreeParticleBuffer(&m_consecutiveContactStepsBuffer);
 	FreeParticleBuffer(&m_positionBuffer);
 	FreeParticleBuffer(&m_velocityBuffer);
 	FreeParticleBuffer(&m_colorBuffer);
@@ -270,6 +278,20 @@ template <typename T> T* b2ParticleSystem::RequestParticleBuffer(T* buffer)
 	return buffer;
 }
 
+template <typename T> T* b2ParticleSystem::RequestGrowableBuffer(T* buffer,
+	int32 count, int32 *capacity)
+{
+	if (count >= *capacity)
+	{
+		int32 oldCapacity = *capacity;
+		int32 newCapacity = count ?
+			2 * count : b2_minParticleBufferCapacity;
+		buffer = ReallocateBuffer(buffer, oldCapacity, newCapacity);
+		*capacity = newCapacity;
+	}
+	return buffer;
+}
+
 static int32 LimitCapacity(int32 capacity, int32 maxCount)
 {
 	return maxCount && capacity > maxCount ? maxCount : capacity;
@@ -280,6 +302,12 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 	// Don't increase capacity beyond the smallest user-supplied buffer size.
 	capacity = LimitCapacity(capacity, m_maxCount);
 	capacity = LimitCapacity(capacity, m_flagsBuffer.userSuppliedCapacity);
+	capacity = LimitCapacity(capacity,
+			m_lastBodyContactStepBuffer.userSuppliedCapacity);
+	capacity = LimitCapacity(capacity,
+			m_bodyContactCountBuffer.userSuppliedCapacity);
+	capacity = LimitCapacity(capacity,
+			m_consecutiveContactStepsBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_positionBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_velocityBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_colorBuffer.userSuppliedCapacity);
@@ -288,6 +316,15 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 	{
 		m_flagsBuffer.data = ReallocateBuffer(
 			&m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
+		m_lastBodyContactStepBuffer.data = ReallocateBuffer(
+			&m_lastBodyContactStepBuffer, m_internalAllocatedCapacity, capacity,
+			false);
+		m_bodyContactCountBuffer.data = ReallocateBuffer(
+			&m_bodyContactCountBuffer, m_internalAllocatedCapacity, capacity,
+			false);
+		m_consecutiveContactStepsBuffer.data = ReallocateBuffer(
+			&m_consecutiveContactStepsBuffer, m_internalAllocatedCapacity,
+			capacity, false);
 		m_positionBuffer.data = ReallocateBuffer(
 			&m_positionBuffer, m_internalAllocatedCapacity, capacity, false);
 		m_velocityBuffer.data = ReallocateBuffer(
@@ -335,6 +372,9 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	}
 	int32 index = m_count++;
 	m_flagsBuffer.data[index] = 0;
+	m_lastBodyContactStepBuffer.data[index] = 0;
+	m_bodyContactCountBuffer.data[index] = 0;
+	m_consecutiveContactStepsBuffer.data[index] = 0;
 	m_positionBuffer.data[index] = def.position;
 	m_velocityBuffer.data[index] = def.velocity;
 	m_weightBuffer[index] = 0;
@@ -357,15 +397,9 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 		m_userDataBuffer.data= RequestParticleBuffer(m_userDataBuffer.data);
 		m_userDataBuffer.data[index] = def.userData;
 	}
-	if (m_proxyCount >= m_proxyCapacity)
-	{
-		int32 oldCapacity = m_proxyCapacity;
-		int32 newCapacity = m_proxyCount ?
-			2 * m_proxyCount : b2_minParticleBufferCapacity;
-		m_proxyBuffer = ReallocateBuffer(m_proxyBuffer, oldCapacity,
-										 newCapacity);
-		m_proxyCapacity = newCapacity;
-	}
+	m_proxyBuffer = RequestGrowableBuffer(m_proxyBuffer, m_proxyCount,
+											&m_proxyCapacity);
+
 	m_proxyBuffer[m_proxyCount++].index = index;
 	SetParticleFlags(index, def.flags);
 	return index;
@@ -651,15 +685,10 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 			if ((groupA->ContainsParticle(a) || groupB->ContainsParticle(b)) &&
 				(groupA->ContainsParticle(b) || groupB->ContainsParticle(a)))
 			{
-				if (m_pairCount >= m_pairCapacity)
-				{
-					int32 oldCapacity = m_pairCapacity;
-					int32 newCapacity = m_pairCount ? 2 * m_pairCount :
-						b2_minParticleBufferCapacity;
-					m_pairBuffer = ReallocateBuffer(m_pairBuffer, oldCapacity,
-													newCapacity);
-					m_pairCapacity = newCapacity;
-				}
+				m_pairBuffer = RequestGrowableBuffer(m_pairBuffer,
+													m_pairCount,
+													&m_pairCapacity);
+
 				Pair& pair = m_pairBuffer[m_pairCount];
 				pair.indexA = a;
 				pair.indexB = b;
@@ -718,16 +747,10 @@ void b2ParticleSystem::UpdateTriadsCallback::operator()(int32 a, int32 b,
 				b2Dot(dbc, dbc) < maxDistanceSquared &&
 				b2Dot(dca, dca) < maxDistanceSquared)
 			{
-				if (system->m_triadCount >= system->m_triadCapacity)
-				{
-					int32 oldCapacity = system->m_triadCapacity;
-					int32 newCapacity = system->m_triadCount ?
-						2 * system->m_triadCount :
-						b2_minParticleBufferCapacity;
-					system->m_triadBuffer = system->ReallocateBuffer(
-						system->m_triadBuffer, oldCapacity, newCapacity);
-					system->m_triadCapacity = newCapacity;
-				}
+				system->m_triadBuffer = system->RequestGrowableBuffer(
+													system->m_triadBuffer,
+													system->m_triadCount,
+													&system->m_triadCapacity);
 				Triad& triad = system->m_triadBuffer[system->m_triadCount];
 				triad.indexA = a;
 				triad.indexB = b;
@@ -910,15 +933,9 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 	float32 distBtParticlesSq = b2Dot(d, d);
 	if (distBtParticlesSq < m_squaredDiameter)
 	{
-		if (m_contactCount >= m_contactCapacity)
-		{
-			int32 oldCapacity = m_contactCapacity;
-			int32 newCapacity = m_contactCount ?
-				2 * m_contactCount : b2_minParticleBufferCapacity;
-			m_contactBuffer = ReallocateBuffer(m_contactBuffer, oldCapacity,
-											   newCapacity);
-			m_contactCapacity = newCapacity;
-		}
+		m_contactBuffer = RequestGrowableBuffer(m_contactBuffer,
+												m_contactCount,
+												&m_contactCapacity);
 		float32 invD = b2InvSqrt(distBtParticlesSq);
 		b2ParticleContact& contact = m_contactBuffer[m_contactCount];
 		contact.indexA = a;
@@ -978,6 +995,49 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 	}
 }
 
+void b2ParticleSystem::DetectStuckParticle(int32 particle)
+{
+	// Detect stuck particles
+	//
+	// The basic algorithm is to allow the user to specify an optional
+	// threshold where we detect whenever a particle is contacting
+	// more than one fixture for more than threshold consecutive
+	// steps. This is considered to be "stuck", and these are put
+	// in a list the user can query per step, if enabled, to deal with
+	// such particles.
+
+	if (m_stuckThreshold <= 0)
+	{
+		return;
+	}
+
+	// Get the state variables for this particle.
+	int32 * const consecutiveCount =
+			&m_consecutiveContactStepsBuffer.data[particle];
+	int32 * const lastStep = &m_lastBodyContactStepBuffer.data[particle];
+	int32 * const bodyCount = &m_bodyContactCountBuffer.data[particle];
+
+	// This is only called when there is a body contact for this particle.
+	++(*bodyCount);
+
+	// We want to only trigger detection once per step, the first time we
+	// contact more than one fixture in a step for a given particle.
+	if (*bodyCount == 2)
+	{
+		++(*consecutiveCount);
+		if (*consecutiveCount > m_stuckThreshold)
+		{
+			m_stuckParticleBuffer = RequestGrowableBuffer(
+					m_stuckParticleBuffer,
+					m_stuckParticleCount,
+					&m_stuckParticleCapacity);
+
+			m_stuckParticleBuffer[m_stuckParticleCount++] = particle;
+		}
+	}
+	*lastStep = m_timestamp;
+}
+
 void b2ParticleSystem::UpdateBodyContacts()
 {
 	b2AABB aabb;
@@ -985,17 +1045,27 @@ void b2ParticleSystem::UpdateBodyContacts()
 	aabb.lowerBound.y = +b2_maxFloat;
 	aabb.upperBound.x = -b2_maxFloat;
 	aabb.upperBound.y = -b2_maxFloat;
+
 	for (int32 i = 0; i < m_count; i++)
 	{
 		b2Vec2 p = m_positionBuffer.data[i];
 		aabb.lowerBound = b2Min(aabb.lowerBound, p);
 		aabb.upperBound = b2Max(aabb.upperBound, p);
+
+		// Detect stuck particles, see comment in
+		// b2ParticleSystem::DetectStuckParticle()
+		m_bodyContactCountBuffer.data[i] = 0;
+		if (m_timestamp > (m_lastBodyContactStepBuffer.data[i] + 1))
+		{
+			m_consecutiveContactStepsBuffer.data[i] = 0;
+		}
 	}
 	aabb.lowerBound.x -= m_particleDiameter;
 	aabb.lowerBound.y -= m_particleDiameter;
 	aabb.upperBound.x += m_particleDiameter;
 	aabb.upperBound.y += m_particleDiameter;
 	m_bodyContactCount = 0;
+	m_stuckParticleCount = 0;
 
 	class UpdateBodyContactsCallback : public b2QueryCallback
 	{
@@ -1033,6 +1103,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 					computeTag(
 						m_system->m_inverseDiameter * aabb.upperBound.x,
 						m_system->m_inverseDiameter * aabb.upperBound.y));
+
 				for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
 				{
 					int32 a = proxy->index;
@@ -1054,32 +1125,25 @@ void b2ParticleSystem::UpdateBodyContacts()
 							b2Vec2 rp = ap - bp;
 							float32 rpn = b2Cross(rp, n);
 							float32 invM = invAm + invBm + invBI * rpn * rpn;
-							if (m_system->m_bodyContactCount >=
-								m_system->m_bodyContactCapacity)
-							{
-								int32 oldCapacity =
-									m_system->m_bodyContactCapacity;
-								int32 newCapacity =
-									m_system->m_bodyContactCount ?
-										2 * m_system->m_bodyContactCount :
-										b2_minParticleBufferCapacity;
-								m_system->m_bodyContactBuffer =
-									m_system->ReallocateBuffer(
+
+							m_system->m_bodyContactBuffer =
+									m_system->RequestGrowableBuffer(
 										m_system->m_bodyContactBuffer,
-										oldCapacity, newCapacity);
-								m_system->m_bodyContactCapacity = newCapacity;
-							}
+										m_system->m_bodyContactCount,
+										&m_system->m_bodyContactCapacity);
+
 							b2ParticleBodyContact& contact =
 								m_system->m_bodyContactBuffer[
 									m_system->m_bodyContactCount];
 							contact.index = a;
 							contact.body = b;
 							contact.fixture = fixture;
-							contact.weight = 
+							contact.weight =
 								1 - d * m_system->m_inverseDiameter;
 							contact.normal = -n;
 							contact.mass = invM > 0 ? 1 / invM : 0;
 							m_system->m_bodyContactCount++;
+							m_system->DetectStuckParticle(a);
 						}
 					}
 				}
@@ -1124,11 +1188,12 @@ void b2ParticleSystem::RemoveSpuriousBodyContacts()
 	//      - repeat for up to n nearest contacts, currently we get good results
 	//        from n=3.
 	std::sort(m_bodyContactBuffer, m_bodyContactBuffer + m_bodyContactCount,
-			  b2ParticleSystem::BodyContactCompare);
+				b2ParticleSystem::BodyContactCompare);
 
 	int32 discarded = 0;
-	std::remove_if(m_bodyContactBuffer, m_bodyContactBuffer + m_bodyContactCount,
-				   b2ParticleBodyContactRemovePredicate(this, &discarded));
+	std::remove_if(m_bodyContactBuffer,
+					m_bodyContactBuffer + m_bodyContactCount,
+					b2ParticleBodyContactRemovePredicate(this, &discarded));
 
 	m_bodyContactCount -= discarded;
 }
@@ -2015,6 +2080,12 @@ void b2ParticleSystem::SolveZombie()
 			if (i != newCount)
 			{
 				m_flagsBuffer.data[newCount] = m_flagsBuffer.data[i];
+				m_lastBodyContactStepBuffer.data[newCount] =
+					m_lastBodyContactStepBuffer.data[i];
+				m_bodyContactCountBuffer.data[newCount] =
+					m_bodyContactCountBuffer.data[i];
+				m_consecutiveContactStepsBuffer.data[newCount] =
+					m_consecutiveContactStepsBuffer.data[i];
 				m_positionBuffer.data[newCount] = m_positionBuffer.data[i];
 				m_velocityBuffer.data[newCount] = m_velocityBuffer.data[i];
 				m_groupBuffer[newCount] = m_groupBuffer[i];
@@ -2222,6 +2293,15 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 
 	std::rotate(m_flagsBuffer.data + start, m_flagsBuffer.data + mid,
 				m_flagsBuffer.data + end);
+	std::rotate(m_lastBodyContactStepBuffer.data + start,
+				m_lastBodyContactStepBuffer.data + mid,
+				m_lastBodyContactStepBuffer.data + end);
+	std::rotate(m_bodyContactCountBuffer.data + start,
+				m_bodyContactCountBuffer.data + mid,
+				m_bodyContactCountBuffer.data + end);
+	std::rotate(m_consecutiveContactStepsBuffer.data + start,
+				m_consecutiveContactStepsBuffer.data + mid,
+				m_consecutiveContactStepsBuffer.data + end);
 	std::rotate(m_positionBuffer.data + start, m_positionBuffer.data + mid,
 				m_positionBuffer.data + end);
 	std::rotate(m_velocityBuffer.data + start, m_velocityBuffer.data + mid,
@@ -2676,4 +2756,9 @@ float32 b2ParticleSystem::ComputeParticleCollisionEnergy() const
 		}
 	}
 	return 0.5f * GetParticleMass() * sum_v2;
+}
+
+void b2ParticleSystem::SetStuckParticleThreshold(int32 steps)
+{
+	m_stuckThreshold = steps;
 }

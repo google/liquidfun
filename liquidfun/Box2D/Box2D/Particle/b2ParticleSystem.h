@@ -380,8 +380,30 @@ public:
 	const b2ParticleBodyContact* GetParticleBodyContacts();
 	int32 GetParticleBodyContactCount();
 
+	/// Set an optional threshold for the maximum number of
+	/// consecutive particle iterations that a particle may contact
+	/// multiple bodies before it is considered a candidate for being
+	/// "stuck". Setting to zero or less disables.
+	void SetStuckParticleThreshold(int32 iterations);
+
+	/// Get potentially stuck particles from the last step; the user must
+	/// decide if they are stuck or not, and if so, delete or move them
+	const int32* GetStuckParticleCandidates() const;
+	/// Get the number of stuck particle candidates from the last step.
+	int32 GetStuckParticleCandidateCount();
+
 	/// Compute the kinetic energy that can be lost by damping force
 	float32 ComputeParticleCollisionEnergy() const;
+
+	/// Set strict Particle/Body contact check.
+	/// This is an option that will help ensure correct behavior if there are
+	/// corners in the world model where Particle/Body contact is ambiguous.
+	/// This option scales at n*log(n) of the number of Particle/Body contacts,
+	/// so it is best to only enable if it is necessary for your geometry.
+	/// Enable if you see strange particle behavior around b2Body intersections.
+	void SetStrictContactCheck(bool enabled);
+	/// Get the status of the strict contact check.
+	bool GetStrictContactCheck() const;
 
 	/// Get the next particle-system in the world's particle-system list.
 	b2ParticleSystem* GetNext();
@@ -496,6 +518,8 @@ private:
 		ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity,
 		bool deferred);
 	template <typename T> T* RequestParticleBuffer(T* buffer);
+	template <typename T> T* RequestGrowableBuffer(T* buffer,
+												int32 count, int32 *capacity);
 
 	void ReallocateInternalAllocatedBuffers(int32 capacity);
 	int32 CreateParticleForGroup(
@@ -540,9 +564,6 @@ private:
 	void SolveZombie();
 	void RotateBuffer(int32 start, int32 mid, int32 end);
 
-	void SetStrictContactCheck(bool enabled);
-	bool GetStrictContactCheck() const;
-
 	float32 GetCriticalVelocity(const b2TimeStep& step) const;
 	float32 GetCriticalVelocitySquared(const b2TimeStep& step) const;
 	float32 GetCriticalPressure(const b2TimeStep& step) const;
@@ -560,6 +581,8 @@ private:
 
 	void RemoveSpuriousBodyContacts();
 	static bool BodyContactCompare(const b2ParticleBodyContact& lhs, const b2ParticleBodyContact& rhs);
+
+	void DetectStuckParticle(int32 particle);
 
 	int32 m_timestamp;
 	int32 m_allParticleFlags;
@@ -605,6 +628,15 @@ private:
 	ParticleBuffer<b2ParticleColor> m_colorBuffer;
 	b2ParticleGroup** m_groupBuffer;
 	ParticleBuffer<void*> m_userDataBuffer;
+
+	/// Stuck particle detection parameters and record keeping
+	int32 m_stuckThreshold;
+	ParticleBuffer<int32> m_lastBodyContactStepBuffer;
+	ParticleBuffer<int32> m_bodyContactCountBuffer;
+	ParticleBuffer<int32> m_consecutiveContactStepsBuffer;
+	int32 m_stuckParticleCount;
+	int32 m_stuckParticleCapacity;
+	int32 *m_stuckParticleBuffer;
 
 	int32 m_proxyCount;
 	int32 m_proxyCapacity;
@@ -686,4 +718,13 @@ inline const b2ParticleSystem* b2ParticleSystem::GetNext() const
 	return m_next;
 }
 
+inline const int32* b2ParticleSystem::GetStuckParticleCandidates() const
+{
+	return m_stuckParticleBuffer;
+}
+
+inline int32 b2ParticleSystem::GetStuckParticleCandidateCount()
+{
+	return m_stuckParticleCount;
+}
 #endif

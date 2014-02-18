@@ -23,10 +23,16 @@ class BodyContactTests : public ::testing::Test {
 protected:
 	virtual void SetUp();
 	virtual void TearDown();
-	int32 drop();
+	void drop();
 
 	b2World *m_world;
+	b2ParticleSystem *m_system;
 	b2Body *m_body;
+
+	// total contacts per run of drop()
+	int32 m_contacts;
+	// total stuck per run of drop()
+	int32 m_stuck;
 };
 
 void
@@ -47,67 +53,119 @@ BodyContactTests::SetUp()
 	// The body is also added to the world.
 	m_body = m_world->CreateBody(&groundBodyDef);
 
-	// Construct a triangle out of many fixtures and add to ground
-	// body, as in the Pointy test in Testbed.
-	const float32 xstep = 1.0f;
-	for (float32 x = -10.0f; x < 10.0f; x += xstep)
+	// Construct a valley out of many fixtures and add to ground
+	// body, as in the AntiPointy test in Testbed.
+	float32 i;
+	const float32 step = 1.0;
+
+	for (i = -10.0; i < 10.0; i+=step)
 	{
 		b2PolygonShape shape;
 		const b2Vec2 vertices[3] = {
-			b2Vec2(x, -10.0f),
-			b2Vec2(x+xstep, -10.0f),
-			b2Vec2(0.0f, 25.0f)};
+			b2Vec2(i, -10.0),
+			b2Vec2(i+step, -10.0),
+			b2Vec2(0.0, 15.0)};
 		shape.Set(vertices, 3);
 		m_body->CreateFixture(&shape, 0.0f);
 	}
+	for (i = -10.0; i < 35.0; i+=step)
+	{
+		b2PolygonShape shape;
+		const b2Vec2 vertices[3] = {
+			b2Vec2(-10.0, i),
+			b2Vec2(-10.0, i+step),
+			b2Vec2(0.0, 15.0)};
+		shape.Set(vertices, 3);
+		m_body->CreateFixture(&shape, 0.0f);
 
-	m_world->SetParticleRadius(1.0f);
+		const b2Vec2 vertices2[3] = {
+			b2Vec2(10.0, i),
+			b2Vec2(10.0, i+step),
+			b2Vec2(0.0, 15.0)};
+		shape.Set(vertices2, 3);
+		m_body->CreateFixture(&shape, 0.0f);
+	}
+	m_system = m_world->GetParticleSystemList();
+	m_system->SetParticleRadius(1.0f);
 }
 void
 BodyContactTests::TearDown()
 {
-	// Reset this between tests so no one forgets to when we add more
+	// Reset these between tests so no one forgets to when we add more
 	// tests to this file.
-	m_world->SetStrictParticleContactCheck(false);
+	m_system->SetStrictContactCheck(false);
+	m_system->SetStuckParticleThreshold(0);
 }
 
-int32 BodyContactTests::drop()
+void BodyContactTests::drop()
 {
+	int32 i;
+
+	// reset counters
+	m_contacts = 0;
+	m_stuck = 0;
+
+	int32 count = m_system->GetParticleCount();
+	for (i = 0; i < count; ++i)
+	{
+		m_system->DestroyParticle(i);
+	}
+
 	const float32 timeStep = 1.0f / 60.0f;
-	const int32 timeout = (int32) (1.0f / timeStep) * 10; // 10 seconds
+	const int32 timeout = (int32) (1.0f / timeStep) * 10; // 10 "seconds"
 	const int32 velocityIterations = 6;
 	const int32 positionIterations = 2;
+
+	// step once to eliminate particles
+	m_world->Step(timeStep, velocityIterations, positionIterations);
 
 	b2ParticleDef pd;
 	pd.position.Set(0.0, 33.0);
 	pd.velocity.Set(0.0, -1.0);
-	m_world->CreateParticle(pd);
+	m_system->CreateParticle(pd);
 
-	int32 contacts;
-	for (int32 i = 0; i < timeout; ++i)
+	for (i = 0; i < timeout; ++i)
 	{
-		// Instruct the world to perform a single step of simulation.
-		// It is generally best to keep the time step and iterations fixed.
 		m_world->Step(timeStep, velocityIterations, positionIterations);
-		contacts = m_world->GetParticleBodyContactCount();
-		if(contacts > 0)
-			return contacts;
+		m_contacts += m_system->GetParticleBodyContactCount();
+		int32 stuck = m_system->GetStuckParticleCandidateCount();
+		if (stuck)
+		{
+			m_stuck += stuck;
+			// should always be particle 0
+			EXPECT_EQ(*(m_system->GetStuckParticleCandidates()), 0);
+		}
 	}
-	return -1;
 }
 
 TEST_F(BodyContactTests, ParticleDrop) {
 
-	m_world->SetStrictParticleContactCheck(false);
+	m_system->SetStrictContactCheck(false);
 
-	int32 contacts = drop();
-	EXPECT_GT(contacts, 0) << "No contacts within timeout";
+	drop();
+	EXPECT_GT(m_contacts, 0) << "No contacts within timeout";
+	int32 contacts = m_contacts;
+	m_system->SetStrictContactCheck(true);
 
-	m_world->SetStrictParticleContactCheck(true);
+	drop();
+	EXPECT_GT(m_contacts, 0) << "No strict contacts within timeout";
+	EXPECT_LT(m_contacts, contacts) << "No contact pruning performed";
+}
 
-	int32 strictContacts = drop();
-	EXPECT_GT(strictContacts, 0) << "No strict contacts within timeout";
-	EXPECT_LT(strictContacts, contacts) << "No contact pruning performed";
+TEST_F(BodyContactTests, Stuck) {
+	drop();
+	EXPECT_GT(m_contacts, 0) << "No contacts within timeout";
+	EXPECT_EQ(m_stuck, 0) << "Stuck particle detected when detection disabled";
+	int32 stuck = 0x7fffffff;
+
+	for (int32 i = 1; i < 256; i *= 2)
+	{
+		m_system->SetStuckParticleThreshold(i);
+		drop();
+		EXPECT_GT(m_stuck, 0) << "No stuck particles detected";
+		EXPECT_GT(stuck, m_stuck) << "Fewer stuck particle reports expected";
+		stuck = m_stuck;
+	}
 }
 
 int
