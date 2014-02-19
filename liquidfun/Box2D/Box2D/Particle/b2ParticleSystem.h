@@ -458,17 +458,7 @@ private:
 	};
 
 	// Callback used with b2VoronoiDiagram.
-	class CreateParticleGroupCallback
-	{
-	public:
-		void operator()(int32 a, int32 b, int32 c) const;
-		b2ParticleSystem* system;
-		const b2ParticleGroupDef* def;
-		int32 firstIndex;
-	};
-
-	// Callback used with b2VoronoiDiagram.
-	class JoinParticleGroupsCallback
+	class UpdateTriadsCallback
 	{
 	public:
 		void operator()(int32 a, int32 b, int32 c) const;
@@ -516,6 +506,10 @@ private:
 	void CreateParticlesFillShapeForGroup(
 		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
 	void DestroyParticleGroup(b2ParticleGroup* group);
+
+	void UpdatePairsAndTriads(
+		int32 firstIndex, int32 lastIndex,
+		b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 	void ComputeDepth();
 
 	void UpdateAllParticleFlags();

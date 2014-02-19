@@ -129,6 +129,9 @@ public:
 	/// Get the offset of this group in the global particle buffer
 	int32 GetBufferIndex() const;
 
+	/// Does this group contain the particle.
+	bool ContainsParticle(int32 index) const;
+
 	/// Get the construction flags for the group.
 	int32 GetGroupFlags() const;
 
@@ -208,6 +211,11 @@ inline const b2ParticleGroup* b2ParticleGroup::GetNext() const
 inline int32 b2ParticleGroup::GetParticleCount() const
 {
 	return m_lastIndex - m_firstIndex;
+}
+
+inline bool b2ParticleGroup::ContainsParticle(int32 index) const
+{
+	return m_firstIndex <= index && index < m_lastIndex;
 }
 
 #endif
