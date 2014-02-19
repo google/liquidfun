@@ -131,9 +131,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def, b2World* worl
 	m_density = 1;
 	m_inverseDensity = 1;
 	m_gravityScale = 1;
-	m_particleDiameter = 1;
-	m_inverseDiameter = 1;
-	m_squaredDiameter = 1;
+	SetParticleRadius(def->particleRadius);
 
 	m_count = 0;
 	m_internalAllocatedCapacity = 0;
@@ -2672,6 +2670,15 @@ void b2ParticleSystem::QueryAABB(b2QueryCallback* callback,
 			}
 		}
 	}
+}
+
+void b2ParticleSystem::QueryShapeAABB(b2QueryCallback* callback,
+									  const b2Shape& shape,
+									  const b2Transform& xf) const
+{
+	b2AABB aabb;
+	shape.ComputeAABB(&aabb, xf, 0);
+	QueryAABB(callback, aabb);
 }
 
 void b2ParticleSystem::RayCast(b2RayCastCallback* callback,
