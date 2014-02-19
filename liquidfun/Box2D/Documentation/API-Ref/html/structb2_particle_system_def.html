@@ -121,6 +121,10 @@ float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <tr class="separator:a6246155e61450cfff6aba5182a1bb60c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a861295bffd9ad85d613545528d95c375"><td class="memItemLeft" align="right" valign="top">float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_system_def.html#a861295bffd9ad85d613545528d95c375">colorMixingStrength</a></td></tr>
 <tr class="separator:a861295bffd9ad85d613545528d95c375"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b68881976d4aada8146175eae4b45f5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_system_def.html#a6b68881976d4aada8146175eae4b45f5">destroyByAge</a></td></tr>
+<tr class="separator:a6b68881976d4aada8146175eae4b45f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7464b9934b877bf5876d9ed14c022ac4"><td class="memItemLeft" align="right" valign="top">float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_system_def.html#a7464b9934b877bf5876d9ed14c022ac4">lifetimeGranularity</a></td></tr>
+<tr class="separator:a7464b9934b877bf5876d9ed14c022ac4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a class="anchor" id="a861295bffd9ad85d613545528d95c375"></a>
@@ -149,6 +153,19 @@ float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 
 </div>
 </div>
+<a class="anchor" id="a6b68881976d4aada8146175eae4b45f5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool b2ParticleSystemDef::destroyByAge</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Whether to destroy particles by age when no more particles can be created. See <a class="el" href="classb2_particle_system.html#a0400ae753ca56deef6f8b2dfe2ab5fb2">b2ParticleSystem::SetDestructionByAge()</a> for more information. </p>
+
+</div>
+</div>
 <a class="anchor" id="af5b833686e2a25848ed04ade040534a5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -172,6 +189,19 @@ float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
       </table>
 </div><div class="memdoc">
 <p>Restores shape of elastic particle groups Larger values increase elastic particle velocity </p>
+
+</div>
+</div>
+<a class="anchor" id="a7464b9934b877bf5876d9ed14c022ac4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float32 b2ParticleSystemDef::lifetimeGranularity</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Granularity of particle lifetimes in seconds. By default this is set to (1.0f / 60.0f) seconds. <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> uses a 32-bit signed value to track particle lifetimes so the maximum lifetime of a particle is (2^32 - 1) / (1.0f / lifetimeGranularity) seconds. With the value set to 1/60 the maximum lifetime or age of a particle is 2.27 years. </p>
 
 </div>
 </div>
@@ -223,7 +253,7 @@ float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Computes static pressure more precisely See SetParticleStaticPressureIterations for details </p>
+<p>Computes static pressure more precisely See SetStaticPressureIterations for details </p>
 
 </div>
 </div>
