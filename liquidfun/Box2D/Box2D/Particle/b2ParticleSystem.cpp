@@ -125,6 +125,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def, b2World* worl
 	m_needsUpdateAllParticleFlags = false;
 	m_allGroupFlags = 0;
 	m_needsUpdateAllGroupFlags = false;
+	m_hasForce = false;
 	m_iterationIndex = 0;
 	m_strictContactCheck = false;
 
@@ -136,6 +137,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def, b2World* worl
 	m_count = 0;
 	m_internalAllocatedCapacity = 0;
 	m_maxCount = 0;
+	m_forceBuffer = NULL;
 	m_weightBuffer = NULL;
 	m_staticPressureBuffer = NULL;
 	m_accumulationBuffer = NULL;
@@ -183,6 +185,7 @@ b2ParticleSystem::~b2ParticleSystem()
 	FreeParticleBuffer(&m_velocityBuffer);
 	FreeParticleBuffer(&m_colorBuffer);
 	FreeParticleBuffer(&m_userDataBuffer);
+	FreeBuffer(&m_forceBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_weightBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_staticPressureBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_accumulationBuffer, m_internalAllocatedCapacity);
@@ -292,6 +295,8 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 			&m_positionBuffer, m_internalAllocatedCapacity, capacity, false);
 		m_velocityBuffer.data = ReallocateBuffer(
 			&m_velocityBuffer, m_internalAllocatedCapacity, capacity, false);
+		m_forceBuffer = ReallocateBuffer(
+			m_forceBuffer, 0, m_internalAllocatedCapacity, capacity, false);
 		m_weightBuffer = ReallocateBuffer(
 			m_weightBuffer, 0, m_internalAllocatedCapacity, capacity, false);
 		m_staticPressureBuffer = ReallocateBuffer(
@@ -338,6 +343,7 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	m_positionBuffer.data[index] = def.position;
 	m_velocityBuffer.data[index] = def.velocity;
 	m_weightBuffer[index] = 0;
+	m_forceBuffer[index] = b2Vec2_zero;
 	if (m_staticPressureBuffer)
 	{
 		m_staticPressureBuffer[index] = 0;
@@ -1177,7 +1183,6 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 			Proxy* beginProxy = m_system->m_proxyBuffer;
 			Proxy* endProxy = beginProxy + m_system->m_proxyCount;
 			int32 childCount = shape->GetChildCount();
-			bool limitBodyVelocity = false;
 			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
 			{
 				b2AABB aabb = fixture->GetAABB(childIndex);
@@ -1220,43 +1225,18 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 						input.maxFraction = 1;
 						if (fixture->RayCast(&output, input, childIndex))
 						{
+							b2Vec2 n = output.normal;
 							b2Vec2 p =
 								(1 - output.fraction) * input.p1 +
 								output.fraction * input.p2 +
-								b2_linearSlop * output.normal;
+								b2_linearSlop * n;
 							b2Vec2 v = m_step.inv_dt * (p - ap);
 							m_system->m_velocityBuffer.data[a] = v;
-							b2Vec2 f = m_system->GetParticleMass() * (av - v);
-							f = b2Dot(f, output.normal) * output.normal;
-							// If density of the body is smaller than particle,
-							// the reactive force to it will be discounted.
-							float32 densityRatio =
-								fixture->GetDensity() *
-								m_system->m_inverseDensity;
-							if (densityRatio < 1)
-							{
-								f *= densityRatio;
-							}
-							body->ApplyLinearImpulse(f, p, true);
-							limitBodyVelocity = true;
+							b2Vec2 f = m_step.inv_dt *
+								m_system->GetParticleMass() * (av - v);
+							m_system->ApplyForce(a, f);
 						}
 					}
-				}
-			}
-			if (limitBodyVelocity)
-			{
-				b2Vec2 lc = body->GetLocalCenter();
-				float32 m = body->GetMass();
-				float32 I = body->GetInertia() - m * b2Dot(lc, lc);
-				b2Vec2 v = body->GetLinearVelocity();
-				float32 w = body->GetAngularVelocity();
-				float32 E = 0.5f * m * b2Dot(v, v) + 0.5f * I * w * w;
-				float32 E0 = m * m_system->GetCriticalVelocitySquared(m_step);
-				if (E > E0)
-				{
-					float32 s = E0 / E;
-					body->SetLinearVelocity(s * v);
-					body->SetAngularVelocity(s * w);
 				}
 			}
 			return true;
@@ -1387,7 +1367,38 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 							if (s < 0 || s > 1) continue;
 						}
 					}
-					vc = va + s * vba;
+					// Set velocity of particle c to interpolated velocity at
+					// the collision point on line ab, and add forces to
+					// particles a, b and c after particle movement so that
+					// momentum will be preserved.
+					// The forces should satisfy the following conditions:
+					//     Cancel the change of linear momentum by collision.
+					//     Don't change angular momentum.
+					//     Minimize the sum of the squares of forces.
+					b2Vec2 pcb = pc - pb;
+					float32 wa = b2Dot(pba, pcb);
+					float32 wb = b2Dot(pba, pca);
+					float32 wc = b2Dot(pca, pca) + b2Dot(pcb, pcb);
+					float32 sumW = wa + wb + wc;
+					if (sumW > 0)
+					{
+						float32 invW = 1 / sumW;
+						wa *= invW;
+						wb *= invW;
+						wc *= invW;
+					}
+					else
+					{
+						wa = 0;
+						wb = 0;
+						wc = 1;
+					}
+					b2Vec2 v = va + s * vba;
+					b2Vec2 f = step.inv_dt * GetParticleMass() * (vc - v);
+					ApplyForce(a, wa * f);
+					ApplyForce(b, wb * f);
+					ApplyForce(c, wc * f);
+					vc = v;
 				}
 			}
 		}
@@ -1426,6 +1437,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		if (m_allGroupFlags & b2_particleGroupNeedsUpdateDepth)
 		{
 			ComputeDepth();
+		}
+		if (m_hasForce)
+		{
+			SolveForce(subStep);
 		}
 		if (m_allParticleFlags & b2_viscousParticle)
 		{
@@ -1964,6 +1979,16 @@ void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 	}
 }
 
+void b2ParticleSystem::SolveForce(const b2TimeStep& step)
+{
+	float32 velocityPerForce = step.dt * GetParticleInvMass();
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_velocityBuffer.data[i] += velocityPerForce * m_forceBuffer[i];
+	}
+	m_hasForce = false;
+}
+
 void b2ParticleSystem::SolveColorMixing()
 {
 	// mixes color between contacting particles
@@ -2018,6 +2043,10 @@ void b2ParticleSystem::SolveZombie()
 				m_positionBuffer.data[newCount] = m_positionBuffer.data[i];
 				m_velocityBuffer.data[newCount] = m_velocityBuffer.data[i];
 				m_groupBuffer[newCount] = m_groupBuffer[i];
+				if (m_hasForce)
+				{
+					m_forceBuffer[newCount] = m_forceBuffer[i];
+				}
 				if (m_staticPressureBuffer)
 				{
 					m_staticPressureBuffer[newCount] =
@@ -2228,6 +2257,11 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 				m_velocityBuffer.data + end);
 	std::rotate(m_groupBuffer + start, m_groupBuffer + mid,
 				m_groupBuffer + end);
+	if (m_hasForce)
+	{
+		std::rotate(m_forceBuffer + start, m_forceBuffer + mid,
+					m_forceBuffer + end);
+	}
 	if (m_staticPressureBuffer)
 	{
 		std::rotate(m_staticPressureBuffer + start,
@@ -2552,6 +2586,20 @@ void b2ParticleSystem::SetParticleGroupFlags(
 		m_allGroupFlags |= newFlags;
 	}
 	*oldFlags = newFlags;
+}
+
+void b2ParticleSystem::ApplyForce(int32 index, const b2Vec2& force)
+{
+	if ((force.x != 0 || force.y != 0) &&
+		!(m_flagsBuffer.data[index] & b2_wallParticle))
+	{
+		if (!m_hasForce)
+		{
+			memset(m_forceBuffer, 0, sizeof(*m_forceBuffer) * m_count);
+			m_hasForce = true;
+		}
+		m_forceBuffer[index] += force;
+	}
 }
 
 void b2ParticleSystem::QueryAABB(b2QueryCallback* callback,
