@@ -36,15 +36,20 @@ protected:
 		// Construct a world object, which will hold and simulate the rigid
 		// bodies.
 		m_world = new b2World(gravity);
+
+		const b2ParticleSystemDef particleSystemDef;
+		m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 	}
 
 	virtual void TearDown()
 	{
 		// Clean up the world after each test.
+		m_world->DestroyParticleSystem(m_particleSystem);
 		delete m_world;
 	}
 
 	b2World *m_world;
+	b2ParticleSystem *m_particleSystem;
 };
 
 // Query callback which counts the number of times ReportParticle() is called.
@@ -76,14 +81,14 @@ public:
 TEST_F(CallbackTests, QueryCallback) {
 	QueryCallback callback;
 	b2AABB aabb;
-	CreateBoxShapedParticleGroup(m_world);
+	CreateBoxShapedParticleGroup(m_particleSystem);
 	aabb.lowerBound.Set(10, -10);
 	aabb.upperBound.Set(20, 10);
-	m_world->QueryAABB(&callback, aabb);
+	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_EQ(callback.m_count, 0);
 	aabb.lowerBound.Set(-10, -10);
 	aabb.upperBound.Set(10, 10);
-	m_world->QueryAABB(&callback, aabb);
+	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_NE(callback.m_count, 0);
 }
 
@@ -124,10 +129,10 @@ public:
 // a ray using a ray cast callback.
 TEST_F(CallbackTests, RayCastCallback) {
 	RayCastCallback callback;
-	CreateBoxShapedParticleGroup(m_world);
-	m_world->RayCast(&callback, b2Vec2(21, 0), b2Vec2(0, 21));
+	CreateBoxShapedParticleGroup(m_particleSystem);
+	m_particleSystem->RayCast(&callback, b2Vec2(21, 0), b2Vec2(0, 21));
 	EXPECT_EQ(callback.m_count, 0);
-	m_world->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	m_particleSystem->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
 	EXPECT_NE(callback.m_count, 0);
 }
 
@@ -158,14 +163,14 @@ public:
 // the b2_destructionListener flag is not set.
 TEST_F(CallbackTests, DestroyParticleWithNoCallback) {
 	DestructionListener listener;
-	m_world->SetDestructionListener(&listener);
+	m_particleSystem->SetDestructionListener(&listener);
 
 	b2ParticleDef def;
-	m_world->DestroyParticle(m_world->CreateParticle(def));
-	m_world->Step(0.001f, 1, 1);
+	m_particleSystem->DestroyParticle(m_particleSystem->CreateParticle(def));
+	m_particleSystem->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 
-	CreateAndDestroyParticle(m_world, 0, false);
+	CreateAndDestroyParticle(m_world, m_particleSystem, 0, false);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 }
 
@@ -174,14 +179,14 @@ TEST_F(CallbackTests, DestroyParticleWithNoCallback) {
 TEST_F(CallbackTests, DestroyParticleWithCallback) {
 	int32 index;
 	DestructionListener listenerNoFlags;
-	m_world->SetDestructionListener(&listenerNoFlags);
-	index = CreateAndDestroyParticle(m_world, 0, true);
+	m_particleSystem->SetDestructionListener(&listenerNoFlags);
+	index = CreateAndDestroyParticle(m_world, m_particleSystem, 0, true);
 	EXPECT_EQ(listenerNoFlags.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listenerNoFlags.m_destroyedParticles[0], index);
 
 	DestructionListener listenerFlag;
-	m_world->SetDestructionListener(&listenerFlag);
-	index = CreateAndDestroyParticle(m_world, b2_destructionListener, false);
+	m_particleSystem->SetDestructionListener(&listenerFlag);
+	index = CreateAndDestroyParticle(m_world, m_particleSystem, b2_destructionListener, false);
 	EXPECT_EQ(listenerFlag.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listenerFlag.m_destroyedParticles[0], index);
 }
@@ -194,19 +199,19 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithNoCallback) {
 	b2Transform xf;
 	xf.SetIdentity();
 	DestructionListener listener;
-	m_world->SetDestructionListener(&listener);
+	m_particleSystem->SetDestructionListener(&listener);
 
 	int32 destroyed;
 	b2ParticleDef def;
-	m_world->CreateParticle(def);
-	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf);
+	m_particleSystem->CreateParticle(def);
+	m_particleSystem->Step(0.001f, 1, 1);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 
-	m_world->CreateParticle(def);
-	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf, false);
+	m_particleSystem->CreateParticle(def);
+	m_particleSystem->Step(0.001f, 1, 1);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf, false);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 }
@@ -219,16 +224,16 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithCallback) {
 	b2Transform xf;
 	xf.SetIdentity();
 	DestructionListener listener;
-	m_world->SetDestructionListener(&listener);
+	m_particleSystem->SetDestructionListener(&listener);
 
 	int32 destroyed;
 	b2ParticleDef def;
-	int32 index = m_world->CreateParticle(def);
-	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf, true);
+	int32 index = m_particleSystem->CreateParticle(def);
+	m_particleSystem->Step(0.001f, 1, 1);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf, true);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
-	m_world->Step(0.001f, 1, 1);
+	m_particleSystem->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listener.m_destroyedParticles[0], index);
 }
@@ -237,11 +242,11 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithCallback) {
 // destroyed.
 TEST_F(CallbackTests, DestroyParticleGroupWithCallback) {
 	DestructionListener listener;
-	m_world->SetDestructionListener(&listener);
-	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_world);
-	m_world->DestroyParticlesInGroup(group);
+	m_particleSystem->SetDestructionListener(&listener);
+	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_particleSystem);
+	m_particleSystem->DestroyParticlesInGroup(group);
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 0U);
-	m_world->Step(0.001f, 1, 1);
+	m_particleSystem->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 1U);
 	EXPECT_EQ(listener.m_destroyedParticleGroups[0], group);
 }

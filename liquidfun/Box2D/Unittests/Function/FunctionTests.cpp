@@ -30,13 +30,19 @@ protected:
 		// Construct a world object, which will hold and simulate the rigid
 		// bodies.
 		m_world = new b2World(gravity);
+
+		const b2ParticleSystemDef particleSystemDef;
+		m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 	}
 	virtual void TearDown()
 	{
+		// Clean up the world after each test.
+		m_world->DestroyParticleSystem(m_particleSystem);
 		delete m_world;
 	}
 
 	b2World *m_world;
+	b2ParticleSystem *m_particleSystem;
 };
 
 TEST_F(FunctionTests, CreateParticle) {
@@ -46,63 +52,63 @@ TEST_F(FunctionTests, CreateParticle) {
 	def.velocity.Set(3, 4);
 	def.color.Set(1, 2, 3, 4);
 	def.userData = this;
-	int index = m_world->CreateParticle(def);
+	int index = m_particleSystem->CreateParticle(def);
 	EXPECT_EQ(index, 0);
-	EXPECT_EQ(m_world->GetParticleCount(), 1);
-	EXPECT_EQ(m_world->GetParticleFlagsBuffer()[index], def.flags);
-	EXPECT_EQ(m_world->GetParticlePositionBuffer()[index], def.position);
-	EXPECT_EQ(m_world->GetParticleVelocityBuffer()[index], def.velocity);
-	EXPECT_EQ(m_world->GetParticleColorBuffer()[index].r, def.color.r);
-	EXPECT_EQ(m_world->GetParticleColorBuffer()[index].g, def.color.g);
-	EXPECT_EQ(m_world->GetParticleColorBuffer()[index].b, def.color.b);
-	EXPECT_EQ(m_world->GetParticleColorBuffer()[index].a, def.color.a);
-	EXPECT_EQ(m_world->GetParticleUserDataBuffer()[index], def.userData);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 1);
+	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer()[index], def.flags);
+	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer()[index], def.position);
+	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer()[index], def.velocity);
+	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer()[index].r, def.color.r);
+	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer()[index].g, def.color.g);
+	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer()[index].b, def.color.b);
+	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer()[index].a, def.color.a);
+	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer()[index], def.userData);
 }
 
 TEST_F(FunctionTests, ParticleRadius) {
 	float r = 12.3f;
-	m_world->SetParticleRadius(r);
-	EXPECT_EQ(m_world->GetParticleRadius(), r);
+	m_particleSystem->SetParticleRadius(r);
+	EXPECT_EQ(m_particleSystem->GetParticleRadius(), r);
 }
 
 TEST_F(FunctionTests, ParticleDensity) {
 	float r = 12.3f;
-	m_world->SetParticleDensity(r);
-	EXPECT_EQ(m_world->GetParticleDensity(), r);
+	m_particleSystem->SetParticleDensity(r);
+	EXPECT_EQ(m_particleSystem->GetParticleDensity(), r);
 }
 
 TEST_F(FunctionTests, ParticleGravityScale) {
 	float g = 12.3f;
-	m_world->SetParticleGravityScale(g);
-	EXPECT_EQ(m_world->GetParticleGravityScale(), g);
+	m_particleSystem->SetParticleGravityScale(g);
+	EXPECT_EQ(m_particleSystem->GetParticleGravityScale(), g);
 }
 
 TEST_F(FunctionTests, ParticleDamping) {
 	float r = 12.3f;
-	m_world->SetParticleDamping(r);
-	EXPECT_EQ(m_world->GetParticleDamping(), r);
+	m_particleSystem->SetParticleDamping(r);
+	EXPECT_EQ(m_particleSystem->GetParticleDamping(), r);
 }
 
 TEST_F(FunctionTests, ParticleStaticPressureItearations) {
 	int n = 123;
-	m_world->SetParticleStaticPressureIterations(n);
-	EXPECT_EQ(m_world->GetParticleStaticPressureIterations(), n);
+	m_particleSystem->SetParticleStaticPressureIterations(n);
+	EXPECT_EQ(m_particleSystem->GetParticleStaticPressureIterations(), n);
 }
 
 // Verify that it's possible to destroy a particle using
 // DestroyParticle(int32) and DestroyParticle(int32, bool).
 TEST_F(FunctionTests, DestroyParticle) {
 	b2ParticleDef def;
-	int index = m_world->CreateParticle(def);
-	m_world->DestroyParticle(index);
+	int index = m_particleSystem->CreateParticle(def);
+	m_particleSystem->DestroyParticle(index);
 	m_world->Step(0.001f, 1, 1);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 
-	CreateAndDestroyParticle(m_world, 0, true);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	CreateAndDestroyParticle(m_world, m_particleSystem, 0, true);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 
-	CreateAndDestroyParticle(m_world, 0, false);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	CreateAndDestroyParticle(m_world, m_particleSystem, 0, false);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 }
 
 // Attempt and fail to destroy a particle with a shape that is outside the
@@ -115,11 +121,11 @@ TEST_F(FunctionTests, DestroyParticlesInShapeNoneInShape) {
 
 	b2ParticleDef def;
 	def.position.x = 3;
-	m_world->CreateParticle(def);
+	m_particleSystem->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
-	int destroyed = m_world->DestroyParticlesInShape(shape, xf);
+	int destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf);
 	EXPECT_EQ(destroyed, 0);
-	EXPECT_EQ(m_world->GetParticleCount(), 1);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 1);
 }
 
 // Destroy a particle within a shape using
@@ -133,37 +139,37 @@ TEST_F(FunctionTests, DestroyParticlesInShape) {
 	int32 destroyed;
 	b2ParticleDef def;
 
-	m_world->CreateParticle(def);
+	m_particleSystem->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf);
 	EXPECT_EQ(destroyed, 1);
-	EXPECT_EQ(m_world->GetParticleCount(), 1);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 1);
 	m_world->Step(0.001f, 1, 1);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 
-	m_world->CreateParticle(def);
+	m_particleSystem->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf, true);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf, true);
 	EXPECT_EQ(destroyed, 1);
-	EXPECT_EQ(m_world->GetParticleCount(), 1);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 1);
 	m_world->Step(0.001f, 1, 1);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 
-	m_world->CreateParticle(def);
+	m_particleSystem->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf, false);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf, false);
 	EXPECT_EQ(destroyed, 1);
-	EXPECT_EQ(m_world->GetParticleCount(), 1);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 1);
 	m_world->Step(0.001f, 1, 1);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 }
 
 TEST_F(FunctionTests, CreateParticleGroup) {
-	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_world);
+	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_particleSystem);
 	EXPECT_NE(group, (b2ParticleGroup *)NULL);
-	EXPECT_EQ(m_world->GetParticleGroupCount(), 1);
-	EXPECT_NE(m_world->GetParticleCount(), 0);
-	EXPECT_EQ(m_world->GetParticleCount(), group->GetParticleCount());
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 1);
+	EXPECT_NE(m_particleSystem->GetParticleCount(), 0);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), group->GetParticleCount());
 }
 
 TEST_F(FunctionTests, CreateParticleGroupWithCustomStride) {
@@ -171,12 +177,12 @@ TEST_F(FunctionTests, CreateParticleGroupWithCustomStride) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	def.stride = 1 * m_world->GetParticleRadius();
-	b2ParticleGroup *group1 = m_world->CreateParticleGroup(def);
-	def.stride = 2 * m_world->GetParticleRadius();
-	b2ParticleGroup *group2 = m_world->CreateParticleGroup(def);
-	def.stride = 3 * m_world->GetParticleRadius();
-	b2ParticleGroup *group3 = m_world->CreateParticleGroup(def);
+	def.stride = 1 * m_particleSystem->GetParticleRadius();
+	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
+	def.stride = 2 * m_particleSystem->GetParticleRadius();
+	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
+	def.stride = 3 * m_particleSystem->GetParticleRadius();
+	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
 	EXPECT_GT(group1->GetParticleCount(), group2->GetParticleCount());
 	EXPECT_GT(group2->GetParticleCount(), group3->GetParticleCount());
 }
@@ -184,19 +190,19 @@ TEST_F(FunctionTests, CreateParticleGroupWithCustomStride) {
 TEST_F(FunctionTests, CreateEmptyParticleGroupWithNoShape) {
 	b2ParticleGroupDef def;
 	def.groupFlags = b2_solidParticleGroup | b2_particleGroupCanBeEmpty;
-	b2ParticleGroup *group = m_world->CreateParticleGroup(def);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 	EXPECT_EQ(group->GetParticleCount(), 0);
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	m_world->JoinParticleGroups(group, m_world->CreateParticleGroup(def));
-	EXPECT_GT(m_world->GetParticleCount(), 0);
+	m_particleSystem->JoinParticleGroups(group, m_particleSystem->CreateParticleGroup(def));
+	EXPECT_GT(m_particleSystem->GetParticleCount(), 0);
 	EXPECT_GT(group->GetParticleCount(), 0);
 	m_world->Step(0.01f, 1, 1, 1);
-	m_world->DestroyParticlesInGroup(group, true);
+	m_particleSystem->DestroyParticlesInGroup(group, true);
 	m_world->Step(0.01f, 1, 1, 1);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 	EXPECT_EQ(group->GetParticleCount(), 0);
 }
 
@@ -210,10 +216,10 @@ TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
 	b2ParticleGroupDef def;
 	def.particleCount = particleCount;
 	def.positionData = positionData;
-	b2ParticleGroup *group = m_world->CreateParticleGroup(def);
-	EXPECT_EQ(m_world->GetParticleCount(), particleCount);
+	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), particleCount);
 	EXPECT_EQ(group->GetParticleCount(), particleCount);
-	const b2Vec2 *positionBuffer = m_world->GetParticlePositionBuffer();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetParticlePositionBuffer();
 	for (int32 i = 0; i < particleCount; i++)
 	{
 		ASSERT_EQ(positionBuffer[i].x, (float32) i);
@@ -222,12 +228,12 @@ TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
 }
 
 TEST_F(FunctionTests, DestroyParticleGroup) {
-	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_world);
-	m_world->DestroyParticlesInGroup(group);
-	EXPECT_EQ(m_world->GetParticleGroupCount(), 1);
+	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_particleSystem);
+	m_particleSystem->DestroyParticlesInGroup(group);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 1);
 	m_world->Step(0.001f, 1, 1);
-	EXPECT_EQ(m_world->GetParticleGroupCount(), 0);
-	EXPECT_EQ(m_world->GetParticleCount(), 0);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 0);
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 }
 
 TEST_F(FunctionTests, GetParticleBuffer) {
@@ -235,21 +241,21 @@ TEST_F(FunctionTests, GetParticleBuffer) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	b2ParticleGroup *group = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
 	EXPECT_EQ(group->GetBufferIndex(), 0);
-	const b2World *constWorld = m_world;
-	EXPECT_EQ(m_world->GetParticleFlagsBuffer(),
-			  constWorld->GetParticleFlagsBuffer());
-	EXPECT_EQ(m_world->GetParticlePositionBuffer(),
-			  constWorld->GetParticlePositionBuffer());
-	EXPECT_EQ(m_world->GetParticleVelocityBuffer(),
-			  constWorld->GetParticleVelocityBuffer());
-	EXPECT_EQ(m_world->GetParticleGroupBuffer(),
-			  constWorld->GetParticleGroupBuffer());
-	EXPECT_EQ(m_world->GetParticleColorBuffer(),
-			  constWorld->GetParticleColorBuffer());
-	EXPECT_EQ(m_world->GetParticleUserDataBuffer(),
-			  constWorld->GetParticleUserDataBuffer());
+	const b2ParticleSystem *constParticleSystem = m_particleSystem;
+	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer(),
+			  constParticleSystem->GetParticleFlagsBuffer());
+	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer(),
+			  constParticleSystem->GetParticlePositionBuffer());
+	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer(),
+			  constParticleSystem->GetParticleVelocityBuffer());
+	EXPECT_EQ(m_particleSystem->GetParticleGroupBuffer(),
+			  constParticleSystem->GetParticleGroupBuffer());
+	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer(),
+			  constParticleSystem->GetParticleColorBuffer());
+	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer(),
+			  constParticleSystem->GetParticleUserDataBuffer());
 	const b2ParticleGroup *constGroup = group;
 	EXPECT_EQ(group->GetBufferIndex(), constGroup->GetBufferIndex());
 }
@@ -261,42 +267,42 @@ TEST_F(FunctionTests, SetParticleBuffer) {
 	b2Vec2 velocityBuffer[size];
 	b2ParticleColor colorBuffer[size];
 	void *userDataBuffer[size];
-	m_world->SetParticleFlagsBuffer(flagsBuffer, size);
-	m_world->SetParticlePositionBuffer(positionBuffer, size);
-	m_world->SetParticleVelocityBuffer(velocityBuffer, size);
-	m_world->SetParticleColorBuffer(colorBuffer, size);
-	m_world->SetParticleUserDataBuffer(userDataBuffer, size);
-	EXPECT_EQ(m_world->GetParticleFlagsBuffer(), flagsBuffer);
-	EXPECT_EQ(m_world->GetParticlePositionBuffer(), positionBuffer);
-	EXPECT_EQ(m_world->GetParticleVelocityBuffer(), velocityBuffer);
-	EXPECT_EQ(m_world->GetParticleColorBuffer(), colorBuffer);
-	EXPECT_EQ(m_world->GetParticleUserDataBuffer(), userDataBuffer);
+	m_particleSystem->SetParticleFlagsBuffer(flagsBuffer, size);
+	m_particleSystem->SetParticlePositionBuffer(positionBuffer, size);
+	m_particleSystem->SetParticleVelocityBuffer(velocityBuffer, size);
+	m_particleSystem->SetParticleColorBuffer(colorBuffer, size);
+	m_particleSystem->SetParticleUserDataBuffer(userDataBuffer, size);
+	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer(), flagsBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer(), positionBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer(), velocityBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer(), colorBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer(), userDataBuffer);
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	m_world->CreateParticleGroup(def);
-	EXPECT_LE(m_world->GetParticleCount(), size);
-	EXPECT_EQ(m_world->GetParticleFlagsBuffer(), flagsBuffer);
-	EXPECT_EQ(m_world->GetParticlePositionBuffer(), positionBuffer);
-	EXPECT_EQ(m_world->GetParticleVelocityBuffer(), velocityBuffer);
-	EXPECT_EQ(m_world->GetParticleColorBuffer(), colorBuffer);
-	EXPECT_EQ(m_world->GetParticleUserDataBuffer(), userDataBuffer);
+	m_particleSystem->CreateParticleGroup(def);
+	EXPECT_LE(m_particleSystem->GetParticleCount(), size);
+	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer(), flagsBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer(), positionBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer(), velocityBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer(), colorBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer(), userDataBuffer);
 	uint32 newFlagsBuffer[size];
 	b2Vec2 newPositionBuffer[size];
 	b2Vec2 newVelocityBuffer[size];
 	b2ParticleColor newColorBuffer[size];
 	void *newUserDataBuffer[size];
-	m_world->SetParticleFlagsBuffer(newFlagsBuffer, size);
-	m_world->SetParticlePositionBuffer(newPositionBuffer, size);
-	m_world->SetParticleVelocityBuffer(newVelocityBuffer, size);
-	m_world->SetParticleColorBuffer(newColorBuffer, size);
-	m_world->SetParticleUserDataBuffer(newUserDataBuffer, size);
-	EXPECT_EQ(m_world->GetParticleFlagsBuffer(), newFlagsBuffer);
-	EXPECT_EQ(m_world->GetParticlePositionBuffer(), newPositionBuffer);
-	EXPECT_EQ(m_world->GetParticleVelocityBuffer(), newVelocityBuffer);
-	EXPECT_EQ(m_world->GetParticleColorBuffer(), newColorBuffer);
-	EXPECT_EQ(m_world->GetParticleUserDataBuffer(), newUserDataBuffer);
+	m_particleSystem->SetParticleFlagsBuffer(newFlagsBuffer, size);
+	m_particleSystem->SetParticlePositionBuffer(newPositionBuffer, size);
+	m_particleSystem->SetParticleVelocityBuffer(newVelocityBuffer, size);
+	m_particleSystem->SetParticleColorBuffer(newColorBuffer, size);
+	m_particleSystem->SetParticleUserDataBuffer(newUserDataBuffer, size);
+	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer(), newFlagsBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer(), newPositionBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer(), newVelocityBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer(), newColorBuffer);
+	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer(), newUserDataBuffer);
 }
 
 TEST_F(FunctionTests, GroupData) {
@@ -310,7 +316,7 @@ TEST_F(FunctionTests, GroupData) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	b2ParticleGroup *group = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
 	EXPECT_NE(group->GetParticleCount(), 0);
 	EXPECT_EQ(group->GetPosition(), def.position);
 	EXPECT_EQ(group->GetAngle(), def.angle);
@@ -323,10 +329,10 @@ TEST_F(FunctionTests, GroupData) {
 
 TEST_F(FunctionTests, GroupList) {
 	b2ParticleGroupDef def;
-	b2ParticleGroup *group1 = m_world->CreateParticleGroup(def);
-	b2ParticleGroup *group2 = m_world->CreateParticleGroup(def);
-	b2ParticleGroup *group3 = m_world->CreateParticleGroup(def);
-	b2ParticleGroup *list = m_world->GetParticleGroupList();
+	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
+	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
+	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
+	b2ParticleGroup *list = m_particleSystem->GetParticleGroupList();
 	EXPECT_EQ(list, group3);
 	list = list->GetNext();
 	EXPECT_EQ(list, group2);
@@ -338,11 +344,11 @@ TEST_F(FunctionTests, GroupList) {
 
 TEST_F(FunctionTests, ConstGroupList) {
 	b2ParticleGroupDef def;
-	b2ParticleGroup *group1 = m_world->CreateParticleGroup(def);
-	b2ParticleGroup *group2 = m_world->CreateParticleGroup(def);
-	b2ParticleGroup *group3 = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
+	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
+	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
 	const b2ParticleGroup *list =
-		((const b2World *)m_world)->GetParticleGroupList();
+		((const b2ParticleSystem *)m_particleSystem)->GetParticleGroupList();
 	EXPECT_EQ(list, group3);
 	list = list->GetNext();
 	EXPECT_EQ(list, group2);
@@ -357,18 +363,18 @@ TEST_F(FunctionTests, JoinParticleGroups) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	b2ParticleGroup *group1 = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
 	shape.SetAsBox(10, 20);
-	b2ParticleGroup *group2 = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
 	shape.SetAsBox(10, 30);
-	b2ParticleGroup *group3 = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
 	int32 count1 = group1->GetParticleCount();
 	int32 count2 = group2->GetParticleCount();
 	int32 count3 = group3->GetParticleCount();
-	EXPECT_EQ(count1 + count2 + count3, m_world->GetParticleCount());
-	EXPECT_EQ(m_world->GetParticleGroupCount(), 3);
-	m_world->JoinParticleGroups(group1, group2);
-	EXPECT_EQ(m_world->GetParticleGroupCount(), 2);
+	EXPECT_EQ(count1 + count2 + count3, m_particleSystem->GetParticleCount());
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 3);
+	m_particleSystem->JoinParticleGroups(group1, group2);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 2);
 	EXPECT_EQ(count1 + count2, group1->GetParticleCount());
 }
 
@@ -377,13 +383,13 @@ TEST_F(FunctionTests, GroupBuffer) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	b2ParticleGroup *group1 = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
 	shape.SetAsBox(10, 20);
-	b2ParticleGroup *group2 = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
 	shape.SetAsBox(10, 30);
-	b2ParticleGroup *group3 = m_world->CreateParticleGroup(def);
+	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
 	const b2ParticleGroup *const *groupBuffer =
-		m_world->GetParticleGroupBuffer();
+		m_particleSystem->GetParticleGroupBuffer();
 	int32 offset1 = group1->GetBufferIndex();
 	int32 count1 = group1->GetParticleCount();
 	for (int32 i = 0; i < count1; i++) {
@@ -399,11 +405,11 @@ TEST_F(FunctionTests, GroupBuffer) {
 	for (int32 i = 0; i < count3; i++) {
 		ASSERT_EQ(group3, groupBuffer[offset3 + i]);
 	}
-	m_world->JoinParticleGroups(group1, group2);
-	m_world->DestroyParticlesInGroup(group3);
+	m_particleSystem->JoinParticleGroups(group1, group2);
+	m_particleSystem->DestroyParticlesInGroup(group3);
 	m_world->Step(0.001f, 1, 1);
-	groupBuffer = m_world->GetParticleGroupBuffer();
-	int32 count = m_world->GetParticleCount();
+	groupBuffer = m_particleSystem->GetParticleGroupBuffer();
+	int32 count = m_particleSystem->GetParticleCount();
 	for (int32 i = 0; i < count; i++) {
 		ASSERT_EQ(group1, groupBuffer[i]);
 	}
@@ -414,9 +420,9 @@ TEST_F(FunctionTests, GetParticleContact) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	m_world->CreateParticleGroup(def);
-	EXPECT_NE(m_world->GetParticleContactCount(), 0);
-	EXPECT_NE(m_world->GetParticleContacts(), (const b2ParticleContact *)NULL);
+	m_particleSystem->CreateParticleGroup(def);
+	EXPECT_NE(m_particleSystem->GetParticleContactCount(), 0);
+	EXPECT_NE(m_particleSystem->GetParticleContacts(), (const b2ParticleContact *)NULL);
 }
 
 TEST_F(FunctionTests, GetParticleBodyContact) {
@@ -424,13 +430,13 @@ TEST_F(FunctionTests, GetParticleBodyContact) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	m_world->CreateParticleGroup(def);
+	m_particleSystem->CreateParticleGroup(def);
 	b2BodyDef bodyDef;
 	b2Body *body = m_world->CreateBody(&bodyDef);
 	body->CreateFixture(&shape, 1.0);
 	m_world->Step(0.001f, 1, 1);
-	EXPECT_NE(m_world->GetParticleBodyContactCount(), 0);
-	EXPECT_NE(m_world->GetParticleBodyContacts(),
+	EXPECT_NE(m_particleSystem->GetParticleBodyContactCount(), 0);
+	EXPECT_NE(m_particleSystem->GetParticleBodyContacts(),
 			  (const b2ParticleBodyContact *)NULL);
 }
 
@@ -439,17 +445,17 @@ TEST_F(FunctionTests, ComputeParticleCollisionEnergy) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	m_world->CreateParticleGroup(def);
-	EXPECT_EQ(m_world->ComputeParticleCollisionEnergy(), 0);
+	m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->ComputeParticleCollisionEnergy(), 0);
 
 	def.position.Set(20, 0);
 	def.linearVelocity.Set(-1, 0);
-	m_world->CreateParticleGroup(def);
+	m_particleSystem->CreateParticleGroup(def);
 	for (int32 t = 0; t < 1000; t++)
 	{
 		m_world->Step(0.1f, 1, 1);
 	}
-	EXPECT_NE(m_world->ComputeParticleCollisionEnergy(), 0);
+	EXPECT_NE(m_particleSystem->ComputeParticleCollisionEnergy(), 0);
 }
 
 int main(int argc, char **argv)
