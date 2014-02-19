@@ -527,7 +527,7 @@ private:
 	void ComputeWeight();
 	void SolvePressure(const b2TimeStep& step);
 	void SolveDamping(const b2TimeStep& step);
-	void SolveExtraDamping(const b2TimeStep& step);
+	void SolveExtraDamping();
 	void SolveWall();
 	void SolveRigid(const b2TimeStep& step);
 	void SolveElastic(const b2TimeStep& step);
