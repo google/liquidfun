@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('md__chapter10__world.html','');});
  &#160;&#160;&#160;&#160;&#160;&#160;<code>GameActor* myActor = (GameActor*)b-&gt;GetUserData();</code><br/>
  &#160;&#160;&#160;&#160;&#160;&#160;<code>if (myActor-&gt;IsDead())</code><br/>
  &#160;&#160;&#160;&#160;&#160;&#160;<code>{</code><br/>
- &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<code>myWorld-&gt;DestroyBody(b);</code><br/>
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<code>myWorld-&gt;DestroyBody(b);</code> <br/>
  &#160;&#160;&#160;&#160;&#160;&#160;<code>}</code><br/>
  &#160;&#160;&#160;<code>}</code><br/>
 </p>
@@ -218,6 +218,9 @@ $(document).ready(function(){initNavTree('md__chapter10__world.html','');});
  &#160;&#160;&#160;&#160;&#160;&#160;<code>myBody-&gt;ApplyForce(myForce, myPoint);</code><br/>
  &#160;&#160;&#160;<code>}</code><br/>
 </p>
+<p>You can apply forces and impulses to particles and particle groups, as well. Unlike with bodies, however, the load is not applied to an arbitrary world point. Instead, it acts upon the center of each particle.</p>
+<p>You can apply forces and impulses to individual particles or to particle groups. The following example spreads an impulse of (0.7, 0.3) kg m/s across the particles in myParticleGroup:</p>
+<p>&#160;&#160;&#160;<code>const b2Vec2 impulse(0.7f, 0.3f);</code> &#160;&#160;&#160;<code>myParticleGroup-&gt;ApplyLinearImpulse(impulse);</code></p>
 <p><a class="anchor" id="ct"></a><br/>
  </p>
 <h2>Coordinate Transformations</h2>

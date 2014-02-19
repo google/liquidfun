@@ -171,16 +171,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>SetCorrectionFactor()
 : <a class="el" href="classb2_motor_joint.html#ae59e624b8a7b6f869ab5e6148352cb52">b2MotorJoint</a>
 </li>
+<li>SetDamping()
+: <a class="el" href="classb2_particle_system.html#af6b8d78e5fe2ee1d26d8ec715647a71c">b2ParticleSystem</a>
+</li>
 <li>SetDampingRatio()
-: <a class="el" href="classb2_distance_joint.html#a58da61301a1f1398a715107b76649923">b2DistanceJoint</a>
+: <a class="el" href="classb2_weld_joint.html#aea79865e590edba09eff9d2243689967">b2WeldJoint</a>
+, <a class="el" href="classb2_distance_joint.html#a58da61301a1f1398a715107b76649923">b2DistanceJoint</a>
 , <a class="el" href="classb2_mouse_joint.html#a648c8f3ecb82f4887c0eefcfe48cbd37">b2MouseJoint</a>
-, <a class="el" href="classb2_weld_joint.html#aea79865e590edba09eff9d2243689967">b2WeldJoint</a>
 </li>
 <li>SetDebugDraw()
 : <a class="el" href="classb2_world.html#a6976d2c67400df03c0d44174ffcfb7ee">b2World</a>
 </li>
 <li>SetDensity()
 : <a class="el" href="classb2_fixture.html#ad4e1d9323103975c8931d022b952d04a">b2Fixture</a>
+, <a class="el" href="classb2_particle_system.html#a5bc512885130a8da6f3afb07187f4039">b2ParticleSystem</a>
+</li>
+<li>SetDestructionByAge()
+: <a class="el" href="classb2_particle_system.html#a0400ae753ca56deef6f8b2dfe2ab5fb2">b2ParticleSystem</a>
 </li>
 <li>SetDestructionListener()
 : <a class="el" href="classb2_world.html#ae377f2dd5512ada7d27f4ad3541c75bf">b2World</a>
@@ -197,6 +204,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>SetFlags()
 : <a class="el" href="classb2_draw.html#ac2bbe31595478690e44de4ff1e7f347e">b2Draw</a>
 </li>
+<li>SetFlagsBuffer()
+: <a class="el" href="classb2_particle_system.html#a40cb56e0a7aba2ffca3d0ed83aea6e5b">b2ParticleSystem</a>
+</li>
 <li>SetFrequency()
 : <a class="el" href="classb2_distance_joint.html#a1a12446f8926a1324edd481d9cd28c8a">b2DistanceJoint</a>
 , <a class="el" href="classb2_mouse_joint.html#a8b37706535923637ca280c5a0467b14d">b2MouseJoint</a>
@@ -211,6 +221,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>SetGravityScale()
 : <a class="el" href="classb2_body.html#a8e66a570c2aeee93b29d84cae861a612">b2Body</a>
+, <a class="el" href="classb2_particle_system.html#a6727500d6d140da6f372c18a482a25e9">b2ParticleSystem</a>
 </li>
 <li>SetGroupFlags()
 : <a class="el" href="classb2_particle_group.html#a13a2f310947a2d69d5184805e6eb8bbd">b2ParticleGroup</a>
@@ -243,9 +254,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classb2_body.html#a58a641fedf8a81e1e26d09ec00a22fe2">b2Body</a>
 </li>
 <li>SetMaxForce()
-: <a class="el" href="classb2_friction_joint.html#a7936d852b5ad71dc92efc397865dda41">b2FrictionJoint</a>
-, <a class="el" href="classb2_motor_joint.html#a62f95f23d60123cebe14f2fcec155801">b2MotorJoint</a>
+: <a class="el" href="classb2_motor_joint.html#a62f95f23d60123cebe14f2fcec155801">b2MotorJoint</a>
 , <a class="el" href="classb2_mouse_joint.html#a4beba6ea0827960fac2474563591c03a">b2MouseJoint</a>
+, <a class="el" href="classb2_friction_joint.html#a7936d852b5ad71dc92efc397865dda41">b2FrictionJoint</a>
 </li>
 <li>SetMaxLength()
 : <a class="el" href="classb2_rope_joint.html#a92cea201d21acd2f2a7cc9b00e165848">b2RopeJoint</a>
@@ -254,54 +265,45 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classb2_prismatic_joint.html#aa7817474aef15ca4815341479ac590e2">b2PrismaticJoint</a>
 </li>
 <li>SetMaxMotorTorque()
-: <a class="el" href="classb2_wheel_joint.html#a8aae3cd624ec9d48fc86c325c4595edc">b2WheelJoint</a>
-, <a class="el" href="classb2_revolute_joint.html#a41779d7ec05be33e6368ef00123a3581">b2RevoluteJoint</a>
+: <a class="el" href="classb2_revolute_joint.html#a41779d7ec05be33e6368ef00123a3581">b2RevoluteJoint</a>
+, <a class="el" href="classb2_wheel_joint.html#a8aae3cd624ec9d48fc86c325c4595edc">b2WheelJoint</a>
+</li>
+<li>SetMaxParticleCount()
+: <a class="el" href="classb2_particle_system.html#a711c962a7a2258127a6126eb69a78321">b2ParticleSystem</a>
 </li>
 <li>SetMaxTorque()
-: <a class="el" href="classb2_friction_joint.html#a9e3aaf485dc86a378bb62ee78cea43aa">b2FrictionJoint</a>
-, <a class="el" href="classb2_motor_joint.html#a3e9a259d36c36e0dc078282e6799d625">b2MotorJoint</a>
+: <a class="el" href="classb2_motor_joint.html#a3e9a259d36c36e0dc078282e6799d625">b2MotorJoint</a>
+, <a class="el" href="classb2_friction_joint.html#a9e3aaf485dc86a378bb62ee78cea43aa">b2FrictionJoint</a>
 </li>
 <li>SetMotorSpeed()
-: <a class="el" href="classb2_prismatic_joint.html#a602ef7a6ca4fca55d011f1b38ab5a6c3">b2PrismaticJoint</a>
+: <a class="el" href="classb2_wheel_joint.html#a6e3255fcf5c82b979ad7e3dc1c089c0b">b2WheelJoint</a>
+, <a class="el" href="classb2_prismatic_joint.html#a602ef7a6ca4fca55d011f1b38ab5a6c3">b2PrismaticJoint</a>
 , <a class="el" href="classb2_revolute_joint.html#a56f60bb1ea69048c8a455da49d62bf65">b2RevoluteJoint</a>
-, <a class="el" href="classb2_wheel_joint.html#a6e3255fcf5c82b979ad7e3dc1c089c0b">b2WheelJoint</a>
 </li>
 <li>SetNextVertex()
 : <a class="el" href="classb2_chain_shape.html#a15c7c2821a52266ef57621ac7d34a95f">b2ChainShape</a>
 </li>
-<li>SetParticleDamping()
-: <a class="el" href="classb2_particle_system.html#a71651270066689579be75c90fa8b898e">b2ParticleSystem</a>
-</li>
-<li>SetParticleDensity()
-: <a class="el" href="classb2_particle_system.html#a4681649e5b22399a1e567e1ea37457a1">b2ParticleSystem</a>
-</li>
 <li>SetParticleFlags()
 : <a class="el" href="classb2_particle_system.html#a0b061d6ac27a1984200868116172cba9">b2ParticleSystem</a>
 </li>
-<li>SetParticleFlagsBuffer()
-: <a class="el" href="classb2_particle_system.html#affaa5a01277923615f095361b2aa0224">b2ParticleSystem</a>
+<li>SetParticleLifetime()
+: <a class="el" href="classb2_particle_system.html#a2d7537d7ddfa1d275dce8ffec23b0a77">b2ParticleSystem</a>
 </li>
-<li>SetParticleGravityScale()
-: <a class="el" href="classb2_particle_system.html#a8a90e2e73bff658a9b0e46fe0032868c">b2ParticleSystem</a>
-</li>
-<li>SetParticleMaxCount()
-: <a class="el" href="classb2_particle_system.html#a8d8395c452613752b4705fab10b25118">b2ParticleSystem</a>
-</li>
-<li>SetParticleRadius()
-: <a class="el" href="classb2_particle_system.html#a8ba293f08550b7569912074e55136da8">b2ParticleSystem</a>
-</li>
-<li>SetParticleStaticPressureIterations()
-: <a class="el" href="classb2_particle_system.html#a76aa96394eb35ce88a169214a7c67dc6">b2ParticleSystem</a>
+<li>SetPaused()
+: <a class="el" href="classb2_particle_system.html#aba25d65675a3dd022498eb2358ee3504">b2ParticleSystem</a>
 </li>
 <li>SetPrevVertex()
 : <a class="el" href="classb2_chain_shape.html#aeb2ddbe0c52a98885e91b7c8f597315b">b2ChainShape</a>
+</li>
+<li>SetRadius()
+: <a class="el" href="classb2_particle_system.html#a1a454fc53ce4a63a0cb45b6c7c810d2f">b2ParticleSystem</a>
 </li>
 <li>SetRatio()
 : <a class="el" href="classb2_gear_joint.html#a21c867bdc00c15ade2f399d370f92636">b2GearJoint</a>
 </li>
 <li>SetRestitution()
-: <a class="el" href="classb2_contact.html#a24ca342c2bb766c53ef5ad04f5268fc1">b2Contact</a>
-, <a class="el" href="classb2_fixture.html#a19c507332e4f7bd04a05f00426f11ee4">b2Fixture</a>
+: <a class="el" href="classb2_fixture.html#a19c507332e4f7bd04a05f00426f11ee4">b2Fixture</a>
+, <a class="el" href="classb2_contact.html#a24ca342c2bb766c53ef5ad04f5268fc1">b2Contact</a>
 </li>
 <li>SetSensor()
 : <a class="el" href="classb2_fixture.html#a6198a81dcee0fe814d730383ebfa7038">b2Fixture</a>
@@ -315,11 +317,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>SetSpringFrequencyHz()
 : <a class="el" href="classb2_wheel_joint.html#af9f8fada5cb30f83aa2fbf486e9d347b">b2WheelJoint</a>
 </li>
+<li>SetStaticPressureIterations()
+: <a class="el" href="classb2_particle_system.html#aa7a7789b70bff96d98a53c10e47d3d98">b2ParticleSystem</a>
+</li>
 <li>SetStrictContactCheck()
 : <a class="el" href="classb2_particle_system.html#aa1e295b8e9f96f1b91e362d114d4e7f3">b2ParticleSystem</a>
 </li>
-<li>SetStuckParticleThreshold()
-: <a class="el" href="classb2_particle_system.html#af1d963e941825a0cadd8013d43b68717">b2ParticleSystem</a>
+<li>SetStuckThreshold()
+: <a class="el" href="classb2_particle_system.html#a459db1f697d93724b0a065c029184c9b">b2ParticleSystem</a>
 </li>
 <li>SetSubStepping()
 : <a class="el" href="classb2_world.html#ae8aacc78ea4753075067daff51b61778">b2World</a>
@@ -337,27 +342,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classb2_body.html#a34ff1c84b10b74eb990749a025a1b1ad">b2Body</a>
 </li>
 <li>SetUserData()
-: <a class="el" href="classb2_fixture.html#a3db7f89ef4493247d922fe3d96351ad9">b2Fixture</a>
+: <a class="el" href="classb2_joint.html#a492f2d02496437572aaec6013ebdc1c8">b2Joint</a>
+, <a class="el" href="classb2_fixture.html#a3db7f89ef4493247d922fe3d96351ad9">b2Fixture</a>
 , <a class="el" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">b2ParticleGroup</a>
-, <a class="el" href="classb2_joint.html#a492f2d02496437572aaec6013ebdc1c8">b2Joint</a>
 , <a class="el" href="classb2_body.html#a5553a5ecdfd2d7200ba2405ce6043f52">b2Body</a>
 </li>
 <li>SetWarmStarting()
 : <a class="el" href="classb2_world.html#a8e8c12142e8c4884a18787926a261359">b2World</a>
 </li>
 <li>SetZero()
-: <a class="el" href="structb2_vec3.html#a5a459ed49f1910a347ca247f848a2dd8">b2Vec3</a>
-, <a class="el" href="structb2_mat33.html#a42fc6953b025e1c8b59717d0ee7accde">b2Mat33</a>
+: <a class="el" href="structb2_vec2.html#a5c6cbe27cfb29c6dbb29b9a3285b88d0">b2Vec2</a>
+, <a class="el" href="structb2_vec3.html#a5a459ed49f1910a347ca247f848a2dd8">b2Vec3</a>
 , <a class="el" href="structb2_mat22.html#aaeae95f61cf3171ffb94703980e3594b">b2Mat22</a>
-, <a class="el" href="structb2_vec2.html#a5c6cbe27cfb29c6dbb29b9a3285b88d0">b2Vec2</a>
+, <a class="el" href="structb2_mat33.html#a42fc6953b025e1c8b59717d0ee7accde">b2Mat33</a>
 </li>
 <li>ShiftOrigin()
-: <a class="el" href="classb2_mouse_joint.html#aa3c46b204aea79822dd6c6843c361801">b2MouseJoint</a>
-, <a class="el" href="classb2_joint.html#a7804f649e993dc0fd9ae47fde5601f90">b2Joint</a>
-, <a class="el" href="classb2_pulley_joint.html#a5b88d498ce306c4ff5ce99dec4811825">b2PulleyJoint</a>
+: <a class="el" href="classb2_dynamic_tree.html#af37ddfed6a5da97d5a78b09918d19ceb">b2DynamicTree</a>
 , <a class="el" href="classb2_broad_phase.html#a410e6115e3d1b4fca61cfbf397767772">b2BroadPhase</a>
-, <a class="el" href="classb2_dynamic_tree.html#af37ddfed6a5da97d5a78b09918d19ceb">b2DynamicTree</a>
+, <a class="el" href="classb2_pulley_joint.html#a5b88d498ce306c4ff5ce99dec4811825">b2PulleyJoint</a>
+, <a class="el" href="classb2_joint.html#a7804f649e993dc0fd9ae47fde5601f90">b2Joint</a>
 , <a class="el" href="classb2_world.html#afc33e20e64252c5be115216051408047">b2World</a>
+, <a class="el" href="classb2_mouse_joint.html#aa3c46b204aea79822dd6c6843c361801">b2MouseJoint</a>
 </li>
 <li>ShouldCollide()
 : <a class="el" href="classb2_contact_filter.html#aac8f6155d1f577d125db587f5269289b">b2ContactFilter</a>
@@ -379,7 +384,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="structb2_mat33.html#a478872c7b6a3bedd13fbedd3ec7a2edb">b2Mat33</a>
 </li>
 <li>Step()
-: <a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">b2World</a>
+: <a class="el" href="classb2_world.html#a7a8eff61af98461f978fe43f3af7be90">b2World</a>
 </li>
 </ul>
 </div><!-- contents -->
