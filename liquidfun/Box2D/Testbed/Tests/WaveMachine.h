@@ -60,11 +60,11 @@ public:
 			m_joint = (b2RevoluteJoint*)m_world->CreateJoint(&jd);
 		}
 
-		m_world->SetParticleRadius(0.025f);
+		m_particleSystem->SetParticleRadius(0.025f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
 		if (particleType == b2_waterParticle)
 		{
-			m_world->SetParticleDamping(0.2f);
+			m_particleSystem->SetParticleDamping(0.2f);
 		}
 
 		{
@@ -75,7 +75,7 @@ public:
 			shape.SetAsBox(0.9f, 0.9f, b2Vec2(0.0f, 1.0f), 0.0);
 
 			pd.shape = &shape;
-			b2ParticleGroup * const group = m_world->CreateParticleGroup(pd);
+			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
 			if (pd.flags & b2_colorMixingParticle)
 			{
 				ColorParticleGroup(group, 0);

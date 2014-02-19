@@ -28,11 +28,11 @@ public:
 	// startingVelocity indicates starting velocity for particles
 	// emitRate is particles/second
 	// color is the particle color you want
-	FaucetEmitter(b2World *world, const b2Vec2 &origin,
+	FaucetEmitter(b2ParticleSystem *particleSystem, const b2Vec2 &origin,
 				  b2Vec2 &startingVelocity, float32 size, float32 emitRate,
 				  b2ParticleColor color) :
 		m_startingVelocity(startingVelocity), m_origin(origin), m_size(size),
-		m_emitRate(emitRate), m_world(world), m_color(color)
+		m_emitRate(emitRate), m_particleSystem(particleSystem), m_color(color)
 	{
 		m_counter = 0;
 	}
@@ -59,7 +59,7 @@ public:
 			pd.velocity = m_startingVelocity;
 			pd.flags = flags;
 
-			m_world->CreateParticle(pd);
+			m_particleSystem->CreateParticle(pd);
 		}
 	}
 
@@ -74,7 +74,7 @@ public:
 	float32 m_emitRate;
 
 	// Pointer to global world
-	b2World *m_world;
+	b2ParticleSystem *m_particleSystem;
 	// Color you'd like the faucet spray
 	b2ParticleColor m_color;
 
@@ -181,7 +181,7 @@ public:
 			}
 		}
 
-		m_world->SetParticleRadius(0.25f);
+		m_particleSystem->SetParticleRadius(0.25f);
 
 		m_pumpTimer = 0;
 
@@ -374,7 +374,7 @@ public:
 		b2Vec2 startingVelocity = b2Vec2(0, PARTICLE_EXIT_Y_SPEED);
 
 		m_emitters[m_faucetEmitterIndex] =
-			new FaucetEmitter(m_world, center, startingVelocity,
+			new FaucetEmitter(m_particleSystem, center, startingVelocity,
 							  DEFAULT_EMITTER_SIZE, DEFAULT_EMITTER_RATE,
 							  color);
 
@@ -400,8 +400,8 @@ public:
 		}
 
 		// Do killfield work--kill every particle near the bottom of the screen
-		m_world->DestroyParticlesInShape(m_killfieldShape,
-										 m_killfieldTransform);
+		m_particleSystem->DestroyParticlesInShape(m_killfieldShape,
+												  m_killfieldTransform);
 
 		// Move the pumps
 		for (int i = 0; i < m_pumpIndex; i++)

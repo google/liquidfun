@@ -38,6 +38,8 @@ class b2Fixture;
 class b2Joint;
 class b2ParticleGroup;
 
+#define ALLOW_DEPRECATED_PARTICLE_SYSTEM_API 1
+
 /// The world class manages all physics entities, dynamic simulation,
 /// and asynchronous queries. The world also contains efficient memory
 /// management facilities.
@@ -255,6 +257,7 @@ public:
 	/// @warning this should be called outside of a time step.
 	void Dump();
 
+#if ALLOW_DEPRECATED_PARTICLE_SYSTEM_API
 	/// Create a particle whose properties have been defined.
 	/// No reference to the definition is retained.
 	/// A simulation step must occur before it's possible to interact with a
@@ -437,6 +440,7 @@ public:
 
 	/// Compute the kinetic energy that can be lost by damping force
 	float32 ComputeParticleCollisionEnergy() const;
+#endif // ALLOW_DEPRECATED_PARTICLE_SYSTEM_API
 
 	/// Get API version.
 	const b2Version* GetVersion() const {
@@ -616,7 +620,7 @@ inline const b2Profile& b2World::GetProfile() const
 {
 	return m_profile;
 }
-
+#if ALLOW_DEPRECATED_PARTICLE_SYSTEM_API
 inline b2ParticleGroup* b2World::GetParticleGroupList()
 {
 	return DEPRECATED_GetUniqueParticleSystem().GetParticleGroupList();
@@ -636,6 +640,7 @@ inline int32 b2World::GetParticleCount() const
 {
 	return DEPRECATED_GetUniqueParticleSystem().GetParticleCount();
 }
+#endif
 
 inline b2ParticleSystem& b2World::DEPRECATED_GetUniqueParticleSystem()
 {

@@ -45,11 +45,11 @@ public:
 			}
 		}
 
-		m_world->SetParticleRadius(0.1f);
+		m_particleSystem->SetParticleRadius(0.1f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
 		if (particleType == b2_waterParticle)
 		{
-			m_world->SetParticleDamping(0.2f);
+			m_particleSystem->SetParticleDamping(0.2f);
 		}
 
 		// Create killfield shape and transform
@@ -73,10 +73,10 @@ public:
 		pd.position.Set(0.0, 33.0);
 		pd.velocity .Set(0.0, -1.0);
 		pd.flags = flags;
-		m_world->CreateParticle(pd);
+		m_particleSystem->CreateParticle(pd);
 
 		// kill every particle near the bottom of the screen
-		m_world->DestroyParticlesInShape(m_killfieldShape, m_killfieldTransform);
+		m_particleSystem->DestroyParticlesInShape(m_killfieldShape, m_killfieldTransform);
 	}
 
 	static Test* Create()

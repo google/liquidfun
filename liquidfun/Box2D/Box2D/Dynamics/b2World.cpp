@@ -1455,7 +1455,7 @@ void b2World::Dump()
 	b2Log("joints = NULL;\n");
 	b2Log("bodies = NULL;\n");
 }
-
+#if ALLOW_DEPRECATED_PARTICLE_SYSTEM_API
 void b2World::SetStrictParticleContactCheck(bool enabled)
 {
 	DEPRECATED_GetUniqueParticleSystem().SetStrictContactCheck(enabled);
@@ -1694,3 +1694,5 @@ float32 b2World::ComputeParticleCollisionEnergy() const
 {
 	return DEPRECATED_GetUniqueParticleSystem().ComputeParticleCollisionEnergy();
 }
+#endif // ALLOW_DEPRECATED_PARTICLE_SYSTEM_API
+

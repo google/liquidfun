@@ -63,11 +63,11 @@ public:
 			}
 		}
 
-		m_world->SetParticleRadius(0.035f);
+		m_particleSystem->SetParticleRadius(0.035f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
 		if (particleType == b2_waterParticle)
 		{
-			m_world->SetParticleDamping(0.2f);
+			m_particleSystem->SetParticleDamping(0.2f);
 		}
 
 		{
@@ -77,7 +77,7 @@ public:
 			b2ParticleGroupDef pd;
 			pd.flags = particleType;
 			pd.shape = &shape;
-			b2ParticleGroup * const group = m_world->CreateParticleGroup(pd);
+			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
 			if (pd.flags & b2_colorMixingParticle)
 			{
 				ColorParticleGroup(group, 0);

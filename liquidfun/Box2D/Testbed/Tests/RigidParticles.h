@@ -63,7 +63,7 @@ public:
 			}
 		}
 
-		m_world->SetParticleRadius(0.035f);
+		m_particleSystem->SetParticleRadius(0.035f);
 
 		{
 			b2CircleShape shape;
@@ -73,7 +73,7 @@ public:
 			pd.groupFlags = b2_rigidParticleGroup | b2_solidParticleGroup;
 			pd.shape = &shape;
 			pd.color.Set(255, 0, 0, 255);
-			m_world->CreateParticleGroup(pd);
+			m_particleSystem->CreateParticleGroup(pd);
 		}
 
 		{
@@ -84,7 +84,7 @@ public:
 			pd.groupFlags = b2_rigidParticleGroup | b2_solidParticleGroup;
 			pd.shape = &shape;
 			pd.color.Set(0, 255, 0, 255);
-			m_world->CreateParticleGroup(pd);
+			m_particleSystem->CreateParticleGroup(pd);
 		}
 
 		{
@@ -97,7 +97,7 @@ public:
 			pd.angularVelocity = 2.0f;
 			pd.shape = &shape;
 			pd.color.Set(0, 0, 255, 255);
-			m_world->CreateParticleGroup(pd);
+			m_particleSystem->CreateParticleGroup(pd);
 		}
 
 		{

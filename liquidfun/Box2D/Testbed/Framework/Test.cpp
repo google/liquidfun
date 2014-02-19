@@ -52,9 +52,11 @@ const uint32 Test::k_ParticleColorsCount =
 
 Test::Test()
 {
+	const b2ParticleSystemDef particleSystemDef;
 	b2Vec2 gravity;
 	gravity.Set(0.0f, -10.0f);
 	m_world = new b2World(gravity);
+	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 	m_bomb = NULL;
 	m_textLine = 30;
 	m_mouseJoint = NULL;
@@ -65,8 +67,8 @@ Test::Test()
 	m_world->SetContactListener(this);
 	m_world->SetDebugDraw(&m_debugDraw);
 
-	m_world->SetParticleGravityScale(0.4f);
-	m_world->SetParticleDensity(1.2f);
+	m_particleSystem->SetParticleGravityScale(0.4f);
+	m_particleSystem->SetParticleDensity(1.2f);
 
 	m_bombSpawning = false;
 
@@ -165,9 +167,10 @@ public:
 class QueryCallback2 : public b2QueryCallback
 {
 public:
-	QueryCallback2(b2World* world, const b2Shape* shape, const b2Vec2& velocity)
+	QueryCallback2(b2ParticleSystem* particleSystem,
+				   const b2Shape* shape, const b2Vec2& velocity)
 	{
-		m_world = world;
+		m_particleSystem = particleSystem;
 		m_shape = shape;
 		m_velocity = velocity;
 	}
@@ -182,16 +185,16 @@ public:
 	{
 		b2Transform xf;
 		xf.SetIdentity();
-		b2Vec2 p = m_world->GetParticlePositionBuffer()[index];
+		b2Vec2 p = m_particleSystem->GetParticlePositionBuffer()[index];
 		if (m_shape->TestPoint(xf, p))
 		{
-			b2Vec2& v = m_world->GetParticleVelocityBuffer()[index];
+			b2Vec2& v = m_particleSystem->GetParticleVelocityBuffer()[index];
 			v = m_velocity;
 		}
 		return true;
 	}
 
-	b2World* m_world;
+	b2ParticleSystem* m_particleSystem;
 	const b2Shape* m_shape;
 	b2Vec2 m_velocity;
 };
@@ -361,7 +364,7 @@ void Test::Step(Settings* settings)
 	m_world->SetWarmStarting(settings->enableWarmStarting > 0);
 	m_world->SetContinuousPhysics(settings->enableContinuous > 0);
 	m_world->SetSubStepping(settings->enableSubStepping > 0);
-	m_world->SetStrictParticleContactCheck(settings->strictContacts > 0);
+	m_particleSystem->SetStrictContactCheck(settings->strictContacts > 0);
 
 	m_pointCount = 0;
 
@@ -387,8 +390,8 @@ void Test::Step(Settings* settings)
 		m_debugDraw.DrawString(5, m_textLine, "bodies/contacts/joints = %d/%d/%d", bodyCount, contactCount, jointCount);
 		m_textLine += DRAW_STRING_NEW_LINE;
 
-		int32 particleCount = m_world->GetParticleCount();
-		int32 groupCount = m_world->GetParticleGroupCount();
+		int32 particleCount = m_particleSystem->GetParticleCount();
+		int32 groupCount = m_particleSystem->GetParticleGroupCount();
 		m_debugDraw.DrawString(5, m_textLine, "particles/groups = %d/%d", particleCount, groupCount);
 		m_textLine += DRAW_STRING_NEW_LINE;
 
@@ -468,7 +471,7 @@ void Test::Step(Settings* settings)
 		b2CircleShape shape;
 		shape.m_p = m_mouseTracerPosition;
 		shape.m_radius = 2 * GetDefaultViewZoom();
-		QueryCallback2 callback(m_world, &shape, m_mouseTracerVelocity);
+		QueryCallback2 callback(m_particleSystem, &shape, m_mouseTracerVelocity);
 		b2AABB aabb;
 		b2Transform xf;
 		xf.SetIdentity();
@@ -563,7 +566,7 @@ void Test::ColorParticleGroup(b2ParticleGroup * const group,
 							  uint32 particlesPerColor)
 {
 	b2Assert(group);
-	b2ParticleColor * const colorBuffer = m_world->GetParticleColorBuffer();
+	b2ParticleColor * const colorBuffer = m_particleSystem->GetParticleColorBuffer();
 	const int32 particleCount = group->GetParticleCount();
 	const int32 groupStart = group->GetBufferIndex();
 	const int32 groupEnd = particleCount + groupStart;

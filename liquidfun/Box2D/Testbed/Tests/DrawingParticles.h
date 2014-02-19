@@ -85,7 +85,7 @@ public:
 		}
 
 		m_colorIndex = 0;
-		m_world->SetParticleRadius(0.05f);
+		m_particleSystem->SetParticleRadius(0.05f);
 		m_lastGroup = NULL;
 		m_drawing = true;
 
@@ -195,7 +195,7 @@ public:
 			b2Transform xf;
 			xf.SetIdentity();
 
-			m_world->DestroyParticlesInShape(shape, xf);
+			m_particleSystem->DestroyParticlesInShape(shape, xf);
 
 			const bool joinGroup =
 				m_lastGroup && m_groupFlags == m_lastGroup->GetGroupFlags();
@@ -208,10 +208,10 @@ public:
 			pd.flags = m_particleFlags;
 			pd.groupFlags = m_groupFlags;
 			pd.color = k_ParticleColors[m_colorIndex];
-			b2ParticleGroup* group = m_world->CreateParticleGroup(pd);
+			b2ParticleGroup* group = m_particleSystem->CreateParticleGroup(pd);
 			if (joinGroup)
 			{
-				m_world->JoinParticleGroups(m_lastGroup, group);
+				m_particleSystem->JoinParticleGroups(m_lastGroup, group);
 			}
 			else
 			{

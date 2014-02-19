@@ -29,7 +29,7 @@ public:
 	// Size is how big of a particle splash to make (in meters)
 	// Speed is the scale of how fast to make the particles shoot out
 	// Lifetime in seconds.
-	ParticleVFX(b2World *world, const b2Vec2 &origin, float32 size,
+	ParticleVFX(b2ParticleSystem *particleSystem, const b2Vec2 &origin, float32 size,
 				float32 speed, float32 lifetime, uint32 particleFlags)
 	{
 
@@ -44,10 +44,10 @@ public:
 		pd.shape = &shape;
 		m_origColor.Set(rand() % 256, rand() % 256, rand() % 256, 255);
 		pd.color = m_origColor;
-		m_world = world;
+		m_particleSystem = particleSystem;
 
 		// Create a circle full of particles
-		m_pg = m_world->CreateParticleGroup(pd);
+		m_pg = m_particleSystem->CreateParticleGroup(pd);
 
 		m_initialLifetime = m_remainingLifetime = lifetime;
 		m_halfLifetime = m_initialLifetime * 0.5f;
@@ -55,8 +55,8 @@ public:
 		// Set particle initial velocity based on how far away it is from
 		// origin, exploding outwards.
 		int32 bufferIndex = m_pg->GetBufferIndex();
-		b2Vec2 *pos = m_world->GetParticlePositionBuffer();
-		b2Vec2 *vel = m_world->GetParticleVelocityBuffer();
+		b2Vec2 *pos = m_particleSystem->GetParticlePositionBuffer();
+		b2Vec2 *vel = m_particleSystem->GetParticleVelocityBuffer();
 		for (int i = bufferIndex; i < bufferIndex + m_pg->GetParticleCount();
 			 i++)
 		{
@@ -67,7 +67,7 @@ public:
 
 	~ParticleVFX()
 	{
-	  m_world->DestroyParticlesInGroup(m_pg, false);
+	  m_particleSystem->DestroyParticlesInGroup(m_pg, false);
 	}
 
 	// Calculates the brightness of the particles.
@@ -91,7 +91,7 @@ public:
           m_remainingLifetime = std::max(m_remainingLifetime - dt, 0.0f);
 			float32 coeff = ColorCoeff();
 
-			b2ParticleColor *colors = m_world->GetParticleColorBuffer();
+			b2ParticleColor *colors = m_particleSystem->GetParticleColorBuffer();
 			int bufferIndex = m_pg->GetBufferIndex();
 
 			// Set particle colors all at once.
@@ -113,7 +113,7 @@ private:
 	float32 m_remainingLifetime;
 	float32 m_halfLifetime;
 	b2ParticleGroup *m_pg;
-	b2World *m_world;
+	b2ParticleSystem *m_particleSystem;
 	b2ParticleColor m_origColor;
 };
 
@@ -134,7 +134,7 @@ public:
 		}
 
 		CreateWalls();
-		m_world->SetParticleRadius(0.1f);
+		m_particleSystem->SetParticleRadius(0.1f);
 
 		// Create a list of circles that will spark.
 		for (int i = 0; i < c_maxCircles; i++)
@@ -213,7 +213,7 @@ public:
 			m_VFX[m_VFXIndex] = NULL;
 		}
 		m_VFX[m_VFXIndex] = new ParticleVFX(
-			m_world, p, RandomFloat(1.0f, 2.0f), RandomFloat(10.0f, 20.0f),
+			m_particleSystem, p, RandomFloat(1.0f, 2.0f), RandomFloat(10.0f, 20.0f),
 			RandomFloat(0.5f, 1.0f), particleFlags);
 		if (++m_VFXIndex >= c_maxVFX)
 		{

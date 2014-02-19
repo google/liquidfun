@@ -40,8 +40,8 @@ public:
 
 		}
 
-		m_world->SetParticleRadius(0.025f);
-		m_world->SetParticleDamping(0.2f);
+		m_particleSystem->SetParticleRadius(0.025f);
+		m_particleSystem->SetParticleDamping(0.2f);
 
 		{
 			b2PolygonShape shape;
@@ -49,7 +49,7 @@ public:
 			b2ParticleGroupDef pd;
 			pd.flags = TestMain::GetParticleParameterValue();
 			pd.shape = &shape;
-			b2ParticleGroup * const group = m_world->CreateParticleGroup(pd);
+			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
 			if (pd.flags & b2_colorMixingParticle)
 			{
 				ColorParticleGroup(group, 0);

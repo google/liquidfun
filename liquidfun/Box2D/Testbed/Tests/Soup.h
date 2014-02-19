@@ -63,14 +63,14 @@ public:
 			}
 		}
 
-		m_world->SetParticleRadius(0.035f);
+		m_particleSystem->SetParticleRadius(0.035f);
 		{
 			b2PolygonShape shape;
 			shape.SetAsBox(2, 1, b2Vec2(0, 1), 0);
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
 			pd.flags = TestMain::GetParticleParameterValue();
-			b2ParticleGroup * const group = m_world->CreateParticleGroup(pd);
+			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
 			if (pd.flags & b2_colorMixingParticle)
 			{
 				ColorParticleGroup(group, 0);
@@ -85,7 +85,7 @@ public:
 			shape.m_p.Set(0, 0.5f);
 			shape.m_radius = 0.1f;
 			body->CreateFixture(&shape, 0.1f);
-			m_world->DestroyParticlesInShape(shape, body->GetTransform());
+			m_particleSystem->DestroyParticlesInShape(shape, body->GetTransform());
 		}
 
 		{
@@ -95,7 +95,7 @@ public:
 			b2PolygonShape shape;
 			shape.SetAsBox(0.1f, 0.1f, b2Vec2(-1, 0.5f), 0);
 			body->CreateFixture(&shape, 0.1f);
-			m_world->DestroyParticlesInShape(shape, body->GetTransform());
+			m_particleSystem->DestroyParticlesInShape(shape, body->GetTransform());
 		}
 
 		{
@@ -105,7 +105,7 @@ public:
 			b2PolygonShape shape;
 			shape.SetAsBox(0.1f, 0.1f, b2Vec2(1, 0.5f), 0.5f);
 			body->CreateFixture(&shape, 0.1f);
-			m_world->DestroyParticlesInShape(shape, body->GetTransform());
+			m_particleSystem->DestroyParticlesInShape(shape, body->GetTransform());
 		}
 
 		{

@@ -42,14 +42,14 @@ public:
 
 		}
 
-		m_world->SetParticleRadius(0.025f);
+		m_particleSystem->SetParticleRadius(0.025f);
 		{
 			b2PolygonShape shape;
 			shape.SetAsBox(2, 0.4f, b2Vec2(0, 3.6f), 0);
 			b2ParticleGroupDef pd;
 			pd.flags = TestMain::GetParticleParameterValue();
 			pd.shape = &shape;
-			b2ParticleGroup * const group = m_world->CreateParticleGroup(pd);
+			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
 			if (pd.flags & b2_colorMixingParticle) {
 				ColorParticleGroup(group, 0);
 			}
