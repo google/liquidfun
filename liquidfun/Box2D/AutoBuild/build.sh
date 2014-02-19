@@ -34,7 +34,7 @@ usage() {
 Generate Makefiles or Xcode project for ${project_name} and build the specified
 configuration.
 
-Usage: ${script_name} [-h] [-n] [-o output_directory] [-v]
+Usage: ${script_name} [-h] [-n] [-o output_directory] [-z archive] [-v]
          [-b build_configuration] [build_configuration]
 
 -h:
@@ -51,6 +51,8 @@ Usage: ${script_name} [-h] [-n] [-o output_directory] [-v]
   If not specified, defaults to \"${build_configs}\".
 -o output_directory:
   Directory to copy build artifacts to.
+-z archive:
+  Create a zip archive of build artifacts.
 -v:
   Display verbose output.
 
@@ -228,9 +230,11 @@ main() {
   local build_configs="debug release"
   local clean=1
   local output_dir=
+  local delete_dirs=
+  local archive=
   local verbose=0
 
-  while getopts 'hndb:o:v' option; do
+  while getopts 'hndb:o:z:v' option; do
     case ${option} in
       h) usage ;;
       n) clean=0 ;;
@@ -238,6 +242,7 @@ main() {
       d) dryrun=echo ;;
       o) mkdir -p "${OPTARG}"
          output_dir="$(cd ${OPTARG} && pwd)";;
+      z) archive="${OPTARG}";;
       v) verbose=1;;
       *) usage ;;
     esac
@@ -247,6 +252,17 @@ main() {
   if [[ $# -gt 0 ]]; then
     build_configs="${1}"
   fi
+
+  # If an archive was specified with no output directory, create a temporary
+  # output directory.
+  if [[ "${archive}" != "" && "${output_dir}" == "" ]]; then
+    archive="$(cd "$(dirname "${archive}")" ; \
+               echo $(pwd)/$(basename "${archive}"))"
+    output_dir=$(mktemp -d XXXXXX)
+    output_dir="$(cd "${output_dir}" && pwd)"
+    delete_dirs="${delete_dirs} ${output_dir}"
+  fi
+
   # Validate the build configuration argument.
   if [[ "$(echo "${build_configs}" | tr ' ' '\n' | \
            grep -vE '(debug|release)')" != "" ]]; then
@@ -278,6 +294,19 @@ main() {
       copy_to_output "${title_case_build_config}" "${base_artifact_dirs}" \
                      "${output_dir}"
     fi
+  done
+
+  # Create the archive of build artifacts.
+  if [[ "${archive}" != "" ]]; then
+    pushd "${output_dir}" >/dev/null
+    rm -f "${archive}"
+    zip -r "${archive}" .
+    popd >/dev/null
+  fi
+
+  # Clean up temporary directories.
+  for delete_dir in ${delete_dirs}; do
+    rm -rf "${delete_dir}"
   done
 }
 

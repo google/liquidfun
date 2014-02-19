@@ -196,7 +196,8 @@ build_native_targets() {
   # possible to restore their timestamps after the build is complete.  This
   # works around a bug in ndk/build/core/setup-app.mk which results in the
   # unconditional execution of the clean-installed-binaries rule.
-  restore_libraries="$(find libs -type f | sed -E 's@^libs/(.*)@\1@')"
+  restore_libraries="$(find libs -type f 2>/dev/null | \
+                       sed -E 's@^libs/(.*)@\1@')"
 
   # Build native code.
   ndkbuild -j$(get_number_of_cores) "$@"
