@@ -65,8 +65,9 @@ public:
 		B2_NOT_USED(fixture);
 		return false;
 	}
-	bool ReportParticle(int32 index)
+	bool ReportParticle(const b2ParticleSystem* particleSystem, int32 index)
 	{
+		B2_NOT_USED(particleSystem);
 		B2_NOT_USED(index);
 		m_count++;
 		return true;
@@ -110,9 +111,11 @@ public:
 		B2_NOT_USED(fraction);
 		return 0;
 	}
-	float32 ReportParticle(int32 index, const b2Vec2& point,
-	                       const b2Vec2& normal, float32 fraction)
+	float32 ReportParticle(const b2ParticleSystem* particleSystem, int32 index,
+						   const b2Vec2& point, const b2Vec2& normal,
+						   float32 fraction)
 	{
+		B2_NOT_USED(particleSystem);
 		B2_NOT_USED(index);
 		B2_NOT_USED(point);
 		B2_NOT_USED(normal);

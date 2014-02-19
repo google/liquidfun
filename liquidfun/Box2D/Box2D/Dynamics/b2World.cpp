@@ -1014,7 +1014,10 @@ void b2World::Step(
 	if (m_stepComplete && step.dt > 0.0f)
 	{
 		b2Timer timer;
-		DEPRECATED_GetUniqueParticleSystem().Solve(step); // Particle Simulation
+		for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+		{
+			p->Solve(step); // Particle Simulation
+		}
 		Solve(step);
 		m_profile.solve = timer.GetMilliseconds();
 	}
@@ -1069,7 +1072,10 @@ void b2World::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const
 	wrapper.broadPhase = &m_contactManager.m_broadPhase;
 	wrapper.callback = callback;
 	m_contactManager.m_broadPhase.Query(&wrapper, aabb);
-	DEPRECATED_GetUniqueParticleSystem().QueryAABB(callback, aabb);
+	for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+	{
+		p->QueryAABB(callback, aabb);
+	}
 }
 
 void b2World::QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
@@ -1115,7 +1121,10 @@ void b2World::RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b
 	input.p1 = point1;
 	input.p2 = point2;
 	m_contactManager.m_broadPhase.RayCast(&wrapper, input);
-	DEPRECATED_GetUniqueParticleSystem().RayCast(callback, point1, point2);
+	for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+	{
+		p->RayCast(callback, point1, point2);
+	}
 }
 
 void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color& color)

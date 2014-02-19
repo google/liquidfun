@@ -181,8 +181,11 @@ public:
 		return false;
 	}
 
-	bool ReportParticle(int32 index)
+	bool ReportParticle(const b2ParticleSystem* particleSystem, int32 index)
 	{
+		if (particleSystem != m_particleSystem)
+			return false;
+
 		b2Transform xf;
 		xf.SetIdentity();
 		b2Vec2 p = m_particleSystem->GetParticlePositionBuffer()[index];
