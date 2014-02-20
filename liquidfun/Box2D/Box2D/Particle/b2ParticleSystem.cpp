@@ -302,12 +302,6 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 	// Don't increase capacity beyond the smallest user-supplied buffer size.
 	capacity = LimitCapacity(capacity, m_maxCount);
 	capacity = LimitCapacity(capacity, m_flagsBuffer.userSuppliedCapacity);
-	capacity = LimitCapacity(capacity,
-			m_lastBodyContactStepBuffer.userSuppliedCapacity);
-	capacity = LimitCapacity(capacity,
-			m_bodyContactCountBuffer.userSuppliedCapacity);
-	capacity = LimitCapacity(capacity,
-			m_consecutiveContactStepsBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_positionBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_velocityBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_colorBuffer.userSuppliedCapacity);
@@ -316,15 +310,19 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 	{
 		m_flagsBuffer.data = ReallocateBuffer(
 			&m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
+
+		// Conditionally defer these as they are optional if the feature is
+		// not enabled.
+		const bool stuck = m_stuckThreshold > 0;
 		m_lastBodyContactStepBuffer.data = ReallocateBuffer(
 			&m_lastBodyContactStepBuffer, m_internalAllocatedCapacity, capacity,
-			false);
+			stuck);
 		m_bodyContactCountBuffer.data = ReallocateBuffer(
 			&m_bodyContactCountBuffer, m_internalAllocatedCapacity, capacity,
-			false);
+			stuck);
 		m_consecutiveContactStepsBuffer.data = ReallocateBuffer(
 			&m_consecutiveContactStepsBuffer, m_internalAllocatedCapacity,
-			capacity, false);
+			capacity, stuck);
 		m_positionBuffer.data = ReallocateBuffer(
 			&m_positionBuffer, m_internalAllocatedCapacity, capacity, false);
 		m_velocityBuffer.data = ReallocateBuffer(
@@ -372,9 +370,18 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	}
 	int32 index = m_count++;
 	m_flagsBuffer.data[index] = 0;
-	m_lastBodyContactStepBuffer.data[index] = 0;
-	m_bodyContactCountBuffer.data[index] = 0;
-	m_consecutiveContactStepsBuffer.data[index] = 0;
+	if (m_lastBodyContactStepBuffer.data)
+	{
+		m_lastBodyContactStepBuffer.data[index] = 0;
+	}
+	if (m_bodyContactCountBuffer.data)
+	{
+		m_bodyContactCountBuffer.data[index] = 0;
+	}
+	if (m_consecutiveContactStepsBuffer.data)
+	{
+		m_consecutiveContactStepsBuffer.data[index] = 0;
+	}
 	m_positionBuffer.data[index] = def.position;
 	m_velocityBuffer.data[index] = def.velocity;
 	m_weightBuffer[index] = 0;
@@ -1052,12 +1059,15 @@ void b2ParticleSystem::UpdateBodyContacts()
 		aabb.lowerBound = b2Min(aabb.lowerBound, p);
 		aabb.upperBound = b2Max(aabb.upperBound, p);
 
-		// Detect stuck particles, see comment in
-		// b2ParticleSystem::DetectStuckParticle()
-		m_bodyContactCountBuffer.data[i] = 0;
-		if (m_timestamp > (m_lastBodyContactStepBuffer.data[i] + 1))
+		if (m_stuckThreshold > 0)
 		{
-			m_consecutiveContactStepsBuffer.data[i] = 0;
+			// Detect stuck particles, see comment in
+			// b2ParticleSystem::DetectStuckParticle()
+			m_bodyContactCountBuffer.data[i] = 0;
+			if (m_timestamp > (m_lastBodyContactStepBuffer.data[i] + 1))
+			{
+				m_consecutiveContactStepsBuffer.data[i] = 0;
+			}
 		}
 	}
 	aabb.lowerBound.x -= m_particleDiameter;
@@ -2080,12 +2090,21 @@ void b2ParticleSystem::SolveZombie()
 			if (i != newCount)
 			{
 				m_flagsBuffer.data[newCount] = m_flagsBuffer.data[i];
-				m_lastBodyContactStepBuffer.data[newCount] =
-					m_lastBodyContactStepBuffer.data[i];
-				m_bodyContactCountBuffer.data[newCount] =
-					m_bodyContactCountBuffer.data[i];
-				m_consecutiveContactStepsBuffer.data[newCount] =
-					m_consecutiveContactStepsBuffer.data[i];
+				if (m_lastBodyContactStepBuffer.data)
+				{
+					m_lastBodyContactStepBuffer.data[newCount] =
+						m_lastBodyContactStepBuffer.data[i];
+				}
+				if (m_bodyContactCountBuffer.data)
+				{
+					m_bodyContactCountBuffer.data[newCount] =
+						m_bodyContactCountBuffer.data[i];
+				}
+				if (m_consecutiveContactStepsBuffer.data)
+				{
+					m_consecutiveContactStepsBuffer.data[newCount] =
+						m_consecutiveContactStepsBuffer.data[i];
+				}
 				m_positionBuffer.data[newCount] = m_positionBuffer.data[i];
 				m_velocityBuffer.data[newCount] = m_velocityBuffer.data[i];
 				m_groupBuffer[newCount] = m_groupBuffer[i];
@@ -2293,15 +2312,24 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 
 	std::rotate(m_flagsBuffer.data + start, m_flagsBuffer.data + mid,
 				m_flagsBuffer.data + end);
-	std::rotate(m_lastBodyContactStepBuffer.data + start,
-				m_lastBodyContactStepBuffer.data + mid,
-				m_lastBodyContactStepBuffer.data + end);
-	std::rotate(m_bodyContactCountBuffer.data + start,
-				m_bodyContactCountBuffer.data + mid,
-				m_bodyContactCountBuffer.data + end);
-	std::rotate(m_consecutiveContactStepsBuffer.data + start,
-				m_consecutiveContactStepsBuffer.data + mid,
-				m_consecutiveContactStepsBuffer.data + end);
+	if (m_lastBodyContactStepBuffer.data)
+	{
+		std::rotate(m_lastBodyContactStepBuffer.data + start,
+					m_lastBodyContactStepBuffer.data + mid,
+					m_lastBodyContactStepBuffer.data + end);
+	}
+	if (m_bodyContactCountBuffer.data)
+	{
+		std::rotate(m_bodyContactCountBuffer.data + start,
+					m_bodyContactCountBuffer.data + mid,
+					m_bodyContactCountBuffer.data + end);
+	}
+	if (m_consecutiveContactStepsBuffer.data)
+	{
+		std::rotate(m_consecutiveContactStepsBuffer.data + start,
+					m_consecutiveContactStepsBuffer.data + mid,
+					m_consecutiveContactStepsBuffer.data + end);
+	}
 	std::rotate(m_positionBuffer.data + start, m_positionBuffer.data + mid,
 				m_positionBuffer.data + end);
 	std::rotate(m_velocityBuffer.data + start, m_velocityBuffer.data + mid,
@@ -2761,4 +2789,14 @@ float32 b2ParticleSystem::ComputeParticleCollisionEnergy() const
 void b2ParticleSystem::SetStuckParticleThreshold(int32 steps)
 {
 	m_stuckThreshold = steps;
+
+	if (steps > 0)
+	{
+		m_lastBodyContactStepBuffer.data = RequestParticleBuffer(
+			m_lastBodyContactStepBuffer.data);
+		m_bodyContactCountBuffer.data = RequestParticleBuffer(
+			m_bodyContactCountBuffer.data);
+		m_consecutiveContactStepsBuffer.data = RequestParticleBuffer(
+			m_consecutiveContactStepsBuffer.data);
+	}
 }
