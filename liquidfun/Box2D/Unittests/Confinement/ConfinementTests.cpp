@@ -35,8 +35,8 @@ class ConfinementTests : public ::testing::Test {
 
 	b2World *m_world;
 	b2Body *m_groundBody;
+	b2ParticleSystem *m_particleSystem;
 	b2ParticleGroup *m_particleGroup;
-
 };
 
 void
@@ -49,16 +49,19 @@ ConfinementTests::SetUp()
 	m_world = new b2World(gravity);
 
 	// Create the ground body
-	b2BodyDef groundBodyDef;
+	const b2BodyDef groundBodyDef;
 	m_groundBody = m_world->CreateBody(&groundBodyDef);
+
+	// Create the particle system
+	const b2ParticleSystemDef particleSystemDef;
+	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 
 	// Create particles
 	b2ParticleGroupDef particleDef;
 	b2PolygonShape particleShape;
 	particleShape.SetAsBox(WIDTH, HEIGHT);
 	particleDef.shape = &particleShape;
-	m_particleGroup = m_world->CreateParticleGroup(particleDef);
-
+	m_particleGroup = m_particleSystem->CreateParticleGroup(particleDef);
 }
 
 void
@@ -75,7 +78,7 @@ ConfinementTests::TestLeakCount()
 	}
 	int32 bufferIndex = m_particleGroup->GetBufferIndex();
 	int32 particleCount = m_particleGroup->GetParticleCount();
-	const b2Vec2 *positionBuffer = m_world->GetParticlePositionBuffer();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetParticlePositionBuffer();
 	int32 leakCount = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		b2Vec2 p = positionBuffer[bufferIndex + i];
@@ -87,7 +90,7 @@ ConfinementTests::TestLeakCount()
 }
 
 TEST_F(ConfinementTests, NoShapes) {
-	ASSERT_EQ(TestLeakCount(), m_world->GetParticleCount());
+	ASSERT_EQ(TestLeakCount(), m_particleSystem->GetParticleCount());
 }
 
 TEST_F(ConfinementTests, PolygonShapes) {
@@ -161,7 +164,7 @@ TEST_F(ConfinementTests, WallParticle) {
 		b2Vec2(-WIDTH, HEIGHT)};
 	shape.CreateLoop(vertices, 4);
 	particleDef.shape = &shape;
-	m_world->CreateParticleGroup(particleDef);
+	m_particleSystem->CreateParticleGroup(particleDef);
 	ASSERT_EQ(TestLeakCount(), m_particleGroup->GetParticleCount());
 }
 
@@ -176,7 +179,7 @@ TEST_F(ConfinementTests, BarrierWallParticle) {
 		b2Vec2(-WIDTH, HEIGHT)};
 	shape.CreateLoop(vertices, 4);
 	particleDef.shape = &shape;
-	m_world->CreateParticleGroup(particleDef);
+	m_particleSystem->CreateParticleGroup(particleDef);
 	ASSERT_EQ(TestLeakCount(), 0);
 }
 

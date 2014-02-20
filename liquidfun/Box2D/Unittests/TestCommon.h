@@ -21,26 +21,30 @@
 #define EPSILON 0.001f
 
 // Create a 10x10 box shaped particle group.
-b2ParticleGroup* CreateBoxShapedParticleGroup(b2World * const world)
+b2ParticleGroup* CreateBoxShapedParticleGroup(
+	b2ParticleSystem *const particleSystem)
 {
-	assert(world);
+	assert(particleSystem);
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	return world->CreateParticleGroup(def);
+	return particleSystem->CreateParticleGroup(def);
 }
 
 // Create and destroy a particle, returning an index to the particle that
 // was destroyed.
-int32 CreateAndDestroyParticle(b2World *const world, uint32 additionalFlags,
-                               bool callDestructionListener)
+int32 CreateAndDestroyParticle(
+	b2World *const world,
+	b2ParticleSystem *const particleSystem,
+	uint32 additionalFlags,
+    bool callDestructionListener)
 {
-	assert(world);
+	assert(particleSystem);
 	b2ParticleDef def;
 	def.flags |= additionalFlags;
-	int32 index = world->CreateParticle(def);
-	world->DestroyParticle(index, callDestructionListener);
+	int32 index = particleSystem->CreateParticle(def);
+	particleSystem->DestroyParticle(index, callDestructionListener);
 	world->Step(0.001f, 1, 1);
 	return index;
 }

@@ -26,8 +26,8 @@ protected:
 	void drop();
 
 	b2World *m_world;
-	b2ParticleSystem *m_system;
 	b2Body *m_body;
+	b2ParticleSystem *m_particleSystem;
 
 	// total contacts per run of drop()
 	int32 m_contacts;
@@ -85,16 +85,17 @@ BodyContactTests::SetUp()
 		shape.Set(vertices2, 3);
 		m_body->CreateFixture(&shape, 0.0f);
 	}
-	m_system = m_world->GetParticleSystemList();
-	m_system->SetParticleRadius(1.0f);
+
+	const b2ParticleSystemDef particleSystemDef;
+	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 }
 void
 BodyContactTests::TearDown()
 {
 	// Reset these between tests so no one forgets to when we add more
 	// tests to this file.
-	m_system->SetStrictContactCheck(false);
-	m_system->SetStuckParticleThreshold(0);
+	m_particleSystem->SetStrictContactCheck(false);
+	m_particleSystem->SetStuckParticleThreshold(0);
 }
 
 void BodyContactTests::drop()
@@ -105,10 +106,10 @@ void BodyContactTests::drop()
 	m_contacts = 0;
 	m_stuck = 0;
 
-	int32 count = m_system->GetParticleCount();
+	int32 count = m_particleSystem->GetParticleCount();
 	for (i = 0; i < count; ++i)
 	{
-		m_system->DestroyParticle(i);
+		m_particleSystem->DestroyParticle(i);
 	}
 
 	const float32 timeStep = 1.0f / 60.0f;
@@ -122,30 +123,30 @@ void BodyContactTests::drop()
 	b2ParticleDef pd;
 	pd.position.Set(0.0, 33.0);
 	pd.velocity.Set(0.0, -1.0);
-	m_system->CreateParticle(pd);
+	m_particleSystem->CreateParticle(pd);
 
 	for (i = 0; i < timeout; ++i)
 	{
 		m_world->Step(timeStep, velocityIterations, positionIterations);
-		m_contacts += m_system->GetParticleBodyContactCount();
-		int32 stuck = m_system->GetStuckParticleCandidateCount();
+		m_contacts += m_particleSystem->GetParticleBodyContactCount();
+		int32 stuck = m_particleSystem->GetStuckParticleCandidateCount();
 		if (stuck)
 		{
 			m_stuck += stuck;
 			// should always be particle 0
-			EXPECT_EQ(*(m_system->GetStuckParticleCandidates()), 0);
+			EXPECT_EQ(*(m_particleSystem->GetStuckParticleCandidates()), 0);
 		}
 	}
 }
 
 TEST_F(BodyContactTests, ParticleDrop) {
 
-	m_system->SetStrictContactCheck(false);
+	m_particleSystem->SetStrictContactCheck(false);
 
 	drop();
 	EXPECT_GT(m_contacts, 0) << "No contacts within timeout";
 	int32 contacts = m_contacts;
-	m_system->SetStrictContactCheck(true);
+	m_particleSystem->SetStrictContactCheck(true);
 
 	drop();
 	EXPECT_GT(m_contacts, 0) << "No strict contacts within timeout";
@@ -160,7 +161,7 @@ TEST_F(BodyContactTests, Stuck) {
 
 	for (int32 i = 1; i < 256; i *= 2)
 	{
-		m_system->SetStuckParticleThreshold(i);
+		m_particleSystem->SetStuckParticleThreshold(i);
 		drop();
 		EXPECT_GT(m_stuck, 0) << "No stuck particles detected";
 		EXPECT_GT(stuck, m_stuck) << "Fewer stuck particle reports expected";
