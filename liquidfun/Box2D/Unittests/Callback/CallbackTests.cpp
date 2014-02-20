@@ -130,9 +130,9 @@ public:
 TEST_F(CallbackTests, RayCastCallback) {
 	RayCastCallback callback;
 	CreateBoxShapedParticleGroup(m_particleSystem);
-	m_particleSystem->RayCast(&callback, b2Vec2(21, 0), b2Vec2(0, 21));
+	m_world->RayCast(&callback, b2Vec2(21, 0), b2Vec2(0, 21));
 	EXPECT_EQ(callback.m_count, 0);
-	m_particleSystem->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	m_world->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
 	EXPECT_NE(callback.m_count, 0);
 }
 
@@ -163,11 +163,11 @@ public:
 // the b2_destructionListener flag is not set.
 TEST_F(CallbackTests, DestroyParticleWithNoCallback) {
 	DestructionListener listener;
-	m_particleSystem->SetDestructionListener(&listener);
+	m_world->SetDestructionListener(&listener);
 
 	b2ParticleDef def;
 	m_particleSystem->DestroyParticle(m_particleSystem->CreateParticle(def));
-	m_particleSystem->Step(0.001f, 1, 1);
+	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 
 	CreateAndDestroyParticle(m_world, m_particleSystem, 0, false);
@@ -179,13 +179,13 @@ TEST_F(CallbackTests, DestroyParticleWithNoCallback) {
 TEST_F(CallbackTests, DestroyParticleWithCallback) {
 	int32 index;
 	DestructionListener listenerNoFlags;
-	m_particleSystem->SetDestructionListener(&listenerNoFlags);
+	m_world->SetDestructionListener(&listenerNoFlags);
 	index = CreateAndDestroyParticle(m_world, m_particleSystem, 0, true);
 	EXPECT_EQ(listenerNoFlags.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listenerNoFlags.m_destroyedParticles[0], index);
 
 	DestructionListener listenerFlag;
-	m_particleSystem->SetDestructionListener(&listenerFlag);
+	m_world->SetDestructionListener(&listenerFlag);
 	index = CreateAndDestroyParticle(m_world, m_particleSystem, b2_destructionListener, false);
 	EXPECT_EQ(listenerFlag.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listenerFlag.m_destroyedParticles[0], index);
@@ -199,18 +199,18 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithNoCallback) {
 	b2Transform xf;
 	xf.SetIdentity();
 	DestructionListener listener;
-	m_particleSystem->SetDestructionListener(&listener);
+	m_world->SetDestructionListener(&listener);
 
 	int32 destroyed;
 	b2ParticleDef def;
 	m_particleSystem->CreateParticle(def);
-	m_particleSystem->Step(0.001f, 1, 1);
+	m_world->Step(0.001f, 1, 1);
 	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 
 	m_particleSystem->CreateParticle(def);
-	m_particleSystem->Step(0.001f, 1, 1);
+	m_world->Step(0.001f, 1, 1);
 	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf, false);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
@@ -224,16 +224,16 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithCallback) {
 	b2Transform xf;
 	xf.SetIdentity();
 	DestructionListener listener;
-	m_particleSystem->SetDestructionListener(&listener);
+	m_world->SetDestructionListener(&listener);
 
 	int32 destroyed;
 	b2ParticleDef def;
 	int32 index = m_particleSystem->CreateParticle(def);
-	m_particleSystem->Step(0.001f, 1, 1);
+	m_world->Step(0.001f, 1, 1);
 	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf, true);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
-	m_particleSystem->Step(0.001f, 1, 1);
+	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listener.m_destroyedParticles[0], index);
 }
@@ -242,11 +242,11 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithCallback) {
 // destroyed.
 TEST_F(CallbackTests, DestroyParticleGroupWithCallback) {
 	DestructionListener listener;
-	m_particleSystem->SetDestructionListener(&listener);
+	m_world->SetDestructionListener(&listener);
 	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_particleSystem);
 	m_particleSystem->DestroyParticlesInGroup(group);
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 0U);
-	m_particleSystem->Step(0.001f, 1, 1);
+	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 1U);
 	EXPECT_EQ(listener.m_destroyedParticleGroups[0], group);
 }
