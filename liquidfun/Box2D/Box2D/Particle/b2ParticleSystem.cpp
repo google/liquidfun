@@ -647,9 +647,8 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 			const b2ParticleContact& contact = m_contactBuffer[k];
 			int32 a = contact.indexA;
 			int32 b = contact.indexB;
-			if (a > b) b2Swap(a, b);
-			if ((groupA->ContainsParticle(a) || groupB->ContainsParticle(b)) &&
-				(groupA->ContainsParticle(b) || groupB->ContainsParticle(a)))
+			if ((groupA->ContainsParticle(a) && groupB->ContainsParticle(b)) ||
+				(groupA->ContainsParticle(b) && groupB->ContainsParticle(a)))
 			{
 				if (m_pairCount >= m_pairCapacity)
 				{
@@ -696,10 +695,17 @@ void b2ParticleSystem::UpdateTriadsCallback::operator()(int32 a, int32 b,
 															  int32 c) const
 {
 	// Create a triad if it will contain particles from both groups.
-	if ((groupA->ContainsParticle(a) || groupA->ContainsParticle(b) ||
-		groupA->ContainsParticle(c))  &&
-		(groupB->ContainsParticle(a) || groupB->ContainsParticle(b)  ||
-		groupB->ContainsParticle(c)))
+	bool groupAContainsA = groupA->ContainsParticle(a);
+	bool groupAContainsB = groupA->ContainsParticle(b);
+	bool groupAContainsC = groupA->ContainsParticle(c);
+	bool groupBContainsA = groupB->ContainsParticle(a);
+	bool groupBContainsB = groupB->ContainsParticle(b);
+	bool groupBContainsC = groupB->ContainsParticle(c);
+	if ((groupAContainsA || groupBContainsA) &&
+		(groupAContainsB || groupBContainsB) &&
+		(groupAContainsC || groupBContainsC) &&
+		(groupAContainsA || groupAContainsB || groupAContainsC) &&
+		(groupBContainsA || groupBContainsB || groupBContainsC))
 	{
 		uint32 af = system->m_flagsBuffer.data[a];
 		uint32 bf = system->m_flagsBuffer.data[b];
