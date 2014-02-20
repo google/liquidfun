@@ -35,6 +35,12 @@ rem Enable dry run mode by setting this to "echo"
 set dryrun=
 rem Output directory for build artifacts.
 set output_dir=
+rem Output archive file.
+set output_archive=
+rem Location of the zip executable.
+set zip=
+rem Space separated list of directories to delete after the script is complete.
+set delete_dirs=
 rem Default build ABIs
 set build_abi=all
 rem List of projects to build relative to the root dir
@@ -51,7 +57,8 @@ goto display_help_end
   echo Build all %project_name% libraries and applications.
   echo.
   echo Usage: %~nx0 [-n] [-d] [-h] [-a abi] [-b build_configurations]
-  echo          [-p projects] [-o output_dir] [build_configurations]
+  echo          [-p projects] [-o output_dir] [-z archive]
+  echo          [build_configurations]
   echo.
   echo -n: Builds the solution without cleaning first.
   echo.
@@ -66,6 +73,9 @@ goto display_help_end
   echo -p projects: Space separated list of projects to build.
   echo.
   echo -o output_dir: Output directory to copy build artifacts to.
+  echo.
+  echo -z archive: Create a zip archive of build artifacts.  This will
+  echo implicitly create a temporary output directory.
   echo.
   echo -h: Display this help message.
   echo.
@@ -99,6 +109,22 @@ goto set_create_output_dir_end
   cd %current_dir%
   goto:eof
 :set_create_output_dir_end
+
+rem Set the output archive filename.
+goto set_output_archive_end
+:set_output_archive
+  if "%1"=="" goto:eof
+  for /F "delims=;" %%a in ('where zip') do set zip=%%a
+  if "%zip%"=="" (
+    echo Unable to find "zip" executable, ignoring output archive %1
+    goto:eof
+  )
+  set current_dir=%cd%
+  cd %execution_dir%
+  for /F %%a in ("%1") do set output_archive=%%~fa
+  cd %current_dir%
+  goto:eof
+:set_output_archive_end
 
 rem Set the build configuration to %1 or fallback to the default set if %1 is
 rem an empty string.
@@ -202,6 +228,10 @@ rem Parse switches.
     call :set_create_output_dir %1
     shift
   )
+  if "%current_arg%"=="-z" (
+    call :set_output_archive %1
+    shift
+  )
   if "%current_arg%"=="-p" (
     call :set_projects %1 1
     shift
@@ -227,6 +257,14 @@ for %%a in (%ndk_build_path% ^
 echo Unable to find ndk-build.cmd. >&2
 exit /B 1
 :ndk_build_set
+
+rem If a zip archive is being created and an output directory isn't specified
+rem use a temporary directory and mark it for deletion.
+if "%output_archive%"=="" goto prepare_archive_end
+if not "%output_dir%"=="" goto prepare_archive_end
+call :set_create_output_dir %temp%\%random%
+set delete_dirs=%delete_dirs% %output_dir%
+:prepare_archive_end
 
 rem If no projects were specified, find all projects in the tree.
 if "%projects%"=="" call :find_projects
@@ -270,6 +308,21 @@ for %%a in (%build_configuration%) do (
        %dryrun% xcopy /Q /K /Y /S libs !artifact_dir!
     )
   )
+)
+
+
+rem Create a zip archive.
+if "%output_archive%"=="" goto archive_end
+set current_dir=%cd%
+cd %output_dir%
+if exist "%output_archive%" del /q "%output_archive%"
+%zip% -r "%output_archive%" .
+cd %current_dir%
+:archive_end
+
+rem Clean up any directories that need to be deleted.
+for %%a in (%delete_dirs%) do (
+  rmdir %%a /S /Q >NUL
 )
 
 rem Display the list of failed builds.

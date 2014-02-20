@@ -29,8 +29,8 @@ usage() {
   echo "\
 Build all ${project_name} libraries and applications for Android.
 
-Usage: ${script_name} [-h] [-n] [-a abi] -o output_directory] [-v]
-         [-p projects] [-b build_configuration] [build_configuration]
+Usage: ${script_name} [-h] [-n] [-a abi] [-o output_directory] [-z archive]
+         [-v] [-p projects] [-b build_configuration] [build_configuration]
 
 -h:
   Display this help message.
@@ -48,6 +48,8 @@ Usage: ${script_name} [-h] [-n] [-a abi] -o output_directory] [-v]
   If not specified, defaults to \"${build_configs}\".
 -o output_directory:
   Directory to copy build artifacts to.
+-z archive:
+  Create a zip archive of build artifacts.
 -p projects:
   Whitespace separated list of projects to build.
 -v:
@@ -87,10 +89,12 @@ main() {
   local build_abi="all"
   local clean=1
   local output_dir=
+  local archive=
+  local delete_dirs=
   local verbose=0
   local projects_to_build=
 
-  while getopts 'hnda:b:o:vp:' option; do
+  while getopts 'hnda:b:o:z:vp:' option; do
     case ${option} in
       h) usage ;;
       n) clean=0 ;;
@@ -99,6 +103,7 @@ main() {
       d) dryrun=echo ;;
       o) mkdir -p "${OPTARG}"
          output_dir="$(cd ${OPTARG} && pwd)";;
+      z) archive="${OPTARG}";;
       v) verbose=1;;
       p) projects_to_build="${OPTARG}" ;;
       *) usage ;;
@@ -114,6 +119,16 @@ main() {
            grep -vE '(debug|release)')" != "" ]]; then
     echo "Invalid build config ${build_configs}" >&2
     exit 1
+  fi
+
+  # If an archive was specified with no output directory, create a temporary
+  # output directory.
+  if [[ "${archive}" != "" && "${output_dir}" == "" ]]; then
+    archive="$(cd "$(dirname "${archive}")" ; \
+               echo $(pwd)/$(basename "${archive}"))"
+    output_dir=$(mktemp -d XXXXXX)
+    output_dir="$(cd "${output_dir}" && pwd)"
+    delete_dirs="${delete_dirs} ${output_dir}"
   fi
 
   if [[ "${projects_to_build}" == "" ]]; then
@@ -201,6 +216,20 @@ main() {
       exit ${build_failed}
     ) || any_builds_failed=1
   done
+
+  # Create the archive of build artifacts.
+  if [[ "${archive}" != "" ]]; then
+    pushd "${output_dir}" >/dev/null
+    rm -f "${archive}"
+    zip -r "${archive}" .
+    popd >/dev/null
+  fi
+
+  # Clean up temporary directories.
+  for delete_dir in ${delete_dirs}; do
+    rm -rf "${delete_dir}"
+  done
+
   exit ${any_builds_failed}
 }
 
