@@ -18,6 +18,7 @@
 #ifndef B2_PARTICLE_SYSTEM_H
 #define B2_PARTICLE_SYSTEM_H
 
+#include <Box2D/Common/b2SlabAllocator.h>
 #include <Box2D/Particle/b2Particle.h>
 #include <Box2D/Dynamics/b2TimeStep.h>
 
@@ -169,6 +170,9 @@ public:
 	/// @warning This function is locked during callbacks.
 	/// @return the index of the particle.
 	int32 CreateParticle(const b2ParticleDef& def);
+
+	/// Retrieve a handle to the particle at the specified index.
+	const b2ParticleHandle* GetParticleHandleFromIndex(const int32 index);
 
 	/// Destroy a particle.
 	/// The particle is removed after the next simulation step (see
@@ -543,6 +547,10 @@ private:
 	template <typename T> T* RequestGrowableBuffer(T* buffer,
 												int32 count, int32 *capacity);
 
+	/// Reallocate the handle / index map and schedule the allocation of a new
+	/// pool for handle allocation.
+	void ReallocateHandleBuffers(int32 newCapacity);
+
 	void ReallocateInternalAllocatedBuffers(int32 capacity);
 	int32 CreateParticleForGroup(
 		const b2ParticleGroupDef& groupDef,
@@ -625,6 +633,10 @@ private:
 	int32 m_count;
 	int32 m_internalAllocatedCapacity;
 	int32 m_maxCount;
+	/// Allocator for b2ParticleHandle instances.
+	b2SlabAllocator<b2ParticleHandle> m_handleAllocator;
+	/// Maps particle indicies to  handles.
+	ParticleBuffer<b2ParticleHandle*> m_handleIndexBuffer;
 	ParticleBuffer<uint32> m_flagsBuffer;
 	ParticleBuffer<b2Vec2> m_positionBuffer;
 	ParticleBuffer<b2Vec2> m_velocityBuffer;

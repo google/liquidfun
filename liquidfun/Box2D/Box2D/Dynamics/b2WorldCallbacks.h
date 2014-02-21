@@ -57,8 +57,9 @@ public:
 
 	/// Called when a particle is about to be destroyed.
 	/// The index can be used in conjunction with
-	/// b2World::GetParticleUserDataBuffer() to determine which particle has
-	/// been destroyed.
+	/// b2ParticleSystem::GetParticleUserDataBuffer() or
+	/// b2ParticleSystem::GetParticleHandleFromIndex() to determine which
+	/// particle has been destroyed.
 	virtual void SayGoodbye(int32 index)
 	{
 		B2_NOT_USED(index);

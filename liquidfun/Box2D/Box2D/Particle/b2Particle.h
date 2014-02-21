@@ -20,6 +20,7 @@
 
 #include <Box2D/Common/b2Math.h>
 #include <Box2D/Common/b2Settings.h>
+#include <Box2D/Common/b2IntrusiveList.h>
 
 struct b2Color;
 class b2ParticleGroup;
@@ -287,5 +288,32 @@ struct b2ParticleDef
 /// A helper function to calculate the optimal number of iterations.
 int32 b2CalculateParticleIterations(
 	float32 gravity, float32 radius, float32 timeStep);
+
+/// Handle to a particle.
+/// Use #b2ParticleSystem::GetParticleHandleFromIndex() to retrieve the
+/// b2ParticleHandle of a particle from the particle system.
+class b2ParticleHandle : public b2TypedIntrusiveListNode<b2ParticleHandle>
+{
+	// Allow b2ParticleSystem to use SetIndex() to associate particle handles
+	// with particle indices.
+	friend class b2ParticleSystem;
+
+public:
+	/// Initialize the index associated with the handle to an invalid index.
+	b2ParticleHandle() : m_index(b2_invalidParticleIndex) { }
+	/// Empty destructor.
+	~b2ParticleHandle() { }
+
+	/// Get the index of the particle associated with this handle.
+	int32 GetIndex() const { return m_index; }
+
+private:
+	/// Set the index of the particle associated with this handle.
+	void SetIndex(int32 index) { m_index = index; }
+
+private:
+	// Index of the particle within the particle system.
+	int32 m_index;
+};
 
 #endif
