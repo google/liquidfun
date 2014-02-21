@@ -28,6 +28,7 @@ class b2Fixture;
 class b2Body;
 class b2Joint;
 class b2Contact;
+class b2ParticleSystem;
 struct b2ContactResult;
 struct b2Manifold;
 class b2ParticleGroup;
@@ -148,8 +149,10 @@ public:
 
 	/// Called for each particle found in the query AABB.
 	/// @return false to terminate the query.
-	virtual bool ReportParticle(int32 index)
+	virtual bool ReportParticle(const b2ParticleSystem* particleSystem,
+								int32 index)
 	{
+		B2_NOT_USED(particleSystem);
 		B2_NOT_USED(index);
 		return false;
 	}
@@ -177,9 +180,11 @@ public:
 									const b2Vec2& normal, float32 fraction) = 0;
 
 	/// Called for each particle found in the query.
-	virtual float32 ReportParticle(	int32 index, const b2Vec2& point,
+	virtual float32 ReportParticle(	const b2ParticleSystem* particleSystem,
+									int32 index, const b2Vec2& point,
 									const b2Vec2& normal, float32 fraction)
 	{
+		B2_NOT_USED(particleSystem);
 		B2_NOT_USED(index);
 		B2_NOT_USED(&point);
 		B2_NOT_USED(&normal);

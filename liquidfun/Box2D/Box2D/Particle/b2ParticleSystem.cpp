@@ -446,8 +446,11 @@ int32 b2ParticleSystem::DestroyParticlesInShape(
 			return false;
 		}
 
-		bool ReportParticle(int32 index)
+		bool ReportParticle(const b2ParticleSystem* particleSystem, int32 index)
 		{
+			if (particleSystem != m_system)
+				return false;
+
 			b2Assert(index >=0 && index < m_system->m_count);
 			if (m_shape->TestPoint(m_xf,
 								   m_system->m_positionBuffer.data[index]))
@@ -2660,7 +2663,7 @@ void b2ParticleSystem::QueryAABB(b2QueryCallback* callback,
 		if (aabb.lowerBound.x < p.x && p.x < aabb.upperBound.x &&
 			aabb.lowerBound.y < p.y && p.y < aabb.upperBound.y)
 		{
-			if (!callback->ReportParticle(i))
+			if (!callback->ReportParticle(this, i))
 			{
 				break;
 			}
@@ -2729,7 +2732,7 @@ void b2ParticleSystem::RayCast(b2RayCastCallback* callback,
 			}
 			b2Vec2 n = p + t * v;
 			n.Normalize();
-			float32 f = callback->ReportParticle(i, point1 + t * v, n, t);
+			float32 f = callback->ReportParticle(this, i, point1 + t * v, n, t);
 			fraction = b2Min(fraction, f);
 			if (fraction <= 0)
 			{
