@@ -41,15 +41,24 @@ const char *b2_liquidFunVersionString =
 	LIQUIDFUN_STRING(LIQUIDFUN_VERSION_MINOR) "."
 	LIQUIDFUN_STRING(LIQUIDFUN_VERSION_REVISION);
 
+static int32 numAllocs = 0;
+
 // Memory allocators. Modify these to use your own allocator.
 void* b2Alloc(int32 size)
 {
+	numAllocs++;
 	return malloc(size);
 }
 
 void b2Free(void* mem)
 {
+	numAllocs--;
 	free(mem);
+}
+
+int32 b2GetNumAllocs()
+{
+	return numAllocs;
 }
 
 // You can modify this to use your logging facility.

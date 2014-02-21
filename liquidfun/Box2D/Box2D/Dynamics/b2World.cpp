@@ -97,6 +97,10 @@ b2World::~b2World()
 	{
 		DestroyParticleSystem(m_particleSystemList);
 	}
+
+	// Even though the block allocator frees them for us, for safety,
+	// we should ensure that all buffers have been freed.
+	b2Assert(m_blockAllocator.GetNumGiantAllocations() == 0);
 }
 
 void b2World::SetDestructionListener(b2DestructionListener* listener)

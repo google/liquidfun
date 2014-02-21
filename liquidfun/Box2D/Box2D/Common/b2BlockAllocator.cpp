@@ -22,8 +22,9 @@
 #include <memory.h>
 #include <stddef.h>
 #include <string.h>
+#include <new> // For placement new
 
-int32 b2BlockAllocator::s_blockSizes[b2_blockSizes] = 
+int32 b2BlockAllocator::s_blockSizes[b2_blockSizes] =
 {
 	16,		// 0
 	32,		// 1
@@ -54,6 +55,20 @@ struct b2Block
 	b2Block* next;
 };
 
+class b2GiantNode
+{
+public:
+	b2GiantNode() {
+		b2Assert(sizeof(*this) == b2_mallocAlignment);
+	}
+
+	B2_INTRUSIVE_LIST_GET_NODE(b2GiantNode, m_node);
+	B2_INTRUSIVE_LIST_NODE_GET_CLASS(b2GiantNode, m_node);
+private:
+	b2IntrusiveListNode m_node;
+	char padding[b2_mallocAlignment - sizeof(m_node)];
+};
+
 b2BlockAllocator::b2BlockAllocator()
 {
 	b2Assert((uint32)b2_blockSizes < UCHAR_MAX);
@@ -61,7 +76,7 @@ b2BlockAllocator::b2BlockAllocator()
 	m_chunkSpace = b2_chunkArrayIncrement;
 	m_chunkCount = 0;
 	m_chunks = (b2Chunk*)b2Alloc(m_chunkSpace * sizeof(b2Chunk));
-	
+
 	memset(m_chunks, 0, m_chunkSpace * sizeof(b2Chunk));
 	memset(m_freeLists, 0, sizeof(m_freeLists));
 
@@ -94,6 +109,38 @@ b2BlockAllocator::~b2BlockAllocator()
 	}
 
 	b2Free(m_chunks);
+
+	for (b2IntrusiveListNode* n = m_giants.GetNext();
+		 n != m_giants.GetTerminator(); n = n->GetNext()) {
+		b2GiantNode* giantNode = b2GiantNode::GetInstanceFromNode(n);
+		giantNode->~b2GiantNode();
+		b2Free(giantNode);
+	}
+}
+
+int32 b2BlockAllocator::GetNumGiantAllocations() const
+{
+	return m_giants.GetLength();
+}
+
+void* b2BlockAllocator::AllocateGiant(int32 size)
+{
+	// Allocate a little extra at the beginning to hold the b2GiantNode header
+	void* nMem = (b2GiantNode*)b2Alloc(sizeof(b2GiantNode) + size);
+	b2GiantNode* n = new(nMem) b2GiantNode; // Placement new
+	m_giants.InsertBefore(n->GetListNode());
+
+	// Return a pointer to the memory immediately after the b2GiantNode header
+	void* mem = n + 1;
+	return mem;
+}
+
+void b2BlockAllocator::FreeGiant(void* mem)
+{
+	// The header comes before the memory that was returned
+	b2GiantNode* n = (b2GiantNode*)mem - 1;
+	n->~b2GiantNode(); // Destructor removes node from list
+	b2Free(n);
 }
 
 void* b2BlockAllocator::Allocate(int32 size)
@@ -105,7 +152,7 @@ void* b2BlockAllocator::Allocate(int32 size)
 
 	if (size > b2_maxBlockSize)
 	{
-		return b2Alloc(size);
+		return AllocateGiant(size);
 	}
 
 	int32 index = s_blockSizeLookup[size];
@@ -165,7 +212,7 @@ void b2BlockAllocator::Free(void* p, int32 size)
 
 	if (size > b2_maxBlockSize)
 	{
-		b2Free(p);
+		FreeGiant(p);
 		return;
 	}
 
