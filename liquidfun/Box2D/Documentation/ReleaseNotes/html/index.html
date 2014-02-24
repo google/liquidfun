@@ -52,7 +52,9 @@
 <ul>
 <li>Added option to substep particle simulation independently of <code>b2World</code>.</li>
 <li>Added barrier particles which can be used to prevent particle tunneling due to large particle velocities or simulation steps.</li>
+<li>Added option to enable a more strict check for Particle/Body interactions in cases where complex world geometry may cause false positive contacts.</li>
 <li>Added "Sparky" and "Sandbox" tests to the Testbed example to demonstrate particle and rigid body interaction.</li>
+<li>Added "Ramp", "Pointy", and "AntiPointy" tests to the Testbed example to illustrate the difference with strict contact checking.</li>
 </ul>
 <h4>API Modifications</h4>
 <ul>
@@ -63,6 +65,9 @@
 <li><p class="startli">Building LiquidFun on Linux, using <code>cmake -G"Unix Makefiles"</code>, now places output files in a build type sub-directory.</p>
 <p class="startli">For example, the output executable of the Testbed example is now written to Box2D/Testbed/Release/Testbed when building using the Release configuration.</p>
 </li>
+<li>Multiple independent particle systems can now exist, each with their own physical co-efficients. Previously, only one particle system existed, and it always existed. Particle systems are created with b2World::CreateParticleSystem, and destroyed with b2World::DestroyParticleSystem.</li>
+<li>The particle system API has been moved from b2World to b2ParticleSystem. For example, b2World::DestroyParticlesInShape is now called via b2ParticleSystem::DestroyParticlesInShape. References to b2ParticleSystem can be acquired with b2World::CreateParticleSystem or b2World::GetParticleSystemList().</li>
+<li>b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle now take a b2ParticleSystem pointer as their first parameter. This is necessary since multiple particle systems can now exist.</li>
 </ul>
 <h4>Other Changes</h4>
 <ul>
@@ -71,7 +76,7 @@
 <li>Fixed <code>b2Timer</code> bug that occurs when the usec component wraps.</li>
 <li>Added <code>b2Stat</code> to calculate min/max/mean of a set of samples, and integrated this functionality into Testbed to measure performance.</li>
 <li>Added operators to <code>b2ParticleColor</code>.</li>
-<li>Improved parameter selection in Testbed with the fullscreen UI.</li>
+<li>Improved parameter and option selection in Testbed with the fullscreen UI.</li>
 <li>Cleaned up statistics display in Testbed.</li>
 <li>Added build step to unit-test execution scripts.</li>
 <li>Added generation of code coverage report for unit-tests.</li>

@@ -206,12 +206,23 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
  Set viscous behavior using the statement</p>
 <p>&#160;&#160;&#160;<code>pd.flags = b2_viscousParticle;</code></p>
 <p>The "Liquid Timer" demo of the Testbed application uses viscous particles.</p>
+<h3>Static Pressure</h3>
+<p>Particles are subject to compression when pressure acts upon them. For example, when particles pour into a container, the ones at the bottom of the container are "crushed" under the weight of those above them and packed more tightly together than the ones at the top of the pile.</p>
+<p>The static-pressure particle eliminates this differential; the same amount of pressure acts upon each particle in the group.</p>
+<p>The following example sets static-pressure behavior.</p>
+<p>&#160;&#160;&#160;<code>pd.flags = b2_staticPressureParticle;</code></p>
 <h3>Wall</h3>
 <p>Wall particles are static. They are permanently stationary, even if something collides with them. <br/>
  Set wall behavior using the statement</p>
 <p>&#160;&#160;&#160;<code>pd.flags = b2_wallParticle;</code></p>
-<h3>Zombie Particles</h3>
-<p>Zombie particles are useful when you want efficiently to destroy multiple particles in a single step. All of the particles that you designate as zombies are destroyed at the same time, in a single iteration of the solver. Destroying particles in a batch, after designating them as zombies, yields better performance than destroying them one by one: Whereas destroying particles one-by-one takes (number of particles) * (time per particle) to complete, destroying them all in a batch takes the same time as it would to destroy a single particle.<br/>
+<h3>Barrier</h3>
+<p>Solid or rigid particle groups are not inherently tunneling-proof. Particles traveling at high enough velocities may penetrate them. Barrier particles, used in conjunction with other particle types, provide particle groups with protection against tunneling. This functionality is useful when, for example, you want to ensure that liquid particles will not leak out of a container formed of wall particles.</p>
+<p>Barrier particles only prevent penetration of the particle groups they inhabit. They cannot prevent particles from getting between groups of particles, even if the groups' positions make them look as if they are contiguous.</p>
+<p>You can use barrier particles with elastic, spring, or wall particles.</p>
+<p>The following example creates an impermeable group of wall particles:</p>
+<p>&#160;&#160;&#160;<code>pd.flags = b2_wallParticle | b_barrierParticle;</code> &#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup;</code></p>
+<h3>Zombie</h3>
+<p>Zombie particles are useful when you want efficiently to destroy multiple particles in a single step. All of the particles that you designate as zombies are destroyed at the same time, in a single iteration of the solver. Destroying particles in a batch, after designating them as zombies, yields better performance than destroying them one by one: Whereas destroying particles one-by-one takes (number of parti`cles) * (time per particle) to complete, destroying them all in a batch takes the same time as it would to destroy a single particle.<br/>
  In the following example, every other particle in a group is designated as a zombie, and will be destroyed in the next step of the solver. (For more information on the LiquidFun solver, see Chapter 1. Introduction.)</p>
 <p>&#160;&#160;&#160;<code>b2ParticleGroup*group= m_world-&gt;CreateParticleGroup(pd);</code><br/>
  &#160;&#160;&#160;<code>for (int32 i=0;i&lt;group-&gt;GetParticleCount();i+=2)</code><br/>

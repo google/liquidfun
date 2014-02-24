@@ -2,6 +2,7 @@ var searchData=
 [
   ['filter',['filter',['../structb2_fixture_def.html#a4c3e493a13d11ab27fcc2eee9f52fd61',1,'b2FixtureDef']]],
   ['fixedrotation',['fixedRotation',['../structb2_body_def.html#a273a51c57440a8884de5939d76b6e3ea',1,'b2BodyDef']]],
+  ['fixture',['fixture',['../structb2_particle_body_contact.html#a3eabb32dc6d641bc0a7987afeb5ef5a7',1,'b2ParticleBodyContact']]],
   ['flagforfiltering',['FlagForFiltering',['../classb2_contact.html#a44a3d32149021269eb9dfd4015c98e0d',1,'b2Contact']]],
   ['flags',['flags',['../structb2_particle_def.html#a95e89ca53d36d93c03eec4f4b04e69f3',1,'b2ParticleDef::flags()'],['../structb2_particle_group_def.html#a4f007e4276d24a300e6861cc0f1e8a34',1,'b2ParticleGroupDef::flags()'],['../structb2_particle_contact.html#a3890fc65968cc2abd1b90cd1772ef54a',1,'b2ParticleContact::flags()']]],
   ['free',['Free',['../classb2_block_allocator.html#a945fdf86e260318b930a53dcc887ca8b',1,'b2BlockAllocator']]],

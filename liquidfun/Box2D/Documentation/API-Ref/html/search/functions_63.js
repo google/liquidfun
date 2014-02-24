@@ -10,12 +10,14 @@ var searchData=
   ['computemass',['ComputeMass',['../classb2_chain_shape.html#a009259d589abebeda27fe580d117b11e',1,'b2ChainShape::ComputeMass()'],['../classb2_circle_shape.html#a335edea2ef84789e102dde41ca889828',1,'b2CircleShape::ComputeMass()'],['../classb2_edge_shape.html#a3a305707a07ca3dffa6f2eaff3735dff',1,'b2EdgeShape::ComputeMass()'],['../classb2_polygon_shape.html#ad86c4c2a83a7122599462da83bf35389',1,'b2PolygonShape::ComputeMass()'],['../classb2_shape.html#a61b365526241b47f124789b0309cac69',1,'b2Shape::ComputeMass()']]],
   ['computeparticlecollisionenergy',['ComputeParticleCollisionEnergy',['../classb2_world.html#a79551978e76de7bbf71155d5be92229a',1,'b2World::ComputeParticleCollisionEnergy()'],['../classb2_particle_system.html#a1bd66244b97bd03c2a9e3a361e508c19',1,'b2ParticleSystem::ComputeParticleCollisionEnergy()']]],
   ['contains',['Contains',['../structb2_a_a_b_b.html#aba5fc112e3c8d05e034a21d95fc37704',1,'b2AABB']]],
+  ['containsparticle',['ContainsParticle',['../classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337',1,'b2ParticleGroup']]],
   ['createbody',['CreateBody',['../classb2_world.html#a2eb36e967e43294bfa03ec3d177c2dae',1,'b2World']]],
   ['createchain',['CreateChain',['../classb2_chain_shape.html#aa0977339b743c05f2179939ccc38e7e0',1,'b2ChainShape']]],
   ['createfixture',['CreateFixture',['../classb2_body.html#aa4892301e9b9d62ede5e93dad1743894',1,'b2Body::CreateFixture(const b2FixtureDef *def)'],['../classb2_body.html#a52d971867086d5db79769a62bbb70a60',1,'b2Body::CreateFixture(const b2Shape *shape, float32 density)']]],
   ['createjoint',['CreateJoint',['../classb2_world.html#a5cba9d0653149eb62504154e6fb35021',1,'b2World']]],
   ['createloop',['CreateLoop',['../classb2_chain_shape.html#ac257742a52cac391e25962a4c703fb06',1,'b2ChainShape']]],
   ['createparticle',['CreateParticle',['../classb2_world.html#a4570ed2da970744aa229cf83deb8b3e9',1,'b2World::CreateParticle()'],['../classb2_particle_system.html#a9a52c227fcd0e7bb0346d748f0df0750',1,'b2ParticleSystem::CreateParticle()']]],
-  ['createparticlegroup',['CreateParticleGroup',['../classb2_world.html#a287385e587d831aca401d6ef89d3c9a4',1,'b2World::CreateParticleGroup()'],['../classb2_particle_system.html#ae479a020886c1ed270ad17a4ffa2eff5',1,'b2ParticleSystem::CreateParticleGroup()']]],
+  ['createparticlegroup',['CreateParticleGroup',['../classb2_world.html#a18fd4e7b4c8d2b17ff227902cf3d23d7',1,'b2World::CreateParticleGroup()'],['../classb2_particle_system.html#ae479a020886c1ed270ad17a4ffa2eff5',1,'b2ParticleSystem::CreateParticleGroup()']]],
+  ['createparticlesystem',['CreateParticleSystem',['../classb2_world.html#a68b967ae71d8363fe01d37781323e07e',1,'b2World']]],
   ['createproxy',['CreateProxy',['../classb2_broad_phase.html#ae2f7af756bc55ece45221466c5af449c',1,'b2BroadPhase::CreateProxy()'],['../classb2_dynamic_tree.html#ae44676f12977dada46037da47fc7ffbf',1,'b2DynamicTree::CreateProxy()']]]
 ];

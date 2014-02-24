@@ -182,7 +182,7 @@ Macros</h2></td></tr>
 <tr class="separator:adc056d2ee984ceb388fcd38e257e71b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67092aba35939215cea0213618591031"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67092aba35939215cea0213618591031"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a67092aba35939215cea0213618591031">b2_particleStride</a>&#160;&#160;&#160;0.75f</td></tr>
-<tr class="memdesc:a67092aba35939215cea0213618591031"><td class="mdescLeft">&#160;</td><td class="mdescRight">The standard distance between particles, divided by the particle diameter. <br/></td></tr>
+<tr class="memdesc:a67092aba35939215cea0213618591031"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default distance between particles, multiplied by the particle diameter. <br/></td></tr>
 <tr class="separator:a67092aba35939215cea0213618591031"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ca77d20adfeafed68bb71041a68a41f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ca77d20adfeafed68bb71041a68a41f"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a8ca77d20adfeafed68bb71041a68a41f">b2_minParticleWeight</a>&#160;&#160;&#160;1.0f</td></tr>
@@ -192,9 +192,7 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a06b74a32a69d07543c724a728afbe906">b2_maxParticlePressure</a>&#160;&#160;&#160;0.25f</td></tr>
 <tr class="memdesc:a06b74a32a69d07543c724a728afbe906"><td class="mdescLeft">&#160;</td><td class="mdescRight">The upper limit for particle pressure. <br/></td></tr>
 <tr class="separator:a06b74a32a69d07543c724a728afbe906"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31415738c2d85a958b43b3086141fc85"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a31415738c2d85a958b43b3086141fc85"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">b2_maxTriadDistance</a>&#160;&#160;&#160;2</td></tr>
-<tr class="memdesc:a31415738c2d85a958b43b3086141fc85"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum distance between particles in a triad, divided by the particle diameter. <br/></td></tr>
+<tr class="memitem:a31415738c2d85a958b43b3086141fc85"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">b2_maxTriadDistance</a>&#160;&#160;&#160;2</td></tr>
 <tr class="separator:a31415738c2d85a958b43b3086141fc85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a46d82b5b300a5c89badc678bd38534"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a46d82b5b300a5c89badc678bd38534"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>b2_maxTriadDistanceSquared</b>&#160;&#160;&#160;(<a class="el" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">b2_maxTriadDistance</a> * <a class="el" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">b2_maxTriadDistance</a>)</td></tr>
@@ -263,6 +261,10 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d">b2Free</a> (void *mem)</td></tr>
 <tr class="memdesc:a50f4abf5edeabd0300946edbd542e24d"><td class="mdescLeft">&#160;</td><td class="mdescRight">If you implement b2Alloc, you should also implement this function. <br/></td></tr>
 <tr class="separator:a50f4abf5edeabd0300946edbd542e24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60375fb093d9f8f71f2d98f9129f9858"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60375fb093d9f8f71f2d98f9129f9858"></a>
+int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a60375fb093d9f8f71f2d98f9129f9858">b2GetNumAllocs</a> ()</td></tr>
+<tr class="memdesc:a60375fb093d9f8f71f2d98f9129f9858"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get number of calls to b2Alloc minus number of calls to b2Free. <br/></td></tr>
+<tr class="separator:a60375fb093d9f8f71f2d98f9129f9858"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f10095d05c74eebfe535931c9061ab2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9f10095d05c74eebfe535931c9061ab2"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a9f10095d05c74eebfe535931c9061ab2">b2Log</a> (const char *string,...)</td></tr>
 <tr class="memdesc:a9f10095d05c74eebfe535931c9061ab2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logging function. <br/></td></tr>
@@ -422,6 +424,19 @@ const <a class="el" href="structb2_version.html">b2Version</a>&#160;</td><td cla
       </table>
 </div><div class="memdoc">
 <p>The maximum linear velocity of a body. This limit is very large and is used to prevent numerical problems. You shouldn't need to adjust this. </p>
+
+</div>
+</div>
+<a class="anchor" id="a31415738c2d85a958b43b3086141fc85"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define b2_maxTriadDistance&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The maximum distance between particles in a triad, multiplied by the particle diameter. </p>
 
 </div>
 </div>

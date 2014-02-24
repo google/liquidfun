@@ -56,6 +56,19 @@ TODO describe the cool new stuff we have in this release TODO
     For example, the output executable of the Testbed example is now
     written to Box2D/Testbed/Release/Testbed when building using the Release
     configuration.
+*   Multiple independent particle systems can now exist, each with their own
+    physical co-efficients. Previously, only one particle system existed, and
+    it always existed. Particle systems are created with
+    b2World::CreateParticleSystem, and destroyed with
+    b2World::DestroyParticleSystem.
+*   The particle system API has been moved from b2World to b2ParticleSystem.
+    For example, b2World::DestroyParticlesInShape is now called via
+    b2ParticleSystem::DestroyParticlesInShape. References to b2ParticleSystem
+    can be acquired with b2World::CreateParticleSystem or
+    b2World::GetParticleSystemList().
+*   b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle now
+    take a b2ParticleSystem pointer as their first parameter. This is necessary
+    since multiple particle systems can now exist.
 
 #### Other Changes
 
