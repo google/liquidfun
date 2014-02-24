@@ -17,6 +17,7 @@
 */
 #include <assert.h>
 #include <Box2D/Box2D.h>
+#include <Box2D/Common/b2IntrusiveList.h>
 
 #define EPSILON 0.001f
 
@@ -48,3 +49,22 @@ int32 CreateAndDestroyParticle(
 	world->Step(0.001f, 1, 1);
 	return index;
 }
+
+/// Item that can be placed in an intrusive list.
+class ListItem
+{
+public:
+	/// Construct an item and assign a value to it.
+	ListItem(const char *value) : m_value(value) { }
+	~ListItem() { }
+
+	/// Get the value assigned to this item.
+	const char* GetValue() const { return m_value; }
+
+	B2_INTRUSIVE_LIST_GET_NODE(m_node);
+	B2_INTRUSIVE_LIST_NODE_GET_CLASS(ListItem, m_node);
+
+private:
+	const char *m_value;
+	b2IntrusiveListNode m_node;
+};

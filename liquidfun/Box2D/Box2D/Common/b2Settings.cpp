@@ -30,6 +30,9 @@ b2Version b2_version = {2, 3, 0};
 #define LIQUIDFUN_STRING_EXPAND(X) #X
 #define LIQUIDFUN_STRING(X) LIQUIDFUN_STRING_EXPAND(X)
 
+static void* b2AllocDefault(int32 size);
+static void b2FreeDefault(void *mem);
+
 const b2Version b2_liquidFunVersion = {
 	LIQUIDFUN_VERSION_MAJOR, LIQUIDFUN_VERSION_MINOR,
 	LIQUIDFUN_VERSION_REVISION,
@@ -43,17 +46,45 @@ const char *b2_liquidFunVersionString =
 
 static int32 numAllocs = 0;
 
+// Initialize default allocator.
+static b2AllocFunction b2AllocCallback = b2AllocDefault;
+static b2FreeFunction b2FreeCallback = b2FreeDefault;
+
+// Default implementation of b2AllocFunction.
+static void* b2AllocDefault(int32 size)
+{
+	return malloc(size);
+}
+
+// Default implementation of b2FreeFunction.
+static void b2FreeDefault(void *mem)
+{
+	free(mem);
+}
+
+/// Set alloc and free callbacks to override the default behavior of using
+/// malloc() and free() for dynamic memory allocation.
+void b2SetAllocFreeCallbacks(b2AllocFunction allocCallback,
+							 b2FreeFunction freeCallback)
+{
+	b2Assert(allocCallback);
+	b2Assert(freeCallback);
+	b2Assert(0 == b2GetNumAllocs());
+	b2AllocCallback = allocCallback;
+	b2FreeCallback = freeCallback;
+}
+
 // Memory allocators. Modify these to use your own allocator.
 void* b2Alloc(int32 size)
 {
 	numAllocs++;
-	return malloc(size);
+	return b2AllocCallback(size);
 }
 
 void b2Free(void* mem)
 {
 	numAllocs--;
-	free(mem);
+	b2FreeCallback(mem);
 }
 
 int32 b2GetNumAllocs()

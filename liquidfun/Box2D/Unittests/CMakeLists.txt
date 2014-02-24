@@ -80,3 +80,5 @@ test_executable(Confinement)
 test_executable(Conservation)
 test_executable(Function)
 test_executable(HelloWorld)
+test_executable(IntrusiveList)
+

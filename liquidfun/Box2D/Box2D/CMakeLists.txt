@@ -41,6 +41,7 @@ set(BOX2D_Common_HDRS
 	Common/b2BlockAllocator.h
 	Common/b2Draw.h
 	Common/b2GrowableStack.h
+	Common/b2IntrusiveList.h
 	Common/b2Math.h
 	Common/b2Settings.h
 	Common/b2StackAllocator.h

@@ -63,7 +63,7 @@ public:
 		B2_NOT_USED(m_padding);
 	}
 
-	B2_INTRUSIVE_LIST_GET_NODE(b2GiantNode, m_node);
+	B2_INTRUSIVE_LIST_GET_NODE(m_node);
 	B2_INTRUSIVE_LIST_NODE_GET_CLASS(b2GiantNode, m_node);
 private:
 	b2IntrusiveListNode m_node;
@@ -113,7 +113,7 @@ b2BlockAllocator::~b2BlockAllocator()
 
 	for (b2IntrusiveListNode* n = m_giants.GetNext();
 		 n != m_giants.GetTerminator(); n = n->GetNext()) {
-		b2GiantNode* giantNode = b2GiantNode::GetInstanceFromNode(n);
+		b2GiantNode* giantNode = b2GiantNode::GetInstanceFromListNode(n);
 		giantNode->~b2GiantNode();
 		b2Free(giantNode);
 	}
