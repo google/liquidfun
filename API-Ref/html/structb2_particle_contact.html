@@ -91,7 +91,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aec5286b03f6a974b988e611b99db269e"><td class="memItemLeft" align="right" valign="top">int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#aec5286b03f6a974b988e611b99db269e">indexA</a></td></tr>
+<tr class="memitem:aec5286b03f6a974b988e611b99db269e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec5286b03f6a974b988e611b99db269e"></a>
+int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#aec5286b03f6a974b988e611b99db269e">indexA</a></td></tr>
+<tr class="memdesc:aec5286b03f6a974b988e611b99db269e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indices of the respective particles making contact. <br/></td></tr>
 <tr class="separator:aec5286b03f6a974b988e611b99db269e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaa92ef515be0d06080eef96c8c9d840"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaaa92ef515be0d06080eef96c8c9d840"></a>
 int32&#160;</td><td class="memItemRight" valign="bottom"><b>indexB</b></td></tr>
@@ -100,7 +102,9 @@ int32&#160;</td><td class="memItemRight" valign="bottom"><b>indexB</b></td></tr>
 <tr class="separator:a3890fc65968cc2abd1b90cd1772ef54a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77703b9c45215f4058c3bc6493469053"><td class="memItemLeft" align="right" valign="top">float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#a77703b9c45215f4058c3bc6493469053">weight</a></td></tr>
 <tr class="separator:a77703b9c45215f4058c3bc6493469053"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a777a531b58ee046a33581079c5ce20be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structb2_vec2.html">b2Vec2</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#a777a531b58ee046a33581079c5ce20be">normal</a></td></tr>
+<tr class="memitem:a777a531b58ee046a33581079c5ce20be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a777a531b58ee046a33581079c5ce20be"></a>
+<a class="el" href="structb2_vec2.html">b2Vec2</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#a777a531b58ee046a33581079c5ce20be">normal</a></td></tr>
+<tr class="memdesc:a777a531b58ee046a33581079c5ce20be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The normalized direction from A to B. <br/></td></tr>
 <tr class="separator:a777a531b58ee046a33581079c5ce20be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -117,32 +121,6 @@ int32&#160;</td><td class="memItemRight" valign="bottom"><b>indexB</b></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aec5286b03f6a974b988e611b99db269e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int32 b2ParticleContact::indexA</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Indices of the respective particles making contact. </p>
-
-</div>
-</div>
-<a class="anchor" id="a777a531b58ee046a33581079c5ce20be"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structb2_vec2.html">b2Vec2</a> b2ParticleContact::normal</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The normalized direction from A to B. </p>
-
-</div>
-</div>
 <a class="anchor" id="a77703b9c45215f4058c3bc6493469053"></a>
 <div class="memitem">
 <div class="memproto">
@@ -152,7 +130,7 @@ int32&#160;</td><td class="memItemRight" valign="bottom"><b>indexB</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Weight of the contact. A value between 0.0f and 1.0f. </p>
+<p>Weight of the contact. A value between 0.0f and 1.0f. 0.0f ==&gt; particles are just barely touching 1.0f ==&gt; particles are perfectly on top of each other </p>
 
 </div>
 </div>

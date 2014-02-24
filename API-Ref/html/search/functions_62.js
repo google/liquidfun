@@ -2,6 +2,7 @@ var searchData=
 [
   ['b2alloc',['b2Alloc',['../b2_settings_8h.html#a2dca9b286e9b9d6d022055fd61534bd7',1,'b2Settings.cpp']]],
   ['b2bodydef',['b2BodyDef',['../structb2_body_def.html#a87bee47596b3b3eced0d9dd1f4c18fee',1,'b2BodyDef']]],
+  ['b2calculateparticleiterations',['b2CalculateParticleIterations',['../b2_particle_8h.html#a26da50c12eeabaa662fb0ccdf624b570',1,'b2Particle.cpp']]],
   ['b2clipsegmenttoline',['b2ClipSegmentToLine',['../b2_collision_8h.html#a8b36e651798f55f2533f9837462ded41',1,'b2Collision.cpp']]],
   ['b2collidecircles',['b2CollideCircles',['../b2_collision_8h.html#ab8a1bf2c6a9453307466f4870c1fa333',1,'b2CollideCircle.cpp']]],
   ['b2collideedgeandcircle',['b2CollideEdgeAndCircle',['../b2_collision_8h.html#aee6f752fdf8c89152e824da12e944733',1,'b2CollideEdge.cpp']]],
@@ -11,6 +12,7 @@ var searchData=
   ['b2dynamictree',['b2DynamicTree',['../classb2_dynamic_tree.html#a8af64cf6a1566fa4c5b5c9683bd937d9',1,'b2DynamicTree']]],
   ['b2fixturedef',['b2FixtureDef',['../structb2_fixture_def.html#aa34ba06bcf0d6d981931a83cf124a602',1,'b2FixtureDef']]],
   ['b2free',['b2Free',['../b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d',1,'b2Settings.cpp']]],
+  ['b2getnumallocs',['b2GetNumAllocs',['../b2_settings_8h.html#a60375fb093d9f8f71f2d98f9129f9858',1,'b2Settings.cpp']]],
   ['b2getpointstates',['b2GetPointStates',['../b2_collision_8h.html#a401e2747d276e9fbfd131989e02ff568',1,'b2Collision.cpp']]],
   ['b2log',['b2Log',['../b2_settings_8h.html#a9f10095d05c74eebfe535931c9061ab2',1,'b2Settings.cpp']]],
   ['b2mat22',['b2Mat22',['../structb2_mat22.html#ac3e10f6d457c8dab9062ba378f66bc4d',1,'b2Mat22::b2Mat22()'],['../structb2_mat22.html#abd674c6d92e26962977f34bcd92ff24d',1,'b2Mat22::b2Mat22(const b2Vec2 &amp;c1, const b2Vec2 &amp;c2)'],['../structb2_mat22.html#a41d5d8743bda32cb8c6e212528934810',1,'b2Mat22::b2Mat22(float32 a11, float32 a12, float32 a21, float32 a22)']]],
@@ -22,6 +24,7 @@ var searchData=
   ['b2transform',['b2Transform',['../structb2_transform.html#a765a2e5c692a2e1d05c7a5441019373d',1,'b2Transform::b2Transform()'],['../structb2_transform.html#a823e190e4810e35e8100f4414d0bef62',1,'b2Transform::b2Transform(const b2Vec2 &amp;position, const b2Rot &amp;rotation)']]],
   ['b2vec2',['b2Vec2',['../structb2_vec2.html#a9171b31deb83af96872f99689939a12f',1,'b2Vec2::b2Vec2()'],['../structb2_vec2.html#aa8a2f026420a84bbbc62f3a3de2041d6',1,'b2Vec2::b2Vec2(float32 x, float32 y)']]],
   ['b2vec3',['b2Vec3',['../structb2_vec3.html#a837423f66d6fb72d815e7390c09938b9',1,'b2Vec3::b2Vec3()'],['../structb2_vec3.html#a47df55b26ab254dcf42a16638c7feeeb',1,'b2Vec3::b2Vec3(float32 x, float32 y, float32 z)']]],
+  ['b2vec4',['b2Vec4',['../structb2_vec4.html#ae1bd17259d4ffee8e247d3e83a12f586',1,'b2Vec4::b2Vec4()'],['../structb2_vec4.html#a06491a0e1dc9dd65e312ec7de649482d',1,'b2Vec4::b2Vec4(float32 x, float32 y, float32 z, float32 w)']]],
   ['b2world',['b2World',['../classb2_world.html#aeccc87fd9e36702c821a8244ca7cd875',1,'b2World']]],
   ['begincontact',['BeginContact',['../classb2_contact_listener.html#a35148fc56fb9eac12077200fbd928f65',1,'b2ContactListener']]]
 ];

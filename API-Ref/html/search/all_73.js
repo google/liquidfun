@@ -59,6 +59,9 @@ var searchData=
   ['setsleepingallowed',['SetSleepingAllowed',['../classb2_body.html#a229a6de228416203fecbf7a7544c33bb',1,'b2Body']]],
   ['setspringdampingratio',['SetSpringDampingRatio',['../classb2_wheel_joint.html#a39b123ac045c8ec93faa65746e6655dc',1,'b2WheelJoint']]],
   ['setspringfrequencyhz',['SetSpringFrequencyHz',['../classb2_wheel_joint.html#af9f8fada5cb30f83aa2fbf486e9d347b',1,'b2WheelJoint']]],
+  ['setstrictcontactcheck',['SetStrictContactCheck',['../classb2_particle_system.html#aa1e295b8e9f96f1b91e362d114d4e7f3',1,'b2ParticleSystem']]],
+  ['setstrictparticlecontactcheck',['SetStrictParticleContactCheck',['../classb2_world.html#a117c743693a71aab0fe32f59da37f0f7',1,'b2World']]],
+  ['setstuckparticlethreshold',['SetStuckParticleThreshold',['../classb2_particle_system.html#af1d963e941825a0cadd8013d43b68717',1,'b2ParticleSystem']]],
   ['setsubstepping',['SetSubStepping',['../classb2_world.html#ae8aacc78ea4753075067daff51b61778',1,'b2World']]],
   ['settangentspeed',['SetTangentSpeed',['../classb2_contact.html#a32033914a6c7f35b469e8fddbc17c566',1,'b2Contact']]],
   ['settarget',['SetTarget',['../classb2_mouse_joint.html#a96f34c1c990407eddbadf07ae359b1f3',1,'b2MouseJoint']]],
@@ -74,7 +77,13 @@ var searchData=
   ['solve',['Solve',['../structb2_mat22.html#ab511ad33f5abf87351581842628a9dc3',1,'b2Mat22']]],
   ['solve22',['Solve22',['../structb2_mat33.html#a2580ac2afadc48028a63ed4c8a1f16bc',1,'b2Mat33']]],
   ['solve33',['Solve33',['../structb2_mat33.html#a478872c7b6a3bedd13fbedd3ec7a2edb',1,'b2Mat33']]],
+  ['springstrength',['springStrength',['../structb2_particle_system_def.html#a935a135684efab860b98a9b6a629d6d6',1,'b2ParticleSystemDef']]],
+  ['staticpressureiterations',['staticPressureIterations',['../structb2_particle_system_def.html#a6246155e61450cfff6aba5182a1bb60c',1,'b2ParticleSystemDef']]],
+  ['staticpressurerelaxation',['staticPressureRelaxation',['../structb2_particle_system_def.html#a497e6bfc2e22867eda10a5c576972184',1,'b2ParticleSystemDef']]],
+  ['staticpressurestrength',['staticPressureStrength',['../structb2_particle_system_def.html#add3df1894038540a311081740dc3e5cb',1,'b2ParticleSystemDef']]],
   ['step',['Step',['../classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420',1,'b2World::Step(float32 timeStep, int32 velocityIterations, int32 positionIterations, int32 particleIterations)'],['../classb2_world.html#a7a8eff61af98461f978fe43f3af7be90',1,'b2World::Step(float32 timeStep, int32 velocityIterations, int32 positionIterations)']]],
   ['strength',['strength',['../structb2_particle_group_def.html#a77c3ac47ae906e34e7f3fecf7b8f7aad',1,'b2ParticleGroupDef']]],
-  ['stride',['stride',['../structb2_particle_group_def.html#ae9882ac9001f1a6c279385b65b7f13d0',1,'b2ParticleGroupDef']]]
+  ['stride',['stride',['../structb2_particle_group_def.html#ae9882ac9001f1a6c279385b65b7f13d0',1,'b2ParticleGroupDef']]],
+  ['surfacetensionnormalstrength',['surfaceTensionNormalStrength',['../structb2_particle_system_def.html#a05d5a189606457a9a6d89dc478a4fb90',1,'b2ParticleSystemDef']]],
+  ['surfacetensionpressurestrength',['surfaceTensionPressureStrength',['../structb2_particle_system_def.html#a892b1069f95f9cb45b482a223542add5',1,'b2ParticleSystemDef']]]
 ];
