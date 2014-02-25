@@ -42,15 +42,17 @@ b2VoronoiDiagram::~b2VoronoiDiagram()
 	m_allocator->Free(m_generatorBuffer);
 }
 
-void b2VoronoiDiagram::AddGenerator(const b2Vec2& center, int32 tag)
+void b2VoronoiDiagram::AddGenerator(
+	const b2Vec2& center, int32 tag, bool necessary)
 {
 	b2Assert(m_generatorCount < m_generatorCapacity);
 	Generator& g = m_generatorBuffer[m_generatorCount++];
 	g.center = center;
 	g.tag = tag;
+	g.necessary = necessary;
 }
 
-void b2VoronoiDiagram::Generate(float32 radius)
+void b2VoronoiDiagram::Generate(float32 radius, float32 margin)
 {
 	b2Assert(m_diagram == NULL);
 	float32 inverseRadius = 1 / radius;
@@ -59,9 +61,16 @@ void b2VoronoiDiagram::Generate(float32 radius)
 	for (int32 k = 0; k < m_generatorCount; k++)
 	{
 		Generator& g = m_generatorBuffer[k];
-		lower = b2Min(lower, g.center);
-		upper = b2Max(upper, g.center);
+		if (g.necessary)
+		{
+			lower = b2Min(lower, g.center);
+			upper = b2Max(upper, g.center);
+		}
 	}
+	lower.x -= margin;
+	lower.y -= margin;
+	upper.x += margin;
+	upper.y += margin;
 	m_countX = 1 + (int32) (inverseRadius * (upper.x - lower.x));
 	m_countY = 1 + (int32) (inverseRadius * (upper.y - lower.y));
 	m_diagram = (Generator**)
@@ -78,9 +87,12 @@ void b2VoronoiDiagram::Generate(float32 radius)
 	{
 		Generator& g = m_generatorBuffer[k];
 		g.center = inverseRadius * (g.center - lower);
-		int32 x = b2Max(0, b2Min((int32) g.center.x, m_countX - 1));
-		int32 y = b2Max(0, b2Min((int32) g.center.y, m_countY - 1));
-		queue.Push(b2VoronoiDiagramTask(x, y, x + y * m_countX, &g));
+		int32 x = (int32) g.center.x;
+		int32 y = (int32) g.center.y;
+		if (x >=0 && y >= 0 && x < m_countX && y < m_countY)
+		{
+			queue.Push(b2VoronoiDiagramTask(x, y, x + y * m_countX, &g));
+		}
 	}
 	while (!queue.Empty())
 	{
@@ -174,6 +186,34 @@ void b2VoronoiDiagram::Generate(float32 radius)
 				if (y < m_countY - 1)
 				{
 					queue.Push(b2VoronoiDiagramTask(x, y + 1, i + m_countX, b));
+				}
+			}
+		}
+	}
+}
+
+void b2VoronoiDiagram::GetNodes(NodeCallback& callback) const
+{
+	for (int32 y = 0; y < m_countY - 1; y++)
+	{
+		for (int32 x = 0; x < m_countX - 1; x++)
+		{
+			int32 i = x + y * m_countX;
+			const Generator* a = m_diagram[i];
+			const Generator* b = m_diagram[i + 1];
+			const Generator* c = m_diagram[i + m_countX];
+			const Generator* d = m_diagram[i + 1 + m_countX];
+			if (b != c)
+			{
+				if (a != b && a != c &&
+					(a->necessary || b->necessary || c->necessary))
+				{
+					callback(a->tag, b->tag, c->tag);
+				}
+				if (d != b && d != c &&
+					(b->necessary || d->necessary || c->necessary))
+				{
+					callback(b->tag, d->tag, c->tag);
 				}
 			}
 		}

@@ -662,8 +662,10 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
 	}
 	SetParticleGroupFlags(group, groupDef.groupFlags);
 
+	// Create pairs and triads between particles in the group.
+	ConnectionFilter filter;
 	UpdateContacts(true);
-	UpdatePairsAndTriads(firstIndex, lastIndex, group, group);
+	UpdatePairsAndTriads(firstIndex, lastIndex, filter);
 
 	if (groupDef.group)
 	{
@@ -690,9 +692,30 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 				 groupB->m_firstIndex);
 	b2Assert(groupA->m_lastIndex == groupB->m_firstIndex);
 
+	// Create pairs and triads connecting groupA and groupB.
+	class JoinParticleGroupsFilter : public ConnectionFilter
+	{
+		bool ShouldCreatePair(int32 a, int32 b) const
+		{
+			return
+				(a < m_threshold && m_threshold <= b) ||
+				(b < m_threshold && m_threshold <= a);
+		}
+		bool ShouldCreateTriad(int32 a, int32 b, int32 c) const
+		{
+			return
+				(a < m_threshold || b < m_threshold || c < m_threshold) &&
+				(m_threshold <= a || m_threshold <= b || m_threshold <= c);
+		}
+		int32 m_threshold;
+	public:
+		JoinParticleGroupsFilter(int32 threshold)
+		{
+			m_threshold = threshold;
+		}
+	} filter(groupB->m_firstIndex);
 	UpdateContacts(true);
-	UpdatePairsAndTriads(
-		groupA->m_firstIndex, groupB->m_lastIndex, groupA, groupB);
+	UpdatePairsAndTriads(groupA->m_firstIndex, groupB->m_lastIndex, filter);
 
 	for (int32 i = groupB->m_firstIndex; i < groupB->m_lastIndex; i++)
 	{
@@ -705,10 +728,51 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 	DestroyParticleGroup(groupB);
 }
 
-void b2ParticleSystem::UpdatePairsAndTriads(
-	int32 firstIndex, int32 lastIndex,
-	b2ParticleGroup* groupA, b2ParticleGroup* groupB)
+void b2ParticleSystem::UpdatePairsAndTriadsWithReactiveParticles()
 {
+	class ReactiveFilter : public ConnectionFilter
+	{
+		bool IsNecessary(int32 index) const
+		{
+			return (m_flagsBuffer[index] & b2_reactiveParticle) != 0;
+		}
+		const uint32* m_flagsBuffer;
+	public:
+		ReactiveFilter(uint32* flagsBuffer)
+		{
+			m_flagsBuffer = flagsBuffer;
+		}
+	} filter(m_flagsBuffer.data);
+	UpdatePairsAndTriads(0, m_count, filter);
+
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_flagsBuffer.data[i] &= ~b2_reactiveParticle;
+	}
+	m_allParticleFlags &= ~b2_reactiveParticle;
+}
+
+static bool ParticleCanBeConnected(
+	uint32 flags, b2ParticleGroup* group)
+{
+	return
+		(flags & (b2_wallParticle | b2_springParticle | b2_elasticParticle)) ||
+		(group && group->GetGroupFlags() & b2_rigidParticleGroup);
+}
+
+void b2ParticleSystem::UpdatePairsAndTriads(
+	int32 firstIndex, int32 lastIndex, const ConnectionFilter& filter)
+{
+	// Create pairs or triads.
+	// All particles in each pair/triad should satisfy the following:
+	// * firstIndex <= index < lastIndex
+	// * don't have b2_zombieParticle
+	// * ParticleCanBeConnected returns true
+	// * ShouldCreatePair/ShouldCreateTriad returns true
+	// Any particles in each pair/triad should satisfy the following:
+	// * filter.IsNeeded returns true
+	// * have one of k_pairFlags/k_triadsFlags
+	b2Assert(firstIndex <= lastIndex);
 	uint32 particleFlags = 0;
 	for (int32 i = firstIndex; i < lastIndex; i++)
 	{
@@ -721,23 +785,37 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 			const b2ParticleContact& contact = m_contactBuffer[k];
 			int32 a = contact.indexA;
 			int32 b = contact.indexB;
-			if ((groupA->ContainsParticle(a) && groupB->ContainsParticle(b)) ||
-				(groupA->ContainsParticle(b) && groupB->ContainsParticle(a)))
+			uint32 af = m_flagsBuffer.data[a];
+			uint32 bf = m_flagsBuffer.data[b];
+			b2ParticleGroup* groupA = m_groupBuffer[a];
+			b2ParticleGroup* groupB = m_groupBuffer[b];
+			if (!((af | bf) & b2_zombieParticle) &&
+				((af | bf) & k_pairFlags) &&
+				(filter.IsNecessary(a) || filter.IsNecessary(b)) &&
+				ParticleCanBeConnected(af, groupA) &&
+				ParticleCanBeConnected(bf, groupB) &&
+				filter.ShouldCreatePair(a, b))
 			{
 				m_pairBuffer = RequestGrowableBuffer(m_pairBuffer,
 													m_pairCount,
 													&m_pairCapacity);
-
 				Pair& pair = m_pairBuffer[m_pairCount];
 				pair.indexA = a;
 				pair.indexB = b;
 				pair.flags = contact.flags;
-				pair.strength = b2Min(groupA->m_strength, groupB->m_strength);
+				pair.strength = b2Min(
+					groupA ? groupA->m_strength : 1,
+					groupB ? groupB->m_strength : 1);
 				pair.distance = b2Distance(m_positionBuffer.data[a],
 										   m_positionBuffer.data[b]);
 				m_pairCount++;
 			}
 		}
+		std::stable_sort(
+			m_pairBuffer, m_pairBuffer + m_pairCount, ComparePairIndices);
+		Pair* lastPair = std::unique(
+			m_pairBuffer, m_pairBuffer + m_pairCount, MatchPairIndices);
+		m_pairCount = (int32) (lastPair - m_pairBuffer);
 	}
 	if (particleFlags & k_triadFlags)
 	{
@@ -745,77 +823,112 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 			&m_world->m_stackAllocator, lastIndex - firstIndex);
 		for (int32 i = firstIndex; i < lastIndex; i++)
 		{
-			if (!(m_flagsBuffer.data[i] & b2_zombieParticle) &&
-				(groupA->ContainsParticle(i) || groupB->ContainsParticle(i)))
+			uint32 flags = m_flagsBuffer.data[i];
+			b2ParticleGroup* group = m_groupBuffer[i];
+			if (!(flags & b2_zombieParticle) &&
+				ParticleCanBeConnected(flags, group))
 			{
-				diagram.AddGenerator(m_positionBuffer.data[i], i);
+				diagram.AddGenerator(
+					m_positionBuffer.data[i], i, filter.IsNecessary(i));
 			}
 		}
-		diagram.Generate(GetParticleStride() / 2);
-		UpdateTriadsCallback callback;
-		callback.system = this;
-		callback.groupA = groupA;
-		callback.groupB = groupB;
+		float32 stride = GetParticleStride();
+		diagram.Generate(stride / 2, stride * 2);
+		class UpdateTriadsCallback : public b2VoronoiDiagram::NodeCallback
+		{
+			void operator()(int32 a, int32 b, int32 c)
+			{
+				uint32 af = m_system->m_flagsBuffer.data[a];
+				uint32 bf = m_system->m_flagsBuffer.data[b];
+				uint32 cf = m_system->m_flagsBuffer.data[c];
+				if (((af | bf | cf) & k_triadFlags) &&
+					m_filter->ShouldCreateTriad(a, b, c))
+				{
+					const b2Vec2& pa = m_system->m_positionBuffer.data[a];
+					const b2Vec2& pb = m_system->m_positionBuffer.data[b];
+					const b2Vec2& pc = m_system->m_positionBuffer.data[c];
+					b2Vec2 dab = pa - pb;
+					b2Vec2 dbc = pb - pc;
+					b2Vec2 dca = pc - pa;
+					float32 maxDistanceSquared = b2_maxTriadDistanceSquared *
+												 m_system->m_squaredDiameter;
+					if (b2Dot(dab, dab) > maxDistanceSquared ||
+						b2Dot(dbc, dbc) > maxDistanceSquared ||
+						b2Dot(dca, dca) > maxDistanceSquared)
+					{
+						return;
+					}
+					m_system->m_triadBuffer = m_system->RequestGrowableBuffer(
+													m_system->m_triadBuffer,
+													m_system->m_triadCount,
+													&m_system->m_triadCapacity);
+					b2ParticleGroup* groupA = m_system->m_groupBuffer[a];
+					b2ParticleGroup* groupB = m_system->m_groupBuffer[b];
+					b2ParticleGroup* groupC = m_system->m_groupBuffer[c];
+					Triad& triad = m_system->m_triadBuffer[m_system->m_triadCount];
+					triad.indexA = a;
+					triad.indexB = b;
+					triad.indexC = c;
+					triad.flags = af | bf | cf;
+					triad.strength = b2Min(b2Min(
+						groupA ? groupA->m_strength : 1,
+						groupB ? groupB->m_strength : 1),
+						groupC ? groupC->m_strength : 1);
+					b2Vec2 midPoint = (float32) 1 / 3 * (pa + pb + pc);
+					triad.pa = pa - midPoint;
+					triad.pb = pb - midPoint;
+					triad.pc = pc - midPoint;
+					triad.ka = -b2Dot(dca, dab);
+					triad.kb = -b2Dot(dab, dbc);
+					triad.kc = -b2Dot(dbc, dca);
+					triad.s = b2Cross(pa, pb) + b2Cross(pb, pc) + b2Cross(pc, pa);
+					m_system->m_triadCount++;
+				}
+			}
+			b2ParticleSystem* m_system;
+			const ConnectionFilter* m_filter;
+		public:
+			UpdateTriadsCallback(
+				b2ParticleSystem* system, const ConnectionFilter* filter)
+			{
+				m_system = system;
+				m_filter = filter;
+			}
+		} callback(this, &filter);
 		diagram.GetNodes(callback);
+		std::stable_sort(
+			m_triadBuffer, m_triadBuffer + m_triadCount, CompareTriadIndices);
+		Triad* lastTriad = std::unique(
+			m_triadBuffer, m_triadBuffer + m_triadCount, MatchTriadIndices);
+		m_triadCount = (int32) (lastTriad - m_triadBuffer);
 	}
 }
 
-void b2ParticleSystem::UpdateTriadsCallback::operator()(int32 a, int32 b,
-															  int32 c) const
+bool b2ParticleSystem::ComparePairIndices(const Pair& a, const Pair& b)
 {
-	// Create a triad if it will contain particles from both groups.
-	bool groupAContainsA = groupA->ContainsParticle(a);
-	bool groupAContainsB = groupA->ContainsParticle(b);
-	bool groupAContainsC = groupA->ContainsParticle(c);
-	bool groupBContainsA = groupB->ContainsParticle(a);
-	bool groupBContainsB = groupB->ContainsParticle(b);
-	bool groupBContainsC = groupB->ContainsParticle(c);
-	if ((groupAContainsA || groupBContainsA) &&
-		(groupAContainsB || groupBContainsB) &&
-		(groupAContainsC || groupBContainsC) &&
-		(groupAContainsA || groupAContainsB || groupAContainsC) &&
-		(groupBContainsA || groupBContainsB || groupBContainsC))
-	{
-		uint32 af = system->m_flagsBuffer.data[a];
-		uint32 bf = system->m_flagsBuffer.data[b];
-		uint32 cf = system->m_flagsBuffer.data[c];
-		if (af & bf & cf & k_triadFlags)
-		{
-			const b2Vec2& pa = system->m_positionBuffer.data[a];
-			const b2Vec2& pb = system->m_positionBuffer.data[b];
-			const b2Vec2& pc = system->m_positionBuffer.data[c];
-			b2Vec2 dab = pa - pb;
-			b2Vec2 dbc = pb - pc;
-			b2Vec2 dca = pc - pa;
-			float32 maxDistanceSquared = b2_maxTriadDistanceSquared *
-										 system->m_squaredDiameter;
-			if (b2Dot(dab, dab) < maxDistanceSquared &&
-				b2Dot(dbc, dbc) < maxDistanceSquared &&
-				b2Dot(dca, dca) < maxDistanceSquared)
-			{
-				system->m_triadBuffer = system->RequestGrowableBuffer(
-													system->m_triadBuffer,
-													system->m_triadCount,
-													&system->m_triadCapacity);
-				Triad& triad = system->m_triadBuffer[system->m_triadCount];
-				triad.indexA = a;
-				triad.indexB = b;
-				triad.indexC = c;
-				triad.flags = af | bf | cf;
-				triad.strength = b2Min(groupA->m_strength, groupB->m_strength);
-				b2Vec2 midPoint = (float32) 1 / 3 * (pa + pb + pc);
-				triad.pa = pa - midPoint;
-				triad.pb = pb - midPoint;
-				triad.pc = pc - midPoint;
-				triad.ka = -b2Dot(dca, dab);
-				triad.kb = -b2Dot(dab, dbc);
-				triad.kc = -b2Dot(dbc, dca);
-				triad.s = b2Cross(pa, pb) + b2Cross(pb, pc) + b2Cross(pc, pa);
-				system->m_triadCount++;
-			}
-		}
-	}
-};
+	int32 diffA = a.indexA - b.indexA;
+	if (diffA != 0) return diffA < 0;
+	return a.indexB < b.indexB;
+}
+
+bool b2ParticleSystem::MatchPairIndices(const Pair& a, const Pair& b)
+{
+	return a.indexA == b.indexA && a.indexB == b.indexB;
+}
+
+bool b2ParticleSystem::CompareTriadIndices(const Triad& a, const Triad& b)
+{
+	int32 diffA = a.indexA - b.indexA;
+	if (diffA != 0) return diffA < 0;
+	int32 diffB = a.indexB - b.indexB;
+	if (diffB != 0) return diffB < 0;
+	return a.indexC < b.indexC;
+}
+
+bool b2ParticleSystem::MatchTriadIndices(const Triad& a, const Triad& b)
+{
+	return a.indexA == b.indexA && a.indexB == b.indexB && a.indexC == b.indexC;
+}
 
 // Only called from SolveZombie() or JoinParticleGroups().
 void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
@@ -1549,6 +1662,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		if (m_allGroupFlags & b2_particleGroupNeedsUpdateDepth)
 		{
 			ComputeDepth();
+		}
+		if (m_allParticleFlags & b2_reactiveParticle)
+		{
+			UpdatePairsAndTriadsWithReactiveParticles();
 		}
 		if (m_hasForce)
 		{

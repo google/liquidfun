@@ -206,6 +206,12 @@ public:
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
 			pd.flags = m_particleFlags;
+			if ((m_particleFlags & (b2_wallParticle | b2_springParticle |
+				b2_elasticParticle | b2_barrierParticle)) ||
+				(m_groupFlags & b2_rigidParticleGroup))
+			{
+				pd.flags |= b2_reactiveParticle;
+			}
 			pd.groupFlags = m_groupFlags;
 			pd.color = k_ParticleColors[m_colorIndex];
 			pd.group = m_lastGroup;
