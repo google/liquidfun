@@ -29,12 +29,14 @@ usage() {
   echo "
 Execute unit tests on Linux or OSX.
 
-Usage: $(basename $0) [-h] [-n] [-v] [-C]
+Usage: $(basename $0) [-h] [-n] [-v] [-C] [-m] [-x]
 
 -h: Display this help message.
 -n: Disable the unit test build step.
 -v: Display verbose code coverage output.
 -C: Disable code coverage.
+-m: Memcheck tests using valgrind (slow, linux only)
+-x: Enable valgrind like -m, but with xml output for tools
 " >&2
   exit 1
 }
@@ -42,12 +44,16 @@ Usage: $(basename $0) [-h] [-n] [-v] [-C]
 # Parse arguments.
 build=1
 coverage_enabled=1
-while getopts 'hnvC' option; do
+valgrind_enabled=0
+valgrind_xml=0
+while getopts 'hnvCmx' option; do
   case ${option} in
     h) usage ;;
     n) build=0 ;;
     v) code_coverage_stream=/dev/stderr ;;
     C) coverage_enabled=0 ;;
+    m) valgrind_enabled=1 ;;
+    x) valgrind_xml=1 ;;
     *) usage ;;
   esac
 done
@@ -56,6 +62,22 @@ done
 # disabled.
 if [[ $((build)) -ne 0 ]]; then
   ${script_directory}/../AutoBuild/build.sh -n || exit $?
+fi
+
+valgrind=
+valgrind_opts="-v --track-origins=yes"
+
+if [[ $valgrind_xml -eq 1 ]]; then
+  valgrind_enabled=1
+fi
+
+if [[ $valgrind_enabled -eq 1 ]]; then
+  valgrind=$(which valgrind)
+  if [[ -z "$valgrind" ]]; then
+     echo "Error: valgrind not installed.  valgrind is required with -m." >&2
+     exit 1
+  fi
+  valgrind="$valgrind $valgrind_opts"
 fi
 
 # Determine whether lcov is installed.
@@ -114,8 +136,19 @@ for test_executable_directory in ${test_executable_directories}; do
     for test_executable in $(find "${test_executable_directory}" \
                                -maxdepth 1 -type f -perm +111 \
                                -name '*Tests'); do
+
+      if [[ -z "$valgrind" ]]; then
+        vcmd=
+      else
+        testname="$(dirname ${test_executable})_$(basename ${test_executable})"
+        vcmd="$valgrind --log-file=./valgrind_$testname.txt"
+        if [[ $((valgrind_xml)) -eq 1 ]]; then
+          vcmd+=" --xml=yes --xml-file=./valgrind_$testname.xml"
+        fi
+      fi
+
       echo ${test_executable}
-      ${test_executable}
+      ${vcmd} ${test_executable}
       if [[ $? -ne 0 ]]; then
         failed="${failed}${test_executable} "
       fi
