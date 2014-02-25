@@ -72,6 +72,7 @@ function(test_executable name)
                             ${name}/${name}Tests.cpp ${SUPPORT_SRCS})
 endfunction()
 
+test_executable(BlockAllocator)
 test_executable(BodyContacts)
 test_executable(Callback)
 test_executable(Color)
@@ -81,4 +82,3 @@ test_executable(Conservation)
 test_executable(Function)
 test_executable(HelloWorld)
 test_executable(IntrusiveList)
-

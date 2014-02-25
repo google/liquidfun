@@ -30,8 +30,8 @@ b2Version b2_version = {2, 3, 0};
 #define LIQUIDFUN_STRING_EXPAND(X) #X
 #define LIQUIDFUN_STRING(X) LIQUIDFUN_STRING_EXPAND(X)
 
-static void* b2AllocDefault(int32 size);
-static void b2FreeDefault(void *mem);
+static void* b2AllocDefault(int32 size, void* callbackData);
+static void b2FreeDefault(void* mem, void* callbackData);
 
 const b2Version b2_liquidFunVersion = {
 	LIQUIDFUN_VERSION_MAJOR, LIQUIDFUN_VERSION_MINOR,
@@ -44,52 +44,72 @@ const char *b2_liquidFunVersionString =
 	LIQUIDFUN_STRING(LIQUIDFUN_VERSION_MINOR) "."
 	LIQUIDFUN_STRING(LIQUIDFUN_VERSION_REVISION);
 
-static int32 numAllocs = 0;
+static int32 b2_numAllocs = 0;
 
 // Initialize default allocator.
-static b2AllocFunction b2AllocCallback = b2AllocDefault;
-static b2FreeFunction b2FreeCallback = b2FreeDefault;
+static b2AllocFunction b2_allocCallback = b2AllocDefault;
+static b2FreeFunction b2_freeCallback = b2FreeDefault;
+static void *b2_callbackData = NULL;
 
 // Default implementation of b2AllocFunction.
-static void* b2AllocDefault(int32 size)
+static void* b2AllocDefault(int32 size, void* callbackData)
 {
+	B2_NOT_USED(callbackData);
 	return malloc(size);
 }
 
 // Default implementation of b2FreeFunction.
-static void b2FreeDefault(void *mem)
+static void b2FreeDefault(void* mem, void* callbackData)
 {
+	B2_NOT_USED(callbackData);
 	free(mem);
 }
 
 /// Set alloc and free callbacks to override the default behavior of using
 /// malloc() and free() for dynamic memory allocation.
+/// Set allocCallback and freeCallback to NULL to restore the default
+/// allocator (malloc / free).
 void b2SetAllocFreeCallbacks(b2AllocFunction allocCallback,
-							 b2FreeFunction freeCallback)
+							 b2FreeFunction freeCallback, void* callbackData)
 {
-	b2Assert(allocCallback);
-	b2Assert(freeCallback);
+	b2Assert((allocCallback && freeCallback) ||
+			 (!allocCallback && !freeCallback));
 	b2Assert(0 == b2GetNumAllocs());
-	b2AllocCallback = allocCallback;
-	b2FreeCallback = freeCallback;
+	if (allocCallback && freeCallback)
+	{
+		b2_allocCallback = allocCallback;
+		b2_freeCallback = freeCallback;
+		b2_callbackData = callbackData;
+	}
+	else
+	{
+		b2_allocCallback = b2AllocDefault;
+		b2_freeCallback = b2FreeDefault;
+		b2_callbackData = NULL;
+	}
 }
 
 // Memory allocators. Modify these to use your own allocator.
 void* b2Alloc(int32 size)
 {
-	numAllocs++;
-	return b2AllocCallback(size);
+	b2_numAllocs++;
+	return b2_allocCallback(size, b2_callbackData);
 }
 
 void b2Free(void* mem)
 {
-	numAllocs--;
-	b2FreeCallback(mem);
+	b2_numAllocs--;
+	b2_freeCallback(mem, b2_callbackData);
+}
+
+void b2SetNumAllocs(const int32 numAllocs)
+{
+	b2_numAllocs = numAllocs;
 }
 
 int32 b2GetNumAllocs()
 {
-	return numAllocs;
+	return b2_numAllocs;
 }
 
 // You can modify this to use your logging facility.
