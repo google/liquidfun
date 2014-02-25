@@ -560,6 +560,7 @@ private:
 	void SolveViscous();
 	void SolvePowder(const b2TimeStep& step);
 	void SolveSolid(const b2TimeStep& step);
+	void SolveForce(const b2TimeStep& step);
 	void SolveColorMixing();
 	void SolveZombie();
 	void RotateBuffer(int32 start, int32 mid, int32 end);
@@ -576,6 +577,8 @@ private:
 
 	void SetParticleGroupFlags(b2ParticleGroup* group, uint32 flags);
 
+	void ApplyForce(int32 index, const b2Vec2& force);
+
 	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1,
 				 const b2Vec2& point2) const;
 
@@ -589,6 +592,7 @@ private:
 	bool m_needsUpdateAllParticleFlags;
 	int32 m_allGroupFlags;
 	bool m_needsUpdateAllGroupFlags;
+	bool m_hasForce;
 	int32 m_iterationIndex;
 	float32 m_density;
 	float32 m_inverseDensity;
@@ -604,6 +608,7 @@ private:
 	ParticleBuffer<uint32> m_flagsBuffer;
 	ParticleBuffer<b2Vec2> m_positionBuffer;
 	ParticleBuffer<b2Vec2> m_velocityBuffer;
+	b2Vec2* m_forceBuffer;
 	/// m_weightBuffer is populated in ComputeWeight and used in
 	/// ComputeDepth(), SolveStaticPressure() and SolvePressure().
 	float32* m_weightBuffer;
