@@ -331,6 +331,12 @@ public:
 		return GetListNode()->IsEmpty();
 	}
 
+	/// Calculate the length of the list.
+	uint32 GetLength() const
+	{
+		return GetListNode()->GetLength();
+	}
+
 	B2_INTRUSIVE_LIST_GET_NODE(m_node);
 
 private:
@@ -359,7 +365,6 @@ private:
 		return nodeOffset;
 	}
 };
-
 
 #endif // B2_INTRUSIVE_LIST
 
