@@ -304,6 +304,17 @@ TEST_F(TypedIntrusiveListTests, AddRemove)
 	EXPECT_TRUE(list.IsEmpty());
 }
 
+// Get the length of a list.
+TEST_F(TypedIntrusiveListTests, GetLength)
+{
+	b2TypedIntrusiveListNode<IntegerItem> list;
+	IntegerItem a(1);
+	IntegerItem b(2);
+	list.InsertAfter(&a);
+	list.InsertAfter(&b);
+	EXPECT_EQ(2U, list.GetLength());
+}
+
 // Insert multiple items into a typed list and iterate through them.
 TEST_F(TypedIntrusiveListTests, InsertListItemsIterate)
 {
