@@ -31,6 +31,7 @@ set(BOX2D_Shapes_HDRS
 set(BOX2D_Common_SRCS
 	Common/b2BlockAllocator.cpp
 	Common/b2Draw.cpp
+	Common/b2FreeList.cpp
 	Common/b2Math.cpp
 	Common/b2Settings.cpp
 	Common/b2StackAllocator.cpp
@@ -40,6 +41,7 @@ set(BOX2D_Common_SRCS
 set(BOX2D_Common_HDRS
 	Common/b2BlockAllocator.h
 	Common/b2Draw.h
+	Common/b2FreeList.h
 	Common/b2GrowableStack.h
 	Common/b2IntrusiveList.h
 	Common/b2Math.h
