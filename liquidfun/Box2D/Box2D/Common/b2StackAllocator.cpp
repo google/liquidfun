@@ -64,6 +64,7 @@ void* b2StackAllocator::Reallocate(void* p, int32 size)
 	b2Assert(m_entryCount > 0);
 	b2StackEntry* entry = m_entries + m_entryCount - 1;
 	b2Assert(p == entry->data);
+	B2_NOT_USED(p);
 	int32 incrementSize = size - entry->size;
 	if (incrementSize > 0)
 	{
