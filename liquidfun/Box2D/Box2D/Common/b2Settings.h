@@ -191,6 +191,16 @@ void* b2Alloc(int32 size);
 /// If you implement b2Alloc, you should also implement this function.
 void b2Free(void* mem);
 
+/// Use this function to override b2Alloc() without recompiling this library.
+typedef void* (*b2AllocFunction)(int32 size);
+/// Use this function to override b2Free() without recompiling this library.
+typedef void (*b2FreeFunction)(void *mem);
+
+/// Set alloc and free callbacks to override the default behavior of using
+/// malloc() and free() for dynamic memory allocation.
+void b2SetAllocFreeCallbacks(b2AllocFunction allocCallback,
+							 b2FreeFunction freeCallback);
+
 /// Get number of calls to b2Alloc minus number of calls to b2Free.
 int32 b2GetNumAllocs();
 
