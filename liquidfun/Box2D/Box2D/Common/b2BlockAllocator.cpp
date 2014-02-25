@@ -55,21 +55,6 @@ struct b2Block
 	b2Block* next;
 };
 
-class b2GiantNode
-{
-public:
-	b2GiantNode() {
-		b2Assert(sizeof(*this) == b2_mallocAlignment);
-		B2_NOT_USED(m_padding);
-	}
-
-	B2_INTRUSIVE_LIST_GET_NODE(m_node);
-	B2_INTRUSIVE_LIST_NODE_GET_CLASS(b2GiantNode, m_node);
-private:
-	b2IntrusiveListNode m_node;
-	char m_padding[b2_mallocAlignment - sizeof(b2IntrusiveListNode)];
-};
-
 b2BlockAllocator::b2BlockAllocator()
 {
 	b2Assert((uint32)b2_blockSizes < UCHAR_MAX);
@@ -110,38 +95,11 @@ b2BlockAllocator::~b2BlockAllocator()
 	}
 
 	b2Free(m_chunks);
-
-	for (b2IntrusiveListNode* n = m_giants.GetNext();
-		 n != m_giants.GetTerminator(); n = n->GetNext()) {
-		b2GiantNode* giantNode = b2GiantNode::GetInstanceFromListNode(n);
-		giantNode->~b2GiantNode();
-		b2Free(giantNode);
-	}
 }
 
-int32 b2BlockAllocator::GetNumGiantAllocations() const
+uint32 b2BlockAllocator::GetNumGiantAllocations() const
 {
-	return m_giants.GetLength();
-}
-
-void* b2BlockAllocator::AllocateGiant(int32 size)
-{
-	// Allocate a little extra at the beginning to hold the b2GiantNode header
-	void* nMem = (b2GiantNode*)b2Alloc(sizeof(b2GiantNode) + size);
-	b2GiantNode* n = new(nMem) b2GiantNode; // Placement new
-	m_giants.InsertBefore(n->GetListNode());
-
-	// Return a pointer to the memory immediately after the b2GiantNode header
-	void* mem = n + 1;
-	return mem;
-}
-
-void b2BlockAllocator::FreeGiant(void* mem)
-{
-	// The header comes before the memory that was returned
-	b2GiantNode* n = (b2GiantNode*)mem - 1;
-	n->~b2GiantNode(); // Destructor removes node from list
-	b2Free(n);
+	return m_giants.GetList().GetLength();
 }
 
 void* b2BlockAllocator::Allocate(int32 size)
@@ -153,7 +111,7 @@ void* b2BlockAllocator::Allocate(int32 size)
 
 	if (size > b2_maxBlockSize)
 	{
-		return AllocateGiant(size);
+		return m_giants.Allocate(size);
 	}
 
 	int32 index = s_blockSizeLookup[size];
@@ -213,7 +171,7 @@ void b2BlockAllocator::Free(void* p, int32 size)
 
 	if (size > b2_maxBlockSize)
 	{
-		FreeGiant(p);
+		m_giants.Free(p);
 		return;
 	}
 
