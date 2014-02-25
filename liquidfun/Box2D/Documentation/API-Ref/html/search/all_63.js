@@ -9,6 +9,7 @@ var searchData=
   ['clone',['Clone',['../classb2_chain_shape.html#a651a039aa4584e48df91db8108729bfa',1,'b2ChainShape::Clone()'],['../classb2_circle_shape.html#a895ba8656a146d26a0c531e9dbea2e14',1,'b2CircleShape::Clone()'],['../classb2_edge_shape.html#a70ce8532bab35dce4367d3717ae024b3',1,'b2EdgeShape::Clone()'],['../classb2_polygon_shape.html#a38cf6a915a85691746465c9dbfc5aeb6',1,'b2PolygonShape::Clone()'],['../classb2_shape.html#a4716243454bb9cf7c7ee1d9cb23ae634',1,'b2Shape::Clone()']]],
   ['collideconnected',['collideConnected',['../structb2_joint_def.html#aef099a1f89b64e230173b6016848ea9b',1,'b2JointDef']]],
   ['color',['color',['../structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91',1,'b2ParticleDef::color()'],['../structb2_particle_group_def.html#a4ec788b26160e46cd8874ed1f980e216',1,'b2ParticleGroupDef::color()']]],
+  ['colormixingstrength',['colorMixingStrength',['../structb2_particle_system_def.html#a861295bffd9ad85d613545528d95c375',1,'b2ParticleSystemDef']]],
   ['combine',['Combine',['../structb2_a_a_b_b.html#ad551edba62d2ad6094672a9ba3e26496',1,'b2AABB::Combine(const b2AABB &amp;aabb)'],['../structb2_a_a_b_b.html#a34b9c7d824df845c10caa9c12ae90452',1,'b2AABB::Combine(const b2AABB &amp;aabb1, const b2AABB &amp;aabb2)']]],
   ['computeaabb',['ComputeAABB',['../classb2_chain_shape.html#a409c21206e4c84f66700809aac5b164c',1,'b2ChainShape::ComputeAABB()'],['../classb2_circle_shape.html#aa6889a5af85aa1e272547fd0008eb64a',1,'b2CircleShape::ComputeAABB()'],['../classb2_edge_shape.html#a30f601c611eb549f9f657eee89d82f9f',1,'b2EdgeShape::ComputeAABB()'],['../classb2_polygon_shape.html#a00e225b0321bf6bb231a554036ffdf23',1,'b2PolygonShape::ComputeAABB()'],['../classb2_shape.html#a88e9807fab0c8ca9a98d8926e50a1411',1,'b2Shape::ComputeAABB()']]],
   ['computedistance',['ComputeDistance',['../classb2_chain_shape.html#ad8d6dfc06276b8c282bab1587bc931ef',1,'b2ChainShape::ComputeDistance()'],['../classb2_circle_shape.html#a9a3fa0f2c16af60debd19d275a6d4291',1,'b2CircleShape::ComputeDistance()'],['../classb2_edge_shape.html#afd7da4736ea71ba98511ef7dade3381f',1,'b2EdgeShape::ComputeDistance()'],['../classb2_polygon_shape.html#ae738a9401f03fb4fa7951ad0dc8e202c',1,'b2PolygonShape::ComputeDistance()'],['../classb2_shape.html#aa86f47d864e8236aacc7e922e5d3979a',1,'b2Shape::ComputeDistance()'],['../classb2_fixture.html#a74f61131feda0adb1d4893137404978b',1,'b2Fixture::ComputeDistance()']]],
@@ -16,6 +17,7 @@ var searchData=
   ['computeparticlecollisionenergy',['ComputeParticleCollisionEnergy',['../classb2_world.html#a79551978e76de7bbf71155d5be92229a',1,'b2World::ComputeParticleCollisionEnergy()'],['../classb2_particle_system.html#a1bd66244b97bd03c2a9e3a361e508c19',1,'b2ParticleSystem::ComputeParticleCollisionEnergy()']]],
   ['contact',['contact',['../structb2_contact_edge.html#a2fbfaffa0dfdf715fd1a709cff939dee',1,'b2ContactEdge']]],
   ['contains',['Contains',['../structb2_a_a_b_b.html#aba5fc112e3c8d05e034a21d95fc37704',1,'b2AABB']]],
+  ['containsparticle',['ContainsParticle',['../classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337',1,'b2ParticleGroup']]],
   ['correctionfactor',['correctionFactor',['../structb2_motor_joint_def.html#ab282afdb92d07ead23530f57fd0eb9ea',1,'b2MotorJointDef']]],
   ['createbody',['CreateBody',['../classb2_world.html#a2eb36e967e43294bfa03ec3d177c2dae',1,'b2World']]],
   ['createchain',['CreateChain',['../classb2_chain_shape.html#aa0977339b743c05f2179939ccc38e7e0',1,'b2ChainShape']]],
@@ -23,6 +25,7 @@ var searchData=
   ['createjoint',['CreateJoint',['../classb2_world.html#a5cba9d0653149eb62504154e6fb35021',1,'b2World']]],
   ['createloop',['CreateLoop',['../classb2_chain_shape.html#ac257742a52cac391e25962a4c703fb06',1,'b2ChainShape']]],
   ['createparticle',['CreateParticle',['../classb2_world.html#a4570ed2da970744aa229cf83deb8b3e9',1,'b2World::CreateParticle()'],['../classb2_particle_system.html#a9a52c227fcd0e7bb0346d748f0df0750',1,'b2ParticleSystem::CreateParticle()']]],
-  ['createparticlegroup',['CreateParticleGroup',['../classb2_world.html#a287385e587d831aca401d6ef89d3c9a4',1,'b2World::CreateParticleGroup()'],['../classb2_particle_system.html#ae479a020886c1ed270ad17a4ffa2eff5',1,'b2ParticleSystem::CreateParticleGroup()']]],
+  ['createparticlegroup',['CreateParticleGroup',['../classb2_world.html#a18fd4e7b4c8d2b17ff227902cf3d23d7',1,'b2World::CreateParticleGroup()'],['../classb2_particle_system.html#ae479a020886c1ed270ad17a4ffa2eff5',1,'b2ParticleSystem::CreateParticleGroup()']]],
+  ['createparticlesystem',['CreateParticleSystem',['../classb2_world.html#a68b967ae71d8363fe01d37781323e07e',1,'b2World']]],
   ['createproxy',['CreateProxy',['../classb2_broad_phase.html#ae2f7af756bc55ece45221466c5af449c',1,'b2BroadPhase::CreateProxy()'],['../classb2_dynamic_tree.html#ae44676f12977dada46037da47fc7ffbf',1,'b2DynamicTree::CreateProxy()']]]
 ];

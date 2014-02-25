@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>LiquidFun: b2BlockAllocator Class Reference</title>
+<title>LiquidFun: b2IntrusiveListNode Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -83,37 +83,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="classb2_block_allocator-members.html">List of all members</a>  </div>
+<a href="classb2_intrusive_list_node-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">b2BlockAllocator Class Reference</div>  </div>
+<div class="title">b2IntrusiveListNode Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p><code>#include &lt;<a class="el" href="b2_block_allocator_8h_source.html">b2BlockAllocator.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a437bf775c23f6e36af11a6d1653d7040"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a437bf775c23f6e36af11a6d1653d7040"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">Allocate</a> (int32 size)</td></tr>
-<tr class="memdesc:a437bf775c23f6e36af11a6d1653d7040"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate memory. This uses b2Alloc if the size is larger than b2_maxBlockSize. <br/></td></tr>
-<tr class="separator:a437bf775c23f6e36af11a6d1653d7040"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a945fdf86e260318b930a53dcc887ca8b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a945fdf86e260318b930a53dcc887ca8b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_block_allocator.html#a945fdf86e260318b930a53dcc887ca8b">Free</a> (void *p, int32 size)</td></tr>
-<tr class="memdesc:a945fdf86e260318b930a53dcc887ca8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free memory. This uses b2Free if the size is larger than b2_maxBlockSize. <br/></td></tr>
-<tr class="separator:a945fdf86e260318b930a53dcc887ca8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d3bac86217eba9d1eb6dff2acee0d77"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d3bac86217eba9d1eb6dff2acee0d77"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Clear</b> ()</td></tr>
-<tr class="separator:a3d3bac86217eba9d1eb6dff2acee0d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a040f1db1e8bf0fe7720d210523464325"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a040f1db1e8bf0fe7720d210523464325"></a>
-int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_block_allocator.html#a040f1db1e8bf0fe7720d210523464325">GetNumGiantAllocations</a> () const </td></tr>
-<tr class="memdesc:a040f1db1e8bf0fe7720d210523464325"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of allocations larger than the max block size. <br/></td></tr>
-<tr class="separator:a040f1db1e8bf0fe7720d210523464325"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac845483f52493f1597cdcd30b8795b85"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac845483f52493f1597cdcd30b8795b85"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>InsertAfter</b> (<a class="el" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> *node)</td></tr>
+<tr class="separator:ac845483f52493f1597cdcd30b8795b85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc66ad6270dca482ce6e4146c5c3ac20"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc66ad6270dca482ce6e4146c5c3ac20"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>InsertBefore</b> (<a class="el" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> *node)</td></tr>
+<tr class="separator:abc66ad6270dca482ce6e4146c5c3ac20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2565390c6868a89e5db7f1577eafd709"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2565390c6868a89e5db7f1577eafd709"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Remove</b> ()</td></tr>
+<tr class="separator:a2565390c6868a89e5db7f1577eafd709"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a824cfd5f79cd5dcedfc0dd96add8e2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a824cfd5f79cd5dcedfc0dd96add8e2"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>InList</b> () const </td></tr>
+<tr class="separator:a2a824cfd5f79cd5dcedfc0dd96add8e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a053482e23d4ff9ab47b3ea35f7e2d6d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a053482e23d4ff9ab47b3ea35f7e2d6d5"></a>
+int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetLength</b> () const </td></tr>
+<tr class="separator:a053482e23d4ff9ab47b3ea35f7e2d6d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6a1055cd0cc27d5d3f39b0ca0d9ecfb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6a1055cd0cc27d5d3f39b0ca0d9ecfb"></a>
+<a class="el" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetNext</b> ()</td></tr>
+<tr class="separator:af6a1055cd0cc27d5d3f39b0ca0d9ecfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51ce6caadf603a44c26b0ed5e9d5e3ca"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a51ce6caadf603a44c26b0ed5e9d5e3ca"></a>
+<a class="el" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetPrevious</b> ()</td></tr>
+<tr class="separator:a51ce6caadf603a44c26b0ed5e9d5e3ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b7478e3f099a41341aecdff137be7f3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4b7478e3f099a41341aecdff137be7f3"></a>
+<a class="el" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetTerminator</b> ()</td></tr>
+<tr class="separator:a4b7478e3f099a41341aecdff137be7f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11822879bf5064df77bd2604af453b28"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a11822879bf5064df77bd2604af453b28"></a>
+const <a class="el" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetNext</b> () const </td></tr>
+<tr class="separator:a11822879bf5064df77bd2604af453b28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91eb93909e7278ec8d269518da95c145"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a91eb93909e7278ec8d269518da95c145"></a>
+const <a class="el" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetPrevious</b> () const </td></tr>
+<tr class="separator:a91eb93909e7278ec8d269518da95c145"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac889c92042c5aacac9637328aead4b2f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac889c92042c5aacac9637328aead4b2f"></a>
+const <a class="el" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetTerminator</b> () const </td></tr>
+<tr class="separator:ac889c92042c5aacac9637328aead4b2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This is a small object allocator used for allocating small objects that persist for more than one time step. See: <a href="http://www.codeproject.com/useritems/Small_Block_Allocator.asp">http://www.codeproject.com/useritems/Small_Block_Allocator.asp</a> </p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="b2_block_allocator_8h_source.html">b2BlockAllocator.h</a></li>
-<li>b2BlockAllocator.cpp</li>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li><a class="el" href="b2_intrusive_list_8h_source.html">b2IntrusiveList.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- Google Analytics -->
