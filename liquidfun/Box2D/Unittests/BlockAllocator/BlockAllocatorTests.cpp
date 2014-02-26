@@ -20,11 +20,77 @@
 #include "AndroidUtil/AndroidMainWrapper.h"
 #include <limits>
 #include <iostream>
+#include <vector>
+
+// Overrides the default allocators to track allocations and frees.
+class MockAllocator {
+public:
+	// Initialize the allocation and free counters.
+	MockAllocator() : m_allocCount(0), m_freeCount(0)
+	{
+	}
+
+	// Disable the override of the allocation functions.
+	~MockAllocator()
+	{
+		Disable();
+	}
+
+	// Get the number of times Alloc has been called.
+	uint32 GetAllocCount() const { return m_allocCount; }
+	// Get the number of times Free has been called.
+	uint32 GetFreeCount() const { return m_freeCount; }
+
+	// Override b2Alloc and b2Free.
+	void Enable()
+	{
+		b2SetAllocFreeCallbacks(Alloc, Free, this);
+	}
+
+	// Restore b2Alloc and b2Free to their default behavior.
+	void Disable()
+	{
+		b2SetAllocFreeCallbacks(NULL, NULL, NULL);
+	}
+
+	// Reset the allocation and free counters and restore the default
+	// allocators.
+	void Reset()
+	{
+		Disable();
+		m_allocCount = 0;
+		m_freeCount = 0;
+	}
+
+protected:
+	uint32 m_allocCount;
+	uint32 m_freeCount;
+
+public:
+	// Increment the allocation counter and allocate size bytes of memory.
+	static void* Alloc(int32 size, void* callbackData)
+	{
+		MockAllocator* const allocator = (MockAllocator*)callbackData;
+		allocator->m_allocCount++;
+		return malloc(size);
+	}
+
+	// Decrement the allocation counter and free the specified memory.
+	static void Free(void* mem, void* callbackData)
+	{
+		MockAllocator* const allocator = (MockAllocator*)callbackData;
+		allocator->m_freeCount++;
+		free(mem);
+	}
+};
 
 class BlockAllocatorTests : public ::testing::Test {
-    protected:
+protected:
 	virtual void SetUp();
 	virtual void TearDown();
+
+protected:
+	MockAllocator m_mockAllocator;
 };
 
 void
@@ -35,7 +101,8 @@ BlockAllocatorTests::SetUp()
 void
 BlockAllocatorTests::TearDown()
 {
-	// Intentionally blank.
+	// Reset the mock allocator.
+	m_mockAllocator.Reset();
 }
 
 
@@ -83,7 +150,7 @@ static int32 CalcAllocationSizes(
 	int32 iterations,
 	int32 runLength,
 	int32 prime,
-	int32* sizes,
+	std::vector<int32>* const sizes,
 	int32 maxSizes)
 {
 	int32 numSizes = 0;
@@ -96,7 +163,7 @@ static int32 CalcAllocationSizes(
 				if (numSizes >= maxSizes)
 					return numSizes;
 
-				sizes[numSizes++] = size;
+				(*sizes)[numSizes++] = size;
 			}
 		}
 	}
@@ -108,11 +175,11 @@ static int32 CalcAllocationSizes(
 // Repeat until 'numSizes' memory blocks have been allocated and freed.
 static void AllocateAndFree(
 	b2BlockAllocator* alloc,
-	const int32* sizes,
+	const std::vector<int32>& sizes,
 	int32 numSizes,
 	int32 freeRun)
 {
-	void* mem[MAX_ALLOCATIONS];
+	std::vector<void*> mem(MAX_ALLOCATIONS);
 
 	// Make a bunch of allocations
 	int numAlloc = 0;
@@ -137,8 +204,7 @@ static void AllocateAndFree(
 TEST_F(BlockAllocatorTests, b2BlockAllocator_FreesAllMallocs)
 {
 	const int32 startAllocs = b2GetNumAllocs();
-
-	int32 sizes[MAX_ALLOCATIONS];
+	std::vector<int32> sizes(MAX_ALLOCATIONS);
 
 	for (int i = 0; i < NUM_ALLOCATION_ITERATIONS; ++i) {
 		for (int j = 0; j < NUM_ALLOCATION_RUN_LENGTHS; ++j) {
@@ -148,7 +214,7 @@ TEST_F(BlockAllocatorTests, b2BlockAllocator_FreesAllMallocs)
 					ALLOCATION_ITERATIONS[i],
 					ALLOCATION_RUN_LENGTHS[j],
 					ALLOCATION_PRIMES[k],
-					sizes,
+					&sizes,
 					MAX_ALLOCATIONS);
 
 				for (int m = 0; m < NUM_ALLOCATION_FREE_RUNS; ++m) {
@@ -169,6 +235,39 @@ TEST_F(BlockAllocatorTests, b2BlockAllocator_FreesAllMallocs)
 			}
 		}
 	}
+}
+
+// Verify that it's possible to override the default memory allocators.
+TEST_F(BlockAllocatorTests, OverrideAllocFree)
+{
+	m_mockAllocator.Enable();
+	void *a = b2Alloc(1);
+	void *b = b2Alloc(2);
+	void *c = b2Alloc(4);
+	EXPECT_EQ(3U, m_mockAllocator.GetAllocCount());
+	EXPECT_EQ(0U, m_mockAllocator.GetFreeCount());
+	b2Free(a);
+	b2Free(b);
+	b2Free(c);
+	EXPECT_EQ(3U, m_mockAllocator.GetAllocCount());
+	EXPECT_EQ(3U, m_mockAllocator.GetFreeCount());
+}
+
+
+// Verify that disabling the default memory allocator restores malloc/free.
+TEST_F(BlockAllocatorTests, RestoreMallocFree)
+{
+	m_mockAllocator.Enable();
+	void *mem = b2Alloc(1);
+	// Reset the global allocated block counter so the default allocator can
+	// be restored without causing an assert.
+	b2SetNumAllocs(0);
+	m_mockAllocator.Disable();
+	// Set the allocation counter so the free will decrement it to 0.
+	b2SetNumAllocs(1);
+	b2Free(mem);
+	EXPECT_EQ(1U, m_mockAllocator.GetAllocCount());
+	EXPECT_EQ(0U, m_mockAllocator.GetFreeCount());
 }
 
 int

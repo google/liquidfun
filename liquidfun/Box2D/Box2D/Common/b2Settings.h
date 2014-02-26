@@ -192,14 +192,22 @@ void* b2Alloc(int32 size);
 void b2Free(void* mem);
 
 /// Use this function to override b2Alloc() without recompiling this library.
-typedef void* (*b2AllocFunction)(int32 size);
+typedef void* (*b2AllocFunction)(int32 size, void* callbackData);
 /// Use this function to override b2Free() without recompiling this library.
-typedef void (*b2FreeFunction)(void *mem);
+typedef void (*b2FreeFunction)(void* mem, void* callbackData);
 
 /// Set alloc and free callbacks to override the default behavior of using
 /// malloc() and free() for dynamic memory allocation.
+/// Set allocCallback and freeCallback to NULL to restore the default
+/// allocator (malloc / free).
 void b2SetAllocFreeCallbacks(b2AllocFunction allocCallback,
-							 b2FreeFunction freeCallback);
+							 b2FreeFunction freeCallback,
+							 void* callbackData);
+
+/// Set the number of calls to b2Alloc minus the number of calls to b2Free.
+/// This can be used to disable the empty heap check in
+/// b2SetAllocFreeCallbacks() which can be useful for testing.
+void b2SetNumAllocs(const int32 numAllocs);
 
 /// Get number of calls to b2Alloc minus number of calls to b2Free.
 int32 b2GetNumAllocs();
