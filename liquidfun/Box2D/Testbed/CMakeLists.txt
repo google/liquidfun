@@ -72,20 +72,21 @@ set(Testbed_Tests_SRCS
 	Tests/VerticalStack.h
 	Tests/Web.h
 
-	Tests/Particles.h
-	Tests/DrawingParticles.h
-	Tests/RigidParticles.h
-	Tests/ElasticParticles.h
-	Tests/ParticlesSurfaceTension.h
-	Tests/WaveMachine.h
-	Tests/DamBreak.h
-	Tests/Soup.h
-	Tests/LiquidTimer.h
-	Tests/Sparky.h
-	Tests/Sandbox.h
 	Tests/AntiPointy.h
+	Tests/CornerCase.h
+	Tests/DamBreak.h
+	Tests/DrawingParticles.h
+	Tests/ElasticParticles.h
+	Tests/LiquidTimer.h
+	Tests/Particles.h
+	Tests/ParticlesSurfaceTension.h
 	Tests/Pointy.h
 	Tests/Ramp.h
+	Tests/RigidParticles.h
+	Tests/Sandbox.h
+	Tests/Soup.h
+	Tests/Sparky.h
+	Tests/WaveMachine.h
 )
 
 # These are used to create visual studio folders.
@@ -119,4 +120,4 @@ target_link_libraries (
 	glui
 	${ADDITIONAL_LIBRARIES}
 	${OPENGL_LIBRARIES}
-) 
+)
