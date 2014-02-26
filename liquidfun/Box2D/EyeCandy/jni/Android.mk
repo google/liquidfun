@@ -23,7 +23,7 @@ LOCAL_SRC_FILES := main.cpp
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2
 LOCAL_STATIC_LIBRARIES := android_native_app_glue liquidfun_static
 LOCAL_ARM_MODE:=arm
-LOCAL_CPPFLAGS += -std=c++11
+LOCAL_CPPFLAGS += -std=c++11 -Wall -Werror
 
 include $(BUILD_SHARED_LIBRARY)
 

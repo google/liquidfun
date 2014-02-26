@@ -45,8 +45,11 @@
 #include <assert.h>
 
 #include <vector>
+#include <algorithm>
 
 #include <Box2D/Box2D.h>
+
+using namespace std;
 
 #define  LOG_TAG    "EyeCandy"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
@@ -318,6 +321,7 @@ public:
     display_(0), surface_(0), context_(0),
     width_(0), height_(0), scale_(1),
     fbo_(0), fbo_tex_(0), background_tex_(0),
+    blob_normal_tex_(0), blob_temporal_tex_(0),
     world_(nullptr), joint_(nullptr), mover_(nullptr),
     which_effect_(0)
   {}
@@ -417,13 +421,13 @@ public:
         EGL_RED_SIZE, 8,
         EGL_NONE
     };
-    EGLint dummy, format;
+    EGLint format;
     EGLint num_configs;
     EGLConfig config;
 
     display_ = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
-    #define EGLCHECK(c) { EGLBoolean ok = (c); assert(ok); }
+    #define EGLCHECK(c) { EGLBoolean ok = (c); assert(ok); B2_NOT_USED(ok); }
 
     EGLCHECK(eglInitialize(display_, nullptr, nullptr));
 
@@ -444,6 +448,7 @@ public:
 
     int ret = ANativeWindow_setBuffersGeometry(app->window, 0, 0, format);
     assert(ret >= 0);
+    B2_NOT_USED(ret);
 
     surface_ = eglCreateWindowSurface(display_, config, app->window, NULL);
 
@@ -508,6 +513,10 @@ public:
     if (!mover_tex_)
       return false;
 
+    blob_normal_tex_ = PrecomputeBlobTexture(kEffectRefraction);
+    blob_temporal_tex_ = PrecomputeBlobTexture(kEffectTemporalBlend);
+    assert(blob_normal_tex_ && blob_temporal_tex_);
+
     InitPhysics();
 
     clock_gettime(CLOCK_REALTIME, &start_time_);
@@ -516,7 +525,94 @@ public:
     return true;
   }
 
-  bool InitPhysics() {
+  float saturate(float x) { return max(min(x, 1.0f), 0.0f); }
+  float smoothstep(float x) { x = saturate(x); return x * x * (3 - 2 * x); }
+  unsigned char quantize(float x) { return saturate(x) * 255.0f; }
+
+  GLuint PrecomputeBlobTexture(int effect) {
+    // This texture creates pre-computed parameters for each particle point
+    // sprite to be blended into an FBO to later be used in the actual full
+    // screen water shader.
+    // We want to compute information that will allow us to have a blended
+    // normal. This is tricky for a 2 reasons:
+    // 1) Because we generally don't have floating point FBO's, we have to make
+    //    sure to fit all the values within an 8-bit range, while taking into
+    //    account up to 6 or so particles can blend for any pixel, which gives
+    //    serious precision issues.
+    // 2) To make the particles appear to smoothly transition into eachother
+    //    as if they were a single liquid under additive blending we have to
+    //    choose our math carefully.
+    // For this reason, we cannot simply blend normals. Instead, we blend a
+    // a directional vector and a fluid height each in their own way, and
+    // reconstruct the normal later. This is also useful for the refraction
+    // term.
+    const int TSIZE = 64;  // Note: lower gives aliasing effects on high res
+                           // screens, higher degrades performance because of
+                           // texture cache.
+    unsigned char tex[TSIZE][TSIZE][4];
+    for (int y = 0; y < TSIZE; y++)
+    {
+      for (int x = 0; x < TSIZE; x++)
+      {
+        // define our cone
+        auto xy = (b2Vec2(x, y) + 0.5f) / TSIZE * 2 - 1;
+        float distsqr = xy.LengthSquared();
+        float falloff = 1.0f - distsqr;
+        float smooth = smoothstep(falloff); // outside circle drops to 0
+
+        // the more we scale the distance for exp(), the more fluid the
+        // transition looks, but also the more precision problems we cause on
+        // the rim. 4 is a good tradeoff.
+        // exp() works better than linear/smoothstep/hemisphere because it
+        // makes the fluid transition nicer (less visible transition
+        // boundaries).
+        float waterheight = expf(distsqr * -4.0f);
+
+        // this value represents the 0 point for the directional components
+        // it needs to be fairly low to make sure we can fit many blended
+        // samples (this depends on how "particlesize" for point.vs is
+        // computed, the larger, the more overlapping particles, and we can't
+        // allow them saturate to 1).
+        // But, the lower, the more precision problems you get.
+        const float bias = 0.075f;
+
+        // the w component effectively holds the number of particles that were
+        // blended to this pixel, i.e. the total bias.
+        // xy is the directional vector. we reduce the magnitude of this vector
+        // by a smooth version of the distance from the center to reduce its
+        // contribution to the blend, this works well because vectors at the
+        // edges tend to have opposed directions, this keeps it smooth and sort
+        // of normalizes (since longer vectors get reduced more) at the cost of
+        // precision at the far ends.
+        // The z component is the fluid height, and unlike the xy is meant to
+        // saturate under blending.
+        const float falloff_min = 0.05f;
+        b2Vec4 out;
+        if (falloff > falloff_min) {
+          if (effect == kEffectRefraction) {
+            auto dxy = xy * 0.5f * smooth + bias;
+            out = b2Vec4(dxy.x, dxy.y, waterheight, bias);
+          } else {
+            out = b2Vec4(0.05f * smooth,
+                         0.08f * smooth,
+                         0.30f * smooth, 1.0f);
+          }
+        } else {
+          out = b2Vec4(0, 0, 0, 0);
+        }
+        tex[y][x][0] = quantize(out.x);
+        tex[y][x][1] = quantize(out.y);
+        tex[y][x][2] = quantize(out.z);
+        tex[y][x][3] = quantize(out.w);
+        // See fullscreen.glslf (starting at vec4 samp) for how these values
+        // are used.
+      }
+    }
+
+    return CreateTexture(TSIZE, TSIZE, &tex[0][0][0], true, false, false);
+  }
+
+  void InitPhysics() {
     world_ = new b2World(b2Vec2(0, -10));
     world_->SetParticleGravityScale(0.4f);
     world_->SetParticleDensity(1.2f);
@@ -586,6 +682,8 @@ public:
                                      1000000000.0));
     float framedelta = time - prev_time_;
     prev_time_ = time;
+    static int frames = 0;
+    if (!(frames++ & 16)) LOGI("framedelta = %f", framedelta);
 
     scale_ = height_ / 12.0f;
 
@@ -598,7 +696,8 @@ public:
     // were added dynamically.
     // note: will shift sizes if particles are removed, which will look
     // weird graphically.
-    while (particle_sizes_.size() < world_->GetParticleCount()) {
+    while (static_cast<int>(particle_sizes_.size())
+             < world_->GetParticleCount()) {
       particle_sizes_.push_back((rand() / static_cast<float>(RAND_MAX)
                                        * 0.8f + 1.5f)
                                       * world_->GetParticleRadius());
@@ -670,7 +769,7 @@ public:
     glBlendFunc(GL_ONE, GL_ONE);
 
     sh_point_.SetWorld(scale_, width_, height_);
-
+    glBindTexture(GL_TEXTURE_2D, blob_normal_tex_);
     DrawParticleBuffers(sh_point_);
 
     glDisable(GL_BLEND);
@@ -712,8 +811,7 @@ public:
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
     sh_blob_.SetWorld(scale_, width_, height_);
-    sh_blob_.Set4f("color", b2Vec4(0.05f, 0.08f, 0.3f, 1.0f));
-
+    glBindTexture(GL_TEXTURE_2D, blob_temporal_tex_);
     DrawParticleBuffers(sh_blob_);
 
     glDisable(GL_BLEND);
@@ -794,16 +892,43 @@ public:
     }
   }
 
+  int DeviceRotation(ANativeActivity *activity) {
+    // Does the equivalent of:
+    // WindowManager wm = Context.getSystemService(Context.WINDOW_SERVICE);
+    // return = wm.getDefaultDisplay().getRotation();
+    JNIEnv *env = activity->env;
+    JavaVM *javaVm = activity->vm;
+    javaVm->AttachCurrentThread(&env, NULL);
+    jclass ContextClass = env->FindClass("android/content/Context");
+    jmethodID getSystemServiceMethod = env->GetMethodID(ContextClass,
+                 "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+    jfieldID WindowServiceID = env->GetStaticFieldID(ContextClass,
+                                       "WINDOW_SERVICE", "Ljava/lang/String;");
+    jobject WindowServiceString = env->GetStaticObjectField(ContextClass,
+                                                              WindowServiceID);
+    jobject wmObject = env->CallObjectMethod(activity->clazz,
+                                  getSystemServiceMethod, WindowServiceString);
+    jclass WindowManagerClass = env->FindClass("android/view/WindowManager");
+    jmethodID getDefaultDisplay = env->GetMethodID(WindowManagerClass,
+                              "getDefaultDisplay", "()Landroid/view/Display;");
+    jobject ddObject = env->CallObjectMethod(wmObject, getDefaultDisplay);
+    jclass DisplayClass = env->FindClass("android/view/Display");
+    jmethodID getRotationMethod = env->GetMethodID(DisplayClass, "getRotation",
+                                                                        "()I");
+    int rotation = env->CallIntMethod(ddObject, getRotationMethod);
+    javaVm->DetachCurrentThread();
+    return rotation;
+  }
+
   void InitApp(android_app *app) {
-    // determine if we should assume the default is landscape mode
     char model_string[PROP_VALUE_MAX+1];
     __system_property_get("ro.product.model", model_string);
     LOGI("model = %s", model_string);
-    // FIXME: instead, call Display.getRotation() (java)
-    // https://googleplex-android.googlesource.com/platform/vendor/
-    //   unbundled_google/libs/liquidfun/+/ub-games-master/Box2D/AndroidUtil/
-    //   AndroidMainWrapper.c#
-    landscape_device_ = strcmp(model_string, "SHIELD") == 0;
+
+    // determine if we should assume the default is landscape mode
+    int rotation = DeviceRotation(app->activity);
+    LOGI("rotation = %d", rotation);
+    landscape_device_ = rotation == 0;
 
     // Prepare to monitor accelerometer
     sensor_manager_ = ASensorManager_getInstance();
@@ -890,6 +1015,7 @@ private:
   GLuint fbo_, fbo_tex_;
   GLuint background_tex_;
   GLuint mover_tex_;
+  GLuint blob_normal_tex_, blob_temporal_tex_;
 
   b2World *world_;
   b2RevoluteJoint *joint_;

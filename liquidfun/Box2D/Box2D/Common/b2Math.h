@@ -143,6 +143,30 @@ struct b2Vec2
 	float32 x, y;
 };
 
+/// Add a float to a vector.
+inline b2Vec2 operator + (const b2Vec2& v, float f)
+{
+	return b2Vec2(v.x + f, v.y + f);
+}
+
+/// Substract a float from a vector.
+inline b2Vec2 operator - (const b2Vec2& v, float f)
+{
+	return b2Vec2(v.x - f, v.y - f);
+}
+
+/// Multiply a float with a vector.
+inline b2Vec2 operator * (const b2Vec2& v, float f)
+{
+	return b2Vec2(v.x * f, v.y * f);
+}
+
+/// Divide a vector by a float.
+inline b2Vec2 operator / (const b2Vec2& v, float f)
+{
+	return b2Vec2(v.x / f, v.y / f);
+}
+
 /// A 3D column vector with 3 elements.
 struct b2Vec3
 {

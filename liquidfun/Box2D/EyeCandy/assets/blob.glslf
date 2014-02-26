@@ -20,17 +20,8 @@
 
 precision mediump float;
 
-uniform vec4 color;
+uniform sampler2D tex0; // the precomputed blob texture
 
 void main() {
-
-  // define our cone
-  vec2 p = gl_PointCoord * 2.0 - 1.0;
-  float distsqr = dot(p, p);
-  float falloff = 1.0 - distsqr;
-  float smooth = smoothstep(0.0, 1.0, falloff); // outside circle drops to 0
-
-  gl_FragColor = falloff > 0.0
-    ? vec4(color.xyz * smooth, 1.0)
-    : vec4(0.0, 0.0, 0.0, 0.0);
+  gl_FragColor = texture2D(tex0, gl_PointCoord);
 }

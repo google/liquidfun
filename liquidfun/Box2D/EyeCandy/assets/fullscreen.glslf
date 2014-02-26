@@ -26,14 +26,20 @@ uniform sampler2D tex1; // background texture
 uniform vec3 lightdir;  // a directional (ortho) light source
 
 void main() {
-
   // This contains very specific parameters packed into the output color in
-  // point.ps, read that first to be able to understand what this shader does.
+  // point.ps (from the texture created in PrecomputeBlobTexture()),
+  // read that first to be able to understand what this shader does.
   vec4 samp = texture2D(tex0, texcoord);
 
   float totalbias = samp.w;
 
-  if (totalbias < 0.001) {
+  // We need to reject any pixels that are outside of any blended particles.
+  // Due to bilinear filtering of the parameter texture this is a tricky value
+  // to get right, it needs to be just less than the bias value, taking into
+  // account the 8bit quantization this has undergone.
+  const float min_filtered_bias = 0.074;
+
+  if (totalbias < min_filtered_bias) {
     // This pixel contains no fluid at all.
     // We sample the background texture to just display it, but artificially
     // darken it a bit to make the fluid pop out a bit more.
