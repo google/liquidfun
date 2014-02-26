@@ -21,12 +21,11 @@
 #include <Box2D/Common/b2Settings.h>
 
 // Whether to enable b2IntrusiveList::ValidateList().
+// Be careful when enabling this since this changes the size of
+// b2IntrusiveListNode so make sure *all* projects that include Box2D.h
+// also define this value in the same way to avoid data corruption.
 #ifndef B2_INTRUSIVE_LIST_VALIDATE
-#if DEBUG
-#define B2_INTRUSIVE_LIST_VALIDATE 1
-#else
 #define B2_INTRUSIVE_LIST_VALIDATE 0
-#endif  // DEBUG
 #endif  // B2_INTRUSIVE_LIST_VALIDATE
 
 /// b2IntrusiveListNode is used to implement an intrusive doubly-linked
@@ -69,18 +68,18 @@ public:
 	b2IntrusiveListNode()
 	{
 		Initialize();
-#if DEBUG
+#if B2_INTRUSIVE_LIST_VALIDATE
 		m_magic = k_magic;
-#endif // DEBUG
+#endif // B2_INTRUSIVE_LIST_VALIDATE
 	}
 
 	/// If the node is in a list, remove it from the list.
 	~b2IntrusiveListNode()
 	{
 		Remove();
-#if DEBUG
+#if B2_INTRUSIVE_LIST_VALIDATE
 		m_magic = 0;
-#endif // DEBUG
+#endif // B2_INTRUSIVE_LIST_VALIDATE
 	}
 
 	/// Insert this node after the specified node.
@@ -155,7 +154,7 @@ public:
 		return m_prev;
 	}
 
-	/// If DEBUG is 1 (compiled in debug mode) perform a very rough validation
+	/// If B2_INTRUSIVE_LIST_VALIDATE is 1 perform a very rough validation
 	/// of all nodes in the list.
 	bool ValidateList() const
 	{
@@ -200,9 +199,9 @@ private:
 	b2IntrusiveListNode *m_next;
 
 private:
-#if DEBUG
+#if B2_INTRUSIVE_LIST_VALIDATE
 	static const uint32 k_magic = 0x7157ac01;
-#endif  // DEBUG
+#endif  // B2_INTRUSIVE_LIST_VALIDATE
 };
 
 /// Declares the member function GetListNode() of Class to retrieve a pointer
