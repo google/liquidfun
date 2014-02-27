@@ -37,6 +37,7 @@ set(BOX2D_Common_SRCS
 	Common/b2StackAllocator.cpp
 	Common/b2Stat.cpp
 	Common/b2Timer.cpp
+	Common/b2TrackedBlock.cpp
 )
 set(BOX2D_Common_HDRS
 	Common/b2BlockAllocator.h
@@ -49,6 +50,7 @@ set(BOX2D_Common_HDRS
 	Common/b2StackAllocator.h
 	Common/b2Stat.h
 	Common/b2Timer.h
+	Common/b2TrackedBlock.h
 )
 set(BOX2D_Dynamics_SRCS
 	Dynamics/b2Body.cpp
