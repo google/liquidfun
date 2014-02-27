@@ -20,6 +20,8 @@
 
 #include "AndroidUtil/AndroidMainWrapper.h"
 #include "TestCommon.h"
+#include <map>
+#include <vector>
 
 class FunctionTests : public ::testing::Test {
 protected:
@@ -31,8 +33,7 @@ protected:
 		// bodies.
 		m_world = new b2World(gravity);
 
-		const b2ParticleSystemDef particleSystemDef;
-		m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
+		m_particleSystem = m_world->CreateParticleSystem(&m_particleSystemDef);
 	}
 	virtual void TearDown()
 	{
@@ -41,8 +42,217 @@ protected:
 		delete m_world;
 	}
 
+protected:
 	b2World *m_world;
 	b2ParticleSystem *m_particleSystem;
+	b2ParticleSystemDef m_particleSystemDef;
+};
+
+// Class which registers itself as a destruction listener on construction and
+// unregisters itself on destruction.
+class ScopedDestructionListener : public b2DestructionListener
+{
+public:
+	// Set this instance as a destruction listener of world.
+	ScopedDestructionListener(b2World* const world,
+							  b2ParticleSystem* const particleSystem) :
+		m_world(world),
+		m_particleSystem(particleSystem)
+	{
+		b2Assert(m_world);
+		b2Assert(m_particleSystem);
+		m_world->SetDestructionListener(this);
+	}
+
+	// Stop this instance acting as the world's destruction listener.
+	virtual ~ScopedDestructionListener()
+	{
+		m_world->SetDestructionListener(NULL);
+	}
+
+	// Ignore destruction of joints.
+	virtual void SayGoodbye(b2Joint* joint) { B2_NOT_USED(joint); }
+
+	// Ignore destruction of fixtures.
+	virtual void SayGoodbye(b2Fixture* fixture) { B2_NOT_USED(fixture); }
+
+	// Ignore destruction of particle groups.
+	virtual void SayGoodbye(b2ParticleGroup* group) { B2_NOT_USED(group); }
+
+	// Verify destruction of particles.
+	virtual void SayGoodbye(int32 index) { B2_NOT_USED(index); }
+
+protected:
+	b2World *m_world;
+	b2ParticleSystem *m_particleSystem;
+};
+
+// Class which tracks the user data associated with particles that are
+// destroyed in a vector.
+class UserDataDestructionTracker : public ScopedDestructionListener
+{
+public:
+	// Set this instance as a destruction listener of world.
+	UserDataDestructionTracker(b2World* const world,
+							   b2ParticleSystem* const particleSystem) :
+		ScopedDestructionListener(world, particleSystem)
+	{
+
+	}
+
+	// Stop this instance acting as the world's destruction listener.
+	virtual ~UserDataDestructionTracker() { }
+
+	// Add the user data of the destroyed particle in a vector.
+	virtual void SayGoodbye(int32 index)
+	{
+		m_userData.push_back(
+			m_particleSystem->GetParticleUserDataBuffer()[index]);
+	}
+
+	// Get the vector of destroyed particle user data.
+	const std::vector<void*>& GetUserData() const {
+		return m_userData;
+	}
+
+protected:
+	std::vector<void*> m_userData;
+};
+
+// Class which verifies a set of particles are destroyed when they reach
+// the end of their lifetime.
+class LifetimeDestructionChecker : public ScopedDestructionListener
+{
+public:
+	// Set this instance as a destruction listener of world.
+	LifetimeDestructionChecker(
+		float32 destructionTimeEpsilon, b2World* const world,
+		b2ParticleSystem* const particleSystem) :
+		ScopedDestructionListener(world, particleSystem),
+		m_timeElapsed(0.0f),
+		m_destructionTimeEpsilon(destructionTimeEpsilon)
+	{
+		b2Assert(m_world);
+		b2Assert(m_particleSystem);
+		m_world->SetDestructionListener(this);
+	}
+
+	// Stop this instance acting as the world's destruction listener.
+	virtual ~LifetimeDestructionChecker() { }
+
+	// Verify the destroyed particle was destroyed in time.
+	virtual void SayGoodbye(int32 index)
+	{
+		void *handle =
+			reinterpret_cast<void*>(
+				m_particleSystem->GetParticleUserDataBuffer()[index]);
+		// Make sure this particle is being tracked.
+		std::map<void*, float>::iterator it =
+			m_particleLifetime.find(handle);
+		ASSERT_NE(it, m_particleLifetime.end());
+
+		// Make sure the particle was destroyed on time.
+		const float32 lifetime = it->second;
+		EXPECT_NEAR(lifetime, m_timeElapsed, m_destructionTimeEpsilon);
+		m_particleLifetime.erase(it);
+	}
+
+	// Track particles with finite lifetimes.
+	void TrackParticleLifetimes(const int32* const particleIndices,
+								const int32 numberOfParticles)
+	{
+		b2Assert(particleIndices);
+		for (int32 i = 0; i < numberOfParticles; ++i)
+		{
+			// Casting away from const is ok here since the pointer will
+			// never be dereferenced.
+			void* const handle = const_cast<int32*>(&particleIndices[i]);
+			const int32 index = particleIndices[i];
+			m_particleSystem->SetParticleFlags(
+				index, m_particleSystem->GetParticleFlags(index) |
+					   b2_destructionListener);
+			m_particleSystem->GetParticleUserDataBuffer()[index] = handle;
+			m_particleLifetime[handle] =
+				m_particleSystem->GetParticleLifetime(index);
+		}
+	}
+
+	// Update the time elapsed.
+	void Step(const float32 deltaT)
+	{
+		m_timeElapsed += deltaT;
+	}
+
+	// Get how much time has elapsed.
+	float32 GetTimeElapsed() const { return m_timeElapsed; }
+
+private:
+	float32 m_timeElapsed;
+	float32 m_destructionTimeEpsilon;
+	// Map of psuedo handle to the particle stored in userdata and the
+	// expected lifetime of the particle.
+	std::map<void*, float32> m_particleLifetime;
+};
+
+// Class which verifies the oldest particle is always destroyed.
+// For this class to check particles, they must be created with the
+// b2_destructionListener flag set.
+class OldestParticleDestroyedChecker : public ScopedDestructionListener
+{
+public:
+	// Set this instance as a destruction listener of the world.
+	OldestParticleDestroyedChecker(b2World* const world,
+								   b2ParticleSystem* const particleSystem) :
+		ScopedDestructionListener(world, particleSystem) { }
+
+	// Stop this instance acting as the world's destruction listener.
+	virtual ~OldestParticleDestroyedChecker() { }
+
+	// Verify the destroyed particle is the oldest particle in the system.
+	virtual void SayGoodbye(int32 index)
+	{
+		const int32 numberOfParticles =
+			m_particleSystem->GetParticleCount();
+		const int32* const expirationTimes =
+			m_particleSystem->GetParticleExpirationTimeBuffer();
+		ASSERT_TRUE(expirationTimes != NULL);
+
+		int32 oldestFiniteExpirationTimeIndex = b2_invalidParticleIndex;
+		int32 oldestFiniteExpirationTime = (int32)1ULL << 31;
+		int32 oldestInfiniteExpirationTimeIndex = b2_invalidParticleIndex;
+		int32 oldestInfiniteExpirationTime = 0;
+		for (int32 i = 0; i < numberOfParticles; ++i)
+		{
+			const int32 expirationTime = expirationTimes[i];
+			if (expirationTime > 0)
+			{
+				if (expirationTime < oldestFiniteExpirationTime)
+				{
+					oldestFiniteExpirationTime = expirationTime;
+					oldestFiniteExpirationTimeIndex = i;
+				}
+			}
+			else
+			{
+				if (expirationTime > oldestInfiniteExpirationTime)
+				{
+					oldestInfiniteExpirationTime = expirationTime;
+					oldestInfiniteExpirationTimeIndex = i;
+				}
+			}
+		}
+		if (oldestFiniteExpirationTimeIndex != b2_invalidParticleIndex)
+		{
+			EXPECT_EQ(oldestFiniteExpirationTimeIndex, index) <<
+				"oldest finite expiration time " << oldestFiniteExpirationTime;
+		}
+		else if (oldestInfiniteExpirationTimeIndex != b2_invalidParticleIndex)
+		{
+			EXPECT_EQ(oldestInfiniteExpirationTimeIndex, index) <<
+				"oldest infinite expiration time " <<
+					oldestInfiniteExpirationTime;
+		}
+	}
 };
 
 TEST_F(FunctionTests, CreateParticle) {
@@ -685,6 +895,328 @@ TEST_F(FunctionTests, ParticleHandlesTrackGroups)
 		EXPECT_EQ(expectedGroupData[i],
 				  *((int32*)system->GetParticleUserDataBuffer()[
 						particleHandles[i]->GetIndex()]));
+	}
+}
+
+// Test the conversion of particle expiration times to lifetimes.
+TEST_F(FunctionTests, ConvertExpirationTimeToLifetime)
+{
+	m_particleSystem->SetParticleDestructionByAge(true);
+	EXPECT_EQ(m_particleSystemDef.lifetimeGranularity,
+			  m_particleSystem->ExpirationTimeToLifetime(1));
+}
+
+// Get the particle expiration time buffers with no particles present.
+TEST_F(FunctionTests, NoParticlesGetExpirationTimeBuffers)
+{
+	EXPECT_TRUE(NULL != m_particleSystem->GetParticleExpirationTimeBuffer());
+	EXPECT_TRUE(NULL !=
+				m_particleSystem->GetParticleIndexByExpirationTimeBuffer());
+}
+
+// Ensure the default lifetime of particles is infinite.
+TEST_F(FunctionTests, GetParticleLifetime)
+{
+	b2ParticleDef def;
+	const int32 index = m_particleSystem->CreateParticle(def);
+	EXPECT_EQ(0.0f, m_particleSystem->GetParticleLifetime(index));
+}
+
+// Get particle expiration time buffers after creating some particles.
+TEST_F(FunctionTests, GetParticleExpirationTimeBuffers)
+{
+	const float32 expirationTimeEpislon =
+		m_particleSystemDef.lifetimeGranularity;
+	// Create some particles with increasing lifetimes (the first one has an
+	// infinite lifetime).
+	b2ParticleDef def;
+	for (int32 i = 0; i < 10; ++i)
+	{
+		const int32 index = m_particleSystem->CreateParticle(def);
+		m_particleSystem->SetParticleLifetime(index, (float32)i);
+	}
+
+	m_world->Step(m_particleSystemDef.lifetimeGranularity, 1, 1);
+
+	const int32* const expirationTimes =
+		m_particleSystem->GetParticleExpirationTimeBuffer();
+	const int32* const indexByLifetime =
+		m_particleSystem->GetParticleIndexByExpirationTimeBuffer();
+	ASSERT_TRUE(expirationTimes != NULL);
+	ASSERT_TRUE(indexByLifetime != NULL);
+
+	// Verify the expiration of the created particles.
+	// particle 0 is a special case since it has an infinite lifetime.
+	EXPECT_LE(expirationTimes[indexByLifetime[0]], 0.0f);
+	for (int32 i = 1; i < m_particleSystem->GetParticleCount(); ++i)
+	{
+		EXPECT_NEAR((float32)(10 - i),
+					m_particleSystem->ExpirationTimeToLifetime(
+						expirationTimes[indexByLifetime[i]]) +
+						m_particleSystemDef.lifetimeGranularity,
+					expirationTimeEpislon);
+	}
+}
+
+// Set a particle lifetime.
+TEST_F(FunctionTests, SetParticleLifetime)
+{
+	b2ParticleDef def;
+	const int32 index = m_particleSystem->CreateParticle(def);
+	m_particleSystem->SetParticleLifetime(index, 1.0f);
+	EXPECT_NEAR(1.0f, m_particleSystem->GetParticleLifetime(index),
+				m_particleSystemDef.lifetimeGranularity);
+}
+
+// Create a particle with an infinite lifetime and verify that it isn't
+// destroyed after a relatively long time (30s).
+TEST_F(FunctionTests, CreateParticleInfiniteLifetime)
+{
+	b2ParticleDef def;
+	const int32 index = m_particleSystem->CreateParticle(def);
+	m_particleSystem->SetParticleLifetime(index, 0.0f);
+	m_world->Step(30.0f, 1, 1);
+	EXPECT_EQ(1, m_particleSystem->GetParticleCount());
+}
+
+// Create a particle with a finite lifetime (1s) and verify that it's
+// destroyed after the time has elasped.
+TEST_F(FunctionTests, CreateParticleFiniteLifetime)
+{
+	static const float32 simulationPeriod = 0.1f;
+	b2ParticleDef def;
+	const int32 index = m_particleSystem->CreateParticle(def);
+	m_particleSystem->SetParticleLifetime(index, 1.0f);
+	float32 secondsElapsed = 0.0f;
+	while (m_particleSystem->GetParticleCount())
+	{
+	   m_world->Step(simulationPeriod, 1, 1);
+	   secondsElapsed += simulationPeriod;
+	}
+	EXPECT_FLOAT_EQ(1.0f, secondsElapsed);
+}
+
+// Create a particle with finite lifetime using a particle definition.
+TEST_F(FunctionTests, CreateParticleWithFiniteLifetimeUsingDef)
+{
+	b2ParticleDef def;
+	def.lifetime = 1.0f;
+	const int32 index = m_particleSystem->CreateParticle(def);
+	EXPECT_NEAR(1.0f, m_particleSystem->GetParticleLifetime(index),
+				m_particleSystemDef.lifetimeGranularity);
+}
+
+// Create a particle group with finite lifetime.
+TEST_F(FunctionTests, CreateParticleGroupWithFiniteLifetime)
+{
+	b2PolygonShape shape;
+	shape.SetAsBox(10.0f, 10.0f);
+	b2ParticleGroupDef def;
+	def.lifetime = 1.0f;
+	def.shape = &shape;
+	b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(def);
+	const int32 particleCount = group->GetParticleCount();
+	const int32 particleGroupIndex = group->GetBufferIndex();
+	for (int32 i = 0; i < particleCount; ++i)
+	{
+		EXPECT_NEAR(1.0f, m_particleSystem->GetParticleLifetime(
+						i + particleGroupIndex),
+					m_particleSystemDef.lifetimeGranularity);
+	}
+}
+
+// Create multiple particles with infinite lifetimes and verify the newest
+// particle has the largest lifetime value and is referenced at the end of the
+// lifetime buffer.
+TEST_F(FunctionTests, CreateMultipleParticlesWithInfiniteLifetimes)
+{
+	static const float32 simulationPeriod =
+		m_particleSystemDef.lifetimeGranularity;
+	b2ParticleDef def;
+	m_particleSystem->SetParticleDestructionByAge(true);
+	for (int32 i = 0; i < 10; ++i)
+	{
+		m_particleSystem->CreateParticle(def);
+		m_world->Step(simulationPeriod, 1, 1);
+	}
+	const int32* const expirationTimes =
+		m_particleSystem->GetParticleExpirationTimeBuffer();
+	const int32* const indexByExpirationTime =
+		m_particleSystem->GetParticleIndexByExpirationTimeBuffer();
+	ASSERT_TRUE(expirationTimes != NULL);
+	ASSERT_TRUE(indexByExpirationTime != NULL);
+
+	int32 previousExpirationTime = expirationTimes[indexByExpirationTime[0]];
+	for (int32 i = 1; i < m_particleSystem->GetParticleCount(); ++i)
+	{
+		const int32 currentExpirationTime =
+			expirationTimes[indexByExpirationTime[i]];
+		EXPECT_LT(currentExpirationTime, previousExpirationTime);
+		previousExpirationTime = currentExpirationTime;
+	}
+}
+
+// Create a set of particles each with a finite lifetime, setting unsorted
+// lifetimes so that the particle system needs to resort the queue of
+// particles that are scheduled to be destroyed.
+TEST_F(FunctionTests, CreateParticlesWithUnsortedLifetimes)
+{
+	static const float32 simulationPeriod = 0.1f;
+	static const float32 lifetimes[] = {0.9f, 0.2f, 0.3f, 0.0f, 2.0f};
+	int32 particleIndices[B2_ARRAY_SIZE(lifetimes)];
+	b2ParticleDef def;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(lifetimes); ++i)
+	{
+		particleIndices[i] = m_particleSystem->CreateParticle(def);
+		m_particleSystem->SetParticleLifetime(i, lifetimes[i]);
+	}
+
+	LifetimeDestructionChecker checker(simulationPeriod,
+									   m_world, m_particleSystem);
+	checker.TrackParticleLifetimes(particleIndices,
+								   B2_ARRAY_SIZE(particleIndices));
+
+	// Simulate for 2.1 seconds since 2 seconds is the maximum lifetime of
+	// the particles with a finite lifetime.
+	while (checker.GetTimeElapsed() < 2.1f)
+	{
+		checker.Step(simulationPeriod);
+		m_world->Step(simulationPeriod, 1, 1);
+	}
+	EXPECT_EQ(1, m_particleSystem->GetParticleCount());
+}
+
+// Create two particle groups containing particles with finite lifetimes
+// joining the groups to force a resort of particle lifetimes.
+TEST_F(FunctionTests, CreateParticleGroupsWithFiniteLifetimes)
+{
+	static const float32 simulationPeriod = 0.1f;
+	static const float32 simulationTime = 10.0f;
+	b2ParticleGroup *groups[2];
+
+	// Create two particle groups.
+	b2ParticleGroupDef def;
+	b2PolygonShape shape;
+	shape.SetAsBox(10, 10);
+	def.shape = &shape;
+	groups[0] = m_particleSystem->CreateParticleGroup(def);
+	def.position = b2Vec2(5.0f, 0.0f);
+	groups[1] = m_particleSystem->CreateParticleGroup(def);
+
+	// Allocate an array to save indices of particles in the groups.
+	const int32 totalParticleCount = groups[0]->GetParticleCount() +
+		groups[1]->GetParticleCount();
+	int32* particleIndices = new int32[totalParticleCount];
+	int32 particleIndexOffset = 0;
+
+	// Assign random lifetimes between 0.1f and simulationTime seconds to
+	// particles in the groups.
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(groups); ++i)
+	{
+		const b2ParticleGroup * const group = groups[i];
+		const int32 numberOfParticles = group->GetParticleCount();
+		const int32 bufferIndex = group->GetBufferIndex();
+		for (int32 j = 0; j < numberOfParticles; ++j)
+		{
+			const int32 particleIndex = bufferIndex + j;
+			particleIndices[particleIndexOffset++] = particleIndex;
+			m_particleSystem->SetParticleLifetime(
+				particleIndex,
+				((float32)(rand() % 99) / simulationTime) + 0.1f);
+		}
+	}
+
+	// Track all particle lifetimes.
+	LifetimeDestructionChecker checker(simulationPeriod,
+									   m_world, m_particleSystem);
+	checker.TrackParticleLifetimes(particleIndices, totalParticleCount);
+
+	delete [] particleIndices;
+	particleIndices = NULL;
+
+	// Simulate 11 seconds (1 second longer than the longest particle lifetime.
+	for (float32 time = 0.0f; time < simulationTime + 1.0f;
+		 time += simulationPeriod)
+	{
+		// Join the particle groups half way through the simulation to
+		// force a resort / compaction of the particle data.
+		if (time >= simulationPeriod * 0.5f && groups[1])
+		{
+			m_particleSystem->JoinParticleGroups(groups[0], groups[1]);
+			groups[1] = NULL;
+		}
+
+		checker.Step(simulationPeriod);
+		m_world->Step(simulationPeriod, 1, 1);
+	}
+}
+
+// Destroy the oldest particle in the world.
+TEST_F(FunctionTests, DestroyOldestParticle)
+{
+	static const int32 numberOfParticles = 10;
+	int32 age[numberOfParticles];
+	UserDataDestructionTracker userDataTracker(m_world, m_particleSystem);
+	b2ParticleDef def;
+	m_particleSystem->SetParticleDestructionByAge(true);
+	for (int32 i = 0; i < numberOfParticles; ++i)
+	{
+		const int32 index = m_particleSystem->CreateParticle(def);
+		age[i] = i;
+		m_particleSystem->GetParticleUserDataBuffer()[index] = &age[i];
+		m_world->Step(0.1f, 1, 1);
+	}
+	// Destroy the particles, oldest first.
+	for (int32 i = 0; i < numberOfParticles; ++i)
+	{
+		m_particleSystem->DestroyOldestParticle(0, true);
+		m_world->Step(0.1f, 1, 1);
+	}
+	// Verify the particles were destroyed by age.
+	const std::vector<void*> userData = userDataTracker.GetUserData();
+	EXPECT_EQ((int32)userData.size(), numberOfParticles);
+	for (int32 i = 0; i < numberOfParticles; ++i)
+	{
+		ASSERT_GE(userData.size(), 1U);
+		// Check the age of the particle, the oldest particle age should be 0
+		// with the youngest age numberOfParticles - 1.
+		EXPECT_EQ(i, *((const int32*)userDataTracker.GetUserData()[i]));
+	}
+}
+
+// Limit the number of particles in the world, continuously create particles
+// destroying the oldest ones when the limit is reached.
+TEST_F(FunctionTests, LimitParticleCountUsingLifetime)
+{
+	static const int32 particleLimit = 10;
+	b2ParticleDef def;
+	OldestParticleDestroyedChecker checker(m_world, m_particleSystem);
+	m_particleSystem->SetParticleMaxCount(particleLimit);
+	m_particleSystem->SetParticleDestructionByAge(true);
+	for (int32 i = 0; i < particleLimit; ++i)
+	{
+		const int32 index = m_particleSystem->CreateParticle(def);
+		m_particleSystem->SetParticleFlags(
+			index, m_particleSystem->GetParticleFlags(index) |
+				   b2_destructionListener);
+		// Create half of the particles with a finite lifetime.
+		if (index & 1)
+		{
+			m_particleSystem->SetParticleLifetime(index, 1.0f);
+		}
+		m_world->Step(0.1f, 1, 1);
+	}
+
+	// The first (particleLimit / 2) finite lifetime particles will be
+	// destroyed followed by (particleLimit / 2) infinite lifetime particles
+	// as new particles are created.
+	for (int32 i = 0; i < particleLimit; ++i)
+	{
+		const int32 index = m_particleSystem->CreateParticle(def);
+		m_particleSystem->SetParticleFlags(
+			index, m_particleSystem->GetParticleFlags(index) |
+				   b2_destructionListener);
+		m_world->Step(0.1f, 1, 1);
 	}
 }
 

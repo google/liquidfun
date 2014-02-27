@@ -39,7 +39,6 @@ static const uint32 xOffset = xScale * (1 << (xTruncBits - 1));
 static const uint32 xMask = (1 << xTruncBits) - 1;
 static const uint32 yMask = (1 << yTruncBits) - 1;
 
-
 // This functor is passed to std::remove_if in RemoveSpuriousBodyContacts
 // to implement the algorithm described there.  It was hoisted out and friended
 // as it would not compile with g++ 4.6.3 as a local class.  It is only used in
@@ -107,6 +106,44 @@ private:
 	int32* m_discarded;
 };
 
+// Compares the expiration time of two particle indices.
+class ExpirationTimeComparator
+{
+public:
+	// Initialize the class with a pointer to an array of particle
+	// lifetimes.
+	ExpirationTimeComparator(const int32* const expirationTimes) :
+		m_expirationTimes(expirationTimes)
+	{
+	}
+	// Empty destructor.
+	~ExpirationTimeComparator() { }
+
+	// Compare the lifetime of particleIndexA and particleIndexB
+	// returning true if the lifetime of A is greater than B for particles
+	// that will expire.  If either particle's lifetime is infinite (<= 0.0f)
+	// this function return true if the lifetime of A is lesser than B.
+	// When used with std::sort() this results in an array of particle
+	// indicies sorted in reverse order by particle lifetime.
+	// For example, the set of lifetimes
+	// (1.0, 0.7, 0.3, 0.0, -1.0, -2.0)
+	// would be sorted as
+	// (0.0, -1.0, -2.0, 1.0, 0.7, 0.3)
+	bool operator() (const int32 particleIndexA,
+					 const int32 particleIndexB) const
+	{
+		const int32 expirationTimeA = m_expirationTimes[particleIndexA];
+		const int32 expirationTimeB = m_expirationTimes[particleIndexB];
+		const bool infiniteExpirationTimeA = expirationTimeA <= 0.0f;
+		const bool infiniteExpirationTimeB = expirationTimeB <= 0.0f;
+		return infiniteExpirationTimeA == infiniteExpirationTimeB ?
+			expirationTimeA > expirationTimeB : infiniteExpirationTimeA;
+	}
+
+private:
+	const int32* m_expirationTimes;
+};
+
 static inline uint32 computeTag(float32 x, float32 y)
 {
 	return ((uint32)(y + yOffset) << yShift) + (uint32)(xScale * x + xOffset);
@@ -170,6 +207,8 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_groupCount = 0;
 	m_groupList = NULL;
 
+	b2Assert(def);
+	b2Assert(def->lifetimeGranularity > 0.0f);
 	m_def = *def;
 
 	m_world = world;
@@ -178,6 +217,9 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_stuckParticleCount = 0;
 	m_stuckParticleCapacity = 0;
 	m_stuckParticleBuffer = NULL;
+
+	m_timeElapsed = 0;
+	m_expirationTimeBufferRequiresSorting = false;
 }
 
 b2ParticleSystem::~b2ParticleSystem()
@@ -196,6 +238,8 @@ b2ParticleSystem::~b2ParticleSystem()
 	FreeParticleBuffer(&m_velocityBuffer);
 	FreeParticleBuffer(&m_colorBuffer);
 	FreeParticleBuffer(&m_userDataBuffer);
+	FreeParticleBuffer(&m_expirationTimeBuffer);
+	FreeParticleBuffer(&m_indexByExpirationTimeBuffer);
 	FreeBuffer(&m_forceBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_weightBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_staticPressureBuffer, m_internalAllocatedCapacity);
@@ -385,6 +429,12 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 			m_groupBuffer, 0, m_internalAllocatedCapacity, capacity, false);
 		m_userDataBuffer.data = ReallocateBuffer(
 			&m_userDataBuffer, m_internalAllocatedCapacity, capacity, true);
+		m_expirationTimeBuffer.data = ReallocateBuffer(
+			&m_expirationTimeBuffer, m_internalAllocatedCapacity, capacity,
+			true);
+		m_indexByExpirationTimeBuffer.data = ReallocateBuffer(
+			&m_indexByExpirationTimeBuffer, m_internalAllocatedCapacity,
+			capacity, true);
 		m_internalAllocatedCapacity = capacity;
 	}
 }
@@ -405,7 +455,18 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	}
 	if (m_count >= m_internalAllocatedCapacity)
 	{
-		return b2_invalidParticleIndex;
+		// If the oldest particle should be destroyed...
+		if (m_def.destroyByAge)
+		{
+			DestroyOldestParticle(0, false);
+			// Need to destroy this particle *now* so that it's possible to
+			// create a new particle.
+			SolveZombie();
+		}
+		else
+		{
+			return b2_invalidParticleIndex;
+		}
 	}
 	int32 index = m_count++;
 	m_flagsBuffer.data[index] = 0;
@@ -449,6 +510,20 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	}
 	m_proxyBuffer = RequestGrowableBuffer(m_proxyBuffer, m_proxyCount,
 											&m_proxyCapacity);
+
+	// If particle lifetimes are enabled or the lifetime is set in the particle
+	// definition, initialize the lifetime.
+	const bool finiteLifetime = def.lifetime > 0;
+	if (m_expirationTimeBuffer.data || finiteLifetime)
+	{
+		SetParticleLifetime(index, finiteLifetime ? def.lifetime :
+								ExpirationTimeToLifetime(
+									-GetQuantizedTimeElapsed()));
+		// Add a reference to the newly added particle to the end of the
+		// queue.
+		m_indexByExpirationTimeBuffer.data[index] = index;
+	}
+
 	m_proxyBuffer[m_proxyCount++].index = index;
 	b2ParticleGroup* group = def.group;
 	m_groupBuffer[index] = group;
@@ -504,6 +579,25 @@ void b2ParticleSystem::DestroyParticle(
 		flags |= b2_destructionListener;
 	}
 	SetParticleFlags(index, m_flagsBuffer.data[index] | flags);
+}
+
+void b2ParticleSystem::DestroyOldestParticle(
+	const int32 index, const bool callDestructionListener)
+{
+	const int32 particleCount = GetParticleCount();
+	b2Assert(index >= 0 && index < particleCount);
+	// Make sure particle lifetime tracking is enabled.
+	b2Assert(m_indexByExpirationTimeBuffer.data);
+	// Destroy the oldest particle (preferring to destroy finite
+	// lifetime particles first) to free a slot in the buffer.
+	const int32 oldestFiniteLifetimeParticle =
+		m_indexByExpirationTimeBuffer.data[particleCount - (index + 1)];
+	const int32 oldestInfiniteLifetimeParticle =
+		m_indexByExpirationTimeBuffer.data[index];
+	DestroyParticle(
+		m_expirationTimeBuffer.data[oldestFiniteLifetimeParticle] > 0.0f ?
+			oldestFiniteLifetimeParticle : oldestInfiniteLifetimeParticle,
+		callDestructionListener);
 }
 
 int32 b2ParticleSystem::DestroyParticlesInShape(
@@ -591,6 +685,7 @@ int32 b2ParticleSystem::CreateParticleForGroup(
 		b2Cross(groupDef.angularVelocity,
 				particleDef.position - groupDef.position);
 	particleDef.color = groupDef.color;
+	particleDef.lifetime = groupDef.lifetime;
 	particleDef.userData = groupDef.userData;
 	return CreateParticle(particleDef);
 }
@@ -1691,6 +1786,11 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	{
 		return;
 	}
+	// If particle lifetimes are enabled, destroy particles that are too old.
+	if (m_expirationTimeBuffer.data)
+	{
+		SolveLifetimes(step);
+	}
 	if (m_allParticleFlags & b2_zombieParticle)
 	{
 		SolveZombie();
@@ -2386,6 +2486,11 @@ void b2ParticleSystem::SolveZombie()
 				{
 					m_userDataBuffer.data[newCount] = m_userDataBuffer.data[i];
 				}
+				if (m_expirationTimeBuffer.data)
+				{
+					m_expirationTimeBuffer.data[newCount] =
+						m_expirationTimeBuffer.data[i];
+				}
 			}
 			newCount++;
 			allParticleFlags |= flags;
@@ -2475,6 +2580,21 @@ void b2ParticleSystem::SolveZombie()
 		Test::IsTriadInvalid);
 	m_triadCount = (int32) (lastTriad - m_triadBuffer);
 
+	// Update lifetime indices.
+	if (m_indexByExpirationTimeBuffer.data)
+	{
+		int32 writeOffset = 0;
+		for (int32 readOffset = 0; readOffset < m_count; readOffset++)
+		{
+			const int32 newIndex = newIndices[
+				m_indexByExpirationTimeBuffer.data[readOffset]];
+			if (newIndex != b2_invalidParticleIndex)
+			{
+				m_indexByExpirationTimeBuffer.data[writeOffset++] = newIndex;
+			}
+		}
+	}
+
 	// update groups
 	for (b2ParticleGroup* group = m_groupList; group; group = group->GetNext())
 	{
@@ -2534,6 +2654,46 @@ void b2ParticleSystem::SolveZombie()
 		}
 		// TODO: split the group if flagged
 		group = next;
+	}
+}
+
+/// Destroy all particles which have outlived their lifetimes set by
+/// SetParticleLifetime().
+void b2ParticleSystem::SolveLifetimes(const b2TimeStep& step)
+{
+	b2Assert(m_expirationTimeBuffer.data);
+	b2Assert(m_indexByExpirationTimeBuffer.data);
+	// Update the time elapsed.
+	m_timeElapsed = LifetimeToExpirationTime(step.dt);
+	// Get the floor (non-fractional component) of the elapsed time.
+	const int32 quantizedTimeElapsed = GetQuantizedTimeElapsed();
+
+	const int32* const expirationTimes = m_expirationTimeBuffer.data;
+	int32* const expirationTimeIndices = m_indexByExpirationTimeBuffer.data;
+	const int32 particleCount = GetParticleCount();
+	// Sort the lifetime buffer if it's required.
+	if (m_expirationTimeBufferRequiresSorting)
+	{
+		const ExpirationTimeComparator expirationTimeComparator(
+			expirationTimes);
+		std::sort(expirationTimeIndices,
+				  expirationTimeIndices + particleCount,
+				  expirationTimeComparator);
+		m_expirationTimeBufferRequiresSorting = false;
+	}
+
+	// Destroy particles which have expired.
+	for (int32 i = particleCount - 1; i >= 0; --i)
+	{
+		const int32 particleIndex = expirationTimeIndices[i];
+		const int32 expirationTime = expirationTimes[particleIndex];
+		// If no particles need to be destroyed, skip this.
+		if (quantizedTimeElapsed < expirationTime || expirationTime <= 0)
+		{
+			break;
+		}
+		// Destroy this particle.
+		DestroyParticle(particleIndex);
 	}
 }
 
@@ -2638,6 +2798,21 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 		}
 	}
 
+	if (m_expirationTimeBuffer.data)
+	{
+		std::rotate(m_expirationTimeBuffer.data + start,
+					m_expirationTimeBuffer.data + mid,
+					m_expirationTimeBuffer.data + end);
+		// Update expiration time buffer indices.
+		const int32 particleCount = GetParticleCount();
+		int32* const indexByExpirationTime =
+			m_indexByExpirationTimeBuffer.data;
+		for (int32 i = 0; i < particleCount; ++i)
+		{
+			indexByExpirationTime[i] = newIndices[indexByExpirationTime[i]];
+		}
+	}
+
 	// update proxies
 	for (int32 k = 0; k < m_proxyCount; k++)
 	{
@@ -2683,6 +2858,111 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 		group->m_firstIndex = newIndices[group->m_firstIndex];
 		group->m_lastIndex = newIndices[group->m_lastIndex - 1] + 1;
 	}
+}
+
+/// Set the lifetime (in seconds) of a particle relative to the current
+/// time.
+void b2ParticleSystem::SetParticleLifetime(const int32 index,
+										   const float32 lifetime)
+{
+	b2Assert(ValidateParticleIndex(index));
+	const bool initializeExpirationTimes =
+		m_indexByExpirationTimeBuffer.data == NULL;
+	m_expirationTimeBuffer.data = RequestParticleBuffer(
+		m_expirationTimeBuffer.data);
+	m_indexByExpirationTimeBuffer.data = RequestParticleBuffer(
+		m_indexByExpirationTimeBuffer.data);
+
+	// Initialize the inverse mapping buffer.
+	if (initializeExpirationTimes)
+	{
+		const int32 particleCount = GetParticleCount();
+		for (int32 i = 0; i < particleCount; ++i)
+		{
+			m_indexByExpirationTimeBuffer.data[i] = i;
+		}
+	}
+	const int32 quantizedLifetime = (int32)(lifetime /
+											m_def.lifetimeGranularity);
+	// Use a negative lifetime so that it's possible to track which
+	// of the infinite lifetime particles are older.
+	const int32 newExpirationTime = quantizedLifetime > 0 ?
+		GetQuantizedTimeElapsed() + quantizedLifetime : quantizedLifetime;
+	if (newExpirationTime != m_expirationTimeBuffer.data[index])
+	{
+		m_expirationTimeBuffer.data[index] = newExpirationTime;
+		m_expirationTimeBufferRequiresSorting = true;
+	}
+}
+
+
+/// Convert a lifetime value in returned by GetParticleExpirationTimeBuffer()
+/// to a value in seconds relative to the current simulation time.
+float32 b2ParticleSystem::ExpirationTimeToLifetime(
+	const int32 expirationTime) const
+{
+	return (float32)(expirationTime > 0 ?
+					 	expirationTime - GetQuantizedTimeElapsed() :
+					 	expirationTime) * m_def.lifetimeGranularity;
+}
+
+/// Get the lifetime (in seconds) of a particle relative to the current
+/// time.
+float32 b2ParticleSystem::GetParticleLifetime(const int32 index)
+{
+	b2Assert(ValidateParticleIndex(index));
+	return ExpirationTimeToLifetime(GetParticleExpirationTimeBuffer()[index]);
+}
+
+/// Get the array of particle lifetimes indexed by particle index.
+/// GetParticleCount() items are in the returned array.
+const int32* b2ParticleSystem::GetParticleExpirationTimeBuffer()
+{
+	m_expirationTimeBuffer.data = RequestParticleBuffer(
+		m_expirationTimeBuffer.data);
+	return m_expirationTimeBuffer.data;
+}
+
+/// Get the array of particle indices ordered by lifetime.
+/// GetParticleExpirationTimeBuffer(
+///    GetParticleIndexByExpirationTimeBuffer()[index])
+/// is equivalent to GetParticleLifetime(index).
+/// GetParticleCount() items are in the returned array.
+const int32* b2ParticleSystem::GetParticleIndexByExpirationTimeBuffer()
+{
+	// If particles are present, initialize / reinitialize the lifetime buffer.
+	if (GetParticleCount())
+	{
+		SetParticleLifetime(0, GetParticleLifetime(0));
+	}
+	else
+	{
+		m_indexByExpirationTimeBuffer.data = RequestParticleBuffer(
+			m_indexByExpirationTimeBuffer.data);
+	}
+	return m_indexByExpirationTimeBuffer.data;
+}
+
+void b2ParticleSystem::SetParticleDestructionByAge(const bool enable)
+{
+	if (enable)
+	{
+		GetParticleExpirationTimeBuffer();
+	}
+	m_def.destroyByAge = enable;
+}
+
+/// Get the time elapsed in b2ParticleSystemDef::lifetimeGranularity.
+int32 b2ParticleSystem::GetQuantizedTimeElapsed() const
+{
+	return (int32)(m_timeElapsed >> 32);
+}
+
+/// Convert a lifetime in seconds to an expiration time.
+int64 b2ParticleSystem::LifetimeToExpirationTime(const float32 lifetime) const
+{
+	return m_timeElapsed + (int64)((lifetime / m_def.lifetimeGranularity) *
+								   (float32)(1LL << 32));
 }
 
 template <typename T> void b2ParticleSystem::SetParticleBuffer(

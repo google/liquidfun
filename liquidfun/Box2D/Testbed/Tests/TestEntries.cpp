@@ -83,6 +83,7 @@
 #include "DamBreak.h"
 #include "DrawingParticles.h"
 #include "ElasticParticles.h"
+#include "Faucet.h"
 #include "LiquidTimer.h"
 #include "Particles.h"
 #include "ParticlesSurfaceTension.h"
@@ -96,22 +97,22 @@
 
 TestEntry g_testEntries[] =
 {
+	{"Sandbox", Sandbox::Create},
+	{"Sparky", Sparky::Create},
 	{"DamBreak", DamBreak::Create},
 	{"Liquid Timer", LiquidTimer::Create},
 	{"Wave Machine", WaveMachine::Create},
 	{"Particles", Particles::Create},
+	{"Faucet", Faucet::Create},
 	{"Particle Drawing", DrawingParticles::Create},
 	{"Soup", Soup::Create},
-	{"Rigid Particles", RigidParticles::Create},
-	{"Elastic Particles", ElasticParticles::Create},
 	{"Surface Tension", ParticlesSurfaceTension::Create},
-	{"Sparky", Sparky::Create},
-	{"Sandbox", Sandbox::Create},
+	{"Elastic Particles", ElasticParticles::Create},
+	{"Rigid Particles", RigidParticles::Create},
 	{"Ramp", Ramp::Create},
 	{"Pointy", Pointy::Create},
 	{"AntiPointy", AntiPointy::Create},
 	{"Corner Case", CornerCase::Create},
-
 
 	{"Ray-Cast", RayCast::Create},
 	{"Dump Shell", DumpShell::Create},
