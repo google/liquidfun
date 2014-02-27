@@ -47,6 +47,7 @@ set(BOX2D_Common_HDRS
 	Common/b2IntrusiveList.h
 	Common/b2Math.h
 	Common/b2Settings.h
+	Common/b2SlabAllocator.h
 	Common/b2StackAllocator.h
 	Common/b2Stat.h
 	Common/b2Timer.h
