@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -250,6 +250,14 @@ typedef long long&#160;</td><td class="memItemRight" valign="bottom"><b>int64</b
 <tr class="memitem:a29940ae63ec06c9998bba873e25407ad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29940ae63ec06c9998bba873e25407ad"></a>
 typedef unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><b>uint64</b></td></tr>
 <tr class="separator:a29940ae63ec06c9998bba873e25407ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac58fac80aa13e098a0e9e6c72c5179ca"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac58fac80aa13e098a0e9e6c72c5179ca"></a>
+typedef void *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#ac58fac80aa13e098a0e9e6c72c5179ca">b2AllocFunction</a> )(int32 size, void *callbackData)</td></tr>
+<tr class="memdesc:ac58fac80aa13e098a0e9e6c72c5179ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this function to override <a class="el" href="b2_settings_8h.html#a2dca9b286e9b9d6d022055fd61534bd7" title="Implement this function to use your own memory allocator. ">b2Alloc()</a> without recompiling this library. <br/></td></tr>
+<tr class="separator:ac58fac80aa13e098a0e9e6c72c5179ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c4c0e67a45d8e9b1feb096973195c2c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7c4c0e67a45d8e9b1feb096973195c2c"></a>
+typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a7c4c0e67a45d8e9b1feb096973195c2c">b2FreeFunction</a> )(void *mem, void *callbackData)</td></tr>
+<tr class="memdesc:a7c4c0e67a45d8e9b1feb096973195c2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this function to override <a class="el" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d" title="If you implement b2Alloc, you should also implement this function. ">b2Free()</a> without recompiling this library. <br/></td></tr>
+<tr class="separator:a7c4c0e67a45d8e9b1feb096973195c2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -261,6 +269,10 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d">b2Free</a> (void *mem)</td></tr>
 <tr class="memdesc:a50f4abf5edeabd0300946edbd542e24d"><td class="mdescLeft">&#160;</td><td class="mdescRight">If you implement b2Alloc, you should also implement this function. <br/></td></tr>
 <tr class="separator:a50f4abf5edeabd0300946edbd542e24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e1c46d4c0c37382656bfb2c79e4508a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a9e1c46d4c0c37382656bfb2c79e4508a">b2SetAllocFreeCallbacks</a> (<a class="el" href="b2_settings_8h.html#ac58fac80aa13e098a0e9e6c72c5179ca">b2AllocFunction</a> allocCallback, <a class="el" href="b2_settings_8h.html#a7c4c0e67a45d8e9b1feb096973195c2c">b2FreeFunction</a> freeCallback, void *callbackData)</td></tr>
+<tr class="separator:a9e1c46d4c0c37382656bfb2c79e4508a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cd45e29c4e5b126cf16b8d88c24a00e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a0cd45e29c4e5b126cf16b8d88c24a00e">b2SetNumAllocs</a> (const int32 numAllocs)</td></tr>
+<tr class="separator:a0cd45e29c4e5b126cf16b8d88c24a00e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60375fb093d9f8f71f2d98f9129f9858"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60375fb093d9f8f71f2d98f9129f9858"></a>
 int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a60375fb093d9f8f71f2d98f9129f9858">b2GetNumAllocs</a> ()</td></tr>
 <tr class="memdesc:a60375fb093d9f8f71f2d98f9129f9858"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get number of calls to b2Alloc minus number of calls to b2Free. <br/></td></tr>
@@ -463,6 +475,57 @@ const <a class="el" href="structb2_version.html">b2Version</a>&#160;</td><td cla
       </table>
 </div><div class="memdoc">
 <p>A velocity threshold for elastic collisions. Any collision with a relative linear velocity below this threshold will be treated as inelastic. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a9e1c46d4c0c37382656bfb2c79e4508a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2SetAllocFreeCallbacks </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="b2_settings_8h.html#ac58fac80aa13e098a0e9e6c72c5179ca">b2AllocFunction</a>&#160;</td>
+          <td class="paramname"><em>allocCallback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="b2_settings_8h.html#a7c4c0e67a45d8e9b1feb096973195c2c">b2FreeFunction</a>&#160;</td>
+          <td class="paramname"><em>freeCallback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>callbackData</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set alloc and free callbacks to override the default behavior of using malloc() and free() for dynamic memory allocation. Set allocCallback and freeCallback to NULL to restore the default allocator (malloc / free). </p>
+
+</div>
+</div>
+<a class="anchor" id="a0cd45e29c4e5b126cf16b8d88c24a00e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2SetNumAllocs </td>
+          <td>(</td>
+          <td class="paramtype">const int32&#160;</td>
+          <td class="paramname"><em>numAllocs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set the number of calls to b2Alloc minus the number of calls to b2Free. This can be used to disable the empty heap check in <a class="el" href="b2_settings_8h.html#a9e1c46d4c0c37382656bfb2c79e4508a">b2SetAllocFreeCallbacks()</a> which can be useful for testing. </p>
 
 </div>
 </div>

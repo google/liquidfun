@@ -1,6 +1,8 @@
 var searchData=
 [
+  ['m_5fallocated',['m_allocated',['../classb2_free_list.html#ae7ae518220bcf257bca24022e9ff7cb9',1,'b2FreeList']]],
   ['m_5fcount',['m_count',['../classb2_chain_shape.html#ab2ad711781e6ac81179074e90e0e058b',1,'b2ChainShape']]],
+  ['m_5ffree',['m_free',['../classb2_free_list.html#a07d0c02fb373cce85874f824506ce0d5',1,'b2FreeList']]],
   ['m_5fp',['m_p',['../classb2_circle_shape.html#a190705618b2e65f636f1dc03c63640ff',1,'b2CircleShape']]],
   ['m_5fvertex0',['m_vertex0',['../classb2_edge_shape.html#a907c9829484cc1ba7527ab368e9fdf93',1,'b2EdgeShape']]],
   ['m_5fvertex1',['m_vertex1',['../classb2_edge_shape.html#a916cf02a752ff1a70db35b2edaf19bb4',1,'b2EdgeShape']]],

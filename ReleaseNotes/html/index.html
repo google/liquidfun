@@ -65,9 +65,9 @@
 <li><p class="startli">Building LiquidFun on Linux, using <code>cmake -G"Unix Makefiles"</code>, now places output files in a build type sub-directory.</p>
 <p class="startli">For example, the output executable of the Testbed example is now written to Box2D/Testbed/Release/Testbed when building using the Release configuration.</p>
 </li>
-<li>Multiple independent particle systems can now exist, each with their own physical co-efficients. Previously, only one particle system existed, and it always existed. Particle systems are created with b2World::CreateParticleSystem, and destroyed with b2World::DestroyParticleSystem.</li>
-<li>The particle system API has been moved from b2World to b2ParticleSystem. For example, b2World::DestroyParticlesInShape is now called via b2ParticleSystem::DestroyParticlesInShape. References to b2ParticleSystem can be acquired with b2World::CreateParticleSystem or b2World::GetParticleSystemList().</li>
-<li>b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle now take a b2ParticleSystem pointer as their first parameter. This is necessary since multiple particle systems can now exist.</li>
+<li>Multiple independent particle systems can now exist, each with its own physical co-efficient. Previously, only one particle system existed, and it always existed. Use b2World::CreateParticleSystem to create particle systems, and b2World::DestroyParticleSystem to destroy them.</li>
+<li>The particle system API has moved from b2World to b2ParticleSystem. For example, b2ParticleSystem::DestroyParticlesInShape replaces b2World::DestroyParticlesInShape. You can use b2World::CreateParticleSystem or b2World::GetParticleSystemList() to acquire references to b2ParticleSystem.</li>
+<li>b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle each now takes a b2ParticleSystem pointer as its first parameter. This change is necessary since multiple particle systems can now exist.</li>
 </ul>
 <h4>Other Changes</h4>
 <ul>
