@@ -106,7 +106,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -228,6 +228,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="structb2_rot.html#a7f534cb7ece8d325662d7d0e27d4f617">b2Rot</a>
 , <a class="el" href="structb2_transform.html#af92af4ec6833552b1b22a6ca6d4f5644">b2Transform</a>
 </li>
+<li>SetItemsPerSlab()
+: <a class="el" href="classb2_slab_allocator.html#ac017dd277c5e8f6d50933009f7745f39">b2SlabAllocator&lt; T &gt;</a>
+</li>
 <li>SetLength()
 : <a class="el" href="classb2_distance_joint.html#a950a0f187ef691208e50de40ed9223fe">b2DistanceJoint</a>
 </li>
@@ -279,16 +282,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="classb2_particle_system.html#a71651270066689579be75c90fa8b898e">b2ParticleSystem</a>
 </li>
 <li>SetParticleDensity()
-: <a class="el" href="classb2_world.html#acdbe82f8ffeb9156edba723db0e90eb1">b2World</a>
-, <a class="el" href="classb2_particle_system.html#a4681649e5b22399a1e567e1ea37457a1">b2ParticleSystem</a>
+: <a class="el" href="classb2_particle_system.html#a4681649e5b22399a1e567e1ea37457a1">b2ParticleSystem</a>
+, <a class="el" href="classb2_world.html#acdbe82f8ffeb9156edba723db0e90eb1">b2World</a>
 </li>
 <li>SetParticleFlags()
 : <a class="el" href="classb2_world.html#a6dfb677ee576053fcd4141562c51bd76">b2World</a>
 , <a class="el" href="classb2_particle_system.html#a0b061d6ac27a1984200868116172cba9">b2ParticleSystem</a>
 </li>
 <li>SetParticleFlagsBuffer()
-: <a class="el" href="classb2_world.html#a129967839b540175cfba58c69d008629">b2World</a>
-, <a class="el" href="classb2_particle_system.html#affaa5a01277923615f095361b2aa0224">b2ParticleSystem</a>
+: <a class="el" href="classb2_particle_system.html#affaa5a01277923615f095361b2aa0224">b2ParticleSystem</a>
+, <a class="el" href="classb2_world.html#a129967839b540175cfba58c69d008629">b2World</a>
 </li>
 <li>SetParticleGravityScale()
 : <a class="el" href="classb2_world.html#ad3d8663e6d941d15e87bba007367f654">b2World</a>
@@ -303,8 +306,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="classb2_particle_system.html#a8ba293f08550b7569912074e55136da8">b2ParticleSystem</a>
 </li>
 <li>SetParticleStaticPressureIterations()
-: <a class="el" href="classb2_world.html#a88a9bc3460ffc5f1394bc5c23a3dad30">b2World</a>
-, <a class="el" href="classb2_particle_system.html#a76aa96394eb35ce88a169214a7c67dc6">b2ParticleSystem</a>
+: <a class="el" href="classb2_particle_system.html#a76aa96394eb35ce88a169214a7c67dc6">b2ParticleSystem</a>
+, <a class="el" href="classb2_world.html#a88a9bc3460ffc5f1394bc5c23a3dad30">b2World</a>
 </li>
 <li>SetPrevVertex()
 : <a class="el" href="classb2_chain_shape.html#aeb2ddbe0c52a98885e91b7c8f597315b">b2ChainShape</a>
@@ -353,18 +356,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classb2_body.html#a34ff1c84b10b74eb990749a025a1b1ad">b2Body</a>
 </li>
 <li>SetUserData()
-: <a class="el" href="classb2_fixture.html#a3db7f89ef4493247d922fe3d96351ad9">b2Fixture</a>
-, <a class="el" href="classb2_body.html#a5553a5ecdfd2d7200ba2405ce6043f52">b2Body</a>
-, <a class="el" href="classb2_joint.html#a492f2d02496437572aaec6013ebdc1c8">b2Joint</a>
+: <a class="el" href="classb2_joint.html#a492f2d02496437572aaec6013ebdc1c8">b2Joint</a>
+, <a class="el" href="classb2_fixture.html#a3db7f89ef4493247d922fe3d96351ad9">b2Fixture</a>
 , <a class="el" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">b2ParticleGroup</a>
+, <a class="el" href="classb2_body.html#a5553a5ecdfd2d7200ba2405ce6043f52">b2Body</a>
 </li>
 <li>SetWarmStarting()
 : <a class="el" href="classb2_world.html#a8e8c12142e8c4884a18787926a261359">b2World</a>
 </li>
 <li>SetZero()
-: <a class="el" href="structb2_vec3.html#a5a459ed49f1910a347ca247f848a2dd8">b2Vec3</a>
+: <a class="el" href="structb2_mat33.html#a42fc6953b025e1c8b59717d0ee7accde">b2Mat33</a>
 , <a class="el" href="structb2_mat22.html#aaeae95f61cf3171ffb94703980e3594b">b2Mat22</a>
-, <a class="el" href="structb2_mat33.html#a42fc6953b025e1c8b59717d0ee7accde">b2Mat33</a>
+, <a class="el" href="structb2_vec3.html#a5a459ed49f1910a347ca247f848a2dd8">b2Vec3</a>
 , <a class="el" href="structb2_vec2.html#a5c6cbe27cfb29c6dbb29b9a3285b88d0">b2Vec2</a>
 </li>
 <li>shape
@@ -373,11 +376,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>ShiftOrigin()
 : <a class="el" href="classb2_pulley_joint.html#a5b88d498ce306c4ff5ce99dec4811825">b2PulleyJoint</a>
-, <a class="el" href="classb2_mouse_joint.html#aa3c46b204aea79822dd6c6843c361801">b2MouseJoint</a>
-, <a class="el" href="classb2_broad_phase.html#a410e6115e3d1b4fca61cfbf397767772">b2BroadPhase</a>
 , <a class="el" href="classb2_world.html#afc33e20e64252c5be115216051408047">b2World</a>
-, <a class="el" href="classb2_joint.html#a7804f649e993dc0fd9ae47fde5601f90">b2Joint</a>
+, <a class="el" href="classb2_broad_phase.html#a410e6115e3d1b4fca61cfbf397767772">b2BroadPhase</a>
 , <a class="el" href="classb2_dynamic_tree.html#af37ddfed6a5da97d5a78b09918d19ceb">b2DynamicTree</a>
+, <a class="el" href="classb2_mouse_joint.html#aa3c46b204aea79822dd6c6843c361801">b2MouseJoint</a>
+, <a class="el" href="classb2_joint.html#a7804f649e993dc0fd9ae47fde5601f90">b2Joint</a>
 </li>
 <li>ShouldCollide()
 : <a class="el" href="classb2_contact_filter.html#aac8f6155d1f577d125db587f5269289b">b2ContactFilter</a>
@@ -407,7 +410,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="structb2_particle_system_def.html#add3df1894038540a311081740dc3e5cb">b2ParticleSystemDef</a>
 </li>
 <li>Step()
-: <a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">b2World</a>
+: <a class="el" href="classb2_world.html#a7a8eff61af98461f978fe43f3af7be90">b2World</a>
 </li>
 <li>strength
 : <a class="el" href="structb2_particle_group_def.html#a77c3ac47ae906e34e7f3fecf7b8f7aad">b2ParticleGroupDef</a>

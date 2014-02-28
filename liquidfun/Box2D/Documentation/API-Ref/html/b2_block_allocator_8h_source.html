@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -109,56 +109,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define B2_BLOCK_ALLOCATOR_H</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="b2_settings_8h.html">Box2D/Common/b2Settings.h</a>&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;Box2D/Common/b2IntrusiveList.h&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;Box2D/Common/b2TrackedBlock.h&gt;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">const</span> int32 b2_chunkSize = 16 * 1024;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">const</span> int32 b2_maxBlockSize = 640;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">const</span> int32 b2_blockSizes = 14;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">const</span> int32 b2_chunkArrayIncrement = 128;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">const</span> int32 b2_mallocAlignment = 32;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">struct </span>b2Block;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">struct </span>b2Chunk;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classb2_block_allocator.html">   37</a></span>&#160;<span class="keyword">class </span><a class="code" href="classb2_block_allocator.html">b2BlockAllocator</a></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classb2_block_allocator.html">b2BlockAllocator</a>();</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    ~<a class="code" href="classb2_block_allocator.html">b2BlockAllocator</a>();</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span>* <a class="code" href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">Allocate</a>(int32 size);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_block_allocator.html#a945fdf86e260318b930a53dcc887ca8b">Free</a>(<span class="keywordtype">void</span>* p, int32 size);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">void</span> Clear();</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    int32 <a class="code" href="classb2_block_allocator.html#a040f1db1e8bf0fe7720d210523464325">GetNumGiantAllocations</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">void</span>* AllocateGiant(int32 size);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">void</span> FreeGiant(<span class="keywordtype">void</span>* mem);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">struct </span>b2Block;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">struct </span>b2Chunk;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classb2_block_allocator.html">   36</a></span>&#160;<span class="keyword">class </span><a class="code" href="classb2_block_allocator.html">b2BlockAllocator</a></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classb2_block_allocator.html">b2BlockAllocator</a>();</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    ~<a class="code" href="classb2_block_allocator.html">b2BlockAllocator</a>();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span>* <a class="code" href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">Allocate</a>(int32 size);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_block_allocator.html#a945fdf86e260318b930a53dcc887ca8b">Free</a>(<span class="keywordtype">void</span>* p, int32 size);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">void</span> Clear();</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    uint32 <a class="code" href="classb2_block_allocator.html#aa26606aa59be5d1cbd45d8e21d42a61f">GetNumGiantAllocations</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    b2Chunk* m_chunks;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    int32 m_chunkCount;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    int32 m_chunkSpace;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    b2Chunk* m_chunks;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    int32 m_chunkCount;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    int32 m_chunkSpace;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    b2Block* m_freeLists[b2_blockSizes];</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="comment">// Record giant allocations--ones bigger than the max block size</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a> m_giants;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">static</span> int32 s_blockSizes[b2_blockSizes];</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">static</span> uint8 s_blockSizeLookup[b2_maxBlockSize + 1];</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> s_blockSizeLookupInitialized;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;};</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classb2_block_allocator_html_a945fdf86e260318b930a53dcc887ca8b"><div class="ttname"><a href="classb2_block_allocator.html#a945fdf86e260318b930a53dcc887ca8b">b2BlockAllocator::Free</a></div><div class="ttdeci">void Free(void *p, int32 size)</div><div class="ttdoc">Free memory. This uses b2Free if the size is larger than b2_maxBlockSize. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:205</div></div>
-<div class="ttc" id="classb2_intrusive_list_node_html"><div class="ttname"><a href="classb2_intrusive_list_node.html">b2IntrusiveListNode</a></div><div class="ttdef"><b>Definition:</b> b2IntrusiveList.h:57</div></div>
-<div class="ttc" id="classb2_block_allocator_html"><div class="ttname"><a href="classb2_block_allocator.html">b2BlockAllocator</a></div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.h:37</div></div>
-<div class="ttc" id="classb2_block_allocator_html_a040f1db1e8bf0fe7720d210523464325"><div class="ttname"><a href="classb2_block_allocator.html#a040f1db1e8bf0fe7720d210523464325">b2BlockAllocator::GetNumGiantAllocations</a></div><div class="ttdeci">int32 GetNumGiantAllocations() const </div><div class="ttdoc">Returns the number of allocations larger than the max block size. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:122</div></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    b2Block* m_freeLists[b2_blockSizes];</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">// Record giant allocations--ones bigger than the max block size</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="classb2_tracked_block_allocator.html">b2TrackedBlockAllocator</a> m_giants;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">static</span> int32 s_blockSizes[b2_blockSizes];</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">static</span> uint8 s_blockSizeLookup[b2_maxBlockSize + 1];</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> s_blockSizeLookupInitialized;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classb2_block_allocator_html_a945fdf86e260318b930a53dcc887ca8b"><div class="ttname"><a href="classb2_block_allocator.html#a945fdf86e260318b930a53dcc887ca8b">b2BlockAllocator::Free</a></div><div class="ttdeci">void Free(void *p, int32 size)</div><div class="ttdoc">Free memory. This uses b2Free if the size is larger than b2_maxBlockSize. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:163</div></div>
+<div class="ttc" id="classb2_block_allocator_html"><div class="ttname"><a href="classb2_block_allocator.html">b2BlockAllocator</a></div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.h:36</div></div>
+<div class="ttc" id="classb2_block_allocator_html_aa26606aa59be5d1cbd45d8e21d42a61f"><div class="ttname"><a href="classb2_block_allocator.html#aa26606aa59be5d1cbd45d8e21d42a61f">b2BlockAllocator::GetNumGiantAllocations</a></div><div class="ttdeci">uint32 GetNumGiantAllocations() const </div><div class="ttdoc">Returns the number of allocations larger than the max block size. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:100</div></div>
 <div class="ttc" id="b2_settings_8h_html"><div class="ttname"><a href="b2_settings_8h.html">b2Settings.h</a></div></div>
-<div class="ttc" id="classb2_block_allocator_html_a437bf775c23f6e36af11a6d1653d7040"><div class="ttname"><a href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">b2BlockAllocator::Allocate</a></div><div class="ttdeci">void * Allocate(int32 size)</div><div class="ttdoc">Allocate memory. This uses b2Alloc if the size is larger than b2_maxBlockSize. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:147</div></div>
+<div class="ttc" id="classb2_block_allocator_html_a437bf775c23f6e36af11a6d1653d7040"><div class="ttname"><a href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">b2BlockAllocator::Allocate</a></div><div class="ttdeci">void * Allocate(int32 size)</div><div class="ttdoc">Allocate memory. This uses b2Alloc if the size is larger than b2_maxBlockSize. </div><div class="ttdef"><b>Definition:</b> b2BlockAllocator.cpp:105</div></div>
+<div class="ttc" id="classb2_tracked_block_allocator_html"><div class="ttname"><a href="classb2_tracked_block_allocator.html">b2TrackedBlockAllocator</a></div><div class="ttdoc">Allocator of blocks which are tracked in a list. </div><div class="ttdef"><b>Definition:</b> b2TrackedBlock.h:62</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Google Analytics -->
 <script>

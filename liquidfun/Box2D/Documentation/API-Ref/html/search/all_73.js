@@ -31,6 +31,7 @@ var searchData=
   ['setgravityscale',['SetGravityScale',['../classb2_body.html#a8e66a570c2aeee93b29d84cae861a612',1,'b2Body']]],
   ['setgroupflags',['SetGroupFlags',['../classb2_particle_group.html#a13a2f310947a2d69d5184805e6eb8bbd',1,'b2ParticleGroup']]],
   ['setidentity',['SetIdentity',['../structb2_mat22.html#a7192f063b771ac9ded060e41df890509',1,'b2Mat22::SetIdentity()'],['../structb2_rot.html#a7f534cb7ece8d325662d7d0e27d4f617',1,'b2Rot::SetIdentity()'],['../structb2_transform.html#af92af4ec6833552b1b22a6ca6d4f5644',1,'b2Transform::SetIdentity()']]],
+  ['setitemsperslab',['SetItemsPerSlab',['../classb2_slab_allocator.html#ac017dd277c5e8f6d50933009f7745f39',1,'b2SlabAllocator']]],
   ['setlength',['SetLength',['../classb2_distance_joint.html#a950a0f187ef691208e50de40ed9223fe',1,'b2DistanceJoint']]],
   ['setlimits',['SetLimits',['../classb2_prismatic_joint.html#a82a220e6d5a212c1924882e0855b0bef',1,'b2PrismaticJoint::SetLimits()'],['../classb2_revolute_joint.html#a32f9393d8a6b993fd523f0f643c28107',1,'b2RevoluteJoint::SetLimits()']]],
   ['setlineardamping',['SetLinearDamping',['../classb2_body.html#a909f9753ad700f70282a56e00bc182a5',1,'b2Body']]],

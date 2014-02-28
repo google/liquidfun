@@ -6,6 +6,8 @@ var searchData=
   ['record',['Record',['../classb2_stat.html#aeb0ef37614c051f87601db8536bfc1ae',1,'b2Stat']]],
   ['referenceangle',['referenceAngle',['../structb2_prismatic_joint_def.html#aa84b43d08e6e11b4daa0c86f46094463',1,'b2PrismaticJointDef::referenceAngle()'],['../structb2_revolute_joint_def.html#a1858d897d5fea04c5e606a1ff73f64f8',1,'b2RevoluteJointDef::referenceAngle()'],['../structb2_weld_joint_def.html#a31aeb208f15842091c55e3f1bab6d8f1',1,'b2WeldJointDef::referenceAngle()']]],
   ['refilter',['Refilter',['../classb2_fixture.html#a45d3320f94811d67383c48466165fa26',1,'b2Fixture']]],
+  ['remove',['Remove',['../classb2_intrusive_list_node.html#a1b5decaef6080b7a9c36a6eec957779a',1,'b2IntrusiveListNode::Remove()'],['../classb2_typed_intrusive_list_node.html#adc1d7a9e50bfe8e92f3d01fafd66aa67',1,'b2TypedIntrusiveListNode::Remove()']]],
+  ['removeall',['RemoveAll',['../classb2_free_list.html#acac7647f48cb979eb38b0a26753afb96',1,'b2FreeList']]],
   ['reportfixture',['ReportFixture',['../classb2_query_callback.html#a187dd04dd0f5164fb05c2ce2cbfd9ee5',1,'b2QueryCallback::ReportFixture()'],['../classb2_ray_cast_callback.html#a658d5c8e89e0c73230cc8bddade4f3a4',1,'b2RayCastCallback::ReportFixture()']]],
   ['reportparticle',['ReportParticle',['../classb2_query_callback.html#a58ce027d6d74c6b552ea001febb92f06',1,'b2QueryCallback::ReportParticle()'],['../classb2_ray_cast_callback.html#af20197786cc29aaf8803f7668a24903f',1,'b2RayCastCallback::ReportParticle()']]],
   ['reset',['Reset',['../classb2_timer.html#a367388794588e9283600437be82f2889',1,'b2Timer']]],
