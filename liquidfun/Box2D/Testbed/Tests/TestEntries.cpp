@@ -78,20 +78,21 @@
 #include "VerticalStack.h"
 #include "Web.h"
 
-#include "Particles.h"
-#include "DrawingParticles.h"
-#include "RigidParticles.h"
-#include "ElasticParticles.h"
-#include "ParticlesSurfaceTension.h"
-#include "WaveMachine.h"
-#include "DamBreak.h"
-#include "Soup.h"
-#include "LiquidTimer.h"
-#include "Sparky.h"
-#include "Sandbox.h"
 #include "AntiPointy.h"
+#include "CornerCase.h"
+#include "DamBreak.h"
+#include "DrawingParticles.h"
+#include "ElasticParticles.h"
+#include "LiquidTimer.h"
+#include "Particles.h"
+#include "ParticlesSurfaceTension.h"
 #include "Pointy.h"
 #include "Ramp.h"
+#include "RigidParticles.h"
+#include "Sandbox.h"
+#include "Soup.h"
+#include "Sparky.h"
+#include "WaveMachine.h"
 
 TestEntry g_testEntries[] =
 {
@@ -109,6 +110,7 @@ TestEntry g_testEntries[] =
 	{"Ramp", Ramp::Create},
 	{"Pointy", Pointy::Create},
 	{"AntiPointy", AntiPointy::Create},
+	{"Corner Case", CornerCase::Create},
 
 
 	{"Ray-Cast", RayCast::Create},
