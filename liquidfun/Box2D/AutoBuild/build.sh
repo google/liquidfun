@@ -110,6 +110,7 @@ build_osx() {
   local -r cmake="${2}"
   local -r clean="${3}"
   local -r verbose="${4}"
+  local status=
   local verbose_filter=xcodebuild_verbose_filter
   if [[ $((verbose)) -eq 1 ]]; then
     verbose_filter=cat
@@ -123,11 +124,15 @@ build_osx() {
      ! -e Box2D.xcodeproj || \
      $(stat -f%m CMakeLists.txt) -gt $(stat -f%m Box2D.xcodeproj) ]] && \
     "${cmake}" -G'Xcode'
-  [[ $((clean)) -ne 0 ]] && \
+  if [[ $((clean)) -ne 0 ]]; then
     ${dryrun} xcodebuild -configuration ${title_case_build_config} clean | \
       ${verbose_filter}
+	status=${PIPESTATUS[0]} && [[ $((status)) -ne 0 ]] && return $((status))
+  fi
   ${dryrun} xcodebuild -configuration ${title_case_build_config} | \
       ${verbose_filter}
+  status=${PIPESTATUS[0]} && [[ $((status)) -ne 0 ]] && return $((status))
+  return 0
 }
 
 # Get a list of OSX build artifact base directories.
