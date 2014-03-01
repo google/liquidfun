@@ -38,7 +38,7 @@ class b2Fixture;
 class b2Joint;
 class b2ParticleGroup;
 
-#define ALLOW_DEPRECATED_PARTICLE_SYSTEM_API 1
+#define ALLOW_DEPRECATED_PARTICLE_SYSTEM_API 0
 
 /// The world class manages all physics entities, dynamic simulation,
 /// and asynchronous queries. The world also contains efficient memory
