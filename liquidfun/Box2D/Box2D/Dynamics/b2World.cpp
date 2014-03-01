@@ -1127,7 +1127,10 @@ void b2World::RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b
 	m_contactManager.m_broadPhase.RayCast(&wrapper, input);
 	for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
 	{
-		p->RayCast(callback, point1, point2);
+		if (callback->ShouldQueryParticleSystem(p))
+		{
+			p->RayCast(callback, point1, point2);
+		}
 	}
 }
 

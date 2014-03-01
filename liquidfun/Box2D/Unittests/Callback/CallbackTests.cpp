@@ -101,6 +101,11 @@ public:
 	RayCastCallback()
 	{
 		m_count = 0;
+		m_shouldQueryParticleSystem = true;
+	}
+	void ResetCount()
+	{
+		m_count = 0;
 	}
 	float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 	                      const b2Vec2& normal, float32 fraction)
@@ -123,9 +128,19 @@ public:
 		m_count++;
 		return 0;
 	}
+	bool ShouldQueryParticleSystem(
+		const b2ParticleSystem* particleSystem)
+	{
+		return m_shouldQueryParticleSystem;
+	}
+	void SetShouldQueryParticleSystem(bool shouldQueryParticleSystem)
+	{
+		m_shouldQueryParticleSystem = shouldQueryParticleSystem;
+	}
 
 public:
 	int32 m_count;
+	bool m_shouldQueryParticleSystem;
 };
 
 // Verify that it's possible to determine the set of particles intersected by
@@ -133,10 +148,33 @@ public:
 TEST_F(CallbackTests, RayCastCallback) {
 	RayCastCallback callback;
 	CreateBoxShapedParticleGroup(m_particleSystem);
+
+	// This ray cast should miss all particles.
 	m_world->RayCast(&callback, b2Vec2(21, 0), b2Vec2(0, 21));
 	EXPECT_EQ(callback.m_count, 0);
+
+	// This ray cast should hit a particle.
 	m_world->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
 	EXPECT_NE(callback.m_count, 0);
+}
+
+// Verify that ShouldQueryParticleSystem disables ray casts against particle
+// systems, but only when called through b2World::RayCast.
+TEST_F(CallbackTests, RayCast_ShouldQueryParticleSystem) {
+	RayCastCallback callback;
+	CreateBoxShapedParticleGroup(m_particleSystem);
+
+	// This ray cast should still hit a particle, since we're calling
+	// b2ParticleSystem::RayCast directly.
+	callback.SetShouldQueryParticleSystem(false);
+	m_particleSystem->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	EXPECT_NE(callback.m_count, 0);
+
+	// This ray cast shouldn't even cast against the particle system,
+	// since we're calling b2World::RayCast.
+	callback.ResetCount();
+	m_world->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	EXPECT_EQ(callback.m_count, 0);
 }
 
 // Destruction listener which records references to particles or particle
