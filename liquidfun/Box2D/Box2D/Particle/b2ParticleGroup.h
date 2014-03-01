@@ -123,6 +123,10 @@ public:
 	b2ParticleGroup* GetNext();
 	const b2ParticleGroup* GetNext() const;
 
+	/// Get the particle system that holds this particle group.
+	b2ParticleSystem* GetParticleSystem();
+	const b2ParticleSystem* GetParticleSystem() const;
+
 	/// Get the number of particles.
 	int32 GetParticleCount() const;
 
@@ -206,6 +210,16 @@ inline b2ParticleGroup* b2ParticleGroup::GetNext()
 inline const b2ParticleGroup* b2ParticleGroup::GetNext() const
 {
 	return m_next;
+}
+
+inline b2ParticleSystem* b2ParticleGroup::GetParticleSystem()
+{
+	return m_system;
+}
+
+inline const b2ParticleSystem* b2ParticleGroup::GetParticleSystem() const
+{
+	return m_system;
 }
 
 inline int32 b2ParticleGroup::GetParticleCount() const
