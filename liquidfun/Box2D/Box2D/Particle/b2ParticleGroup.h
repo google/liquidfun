@@ -222,4 +222,74 @@ inline bool b2ParticleGroup::ContainsParticle(int32 index) const
 	return m_firstIndex <= index && index < m_lastIndex;
 }
 
+inline b2ParticleGroup::~b2ParticleGroup()
+{
+}
+
+inline int32 b2ParticleGroup::GetBufferIndex() const
+{
+  return m_firstIndex;
+}
+
+inline int32 b2ParticleGroup::GetGroupFlags() const
+{
+	return m_groupFlags & ~b2_particleGroupInternalMask;
+}
+
+inline float32 b2ParticleGroup::GetMass() const
+{
+	UpdateStatistics();
+	return m_mass;
+}
+
+inline float32 b2ParticleGroup::GetInertia() const
+{
+	UpdateStatistics();
+	return m_inertia;
+}
+
+inline b2Vec2 b2ParticleGroup::GetCenter() const
+{
+	UpdateStatistics();
+	return m_center;
+}
+
+inline b2Vec2 b2ParticleGroup::GetLinearVelocity() const
+{
+	UpdateStatistics();
+	return m_linearVelocity;
+}
+
+inline float32 b2ParticleGroup::GetAngularVelocity() const
+{
+	UpdateStatistics();
+	return m_angularVelocity;
+}
+
+inline const b2Transform& b2ParticleGroup::GetTransform() const
+{
+	return m_transform;
+}
+
+inline const b2Vec2& b2ParticleGroup::GetPosition() const
+{
+	return m_transform.p;
+}
+
+inline float32 b2ParticleGroup::GetAngle() const
+{
+	return m_transform.q.GetAngle();
+}
+
+inline void* b2ParticleGroup::GetUserData() const
+{
+	return m_userData;
+}
+
+inline void b2ParticleGroup::SetUserData(void* data)
+{
+	m_userData = data;
+}
+
+
 #endif

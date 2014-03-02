@@ -295,6 +295,18 @@ template <typename T> T* b2ParticleSystem::RequestGrowableBuffer(T* buffer,
 	return buffer;
 }
 
+b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer()
+{
+	m_colorBuffer.data = RequestParticleBuffer(m_colorBuffer.data);
+	return m_colorBuffer.data;
+}
+
+void** b2ParticleSystem::GetParticleUserDataBuffer()
+{
+	m_userDataBuffer.data = RequestParticleBuffer(m_userDataBuffer.data);
+	return m_userDataBuffer.data;
+}
+
 static int32 LimitCapacity(int32 capacity, int32 maxCount)
 {
 	return maxCount && capacity > maxCount ? maxCount : capacity;
@@ -994,7 +1006,7 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 	}
 }
 
-static bool b2ParticleContactIsZombie(const b2ParticleContact& contact)
+static inline bool b2ParticleContactIsZombie(const b2ParticleContact& contact)
 {
 	return (contact.flags & b2_zombieParticle) == b2_zombieParticle;
 }
@@ -2476,166 +2488,6 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	}
 }
 
-void b2ParticleSystem::SetStrictContactCheck(bool enabled)
-{
-	m_strictContactCheck = enabled;
-}
-
-bool b2ParticleSystem::GetStrictContactCheck() const
-{
-	return m_strictContactCheck;
-}
-
-void b2ParticleSystem::SetParticleRadius(float32 radius)
-{
-	m_particleDiameter = 2 * radius;
-	m_squaredDiameter = m_particleDiameter * m_particleDiameter;
-	m_inverseDiameter = 1 / m_particleDiameter;
-}
-
-void b2ParticleSystem::SetParticleDensity(float32 density)
-{
-	m_density = density;
-	m_inverseDensity =  1 / m_density;
-}
-
-float32 b2ParticleSystem::GetParticleDensity() const
-{
-	return m_density;
-}
-
-void b2ParticleSystem::SetParticleGravityScale(float32 gravityScale)
-{
-	m_gravityScale = gravityScale;
-}
-
-float32 b2ParticleSystem::GetParticleGravityScale() const
-{
-	return m_gravityScale;
-}
-
-void b2ParticleSystem::SetParticleDamping(float32 damping)
-{
-	m_def.dampingStrength = damping;
-}
-
-float32 b2ParticleSystem::GetParticleDamping() const
-{
-	return m_def.dampingStrength;
-}
-
-void b2ParticleSystem::SetParticleStaticPressureIterations(int32 iterations)
-{
-	m_def.staticPressureIterations = iterations;
-}
-
-int32 b2ParticleSystem::GetParticleStaticPressureIterations() const
-{
-	return m_def.staticPressureIterations;
-}
-
-float32 b2ParticleSystem::GetParticleRadius() const
-{
-	return m_particleDiameter / 2;
-}
-
-float32 b2ParticleSystem::GetCriticalVelocity(const b2TimeStep& step) const
-{
-	return m_particleDiameter * step.inv_dt;
-}
-
-float32 b2ParticleSystem::GetCriticalVelocitySquared(
-	const b2TimeStep& step) const
-{
-	float32 velocity = GetCriticalVelocity(step);
-	return velocity * velocity;
-}
-
-float32 b2ParticleSystem::GetCriticalPressure(const b2TimeStep& step) const
-{
-	return m_density * GetCriticalVelocitySquared(step);
-}
-
-float32 b2ParticleSystem::GetParticleStride() const
-{
-	return b2_particleStride * m_particleDiameter;
-}
-
-float32 b2ParticleSystem::GetParticleMass() const
-{
-	float32 stride = GetParticleStride();
-	return m_density * stride * stride;
-}
-
-float32 b2ParticleSystem::GetParticleInvMass() const
-{
-	return 1.777777f * m_inverseDensity * m_inverseDiameter *
-			 m_inverseDiameter;
-}
-
-b2Vec2* b2ParticleSystem::GetParticlePositionBuffer()
-{
-	return m_positionBuffer.data;
-}
-
-b2Vec2* b2ParticleSystem::GetParticleVelocityBuffer()
-{
-	return m_velocityBuffer.data;
-}
-
-b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer()
-{
-	m_colorBuffer.data = RequestParticleBuffer(m_colorBuffer.data);
-	return m_colorBuffer.data;
-}
-
-void** b2ParticleSystem::GetParticleUserDataBuffer()
-{
-	m_userDataBuffer.data = RequestParticleBuffer(m_userDataBuffer.data);
-	return m_userDataBuffer.data;
-}
-
-int32 b2ParticleSystem::GetParticleMaxCount() const
-{
-	return m_maxCount;
-}
-
-void b2ParticleSystem::SetParticleMaxCount(int32 count)
-{
-	b2Assert(m_count <= count);
-	m_maxCount = count;
-}
-
-const uint32* b2ParticleSystem::GetParticleFlagsBuffer() const
-{
-	return m_flagsBuffer.data;
-}
-
-const b2Vec2* b2ParticleSystem::GetParticlePositionBuffer() const
-{
-	return m_positionBuffer.data;
-}
-
-const b2Vec2* b2ParticleSystem::GetParticleVelocityBuffer() const
-{
-	return m_velocityBuffer.data;
-}
-
-const b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer() const
-{
-	return ((b2ParticleSystem*) this)->GetParticleColorBuffer();
-}
-
-const b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer() const
-{
-	return m_groupBuffer;
-}
-
-void* const* b2ParticleSystem::GetParticleUserDataBuffer() const
-{
-	return ((b2ParticleSystem*) this)->GetParticleUserDataBuffer();
-}
-
 template <typename T> void b2ParticleSystem::SetParticleBuffer(
 	ParticleBuffer<T>* buffer, T* newData, int32 newCapacity)
 {
@@ -2670,11 +2522,6 @@ void b2ParticleSystem::SetParticleColorBuffer(b2ParticleColor* buffer,
 											  int32 capacity)
 {
 	SetParticleBuffer(&m_colorBuffer, buffer, capacity);
-}
-
-b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer()
-{
-	return m_groupBuffer;
 }
 
 void b2ParticleSystem::SetParticleUserDataBuffer(void** buffer, int32 capacity)

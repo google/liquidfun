@@ -41,80 +41,11 @@ b2ParticleGroup::b2ParticleGroup()
 
 }
 
-b2ParticleGroup::~b2ParticleGroup()
-{
-}
-
-int32 b2ParticleGroup::GetBufferIndex() const
-{
-  return m_firstIndex;
-}
-
-int32 b2ParticleGroup::GetGroupFlags() const
-{
-	return m_groupFlags & ~b2_particleGroupInternalMask;
-}
-
 void b2ParticleGroup::SetGroupFlags(int32 flags)
 {
 	b2Assert((flags & b2_particleGroupInternalMask) == 0);
 	flags |= m_groupFlags & ~b2_particleGroupInternalMask;
 	m_system->SetParticleGroupFlags(this, flags);
-}
-
-float32 b2ParticleGroup::GetMass() const
-{
-	UpdateStatistics();
-	return m_mass;
-}
-
-float32 b2ParticleGroup::GetInertia() const
-{
-	UpdateStatistics();
-	return m_inertia;
-}
-
-b2Vec2 b2ParticleGroup::GetCenter() const
-{
-	UpdateStatistics();
-	return m_center;
-}
-
-b2Vec2 b2ParticleGroup::GetLinearVelocity() const
-{
-	UpdateStatistics();
-	return m_linearVelocity;
-}
-
-float32 b2ParticleGroup::GetAngularVelocity() const
-{
-	UpdateStatistics();
-	return m_angularVelocity;
-}
-
-const b2Transform& b2ParticleGroup::GetTransform() const
-{
-	return m_transform;
-}
-
-const b2Vec2& b2ParticleGroup::GetPosition() const
-{
-	return m_transform.p;
-}
-
-float32 b2ParticleGroup::GetAngle() const
-{
-	return m_transform.q.GetAngle();
-}
-
-void* b2ParticleGroup::GetUserData() const
-{
-	return m_userData;
-}
-
-void b2ParticleGroup::SetUserData(void* data)
-{
-	m_userData = data;
 }
 
 void b2ParticleGroup::UpdateStatistics() const

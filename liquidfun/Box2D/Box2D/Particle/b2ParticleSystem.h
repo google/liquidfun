@@ -762,4 +762,158 @@ inline int32 b2ParticleSystem::GetStuckParticleCandidateCount()
 {
 	return m_stuckParticleCount;
 }
+
+inline void b2ParticleSystem::SetStrictContactCheck(bool enabled)
+{
+	m_strictContactCheck = enabled;
+}
+
+inline bool b2ParticleSystem::GetStrictContactCheck() const
+{
+	return m_strictContactCheck;
+}
+
+inline void b2ParticleSystem::SetParticleRadius(float32 radius)
+{
+	m_particleDiameter = 2 * radius;
+	m_squaredDiameter = m_particleDiameter * m_particleDiameter;
+	m_inverseDiameter = 1 / m_particleDiameter;
+}
+
+inline void b2ParticleSystem::SetParticleDensity(float32 density)
+{
+	m_density = density;
+	m_inverseDensity =  1 / m_density;
+}
+
+inline float32 b2ParticleSystem::GetParticleDensity() const
+{
+	return m_density;
+}
+
+inline void b2ParticleSystem::SetParticleGravityScale(float32 gravityScale)
+{
+	m_gravityScale = gravityScale;
+}
+
+inline float32 b2ParticleSystem::GetParticleGravityScale() const
+{
+	return m_gravityScale;
+}
+
+inline void b2ParticleSystem::SetParticleDamping(float32 damping)
+{
+	m_def.dampingStrength = damping;
+}
+
+inline float32 b2ParticleSystem::GetParticleDamping() const
+{
+	return m_def.dampingStrength;
+}
+
+inline void b2ParticleSystem::SetParticleStaticPressureIterations(int32 iterations)
+{
+	m_def.staticPressureIterations = iterations;
+}
+
+inline int32 b2ParticleSystem::GetParticleStaticPressureIterations() const
+{
+	return m_def.staticPressureIterations;
+}
+
+inline float32 b2ParticleSystem::GetParticleRadius() const
+{
+	return m_particleDiameter / 2;
+}
+
+inline float32 b2ParticleSystem::GetCriticalVelocity(const b2TimeStep& step) const
+{
+	return m_particleDiameter * step.inv_dt;
+}
+
+inline float32 b2ParticleSystem::GetCriticalVelocitySquared(
+	const b2TimeStep& step) const
+{
+	float32 velocity = GetCriticalVelocity(step);
+	return velocity * velocity;
+}
+
+inline float32 b2ParticleSystem::GetCriticalPressure(const b2TimeStep& step) const
+{
+	return m_density * GetCriticalVelocitySquared(step);
+}
+
+inline float32 b2ParticleSystem::GetParticleStride() const
+{
+	return b2_particleStride * m_particleDiameter;
+}
+
+inline float32 b2ParticleSystem::GetParticleMass() const
+{
+	float32 stride = GetParticleStride();
+	return m_density * stride * stride;
+}
+
+inline float32 b2ParticleSystem::GetParticleInvMass() const
+{
+	return 1.777777f * m_inverseDensity * m_inverseDiameter *
+			m_inverseDiameter;
+}
+
+inline b2Vec2* b2ParticleSystem::GetParticlePositionBuffer()
+{
+	return m_positionBuffer.data;
+}
+
+inline b2Vec2* b2ParticleSystem::GetParticleVelocityBuffer()
+{
+	return m_velocityBuffer.data;
+}
+
+inline int32 b2ParticleSystem::GetParticleMaxCount() const
+{
+	return m_maxCount;
+}
+
+inline void b2ParticleSystem::SetParticleMaxCount(int32 count)
+{
+	b2Assert(m_count <= count);
+	m_maxCount = count;
+}
+
+inline const uint32* b2ParticleSystem::GetParticleFlagsBuffer() const
+{
+	return m_flagsBuffer.data;
+}
+
+inline const b2Vec2* b2ParticleSystem::GetParticlePositionBuffer() const
+{
+	return m_positionBuffer.data;
+}
+
+inline const b2Vec2* b2ParticleSystem::GetParticleVelocityBuffer() const
+{
+	return m_velocityBuffer.data;
+}
+
+inline const b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer() const
+{
+	return ((b2ParticleSystem*) this)->GetParticleColorBuffer();
+}
+
+inline const b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer() const
+{
+	return m_groupBuffer;
+}
+
+inline void* const* b2ParticleSystem::GetParticleUserDataBuffer() const
+{
+	return ((b2ParticleSystem*) this)->GetParticleUserDataBuffer();
+}
+
+inline b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer()
+{
+	return m_groupBuffer;
+}
+
 #endif
