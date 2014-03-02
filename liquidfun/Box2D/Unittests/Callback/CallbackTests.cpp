@@ -59,6 +59,11 @@ public:
 	QueryCallback()
 	{
 		m_count = 0;
+		m_shouldQueryParticleSystem = true;
+	}
+	void ResetCount()
+	{
+		m_count = 0;
 	}
 	bool ReportFixture(b2Fixture* fixture)
 	{
@@ -72,9 +77,18 @@ public:
 		m_count++;
 		return true;
 	}
+	bool ShouldQueryParticleSystem(const b2ParticleSystem* particleSystem)
+	{
+		return m_shouldQueryParticleSystem;
+	}
+	void SetShouldQueryParticleSystem(bool shouldQueryParticleSystem)
+	{
+		m_shouldQueryParticleSystem = shouldQueryParticleSystem;
+	}
 
 public:
 	int32 m_count;
+	bool m_shouldQueryParticleSystem;
 };
 
 // Verify that it's possible to determine the set of particles within an
@@ -83,14 +97,38 @@ TEST_F(CallbackTests, QueryCallback) {
 	QueryCallback callback;
 	b2AABB aabb;
 	CreateBoxShapedParticleGroup(m_particleSystem);
+
+	// This AABB query should miss all particles.
 	aabb.lowerBound.Set(10, -10);
 	aabb.upperBound.Set(20, 10);
 	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_EQ(callback.m_count, 0);
+
+	// This AABB query should hit some particles.
 	aabb.lowerBound.Set(-10, -10);
 	aabb.upperBound.Set(10, 10);
 	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_NE(callback.m_count, 0);
+}
+
+// Verify that b2QueryCallback::SetShouldQueryParticleSystem is working,
+// but only when QueryAABB is called through b2World.
+TEST_F(CallbackTests, QueryCallback_ShouldQueryParticleSystem) {
+	QueryCallback callback;
+	b2AABB aabb;
+	CreateBoxShapedParticleGroup(m_particleSystem);
+
+	// This AABB query should still check the particle system,
+	// because we're calling b2ParticleSystem::QueryAABB directly.
+	callback.SetShouldQueryParticleSystem(false);
+	m_particleSystem->QueryAABB(&callback, aabb);
+	EXPECT_NE(callback.m_count, 0);
+
+	// This AABB query shouldn't check the particle system at all,
+	// because we're calling b2World::QueryAABB.
+	callback.ResetCount();
+	m_world->QueryAABB(&callback, aabb);
+	EXPECT_EQ(callback.m_count, 0);
 }
 
 // Ray cast callback which counts the number of times ReportParticle() is

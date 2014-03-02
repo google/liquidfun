@@ -156,6 +156,17 @@ public:
 		B2_NOT_USED(index);
 		return false;
 	}
+
+	/// Cull an entire particle system from b2World::QueryAABB. Ignored for
+	/// b2ParticleSystem::QueryAABB.
+	/// @return true if you want to include particleSystem in the AABB query, or
+	/// false to cull particleSystem from the AABB query.
+	virtual bool ShouldQueryParticleSystem(
+		const b2ParticleSystem* particleSystem)
+	{
+		B2_NOT_USED(particleSystem);
+		return true;
+	}
 };
 
 /// Callback class for ray casts.

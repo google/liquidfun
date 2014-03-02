@@ -1078,7 +1078,10 @@ void b2World::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const
 	m_contactManager.m_broadPhase.Query(&wrapper, aabb);
 	for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
 	{
-		p->QueryAABB(callback, aabb);
+		if (callback->ShouldQueryParticleSystem(p))
+		{
+			p->QueryAABB(callback, aabb);
+		}
 	}
 }
 

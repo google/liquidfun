@@ -420,13 +420,15 @@ public:
 	const b2ParticleSystem* GetNext() const;
 
 	/// Query the particle system for all particles that potentially overlap
-	/// the provided AABB.
+	/// the provided AABB. b2QueryCallback::ShouldQueryParticleSystem is
+	/// ignored.
 	/// @param callback a user implemented callback class.
 	/// @param aabb the query box.
 	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
 
 	/// Query the particle system for all particles that potentially overlap
 	/// the provided shape's AABB. Calls QueryAABB internally.
+	/// b2QueryCallback::ShouldQueryParticleSystem is ignored.
 	/// @param callback a user implemented callback class.
 	/// @param shape the query shape
 	/// @param xf the transform of the AABB
