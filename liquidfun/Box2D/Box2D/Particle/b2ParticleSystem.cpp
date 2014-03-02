@@ -119,7 +119,7 @@ static inline uint32 computeRelativeTag(uint32 tag, int32 x, int32 y)
 
 b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def, b2World* world)
 {
-
+	m_paused = false;
 	m_timestamp = 0;
 	m_allParticleFlags = 0;
 	m_needsUpdateAllParticleFlags = false;
@@ -1506,6 +1506,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 	if (m_needsUpdateAllGroupFlags)
 	{
 		UpdateAllGroupFlags();
+	}
+	if (m_paused)
+	{
+		return;
 	}
 	for (m_iterationIndex = 0;
 		m_iterationIndex < step.particleIterations;

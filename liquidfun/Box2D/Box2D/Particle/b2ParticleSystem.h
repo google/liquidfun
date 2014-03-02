@@ -154,7 +154,7 @@ struct b2ParticleSystemDef
 
 	/// Determines how fast colors are mixed
 	/// 1.0f ==> mixed immediately
-	/// 0.5f ==> mixed half way each simulation step (see Step())
+	/// 0.5f ==> mixed half way each simulation step (see b2World::Step())
 	float32 colorMixingStrength;
 };
 
@@ -165,13 +165,14 @@ public:
 	/// No reference to the definition is retained.
 	/// A simulation step must occur before it's possible to interact with a
 	/// newly created particle.  For example, DestroyParticleInShape() will
-	/// not destroy a particle until Step() has been called.
+	/// not destroy a particle until b2World::Step() has been called.
 	/// @warning This function is locked during callbacks.
 	/// @return the index of the particle.
 	int32 CreateParticle(const b2ParticleDef& def);
 
 	/// Destroy a particle.
-	/// The particle is removed after the next simulation step (see Step()).
+	/// The particle is removed after the next simulation step (see
+	/// b2World::Step()).
 	void DestroyParticle(int32 index)
 	{
 		DestroyParticle(index, false);
@@ -211,7 +212,6 @@ public:
 	/// @return Number of particles destroyed.
 	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf,
 	                              bool callDestructionListener);
-
 
 	/// Create a particle group whose properties have been defined. No
 	/// reference to the definition is retained.
@@ -265,6 +265,16 @@ public:
 	/// Note: If you try to CreateParticle() with more than this count,
 	/// b2_invalidParticleIndex is returned.
 	void SetParticleMaxCount(int32 count);
+
+	/// Pause or unpause the particle system. When paused, b2World::Step() skips
+	/// over this particle system. All b2ParticleSystem function calls still
+	/// work.
+	/// @param paused is true to pause, false to un-pause.
+	void PauseSimulation(bool paused);
+
+	/// @return true if the particle system is being updated in b2World::Step().
+	/// Initially, true, then, the last value passed into PauseSimulation().
+	bool IsSimulationPaused() const;
 
 	/// Change the particle density.
 	/// Particle density affects the mass of the particles, which in turn
@@ -587,6 +597,7 @@ private:
 
 	void DetectStuckParticle(int32 particle);
 
+	bool m_paused;
 	int32 m_timestamp;
 	int32 m_allParticleFlags;
 	bool m_needsUpdateAllParticleFlags;
@@ -691,6 +702,16 @@ inline int32 b2ParticleSystem::GetParticleGroupCount() const
 inline int32 b2ParticleSystem::GetParticleCount() const
 {
 	return m_count;
+}
+
+inline void b2ParticleSystem::PauseSimulation(bool paused)
+{
+	m_paused = paused;
+}
+
+inline bool b2ParticleSystem::IsSimulationPaused() const
+{
+	return m_paused;
 }
 
 inline const b2ParticleContact* b2ParticleSystem::GetParticleContacts()

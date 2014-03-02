@@ -458,6 +458,38 @@ TEST_F(FunctionTests, ComputeParticleCollisionEnergy) {
 	EXPECT_NE(m_particleSystem->ComputeParticleCollisionEnergy(), 0);
 }
 
+TEST_F(FunctionTests, PauseSimulation) {
+	EXPECT_FALSE(m_particleSystem->IsSimulationPaused());
+
+	b2ParticleDef def;
+	def.flags = b2_elasticParticle | b2_springParticle;
+	def.position.Set(1, 2);
+	def.velocity.Set(3, 4);
+	def.color.Set(1, 2, 3, 4);
+	def.userData = this;
+	m_particleSystem->CreateParticle(def);
+
+	// Step the simulation to ensure the particle is moving.
+	const b2Vec2* positions = m_particleSystem->GetParticlePositionBuffer();
+	const b2Vec2 initialPosition = positions[0];
+	m_world->Step(0.1f, 1, 1);
+	const b2Vec2 steppedPosition = positions[0];
+	EXPECT_NE(initialPosition, steppedPosition);
+
+	// Pause the particle system, then step simulation again.
+	// Ensure the particle hasn't moved.
+	m_particleSystem->PauseSimulation(true);
+	EXPECT_TRUE(m_particleSystem->IsSimulationPaused());
+	m_world->Step(0.1f, 1, 1);
+	EXPECT_EQ(steppedPosition, positions[0]);
+
+	// Unpause the particle system. Ensure the particle is moving again.
+	m_particleSystem->PauseSimulation(false);
+	EXPECT_FALSE(m_particleSystem->IsSimulationPaused());
+	m_world->Step(0.1f, 1, 1);
+	EXPECT_NE(steppedPosition, positions[0]);
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
