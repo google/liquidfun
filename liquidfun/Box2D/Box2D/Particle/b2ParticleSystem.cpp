@@ -1609,7 +1609,7 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 							m_system->m_velocityBuffer.data[a] = v;
 							b2Vec2 f = m_step.inv_dt *
 								m_system->GetParticleMass() * (av - v);
-							m_system->ApplyForce(a, f);
+							m_system->ParticleApplyForce(a, f);
 						}
 					}
 				}
@@ -1770,9 +1770,9 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 					}
 					b2Vec2 v = va + s * vba;
 					b2Vec2 f = step.inv_dt * GetParticleMass() * (vc - v);
-					ApplyForce(a, wa * f);
-					ApplyForce(b, wb * f);
-					ApplyForce(c, wc * f);
+					ParticleApplyForce(a, wa * f);
+					ParticleApplyForce(b, wb * f);
+					ParticleApplyForce(c, wc * f);
 					vc = v;
 				}
 			}
@@ -3059,17 +3059,72 @@ void b2ParticleSystem::SetParticleGroupFlags(
 	*oldFlags = newFlags;
 }
 
-void b2ParticleSystem::ApplyForce(int32 index, const b2Vec2& force)
+static inline bool IsSignificantForce(const b2Vec2& force)
 {
-	if ((force.x != 0 || force.y != 0) &&
-		!(m_flagsBuffer.data[index] & b2_wallParticle))
+	return force.x != 0 || force.y != 0;
+}
+
+inline bool b2ParticleSystem::ForceCanBeApplied(uint32 flags) const
+{
+	return !(flags & b2_wallParticle);
+}
+
+inline void b2ParticleSystem::PrepareForceBuffer()
+{
+	if (!m_hasForce)
 	{
-		if (!m_hasForce)
+		memset(m_forceBuffer, 0, sizeof(*m_forceBuffer) * m_count);
+		m_hasForce = true;
+	}
+}
+
+void b2ParticleSystem::ApplyForce(int32 firstIndex, int32 lastIndex,
+								  const b2Vec2& force)
+{
+	// Ensure we're not trying to apply force to particles that can't move,
+	// such as wall particles.
+#if B2_ASSERT_ENABLED
+	uint32 flags = 0;
+	for (int32 i = firstIndex; i < lastIndex; i++)
+	{
+		flags |= m_flagsBuffer.data[i];
+	}
+	b2Assert(ForceCanBeApplied(flags));
+#endif
+
+	// Early out if force does nothing (optimization).
+	const b2Vec2 distributedForce = force / (lastIndex - firstIndex);
+	if (IsSignificantForce(distributedForce))
+	{
+		PrepareForceBuffer();
+
+		// Distribute the force over all the particles.
+		for (int32 i = firstIndex; i < lastIndex; i++)
 		{
-			memset(m_forceBuffer, 0, sizeof(*m_forceBuffer) * m_count);
-			m_hasForce = true;
+			m_forceBuffer[i] += distributedForce;
 		}
+	}
+}
+
+void b2ParticleSystem::ParticleApplyForce(int32 index, const b2Vec2& force)
+{
+	if (IsSignificantForce(force) &&
+		ForceCanBeApplied(m_flagsBuffer.data[index]))
+	{
+		PrepareForceBuffer();
 		m_forceBuffer[index] += force;
+	}
+}
+
+void b2ParticleSystem::ApplyLinearImpulse(int32 firstIndex, int32 lastIndex,
+										  const b2Vec2& impulse)
+{
+	const float32 numParticles = (float32)(lastIndex - firstIndex);
+	const float32 totalMass = numParticles * GetParticleMass();
+	const b2Vec2 velocityDelta = impulse / totalMass;
+	for (int32 i = firstIndex; i < lastIndex; i++)
+	{
+		m_velocityBuffer.data[i] += velocityDelta;
 	}
 }
 
@@ -3211,3 +3266,4 @@ void b2ParticleSystem::SetStuckParticleThreshold(int32 steps)
 			m_consecutiveContactStepsBuffer.data);
 	}
 }
+

@@ -180,6 +180,13 @@ public:
 	/// Set the user data. Use this to store your application specific data.
 	void SetUserData(void* data);
 
+	/// Call b2ParticleSystem::ApplyForce for every particle in the group.
+	void ApplyForce(const b2Vec2& force);
+
+	/// Call b2ParticleSystem::ApplyLinearImpulse for every particle in the
+	/// group.
+	void ApplyLinearImpulse(const b2Vec2& impulse);
+
 private:
 
 	friend class b2ParticleSystem;

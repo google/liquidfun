@@ -83,3 +83,13 @@ void b2ParticleGroup::UpdateStatistics() const
 		m_timestamp = m_system->m_timestamp;
 	}
 }
+
+void b2ParticleGroup::ApplyForce(const b2Vec2& force)
+{
+	m_system->ApplyForce(m_firstIndex, m_lastIndex, force);
+}
+
+void b2ParticleGroup::ApplyLinearImpulse(const b2Vec2& impulse)
+{
+	m_system->ApplyLinearImpulse(m_firstIndex, m_lastIndex, impulse);
+}

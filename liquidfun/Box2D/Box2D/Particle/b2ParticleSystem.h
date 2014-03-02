@@ -490,6 +490,38 @@ public:
 	/// GetParticleCount() items are in the returned array.
 	const int32* GetParticleIndexByExpirationTimeBuffer();
 
+	/// Apply an impulse to one particle. This immediately modifies the
+	/// velocity. Similar to b2Body::ApplyLinearImpulse.
+	/// @param index the particle that will be modified.
+	/// @param impulse the world impulse vector, usually in N-seconds or kg-m/s.
+	void ParticleApplyLinearImpulse(int32 index, const b2Vec2& impulse);
+
+	/// Apply an impulse to all particles between 'firstIndex' and 'lastIndex'.
+	/// This immediately modifies the velocity. Note that the impulse is
+	/// applied to the total mass of all particles. So, calling
+	/// ApplyLinearImpulse(0, impulse) and ApplyLinearImpulse(1, impulse) will
+	/// impart twice as much velocity as calling just
+	/// ApplyLinearImpulse(0, 1, impulse).
+	/// @param firstIndex the first particle to be modified.
+	/// @param lastIndex the last particle to be modified.
+	/// @param impulse the world impulse vector, usually in N-seconds or kg-m/s.
+	void ApplyLinearImpulse(int32 firstIndex, int32 lastIndex,
+							const b2Vec2& impulse);
+
+	/// Apply a force to the center of a particle.
+	/// @param index the particle that will be modified.
+	/// @param force the world force vector, usually in Newtons (N).
+	void ParticleApplyForce(int32 index, const b2Vec2& force);
+
+	/// Distribute a force across several particles. The particles must not be
+	/// wall particles. Note that the force is distributed across all the
+	/// particles, so calling this function for indices 0..N is not the same as
+	/// calling ApplyForce(i, force) for i in 0..N.
+	/// @param firstIndex the first particle to be modified.
+	/// @param lastIndex the last particle to be modified.
+	/// @param force the world force vector, usually in Newtons (N).
+	void ApplyForce(int32 firstIndex, int32 lastIndex, const b2Vec2& force);
+
 	/// Get the next particle-system in the world's particle-system list.
 	b2ParticleSystem* GetNext();
 	const b2ParticleSystem* GetNext() const;
@@ -707,8 +739,6 @@ private:
 
 	void SetParticleGroupFlags(b2ParticleGroup* group, uint32 flags);
 
-	void ApplyForce(int32 index, const b2Vec2& force);
-
 	void RemoveSpuriousBodyContacts();
 	static bool BodyContactCompare(const b2ParticleBodyContact& lhs, const b2ParticleBodyContact& rhs);
 
@@ -721,6 +751,9 @@ private:
 	int32 GetQuantizedTimeElapsed() const;
 	/// Convert a lifetime in seconds to an expiration time.
 	int64 LifetimeToExpirationTime(const float32 lifetime) const;
+
+	bool ForceCanBeApplied(uint32 flags) const;
+	void PrepareForceBuffer();
 
 	bool m_paused;
 	int32 m_timestamp;
@@ -1064,6 +1097,12 @@ inline bool b2ParticleSystem::ValidateParticleIndex(const int32 index) const
 inline bool b2ParticleSystem::GetParticleDestructionByAge() const
 {
 	return m_def.destroyByAge;
+}
+
+inline void b2ParticleSystem::ParticleApplyLinearImpulse(int32 index,
+														 const b2Vec2& impulse)
+{
+	ApplyLinearImpulse(index, index + 1, impulse);
 }
 
 #endif
