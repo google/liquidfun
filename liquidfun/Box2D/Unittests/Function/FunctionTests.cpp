@@ -170,7 +170,7 @@ public:
 			const int32 index = particleIndices[i];
 			m_particleSystem->SetParticleFlags(
 				index, m_particleSystem->GetParticleFlags(index) |
-					   b2_destructionListener);
+					   b2_destructionListenerParticle);
 			m_particleSystem->GetUserDataBuffer()[index] = handle;
 			m_particleLifetime[handle] =
 				m_particleSystem->GetParticleLifetime(index);
@@ -1218,7 +1218,7 @@ TEST_F(FunctionTests, LimitParticleCountUsingLifetime)
 		const int32 index = m_particleSystem->CreateParticle(def);
 		m_particleSystem->SetParticleFlags(
 			index, m_particleSystem->GetParticleFlags(index) |
-				   b2_destructionListener);
+				   b2_destructionListenerParticle);
 		// Create half of the particles with a finite lifetime.
 		if (index & 1)
 		{
@@ -1235,7 +1235,7 @@ TEST_F(FunctionTests, LimitParticleCountUsingLifetime)
 		const int32 index = m_particleSystem->CreateParticle(def);
 		m_particleSystem->SetParticleFlags(
 			index, m_particleSystem->GetParticleFlags(index) |
-				   b2_destructionListener);
+				   b2_destructionListenerParticle);
 		m_world->Step(0.1f, 1, 1);
 	}
 }

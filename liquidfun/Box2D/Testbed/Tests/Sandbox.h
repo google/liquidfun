@@ -177,7 +177,7 @@ public:
 			m_particleSystem->SetParticleFlags(
 				particleIndex,
 				m_particleSystem->GetFlagsBuffer()[particleIndex] |
-					b2_destructionListener);
+					b2_destructionListenerParticle);
 			m_particles.insert(m_particleSystem->GetParticleHandleFromIndex(
 								   particleIndex));
 		}

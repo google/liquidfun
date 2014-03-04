@@ -101,6 +101,9 @@ TODO describe the cool new stuff we have in this release TODO
 *   b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle each
     now takes a b2ParticleSystem pointer as its first parameter. This change is
     necessary since multiple particle systems can now exist.
+*   Renamed `b2ParticleFlag` `b2DestructionListener` to
+    `b2DestructionListenerParticle` to be consistent with other particle flag
+    names.
 
 #### Other Changes
 

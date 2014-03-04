@@ -49,7 +49,7 @@ enum b2ParticleFlag
 	/// Mix color between contacting particles.
 	b2_colorMixingParticle = 1 << 8,
 	/// Call b2DestructionListener on destruction.
-	b2_destructionListener = 1 << 9,
+	b2_destructionListenerParticle = 1 << 9,
 	/// Prevents other particles from leaking.
 	b2_barrierParticle = 1 << 10,
 	/// Less compressibility.

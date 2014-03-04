@@ -590,7 +590,7 @@ void b2ParticleSystem::DestroyParticle(
 	uint32 flags = b2_zombieParticle;
 	if (callDestructionListener)
 	{
-		flags |= b2_destructionListener;
+		flags |= b2_destructionListenerParticle;
 	}
 	SetParticleFlags(index, m_flagsBuffer.data[index] | flags);
 }
@@ -2431,7 +2431,7 @@ void b2ParticleSystem::SolveZombie()
 		{
 			b2DestructionListener * const destructionListener =
 				m_world->m_destructionListener;
-			if ((flags & b2_destructionListener) &&
+			if ((flags & b2_destructionListenerParticle) &&
 				destructionListener)
 			{
 				destructionListener->SayGoodbye(i);

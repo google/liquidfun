@@ -269,7 +269,8 @@ TEST_F(CallbackTests, DestroyParticleWithCallback) {
 
 	DestructionListener listenerFlag;
 	m_world->SetDestructionListener(&listenerFlag);
-	index = CreateAndDestroyParticle(m_world, m_particleSystem, b2_destructionListener, false);
+	index = CreateAndDestroyParticle(m_world, m_particleSystem,
+                                     b2_destructionListenerParticle, false);
 	EXPECT_EQ(listenerFlag.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listenerFlag.m_destroyedParticles[0], index);
 }
