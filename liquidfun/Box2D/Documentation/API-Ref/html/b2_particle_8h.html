@@ -94,6 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 <div class="textblock"><code>#include &lt;Box2D/Common/b2Math.h&gt;</code><br/>
 <code>#include &lt;<a class="el" href="b2_settings_8h_source.html">Box2D/Common/b2Settings.h</a>&gt;</code><br/>
+<code>#include &lt;Box2D/Common/b2IntrusiveList.h&gt;</code><br/>
 </div>
 <p><a href="b2_particle_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -103,6 +104,8 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Small color object for each particle.  <a href="classb2_particle_color.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_def.html">b2ParticleDef</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -121,7 +124,9 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a780f86abd0e0ee164868109f5be83dca">b2_colorMixingParticle</a> = 1 &lt;&lt; 8, 
 <a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50ace8eced822dad3b6706f18053c803bf1">b2_destructionListener</a> = 1 &lt;&lt; 9, 
 <a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a6e0c509b4673cf041ead1cdd90b36ec1">b2_barrierParticle</a> = 1 &lt;&lt; 10, 
-<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a189a78e47cb348efe3d4f2913841fc5e">b2_staticPressureParticle</a> = 1 &lt;&lt; 11
+<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a189a78e47cb348efe3d4f2913841fc5e">b2_staticPressureParticle</a> = 1 &lt;&lt; 11, 
+<br/>
+&#160;&#160;<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50acc9479dc00efdc07365ab91ecbc892f6">b2_reactiveParticle</a> = 1 &lt;&lt; 12
 <br/>
  }</td></tr>
 <tr class="memdesc:a73d3b011893cb87452253b1b67a5cf50"><td class="mdescLeft">&#160;</td><td class="mdescRight">The particle type. Can be combined with the | operator.  <a href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50">More...</a><br/></td></tr>
@@ -188,6 +193,9 @@ Variables</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="a73d3b011893cb87452253b1b67a5cf50a189a78e47cb348efe3d4f2913841fc5e"></a>b2_staticPressureParticle</em>&nbsp;</td><td class="fielddoc">
 <p>Less compressibility. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a73d3b011893cb87452253b1b67a5cf50acc9479dc00efdc07365ab91ecbc892f6"></a>b2_reactiveParticle</em>&nbsp;</td><td class="fielddoc">
+<p>Makes pairs or triads with other particles. </p>
 </td></tr>
 </table>
 
