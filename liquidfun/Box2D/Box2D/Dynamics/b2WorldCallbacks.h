@@ -179,7 +179,21 @@ public:
 	virtual float32 ReportFixture(	b2Fixture* fixture, const b2Vec2& point,
 									const b2Vec2& normal, float32 fraction) = 0;
 
-	/// Called for each particle found in the query.
+	/// Called for each particle found in the query. You control how the ray
+	/// cast proceeds by returning a float:
+	/// return <=0: ignore the remaining particles in this particle system
+	/// return fraction: ignore particles that are 'fraction' percent farther
+	///   along the line from 'point1' to 'point2'. Note that 'point1' and
+	///   'point2' are parameters to b2World::RayCast.
+	/// @param particleSystem the particle system containing the particle
+	/// @param index the index of the particle in particleSystem
+	/// @param point the point of intersection bt the ray and the particle
+	/// @param normal the normal vector at the point of intersection
+	/// @param fraction percent (0.0~1.0) from 'point0' to 'point1' along the
+	///   ray. Note that 'point1' and 'point2' are parameters to
+	///   b2World::RayCast.
+	/// @return <=0 to ignore rest of particle system, fraction to ignore
+	/// particles that are farther away.
 	virtual float32 ReportParticle(	const b2ParticleSystem* particleSystem,
 									int32 index, const b2Vec2& point,
 									const b2Vec2& normal, float32 fraction)
@@ -190,6 +204,17 @@ public:
 		B2_NOT_USED(&normal);
 		B2_NOT_USED(fraction);
 		return 0;
+	}
+
+	/// Cull an entire particle system from b2World::RayCast. Ignored in
+	/// b2ParticleSystem::RayCast.
+	/// @return true if you want to include particleSystem in the RayCast, or
+	/// false to cull particleSystem from the RayCast.
+	virtual bool ShouldQueryParticleSystem(
+		const b2ParticleSystem* particleSystem)
+	{
+		B2_NOT_USED(particleSystem);
+		return true;
 	}
 };
 

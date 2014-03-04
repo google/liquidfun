@@ -433,6 +433,16 @@ public:
 	void QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
 						const b2Transform& xf) const;
 
+	/// Ray-cast the particle system for all particles in the path of the ray.
+	/// Your callback controls whether you get the closest point, any point, or
+	/// n-points. The ray-cast ignores particles that contain the starting
+	/// point. b2RayCastCallback::ShouldQueryParticleSystem is ignored.
+	/// @param callback a user implemented callback class.
+	/// @param point1 the ray starting point
+	/// @param point2 the ray ending point
+	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1,
+				 const b2Vec2& point2) const;
+
 private:
 
 	friend class b2World;
@@ -588,9 +598,6 @@ private:
 	void SetParticleGroupFlags(b2ParticleGroup* group, uint32 flags);
 
 	void ApplyForce(int32 index, const b2Vec2& force);
-
-	void RayCast(b2RayCastCallback* callback, const b2Vec2& point1,
-				 const b2Vec2& point2) const;
 
 	void RemoveSpuriousBodyContacts();
 	static bool BodyContactCompare(const b2ParticleBodyContact& lhs, const b2ParticleBodyContact& rhs);
