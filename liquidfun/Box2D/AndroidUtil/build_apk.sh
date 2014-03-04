@@ -109,7 +109,7 @@ kill_process_group() {
                      awk '{ if ($3 == '"${parent_pid}"') { print $2 } }'); do
     kill_process_group "${child_pid}"
   done
-  kill "${parent_pid}"
+  kill "${parent_pid}" 2>/dev/null
 }
 
 # Find and run "adb".
@@ -338,7 +338,22 @@ launch_package() {
     adb ${adb_device} logcat -c
 
     # Display logcat in the background.
-    adb ${adb_device} logcat &
+    # Stop displaying the log when the app launch / execution completes.
+    local finished_msg='Displayed '"${package_name}"
+    local timeout_msg='Activity destroy timeout.*'"${package_name}"
+    adb ${adb_device} logcat | \
+      awk "
+        {
+          print \$0
+        }
+
+        /ActivityManager.*: ${finished_msg}/ {
+          exit 0
+        }
+
+        /ActivityManager.*: ${timeout_msg}/ {
+          exit 0
+        }" &
     logcat_pid=$!
     # Kill adb logcat if this shell exits.
     trap "kill_process_group ${logcat_pid}" SIGINT SIGTERM EXIT
@@ -356,8 +371,10 @@ launch_package() {
     fi
 
     # Launch the activity and wait for it to complete.
-    adb ${adb_device} shell am start ${adb_stop_activity} -W -n \
+    adb ${adb_device} shell am start ${adb_stop_activity} -n \
       ${package_name}/android.app.NativeActivity
+
+    wait "${logcat_pid}"
   )
 }
 
