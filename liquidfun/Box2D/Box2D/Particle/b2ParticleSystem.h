@@ -22,8 +22,9 @@
 #include <Box2D/Particle/b2Particle.h>
 #include <Box2D/Dynamics/b2TimeStep.h>
 
-/// You need not to directly access b2ParticleSystem.
-/// To access particle data, use functions in b2World or b2ParticleGroup.
+#ifdef LIQUIDFUN_UNIT_TESTS
+#include <gtest/gtest.h>
+#endif // LIQUIDFUN_UNIT_TESTS
 
 class b2World;
 class b2Body;
@@ -524,6 +525,9 @@ private:
 	friend class b2World;
 	friend class b2ParticleGroup;
 	friend class b2ParticleBodyContactRemovePredicate;
+#ifdef LIQUIDFUN_UNIT_TESTS
+	FRIEND_TEST(FunctionTests, GetParticleMass);
+#endif // LIQUIDFUN_UNIT_TESTS
 
 	template <typename T>
 	struct ParticleBuffer
@@ -985,8 +989,9 @@ inline float32 b2ParticleSystem::GetParticleMass() const
 
 inline float32 b2ParticleSystem::GetParticleInvMass() const
 {
-	return 1.777777f * m_inverseDensity * m_inverseDiameter *
-			m_inverseDiameter;
+	// mass = density * stride^2, so we take the inverse of this.
+	float32 inverseStride = m_inverseDiameter * (1.0f / b2_particleStride);
+	return m_inverseDensity * inverseStride * inverseStride;
 }
 
 inline b2Vec2* b2ParticleSystem::GetParticlePositionBuffer()
