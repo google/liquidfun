@@ -86,6 +86,7 @@ set(Testbed_Tests_SRCS
 	Tests/RigidParticles.h
 	Tests/Sandbox.h
 	Tests/Soup.h
+	Tests/SoupStirrer.h
 	Tests/Sparky.h
 	Tests/WaveMachine.h
 )
