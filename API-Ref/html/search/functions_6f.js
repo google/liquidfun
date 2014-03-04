@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['operator_28_29',['operator()',['../structb2_vec2.html#a9cb67b5f755b82d40673337a3652d81f',1,'b2Vec2::operator()(int32 i) const '],['../structb2_vec2.html#a50b39580d9f479e17b23ce3cb8efbac6',1,'b2Vec2::operator()(int32 i)']]],
+  ['operator_28_29',['operator()',['../structb2_vec2.html#a9cb67b5f755b82d40673337a3652d81f',1,'b2Vec2::operator()(int32 i) const '],['../structb2_vec2.html#a50b39580d9f479e17b23ce3cb8efbac6',1,'b2Vec2::operator()(int32 i)'],['../classb2_voronoi_diagram_1_1_node_callback.html#ac5635af18d3aecf0baff77e057984c5e',1,'b2VoronoiDiagram::NodeCallback::operator()()']]],
   ['operator_2a',['operator*',['../classb2_particle_color.html#a3e6f84ca10776e9baa59d5f60d0d8ba4',1,'b2ParticleColor::operator*(float32 s) const '],['../classb2_particle_color.html#ad6683d23159c5097a4b6b2685ca8d628',1,'b2ParticleColor::operator*(uint8 s) const ']]],
   ['operator_2a_3d',['operator*=',['../structb2_vec2.html#a7097696dce578322928f4535b34f1c6b',1,'b2Vec2::operator*=()'],['../structb2_vec3.html#aaa9aa20195cd0ee53c7176a9a9b02389',1,'b2Vec3::operator*=()'],['../classb2_particle_color.html#ab1875044d1ac194bf5733053b968f442',1,'b2ParticleColor::operator*=(float32 s)'],['../classb2_particle_color.html#ad74c0763f4d48d018d60388bf6ddbf89',1,'b2ParticleColor::operator*=(uint8 s)']]],
   ['operator_2b',['operator+',['../classb2_particle_color.html#a9e90091e382b6cdcff1819a59515fea7',1,'b2ParticleColor']]],

@@ -97,6 +97,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a187dd04dd0f5164fb05c2ce2cbfd9ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58ce027d6d74c6b552ea001febb92f06"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_query_callback.html#a58ce027d6d74c6b552ea001febb92f06">ReportParticle</a> (const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, int32 index)</td></tr>
 <tr class="separator:a58ce027d6d74c6b552ea001febb92f06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace46c6328f9edace4818da61bad4903a"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_query_callback.html#ace46c6328f9edace4818da61bad4903a">ShouldQueryParticleSystem</a> (const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem)</td></tr>
+<tr class="separator:ace46c6328f9edace4818da61bad4903a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Callback class for AABB queries. See b2World::Query </p>
@@ -160,6 +162,32 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Called for each particle found in the query AABB. </p>
 <dl class="section return"><dt>Returns</dt><dd>false to terminate the query. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ace46c6328f9edace4818da61bad4903a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool b2QueryCallback::ShouldQueryParticleSystem </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Cull an entire particle system from <a class="el" href="classb2_world.html#a711e55d2c6e68400f93472f807c3775b">b2World::QueryAABB</a>. Ignored for <a class="el" href="classb2_particle_system.html#af31818150a338125c9f84c9ae9003196">b2ParticleSystem::QueryAABB</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if you want to include particleSystem in the AABB query, or false to cull particleSystem from the AABB query. </dd></dl>
 
 </div>
 </div>

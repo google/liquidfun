@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['addgenerator',['AddGenerator',['../classb2_voronoi_diagram.html#a15c68762b1984fcd0d7b5a814d19e49b',1,'b2VoronoiDiagram']]],
   ['addtofreelist',['AddToFreeList',['../classb2_free_list.html#a8068b95c06caf411cdb7180029c8ec2a',1,'b2FreeList::AddToFreeList()'],['../classb2_typed_free_list.html#a753f41e60a6ea64f22ee33c74c5617d7',1,'b2TypedFreeList::AddToFreeList()']]],
   ['advance',['Advance',['../structb2_sweep.html#a35eb9b976ca87c9b8d758bec070c6c06',1,'b2Sweep']]],
   ['allocate',['Allocate',['../classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040',1,'b2BlockAllocator::Allocate()'],['../classb2_free_list.html#ad1e8c4f276273754005e150c93f18075',1,'b2FreeList::Allocate()'],['../classb2_typed_free_list.html#a2b8c7550c1baad711d3af374b6602d1c',1,'b2TypedFreeList::Allocate()'],['../classb2_slab_allocator.html#a0855486c61a5e3345ae4ffce8d7ff20f',1,'b2SlabAllocator::Allocate()'],['../classb2_tracked_block.html#ae057d940443021985b2cefbc928af2a4',1,'b2TrackedBlock::Allocate()'],['../classb2_tracked_block_allocator.html#a9590c3f44c58a1ca44b81910927ca4a9',1,'b2TrackedBlockAllocator::Allocate()']]],
