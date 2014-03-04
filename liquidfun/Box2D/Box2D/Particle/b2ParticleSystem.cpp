@@ -395,7 +395,6 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	{
 		m_staticPressureBuffer[index] = 0;
 	}
-	m_groupBuffer[index] = NULL;
 	if (m_depthBuffer)
 	{
 		m_depthBuffer[index] = 0;
@@ -412,8 +411,27 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	}
 	m_proxyBuffer = RequestGrowableBuffer(m_proxyBuffer, m_proxyCount,
 											&m_proxyCapacity);
-
 	m_proxyBuffer[m_proxyCount++].index = index;
+	b2ParticleGroup* group = def.group;
+	m_groupBuffer[index] = group;
+	if (group)
+	{
+		if (group->m_firstIndex < group->m_lastIndex)
+		{
+			// Move particles in the group just before the new particle.
+			RotateBuffer(group->m_firstIndex, group->m_lastIndex, index);
+			b2Assert(group->m_lastIndex == index);
+			// Update the index range of the group to contain the new particle.
+			group->m_lastIndex = index + 1;
+		}
+		else
+		{
+			// If the group is empty, reset the index range to contain only the
+			// new particle.
+			group->m_firstIndex = index;
+			group->m_lastIndex = index + 1;
+		}
+	}
 	SetParticleFlags(index, def.flags);
 	return index;
 }
@@ -646,6 +664,12 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
 
 	UpdateContacts(true);
 	UpdatePairsAndTriads(firstIndex, lastIndex, group, group);
+
+	if (groupDef.group)
+	{
+		JoinParticleGroups(groupDef.group, group);
+		group = groupDef.group;
+	}
 
 	return group;
 }

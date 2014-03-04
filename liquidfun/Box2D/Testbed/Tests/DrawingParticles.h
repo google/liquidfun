@@ -208,15 +208,8 @@ public:
 			pd.flags = m_particleFlags;
 			pd.groupFlags = m_groupFlags;
 			pd.color = k_ParticleColors[m_colorIndex];
-			b2ParticleGroup* group = m_particleSystem->CreateParticleGroup(pd);
-			if (joinGroup)
-			{
-				m_particleSystem->JoinParticleGroups(m_lastGroup, group);
-			}
-			else
-			{
-				m_lastGroup = group;
-			}
+			pd.group = m_lastGroup;
+			m_lastGroup = m_particleSystem->CreateParticleGroup(pd);
 			m_mouseTracing = false;
 		}
 	}

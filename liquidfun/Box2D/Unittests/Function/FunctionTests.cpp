@@ -65,6 +65,41 @@ TEST_F(FunctionTests, CreateParticle) {
 	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer()[index], def.userData);
 }
 
+TEST_F(FunctionTests, CreateParticleInExistingGroup) {
+	b2ParticleGroupDef groupDef;
+	b2ParticleGroup *groupA = m_particleSystem->CreateParticleGroup(groupDef);
+	b2ParticleGroup *groupB = m_particleSystem->CreateParticleGroup(groupDef);
+	b2ParticleDef def;
+	for (int i = 0; i < 20; i++)
+	{
+		if (i % 2)
+		{
+			def.position.Set(1, 0);
+			def.group = groupA;
+		}
+		else
+		{
+			def.position.Set(2, 0);
+			def.group = groupB;
+		}
+		m_particleSystem->CreateParticle(def);
+	}
+	EXPECT_EQ(m_particleSystem->GetParticleCount(), 20);
+	EXPECT_EQ(groupA->GetParticleCount(), 10);
+	EXPECT_EQ(groupB->GetParticleCount(), 10);
+	b2Vec2 *positionBuffer = m_particleSystem->GetParticlePositionBuffer();
+	b2ParticleGroup *const *groupBuffer = m_particleSystem->GetParticleGroupBuffer();
+	for (int i = 0; i < 10; i++)
+	{
+		int a = groupA->GetBufferIndex() + i;
+		int b = groupB->GetBufferIndex() + i;
+		EXPECT_EQ((int)positionBuffer[a].x, 1);
+		EXPECT_EQ((int)positionBuffer[b].x, 2);
+		EXPECT_EQ(groupBuffer[a], groupA);
+		EXPECT_EQ(groupBuffer[b], groupB);
+	}
+}
+
 TEST_F(FunctionTests, ParticleRadius) {
 	float r = 12.3f;
 	m_particleSystem->SetParticleRadius(r);
@@ -225,6 +260,21 @@ TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
 		ASSERT_EQ(positionBuffer[i].x, (float32) i);
 		ASSERT_EQ(positionBuffer[i].y, (float32) i);
 	}
+}
+
+TEST_F(FunctionTests, CreateParticleGroupInExistingGroup) {
+	b2ParticleGroupDef groupDef;
+	b2ParticleGroup *groupA = m_particleSystem->CreateParticleGroup(groupDef);
+	b2PolygonShape shape;
+	shape.SetAsBox(10, 10);
+	groupDef.shape = &shape;
+	groupDef.group = groupA;
+	b2ParticleGroup *groupB = m_particleSystem->CreateParticleGroup(groupDef);
+	groupDef.shape = NULL;
+	b2ParticleGroup *groupC = m_particleSystem->CreateParticleGroup(groupDef);
+	EXPECT_EQ(groupA, groupB);
+	EXPECT_EQ(groupA, groupC);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 1);
 }
 
 TEST_F(FunctionTests, DestroyParticleGroup) {
