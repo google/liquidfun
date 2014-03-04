@@ -23,8 +23,6 @@ const ParticleParameter::Value ParticleParameter::k_particleTypes[] =
 	{ b2_waterParticle, ParticleParameter::k_DefaultOptions, "water" },
 	{ b2_waterParticle, ParticleParameter::k_DefaultOptions |
 				ParticleParameter::OptionStrictContacts, "water (strict)" },
-	{ b2_waterParticle, ParticleParameter::k_DefaultOptions |
-				ParticleParameter::OptionDrawAABBs, "water (bounding boxes)" },
 	{ b2_springParticle, ParticleParameter::k_DefaultOptions, "spring" },
 	{ b2_elasticParticle, ParticleParameter::k_DefaultOptions, "elastic" },
 	{ b2_viscousParticle, ParticleParameter::k_DefaultOptions, "viscous" },
@@ -37,6 +35,8 @@ const ParticleParameter::Value ParticleParameter::k_particleTypes[] =
 		"barrier" },
 	{ b2_staticPressureParticle, ParticleParameter::k_DefaultOptions,
 		"static pressure" },
+	{ b2_waterParticle, ParticleParameter::k_DefaultOptions |
+				ParticleParameter::OptionDrawAABBs, "water (bounding boxes)" },
 };
 const ParticleParameter::Value *ParticleParameter::k_particleTypesPtr =
 	ParticleParameter::k_particleTypes;
