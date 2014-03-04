@@ -77,6 +77,8 @@ set(Testbed_Tests_SRCS
 	Tests/DamBreak.h
 	Tests/DrawingParticles.h
 	Tests/ElasticParticles.h
+	Tests/Faucet.h
+	Tests/Fracker.h
 	Tests/Impulse.h
 	Tests/LiquidTimer.h
 	Tests/Maxwell.h
