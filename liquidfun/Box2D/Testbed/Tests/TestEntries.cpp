@@ -86,6 +86,7 @@
 #include "Faucet.h"
 #include "Impulse.h"
 #include "LiquidTimer.h"
+#include "Maxwell.h"
 #include "Particles.h"
 #include "ParticlesSurfaceTension.h"
 #include "Pointy.h"
@@ -113,6 +114,7 @@ TestEntry g_testEntries[] =
 	{"Rigid Particles", RigidParticles::Create},
 	{"Impulse", Impulse::Create},
 	{"Soup Stirrer", SoupStirrer::Create},
+	{"Maxwell", Maxwell::Create},
 	{"Ramp", Ramp::Create},
 	{"Pointy", Pointy::Create},
 	{"AntiPointy", AntiPointy::Create},

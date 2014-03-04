@@ -79,6 +79,7 @@ set(Testbed_Tests_SRCS
 	Tests/ElasticParticles.h
 	Tests/Impulse.h
 	Tests/LiquidTimer.h
+	Tests/Maxwell.h
 	Tests/Particles.h
 	Tests/ParticlesSurfaceTension.h
 	Tests/Pointy.h
