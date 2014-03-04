@@ -120,6 +120,8 @@ TEST_F(CallbackTests, QueryCallback_ShouldQueryParticleSystem) {
 
 	// This AABB query should still check the particle system,
 	// because we're calling b2ParticleSystem::QueryAABB directly.
+	aabb.lowerBound.Set(-10, -10);
+	aabb.upperBound.Set(10, 10);
 	callback.SetShouldQueryParticleSystem(false);
 	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_NE(callback.m_count, 0);
