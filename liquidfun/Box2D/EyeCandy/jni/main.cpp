@@ -322,7 +322,8 @@ public:
     width_(0), height_(0), scale_(1),
     fbo_(0), fbo_tex_(0), background_tex_(0),
     blob_normal_tex_(0), blob_temporal_tex_(0),
-    world_(nullptr), joint_(nullptr), mover_(nullptr),
+    world_(nullptr), particleSystem_(nullptr),
+    joint_(nullptr), mover_(nullptr),
     which_effect_(0)
   {}
 
@@ -614,10 +615,13 @@ public:
 
   void InitPhysics() {
     world_ = new b2World(b2Vec2(0, -10));
-    world_->SetParticleGravityScale(0.4f);
-    world_->SetParticleDensity(1.2f);
-    world_->SetParticleRadius(0.3f);
-    world_->SetParticleDamping(0.2f);
+
+    b2ParticleSystemDef particleSystemDef;
+    particleSystemDef.dampingStrength = 0.2f;
+    particleSystemDef.particleRadius = 0.3f;
+    particleSystem_ = world_->CreateParticleSystem(&particleSystemDef);
+    particleSystem_->SetParticleGravityScale(0.4f);
+    particleSystem_->SetParticleDensity(1.2f);
 
     b2BodyDef bdg;
     b2Body* ground = world_->CreateBody(&bdg);
@@ -662,7 +666,7 @@ public:
     shape2.SetAsBox(9.0f, 9.0f, b2Vec2(0.0f, 0.0f), 0.0);
 
     pd.shape = &shape2;
-    world_->CreateParticleGroup(pd);
+    particleSystem_->CreateParticleGroup(pd);
   }
 
   enum { kEffectTemporalBlend, kEffectRefraction, kEffectMax };
@@ -697,10 +701,10 @@ public:
     // note: will shift sizes if particles are removed, which will look
     // weird graphically.
     while (static_cast<int>(particle_sizes_.size())
-             < world_->GetParticleCount()) {
+             < particleSystem_->GetParticleCount()) {
       particle_sizes_.push_back((rand() / static_cast<float>(RAND_MAX)
                                        * 0.8f + 1.5f)
-                                      * world_->GetParticleRadius());
+                                      * particleSystem_->GetParticleRadius());
     }
 
     glDisable(GL_DEPTH_TEST);
@@ -745,14 +749,15 @@ public:
 
   void DrawParticleBuffers(const EyeCandyShader &sh) {
     glVertexAttribPointer(sh.position_handle, 2, GL_FLOAT,
-                    GL_FALSE, 0, &world_->GetParticlePositionBuffer()->x);
+                    GL_FALSE, 0,
+                    &particleSystem_->GetParticlePositionBuffer()->x);
     glEnableVertexAttribArray(sh.position_handle);
 
     glVertexAttribPointer(sh.particlesize_handle, 1, GL_FLOAT,
                     GL_FALSE, 0, &particle_sizes_[0]);
     glEnableVertexAttribArray(sh_blob_.particlesize_handle);
 
-    glDrawArrays(GL_POINTS, 0, world_->GetParticleCount());
+    glDrawArrays(GL_POINTS, 0, particleSystem_->GetParticleCount());
 
     glDisableVertexAttribArray(sh.position_handle);
     glDisableVertexAttribArray(sh.particlesize_handle);
@@ -1018,6 +1023,7 @@ private:
   GLuint blob_normal_tex_, blob_temporal_tex_;
 
   b2World *world_;
+  b2ParticleSystem *particleSystem_;
   b2RevoluteJoint *joint_;
   b2Body *mover_;
 
