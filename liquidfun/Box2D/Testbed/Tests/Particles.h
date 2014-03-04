@@ -65,10 +65,7 @@ public:
 
 		m_particleSystem->SetParticleRadius(0.035f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
-		if (particleType == b2_waterParticle)
-		{
-			m_particleSystem->SetParticleDamping(0.2f);
-		}
+		m_particleSystem->SetParticleDamping(0.2f);
 
 		{
 			b2CircleShape shape;
