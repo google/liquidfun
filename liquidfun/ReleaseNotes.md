@@ -31,8 +31,14 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added option to substep particle simulation independently of `b2World`.
 *   Added barrier particles which can be used to prevent particle tunneling
     due to large particle velocities or simulation steps.
+*   Added static pressure particles to reduce compression of fluids.
+*   Added support for multiple independent particle systems.
+*   Added option to create particles in an existing particle group.
+*   Added option to detect stuck particles.
 *   Added option to enable a more strict check for Particle/Body interactions
     in cases where complex world geometry may cause false positive contacts.
+*   Added "EyeCandy" sample to demonstrate different particle rendering methods
+    on Android.
 *   Added "Sparky" and "Sandbox" tests to the Testbed example to demonstrate
     particle and rigid body interaction.
 *   Added "Ramp", "Pointy", and "AntiPointy" tests to the Testbed example to
@@ -57,14 +63,14 @@ TODO describe the cool new stuff we have in this release TODO
     written to Box2D/Testbed/Release/Testbed when building using the Release
     configuration.
 *   Multiple independent particle systems can now exist, each with its own
-    physical co-efficient. Previously, only one particle system existed, and
+    physical coefficients.  Previously, only one particle system existed, and
     it always existed. Use b2World::CreateParticleSystem to create particle
     systems, and b2World::DestroyParticleSystem to destroy them.
 *   The particle system API has moved from b2World to b2ParticleSystem.
     For example, b2ParticleSystem::DestroyParticlesInShape replaces
-    b2World::DestroyParticlesInShape. You can use b2World::CreateParticleSystem
-    or b2World::GetParticleSystemList() to acquire references to
-    b2ParticleSystem.
+    b2World::DestroyParticlesInShape.  You can use
+    b2World::CreateParticleSystem or b2World::GetParticleSystemList() to
+    acquire references to b2ParticleSystem.
 *   b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle each
     now takes a b2ParticleSystem pointer as its first parameter. This change is
     necessary since multiple particle systems can now exist.
@@ -72,13 +78,18 @@ TODO describe the cool new stuff we have in this release TODO
 #### Other Changes
 
 *   Integrated [Box2D][] 2.3.0 release from [Box2D revision 280][].
+*   Reduced the size of particles in Testbed particle tests to be consistent
+    with the size of rigid bodies.
 *   Improved damping force to prevent particle explosions.
 *   Fixed `b2Timer` bug that occurs when the usec component wraps.
 *   Added `b2Stat` to calculate min/max/mean of a set of samples, and
     integrated this functionality into Testbed to measure performance.
+*   Fixed memory leaks of large blocks allocated by b2BlockAllocator.
+*   Fixed incorrect stack-capacity calculation in b2VoronoiDiagram.
 *   Added operators to `b2ParticleColor`.
 *   Improved parameter and option selection in Testbed with the fullscreen UI.
 *   Cleaned up statistics display in Testbed.
+*   Fixed depth-buffer allocation when creating an empty particle group.
 *   Added build step to unit-test execution scripts.
 *   Added generation of code coverage report for unit-tests.
 *   Added a script to clean up temporary cmake files.
@@ -86,6 +97,15 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added unit-test for b2IsValid().
 *   Added `b2World::QueryShapeAABB()` convenience function to query the world
     for objects in the AABB which encloses a shape.
+*   Inlined some simple b2ParticleSystem and b2ParticleGroup functions.
+*   Allowed particle systems to be culled from b2World::QueryAABB and
+    b2World::RayCast.
+*   Added callbacks so an application can override b2Alloc() and b2Free()
+    without modifying the library.
+*   Added valgrind support to unit-test runner on Linux / OSX.
+*   Added cygwin wrapper script for build.bat and build_android.bat on Windows.
+*   Added option to archive build artifacts from build scripts.
+*   Changed Android C++ runtime library to gnustl_static.
 
 ### 0.9.0 <a name="0.9.0"></a>
 

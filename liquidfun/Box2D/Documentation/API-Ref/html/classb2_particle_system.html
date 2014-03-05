@@ -95,6 +95,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a9a52c227fcd0e7bb0346d748f0df0750"><td class="memItemLeft" align="right" valign="top">int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a9a52c227fcd0e7bb0346d748f0df0750">CreateParticle</a> (const <a class="el" href="structb2_particle_def.html">b2ParticleDef</a> &amp;def)</td></tr>
 <tr class="separator:a9a52c227fcd0e7bb0346d748f0df0750"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5a120786c332f35916d8a01620c4967"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5a120786c332f35916d8a01620c4967"></a>
+const <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#aa5a120786c332f35916d8a01620c4967">GetParticleHandleFromIndex</a> (const int32 index)</td></tr>
+<tr class="memdesc:aa5a120786c332f35916d8a01620c4967"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve a handle to the particle at the specified index. <br/></td></tr>
+<tr class="separator:aa5a120786c332f35916d8a01620c4967"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20d1f9ecb7fcbc287de9b4816dae44e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a20d1f9ecb7fcbc287de9b4816dae44e1">DestroyParticle</a> (int32 index)</td></tr>
 <tr class="separator:a20d1f9ecb7fcbc287de9b4816dae44e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8e28d251de7fa5139a6cff9f92f21ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#ad8e28d251de7fa5139a6cff9f92f21ad">DestroyParticle</a> (int32 index, bool callDestructionListener)</td></tr>
@@ -130,6 +134,10 @@ int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:af2a07328aa7e0fc1c6ae564ceed33681"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d8395c452613752b4705fab10b25118"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a8d8395c452613752b4705fab10b25118">SetParticleMaxCount</a> (int32 count)</td></tr>
 <tr class="separator:a8d8395c452613752b4705fab10b25118"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2968341585a626879efd10784272561c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a2968341585a626879efd10784272561c">PauseSimulation</a> (bool paused)</td></tr>
+<tr class="separator:a2968341585a626879efd10784272561c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac28605bbd4a9b5f244002fde0620e609"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#ac28605bbd4a9b5f244002fde0620e609">IsSimulationPaused</a> () const </td></tr>
+<tr class="separator:ac28605bbd4a9b5f244002fde0620e609"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4681649e5b22399a1e567e1ea37457a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a4681649e5b22399a1e567e1ea37457a1">SetParticleDensity</a> (float32 density)</td></tr>
 <tr class="separator:a4681649e5b22399a1e567e1ea37457a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47978266923c797f313cab13381e132a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47978266923c797f313cab13381e132a"></a>
@@ -244,6 +252,8 @@ const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#
 <tr class="separator:af31818150a338125c9f84c9ae9003196"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a036f009bf8d329675061aa0687b06bb7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a036f009bf8d329675061aa0687b06bb7">QueryShapeAABB</a> (<a class="el" href="classb2_query_callback.html">b2QueryCallback</a> *callback, const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;shape, const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;xf) const </td></tr>
 <tr class="separator:a036f009bf8d329675061aa0687b06bb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4759f4e8f04494e32051385e72ebd332"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a4759f4e8f04494e32051385e72ebd332">RayCast</a> (<a class="el" href="classb2_ray_cast_callback.html">b2RayCastCallback</a> *callback, const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;point1, const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;point2) const </td></tr>
+<tr class="separator:a4759f4e8f04494e32051385e72ebd332"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -271,7 +281,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create a particle whose properties have been defined. No reference to the definition is retained. A simulation step must occur before it's possible to interact with a newly created particle. For example, DestroyParticleInShape() will not destroy a particle until Step() has been called. </p>
+<p>Create a particle whose properties have been defined. No reference to the definition is retained. A simulation step must occur before it's possible to interact with a newly created particle. For example, DestroyParticleInShape() will not destroy a particle until <a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">b2World::Step()</a> has been called. </p>
 <dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>the index of the particle. </dd></dl>
 
@@ -316,7 +326,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Destroy a particle. The particle is removed after the next simulation step (see Step()). </p>
+<p>Destroy a particle. The particle is removed after the next simulation step (see <a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">b2World::Step()</a>). </p>
 
 </div>
 </div>
@@ -576,6 +586,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="aa8fb2eb17c8ecd0c6824cb90853788f7"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">const uint32 * b2ParticleSystem::GetParticleFlagsBuffer </td>
@@ -584,6 +597,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Get the flags for each particle. See the b2ParticleFlag enum. Array is length <a class="el" href="classb2_particle_system.html#ae44c656c8b56377e11f511d3b080004d" title="Get the number of particles. ">GetParticleCount()</a> </p>
 <dl class="section return"><dt>Returns</dt><dd>the pointer to the head of the particle-flags array. </dd></dl>
@@ -593,6 +611,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="ab8583d3350674e2b8e6afaa82caf411f"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *const * b2ParticleSystem::GetParticleGroupBuffer </td>
@@ -601,6 +622,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Get the particle-group of each particle. Array is length <a class="el" href="classb2_particle_system.html#ae44c656c8b56377e11f511d3b080004d" title="Get the number of particles. ">GetParticleCount()</a> </p>
 <dl class="section return"><dt>Returns</dt><dd>the pointer to the head of the particle group array. </dd></dl>
@@ -635,6 +661,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="a577e503bff2db6f0504ccdafdfae1018"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="structb2_vec2.html">b2Vec2</a> * b2ParticleSystem::GetParticlePositionBuffer </td>
@@ -643,6 +672,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Get the position of each particle Array is length <a class="el" href="classb2_particle_system.html#ae44c656c8b56377e11f511d3b080004d" title="Get the number of particles. ">GetParticleCount()</a> </p>
 <dl class="section return"><dt>Returns</dt><dd>the pointer to the head of the particle positions array. </dd></dl>
@@ -669,6 +703,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="a6eb7085049b5bedcedfb984abf082398"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="structb2_vec2.html">b2Vec2</a> * b2ParticleSystem::GetParticleVelocityBuffer </td>
@@ -677,6 +714,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Get the velocity of each particle Array is length <a class="el" href="classb2_particle_system.html#ae44c656c8b56377e11f511d3b080004d" title="Get the number of particles. ">GetParticleCount()</a> </p>
 <dl class="section return"><dt>Returns</dt><dd>the pointer to the head of the particle velocities array. </dd></dl>
@@ -704,6 +746,30 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 </table>
 </div><div class="memdoc">
 <p>Get potentially stuck particles from the last step; the user must decide if they are stuck or not, and if so, delete or move them </p>
+
+</div>
+</div>
+<a class="anchor" id="ac28605bbd4a9b5f244002fde0620e609"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool b2ParticleSystem::IsSimulationPaused </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>true if the particle system is being updated in <a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">b2World::Step()</a>. Initially, true, then, the last value passed into <a class="el" href="classb2_particle_system.html#a2968341585a626879efd10784272561c">PauseSimulation()</a>. </dd></dl>
 
 </div>
 </div>
@@ -742,6 +808,37 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 
 </div>
 </div>
+<a class="anchor" id="a2968341585a626879efd10784272561c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2ParticleSystem::PauseSimulation </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>paused</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Pause or unpause the particle system. When paused, <a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">b2World::Step()</a> skips over this particle system. All <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> function calls still work. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">paused</td><td>is true to pause, false to un-pause. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="af31818150a338125c9f84c9ae9003196"></a>
 <div class="memitem">
 <div class="memproto">
@@ -765,7 +862,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Query the particle system for all particles that potentially overlap the provided AABB. </p>
+<p>Query the particle system for all particles that potentially overlap the provided AABB. <a class="el" href="classb2_query_callback.html#ace46c6328f9edace4818da61bad4903a">b2QueryCallback::ShouldQueryParticleSystem</a> is ignored. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">callback</td><td>a user implemented callback class. </td></tr>
@@ -805,7 +902,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Query the particle system for all particles that potentially overlap the provided shape's AABB. Calls QueryAABB internally. </p>
+<p>Query the particle system for all particles that potentially overlap the provided shape's AABB. Calls QueryAABB internally. <a class="el" href="classb2_query_callback.html#ace46c6328f9edace4818da61bad4903a">b2QueryCallback::ShouldQueryParticleSystem</a> is ignored. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">callback</td><td>a user implemented callback class. </td></tr>
@@ -817,9 +914,53 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 
 </div>
 </div>
+<a class="anchor" id="a4759f4e8f04494e32051385e72ebd332"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2ParticleSystem::RayCast </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_ray_cast_callback.html">b2RayCastCallback</a> *&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;&#160;</td>
+          <td class="paramname"><em>point1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;&#160;</td>
+          <td class="paramname"><em>point2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Ray-cast the particle system for all particles in the path of the ray. Your callback controls whether you get the closest point, any point, or n-points. The ray-cast ignores particles that contain the starting point. <a class="el" href="classb2_ray_cast_callback.html#a31a405586d562c586f92639e8eead805">b2RayCastCallback::ShouldQueryParticleSystem</a> is ignored. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>a user implemented callback class. </td></tr>
+    <tr><td class="paramname">point1</td><td>the ray starting point </td></tr>
+    <tr><td class="paramname">point2</td><td>the ray ending point </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a71651270066689579be75c90fa8b898e"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2ParticleSystem::SetParticleDamping </td>
@@ -829,6 +970,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Damping is used to reduce the velocity of particles. The damping parameter can be larger than 1.0f but the damping effect becomes sensitive to the time step when the damping parameter is large. </p>
 
@@ -837,6 +983,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="a4681649e5b22399a1e567e1ea37457a1"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2ParticleSystem::SetParticleDensity </td>
@@ -846,6 +995,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Change the particle density. Particle density affects the mass of the particles, which in turn affects how the partcles interact with b2Bodies. Note that the density does not affect how the particles interact with each other. </p>
 
@@ -889,6 +1043,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="a8a90e2e73bff658a9b0e46fe0032868c"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2ParticleSystem::SetParticleGravityScale </td>
@@ -898,6 +1055,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Change the particle gravity scale. Adjusts the effect of the global gravity vector on particles. Default value is 1.0f. </p>
 
@@ -906,6 +1068,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="a8d8395c452613752b4705fab10b25118"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2ParticleSystem::SetParticleMaxCount </td>
@@ -915,6 +1080,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Set the maximum number of particles. By default, there is no maximum. The particle buffers can continue to grow while <a class="el" href="classb2_world.html">b2World</a>'s block allocator still has memory. Note: If you try to <a class="el" href="classb2_particle_system.html#a9a52c227fcd0e7bb0346d748f0df0750">CreateParticle()</a> with more than this count, b2_invalidParticleIndex is returned. </p>
 
@@ -923,6 +1093,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="a8ba293f08550b7569912074e55136da8"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2ParticleSystem::SetParticleRadius </td>
@@ -932,6 +1105,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Change the particle radius. You should set this only once, on world start. If you change the radius during execution, existing particles may explode, shrink, or behave unexpectedly. </p>
 
@@ -940,6 +1118,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="a76aa96394eb35ce88a169214a7c67dc6"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2ParticleSystem::SetParticleStaticPressureIterations </td>
@@ -949,6 +1130,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Change the number of iterations when calculating the static pressure of particles. By default, 8 iterations. You can reduce the number of iterations down to 1 in some situations, but this may cause instabilities when many particles come together. If you see particles popping away from each other like popcorn, you may have to increase the number of iterations. For a description of static pressure, see <a href="http://en.wikipedia.org/wiki/Static_pressure#Static_pressure_in_fluid_dynamics">http://en.wikipedia.org/wiki/Static_pressure#Static_pressure_in_fluid_dynamics</a> </p>
 
@@ -957,6 +1143,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 <a class="anchor" id="aa1e295b8e9f96f1b91e362d114d4e7f3"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2ParticleSystem::SetStrictContactCheck </td>
@@ -966,6 +1155,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Set strict Particle/Body contact check. This is an option that will help ensure correct behavior if there are corners in the world model where Particle/Body contact is ambiguous. This option scales at n*log(n) of the number of Particle/Body contacts, so it is best to only enable if it is necessary for your geometry. Enable if you see strange particle behavior around <a class="el" href="classb2_body.html" title="A rigid body. These are created via b2World::CreateBody. ">b2Body</a> intersections. </p>
 

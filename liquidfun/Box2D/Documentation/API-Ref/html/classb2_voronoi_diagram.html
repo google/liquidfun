@@ -95,25 +95,126 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="b2_voronoi_diagram_8h_source.html">b2VoronoiDiagram.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_voronoi_diagram_1_1_node_callback.html">NodeCallback</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback used by <a class="el" href="classb2_voronoi_diagram.html#ac941c83e66aa071bb813fb80bb9aacae">GetNodes()</a>.  <a href="classb2_voronoi_diagram_1_1_node_callback.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:affceaf7c8c314a79d4061caa25fa6c86"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="affceaf7c8c314a79d4061caa25fa6c86"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>b2VoronoiDiagram</b> (<a class="el" href="classb2_stack_allocator.html">b2StackAllocator</a> *allocator, int32 generatorCapacity)</td></tr>
 <tr class="separator:affceaf7c8c314a79d4061caa25fa6c86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf14bde19ad574d568bb619aec9614dd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf14bde19ad574d568bb619aec9614dd"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>AddGenerator</b> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;center, int32 tag)</td></tr>
-<tr class="separator:acf14bde19ad574d568bb619aec9614dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a068c23952ad7d5fc9e6710d74680c63e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a068c23952ad7d5fc9e6710d74680c63e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Generate</b> (float32 radius)</td></tr>
-<tr class="separator:a068c23952ad7d5fc9e6710d74680c63e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8eab412d170ffd54bb5e77e65d20a70f"><td class="memTemplParams" colspan="2"><a class="anchor" id="a8eab412d170ffd54bb5e77e65d20a70f"></a>
-template&lt;class Callback &gt; </td></tr>
-<tr class="memitem:a8eab412d170ffd54bb5e77e65d20a70f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetNodes</b> (const Callback &amp;callback) const </td></tr>
-<tr class="separator:a8eab412d170ffd54bb5e77e65d20a70f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15c68762b1984fcd0d7b5a814d19e49b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_voronoi_diagram.html#a15c68762b1984fcd0d7b5a814d19e49b">AddGenerator</a> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;center, int32 tag, bool necessary)</td></tr>
+<tr class="separator:a15c68762b1984fcd0d7b5a814d19e49b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affc5f0031e8283bb38fa0b59b5ed32d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_voronoi_diagram.html#affc5f0031e8283bb38fa0b59b5ed32d1">Generate</a> (float32 radius, float32 margin)</td></tr>
+<tr class="separator:affc5f0031e8283bb38fa0b59b5ed32d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac941c83e66aa071bb813fb80bb9aacae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_voronoi_diagram.html#ac941c83e66aa071bb813fb80bb9aacae">GetNodes</a> (<a class="el" href="classb2_voronoi_diagram_1_1_node_callback.html">NodeCallback</a> &amp;callback) const </td></tr>
+<tr class="separator:ac941c83e66aa071bb813fb80bb9aacae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A field representing the nearest generator from each point. </p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a15c68762b1984fcd0d7b5a814d19e49b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2VoronoiDiagram::AddGenerator </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;&#160;</td>
+          <td class="paramname"><em>center</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>tag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>necessary</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Add a generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>position of the generator. </td></tr>
+    <tr><td class="paramname">a</td><td>tag used to identify the generator in callback functions. </td></tr>
+    <tr><td class="paramname">whether</td><td>to callback for nodes associated with the generator. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="affc5f0031e8283bb38fa0b59b5ed32d1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2VoronoiDiagram::Generate </td>
+          <td>(</td>
+          <td class="paramtype">float32&#160;</td>
+          <td class="paramname"><em>radius</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float32&#160;</td>
+          <td class="paramname"><em>margin</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Generate the Voronoi diagram. It is rasterized with a given interval in the same range as the necessary generators exist. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>interval of the diagram. </td></tr>
+    <tr><td class="paramname">margin</td><td>for which the range of the diagram is extended. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ac941c83e66aa071bb813fb80bb9aacae"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2VoronoiDiagram::GetNodes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_voronoi_diagram_1_1_node_callback.html">NodeCallback</a> &amp;&#160;</td>
+          <td class="paramname"><em>callback</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enumerate all nodes that contain at least one necessary generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td>callback function object called for each node. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="b2_voronoi_diagram_8h_source.html">b2VoronoiDiagram.h</a></li>
 <li>b2VoronoiDiagram.cpp</li>
 </ul>
