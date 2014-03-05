@@ -514,16 +514,22 @@ private:
 		/// A pair or a triad should contain at least one 'necessary' particle.
 		virtual bool IsNecessary(int32 index) const
 		{
+			B2_NOT_USED(index);
 			return true;
 		}
 		/// An additional condition for creating a pair.
 		virtual bool ShouldCreatePair(int32 a, int32 b) const
 		{
+			B2_NOT_USED(a);
+			B2_NOT_USED(b);
 			return true;
 		}
 		/// An additional condition for creating a triad.
 		virtual bool ShouldCreateTriad(int32 a, int32 b, int32 c) const
 		{
+			B2_NOT_USED(a);
+			B2_NOT_USED(b);
+			B2_NOT_USED(c);
 			return true;
 		}
 	};
