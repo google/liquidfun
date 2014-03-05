@@ -20,4 +20,4 @@
 
 declare -r script_directory="$(cd "$(dirname "$0")"; pwd)"
 PATH_ARGS="-o -v" EXECUTABLE=${script_directory}/build_android.bat \
-  "${script_directory}/build_windows.sh"
+  "${script_directory}/build_windows.sh" "$@"

@@ -331,4 +331,6 @@ if not "%failed_build%"=="" (
   for %%a in (%failed_build%) do (
     echo   %%a >&2
   )
+  exit /B 1
 )
+exit /B 0
