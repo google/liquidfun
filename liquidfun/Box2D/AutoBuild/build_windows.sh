@@ -47,6 +47,7 @@ main() {
     fi
   done
   eval "${EXECUTABLE} ${arguments}"
+  exit $?
 }
 
 main "${@}"

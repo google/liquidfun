@@ -16,6 +16,8 @@
 @echo off
 rem See help text below or run with -h for a description of this batch file.
 
+setlocal enabledelayedexpansion
+
 rem Project name.
 set project_name=LiquidFun
 rem Minimum cmake version this project has been tested with.
@@ -243,7 +245,6 @@ if %cmake_ver_minmaj% LSS %cmake_minversion_minmaj% (
 )
 
 rem Determine whether the selected version of visual studio is installed.
-setlocal enabledelayedexpansion
 if not "%visual_studio_version%"=="" (
   reg query ^
     HKLM\SOFTWARE\Microsoft\VisualStudio\%visual_studio_version%.0 /ve ^
@@ -297,20 +298,21 @@ if "%run_cmake%"=="1" (
     exit /B %ERRORLEVEL%
   )
 )
-endlocal
 
 rem Build the project.
+set build_succeeded=1
 for %%c in (%build_configuration%) do (
   cd %batch_file_dir%/..
   echo Building %solution_to_build% with the %%c configuration. >&2
   %dryrun% call AutoBuild\msbuild.bat %msbuild_args% /p:Configuration=%%c ^
     %solution_to_build%
+  if !ERRORLEVEL! NEQ 0 set build_succeeded=0
 )
 
 rem Copy build artifacts to the output directory.
 if "%output_dir%"=="" goto archive_end
 cd %batch_file_dir%/..
-setlocal enabledelayedexpansion
+
 rem Find the root of all project directories in the tree.
 set projects=
 set root=%cd%
@@ -346,7 +348,6 @@ if exist "%output_archive%" del /q "%output_archive%"
 %zip% -r "%output_archive%" .
 cd %current_dir%
 
-endlocal
 :archive_end
 
 rem Clean up any directories that need to be deleted.
@@ -356,3 +357,7 @@ for %%a in (%delete_dirs%) do (
 
 rem Return to the directory this was executed from.
 cd %execution_dir%
+
+rem Report whether the build succeeded.
+if %build_succeeded% equ 0 exit /B 1
+exit /B 0
