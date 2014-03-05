@@ -35,49 +35,52 @@ public:
 			// left edge
 			{
 				b2PolygonShape shape;
-				const b2Vec2 vertices[4] = {
-					b2Vec2(-20.0, 30.0),
-					b2Vec2(-20.0, 0.0),
-					b2Vec2(-25.0, 0.0),
-					b2Vec2(-25.0, 30.0)
-					};
-				shape.Set(vertices, 4);
+				const b2Vec2 vertices[] = {
+					b2Vec2(-20.0f, 30.0f),
+					b2Vec2(-20.0f, 0.0f),
+					b2Vec2(-25.0f, 0.0f),
+					b2Vec2(-25.0f, 30.f)
+				};
+				shape.Set(vertices, B2_ARRAY_SIZE(vertices));
 				ground->CreateFixture(&shape, 0.0f);
 			}
 
 			float32 x, y;
-			const float32 yrange=30.0, ystep = yrange/10,
-							xrange=20.0, xstep=xrange/2.0;
+			const float32 yrange=30.0f, ystep = yrange/10.0f,
+							xrange=20.0f, xstep=xrange/2.0f;
 
 			{
 				b2PolygonShape shape;
-				const b2Vec2 vertices[3] = {
-					b2Vec2(-25.0, 0.0),
-					b2Vec2(20.0, 15.0),
-					b2Vec2(25.0, 0.0)};
-				shape.Set(vertices, 3);
+				const b2Vec2 vertices[] = {
+					b2Vec2(-25.0f, 0.0f),
+					b2Vec2(20.0f, 15.0f),
+					b2Vec2(25.0f, 0.0f)
+				};
+				shape.Set(vertices, B2_ARRAY_SIZE(vertices));
 				ground->CreateFixture(&shape, 0.0f);
 			}
 
 			for (x = -xrange; x < xrange; x += xstep)
 			{
 				b2PolygonShape shape;
-				const b2Vec2 vertices2[3] = {
-					b2Vec2(-25.0, 0.0),
-					b2Vec2(x, 15.0),
-					b2Vec2(x+xstep, 15.0)};
-				shape.Set(vertices2, 3);
+				const b2Vec2 vertices[] = {
+					b2Vec2(-25.0f, 0.0f),
+					b2Vec2(x, 15.0f),
+					b2Vec2(x+xstep, 15.0f)
+				};
+				shape.Set(vertices, B2_ARRAY_SIZE(vertices));
 				ground->CreateFixture(&shape, 0.0f);
 			}
 
 			for (y = 0.0; y < yrange; y += ystep)
 			{
 				b2PolygonShape shape;
-				const b2Vec2 vertices[3] = {
-					b2Vec2(25.0, y),
-					b2Vec2(25.0, y+ystep),
-					b2Vec2(20.0, 15.0)};
-				shape.Set(vertices, 3);
+				const b2Vec2 vertices[] = {
+					b2Vec2(25.0f, y),
+					b2Vec2(25.0f, y+ystep),
+					b2Vec2(20.0f, 15.0f)
+				};
+				shape.Set(vertices, B2_ARRAY_SIZE(vertices));
 				ground->CreateFixture(&shape, 0.0f);
 			}
 
@@ -93,7 +96,8 @@ public:
 			b2ParticleGroupDef pd;
 			pd.flags = particleType;
 			pd.shape = &shape;
-			b2ParticleGroup* const group = m_particleSystem->CreateParticleGroup(pd);
+			b2ParticleGroup* const group =
+				m_particleSystem->CreateParticleGroup(pd);
 			if (pd.flags & b2_colorMixingParticle)
 			{
 				ColorParticleGroup(group, 0);
