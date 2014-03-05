@@ -540,6 +540,154 @@ TEST_F(FunctionTests, PauseSimulation) {
 	EXPECT_NE(steppedPosition, positions[0]);
 }
 
+// Verify that it's possible to retrieve a handle from a particle index.
+TEST_F(FunctionTests, GetParticleHandleFromIndex)
+{
+	b2ParticleSystem *system = m_world->GetParticleSystemList();
+	const b2ParticleDef particleDef;
+	const int32 particleIndex = system->CreateParticle(particleDef);
+	ASSERT_NE(particleIndex, b2_invalidParticleIndex);
+	const b2ParticleHandle* particleHandle =
+		system->GetParticleHandleFromIndex(particleIndex);
+	EXPECT_EQ(particleIndex, particleHandle->GetIndex());
+}
+
+// Ensure particle handles track particles correctly as the array of particles
+// is compacted when particles are destroyed.
+TEST_F(FunctionTests, ParticleHandleTrackCompactParticles)
+{
+	static const int32 kNumberOfHandles = 1024;
+	b2TrackedBlockAllocator allocator;
+	const b2ParticleHandle** const handles =
+		(const b2ParticleHandle**)allocator.Allocate(
+			kNumberOfHandles * sizeof(*handles));
+	int32* const expectedUserData = (int32*)allocator.Allocate(
+			kNumberOfHandles * sizeof(*expectedUserData));
+	b2ParticleSystem *system = m_world->GetParticleSystemList();
+
+	// Create particles and store a handle to each particle.  Also, associate
+	// each particle with user data that contains the index into the array of
+	// handles.
+	b2ParticleDef particleDef;
+	for (int32 i = 0; i < kNumberOfHandles; ++i)
+	{
+		handles[i] = system->GetParticleHandleFromIndex(
+			system->CreateParticle(particleDef));
+		EXPECT_TRUE(handles[i] != NULL);
+		const int32 particleIndex = handles[i]->GetIndex();
+		EXPECT_NE(particleIndex, b2_invalidParticleIndex);
+		// NOTE: The user data buffer is retrieved each time since it's
+		// possible for the particle system to reallocate it when particles are
+		// created.
+		system->GetParticleUserDataBuffer()[particleIndex] =
+			&expectedUserData[i];
+		expectedUserData[i] = i;
+	}
+
+	// Update the particle system state.
+	m_world->Step(0.001f, 1, 1);
+
+	// Verify that it's possible to retrieve each particle's user data from a
+	// handle.
+	for (int32 i = 0; i < kNumberOfHandles; ++i)
+	{
+		const int32 particleIndex = handles[i]->GetIndex();
+		EXPECT_EQ(*(((int32**)system->GetParticleUserDataBuffer())[
+						particleIndex]), i);
+	}
+
+	// Mark half of the particles for deletion and clear the user data
+	// associated with each of the handles that is marked for deletion.
+	for (int32 i = 0; i < kNumberOfHandles; i += 2)
+	{
+		const int32 particleIndex = handles[i]->GetIndex();
+		system->DestroyParticle(particleIndex, false);
+		expectedUserData[i] = -1;
+	}
+
+	// Delete the particles.
+	// Since every other particle has been deleted this will result in
+	// the compaction of particle buffers changing the index of each particle.
+	m_world->Step(0.001f, 1, 1);
+
+	// Verify user data referenced by remaining particles is correct.
+	for (int32 i = 1; i < kNumberOfHandles; i += 2)
+	{
+		const int32 particleIndex = handles[i]->GetIndex();
+		EXPECT_EQ(*(((int32**)system->GetParticleUserDataBuffer())[
+						particleIndex]), i);
+	}
+}
+
+// Ensure particle handles track particles correctly as the array of particles
+// is compacted when particles are destroyed.
+TEST_F(FunctionTests, ParticleHandlesTrackGroups)
+{
+	b2TrackedBlockAllocator allocator;
+	b2ParticleSystem *system = m_world->GetParticleSystemList();
+	// Create particle groups, join them, check data after resorting.
+	b2ParticleGroupDef groupDef;
+	b2PolygonShape box;
+	box.SetAsBox(10, 10);
+	groupDef.shape = &box;
+	b2ParticleGroup *groupA = system->CreateParticleGroup(groupDef);
+	// Create a particle groupB next to groupA.
+	groupDef.position = b2Vec2(10.0f, 0.0f);
+	b2ParticleGroup *groupB = system->CreateParticleGroup(groupDef);
+
+	const int32 groupAParticleCount = groupA->GetParticleCount();
+	const int32 numberOfGroupParticles = groupAParticleCount +
+		groupB->GetParticleCount();
+	const b2ParticleHandle **particleHandles =
+		(const b2ParticleHandle**)allocator.Allocate(
+			numberOfGroupParticles * sizeof(*particleHandles));
+	int32* const expectedGroupData = (int32*)allocator.Allocate(
+			numberOfGroupParticles * sizeof(*expectedGroupData));
+
+	// Get a handle for each particle in both groups and assign expected
+	// user data to each particle.
+	for (int32 i = 0; i < numberOfGroupParticles; ++i)
+	{
+		b2ParticleGroup* group;
+		int32 particleIndex;
+		if (i < groupAParticleCount)
+		{
+			group = groupA;
+			particleIndex = i;
+		}
+		else
+		{
+			group = groupB;
+			particleIndex = i - groupAParticleCount;
+		}
+		particleIndex += group->GetBufferIndex();
+
+		particleHandles[i] = system->GetParticleHandleFromIndex(
+			particleIndex);
+		expectedGroupData[i] = i;
+		system->GetParticleUserDataBuffer()[particleIndex] =
+			&expectedGroupData[i];
+	}
+
+	m_world->Step(0.001f, 1, 1);
+
+	// Join the particle groups.
+	system->JoinParticleGroups(groupA, groupB);
+	groupB = NULL;
+
+	m_world->Step(0.001f, 1, 1);
+
+	// Verify the handles still point at valid data by checking the value
+	// associated with each particle's user data.
+	ASSERT_EQ(numberOfGroupParticles, groupA->GetParticleCount());
+	for (int32 i = 0; i < numberOfGroupParticles; ++i)
+	{
+		EXPECT_EQ(expectedGroupData[i],
+				  *((int32*)system->GetParticleUserDataBuffer()[
+						particleHandles[i]->GetIndex()]));
+	}
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

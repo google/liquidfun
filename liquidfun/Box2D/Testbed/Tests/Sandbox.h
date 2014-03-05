@@ -18,6 +18,8 @@
 
 #ifndef SANDBOX_H
 #define SANDBOX_H
+#include <math.h>
+#include <set>
 
 // Emits particles along a line, as if it were some kind of faucet.
 class FaucetEmitter {
@@ -38,9 +40,15 @@ public:
 	}
 
 	// dt is seconds that have passed, flags are the particle flags that you
-	// want set on each particle.
-	void Step(float32 dt, uint32 flags)
+	// want set on each particle, particleIndices is an optional pointer to
+	// an array which tracks which particles have been created and
+	// particleIndicesCount is the size of the particleIndices array.
+	// This function returns the number of particles created during this
+	// simulation step.
+	int32 Step(float32 dt, uint32 flags, int32* const particleIndices,
+			   const int32 particleIndicesCount)
 	{
+		int32 numberOfParticlesCreated = 0;
 		// How many (fractional) particles should we have emitted this frame?
 		m_counter += m_emitRate * dt;
 
@@ -59,8 +67,15 @@ public:
 			pd.velocity = m_startingVelocity;
 			pd.flags = flags;
 
-			m_particleSystem->CreateParticle(pd);
+			const int32 particleIndex = m_particleSystem->CreateParticle(pd);
+			if (particleIndices &&
+				numberOfParticlesCreated < particleIndicesCount)
+			{
+				particleIndices[numberOfParticlesCreated] = particleIndex;
+			}
+			++numberOfParticlesCreated;
 		}
+		return numberOfParticlesCreated;
 	}
 
  private:
@@ -116,8 +131,108 @@ static const float32 PARTICLE_EXIT_Y_SPEED = -9.8f;
 // How hard the pumps can push
 static const float32 PUMP_FORCE = 600;
 
+// Number of *special* particles.
+static const uint32 NUMBER_OF_SPECIAL_PARTICLES = 256;
+
 }  // namespace SandboxParams
 
+
+// Class which tracks a set of particles and applies a special effect to them.
+class SpecialParticleTracker : public b2DestructionListener
+{
+public:
+	// Initialize
+	SpecialParticleTracker() :
+		m_world(NULL),
+		m_particleSystem(NULL),
+		m_colorOscillationTime(0.0f),
+		m_colorOscillationPeriod(2.0f)
+	{
+	}
+
+	~SpecialParticleTracker()
+	{
+		m_world->SetDestructionListener(NULL);
+	}
+
+	// Register this class as a destruction listener so that it's possible
+	// to keep track of special particles.
+	void Init(b2World* const world, b2ParticleSystem* const system)
+	{
+		b2Assert(world);
+		b2Assert(system);
+		m_world = world;
+		m_particleSystem = system;
+		m_world->SetDestructionListener(this);
+	}
+
+	// Add as many of the specified particles to the set of special particles.
+	void Add(const int32* const particleIndices, const int32 numberOfParticles)
+	{
+		b2Assert(m_particleSystem);
+		for (int32 i = 0; i < numberOfParticles && m_particles.size() <
+				 SandboxParams::NUMBER_OF_SPECIAL_PARTICLES; ++i)
+		{
+			const int32 particleIndex = particleIndices[i];
+			m_particleSystem->SetParticleFlags(
+				particleIndex,
+				m_particleSystem->GetParticleFlagsBuffer()[particleIndex] |
+					b2_destructionListener);
+			m_particles.insert(m_particleSystem->GetParticleHandleFromIndex(
+								   particleIndex));
+		}
+	}
+
+	// Apply effects to special particles.
+	void Step(float32 dt)
+	{
+		// Oscillate the shade of color over m_colorOscillationPeriod seconds.
+		m_colorOscillationTime = fmodf(m_colorOscillationTime + dt,
+									   m_colorOscillationPeriod);
+		const float32 colorCoeff = 2.0f * fabsf(
+			(m_colorOscillationTime / m_colorOscillationPeriod) - 0.5f);
+		const b2ParticleColor color(
+			128 + (int8)(128.0f * (1.0f - colorCoeff)),
+			128 + (int8)(256.0f * fabsf(0.5f - colorCoeff)),
+			128 + (int8)(128.0f * colorCoeff), 255);
+		// Update the color of all special particles.
+		for (std::set<const b2ParticleHandle*>::const_iterator it =
+				 m_particles.begin(); it != m_particles.end(); ++it)
+		{
+			m_particleSystem->GetParticleColorBuffer()[(*it)->GetIndex()] =
+				color;
+		}
+	}
+
+	virtual void SayGoodbye(b2Joint* joint) { B2_NOT_USED(joint); }
+	virtual void SayGoodbye(b2Fixture* fixture) { B2_NOT_USED(fixture); }
+	virtual void SayGoodbye(b2ParticleGroup* group) { B2_NOT_USED(group); }
+
+	// When a particle is about to be destroyed, remove it from the list of
+	// special particles as the handle will become invalid.
+	virtual void SayGoodbye(int32 index)
+	{
+		// NOTE: user data could be used as an alternative method to look up
+		// the local handle pointer from the index.
+		size_t erased = m_particles.erase(
+			m_particleSystem->GetParticleHandleFromIndex(index));
+		b2Assert(erased == 1);
+		B2_NOT_USED(erased);
+	}
+
+private:
+	// Set of particle handles used to track special particles.
+	std::set<const b2ParticleHandle*> m_particles;
+	// Pointer to the world used to enable / disable this class as a
+	// destruction listener.
+	b2World* m_world;
+	// Pointer to the particle system used to retrieve particle handles.
+	b2ParticleSystem* m_particleSystem;
+	// Current offset into m_colorOscillationPeriod.
+	float32 m_colorOscillationTime;
+	// Color oscillation period in seconds.
+	float32 m_colorOscillationPeriod;
+};
 
 // Sandbox test creates a maze of faucets, pumps, ramps, circles, and blocks
 // based on a string constant.  Please modify and play with this string to make
@@ -182,6 +297,8 @@ public:
 		}
 
 		m_particleSystem->SetParticleRadius(0.25f);
+
+		m_specialTracker.Init(m_world, m_particleSystem);
 
 		m_pumpTimer = 0;
 
@@ -395,9 +512,17 @@ public:
 		// Step all the emitters
 		for (int i = 0; i < m_faucetEmitterIndex; i++)
 		{
+			int32 particleIndices[NUMBER_OF_SPECIAL_PARTICLES];
 			FaucetEmitter *emitter = m_emitters[i];
-			emitter->Step(dt, m_particleFlags);
+
+			const int32 particlesCreated = emitter->Step(
+				dt, m_particleFlags, particleIndices,
+				B2_ARRAY_SIZE(particleIndices));
+			m_specialTracker.Add(particleIndices, particlesCreated);
 		}
+
+		// Step the special tracker.
+		m_specialTracker.Step(dt);
 
 		// Do killfield work--kill every particle near the bottom of the screen
 		m_particleSystem->DestroyParticlesInShape(m_killfieldShape,
@@ -489,6 +614,9 @@ private:
 	// Pumps and emitters
 	b2Body* m_pumps[SandboxParams::MAX_PUMPS];
 	FaucetEmitter *m_emitters[SandboxParams::MAX_EMITTERS];
+
+	// Special particle tracker.
+	SpecialParticleTracker m_specialTracker;
 
 	static const ParticleParameter::Value k_paramValues[];
 	static const ParticleParameter::Definition k_paramDef[];

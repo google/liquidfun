@@ -117,7 +117,9 @@ static inline uint32 computeRelativeTag(uint32 tag, int32 x, int32 y)
 	return tag + (y << yShift) + (x << xShift);
 }
 
-b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def, b2World* world)
+b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
+								   b2World* world) :
+	m_handleAllocator(b2_minParticleBufferCapacity)
 {
 	m_paused = false;
 	m_timestamp = 0;
@@ -185,6 +187,7 @@ b2ParticleSystem::~b2ParticleSystem()
 		DestroyParticleGroup(m_groupList);
 	}
 
+	FreeParticleBuffer(&m_handleIndexBuffer);
 	FreeParticleBuffer(&m_flagsBuffer);
 	FreeParticleBuffer(&m_lastBodyContactStepBuffer);
 	FreeParticleBuffer(&m_bodyContactCountBuffer);
@@ -233,8 +236,11 @@ template <typename T> T* b2ParticleSystem::ReallocateBuffer(
 	b2Assert(newCapacity > oldCapacity);
 	T* newBuffer = (T*) m_world->m_blockAllocator.Allocate(
 		sizeof(T) * newCapacity);
-	memcpy(newBuffer, oldBuffer, sizeof(T) * oldCapacity);
-	m_world->m_blockAllocator.Free(oldBuffer, sizeof(T) * oldCapacity);
+	if (oldBuffer)
+	{
+		memcpy(newBuffer, oldBuffer, sizeof(T) * oldCapacity);
+		m_world->m_blockAllocator.Free(oldBuffer, sizeof(T) * oldCapacity);
+	}
 	return newBuffer;
 }
 
@@ -263,6 +269,21 @@ template <typename T> T* b2ParticleSystem::ReallocateBuffer(
 	b2Assert(newCapacity > oldCapacity);
 	return ReallocateBuffer(buffer->data, buffer->userSuppliedCapacity,
 							oldCapacity, newCapacity, deferred);
+}
+
+/// Reallocate the handle / index map and schedule the allocation of a new
+/// pool for handle allocation.
+void b2ParticleSystem::ReallocateHandleBuffers(int32 newCapacity)
+{
+	b2Assert(newCapacity > m_internalAllocatedCapacity);
+	// Reallocate a new handle / index map buffer, copying old handle pointers
+	// is fine since they're kept around.
+	m_handleIndexBuffer.data = ReallocateBuffer(
+		&m_handleIndexBuffer, m_internalAllocatedCapacity, newCapacity,
+		true);
+	// Set the size of the next handle allocation.
+	m_handleAllocator.SetItemsPerSlab(newCapacity -
+									  m_internalAllocatedCapacity);
 }
 
 template <typename T> T* b2ParticleSystem::RequestParticleBuffer(T* buffer)
@@ -323,6 +344,7 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 	capacity = LimitCapacity(capacity, m_userDataBuffer.userSuppliedCapacity);
 	if (m_internalAllocatedCapacity < capacity)
 	{
+		ReallocateHandleBuffers(capacity);
 		m_flagsBuffer.data = ReallocateBuffer(
 			&m_flagsBuffer, m_internalAllocatedCapacity, capacity, false);
 
@@ -421,6 +443,10 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 		m_userDataBuffer.data= RequestParticleBuffer(m_userDataBuffer.data);
 		m_userDataBuffer.data[index] = def.userData;
 	}
+	if (m_handleIndexBuffer.data)
+	{
+		m_handleIndexBuffer.data[index] = NULL;
+	}
 	m_proxyBuffer = RequestGrowableBuffer(m_proxyBuffer, m_proxyCount,
 											&m_proxyCapacity);
 	m_proxyBuffer[m_proxyCount++].index = index;
@@ -447,6 +473,27 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	SetParticleFlags(index, def.flags);
 	return index;
 }
+
+/// Retrieve a handle to the particle at the specified index.
+const b2ParticleHandle* b2ParticleSystem::GetParticleHandleFromIndex(
+	const int32 index)
+{
+	b2Assert(index >= 0 && index < GetParticleCount() &&
+			 index != b2_invalidParticleIndex);
+	m_handleIndexBuffer.data = RequestParticleBuffer(m_handleIndexBuffer.data);
+	b2ParticleHandle* handle = m_handleIndexBuffer.data[index];
+	if (handle)
+	{
+		return handle;
+	}
+	// Create a handle.
+	handle = m_handleAllocator.Allocate();
+	b2Assert(handle);
+	handle->SetIndex(index);
+	m_handleIndexBuffer.data[index] = handle;
+	return handle;
+}
+
 
 void b2ParticleSystem::DestroyParticle(
 	int32 index, bool callDestructionListener)
@@ -2156,6 +2203,17 @@ void b2ParticleSystem::SolveZombie()
 			{
 				destructionListener->SayGoodbye(i);
 			}
+			// Destroy particle handle.
+			if (m_handleIndexBuffer.data)
+			{
+				b2ParticleHandle * const handle = m_handleIndexBuffer.data[i];
+				if (handle)
+				{
+					handle->SetIndex(b2_invalidParticleIndex);
+					m_handleIndexBuffer.data[i] = NULL;
+					m_handleAllocator.Free(handle);
+				}
+			}
 			newIndices[i] = b2_invalidParticleIndex;
 		}
 		else
@@ -2163,6 +2221,14 @@ void b2ParticleSystem::SolveZombie()
 			newIndices[i] = newCount;
 			if (i != newCount)
 			{
+				// Update handle to reference new particle index.
+				if (m_handleIndexBuffer.data)
+				{
+					b2ParticleHandle * const handle =
+						m_handleIndexBuffer.data[i];
+					if (handle) handle->SetIndex(newCount);
+					m_handleIndexBuffer.data[newCount] = handle;
+				}
 				m_flagsBuffer.data[newCount] = m_flagsBuffer.data[i];
 				if (m_lastBodyContactStepBuffer.data)
 				{
@@ -2361,6 +2427,7 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	{
 		return;
 	}
+	b2Assert(mid >= start && mid <= end);
 	struct NewIndices
 	{
 		int32 operator[](int32 i) const
@@ -2439,6 +2506,19 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	{
 		std::rotate(m_userDataBuffer.data + start,
 					m_userDataBuffer.data + mid, m_userDataBuffer.data + end);
+	}
+
+	// Update handle indices.
+	if (m_handleIndexBuffer.data)
+	{
+		std::rotate(m_handleIndexBuffer.data + start,
+					m_handleIndexBuffer.data + mid,
+					m_handleIndexBuffer.data + end);
+		for (int32 i = start; i < end; ++i)
+		{
+			b2ParticleHandle * const handle = m_handleIndexBuffer.data[i];
+			if (handle) handle->SetIndex(newIndices[handle->GetIndex()]);
+		}
 	}
 
 	// update proxies
