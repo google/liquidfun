@@ -2166,6 +2166,7 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 							 * criticalVelocity;
 	float32 normalStrength = m_def.surfaceTensionNormalStrength
 						   * criticalVelocity;
+	float32 maxVelocityVariation = b2_maxParticleForce * criticalVelocity;
 	for (int32 k = 0; k < m_contactCount; k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
@@ -2177,8 +2178,9 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 			b2Vec2 n = contact.normal;
 			float32 h = m_weightBuffer[a] + m_weightBuffer[b];
 			b2Vec2 s = m_accumulation2Buffer[b] - m_accumulation2Buffer[a];
-			float32 fn = (pressureStrength * (h - 2)
-					      + normalStrength * b2Dot(s, n)) * w;
+			float32 fn = b2Min(
+					pressureStrength * (h - 2) + normalStrength * b2Dot(s, n),
+					maxVelocityVariation) * w;
 			b2Vec2 f = fn * n;
 			m_velocityBuffer.data[a] -= f;
 			m_velocityBuffer.data[b] += f;
