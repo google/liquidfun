@@ -117,7 +117,7 @@ struct b2ParticleGroupDef
 
 };
 
-/// A group of particles. These are created via b2World::CreateParticleGroup.
+/// A group of particles. b2ParticleGroup::CreateParticleGroup creates these.
 class b2ParticleGroup
 {
 
