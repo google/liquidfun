@@ -505,14 +505,27 @@ private:
 		float32 ka, kb, kc, s;
 	};
 
-	// Callback used with b2VoronoiDiagram.
-	class UpdateTriadsCallback
+	/// Class for filtering pairs or triads.
+	class ConnectionFilter
 	{
 	public:
-		void operator()(int32 a, int32 b, int32 c) const;
-		b2ParticleSystem* system;
-		b2ParticleGroup* groupA;
-		b2ParticleGroup* groupB;
+		virtual ~ConnectionFilter() {}
+		/// Is the particle necessary for connection?
+		/// A pair or a triad should contain at least one 'necessary' particle.
+		virtual bool IsNecessary(int32 index) const
+		{
+			return true;
+		}
+		/// An additional condition for creating a pair.
+		virtual bool ShouldCreatePair(int32 a, int32 b) const
+		{
+			return true;
+		}
+		/// An additional condition for creating a triad.
+		virtual bool ShouldCreateTriad(int32 a, int32 b, int32 c) const
+		{
+			return true;
+		}
 	};
 
 	/// All particle types that require creating pairs
@@ -562,8 +575,12 @@ private:
 	void DestroyParticleGroup(b2ParticleGroup* group);
 
 	void UpdatePairsAndTriads(
-		int32 firstIndex, int32 lastIndex,
-		b2ParticleGroup* groupA, b2ParticleGroup* groupB);
+		int32 firstIndex, int32 lastIndex, const ConnectionFilter& filter);
+	void UpdatePairsAndTriadsWithReactiveParticles();
+	static bool ComparePairIndices(const Pair& a, const Pair& b);
+	static bool MatchPairIndices(const Pair& a, const Pair& b);
+	static bool CompareTriadIndices(const Triad& a, const Triad& b);
+	static bool MatchTriadIndices(const Triad& a, const Triad& b);
 	void ComputeDepth();
 
 	void UpdateAllParticleFlags();

@@ -71,8 +71,16 @@ public:
 		b2ParticleDef pd;
 
 		pd.position.Set(0.0, 33.0);
-		pd.velocity .Set(0.0, -1.0);
+		pd.velocity.Set(0.0, -1.0);
 		pd.flags = flags;
+
+		if (flags & (b2_springParticle | b2_elasticParticle))
+		{
+			int32 count = m_particleSystem->GetParticleCount();
+			pd.velocity.Set(count & 1 ? -1.0 : 1.0, -5.0);
+			pd.flags |= b2_reactiveParticle;
+		}
+
 		m_particleSystem->CreateParticle(pd);
 
 		// kill every particle near the bottom of the screen
