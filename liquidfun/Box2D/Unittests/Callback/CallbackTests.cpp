@@ -79,6 +79,7 @@ public:
 	}
 	bool ShouldQueryParticleSystem(const b2ParticleSystem* particleSystem)
 	{
+		B2_NOT_USED(particleSystem);
 		return m_shouldQueryParticleSystem;
 	}
 	void SetShouldQueryParticleSystem(bool shouldQueryParticleSystem)
@@ -171,6 +172,7 @@ public:
 	bool ShouldQueryParticleSystem(
 		const b2ParticleSystem* particleSystem)
 	{
+		B2_NOT_USED(particleSystem);
 		return m_shouldQueryParticleSystem;
 	}
 	void SetShouldQueryParticleSystem(bool shouldQueryParticleSystem)
