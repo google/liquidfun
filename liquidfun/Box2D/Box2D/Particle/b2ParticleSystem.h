@@ -98,6 +98,8 @@ struct b2ParticleSystemDef
 		staticPressureRelaxation = 0.2f;
 		staticPressureIterations = 8;
 		colorMixingStrength = 0.5f;
+		destroyByAge = true;
+		lifetimeGranularity = 1.0f / 60.0f;
 	}
 
 	/// Particles behave as circles with this radius. In Box2D units.
@@ -157,6 +159,19 @@ struct b2ParticleSystemDef
 	/// 1.0f ==> mixed immediately
 	/// 0.5f ==> mixed half way each simulation step (see b2World::Step())
 	float32 colorMixingStrength;
+
+	/// Whether to destroy particles by age when no more particles can be
+	/// created.  See #b2ParticleSystem::SetParticleDestructionByAge() for
+	/// more information.
+	bool destroyByAge;
+
+	/// Granularity of particle lifetimes in seconds.  By default this is
+	/// set to (1.0f / 60.0f) seconds.  b2ParticleSystem uses a 32-bit signed
+	/// value to track particle lifetimes so the maximum lifetime of a
+	/// particle is (2^32 - 1) / (1.0f / lifetimeGranularity) seconds.
+	/// With the value set to 1/60 the maximum lifetime or age of a particle is
+	/// 2.27 years.
+	float32 lifetimeGranularity;
 };
 
 class b2ParticleSystem
@@ -188,6 +203,16 @@ public:
 	/// @param Whether to call the destruction listener just before the
 	/// particle is destroyed.
 	void DestroyParticle(int32 index, bool callDestructionListener);
+
+	/// Destroy the Nth oldest particle in the system.
+	/// The particle is removed after the next b2World::Step().
+	/// @param Index of the Nth oldest particle to destroy, 0 will destroy the
+	/// oldest particle in the system, 1 will destroy the next oldest
+	/// particle etc.
+	/// @param Whether to call the destruction listener just before the
+	/// particle is destroyed.
+	void DestroyOldestParticle(const int32 index,
+							   const bool callDestructionListener);
 
 	/// Destroy particles inside a shape without enabling the destruction
 	/// callback for destroyed particles.
@@ -267,7 +292,9 @@ public:
 	/// By default, there is no maximum. The particle buffers can continue to
 	/// grow while b2World's block allocator still has memory.
 	/// Note: If you try to CreateParticle() with more than this count,
-	/// b2_invalidParticleIndex is returned.
+	/// b2_invalidParticleIndex is returned unless
+	/// SetParticleDestructionByAge() is used to enable the destruction of the
+	/// oldest particles in the system.
 	void SetParticleMaxCount(int32 count);
 
 	/// Pause or unpause the particle system. When paused, b2World::Step() skips
@@ -363,6 +390,8 @@ public:
 
 	/// Set flags for a particle. See the b2ParticleFlag enum.
 	void SetParticleFlags(int32 index, uint32 flags);
+	/// Get flags for a particle. See the b2ParticleFlag enum.
+	uint32 GetParticleFlags(const int32 index);
 
 	/// Set an external buffer for particle data.
 	/// Normally, the b2World's block allocator is used for particle data.
@@ -414,10 +443,51 @@ public:
 	/// corners in the world model where Particle/Body contact is ambiguous.
 	/// This option scales at n*log(n) of the number of Particle/Body contacts,
 	/// so it is best to only enable if it is necessary for your geometry.
-	/// Enable if you see strange particle behavior around b2Body intersections.
+	/// Enable if you see strange particle behavior around b2Body
+	/// intersections.
 	void SetStrictContactCheck(bool enabled);
 	/// Get the status of the strict contact check.
 	bool GetStrictContactCheck() const;
+
+	/// Set the lifetime (in seconds) of a particle relative to the current
+	/// time.  A lifetime of less than or equal to 0.0f results in the particle
+	/// living forever until it's manually destroyed by the application.
+	void SetParticleLifetime(const int32 index, const float32 lifetime);
+	/// Get the lifetime (in seconds) of a particle relative to the current
+	/// time.  A value > 0.0f is returned if the particle is scheduled to be
+	/// destroyed in the future, values <= 0.0f indicate the particle has an
+	/// infinite lifetime.
+	float32 GetParticleLifetime(const int32 index);
+
+	/// Enable / disable destruction of particles in CreateParticle() when
+	/// no more particles can be created due to a prior call to
+	/// SetParticleMaxCount().  When this is enabled, the oldest particle is
+	/// destroyed in CreateParticle() favoring the destruction of particles
+	/// with a finite lifetime over particles with infinite lifetimes.
+	/// This feature is enabled by default when particle lifetimes are
+	/// tracked.  Explicitly enabling this feature using this function enables
+	/// particle lifetime tracking.
+	void SetParticleDestructionByAge(const bool enable);
+	/// Get whether the oldest particle will be destroyed in CreateParticle()
+	/// when the maximum number of particles are present in the system.
+	bool GetParticleDestructionByAge() const;
+
+	/// Get the array of particle expiration times indexed by particle index.
+	/// GetParticleCount() items are in the returned array.
+	const int32* GetParticleExpirationTimeBuffer();
+	/// Convert a expiration time value in returned by
+	/// GetParticleExpirationTimeBuffer() to a time in seconds relative to the
+	/// current simulation time.
+	float32 ExpirationTimeToLifetime(const int32 expirationTime) const;
+	/// Get the array of particle indices ordered by reverse lifetime.
+	/// The oldest particle indexes are at the end of the array with the
+	/// newest at the start.  Particles with infinite lifetimes
+	/// (i.e expiration times less than or equal to 0) are placed at the start
+	///  of the array.
+	/// ExpirationTimeToLifetime(GetParticleExpirationTimeBuffer()[index])
+	/// is equivalent to GetParticleLifetime(index).
+	/// GetParticleCount() items are in the returned array.
+	const int32* GetParticleIndexByExpirationTimeBuffer();
 
 	/// Get the next particle-system in the world's particle-system list.
 	b2ParticleSystem* GetNext();
@@ -616,6 +686,9 @@ private:
 	void SolveForce(const b2TimeStep& step);
 	void SolveColorMixing();
 	void SolveZombie();
+	/// Destroy all particles which have outlived their lifetimes set by
+	/// SetParticleLifetime().
+	void SolveLifetimes(const b2TimeStep& step);
 	void RotateBuffer(int32 start, int32 mid, int32 end);
 
 	float32 GetCriticalVelocity(const b2TimeStep& step) const;
@@ -636,6 +709,14 @@ private:
 	static bool BodyContactCompare(const b2ParticleBodyContact& lhs, const b2ParticleBodyContact& rhs);
 
 	void DetectStuckParticle(int32 particle);
+
+	/// Determine whether a particle index is valid.
+	bool ValidateParticleIndex(const int32 index) const;
+
+	/// Get the time elapsed in b2ParticleSystemDef::lifetimeGranularity.
+	int32 GetQuantizedTimeElapsed() const;
+	/// Convert a lifetime in seconds to an expiration time.
+	int64 LifetimeToExpirationTime(const float32 lifetime) const;
 
 	bool m_paused;
 	int32 m_timestamp;
@@ -717,6 +798,19 @@ private:
 	int32 m_triadCount;
 	int32 m_triadCapacity;
 	Triad* m_triadBuffer;
+
+	/// Time each particle should be destroyed relative to the last time
+	/// m_timeElapsed was initialized.  Each unit of time corresponds to
+	/// b2ParticleSystemDef::lifetimeGranularity seconds.
+	ParticleBuffer<int32> m_expirationTimeBuffer;
+	/// List of particle indices sorted by expiration time.
+	ParticleBuffer<int32> m_indexByExpirationTimeBuffer;
+	/// Time elapsed in 32:32 fixed point.  Each non-fractional unit of time
+	/// corresponds to b2ParticleSystemDef::lifetimeGranularity seconds.
+	int64 m_timeElapsed;
+	/// Whether the expiration time buffer has been modified and needs to be
+	/// resorted.
+	bool m_expirationTimeBufferRequiresSorting;
 
 	int32 m_groupCount;
 	b2ParticleGroup* m_groupList;
@@ -949,6 +1043,22 @@ inline void* const* b2ParticleSystem::GetParticleUserDataBuffer() const
 inline b2ParticleGroup* const* b2ParticleSystem::GetParticleGroupBuffer()
 {
 	return m_groupBuffer;
+}
+
+inline uint32 b2ParticleSystem::GetParticleFlags(int32 index)
+{
+	return GetParticleFlagsBuffer()[index];
+}
+
+inline bool b2ParticleSystem::ValidateParticleIndex(const int32 index) const
+{
+	return index >= 0 && index < GetParticleCount() &&
+		index != b2_invalidParticleIndex;
+}
+
+inline bool b2ParticleSystem::GetParticleDestructionByAge() const
+{
+	return m_def.destroyByAge;
 }
 
 #endif

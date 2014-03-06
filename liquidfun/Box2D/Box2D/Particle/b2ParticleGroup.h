@@ -65,6 +65,7 @@ struct b2ParticleGroupDef
 		stride = 0;
 		particleCount = 0;
 		positionData = NULL;
+		lifetime = 0.0f;
 		userData = NULL;
 		group = NULL;
 	}
@@ -108,6 +109,10 @@ struct b2ParticleGroupDef
 
 	/// The initial positions of the particleCount particles.
 	const b2Vec2* positionData;
+
+	/// Lifetime of the particle group in seconds.  A value <= 0.0f indicates a
+	/// particle group with infinite lifetime.
+	float32 lifetime;
 
 	/// Use this to store application-specific group data.
 	void* userData;

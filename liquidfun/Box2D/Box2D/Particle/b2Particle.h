@@ -252,13 +252,13 @@ extern b2ParticleColor b2ParticleColor_zero;
 /// You can safely re-use these definitions.
 struct b2ParticleDef
 {
-
 	b2ParticleDef()
 	{
 		flags = 0;
 		position = b2Vec2_zero;
 		velocity = b2Vec2_zero;
 		color = b2ParticleColor_zero;
+		lifetime = 0.0f;
 		userData = NULL;
 		group = NULL;
 	}
@@ -278,6 +278,10 @@ struct b2ParticleDef
 
 	/// The color of the particle.
 	b2ParticleColor color;
+
+	/// Lifetime of the particle in seconds.  A value <= 0.0f indicates a
+	/// particle with infinite lifetime.
+	float32 lifetime;
 
 	/// Use this to store application-specific body data.
 	void* userData;
