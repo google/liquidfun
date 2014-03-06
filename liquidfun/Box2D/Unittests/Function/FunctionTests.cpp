@@ -1220,6 +1220,12 @@ TEST_F(FunctionTests, LimitParticleCountUsingLifetime)
 	}
 }
 
+TEST_F(FunctionTests, GetParticleMass) {
+	const float mass = m_particleSystem->GetParticleMass();
+	const float invMass = m_particleSystem->GetParticleInvMass();
+	EXPECT_NEAR(mass * invMass, 1.0f, 0.000001f);
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
