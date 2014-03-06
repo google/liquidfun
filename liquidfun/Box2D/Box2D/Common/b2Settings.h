@@ -161,6 +161,9 @@ typedef unsigned long long uint64;
 /// The upper limit for particle pressure.
 #define b2_maxParticlePressure		0.25f
 
+/// The upper limit for force between particles.
+#define b2_maxParticleForce		0.5f
+
 /// The maximum distance between particles in a triad, multiplied by the
 /// particle diameter.
 #define b2_maxTriadDistance			2
