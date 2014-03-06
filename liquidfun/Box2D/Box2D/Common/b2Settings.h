@@ -170,7 +170,7 @@ typedef unsigned long long uint64;
 #define b2_maxTriadDistanceSquared		(b2_maxTriadDistance * b2_maxTriadDistance)
 
 /// The initial size of particle data buffers.
-#define b2_minParticleBufferCapacity	256
+#define b2_minParticleSystemBufferCapacity	256
 
 /// The time into the future that collisions against barrier particles will be detected.
 #define b2_barrierCollisionTime 2.5f

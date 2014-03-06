@@ -156,7 +156,7 @@ static inline uint32 computeRelativeTag(uint32 tag, int32 x, int32 y)
 
 b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 								   b2World* world) :
-	m_handleAllocator(b2_minParticleBufferCapacity)
+	m_handleAllocator(b2_minParticleSystemBufferCapacity)
 {
 	m_paused = false;
 	m_timestamp = 0;
@@ -229,17 +229,17 @@ b2ParticleSystem::~b2ParticleSystem()
 		DestroyParticleGroup(m_groupList);
 	}
 
-	FreeParticleBuffer(&m_handleIndexBuffer);
-	FreeParticleBuffer(&m_flagsBuffer);
-	FreeParticleBuffer(&m_lastBodyContactStepBuffer);
-	FreeParticleBuffer(&m_bodyContactCountBuffer);
-	FreeParticleBuffer(&m_consecutiveContactStepsBuffer);
-	FreeParticleBuffer(&m_positionBuffer);
-	FreeParticleBuffer(&m_velocityBuffer);
-	FreeParticleBuffer(&m_colorBuffer);
-	FreeParticleBuffer(&m_userDataBuffer);
-	FreeParticleBuffer(&m_expirationTimeBuffer);
-	FreeParticleBuffer(&m_indexByExpirationTimeBuffer);
+	FreeUserOverridableBuffer(&m_handleIndexBuffer);
+	FreeUserOverridableBuffer(&m_flagsBuffer);
+	FreeUserOverridableBuffer(&m_lastBodyContactStepBuffer);
+	FreeUserOverridableBuffer(&m_bodyContactCountBuffer);
+	FreeUserOverridableBuffer(&m_consecutiveContactStepsBuffer);
+	FreeUserOverridableBuffer(&m_positionBuffer);
+	FreeUserOverridableBuffer(&m_velocityBuffer);
+	FreeUserOverridableBuffer(&m_colorBuffer);
+	FreeUserOverridableBuffer(&m_userDataBuffer);
+	FreeUserOverridableBuffer(&m_expirationTimeBuffer);
+	FreeUserOverridableBuffer(&m_indexByExpirationTimeBuffer);
 	FreeBuffer(&m_forceBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_weightBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_staticPressureBuffer, m_internalAllocatedCapacity);
@@ -264,8 +264,8 @@ template <typename T> void b2ParticleSystem::FreeBuffer(T** b, int capacity)
 }
 
 // Free buffer, if it was allocated with b2World's block allocator
-template <typename T> void b2ParticleSystem::FreeParticleBuffer(
-	ParticleBuffer<T>* b)
+template <typename T> void b2ParticleSystem::FreeUserOverridableBuffer(
+	UserOverridableBuffer<T>* b)
 {
 	if (b->userSuppliedCapacity == 0)
 	{
@@ -307,7 +307,7 @@ template <typename T> T* b2ParticleSystem::ReallocateBuffer(
 
 // Reallocate a buffer
 template <typename T> T* b2ParticleSystem::ReallocateBuffer(
-	ParticleBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity,
+	UserOverridableBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity,
 	bool deferred)
 {
 	b2Assert(newCapacity > oldCapacity);
@@ -330,13 +330,14 @@ void b2ParticleSystem::ReallocateHandleBuffers(int32 newCapacity)
 									  m_internalAllocatedCapacity);
 }
 
-template <typename T> T* b2ParticleSystem::RequestParticleBuffer(T* buffer)
+template <typename T> T* b2ParticleSystem::RequestBuffer(T* buffer)
 {
 	if (!buffer)
 	{
 		if (m_internalAllocatedCapacity == 0)
 		{
-			ReallocateInternalAllocatedBuffers(b2_minParticleBufferCapacity);
+			ReallocateInternalAllocatedBuffers(
+				b2_minParticleSystemBufferCapacity);
 		}
 		buffer = (T*) (m_world->m_blockAllocator.Allocate(
 						   sizeof(T) * m_internalAllocatedCapacity));
@@ -353,22 +354,22 @@ template <typename T> T* b2ParticleSystem::RequestGrowableBuffer(T* buffer,
 	{
 		int32 oldCapacity = *capacity;
 		int32 newCapacity = count ?
-			2 * count : b2_minParticleBufferCapacity;
+			2 * count : b2_minParticleSystemBufferCapacity;
 		buffer = ReallocateBuffer(buffer, oldCapacity, newCapacity);
 		*capacity = newCapacity;
 	}
 	return buffer;
 }
 
-b2ParticleColor* b2ParticleSystem::GetParticleColorBuffer()
+b2ParticleColor* b2ParticleSystem::GetColorBuffer()
 {
-	m_colorBuffer.data = RequestParticleBuffer(m_colorBuffer.data);
+	m_colorBuffer.data = RequestBuffer(m_colorBuffer.data);
 	return m_colorBuffer.data;
 }
 
-void** b2ParticleSystem::GetParticleUserDataBuffer()
+void** b2ParticleSystem::GetUserDataBuffer()
 {
-	m_userDataBuffer.data = RequestParticleBuffer(m_userDataBuffer.data);
+	m_userDataBuffer.data = RequestBuffer(m_userDataBuffer.data);
 	return m_userDataBuffer.data;
 }
 
@@ -450,7 +451,8 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	if (m_count >= m_internalAllocatedCapacity)
 	{
 		// Double the particle capacity.
-		int32 capacity = m_count ? 2 * m_count : b2_minParticleBufferCapacity;
+		int32 capacity = 
+			m_count ? 2 * m_count : b2_minParticleSystemBufferCapacity;
 		ReallocateInternalAllocatedBuffers(capacity);
 	}
 	if (m_count >= m_internalAllocatedCapacity)
@@ -496,12 +498,12 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	}
 	if (m_colorBuffer.data || !def.color.IsZero())
 	{
-		m_colorBuffer.data = RequestParticleBuffer(m_colorBuffer.data);
+		m_colorBuffer.data = RequestBuffer(m_colorBuffer.data);
 		m_colorBuffer.data[index] = def.color;
 	}
 	if (m_userDataBuffer.data || def.userData)
 	{
-		m_userDataBuffer.data= RequestParticleBuffer(m_userDataBuffer.data);
+		m_userDataBuffer.data= RequestBuffer(m_userDataBuffer.data);
 		m_userDataBuffer.data[index] = def.userData;
 	}
 	if (m_handleIndexBuffer.data)
@@ -555,7 +557,7 @@ const b2ParticleHandle* b2ParticleSystem::GetParticleHandleFromIndex(
 {
 	b2Assert(index >= 0 && index < GetParticleCount() &&
 			 index != b2_invalidParticleIndex);
-	m_handleIndexBuffer.data = RequestParticleBuffer(m_handleIndexBuffer.data);
+	m_handleIndexBuffer.data = RequestBuffer(m_handleIndexBuffer.data);
 	b2ParticleHandle* handle = m_handleIndexBuffer.data[index];
 	if (handle)
 	{
@@ -658,20 +660,6 @@ int32 b2ParticleSystem::DestroyParticlesInShape(
 	shape.ComputeAABB(&aabb, xf, 0);
 	m_world->QueryAABB(&callback, aabb);
 	return callback.Destroyed();
-}
-
-void b2ParticleSystem::DestroyParticlesInGroup(
-	b2ParticleGroup* group, bool callDestructionListener)
-{
-	b2Assert(m_world->IsLocked() == false);
-	if (m_world->IsLocked())
-	{
-		return;
-	}
-
-	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++) {
-		DestroyParticle(i, callDestructionListener);
-	}
 }
 
 int32 b2ParticleSystem::CreateParticleForGroup(
@@ -814,7 +802,7 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
 	{
 		m_groupBuffer[i] = group;
 	}
-	SetParticleGroupFlags(group, groupDef.groupFlags);
+	SetGroupFlags(group, groupDef.groupFlags);
 
 	// Create pairs and triads between particles in the group.
 	ConnectionFilter filter;
@@ -876,7 +864,7 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 		m_groupBuffer[i] = groupA;
 	}
 	uint32 groupFlags = groupA->m_groupFlags | groupB->m_groupFlags;
-	SetParticleGroupFlags(groupA, groupFlags);
+	SetGroupFlags(groupA, groupFlags);
 	groupA->m_lastIndex = groupB->m_lastIndex;
 	groupB->m_firstIndex = groupB->m_lastIndex;
 	DestroyParticleGroup(groupB);
@@ -1095,7 +1083,7 @@ void b2ParticleSystem::DestroyParticleGroup(b2ParticleGroup* group)
 		m_world->m_destructionListener->SayGoodbye(group);
 	}
 
-	SetParticleGroupFlags(group, 0);
+	SetGroupFlags(group, 0);
 	for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 	{
 		m_groupBuffer[i] = NULL;
@@ -1168,9 +1156,9 @@ void b2ParticleSystem::ComputeDepth()
 		if (group->m_groupFlags & b2_particleGroupNeedsUpdateDepth)
 		{
 			groupsToUpdate[groupsToUpdateCount++] = group;
-			SetParticleGroupFlags(group,
-								  group->m_groupFlags &
-									~b2_particleGroupNeedsUpdateDepth);
+			SetGroupFlags(group,
+						  group->m_groupFlags &
+						  ~b2_particleGroupNeedsUpdateDepth);
 			for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 			{
 				m_accumulationBuffer[i] = 0;
@@ -1942,7 +1930,7 @@ void b2ParticleSystem::SolveGravity(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 {
-	m_staticPressureBuffer = RequestParticleBuffer(m_staticPressureBuffer);
+	m_staticPressureBuffer = RequestBuffer(m_staticPressureBuffer);
 	float32 criticalPressure = GetCriticalPressure(step);
 	float32 pressurePerWeight = m_def.staticPressureStrength * criticalPressure;
 	float32 maxPressure = b2_maxParticlePressure * criticalPressure;
@@ -2621,9 +2609,9 @@ void b2ParticleSystem::SolveZombie()
 			{
 				if (group->m_groupFlags & b2_solidParticleGroup)
 				{
-					SetParticleGroupFlags(group,
-										  group->m_groupFlags |
-											b2_particleGroupNeedsUpdateDepth);
+					SetGroupFlags(group,
+								  group->m_groupFlags |
+								  b2_particleGroupNeedsUpdateDepth);
 				}
 				// TODO: flag to split if needed
 			}
@@ -2634,7 +2622,7 @@ void b2ParticleSystem::SolveZombie()
 			group->m_lastIndex = 0;
 			if (!(group->m_groupFlags & b2_particleGroupCanBeEmpty))
 			{
-				SetParticleGroupFlags(group,
+				SetGroupFlags(group,
 					group->m_groupFlags | b2_particleGroupWillBeDestroyed);
 			}
 		}
@@ -2870,9 +2858,9 @@ void b2ParticleSystem::SetParticleLifetime(const int32 index,
 	b2Assert(ValidateParticleIndex(index));
 	const bool initializeExpirationTimes =
 		m_indexByExpirationTimeBuffer.data == NULL;
-	m_expirationTimeBuffer.data = RequestParticleBuffer(
+	m_expirationTimeBuffer.data = RequestBuffer(
 		m_expirationTimeBuffer.data);
-	m_indexByExpirationTimeBuffer.data = RequestParticleBuffer(
+	m_indexByExpirationTimeBuffer.data = RequestBuffer(
 		m_indexByExpirationTimeBuffer.data);
 
 	// Initialize the inverse mapping buffer.
@@ -2918,9 +2906,9 @@ float32 b2ParticleSystem::GetParticleLifetime(const int32 index)
 
 /// Get the array of particle lifetimes indexed by particle index.
 /// GetParticleCount() items are in the returned array.
-const int32* b2ParticleSystem::GetParticleExpirationTimeBuffer()
+const int32* b2ParticleSystem::GetExpirationTimeBuffer()
 {
-	m_expirationTimeBuffer.data = RequestParticleBuffer(
+	m_expirationTimeBuffer.data = RequestBuffer(
 		m_expirationTimeBuffer.data);
 	return m_expirationTimeBuffer.data;
 }
@@ -2930,7 +2918,7 @@ const int32* b2ParticleSystem::GetParticleExpirationTimeBuffer()
 ///    GetParticleIndexByExpirationTimeBuffer()[index])
 /// is equivalent to GetParticleLifetime(index).
 /// GetParticleCount() items are in the returned array.
-const int32* b2ParticleSystem::GetParticleIndexByExpirationTimeBuffer()
+const int32* b2ParticleSystem::GetIndexByExpirationTimeBuffer()
 {
 	// If particles are present, initialize / reinitialize the lifetime buffer.
 	if (GetParticleCount())
@@ -2939,13 +2927,13 @@ const int32* b2ParticleSystem::GetParticleIndexByExpirationTimeBuffer()
 	}
 	else
 	{
-		m_indexByExpirationTimeBuffer.data = RequestParticleBuffer(
+		m_indexByExpirationTimeBuffer.data = RequestBuffer(
 			m_indexByExpirationTimeBuffer.data);
 	}
 	return m_indexByExpirationTimeBuffer.data;
 }
 
-void b2ParticleSystem::SetParticleDestructionByAge(const bool enable)
+void b2ParticleSystem::SetDestructionByAge(const bool enable)
 {
 	if (enable)
 	{
@@ -2967,8 +2955,8 @@ int64 b2ParticleSystem::LifetimeToExpirationTime(const float32 lifetime) const
 								   (float32)(1LL << 32));
 }
 
-template <typename T> void b2ParticleSystem::SetParticleBuffer(
-	ParticleBuffer<T>* buffer, T* newData, int32 newCapacity)
+template <typename T> void b2ParticleSystem::SetUserOverridableBuffer(
+	UserOverridableBuffer<T>* buffer, T* newData, int32 newCapacity)
 {
 	b2Assert((newData && newCapacity) || (!newData && !newCapacity));
 	if (!buffer->userSuppliedCapacity)
@@ -2980,32 +2968,32 @@ template <typename T> void b2ParticleSystem::SetParticleBuffer(
 	buffer->userSuppliedCapacity = newCapacity;
 }
 
-void b2ParticleSystem::SetParticleFlagsBuffer(uint32* buffer, int32 capacity)
+void b2ParticleSystem::SetFlagsBuffer(uint32* buffer, int32 capacity)
 {
-	SetParticleBuffer(&m_flagsBuffer, buffer, capacity);
+	SetUserOverridableBuffer(&m_flagsBuffer, buffer, capacity);
 }
 
-void b2ParticleSystem::SetParticlePositionBuffer(b2Vec2* buffer,
+void b2ParticleSystem::SetPositionBuffer(b2Vec2* buffer,
 												 int32 capacity)
 {
-	SetParticleBuffer(&m_positionBuffer, buffer, capacity);
+	SetUserOverridableBuffer(&m_positionBuffer, buffer, capacity);
 }
 
-void b2ParticleSystem::SetParticleVelocityBuffer(b2Vec2* buffer,
+void b2ParticleSystem::SetVelocityBuffer(b2Vec2* buffer,
 												 int32 capacity)
 {
-	SetParticleBuffer(&m_velocityBuffer, buffer, capacity);
+	SetUserOverridableBuffer(&m_velocityBuffer, buffer, capacity);
 }
 
-void b2ParticleSystem::SetParticleColorBuffer(b2ParticleColor* buffer,
+void b2ParticleSystem::SetColorBuffer(b2ParticleColor* buffer,
 											  int32 capacity)
 {
-	SetParticleBuffer(&m_colorBuffer, buffer, capacity);
+	SetUserOverridableBuffer(&m_colorBuffer, buffer, capacity);
 }
 
-void b2ParticleSystem::SetParticleUserDataBuffer(void** buffer, int32 capacity)
+void b2ParticleSystem::SetUserDataBuffer(void** buffer, int32 capacity)
 {
-	SetParticleBuffer(&m_userDataBuffer, buffer, capacity);
+	SetUserOverridableBuffer(&m_userDataBuffer, buffer, capacity);
 }
 
 void b2ParticleSystem::SetParticleFlags(int32 index, uint32 newFlags)
@@ -3021,19 +3009,19 @@ void b2ParticleSystem::SetParticleFlags(int32 index, uint32 newFlags)
 		// If any flags were added
 		if (newFlags & b2_tensileParticle)
 		{
-			m_accumulation2Buffer = RequestParticleBuffer(
+			m_accumulation2Buffer = RequestBuffer(
 				m_accumulation2Buffer);
 		}
 		if (newFlags & b2_colorMixingParticle)
 		{
-			m_colorBuffer.data = RequestParticleBuffer(m_colorBuffer.data);
+			m_colorBuffer.data = RequestBuffer(m_colorBuffer.data);
 		}
 		m_allParticleFlags |= newFlags;
 	}
 	*oldFlags = newFlags;
 }
 
-void b2ParticleSystem::SetParticleGroupFlags(
+void b2ParticleSystem::SetGroupFlags(
 	b2ParticleGroup* group, uint32 newFlags)
 {
 	uint32* oldFlags = &group->m_groupFlags;
@@ -3052,7 +3040,7 @@ void b2ParticleSystem::SetParticleGroupFlags(
 		// If any flags were added
 		if (newFlags & b2_solidParticleGroup)
 		{
-			m_depthBuffer = RequestParticleBuffer(m_depthBuffer);
+			m_depthBuffer = RequestBuffer(m_depthBuffer);
 		}
 		m_allGroupFlags |= newFlags;
 	}
@@ -3233,7 +3221,7 @@ void b2ParticleSystem::RayCast(b2RayCastCallback* callback,
 	}
 }
 
-float32 b2ParticleSystem::ComputeParticleCollisionEnergy() const
+float32 b2ParticleSystem::ComputeCollisionEnergy() const
 {
 	float32 sum_v2 = 0;
 	for (int32 k = 0; k < m_contactCount; k++)
@@ -3252,18 +3240,31 @@ float32 b2ParticleSystem::ComputeParticleCollisionEnergy() const
 	return 0.5f * GetParticleMass() * sum_v2;
 }
 
-void b2ParticleSystem::SetStuckParticleThreshold(int32 steps)
+void b2ParticleSystem::SetStuckThreshold(int32 steps)
 {
 	m_stuckThreshold = steps;
 
 	if (steps > 0)
 	{
-		m_lastBodyContactStepBuffer.data = RequestParticleBuffer(
+		m_lastBodyContactStepBuffer.data = RequestBuffer(
 			m_lastBodyContactStepBuffer.data);
-		m_bodyContactCountBuffer.data = RequestParticleBuffer(
+		m_bodyContactCountBuffer.data = RequestBuffer(
 			m_bodyContactCountBuffer.data);
-		m_consecutiveContactStepsBuffer.data = RequestParticleBuffer(
+		m_consecutiveContactStepsBuffer.data = RequestBuffer(
 			m_consecutiveContactStepsBuffer.data);
 	}
 }
+
+#if ALLOW_OLD_API_NAMES
+void b2ParticleSystem::DestroyParticlesInGroup(b2ParticleGroup* group,
+							 bool callDestructionListener)
+{
+	group->DestroyParticles(callDestructionListener);
+}
+
+void b2ParticleSystem::DestroyParticlesInGroup(b2ParticleGroup* group)
+{
+	group->DestroyParticles();
+}
+#endif // ALLOW_OLD_API_NAMES
 
