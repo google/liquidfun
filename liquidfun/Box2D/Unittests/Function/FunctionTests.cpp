@@ -149,7 +149,7 @@ public:
 		// Make sure this particle is being tracked.
 		std::map<void*, float>::iterator it =
 			m_particleLifetime.find(handle);
-		ASSERT_NE(it, m_particleLifetime.end());
+		ASSERT_TRUE(it != m_particleLifetime.end());
 
 		// Make sure the particle was destroyed on time.
 		const float32 lifetime = it->second;
