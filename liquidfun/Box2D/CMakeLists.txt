@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 project(Box2D)
 
 if(UNIX)
-	set(BOX2D_INSTALL_BY_DEFAULT ON)
+  set(BOX2D_INSTALL_BY_DEFAULT ON)
 else(UNIX)
-	set(BOX2D_INSTALL_BY_DEFAULT OFF)
+  set(BOX2D_INSTALL_BY_DEFAULT OFF)
 endif(UNIX)
 
 # LiquidFun build configuration.
@@ -24,6 +24,8 @@ option(BOX2D_BUILD_SHARED "Build Box2D shared libraries" OFF)
 option(BOX2D_BUILD_STATIC "Build Box2D static libraries" ON)
 option(BOX2D_BUILD_EXAMPLES "Build Box2D examples" ON)
 option(BOX2D_BUILD_UNITTESTS "Build Box2D Unit Tests" ON)
+# NOTE: Code coverage only works on Linux & OSX.
+option(BOX2D_CODE_COVERAGE "Enable the code coverage build option." OFF)
 
 set(BOX2D_VERSION 2.3.0)
 set(LIB_INSTALL_DIR lib${LIB_SUFFIX})
@@ -68,6 +70,25 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
 endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS_WARNINGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS_WARNINGS}")
+
+# Configure flags for gcov when the code coverage config is enabled.
+if (BOX2D_CODE_COVERAGE AND
+    (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
+     CMAKE_COMPILER_IS_CLANGXX))
+  set(GCOV_FLAGS "-fprofile-arcs -ftest-coverage")
+  set(GCOV_COMPILER_FLAGS "-g ${GCOV_FLAGS}")
+  # DEBUG and RELEASE flags are set explicitly here as CMAKE_C*_FLAGS get
+  # used to perform check compiles for cmake's configure step which fails on
+  # OSX when gcov flags are specified.
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${GCOV_COMPILER_FLAGS}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCOV_COMPILER_FLAGS}")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${GCOV_COMPILER_FLAGS}")
+  set(CMAKE_CXX_FLAGS_RELEASE
+        "${CMAKE_CXX_FLAGS_RELEASE} ${GCOV_COMPILER_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCOV_FLAGS}")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${GCOV_FLAGS}")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${GCOV_FLAGS}")
+endif()
 
 # The XCode generator ignores CMAKE_C_FLAGS AND CMAKE_CXX_FLAGS so flags
 # need to be added with target properties.
