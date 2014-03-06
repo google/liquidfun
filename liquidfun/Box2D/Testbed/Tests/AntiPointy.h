@@ -98,7 +98,7 @@ public:
 		if (flags & (b2_springParticle | b2_elasticParticle))
 		{
 			int32 count = m_particleSystem->GetParticleCount();
-			pd.velocity.Set(count & 1 ? -1.0 : 1.0, -5.0);
+			pd.velocity.Set(count & 1 ? -1.0f : 1.0f, -5.0f);
 			pd.flags |= b2_reactiveParticle;
 		}
 
