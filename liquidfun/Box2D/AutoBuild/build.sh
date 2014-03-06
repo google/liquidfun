@@ -35,7 +35,7 @@ Generate Makefiles or Xcode project for ${project_name} and build the specified
 configuration.
 
 Usage: ${script_name} [-h] [-n] [-o output_directory] [-z archive] [-v]
-         [-b build_configuration] [build_configuration]
+         [-c] [-b build_configuration] [build_configuration]
 
 -h:
   Display this help message.
@@ -53,6 +53,11 @@ Usage: ${script_name} [-h] [-n] [-o output_directory] [-z archive] [-v]
   Directory to copy build artifacts to.
 -z archive:
   Create a zip archive of build artifacts.
+-c:
+  Enable code coverage build.  WARNING it's not possible to build code
+  coverage builds and non-code coverage builds side by side in the same
+  tree.  All build targets should be cleaned before switching between these
+  build configurations.
 -v:
   Display verbose output.
 
@@ -105,11 +110,13 @@ xcodebuild_verbose_filter() {
 # $2: cmake binary path.
 # $3: whether to clean the project (1 = clean).
 # $4: whether to print verbose output (1 = enable).
+# $5: Addition flags for cmake.
 build_osx() {
   local -r title_case_build_config="${1}"
   local -r cmake="${2}"
   local -r clean="${3}"
   local -r verbose="${4}"
+  local -r cmake_flags="${5}"
   local status=
   local verbose_filter=xcodebuild_verbose_filter
   if [[ $((verbose)) -eq 1 ]]; then
@@ -123,11 +130,11 @@ build_osx() {
   [[ $((clean)) -eq 1 || \
      ! -e Box2D.xcodeproj || \
      $(stat -f%m CMakeLists.txt) -gt $(stat -f%m Box2D.xcodeproj) ]] && \
-    "${cmake}" -G'Xcode'
+    "${cmake}" -G'Xcode' ${cmake_flags}
   if [[ $((clean)) -ne 0 ]]; then
     ${dryrun} xcodebuild -configuration ${title_case_build_config} clean | \
       ${verbose_filter}
-	status=${PIPESTATUS[0]} && [[ $((status)) -ne 0 ]] && return $((status))
+    status=${PIPESTATUS[0]} && [[ $((status)) -ne 0 ]] && return $((status))
   fi
   ${dryrun} xcodebuild -configuration ${title_case_build_config} | \
       ${verbose_filter}
@@ -145,12 +152,15 @@ get_osx_build_artifact_dirs() {
 # $2: cmake binary path.
 # $3: whether to clean the project (1 = clean).
 # $4: whether to print verbose output (1 = enable).
+# $5: Additional flags for cmake.
 build_linux() {
   local -r title_case_build_config="${1}"
   local -r cmake="${2}"
   local -r clean="${3}"
   local -r verbose="${4}"
-  local -r cmake_config="-DCMAKE_BUILD_TYPE=${title_case_build_config}"
+  local -r cmake_flags="${5}"
+  local -r cmake_config="-DCMAKE_BUILD_TYPE=${title_case_build_config} \
+                         ${cmake_flags}"
   local verbose_arg=
 
   if [[ $((verbose)) -eq 1 ]]; then
@@ -238,8 +248,9 @@ main() {
   local delete_dirs=
   local archive=
   local verbose=0
+  local cmake_flags=
 
-  while getopts 'hndb:o:z:v' option; do
+  while getopts 'hndb:o:z:cv' option; do
     case ${option} in
       h) usage ;;
       n) clean=0 ;;
@@ -249,6 +260,7 @@ main() {
          output_dir="$(cd ${OPTARG} && pwd)";;
       z) archive="${OPTARG}";;
       v) verbose=1;;
+	  c) cmake_flags="${cmake_flags} -DBOX2D_CODE_COVERAGE=ON";;
       *) usage ;;
     esac
   done
@@ -286,11 +298,12 @@ main() {
 
     # Build the project.
     if [[ "${os_name}" == "Darwin" ]]; then
-      build_osx "${title_case_build_config}" "${cmake}" $((clean)) $((verbose))
+      build_osx "${title_case_build_config}" "${cmake}" $((clean)) \
+                $((verbose)) "${cmake_flags}"
       base_artifact_dirs="$(get_osx_build_artifact_dirs)"
     else
       build_linux "${title_case_build_config}" "${cmake}" $((clean)) \
-                  $((verbose))
+                  $((verbose)) "${cmake_flags}"
       base_artifact_dirs="$(get_linux_build_artifact_dirs)"
     fi
 
