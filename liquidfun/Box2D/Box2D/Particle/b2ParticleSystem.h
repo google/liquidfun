@@ -166,7 +166,7 @@ struct b2ParticleSystemDef
 	float32 colorMixingStrength;
 
 	/// Whether to destroy particles by age when no more particles can be
-	/// created.  See #b2ParticleSystem::SetParticleDestructionByAge() for
+	/// created.  See #b2ParticleSystem::SetDestructionByAge() for
 	/// more information.
 	bool destroyByAge;
 
@@ -279,7 +279,7 @@ public:
 	/// grow while b2World's block allocator still has memory.
 	/// Note: If you try to CreateParticle() with more than this count,
 	/// b2_invalidParticleIndex is returned unless
-	/// SetParticleDestructionByAge() is used to enable the destruction of the
+	/// SetDestructionByAge() is used to enable the destruction of the
 	/// oldest particles in the system.
 	void SetMaxParticleCount(int32 count);
 

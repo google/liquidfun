@@ -55,8 +55,8 @@ public:
 		// Set particle initial velocity based on how far away it is from
 		// origin, exploding outwards.
 		int32 bufferIndex = m_pg->GetBufferIndex();
-		b2Vec2 *pos = m_particleSystem->GetParticlePositionBuffer();
-		b2Vec2 *vel = m_particleSystem->GetParticleVelocityBuffer();
+		b2Vec2 *pos = m_particleSystem->GetPositionBuffer();
+		b2Vec2 *vel = m_particleSystem->GetVelocityBuffer();
 		for (int i = bufferIndex; i < bufferIndex + m_pg->GetParticleCount();
 			 i++)
 		{
@@ -67,7 +67,7 @@ public:
 
 	~ParticleVFX()
 	{
-	  m_particleSystem->DestroyParticlesInGroup(m_pg, false);
+	  m_pg->DestroyParticles(false);
 	}
 
 	// Calculates the brightness of the particles.
@@ -91,7 +91,7 @@ public:
           m_remainingLifetime = std::max(m_remainingLifetime - dt, 0.0f);
 			float32 coeff = ColorCoeff();
 
-			b2ParticleColor *colors = m_particleSystem->GetParticleColorBuffer();
+			b2ParticleColor *colors = m_particleSystem->GetColorBuffer();
 			int bufferIndex = m_pg->GetBufferIndex();
 
 			// Set particle colors all at once.
@@ -134,7 +134,7 @@ public:
 		}
 
 		CreateWalls();
-		m_particleSystem->SetParticleRadius(0.1f);
+		m_particleSystem->SetRadius(0.1f);
 
 		// Create a list of circles that will spark.
 		for (int i = 0; i < c_maxCircles; i++)

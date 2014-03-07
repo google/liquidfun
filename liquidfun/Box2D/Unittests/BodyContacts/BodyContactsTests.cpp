@@ -95,7 +95,7 @@ BodyContactTests::TearDown()
 	// Reset these between tests so no one forgets to when we add more
 	// tests to this file.
 	m_particleSystem->SetStrictContactCheck(false);
-	m_particleSystem->SetStuckParticleThreshold(0);
+	m_particleSystem->SetStuckThreshold(0);
 }
 
 void BodyContactTests::drop()
@@ -128,13 +128,13 @@ void BodyContactTests::drop()
 	for (i = 0; i < timeout; ++i)
 	{
 		m_world->Step(timeStep, velocityIterations, positionIterations);
-		m_contacts += m_particleSystem->GetParticleBodyContactCount();
-		int32 stuck = m_particleSystem->GetStuckParticleCandidateCount();
+		m_contacts += m_particleSystem->GetBodyContactCount();
+		int32 stuck = m_particleSystem->GetStuckCandidateCount();
 		if (stuck)
 		{
 			m_stuck += stuck;
 			// should always be particle 0
-			EXPECT_EQ(*(m_particleSystem->GetStuckParticleCandidates()), 0);
+			EXPECT_EQ(*(m_particleSystem->GetStuckCandidates()), 0);
 		}
 	}
 }
@@ -161,7 +161,7 @@ TEST_F(BodyContactTests, Stuck) {
 
 	for (int32 i = 1; i < 256; i *= 2)
 	{
-		m_particleSystem->SetStuckParticleThreshold(i);
+		m_particleSystem->SetStuckThreshold(i);
 		drop();
 		EXPECT_GT(m_stuck, 0) << "No stuck particles detected";
 		EXPECT_GT(stuck, m_stuck) << "Fewer stuck particle reports expected";

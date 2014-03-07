@@ -50,8 +50,8 @@ public:
 			ground->CreateFixture(&shape, 0.0f);
 		}
 
-		m_particleSystem->SetParticleRadius(0.025f);
-		m_particleSystem->SetParticleDamping(0.2f);
+		m_particleSystem->SetRadius(0.025f);
+		m_particleSystem->SetDamping(0.2f);
 
 		// Create the particles.
 		{

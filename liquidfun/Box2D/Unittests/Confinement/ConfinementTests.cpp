@@ -78,7 +78,7 @@ ConfinementTests::TestLeakCount()
 	}
 	int32 bufferIndex = m_particleGroup->GetBufferIndex();
 	int32 particleCount = m_particleGroup->GetParticleCount();
-	const b2Vec2 *positionBuffer = m_particleSystem->GetParticlePositionBuffer();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
 	int32 leakCount = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		b2Vec2 p = positionBuffer[bufferIndex + i];

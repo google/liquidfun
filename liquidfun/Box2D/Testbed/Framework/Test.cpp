@@ -67,8 +67,8 @@ Test::Test()
 	m_world->SetContactListener(this);
 	m_world->SetDebugDraw(&m_debugDraw);
 
-	m_particleSystem->SetParticleGravityScale(0.4f);
-	m_particleSystem->SetParticleDensity(1.2f);
+	m_particleSystem->SetGravityScale(0.4f);
+	m_particleSystem->SetDensity(1.2f);
 
 	m_bombSpawning = false;
 
@@ -188,10 +188,10 @@ public:
 
 		b2Transform xf;
 		xf.SetIdentity();
-		b2Vec2 p = m_particleSystem->GetParticlePositionBuffer()[index];
+		b2Vec2 p = m_particleSystem->GetPositionBuffer()[index];
 		if (m_shape->TestPoint(xf, p))
 		{
-			b2Vec2& v = m_particleSystem->GetParticleVelocityBuffer()[index];
+			b2Vec2& v = m_particleSystem->GetVelocityBuffer()[index];
 			v = m_velocity;
 		}
 		return true;
@@ -569,7 +569,7 @@ void Test::ColorParticleGroup(b2ParticleGroup * const group,
 							  uint32 particlesPerColor)
 {
 	b2Assert(group);
-	b2ParticleColor * const colorBuffer = m_particleSystem->GetParticleColorBuffer();
+	b2ParticleColor * const colorBuffer = m_particleSystem->GetColorBuffer();
 	const int32 particleCount = group->GetParticleCount();
 	const int32 groupStart = group->GetBufferIndex();
 	const int32 groupEnd = particleCount + groupStart;

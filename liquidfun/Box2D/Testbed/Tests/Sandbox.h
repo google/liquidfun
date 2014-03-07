@@ -176,7 +176,7 @@ public:
 			const int32 particleIndex = particleIndices[i];
 			m_particleSystem->SetParticleFlags(
 				particleIndex,
-				m_particleSystem->GetParticleFlagsBuffer()[particleIndex] |
+				m_particleSystem->GetFlagsBuffer()[particleIndex] |
 					b2_destructionListener);
 			m_particles.insert(m_particleSystem->GetParticleHandleFromIndex(
 								   particleIndex));
@@ -199,7 +199,7 @@ public:
 		for (std::set<const b2ParticleHandle*>::const_iterator it =
 				 m_particles.begin(); it != m_particles.end(); ++it)
 		{
-			m_particleSystem->GetParticleColorBuffer()[(*it)->GetIndex()] =
+			m_particleSystem->GetColorBuffer()[(*it)->GetIndex()] =
 				color;
 		}
 	}
@@ -296,7 +296,7 @@ public:
 			}
 		}
 
-		m_particleSystem->SetParticleRadius(0.25f);
+		m_particleSystem->SetRadius(0.25f);
 
 		m_specialTracker.Init(m_world, m_particleSystem);
 

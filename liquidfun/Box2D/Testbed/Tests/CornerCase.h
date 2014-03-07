@@ -86,7 +86,7 @@ public:
 
 		}
 
-		m_particleSystem->SetParticleRadius(1.0f);
+		m_particleSystem->SetRadius(1.0f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
 
 		{

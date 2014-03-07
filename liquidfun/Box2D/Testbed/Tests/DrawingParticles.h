@@ -85,7 +85,7 @@ public:
 		}
 
 		m_colorIndex = 0;
-		m_particleSystem->SetParticleRadius(0.05f);
+		m_particleSystem->SetRadius(0.05f);
 		m_lastGroup = NULL;
 		m_drawing = true;
 

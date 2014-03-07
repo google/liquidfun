@@ -70,7 +70,7 @@ ConservationTests::TearDown()
 
 TEST_F(ConservationTests, GravityCenter) {
 	int32 particleCount = m_particleSystem->GetParticleCount();
-	const b2Vec2 *positionBuffer = m_particleSystem->GetParticlePositionBuffer();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
 	float64 beforeX = 0;
 	float64 beforeY = 0;
 	for (int32 i = 0; i < particleCount; i++) {
@@ -98,7 +98,7 @@ TEST_F(ConservationTests, GravityCenter) {
 
 TEST_F(ConservationTests, LinearMomentum) {
 	int32 particleCount = m_particleSystem->GetParticleCount();
-	const b2Vec2 *velocityBuffer = m_particleSystem->GetParticleVelocityBuffer();
+	const b2Vec2 *velocityBuffer = m_particleSystem->GetVelocityBuffer();
 	float64 beforeX = 0;
 	float64 beforeY = 0;
 	for (int32 i = 0; i < particleCount; i++) {
@@ -122,8 +122,8 @@ TEST_F(ConservationTests, LinearMomentum) {
 
 TEST_F(ConservationTests, AngularMomentum) {
 	int32 particleCount = m_particleSystem->GetParticleCount();
-	const b2Vec2 *positionBuffer = m_particleSystem->GetParticlePositionBuffer();
-	const b2Vec2 *velocityBuffer = m_particleSystem->GetParticleVelocityBuffer();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
+	const b2Vec2 *velocityBuffer = m_particleSystem->GetVelocityBuffer();
 	float64 before = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		before += b2Cross(positionBuffer[i], velocityBuffer[i]);
@@ -141,7 +141,7 @@ TEST_F(ConservationTests, AngularMomentum) {
 
 TEST_F(ConservationTests, KineticEnergy) {
 	int32 particleCount = m_particleSystem->GetParticleCount();
-	const b2Vec2 *velocityBuffer = m_particleSystem->GetParticleVelocityBuffer();
+	const b2Vec2 *velocityBuffer = m_particleSystem->GetVelocityBuffer();
 	float64 before = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		b2Vec2 v = velocityBuffer[i];

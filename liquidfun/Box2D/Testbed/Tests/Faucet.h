@@ -30,9 +30,9 @@ public:
 		m_emitRate(120.0f)
 	{
 		// Configure particle system parameters.
-		m_particleSystem->SetParticleRadius(0.035f);
-		m_particleSystem->SetParticleMaxCount(k_maxParticleCount);
-		m_particleSystem->SetParticleDestructionByAge(true);
+		m_particleSystem->SetRadius(0.035f);
+		m_particleSystem->SetMaxParticleCount(k_maxParticleCount);
+		m_particleSystem->SetDestructionByAge(true);
 
 		b2Body* ground = NULL;
 		{
@@ -67,7 +67,7 @@ public:
 		{
 			b2PolygonShape shape;
 			const float32 particleDiameter =
-				m_particleSystem->GetParticleRadius() * 2.0f;
+				m_particleSystem->GetRadius() * 2.0f;
 			const float32 faucetLength = k_faucetLength * particleDiameter;
 			// Dimensions of the faucet in world units.
 			const float32 length = faucetLength * k_spoutLength;
@@ -110,7 +110,7 @@ public:
 		const float32 particles = (m_emitRate * dt) + m_emitRemainder;
 		const int32 particlesToCreate = (int32)particles;
 		const float32 faucetLength =
-			m_particleSystem->GetParticleRadius() * 2.0f * k_faucetLength;
+			m_particleSystem->GetRadius() * 2.0f * k_faucetLength;
 		b2ParticleDef particleDef;
 
 		// Propagate the currently selected particle flags.
@@ -140,7 +140,7 @@ public:
 						(k_particleLifetimeMax - k_particleLifetimeMin) +
 						k_particleLifetimeMin);
 			// Set the particle's color.
-			m_particleSystem->GetParticleColorBuffer()[index] = color;
+			m_particleSystem->GetColorBuffer()[index] = color;
 		}
 		m_emitRemainder = (float32)(particles - particlesToCreate);
 

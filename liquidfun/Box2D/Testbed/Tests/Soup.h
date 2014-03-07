@@ -63,7 +63,7 @@ public:
 			}
 		}
 
-		m_particleSystem->SetParticleRadius(0.035f);
+		m_particleSystem->SetRadius(0.035f);
 		{
 			b2PolygonShape shape;
 			shape.SetAsBox(2, 1, b2Vec2(0, 1), 0);

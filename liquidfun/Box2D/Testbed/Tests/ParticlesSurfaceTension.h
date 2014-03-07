@@ -63,7 +63,7 @@ public:
 			}
 		}
 
-		m_particleSystem->SetParticleRadius(0.035f);
+		m_particleSystem->SetRadius(0.035f);
 
 		{
 			b2CircleShape shape;

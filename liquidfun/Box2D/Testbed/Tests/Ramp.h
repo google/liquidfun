@@ -57,11 +57,11 @@ public:
 			}
 		}
 
-		m_particleSystem->SetParticleRadius(0.05f);
+		m_particleSystem->SetRadius(0.05f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
 		if (particleType == b2_waterParticle)
 		{
-			m_particleSystem->SetParticleDamping(0.2f);
+			m_particleSystem->SetDamping(0.2f);
 		}
 
 		{

@@ -107,7 +107,7 @@ public:
 	virtual void SayGoodbye(int32 index)
 	{
 		m_userData.push_back(
-			m_particleSystem->GetParticleUserDataBuffer()[index]);
+			m_particleSystem->GetUserDataBuffer()[index]);
 	}
 
 	// Get the vector of destroyed particle user data.
@@ -145,7 +145,7 @@ public:
 	{
 		void *handle =
 			reinterpret_cast<void*>(
-				m_particleSystem->GetParticleUserDataBuffer()[index]);
+				m_particleSystem->GetUserDataBuffer()[index]);
 		// Make sure this particle is being tracked.
 		std::map<void*, float>::iterator it =
 			m_particleLifetime.find(handle);
@@ -171,7 +171,7 @@ public:
 			m_particleSystem->SetParticleFlags(
 				index, m_particleSystem->GetParticleFlags(index) |
 					   b2_destructionListener);
-			m_particleSystem->GetParticleUserDataBuffer()[index] = handle;
+			m_particleSystem->GetUserDataBuffer()[index] = handle;
 			m_particleLifetime[handle] =
 				m_particleSystem->GetParticleLifetime(index);
 		}
@@ -214,7 +214,7 @@ public:
 		const int32 numberOfParticles =
 			m_particleSystem->GetParticleCount();
 		const int32* const expirationTimes =
-			m_particleSystem->GetParticleExpirationTimeBuffer();
+			m_particleSystem->GetExpirationTimeBuffer();
 		ASSERT_TRUE(expirationTimes != NULL);
 
 		int32 oldestFiniteExpirationTimeIndex = b2_invalidParticleIndex;
@@ -265,14 +265,14 @@ TEST_F(FunctionTests, CreateParticle) {
 	int index = m_particleSystem->CreateParticle(def);
 	EXPECT_EQ(index, 0);
 	EXPECT_EQ(m_particleSystem->GetParticleCount(), 1);
-	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer()[index], def.flags);
-	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer()[index], def.position);
-	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer()[index], def.velocity);
-	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer()[index].r, def.color.r);
-	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer()[index].g, def.color.g);
-	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer()[index].b, def.color.b);
-	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer()[index].a, def.color.a);
-	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer()[index], def.userData);
+	EXPECT_EQ(m_particleSystem->GetFlagsBuffer()[index], def.flags);
+	EXPECT_EQ(m_particleSystem->GetPositionBuffer()[index], def.position);
+	EXPECT_EQ(m_particleSystem->GetVelocityBuffer()[index], def.velocity);
+	EXPECT_EQ(m_particleSystem->GetColorBuffer()[index].r, def.color.r);
+	EXPECT_EQ(m_particleSystem->GetColorBuffer()[index].g, def.color.g);
+	EXPECT_EQ(m_particleSystem->GetColorBuffer()[index].b, def.color.b);
+	EXPECT_EQ(m_particleSystem->GetColorBuffer()[index].a, def.color.a);
+	EXPECT_EQ(m_particleSystem->GetUserDataBuffer()[index], def.userData);
 }
 
 TEST_F(FunctionTests, CreateParticleInExistingGroup) {
@@ -297,8 +297,8 @@ TEST_F(FunctionTests, CreateParticleInExistingGroup) {
 	EXPECT_EQ(m_particleSystem->GetParticleCount(), 20);
 	EXPECT_EQ(groupA->GetParticleCount(), 10);
 	EXPECT_EQ(groupB->GetParticleCount(), 10);
-	b2Vec2 *positionBuffer = m_particleSystem->GetParticlePositionBuffer();
-	b2ParticleGroup *const *groupBuffer = m_particleSystem->GetParticleGroupBuffer();
+	b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
+	b2ParticleGroup *const *groupBuffer = m_particleSystem->GetGroupBuffer();
 	for (int i = 0; i < 10; i++)
 	{
 		int a = groupA->GetBufferIndex() + i;
@@ -312,32 +312,32 @@ TEST_F(FunctionTests, CreateParticleInExistingGroup) {
 
 TEST_F(FunctionTests, ParticleRadius) {
 	float r = 12.3f;
-	m_particleSystem->SetParticleRadius(r);
-	EXPECT_EQ(m_particleSystem->GetParticleRadius(), r);
+	m_particleSystem->SetRadius(r);
+	EXPECT_EQ(m_particleSystem->GetRadius(), r);
 }
 
 TEST_F(FunctionTests, ParticleDensity) {
 	float r = 12.3f;
-	m_particleSystem->SetParticleDensity(r);
-	EXPECT_EQ(m_particleSystem->GetParticleDensity(), r);
+	m_particleSystem->SetDensity(r);
+	EXPECT_EQ(m_particleSystem->GetDensity(), r);
 }
 
 TEST_F(FunctionTests, ParticleGravityScale) {
 	float g = 12.3f;
-	m_particleSystem->SetParticleGravityScale(g);
-	EXPECT_EQ(m_particleSystem->GetParticleGravityScale(), g);
+	m_particleSystem->SetGravityScale(g);
+	EXPECT_EQ(m_particleSystem->GetGravityScale(), g);
 }
 
 TEST_F(FunctionTests, ParticleDamping) {
 	float r = 12.3f;
-	m_particleSystem->SetParticleDamping(r);
-	EXPECT_EQ(m_particleSystem->GetParticleDamping(), r);
+	m_particleSystem->SetDamping(r);
+	EXPECT_EQ(m_particleSystem->GetDamping(), r);
 }
 
 TEST_F(FunctionTests, ParticleStaticPressureItearations) {
 	int n = 123;
-	m_particleSystem->SetParticleStaticPressureIterations(n);
-	EXPECT_EQ(m_particleSystem->GetParticleStaticPressureIterations(), n);
+	m_particleSystem->SetStaticPressureIterations(n);
+	EXPECT_EQ(m_particleSystem->GetStaticPressureIterations(), n);
 }
 
 // Verify that it's possible to destroy a particle using
@@ -422,11 +422,11 @@ TEST_F(FunctionTests, CreateParticleGroupWithCustomStride) {
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	def.stride = 1 * m_particleSystem->GetParticleRadius();
+	def.stride = 1 * m_particleSystem->GetRadius();
 	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
-	def.stride = 2 * m_particleSystem->GetParticleRadius();
+	def.stride = 2 * m_particleSystem->GetRadius();
 	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
-	def.stride = 3 * m_particleSystem->GetParticleRadius();
+	def.stride = 3 * m_particleSystem->GetRadius();
 	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
 	EXPECT_GT(group1->GetParticleCount(), group2->GetParticleCount());
 	EXPECT_GT(group2->GetParticleCount(), group3->GetParticleCount());
@@ -445,7 +445,7 @@ TEST_F(FunctionTests, CreateEmptyParticleGroupWithNoShape) {
 	EXPECT_GT(m_particleSystem->GetParticleCount(), 0);
 	EXPECT_GT(group->GetParticleCount(), 0);
 	m_world->Step(0.01f, 1, 1, 1);
-	m_particleSystem->DestroyParticlesInGroup(group, true);
+	group->DestroyParticles(true);
 	m_world->Step(0.01f, 1, 1, 1);
 	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 	EXPECT_EQ(group->GetParticleCount(), 0);
@@ -464,7 +464,7 @@ TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
 	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
 	EXPECT_EQ(m_particleSystem->GetParticleCount(), particleCount);
 	EXPECT_EQ(group->GetParticleCount(), particleCount);
-	const b2Vec2 *positionBuffer = m_particleSystem->GetParticlePositionBuffer();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
 	for (int32 i = 0; i < particleCount; i++)
 	{
 		ASSERT_EQ(positionBuffer[i].x, (float32) i);
@@ -489,7 +489,7 @@ TEST_F(FunctionTests, CreateParticleGroupInExistingGroup) {
 
 TEST_F(FunctionTests, DestroyParticleGroup) {
 	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_particleSystem);
-	m_particleSystem->DestroyParticlesInGroup(group);
+	group->DestroyParticles();
 	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 1);
 	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 0);
@@ -504,18 +504,18 @@ TEST_F(FunctionTests, GetParticleBuffer) {
 	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
 	EXPECT_EQ(group->GetBufferIndex(), 0);
 	const b2ParticleSystem *constParticleSystem = m_particleSystem;
-	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer(),
-			  constParticleSystem->GetParticleFlagsBuffer());
-	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer(),
-			  constParticleSystem->GetParticlePositionBuffer());
-	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer(),
-			  constParticleSystem->GetParticleVelocityBuffer());
-	EXPECT_EQ(m_particleSystem->GetParticleGroupBuffer(),
-			  constParticleSystem->GetParticleGroupBuffer());
-	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer(),
-			  constParticleSystem->GetParticleColorBuffer());
-	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer(),
-			  constParticleSystem->GetParticleUserDataBuffer());
+	EXPECT_EQ(m_particleSystem->GetFlagsBuffer(),
+			  constParticleSystem->GetFlagsBuffer());
+	EXPECT_EQ(m_particleSystem->GetPositionBuffer(),
+			  constParticleSystem->GetPositionBuffer());
+	EXPECT_EQ(m_particleSystem->GetVelocityBuffer(),
+			  constParticleSystem->GetVelocityBuffer());
+	EXPECT_EQ(m_particleSystem->GetGroupBuffer(),
+			  constParticleSystem->GetGroupBuffer());
+	EXPECT_EQ(m_particleSystem->GetColorBuffer(),
+			  constParticleSystem->GetColorBuffer());
+	EXPECT_EQ(m_particleSystem->GetUserDataBuffer(),
+			  constParticleSystem->GetUserDataBuffer());
 	const b2ParticleGroup *constGroup = group;
 	EXPECT_EQ(group->GetBufferIndex(), constGroup->GetBufferIndex());
 }
@@ -527,42 +527,42 @@ TEST_F(FunctionTests, SetParticleBuffer) {
 	b2Vec2 velocityBuffer[size];
 	b2ParticleColor colorBuffer[size];
 	void *userDataBuffer[size];
-	m_particleSystem->SetParticleFlagsBuffer(flagsBuffer, size);
-	m_particleSystem->SetParticlePositionBuffer(positionBuffer, size);
-	m_particleSystem->SetParticleVelocityBuffer(velocityBuffer, size);
-	m_particleSystem->SetParticleColorBuffer(colorBuffer, size);
-	m_particleSystem->SetParticleUserDataBuffer(userDataBuffer, size);
-	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer(), flagsBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer(), positionBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer(), velocityBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer(), colorBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer(), userDataBuffer);
+	m_particleSystem->SetFlagsBuffer(flagsBuffer, size);
+	m_particleSystem->SetPositionBuffer(positionBuffer, size);
+	m_particleSystem->SetVelocityBuffer(velocityBuffer, size);
+	m_particleSystem->SetColorBuffer(colorBuffer, size);
+	m_particleSystem->SetUserDataBuffer(userDataBuffer, size);
+	EXPECT_EQ(m_particleSystem->GetFlagsBuffer(), flagsBuffer);
+	EXPECT_EQ(m_particleSystem->GetPositionBuffer(), positionBuffer);
+	EXPECT_EQ(m_particleSystem->GetVelocityBuffer(), velocityBuffer);
+	EXPECT_EQ(m_particleSystem->GetColorBuffer(), colorBuffer);
+	EXPECT_EQ(m_particleSystem->GetUserDataBuffer(), userDataBuffer);
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
 	m_particleSystem->CreateParticleGroup(def);
 	EXPECT_LE(m_particleSystem->GetParticleCount(), size);
-	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer(), flagsBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer(), positionBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer(), velocityBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer(), colorBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer(), userDataBuffer);
+	EXPECT_EQ(m_particleSystem->GetFlagsBuffer(), flagsBuffer);
+	EXPECT_EQ(m_particleSystem->GetPositionBuffer(), positionBuffer);
+	EXPECT_EQ(m_particleSystem->GetVelocityBuffer(), velocityBuffer);
+	EXPECT_EQ(m_particleSystem->GetColorBuffer(), colorBuffer);
+	EXPECT_EQ(m_particleSystem->GetUserDataBuffer(), userDataBuffer);
 	uint32 newFlagsBuffer[size];
 	b2Vec2 newPositionBuffer[size];
 	b2Vec2 newVelocityBuffer[size];
 	b2ParticleColor newColorBuffer[size];
 	void *newUserDataBuffer[size];
-	m_particleSystem->SetParticleFlagsBuffer(newFlagsBuffer, size);
-	m_particleSystem->SetParticlePositionBuffer(newPositionBuffer, size);
-	m_particleSystem->SetParticleVelocityBuffer(newVelocityBuffer, size);
-	m_particleSystem->SetParticleColorBuffer(newColorBuffer, size);
-	m_particleSystem->SetParticleUserDataBuffer(newUserDataBuffer, size);
-	EXPECT_EQ(m_particleSystem->GetParticleFlagsBuffer(), newFlagsBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticlePositionBuffer(), newPositionBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleVelocityBuffer(), newVelocityBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleColorBuffer(), newColorBuffer);
-	EXPECT_EQ(m_particleSystem->GetParticleUserDataBuffer(), newUserDataBuffer);
+	m_particleSystem->SetFlagsBuffer(newFlagsBuffer, size);
+	m_particleSystem->SetPositionBuffer(newPositionBuffer, size);
+	m_particleSystem->SetVelocityBuffer(newVelocityBuffer, size);
+	m_particleSystem->SetColorBuffer(newColorBuffer, size);
+	m_particleSystem->SetUserDataBuffer(newUserDataBuffer, size);
+	EXPECT_EQ(m_particleSystem->GetFlagsBuffer(), newFlagsBuffer);
+	EXPECT_EQ(m_particleSystem->GetPositionBuffer(), newPositionBuffer);
+	EXPECT_EQ(m_particleSystem->GetVelocityBuffer(), newVelocityBuffer);
+	EXPECT_EQ(m_particleSystem->GetColorBuffer(), newColorBuffer);
+	EXPECT_EQ(m_particleSystem->GetUserDataBuffer(), newUserDataBuffer);
 }
 
 TEST_F(FunctionTests, GroupData) {
@@ -649,7 +649,7 @@ TEST_F(FunctionTests, GroupBuffer) {
 	shape.SetAsBox(10, 30);
 	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
 	const b2ParticleGroup *const *groupBuffer =
-		m_particleSystem->GetParticleGroupBuffer();
+		m_particleSystem->GetGroupBuffer();
 	int32 offset1 = group1->GetBufferIndex();
 	int32 count1 = group1->GetParticleCount();
 	for (int32 i = 0; i < count1; i++) {
@@ -666,9 +666,9 @@ TEST_F(FunctionTests, GroupBuffer) {
 		ASSERT_EQ(group3, groupBuffer[offset3 + i]);
 	}
 	m_particleSystem->JoinParticleGroups(group1, group2);
-	m_particleSystem->DestroyParticlesInGroup(group3);
+	group3->DestroyParticles();
 	m_world->Step(0.001f, 1, 1);
-	groupBuffer = m_particleSystem->GetParticleGroupBuffer();
+	groupBuffer = m_particleSystem->GetGroupBuffer();
 	int32 count = m_particleSystem->GetParticleCount();
 	for (int32 i = 0; i < count; i++) {
 		ASSERT_EQ(group1, groupBuffer[i]);
@@ -681,8 +681,8 @@ TEST_F(FunctionTests, GetParticleContact) {
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
 	m_particleSystem->CreateParticleGroup(def);
-	EXPECT_NE(m_particleSystem->GetParticleContactCount(), 0);
-	EXPECT_NE(m_particleSystem->GetParticleContacts(), (const b2ParticleContact *)NULL);
+	EXPECT_NE(m_particleSystem->GetContactCount(), 0);
+	EXPECT_NE(m_particleSystem->GetContacts(), (const b2ParticleContact *)NULL);
 }
 
 TEST_F(FunctionTests, GetParticleBodyContact) {
@@ -695,18 +695,18 @@ TEST_F(FunctionTests, GetParticleBodyContact) {
 	b2Body *body = m_world->CreateBody(&bodyDef);
 	body->CreateFixture(&shape, 1.0);
 	m_world->Step(0.001f, 1, 1);
-	EXPECT_NE(m_particleSystem->GetParticleBodyContactCount(), 0);
-	EXPECT_NE(m_particleSystem->GetParticleBodyContacts(),
+	EXPECT_NE(m_particleSystem->GetBodyContactCount(), 0);
+	EXPECT_NE(m_particleSystem->GetBodyContacts(),
 			  (const b2ParticleBodyContact *)NULL);
 }
 
-TEST_F(FunctionTests, ComputeParticleCollisionEnergy) {
+TEST_F(FunctionTests, ComputeCollisionEnergy) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
 	m_particleSystem->CreateParticleGroup(def);
-	EXPECT_EQ(m_particleSystem->ComputeParticleCollisionEnergy(), 0);
+	EXPECT_EQ(m_particleSystem->ComputeCollisionEnergy(), 0);
 
 	def.position.Set(20, 0);
 	def.linearVelocity.Set(-1, 0);
@@ -715,11 +715,11 @@ TEST_F(FunctionTests, ComputeParticleCollisionEnergy) {
 	{
 		m_world->Step(0.1f, 1, 1);
 	}
-	EXPECT_NE(m_particleSystem->ComputeParticleCollisionEnergy(), 0);
+	EXPECT_NE(m_particleSystem->ComputeCollisionEnergy(), 0);
 }
 
-TEST_F(FunctionTests, PauseSimulation) {
-	EXPECT_FALSE(m_particleSystem->IsSimulationPaused());
+TEST_F(FunctionTests, SetPaused) {
+	EXPECT_FALSE(m_particleSystem->GetPaused());
 
 	b2ParticleDef def;
 	def.flags = b2_elasticParticle | b2_springParticle;
@@ -730,7 +730,7 @@ TEST_F(FunctionTests, PauseSimulation) {
 	m_particleSystem->CreateParticle(def);
 
 	// Step the simulation to ensure the particle is moving.
-	const b2Vec2* positions = m_particleSystem->GetParticlePositionBuffer();
+	const b2Vec2* positions = m_particleSystem->GetPositionBuffer();
 	const b2Vec2 initialPosition = positions[0];
 	m_world->Step(0.1f, 1, 1);
 	const b2Vec2 steppedPosition = positions[0];
@@ -738,14 +738,14 @@ TEST_F(FunctionTests, PauseSimulation) {
 
 	// Pause the particle system, then step simulation again.
 	// Ensure the particle hasn't moved.
-	m_particleSystem->PauseSimulation(true);
-	EXPECT_TRUE(m_particleSystem->IsSimulationPaused());
+	m_particleSystem->SetPaused(true);
+	EXPECT_TRUE(m_particleSystem->GetPaused());
 	m_world->Step(0.1f, 1, 1);
 	EXPECT_EQ(steppedPosition, positions[0]);
 
 	// Unpause the particle system. Ensure the particle is moving again.
-	m_particleSystem->PauseSimulation(false);
-	EXPECT_FALSE(m_particleSystem->IsSimulationPaused());
+	m_particleSystem->SetPaused(false);
+	EXPECT_FALSE(m_particleSystem->GetPaused());
 	m_world->Step(0.1f, 1, 1);
 	EXPECT_NE(steppedPosition, positions[0]);
 }
@@ -789,7 +789,7 @@ TEST_F(FunctionTests, ParticleHandleTrackCompactParticles)
 		// NOTE: The user data buffer is retrieved each time since it's
 		// possible for the particle system to reallocate it when particles are
 		// created.
-		system->GetParticleUserDataBuffer()[particleIndex] =
+		system->GetUserDataBuffer()[particleIndex] =
 			&expectedUserData[i];
 		expectedUserData[i] = i;
 	}
@@ -802,7 +802,7 @@ TEST_F(FunctionTests, ParticleHandleTrackCompactParticles)
 	for (int32 i = 0; i < kNumberOfHandles; ++i)
 	{
 		const int32 particleIndex = handles[i]->GetIndex();
-		EXPECT_EQ(*(((int32**)system->GetParticleUserDataBuffer())[
+		EXPECT_EQ(*(((int32**)system->GetUserDataBuffer())[
 						particleIndex]), i);
 	}
 
@@ -824,7 +824,7 @@ TEST_F(FunctionTests, ParticleHandleTrackCompactParticles)
 	for (int32 i = 1; i < kNumberOfHandles; i += 2)
 	{
 		const int32 particleIndex = handles[i]->GetIndex();
-		EXPECT_EQ(*(((int32**)system->GetParticleUserDataBuffer())[
+		EXPECT_EQ(*(((int32**)system->GetUserDataBuffer())[
 						particleIndex]), i);
 	}
 }
@@ -875,7 +875,7 @@ TEST_F(FunctionTests, ParticleHandlesTrackGroups)
 		particleHandles[i] = system->GetParticleHandleFromIndex(
 			particleIndex);
 		expectedGroupData[i] = i;
-		system->GetParticleUserDataBuffer()[particleIndex] =
+		system->GetUserDataBuffer()[particleIndex] =
 			&expectedGroupData[i];
 	}
 
@@ -893,7 +893,7 @@ TEST_F(FunctionTests, ParticleHandlesTrackGroups)
 	for (int32 i = 0; i < numberOfGroupParticles; ++i)
 	{
 		EXPECT_EQ(expectedGroupData[i],
-				  *((int32*)system->GetParticleUserDataBuffer()[
+				  *((int32*)system->GetUserDataBuffer()[
 						particleHandles[i]->GetIndex()]));
 	}
 }
@@ -901,7 +901,7 @@ TEST_F(FunctionTests, ParticleHandlesTrackGroups)
 // Test the conversion of particle expiration times to lifetimes.
 TEST_F(FunctionTests, ConvertExpirationTimeToLifetime)
 {
-	m_particleSystem->SetParticleDestructionByAge(true);
+	m_particleSystem->SetDestructionByAge(true);
 	EXPECT_EQ(m_particleSystemDef.lifetimeGranularity,
 			  m_particleSystem->ExpirationTimeToLifetime(1));
 }
@@ -909,9 +909,9 @@ TEST_F(FunctionTests, ConvertExpirationTimeToLifetime)
 // Get the particle expiration time buffers with no particles present.
 TEST_F(FunctionTests, NoParticlesGetExpirationTimeBuffers)
 {
-	EXPECT_TRUE(NULL != m_particleSystem->GetParticleExpirationTimeBuffer());
+	EXPECT_TRUE(NULL != m_particleSystem->GetExpirationTimeBuffer());
 	EXPECT_TRUE(NULL !=
-				m_particleSystem->GetParticleIndexByExpirationTimeBuffer());
+				m_particleSystem->GetIndexByExpirationTimeBuffer());
 }
 
 // Ensure the default lifetime of particles is infinite.
@@ -923,7 +923,7 @@ TEST_F(FunctionTests, GetParticleLifetime)
 }
 
 // Get particle expiration time buffers after creating some particles.
-TEST_F(FunctionTests, GetParticleExpirationTimeBuffers)
+TEST_F(FunctionTests, GetExpirationTimeBuffers)
 {
 	const float32 expirationTimeEpislon =
 		m_particleSystemDef.lifetimeGranularity;
@@ -939,9 +939,9 @@ TEST_F(FunctionTests, GetParticleExpirationTimeBuffers)
 	m_world->Step(m_particleSystemDef.lifetimeGranularity, 1, 1);
 
 	const int32* const expirationTimes =
-		m_particleSystem->GetParticleExpirationTimeBuffer();
+		m_particleSystem->GetExpirationTimeBuffer();
 	const int32* const indexByLifetime =
-		m_particleSystem->GetParticleIndexByExpirationTimeBuffer();
+		m_particleSystem->GetIndexByExpirationTimeBuffer();
 	ASSERT_TRUE(expirationTimes != NULL);
 	ASSERT_TRUE(indexByLifetime != NULL);
 
@@ -1033,16 +1033,16 @@ TEST_F(FunctionTests, CreateMultipleParticlesWithInfiniteLifetimes)
 	static const float32 simulationPeriod =
 		m_particleSystemDef.lifetimeGranularity;
 	b2ParticleDef def;
-	m_particleSystem->SetParticleDestructionByAge(true);
+	m_particleSystem->SetDestructionByAge(true);
 	for (int32 i = 0; i < 10; ++i)
 	{
 		m_particleSystem->CreateParticle(def);
 		m_world->Step(simulationPeriod, 1, 1);
 	}
 	const int32* const expirationTimes =
-		m_particleSystem->GetParticleExpirationTimeBuffer();
+		m_particleSystem->GetExpirationTimeBuffer();
 	const int32* const indexByExpirationTime =
-		m_particleSystem->GetParticleIndexByExpirationTimeBuffer();
+		m_particleSystem->GetIndexByExpirationTimeBuffer();
 	ASSERT_TRUE(expirationTimes != NULL);
 	ASSERT_TRUE(indexByExpirationTime != NULL);
 
@@ -1158,12 +1158,12 @@ TEST_F(FunctionTests, DestroyOldestParticle)
 	int32 age[numberOfParticles];
 	UserDataDestructionTracker userDataTracker(m_world, m_particleSystem);
 	b2ParticleDef def;
-	m_particleSystem->SetParticleDestructionByAge(true);
+	m_particleSystem->SetDestructionByAge(true);
 	for (int32 i = 0; i < numberOfParticles; ++i)
 	{
 		const int32 index = m_particleSystem->CreateParticle(def);
 		age[i] = i;
-		m_particleSystem->GetParticleUserDataBuffer()[index] = &age[i];
+		m_particleSystem->GetUserDataBuffer()[index] = &age[i];
 		m_world->Step(0.1f, 1, 1);
 	}
 	// Destroy the particles, oldest first.
@@ -1191,8 +1191,8 @@ TEST_F(FunctionTests, LimitParticleCountUsingLifetime)
 	static const int32 particleLimit = 10;
 	b2ParticleDef def;
 	OldestParticleDestroyedChecker checker(m_world, m_particleSystem);
-	m_particleSystem->SetParticleMaxCount(particleLimit);
-	m_particleSystem->SetParticleDestructionByAge(true);
+	m_particleSystem->SetMaxParticleCount(particleLimit);
+	m_particleSystem->SetDestructionByAge(true);
 	for (int32 i = 0; i < particleLimit; ++i)
 	{
 		const int32 index = m_particleSystem->CreateParticle(def);

@@ -63,9 +63,9 @@ public:
 			}
 		}
 
-		m_particleSystem->SetParticleRadius(0.035f);
+		m_particleSystem->SetRadius(0.035f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
-		m_particleSystem->SetParticleDamping(0.2f);
+		m_particleSystem->SetDamping(0.2f);
 
 		{
 			b2CircleShape shape;

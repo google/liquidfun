@@ -69,11 +69,11 @@ public:
 		// Cap the number of generated particles or we'll fill forever
 		m_particlesToCreate = 2000;
 
-		m_particleSystem->SetParticleRadius(0.1f);
+		m_particleSystem->SetRadius(0.1f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
 		if (particleType == b2_waterParticle)
 		{
-			m_particleSystem->SetParticleDamping(0.2f);
+			m_particleSystem->SetDamping(0.2f);
 		}
 	}
 

@@ -183,7 +183,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_density = 1;
 	m_inverseDensity = 1;
 	m_gravityScale = 1;
-	SetParticleRadius(def->particleRadius);
+	SetRadius(def->particleRadius);
 
 	m_count = 0;
 	m_internalAllocatedCapacity = 0;
@@ -463,7 +463,7 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	if (m_count >= m_internalAllocatedCapacity)
 	{
 		// Double the particle capacity.
-		int32 capacity = 
+		int32 capacity =
 			m_count ? 2 * m_count : b2_minParticleSystemBufferCapacity;
 		ReallocateInternalAllocatedBuffers(capacity);
 	}
@@ -2898,7 +2898,7 @@ void b2ParticleSystem::SetParticleLifetime(const int32 index,
 }
 
 
-/// Convert a lifetime value in returned by GetParticleExpirationTimeBuffer()
+/// Convert a lifetime value in returned by GetExpirationTimeBuffer()
 /// to a value in seconds relative to the current simulation time.
 float32 b2ParticleSystem::ExpirationTimeToLifetime(
 	const int32 expirationTime) const
@@ -2913,7 +2913,7 @@ float32 b2ParticleSystem::ExpirationTimeToLifetime(
 float32 b2ParticleSystem::GetParticleLifetime(const int32 index)
 {
 	b2Assert(ValidateParticleIndex(index));
-	return ExpirationTimeToLifetime(GetParticleExpirationTimeBuffer()[index]);
+	return ExpirationTimeToLifetime(GetExpirationTimeBuffer()[index]);
 }
 
 /// Get the array of particle lifetimes indexed by particle index.
@@ -2926,8 +2926,8 @@ const int32* b2ParticleSystem::GetExpirationTimeBuffer()
 }
 
 /// Get the array of particle indices ordered by lifetime.
-/// GetParticleExpirationTimeBuffer(
-///    GetParticleIndexByExpirationTimeBuffer()[index])
+/// GetExpirationTimeBuffer(
+///    GetIndexByExpirationTimeBuffer()[index])
 /// is equivalent to GetParticleLifetime(index).
 /// GetParticleCount() items are in the returned array.
 const int32* b2ParticleSystem::GetIndexByExpirationTimeBuffer()
@@ -2949,7 +2949,7 @@ void b2ParticleSystem::SetDestructionByAge(const bool enable)
 {
 	if (enable)
 	{
-		GetParticleExpirationTimeBuffer();
+		GetExpirationTimeBuffer();
 	}
 	m_def.destroyByAge = enable;
 }

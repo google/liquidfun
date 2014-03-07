@@ -350,7 +350,7 @@ information on the LiquidFun solver, see Chapter 1. Introduction.)
 m_world->CreateParticleGroup(pd);`<br/>
 &nbsp;&nbsp;&nbsp;`for (int32 i=0;i<group->GetParticleCount();i+=2)`<br/>
 &nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`group->GetParticleFlagsBuffer()[i] |=`
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`group->GetFlagsBuffer()[i] |=`
 `b2_zombieParticle;`<br/>
 &nbsp;&nbsp;&nbsp;`}`
 
@@ -387,7 +387,7 @@ takes a value of 0-255.
 
 Set particle size using the statement
 
-&nbsp;&nbsp;&nbsp;`m_world->SetParticleRadius®;`
+&nbsp;&nbsp;&nbsp;`m_world->SetRadius®;`
 
 where `r` is a float32 value greater than 0.0f. Its default value is 1.0f.<br/>
 There are two points to keep in mind when using small particles. First, in the
@@ -404,7 +404,7 @@ Note that
 
 Set gravity scale using the statement
 
-&nbsp;&nbsp;&nbsp;`m_world->SetParticleGravityScale(g);`
+&nbsp;&nbsp;&nbsp;`m_world->SetGravityScale(g);`
 
 where `g` is a float32 value.
 

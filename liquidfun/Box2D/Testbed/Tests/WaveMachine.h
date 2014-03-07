@@ -60,9 +60,9 @@ public:
 			m_joint = (b2RevoluteJoint*)m_world->CreateJoint(&jd);
 		}
 
-		m_particleSystem->SetParticleRadius(0.025f);
+		m_particleSystem->SetRadius(0.025f);
 		const uint32 particleType = TestMain::GetParticleParameterValue();
-		m_particleSystem->SetParticleDamping(0.2f);
+		m_particleSystem->SetDamping(0.2f);
 
 		{
 			b2ParticleGroupDef pd;

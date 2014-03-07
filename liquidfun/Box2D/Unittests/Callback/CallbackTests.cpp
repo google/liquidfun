@@ -327,7 +327,7 @@ TEST_F(CallbackTests, DestroyParticleGroupWithCallback) {
 	DestructionListener listener;
 	m_world->SetDestructionListener(&listener);
 	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_particleSystem);
-	m_particleSystem->DestroyParticlesInGroup(group);
+	group->DestroyParticles();
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 0U);
 	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 1U);

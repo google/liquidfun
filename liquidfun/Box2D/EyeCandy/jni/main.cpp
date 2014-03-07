@@ -620,8 +620,8 @@ public:
     particleSystemDef.dampingStrength = 0.2f;
     particleSystemDef.particleRadius = 0.3f;
     particleSystem_ = world_->CreateParticleSystem(&particleSystemDef);
-    particleSystem_->SetParticleGravityScale(0.4f);
-    particleSystem_->SetParticleDensity(1.2f);
+    particleSystem_->SetGravityScale(0.4f);
+    particleSystem_->SetDensity(1.2f);
 
     b2BodyDef bdg;
     b2Body* ground = world_->CreateBody(&bdg);
@@ -694,7 +694,7 @@ public:
     joint_->SetMotorSpeed(0.7f * cos(time));
 
     world_->Step(framedelta, 8, 3); /*, b2CalculateParticleIterations(10,
-                                   world_->GetParticleRadius(), framedelta)); */
+                                   world_->GetRadius(), framedelta)); */
 
     // Make sure we always have enough sizes in our array, if particles
     // were added dynamically.
@@ -704,7 +704,7 @@ public:
              < particleSystem_->GetParticleCount()) {
       particle_sizes_.push_back((rand() / static_cast<float>(RAND_MAX)
                                        * 0.8f + 1.5f)
-                                      * particleSystem_->GetParticleRadius());
+                                      * particleSystem_->GetRadius());
     }
 
     glDisable(GL_DEPTH_TEST);
@@ -750,7 +750,7 @@ public:
   void DrawParticleBuffers(const EyeCandyShader &sh) {
     glVertexAttribPointer(sh.position_handle, 2, GL_FLOAT,
                     GL_FALSE, 0,
-                    &particleSystem_->GetParticlePositionBuffer()->x);
+                    &particleSystem_->GetPositionBuffer()->x);
     glEnableVertexAttribArray(sh.position_handle);
 
     glVertexAttribPointer(sh.particlesize_handle, 1, GL_FLOAT,

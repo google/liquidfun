@@ -130,15 +130,15 @@ TEST_F(MultipleParticleSystemsTests, IdenticalSimulations) {
 		m_world->Step(timeStep, velocityIterations, positionIterations);
 
 		for (int j = 0; j < kNumParticleSystems; ++j) {
-			contacts[j] += m_particleSystems[j]->GetParticleBodyContactCount();
+			contacts[j] += m_particleSystems[j]->GetBodyContactCount();
 		}
 	}
 
 	// Verify that all the particle systems are in the same state.
 	const b2Vec2* positions0 =
-		m_particleSystems[0]->GetParticlePositionBuffer();
+		m_particleSystems[0]->GetPositionBuffer();
 	const b2Vec2* velocities0 =
-		m_particleSystems[0]->GetParticleVelocityBuffer();
+		m_particleSystems[0]->GetVelocityBuffer();
 	for (int j = 1; j < kNumParticleSystems; ++j) {
 		// Check that the particle count matches.
 		const int32 particleCount = m_particleSystems[0]->GetParticleCount();
@@ -146,9 +146,9 @@ TEST_F(MultipleParticleSystemsTests, IdenticalSimulations) {
 
 		// Check that the particle positions and velocities match.
 		const b2Vec2* positionsJ =
-			m_particleSystems[j]->GetParticlePositionBuffer();
+			m_particleSystems[j]->GetPositionBuffer();
 		const b2Vec2* velocitiesJ =
-			m_particleSystems[j]->GetParticleVelocityBuffer();
+			m_particleSystems[j]->GetVelocityBuffer();
 		for (int k = 0; k < particleCount; ++k ) {
 			EXPECT_EQ(positions0[k], positionsJ[k]) << "Positions differ";
 			EXPECT_EQ(velocities0[k], velocitiesJ[k]) << "Velocities differ";
