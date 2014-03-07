@@ -86,6 +86,18 @@ public:
 		// now lie on or in the fixture generating
 		if (!contact.fixture->TestPoint(pos))
 		{
+			int32 childCount = contact.fixture->GetShape()->GetChildCount();
+			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+			{
+				float32 distance;
+				b2Vec2 normal;
+				contact.fixture->ComputeDistance(pos, &distance, &normal,
+																	childIndex);
+				if (distance < b2_linearSlop)
+				{
+					return false;
+				}
+			}
 			++(*m_discarded);
 			return true;
 		}
