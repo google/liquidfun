@@ -93,6 +93,7 @@
 #include "RigidParticles.h"
 #include "Sandbox.h"
 #include "Soup.h"
+#include "SoupStirrer.h"
 #include "Sparky.h"
 #include "WaveMachine.h"
 
@@ -111,6 +112,7 @@ TestEntry g_testEntries[] =
 	{"Elastic Particles", ElasticParticles::Create},
 	{"Rigid Particles", RigidParticles::Create},
 	{"Impulse", Impulse::Create},
+	{"Soup Stirrer", SoupStirrer::Create},
 	{"Ramp", Ramp::Create},
 	{"Pointy", Pointy::Create},
 	{"AntiPointy", AntiPointy::Create},

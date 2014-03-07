@@ -39,8 +39,8 @@ TODO describe the cool new stuff we have in this release TODO
     in cases where complex world geometry may cause false positive contacts.
 *   Added "EyeCandy" sample to demonstrate different particle rendering methods
     on Android.
-*   Added "Sparky" and "Sandbox" tests to the Testbed example to demonstrate
-    particle and rigid body interaction.
+*   Added "Sparky", "Sandbox" and "Soup Stirrer" tests to the Testbed example
+    to demonstrate particle and rigid body interaction.
 *   Added "Ramp", "Pointy", and "AntiPointy" tests to the Testbed example to
     illustrate the difference with strict contact checking.
 

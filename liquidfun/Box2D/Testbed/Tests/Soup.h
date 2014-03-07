@@ -27,7 +27,7 @@ public:
 
 		{
 			b2BodyDef bd;
-			b2Body* ground = m_world->CreateBody(&bd);
+			m_ground = m_world->CreateBody(&bd);
 
 			{
 				b2PolygonShape shape;
@@ -37,7 +37,7 @@ public:
 					b2Vec2(4, 0),
 					b2Vec2(-4, 0)};
 				shape.Set(vertices, 4);
-				ground->CreateFixture(&shape, 0.0f);
+				m_ground->CreateFixture(&shape, 0.0f);
 			}
 
 			{
@@ -48,7 +48,7 @@ public:
 					b2Vec2(-2, 2),
 					b2Vec2(-4, 3)};
 				shape.Set(vertices, 4);
-				ground->CreateFixture(&shape, 0.0f);
+				m_ground->CreateFixture(&shape, 0.0f);
 			}
 
 			{
@@ -59,7 +59,7 @@ public:
 					b2Vec2(4, 3),
 					b2Vec2(2, 2)};
 				shape.Set(vertices, 4);
-				ground->CreateFixture(&shape, 0.0f);
+				m_ground->CreateFixture(&shape, 0.0f);
 			}
 		}
 
@@ -70,7 +70,8 @@ public:
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
 			pd.flags = TestMain::GetParticleParameterValue();
-			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
+			b2ParticleGroup * const group =
+				m_particleSystem->CreateParticleGroup(pd);
 			if (pd.flags & b2_colorMixingParticle)
 			{
 				ColorParticleGroup(group, 0);
@@ -85,7 +86,8 @@ public:
 			shape.m_p.Set(0, 0.5f);
 			shape.m_radius = 0.1f;
 			body->CreateFixture(&shape, 0.1f);
-			m_particleSystem->DestroyParticlesInShape(shape, body->GetTransform());
+			m_particleSystem->DestroyParticlesInShape(shape,
+													  body->GetTransform());
 		}
 
 		{
@@ -95,7 +97,8 @@ public:
 			b2PolygonShape shape;
 			shape.SetAsBox(0.1f, 0.1f, b2Vec2(-1, 0.5f), 0);
 			body->CreateFixture(&shape, 0.1f);
-			m_particleSystem->DestroyParticlesInShape(shape, body->GetTransform());
+			m_particleSystem->DestroyParticlesInShape(shape,
+													  body->GetTransform());
 		}
 
 		{
@@ -105,7 +108,8 @@ public:
 			b2PolygonShape shape;
 			shape.SetAsBox(0.1f, 0.1f, b2Vec2(1, 0.5f), 0.5f);
 			body->CreateFixture(&shape, 0.1f);
-			m_particleSystem->DestroyParticlesInShape(shape, body->GetTransform());
+			m_particleSystem->DestroyParticlesInShape(shape,
+													  body->GetTransform());
 		}
 
 		{
@@ -154,6 +158,9 @@ public:
 	{
 		return new Soup;
 	}
+
+protected:
+	b2Body* m_ground;
 };
 
 #endif
