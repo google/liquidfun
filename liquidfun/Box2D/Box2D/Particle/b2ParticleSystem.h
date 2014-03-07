@@ -681,8 +681,13 @@ private:
 		const b2ParticleGroupDef& groupDef,
 		const b2Transform& xf, const b2Vec2& position);
 	void CreateParticlesStrokeShapeForGroup(
+		const b2Shape* shape,
 		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
 	void CreateParticlesFillShapeForGroup(
+		const b2Shape* shape,
+		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
+	void CreateParticlesWithShapeForGroup(
+		const b2Shape* shape,
 		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
 	void DestroyParticleGroup(b2ParticleGroup* group);
 

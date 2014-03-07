@@ -691,9 +691,9 @@ int32 b2ParticleSystem::CreateParticleForGroup(
 }
 
 void b2ParticleSystem::CreateParticlesStrokeShapeForGroup(
+	const b2Shape *shape,
 	const b2ParticleGroupDef& groupDef, const b2Transform& xf)
 {
-	const b2Shape *shape = groupDef.shape;
 	float32 stride = groupDef.stride;
 	if (stride == 0)
 	{
@@ -726,9 +726,9 @@ void b2ParticleSystem::CreateParticlesStrokeShapeForGroup(
 }
 
 void b2ParticleSystem::CreateParticlesFillShapeForGroup(
+	const b2Shape *shape,
 	const b2ParticleGroupDef& groupDef, const b2Transform& xf)
 {
-	const b2Shape *shape = groupDef.shape;
 	float32 stride = groupDef.stride;
 	if (stride == 0)
 	{
@@ -754,6 +754,25 @@ void b2ParticleSystem::CreateParticlesFillShapeForGroup(
 	}
 }
 
+void b2ParticleSystem::CreateParticlesWithShapeForGroup(
+	const b2Shape* shape,
+	const b2ParticleGroupDef& groupDef, const b2Transform& xf)
+{
+	switch (shape->GetType()) {
+	case b2Shape::e_edge:
+	case b2Shape::e_chain:
+		CreateParticlesStrokeShapeForGroup(shape, groupDef, xf);
+		break;
+	case b2Shape::e_polygon:
+	case b2Shape::e_circle:
+		CreateParticlesFillShapeForGroup(shape, groupDef, xf);
+		break;
+	default:
+		b2Assert(false);
+		break;
+	}
+}
+
 b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
 	const b2ParticleGroupDef& groupDef)
 {
@@ -768,19 +787,14 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
 	int32 firstIndex = m_count;
 	if (groupDef.shape)
 	{
-		const b2Shape *shape = groupDef.shape;
-		switch (shape->GetType()) {
-		case b2Shape::e_edge:
-		case b2Shape::e_chain:
-			CreateParticlesStrokeShapeForGroup(groupDef, transform);
-			break;
-		case b2Shape::e_polygon:
-		case b2Shape::e_circle:
-			CreateParticlesFillShapeForGroup(groupDef, transform);
-			break;
-		default:
-			b2Assert(false);
-			break;
+		CreateParticlesWithShapeForGroup(groupDef.shape, groupDef, transform);
+	}
+	if (groupDef.shapes)
+	{
+		for (int32 i = 0; i < groupDef.shapeCount; i++)
+		{
+			CreateParticlesWithShapeForGroup(
+									groupDef.shapes[i], groupDef, transform);
 		}
 	}
 	if (groupDef.particleCount)
