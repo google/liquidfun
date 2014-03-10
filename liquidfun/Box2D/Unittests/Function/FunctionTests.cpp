@@ -417,6 +417,26 @@ TEST_F(FunctionTests, CreateParticleGroup) {
 	EXPECT_EQ(m_particleSystem->GetParticleCount(), group->GetParticleCount());
 }
 
+TEST_F(FunctionTests, CreateParticleGroupWithShapeList) {
+	b2ParticleGroupDef def;
+	static const int32 shapeCount = 10;
+	b2CircleShape circleShapes[shapeCount];
+	const b2Shape *shapes[shapeCount];
+	for (int32 i = 0; i < shapeCount; i++)
+	{
+		circleShapes[i].m_p.Set(2 * i, 10);
+		circleShapes[i].m_radius = 1;
+		shapes[i] = &circleShapes[i];
+	}
+	def.shapes = shapes;
+	def.shapeCount = 1;
+	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_GT(group1->GetParticleCount(), 0);
+	def.shapeCount = shapeCount;
+	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_GT(group2->GetParticleCount(), group1->GetParticleCount());
+}
+
 TEST_F(FunctionTests, CreateParticleGroupWithCustomStride) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;

@@ -62,6 +62,8 @@ struct b2ParticleGroupDef
 		color = b2ParticleColor_zero;
 		strength = 1;
 		shape = NULL;
+		shapes = NULL;
+		shapeCount = 0;
 		stride = 0;
 		particleCount = 0;
 		positionData = NULL;
@@ -99,6 +101,12 @@ struct b2ParticleGroupDef
 
 	/// The shape where particles will be added.
 	const b2Shape* shape;
+
+	/// A array of shapes where particles will be added.
+	const b2Shape* const* shapes;
+
+	/// The number of shapes.
+	int32 shapeCount;
 
 	/// The interval of particles in the shape.
 	/// If it is 0, b2_particleStride * particleDiameter is used instead.
