@@ -191,6 +191,19 @@ public:
 	/// group.
 	void ApplyLinearImpulse(const b2Vec2& impulse);
 
+	/// Destroy all the particles in this group.
+	/// This function is locked during callbacks.
+	/// @param Whether to call the world b2DestructionListener for each
+	/// particle is destroyed.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticles(bool callDestructionListener);
+
+	/// Destroy all particles in this group without enabling the destruction
+	/// callback for destroyed particles.
+	/// This function is locked during callbacks.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticles();
+
 private:
 
 	friend class b2ParticleSystem;
@@ -317,5 +330,9 @@ inline void b2ParticleGroup::SetUserData(void* data)
 	m_userData = data;
 }
 
+inline void b2ParticleGroup::DestroyParticles()
+{
+	DestroyParticles(false);
+}
 
 #endif

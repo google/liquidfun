@@ -17,6 +17,7 @@
 */
 #include <Box2D/Particle/b2ParticleGroup.h>
 #include <Box2D/Particle/b2ParticleSystem.h>
+#include <Box2D/Dynamics/b2World.h>
 
 b2ParticleGroup::b2ParticleGroup()
 {
@@ -45,7 +46,7 @@ void b2ParticleGroup::SetGroupFlags(int32 flags)
 {
 	b2Assert((flags & b2_particleGroupInternalMask) == 0);
 	flags |= m_groupFlags & ~b2_particleGroupInternalMask;
-	m_system->SetParticleGroupFlags(this, flags);
+	m_system->SetGroupFlags(this, flags);
 }
 
 void b2ParticleGroup::UpdateStatistics() const
@@ -93,3 +94,17 @@ void b2ParticleGroup::ApplyLinearImpulse(const b2Vec2& impulse)
 {
 	m_system->ApplyLinearImpulse(m_firstIndex, m_lastIndex, impulse);
 }
+
+void b2ParticleGroup::DestroyParticles(bool callDestructionListener)
+{
+	b2Assert(m_system->m_world->IsLocked() == false);
+	if (m_system->m_world->IsLocked())
+	{
+		return;
+	}
+
+	for (int32 i = m_firstIndex; i < m_lastIndex; i++) {
+		m_system->DestroyParticle(i, callDestructionListener);
+	}
+}
+
