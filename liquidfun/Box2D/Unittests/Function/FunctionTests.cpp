@@ -695,6 +695,19 @@ TEST_F(FunctionTests, GroupBuffer) {
 	}
 }
 
+TEST_F(FunctionTests, GroupFlags) {
+	b2ParticleGroup* group = CreateBoxShapedParticleGroup(m_particleSystem);
+	group->SetGroupFlags(b2_rigidParticleGroup);
+	EXPECT_EQ(group->GetGroupFlags(), b2_rigidParticleGroup);
+	group->SetGroupFlags(b2_rigidParticleGroup | b2_solidParticleGroup);
+	EXPECT_EQ(
+		group->GetGroupFlags(), b2_rigidParticleGroup | b2_solidParticleGroup);
+	group->SetGroupFlags(b2_particleGroupCanBeEmpty);
+	EXPECT_EQ(group->GetGroupFlags(), b2_particleGroupCanBeEmpty);
+	group->SetGroupFlags(0);
+	EXPECT_EQ(group->GetGroupFlags(), 0);
+}
+
 TEST_F(FunctionTests, GetParticleContact) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;

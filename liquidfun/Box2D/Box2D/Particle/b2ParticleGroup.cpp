@@ -45,7 +45,7 @@ b2ParticleGroup::b2ParticleGroup()
 void b2ParticleGroup::SetGroupFlags(int32 flags)
 {
 	b2Assert((flags & b2_particleGroupInternalMask) == 0);
-	flags |= m_groupFlags & ~b2_particleGroupInternalMask;
+	flags |= m_groupFlags & b2_particleGroupInternalMask;
 	m_system->SetGroupFlags(this, flags);
 }
 
