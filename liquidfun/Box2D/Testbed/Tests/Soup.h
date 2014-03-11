@@ -18,12 +18,17 @@
 #ifndef SOUP_H
 #define SOUP_H
 
+#include <string.h>
+#include <memory.h>
+
 class Soup : public Test
 {
 public:
 
 	Soup()
 	{
+		// Disable the selection of wall and barrier particles for this test.
+		InitializeParticleParameters(b2_wallParticle | b2_barrierParticle);
 
 		{
 			b2BodyDef bd;

@@ -18,6 +18,7 @@
 */
 
 #include "Test.h"
+#include "Main.h"
 #include <stdio.h>
 
 void DestructionListener::SayGoodbye(b2Joint* joint)
@@ -84,6 +85,8 @@ Test::Test()
 
 	memset(&m_maxProfile, 0, sizeof(b2Profile));
 	memset(&m_totalProfile, 0, sizeof(b2Profile));
+
+	m_particleParameters = NULL;
 }
 
 Test::~Test()
@@ -91,6 +94,7 @@ Test::~Test()
 	// By deleting the world, we delete the bomb, mouse joint, etc.
 	delete m_world;
 	m_world = NULL;
+	RestoreParticleParameters();
 }
 
 void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
@@ -585,5 +589,45 @@ void Test::ColorParticleGroup(b2ParticleGroup * const group,
 	for (int32 i = groupStart; i < groupEnd; i++)
 	{
 		colorBuffer[i] = k_ParticleColors[i / particlesPerColor];
+	}
+}
+
+
+// Remove particle parameters matching "filterMask" from the set of
+// particle parameters available for this test.
+void Test::InitializeParticleParameters(const uint32 filterMask)
+{
+	const uint32 defaultNumValues =
+		ParticleParameter::k_defaultDefinition[0].numValues;
+	const ParticleParameter::Value * const defaultValues =
+		ParticleParameter::k_defaultDefinition[0].values;
+	m_particleParameters = new ParticleParameter::Value[defaultNumValues];
+
+	// Disable selection of wall and barrier particle types.
+	uint32 numValues = 0;
+	for (uint32 i = 0; i < defaultNumValues; i++)
+	{
+		if (defaultValues[i].value & filterMask)
+		{
+			continue;
+		}
+		memcpy(&m_particleParameters[numValues], &defaultValues[i],
+			   sizeof(defaultValues[0]));
+		numValues++;
+	}
+	m_particleParameterDef.values = m_particleParameters;
+	m_particleParameterDef.numValues = numValues;
+	TestMain::SetParticleParameters(&m_particleParameterDef, 1);
+}
+
+// Restore default particle parameters.
+void Test::RestoreParticleParameters()
+{
+	if (m_particleParameters)
+	{
+		TestMain::SetParticleParameters(
+			ParticleParameter::k_defaultDefinition, 1);
+		delete [] m_particleParameters;
+		m_particleParameters = NULL;
 	}
 }
