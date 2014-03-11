@@ -9,6 +9,7 @@
 [Particle Behaviors](#pb)<br/>
 [Particle Properties](#pp)<br/>
 [Rendering with OpenGL](#gl)<br/>
+[Sample Applications](#sa)<br/>
 
 <a name="About">
 ## About
@@ -440,7 +441,7 @@ as radians per second).
 This property applies only to rigid particle groups. It indicates the angle at
 which a group is tilted. Set angle with the statement
 
-&nbsp;&nbsp;&nbsp;`pd.angle = a;`
+&nbsp;&nbsp;&nbsp;`pd.angle =checkout a;`
 
 where `a` is the angle of tilt, expressed in radians. Left unspecified, the
 value defaults to 0.
@@ -514,3 +515,28 @@ In this example, OpenGL 1.1 would use glVertexPointer and glColorPointer to
 get
 the values from memory. OpenGL 2.0 would use glVertexAttribPointer.<br/>
 OpenGL can be used to render either individual particles or particle groups.
+
+<a name="sa">
+## Sample Applications
+
+Among the samples included in the LiquidFun distribution are two applications 
+that offer a quick look into the capabilities of the library.
+
+Testbed includes a large number of demos that provide examples of different 
+types of particle behavior. While some of the demos are "look only," others are 
+interactive, allowing you to use your mouse or touchscreen to affect the 
+behavior on screen. 
+
+Experimenting with each of the demos, and comparing their behavior against the 
+source code, can provide useful insights into how different particles behave 
+under various conditions. Testbed builds and runs on Android, MacOSX, Linux, 
+and Windows.
+
+EyeCandy is an Android-only application and is twofold in purpose: It provides
+a simple Android example of how to use LiquidFun; and, it seeks to inspire
+developers with its demonstration of the powerful liquid shaders it brings to
+mobile hardware.
+ 
+When running the program, you can slosh the fluid around by changing the
+orientation of the Android device. You can also toggle bewteen shaders by
+tapping the screen.

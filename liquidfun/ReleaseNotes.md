@@ -20,6 +20,33 @@ following:
     For example, go to http://github.com/google/liquidfun/commits/v0.9.0 to
     view all changes present in the [0.9.0][] release.
 
+### 1.0
+
+TODO Flesh out further.
+
+### Overview
+
+LiquidFun 1.0 is available for download from the [0.9.0 release][] release page.
+
+#### New Features
+
+*   Barrier, static-pressure, and repulsive particles.
+*   Detection of stuck particles.
+*   The ability to create multiple particle systems.
+*   The ability to apply forces and impulses to particles.
+*   Java support via SWIG.
+*   "EyeCandy" sample application.
+
+#### API Modifications
+
+*   Improved performance
+*   Better particle-behavior stability
+*   Improved API stability
+
+#### Other Changes
+
+*   Improved documentation
+
 ### 0.9.1 TODO update prior to release.
 
 #### Overview
