@@ -957,7 +957,9 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 			uint32 bf = m_flagsBuffer.data[b];
 			b2ParticleGroup* groupA = m_groupBuffer[a];
 			b2ParticleGroup* groupB = m_groupBuffer[b];
-			if (!((af | bf) & b2_zombieParticle) &&
+			if (a >= firstIndex && a < lastIndex &&
+				b >= firstIndex && b < lastIndex &&
+				!((af | bf) & b2_zombieParticle) &&
 				((af | bf) & k_pairFlags) &&
 				(filter.IsNecessary(a) || filter.IsNecessary(b)) &&
 				ParticleCanBeConnected(af, groupA) &&
@@ -1728,11 +1730,11 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 					{
 						if (e1 == 0) continue;
 						t = - e0 / e1;
-						if (t < 0 || t > tmax) continue;
+						if (!(t >= 0 && t < tmax)) continue;
 						qba = pba + t * vba;
 						qca = pca + t * vca;
 						s = b2Dot(qba, qca) / b2Dot(qba, qba);
-						if (s < 0 || s > 1) continue;
+						if (!(s >= 0 && s <= 1)) continue;
 					}
 					else
 					{
@@ -1746,48 +1748,23 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 						qba = pba + t * vba;
 						qca = pca + t * vca;
 						s = b2Dot(qba, qca) / b2Dot(qba, qba);
-						if (t < 0 || t > tmax || s < 0 || s > 1)
+						if (!(t >= 0 && t < tmax && s >= 0 && s <= 1))
 						{
 							t = t2;
-							if (t < 0 || t > tmax) continue;
+							if (!(t >= 0 && t < tmax)) continue;
 							qba = pba + t * vba;
 							qca = pca + t * vca;
 							s = b2Dot(qba, qca) / b2Dot(qba, qba);
-							if (s < 0 || s > 1) continue;
+							if (!(s >= 0 && s <= 1)) continue;
 						}
 					}
 					// Set velocity of particle c to interpolated velocity at
-					// the collision point on line ab, and add forces to
-					// particles a, b and c after particle movement so that
-					// momentum will be preserved.
-					// The forces should satisfy the following conditions:
-					//     Cancel the change of linear momentum by collision.
-					//     Don't change angular momentum.
-					//     Minimize the sum of the squares of forces.
-					b2Vec2 pcb = pc - pb;
-					float32 wa = b2Dot(pba, pcb);
-					float32 wb = b2Dot(pba, pca);
-					float32 wc = b2Dot(pca, pca) + b2Dot(pcb, pcb);
-					float32 sumW = wa + wb + wc;
-					if (sumW > 0)
-					{
-						float32 invW = 1 / sumW;
-						wa *= invW;
-						wb *= invW;
-						wc *= invW;
-					}
-					else
-					{
-						wa = 0;
-						wb = 0;
-						wc = 1;
-					}
-					b2Vec2 v = va + s * vba;
-					b2Vec2 f = step.inv_dt * GetParticleMass() * (vc - v);
-					ParticleApplyForce(a, wa * f);
-					ParticleApplyForce(b, wb * f);
-					ParticleApplyForce(c, wc * f);
-					vc = v;
+					// the collision point on line ab, and add force to
+					// particle c after particle movement so that momentum will
+					// be preserved.
+					b2Vec2 f = va + s * vba - vc;
+					ParticleApplyForce(c, -step.inv_dt * GetParticleMass() * f);
+					vc += f;
 				}
 			}
 		}
