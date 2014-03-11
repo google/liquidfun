@@ -3107,7 +3107,7 @@ void b2ParticleSystem::ApplyForce(int32 firstIndex, int32 lastIndex,
 #endif
 
 	// Early out if force does nothing (optimization).
-	const b2Vec2 distributedForce = force / (lastIndex - firstIndex);
+	const b2Vec2 distributedForce = force / (float32)(lastIndex - firstIndex);
 	if (IsSignificantForce(distributedForce))
 	{
 		PrepareForceBuffer();

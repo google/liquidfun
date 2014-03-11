@@ -424,7 +424,7 @@ TEST_F(FunctionTests, CreateParticleGroupWithShapeList) {
 	const b2Shape *shapes[shapeCount];
 	for (int32 i = 0; i < shapeCount; i++)
 	{
-		circleShapes[i].m_p.Set(2 * i, 10);
+		circleShapes[i].m_p.Set(2.0f * (float32)i, 10.0f);
 		circleShapes[i].m_radius = 1;
 		shapes[i] = &circleShapes[i];
 	}
