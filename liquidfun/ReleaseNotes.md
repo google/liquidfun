@@ -20,32 +20,6 @@ following:
     For example, go to http://github.com/google/liquidfun/commits/v0.9.0 to
     view all changes present in the [0.9.0][] release.
 
-### 1.0
-
-TODO Flesh out further.
-
-### Overview
-
-LiquidFun 1.0 is available for download from the [0.9.0 release][] release page.
-
-#### New Features
-
-*   Barrier, static-pressure, and repulsive particles.
-*   Detection of stuck particles.
-*   The ability to create multiple particle systems.
-*   The ability to apply forces and impulses to particles.
-*   Java support via SWIG.
-*   "EyeCandy" sample application.
-
-#### API Modifications
-
-*   Improved performance
-*   Better particle-behavior stability
-*   Improved API stability
-
-#### Other Changes
-
-*   Improved documentation
 
 ### 0.9.1 TODO update prior to release.
 
@@ -69,6 +43,7 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added option to call a contact listener or filter on particle / fixture
     or particle / particle interactions.
     in cases where complex world geometry may cause false positive contacts.
+*   Added the ability to apply forces and impulses to particles.
 *   Added "EyeCandy" sample to demonstrate different particle rendering methods
     on Android.
 *   Added "Sparky", "Sandbox" and "Soup Stirrer" tests to the Testbed example
@@ -81,7 +56,8 @@ TODO describe the cool new stuff we have in this release TODO
     destruction callbacks.
 *   Added Java Native Interface support via SWIG. It covers a subset of the
     API.
-
+*   Added the ability to pass a list of shapes to be passed in for particle-group
+    creation.
 #### API Modifications
 
 *   `b2Draw::e_particleBit` flag now enables/disables
@@ -158,6 +134,7 @@ TODO describe the cool new stuff we have in this release TODO
 *   Renamed `b2ParticleFlag` `b2DestructionListener` to
     `b2DestructionListenerParticle` to be consistent with other particle flag
     names.
+*   Better particle-behavior stability.
 
 #### Other Changes
 
