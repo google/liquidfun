@@ -22,6 +22,7 @@
 
 #include <Box2D/Box2D.h>
 #include "Render.h"
+#include "ParticleParameter.h"
 
 #include <stdlib.h>
 
@@ -197,6 +198,13 @@ public:
 	void ColorParticleGroup(b2ParticleGroup * const group,
 							uint32 particlesPerColor);
 
+	// Remove particle parameters matching "filterMask" from the set of
+	// particle parameters available for this test.
+	void InitializeParticleParameters(const uint32 filterMask);
+
+	// Restore default particle parameters.
+	void RestoreParticleParameters();
+
 protected:
 	friend class DestructionListener;
 	friend class BoundaryListener;
@@ -223,6 +231,10 @@ protected:
 
 	b2Profile m_maxProfile;
 	b2Profile m_totalProfile;
+
+	// Valid particle parameters for this test.
+	ParticleParameter::Value* m_particleParameters;
+	ParticleParameter::Definition m_particleParameterDef;
 
 	static const b2ParticleColor k_ParticleColors[];
 	static const uint32 k_ParticleColorsCount;
