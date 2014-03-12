@@ -125,13 +125,15 @@ private:
 		if (m_useLinearImpulse)
 		{
 			const float kImpulseMagnitude = 0.005f;
-			const b2Vec2 impulse = kImpulseMagnitude * direction * numParticles;
+			const b2Vec2 impulse = kImpulseMagnitude * direction *
+				(float32)numParticles;
 			particleGroup->ApplyLinearImpulse(impulse);
 		}
 		else
 		{
 			const float kForceMagnitude = 1.0f;
-			const b2Vec2 force = kForceMagnitude * direction * numParticles;
+			const b2Vec2 force = kForceMagnitude * direction *
+				(float32)numParticles;
 			particleGroup->ApplyForce(force);
 		}
 	}
