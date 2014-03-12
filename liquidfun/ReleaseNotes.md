@@ -71,6 +71,8 @@ TODO describe the cool new stuff we have in this release TODO
     to demonstrate particle and rigid body interaction.
 *   Added "Ramp", "Pointy", and "AntiPointy" tests to the Testbed example to
     illustrate the difference with strict contact checking.
+*   Added "Maxwell" test to the Testbed to demonstrate the direct modification
+    of particle velocities.
 
 #### API Modifications
 
