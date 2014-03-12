@@ -17,17 +17,43 @@
 */
 #ifndef FAUCET_H
 #define FAUCET_H
+#include "../Framework/ParticleEmitter.h"
 
 // Faucet test creates a container from boxes and continually spawning
 // particles with finite lifetimes that pour into the box.
 class Faucet : public Test
 {
+private:
+	// Assigns a random lifetime to each created particle.
+	class ParticleLifetimeRandomizer : public EmittedParticleCallback
+	{
+	public:
+		// Initialize the randomizer to set lifetimes between minLifetime to
+		// maxLifetime.
+		ParticleLifetimeRandomizer(const float32 minLifetime,
+								   const float32 maxLifetime) :
+			m_minLifetime(minLifetime), m_maxLifetime(maxLifetime) { }
+		virtual ~ParticleLifetimeRandomizer() { }
+
+		// Called for each created particle.
+		virtual void ParticleCreated(b2ParticleSystem * const system,
+									 const int32 particleIndex)
+		{
+			system->SetParticleLifetime(
+				particleIndex, ((float32)rand() / (float32)RAND_MAX) *
+					(m_maxLifetime - m_minLifetime) + m_minLifetime);
+		}
+
+	private:
+		float32 m_minLifetime;
+		float32 m_maxLifetime;
+	};
+
 public:
 	// Construct the world.
 	Faucet() :
-		m_emitRemainder(0.0f),
 		m_particleColorOffset(0.0f),
-		m_emitRate(120.0f)
+		m_lifetimeRandomizer(k_particleLifetimeMin, k_particleLifetimeMax)
 	{
 		// Configure particle system parameters.
 		m_particleSystem->SetRadius(0.035f);
@@ -89,6 +115,22 @@ public:
 			ground->CreateFixture(&shape, 0.0f);
 		}
 
+		// Initialize the particle emitter.
+		{
+			const float32 faucetLength =
+				m_particleSystem->GetParticleRadius() * 2.0f * k_faucetLength;
+			m_emitter.SetParticleSystem(m_particleSystem);
+			m_emitter.SetCallback(&m_lifetimeRandomizer);
+			m_emitter.SetPosition(b2Vec2(k_containerWidth * k_faucetWidth,
+										 k_containerHeight * k_faucetHeight +
+										 (faucetLength * 0.5f)));
+			m_emitter.SetVelocity(b2Vec2(0.0f, 0.0f));
+			m_emitter.SetSize(b2Vec2(0.0f, faucetLength));
+			m_emitter.SetColor(b2ParticleColor(255, 255, 255, 255));
+			m_emitter.SetEmitRate(120.0f);
+			m_emitter.SetParticleFlags(TestMain::GetParticleParameterValue());
+		}
+
 		// Don't restart the test when changing particle types.
 		TestMain::SetRestartOnParticleParameterChange(false);
 		// Limit the set of particle types.
@@ -107,42 +149,24 @@ public:
 			m_particleColorOffset -= (float32)k_ParticleColorsCount;
 		}
 
-		const float32 particles = (m_emitRate * dt) + m_emitRemainder;
-		const int32 particlesToCreate = (int32)particles;
-		const float32 faucetLength =
-			m_particleSystem->GetRadius() * 2.0f * k_faucetLength;
-		b2ParticleDef particleDef;
-
 		// Propagate the currently selected particle flags.
-		particleDef.flags = TestMain::GetParticleParameterValue();
+		m_emitter.SetParticleFlags(TestMain::GetParticleParameterValue());
 
 		// If this is a color mixing particle, add some color.
 		b2ParticleColor color(255, 255, 255, 255);
-		if (particleDef.flags & b2_colorMixingParticle)
+		if (m_emitter.GetParticleFlags() & b2_colorMixingParticle)
 		{
 			// Each second, select a different color.
-			color =  k_ParticleColors[(int32)m_particleColorOffset %
-									  k_ParticleColorsCount];
+			m_emitter.SetColor(k_ParticleColors[(int32)m_particleColorOffset %
+												k_ParticleColorsCount]);
+		}
+		else
+		{
+			m_emitter.SetColor(b2ParticleColor(255, 255, 255, 255));
 		}
 
-		for (int32 i = 0; i < particlesToCreate; ++i)
-		{
-			// Emit particles from above the container.
-			particleDef.position.Set(
-				Random() * (k_containerWidth * k_faucetWidth),
-				k_containerHeight * k_faucetHeight +
-				(faucetLength * Random()));
-			// Create a particle.
-			const int32 index = m_particleSystem->CreateParticle(particleDef);
-			// Set the particle's lifetime.
-			m_particleSystem->SetParticleLifetime(
-				index, Random() *
-						(k_particleLifetimeMax - k_particleLifetimeMin) +
-						k_particleLifetimeMin);
-			// Set the particle's color.
-			m_particleSystem->GetColorBuffer()[index] = color;
-		}
-		m_emitRemainder = (float32)(particles - particlesToCreate);
+		// Create the particles.
+		m_emitter.Step(dt, NULL, 0);
 
 		static const char* k_keys[] = {
 			"Keys: (w) water, (q) powder",
@@ -182,12 +206,20 @@ public:
 			parameter = b2_staticPressureParticle;
 			break;
 		case '+':
-			m_emitRate *= k_emitRateChangeFactor;
-			m_emitRate = b2Max(m_emitRate, k_emitRateMin);
+		{
+			float32 emitRate = m_emitter.GetEmitRate();
+			emitRate *= k_emitRateChangeFactor;
+			emitRate = b2Max(emitRate, k_emitRateMin);
+			m_emitter.SetEmitRate(emitRate);
 			break;
+		}
 		case '-':
-			m_emitRate *= 1.0f / k_emitRateChangeFactor;
-			m_emitRate = b2Min(m_emitRate, k_emitRateMax);
+		{
+			float32 emitRate = m_emitter.GetEmitRate();
+			emitRate *= 1.0f / k_emitRateChangeFactor;
+			emitRate = b2Min(emitRate, k_emitRateMax);
+			m_emitter.SetEmitRate(emitRate);
+		}
 			break;
 		default:
 			// Nothing.
@@ -207,19 +239,13 @@ public:
 		return new Faucet;
 	}
 
-	// Generate a random number between -0.5f to 0.5f.
-	static float32 Random()
-	{
-		return ((float32)rand() / (float32)RAND_MAX) - 0.5f;
-	}
-
 private:
-	// Fractional particles to emit in the next Step().
-	float32 m_emitRemainder;
 	// Used to cycle through particle colors.
 	float32 m_particleColorOffset;
-	// Number of particles emitted per second.
-	float32 m_emitRate;
+	// Particle emitter.
+	RadialEmitter m_emitter;
+	// Callback which sets the lifetime of emitted particles.
+	ParticleLifetimeRandomizer m_lifetimeRandomizer;
 
 private:
 	// Minimum lifetime of particles in seconds.

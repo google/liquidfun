@@ -19,120 +19,44 @@
 #ifndef SANDBOX_H
 #define SANDBOX_H
 #include <math.h>
-#include <set>
-
-// Emits particles along a line, as if it were some kind of faucet.
-class FaucetEmitter {
-public:
-
-	// World is a pointer to the world.
-	// Origin is center of faucet
-	// startingVelocity indicates starting velocity for particles
-	// emitRate is particles/second
-	// color is the particle color you want
-	FaucetEmitter(b2ParticleSystem *particleSystem, const b2Vec2 &origin,
-				  b2Vec2 &startingVelocity, float32 size, float32 emitRate,
-				  b2ParticleColor color) :
-		m_startingVelocity(startingVelocity), m_origin(origin), m_size(size),
-		m_emitRate(emitRate), m_particleSystem(particleSystem), m_color(color)
-	{
-		m_counter = 0;
-	}
-
-	// dt is seconds that have passed, flags are the particle flags that you
-	// want set on each particle, particleIndices is an optional pointer to
-	// an array which tracks which particles have been created and
-	// particleIndicesCount is the size of the particleIndices array.
-	// This function returns the number of particles created during this
-	// simulation step.
-	int32 Step(float32 dt, uint32 flags, int32* const particleIndices,
-			   const int32 particleIndicesCount)
-	{
-		int32 numberOfParticlesCreated = 0;
-		// How many (fractional) particles should we have emitted this frame?
-		m_counter += m_emitRate * dt;
-
-		b2ParticleDef pd;
-		pd.color = m_color;
-
-		// Keep emitting particles on this frame until we only have a
-		// fractional particle left.
-		while(m_counter > 1) {
-			m_counter -= 1;
-
-			// Randomly pick a position along the line that is the faucet.
-			pd.position.Set(m_origin.x + (rand() % 100)/100.0f *
-			                m_size - m_size/2, m_origin.y);
-			// Send it flying
-			pd.velocity = m_startingVelocity;
-			pd.flags = flags;
-
-			const int32 particleIndex = m_particleSystem->CreateParticle(pd);
-			if (particleIndices &&
-				numberOfParticlesCreated < particleIndicesCount)
-			{
-				particleIndices[numberOfParticlesCreated] = particleIndex;
-			}
-			++numberOfParticlesCreated;
-		}
-		return numberOfParticlesCreated;
-	}
-
- private:
-	// Launch direction.
-	b2Vec2 m_startingVelocity;
-	// Center of particle emitter
-	b2Vec2 m_origin;
-	// Total width of particle emitter
-	float32 m_size;
-	// Particles per second
-	float32 m_emitRate;
-
-	// Pointer to global world
-	b2ParticleSystem *m_particleSystem;
-	// Color you'd like the faucet spray
-	b2ParticleColor m_color;
-
-	// Number particles I need to emit on the next frame
-	float32 m_counter;
-};
+#include "../Framework/ParticleEmitter.h"
 
 // The following parameters are not static const members of the Sandbox class
 // with values assigned inline as it can result in link errors when using gcc.
 namespace SandboxParams {
 
 // Total possible pump squares
-static const int MAX_PUMPS = 5;
+static const int k_maxPumps = 5;
 // Total possible emitters
-static const int MAX_EMITTERS = 5;
+static const int k_maxEmitters = 5;
 // Number of seconds to push one direction or the other on the pumps
-static const float32 FLIP_TIME = 6;
+static const float32 k_flipTime = 6;
 // Radius of a tile
-static const float32 TILE_RADIUS = 2;
+static const float32 k_tileRadius = 2;
 // Diameter of a tile
-static const float32 TILE_DIAMETER = 4;
+static const float32 k_tileDiameter = 4;
 // Pump radius; slightly smaller than a tile
-static const float32 PUMP_RADIUS = 2.0f - 0.05f;
+static const float32 k_pumpRadius = 2.0f - 0.05f;
 
-static const float32 PLAYFIELD_LEFT_EDGE = -20;
-static const float32 PLAYFIELD_RIGHT_EDGE = 20;
-static const float32 PLAYFIELD_BOTTOM_EDGE = 40;
+static const float32 k_playfieldLeftEdge = -20;
+static const float32 k_playfieldRightEdge = 20;
+static const float32 k_playfieldBottomEdge = 40;
 
 // The world size in the TILE
-static const int TILE_WIDTH = 10;
-static const int TILE_HEIGHT = 11;
+static const int k_tileWidth = 10;
+static const int k_tileHeight = 11;
 
 // Particles/second
-static const float32 DEFAULT_EMITTER_RATE = 30;
+static const float32 k_defaultEmitterRate = 30;
 // Fit cleanly inside one block
-static const float32 DEFAULT_EMITTER_SIZE = 3;
+static const float32 k_defaultEmitterSize = 3;
 // How fast particles coming out of the particles should drop
-static const float32 PARTICLE_EXIT_Y_SPEED = -9.8f;
+static const float32 k_particleExitSpeedY = -9.8f;
 // How hard the pumps can push
-static const float32 PUMP_FORCE = 600;
+static const float32 k_pumpForce = 600;
 
 // Number of *special* particles.
-static const uint32 NUMBER_OF_SPECIAL_PARTICLES = 256;
+static const uint32 k_numberOfSpecialParticles = 256;
 
 }  // namespace SandboxParams
 
@@ -171,7 +95,7 @@ public:
 	{
 		b2Assert(m_particleSystem);
 		for (int32 i = 0; i < numberOfParticles && m_particles.size() <
-				 SandboxParams::NUMBER_OF_SPECIAL_PARTICLES; ++i)
+				 SandboxParams::k_numberOfSpecialParticles; ++i)
 		{
 			const int32 particleIndex = particleIndices[i];
 			m_particleSystem->SetParticleFlags(
@@ -250,11 +174,11 @@ public:
 		b2Body* ground = m_world->CreateBody(&bd);
 
 		// Reset our pointers
-		for (int i = 0; i < MAX_EMITTERS; i++) {
+		for (int i = 0; i < k_maxEmitters; i++) {
 			m_emitters[i] = NULL;
 		}
 
-		for (int i = 0; i < MAX_PUMPS; i++) {
+		for (int i = 0; i < k_maxPumps; i++) {
 			m_pumps[i] = NULL;
 		}
 
@@ -276,10 +200,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(PLAYFIELD_LEFT_EDGE - 20, -1),
-					b2Vec2(PLAYFIELD_LEFT_EDGE, -1),
-					b2Vec2(PLAYFIELD_LEFT_EDGE, 50),
-					b2Vec2(PLAYFIELD_LEFT_EDGE - 20, 50)};
+					b2Vec2(k_playfieldLeftEdge - 20, -1),
+					b2Vec2(k_playfieldLeftEdge, -1),
+					b2Vec2(k_playfieldLeftEdge, 50),
+					b2Vec2(k_playfieldLeftEdge - 20, 50)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -287,10 +211,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(PLAYFIELD_RIGHT_EDGE, -1),
-					b2Vec2(PLAYFIELD_RIGHT_EDGE + 20, -1),
-					b2Vec2(PLAYFIELD_RIGHT_EDGE + 20, 50),
-					b2Vec2(PLAYFIELD_RIGHT_EDGE, 50)};
+					b2Vec2(k_playfieldRightEdge, -1),
+					b2Vec2(k_playfieldRightEdge + 20, -1),
+					b2Vec2(k_playfieldRightEdge + 20, 50),
+					b2Vec2(k_playfieldRightEdge, 50)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -306,8 +230,8 @@ public:
 
 		// Create killfield shape and transform
 		m_killfieldShape = b2PolygonShape();
-		m_killfieldShape.SetAsBox(PLAYFIELD_RIGHT_EDGE -
-								  PLAYFIELD_LEFT_EDGE,1);
+		m_killfieldShape.SetAsBox(k_playfieldRightEdge -
+								  k_playfieldLeftEdge,1);
 
 		// Put this at the bottom of the world
 		m_killfieldTransform = b2Transform();
@@ -358,44 +282,45 @@ public:
 			"A        /"
 			"#####KK###";
 
-		b2Assert(strlen(maze) == TILE_WIDTH * TILE_HEIGHT);
+		b2Assert(strlen(maze) == k_tileWidth * k_tileHeight);
 
 		m_faucetEmitterIndex = 0;
 		m_pumpIndex = 0;
 
 		// Set up some standard shapes/vertices we'll use later.
 		b2PolygonShape boxShape;
-		boxShape.SetAsBox(TILE_RADIUS, TILE_RADIUS);
+		boxShape.SetAsBox(k_tileRadius, k_tileRadius);
 
 		b2Vec2 triangle[3];
-		triangle[0].Set(-TILE_RADIUS, -TILE_RADIUS);
-		triangle[1].Set(TILE_RADIUS, TILE_RADIUS);
-		triangle[2].Set(TILE_RADIUS, -TILE_RADIUS);
+		triangle[0].Set(-k_tileRadius, -k_tileRadius);
+		triangle[1].Set(k_tileRadius, k_tileRadius);
+		triangle[2].Set(k_tileRadius, -k_tileRadius);
 		b2PolygonShape rightTriangleShape;
 		rightTriangleShape.Set(triangle, 3);
 
-		triangle[1].Set(-TILE_RADIUS, TILE_RADIUS);
+		triangle[1].Set(-k_tileRadius, k_tileRadius);
 		b2PolygonShape leftTriangleShape;
 		leftTriangleShape.Set(triangle, 3);
 
 		// Make these just a touch smaller than a tile
 		b2CircleShape circleShape = b2CircleShape();
-		circleShape.m_radius = TILE_RADIUS * 0.7f;
+		circleShape.m_radius = k_tileRadius * 0.7f;
 
 		b2ParticleColor red = b2ParticleColor(255, 128, 128, 255);
 		b2ParticleColor green = b2ParticleColor(128, 255, 128, 255);
 		b2ParticleColor blue = b2ParticleColor(128, 128, 255, 255);
 
-		m_pumpForce = b2Vec2(PUMP_FORCE,0);
+		m_pumpForce = b2Vec2(k_pumpForce,0);
 
-		for (int i = 0; i < TILE_WIDTH; i++) {
-			for (int j = 0; j < TILE_HEIGHT; j++) {
-				char item = maze[j * TILE_WIDTH + i];
+		for (int i = 0; i < k_tileWidth; i++) {
+			for (int j = 0; j < k_tileHeight; j++) {
+				char item = maze[j * k_tileWidth + i];
 
 				// Calculate center of this square
 				b2Vec2 center = b2Vec2(
-					PLAYFIELD_LEFT_EDGE + TILE_RADIUS * 2 * i + TILE_RADIUS,
-					PLAYFIELD_BOTTOM_EDGE - TILE_RADIUS * 2 * j + TILE_RADIUS);
+					k_playfieldLeftEdge + k_tileRadius * 2 * i + k_tileRadius,
+					k_playfieldBottomEdge - k_tileRadius * 2 * j +
+						k_tileRadius);
 
 				// Let's add some items
 				switch (item) {
@@ -453,10 +378,10 @@ public:
 		using namespace SandboxParams;
 
 		// Don't make too many pumps
-		b2Assert(m_pumpIndex < MAX_PUMPS);
+		b2Assert(m_pumpIndex < k_maxPumps);
 
 		b2PolygonShape shape = b2PolygonShape();
-		shape.SetAsBox(PUMP_RADIUS, PUMP_RADIUS);
+		shape.SetAsBox(k_pumpRadius, k_pumpRadius);
 
 		b2BodyDef def = b2BodyDef();
 		def.position = center;
@@ -486,15 +411,18 @@ public:
 		using namespace SandboxParams;
 
 		// Don't make too many emitters
-		b2Assert(m_faucetEmitterIndex < SandboxParams::MAX_PUMPS);
+		b2Assert(m_faucetEmitterIndex < SandboxParams::k_maxPumps);
 
-		b2Vec2 startingVelocity = b2Vec2(0, PARTICLE_EXIT_Y_SPEED);
+		b2Vec2 startingVelocity = b2Vec2(0, k_particleExitSpeedY);
 
-		m_emitters[m_faucetEmitterIndex] =
-			new FaucetEmitter(m_particleSystem, center, startingVelocity,
-							  DEFAULT_EMITTER_SIZE, DEFAULT_EMITTER_RATE,
-							  color);
-
+		RadialEmitter * const emitter = new RadialEmitter();
+		emitter->SetParticleSystem(m_particleSystem);
+		emitter->SetPosition(center);
+		emitter->SetVelocity(startingVelocity);
+		emitter->SetSize(b2Vec2(k_defaultEmitterSize, 0.0f));
+		emitter->SetEmitRate(k_defaultEmitterRate);
+		emitter->SetColor(color);
+		m_emitters[m_faucetEmitterIndex] = emitter;
 		m_faucetEmitterIndex++;
 	}
 
@@ -512,12 +440,12 @@ public:
 		// Step all the emitters
 		for (int i = 0; i < m_faucetEmitterIndex; i++)
 		{
-			int32 particleIndices[NUMBER_OF_SPECIAL_PARTICLES];
-			FaucetEmitter *emitter = m_emitters[i];
+			int32 particleIndices[k_numberOfSpecialParticles];
+			RadialEmitter *emitter = m_emitters[i];
 
+			emitter->SetParticleFlags(m_particleFlags);
 			const int32 particlesCreated = emitter->Step(
-				dt, m_particleFlags, particleIndices,
-				B2_ARRAY_SIZE(particleIndices));
+				dt, particleIndices, B2_ARRAY_SIZE(particleIndices));
 			m_specialTracker.Add(particleIndices, particlesCreated);
 		}
 
@@ -534,15 +462,15 @@ public:
 			b2Body* pump = m_pumps[i];
 
 			// Pumps can and will clog up if the pile of particles they're
-			// trying to push is too heavy. Increase PUMP_FORCE to make
+			// trying to push is too heavy. Increase k_pumpForce to make
 			// stronger pumps.
 			pump->ApplyForceToCenter(m_pumpForce, true);
 
 			m_pumpTimer+=dt;
 
 			// Reset pump to go back right again
-			if (m_pumpTimer > FLIP_TIME) {
-				m_pumpTimer -= FLIP_TIME;
+			if (m_pumpTimer > k_flipTime) {
+				m_pumpTimer -= k_flipTime;
 				m_pumpForce.x *= -1;
 			}
 		}
@@ -612,8 +540,8 @@ private:
 	b2Transform m_killfieldTransform;
 
 	// Pumps and emitters
-	b2Body* m_pumps[SandboxParams::MAX_PUMPS];
-	FaucetEmitter *m_emitters[SandboxParams::MAX_EMITTERS];
+	b2Body* m_pumps[SandboxParams::k_maxPumps];
+	RadialEmitter *m_emitters[SandboxParams::k_maxEmitters];
 
 	// Special particle tracker.
 	SpecialParticleTracker m_specialTracker;
