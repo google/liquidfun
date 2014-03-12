@@ -55,6 +55,7 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <div class="contents">
 <div class="textblock"><p><a href="#About">About</a><br/>
  <a href="#Particles">Particles</a><br/>
+ <a href="#ps">Particle Systems</a><br/>
  <a href="#pg">Particle Groups</a><br/>
  <a href="#dp">Discrete Particles vs. Particle Groups</a><br/>
  <a href="#cdp">Creating and Destroying Particles</a><br/>
@@ -62,6 +63,7 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
  <a href="#pb">Particle Behaviors</a><br/>
  <a href="#pp">Particle Properties</a><br/>
  <a href="#gl">Rendering with OpenGL</a><br/>
+ <a href="#sa">Sample Applications</a><br/>
 </p>
 <p><a class="anchor" id="About"></a> </p>
 <h2>About</h2>
@@ -70,6 +72,15 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <h2>Particles</h2>
 <p>A particle is round, and the minimal unit of matter in a particle system. By default, a particle behaves as a liquid. You can set behavioral flags, however, to assign different behaviors (explained in <a href="#pb">Particle Behaviors</a>) to individual particles or groups of particles. You can also set other particle properties including position, velocity, and color.<br/>
  The <code>b2Particle.h</code> file contains the enumerated behavior values, as well as the variables specifying other particle properties. The corresponding enum is named <code>b2ParticleFlag.</code></p>
+<p><a class="anchor" id="ps"></a> </p>
+<h2>Particle Systems</h2>
+<p>The "world" that particles inhabit is called a particle system. A particle system describes a wide variety of physical coefficients that help dictate how particles interact with the world around them. A few examples of these conditions are default particle radius, elasticity, and viscosity. For more detail, see the API Reference description of the b2ParticleSystemDef struct.</p>
+<p>The following example creates a particle system:</p>
+<p>&#160;&#160;&#160;<code>const b2ParticleSystemDef particleSystemDef;</code> &#160;&#160;&#160;<code>m_particleSystems[0] =</code> &#160;&#160;&#160;<code>m_world-&gt;CreateParticleSystem(&amp;particleSystemDef);</code></p>
+<p>You can also create more than one particle system: Thus, one "world's" particles may have a certain default radius, elasticity, etc., while the other "world" has different default values for these properties. The following sample shows the creation of multiple particle systems:</p>
+<p>&#160;&#160;&#160;<code>const b2ParticleSystemDef particleSystemDef;</code> &#160;&#160;&#160;<code>for (int i = 0; i &lt; NUM_PARTICLE_SYSTEMS; ++i) {</code> &#160;&#160;&#160; <code>m_particleSystems[i] =</code> &#160;&#160;&#160; <code>m_world-&gt;CreateParticleSystem(&amp;particleSystemDef);</code></p>
+<p>In many, if not most, cases, it will not be necessary to adjust the default values or create multiple particle systems. You may find it useful in some cases, however.</p>
+<p>For example, dividing particles into multiple systems can yield a performance gain by allowing you to simulate only the visible systems while putting all other systems in a "paused" state using <code>b2ParticleSystem::SetPaused()</code>.</p>
 <p><a class="anchor" id="pg"></a> </p>
 <h2>Particle Groups</h2>
 <p>Instead of creating particles individually, you can create a group of particles to manipulate en masse. Some of the particle-group properties that you can set are the same as those for discrete particles: behavior, position, linear velocity, and color. There are also properties specific to groups: rotational angle, rotational velocity, and strength.<br/>
@@ -94,9 +105,72 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>The following example destroys the particle created above.</p>
 <p>&#160;&#160;&#160;<code>m_world-&gt;DestroyParticle(tempIndex);</code><br/>
 </p>
-<p><a class="anchor" id="cdpg"></a> </p>
+<h3>Particle lifetimes</h3>
+<p>In addition to manual destruction of particles as described above, particles can also expire and be destroyed due to age.</p>
+<p>The following example tells the system to track particle ages for the purpose of destroying them.</p>
+<p>&#160;&#160;&#160;<code>m_particleSystem-&gt;SetParticleDestructionByAge(true);</code></p>
+<p>A particle can die one of two "age-related" deaths. First, you can set a lifetime for a particle&ndash;a period of time after which it expires. The following example does this:</p>
+<p>&#160;&#160;&#160;<code>m_particleSystem-&gt;SetParticleLifetime(</code> &#160;&#160;&#160;<code>index, Random() *</code> &#160;&#160;&#160;<code>(k_particleLifetimeMax - k_particleLifetimeMin) +</code> &#160;&#160;&#160;<code>k_particleLifetimeMin);</code></p>
+<p>where <code>index</code> specifies the number of the particle whose lifetime is being assigned, and the <code>Random()</code> function generates a random value for that lifetime.</p>
+<p>You do not need to set a specific lifetime for a particle for it to have an age-related death. If you set a maximum number of particles that can exist in a particle system, and you have have told the system to track particle ages, the system clamps particle count by culling "excess" particles. Particle culling takes place in age order, with the oldest ones destroyed first.</p>
+<p>The following example sets a maximum particle count for a particle system.</p>
+<p>&#160;&#160;&#160;<code>m_particleSystem-&gt;SetParticleMaxCount(k_maxParticleCount);</code></p>
+<p>The Faucet example in the Testbed provides an example of both types of lifetime-driven particle destruction.</p>
+<h3>Stuck Particles</h3>
+<p>Particles may get stuck and become obstructions that need to be destroyed or relocated. A particle is identified as possibly stuck if it remains in contact with two or more surfaces for a user-specified number (threshold) of particle iterations. Once "candidates" are identified, you can implement your own logic to decide whether they are actually stuck, and how to deal with them.</p>
+<p>The ability to implement your own logic gives you flexibility in deciding when you want to consider a particle stuck. For instance, a ball may be traveling down a chute, making contact with walls on multiple sides. This state satisfies the "possibly stuck" condition described in the previous paragraph. But you could implement logic judging the ball not stuck as long as it keeps traveling down the chute.</p>
+<p>On the other hand, you could also decide that not only an immobile particle, but even a mobile one trapped in a certain spatial range, is stuck. The system relies on you to judge the candidates.</p>
+<p>The following example shows one possible implementation for such a case.</p>
+<pre>
+&#160;&#160;&#160;// This code example of app logic deciding whether or not to
+&#160;&#160;&#160;// eliminate stuck
+&#160;&#160;&#160;// particles shows a user who set up a global array of sensor
+&#160;&#160;&#160;// fixtures covering
+&#160;&#160;&#160;// areas they know to be "problematic" for stuck particles in
+&#160;&#160;&#160;// their geometry,
+&#160;&#160;&#160;// and then at each step testing any stuck particles against
+&#160;&#160;&#160;// those sensors,
+&#160;&#160;&#160;// eliminating any stuck particles that lie inside a known
+&#160;&#160;&#160;// problem region.
+&#160;&#160;&#160;void DestroyStuckParticlesInSensors(const b2Fixture * const
+&#160;&#160;&#160;// *sensors, int32 num)
+&#160;&#160;&#160;{
+&#160;&#160;&#160; const int32 stuck = gParticleSystem-
+&#160;&#160;&#160;&gt;GetStuckCandidateCount();
+&#160;&#160;&#160; if (stuck &gt; 0)
+&#160;&#160;&#160; {
+&#160;&#160;&#160;  const int32 *candidates = gParticleSystem-
+&#160;&#160;&#160;&gt;GetStuckCandidates();
+&#160;&#160;&#160;  const b2Vec2 *positions = gParticleSystem-
+&#160;&#160;&#160;&gt;GetParticlePositionBuffer();
+&#160;&#160;&#160;  for (int32 i = 0; i &lt; stuck; ++i)
+&#160;&#160;&#160;  {
+&#160;&#160;&#160;   const int32 particle = candidates[i];
+&#160;&#160;&#160;   const b2Vec2 &amp;position = positions
+&#160;&#160;&#160;[particle];
+&#160;&#160;&#160;   for (int32 j = 0; j &lt; num; ++j)
+&#160;&#160;&#160;   {
+&#160;&#160;&#160;    if(sensors[j]-&gt;TestPoint
+&#160;&#160;&#160;(position))
+&#160;&#160;&#160;    {
+&#160;&#160;&#160;     gParticleSystem-
+&#160;&#160;&#160;&gt;DestroyParticle(particle);
+&#160;&#160;&#160;    }
+&#160;&#160;&#160;   }
+&#160;&#160;&#160;  }
+&#160;&#160;&#160; }
+&#160;&#160;&#160;}
+&#160;&#160;&#160;// particles in multiple contacts for 5 or more iterations are
+&#160;&#160;&#160;// candidates
+&#160;&#160;&#160;gParticleSystem-&gt;SetStuckThreshold(5);</pre><pre>&#160;&#160;&#160;// step the world (assuming the timestep, velocity iterations,
+&#160;&#160;&#160;// and position iterations have been set globally).</pre><pre>&#160;&#160;&#160;gWorld-&gt;Step(gTimeStep, gVelocityIterations,
+gPositionIterations);</pre><pre>&#160;&#160;&#160;// Perform the above check for stuck particles against sensors
+&#160;&#160;&#160;// in this global array.
+&#160;&#160;&#160;DestroyStuckParticlesInSensors(gProblemAreaSensors,
+gNumSensors);
+</pre><p><a class="anchor" id="cdpg"></a> </p>
 <h2>Creating and Destroying Particle Groups</h2>
-<p>A particle group begins life in a shaped container. You must therefore start a particle group definition by specifying a shape. Next, create a b2ParticleGroupDef-struct object. Then, specify the behavior and properties of the particle. Finally, call the method to create a particle group.<br/>
+<p>A particle group begins life in a shaped container. You must therefore start a particle group definition by specifying a shape. Next, create a b2ParticleGroupDef-struct object. Then, specify the behavior and properties of the particles themselves. Finally, call the method to create a particle group.<br/>
  The following example creates five differently colored, box-shaped groups of particles.</p>
 <p>&#160;&#160;&#160;<code>b2ParticleGroupDef pd;</code><br/>
  &#160;&#160;&#160;<code>b2PolygonShape shape;</code><br/>
@@ -227,7 +301,7 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>&#160;&#160;&#160;<code>b2ParticleGroup*group= m_world-&gt;CreateParticleGroup(pd);</code><br/>
  &#160;&#160;&#160;<code>for (int32 i=0;i&lt;group-&gt;GetParticleCount();i+=2)</code><br/>
  &#160;&#160;&#160;<code>{</code><br/>
- &#160;&#160;&#160;&#160;&#160;&#160;<code>group-&gt;GetParticleFlagsBuffer()[i] |=</code> <code>b2_zombieParticle;</code><br/>
+ &#160;&#160;&#160;&#160;&#160;&#160;<code>group-&gt;GetFlagsBuffer()[i] |=</code> <code>b2_zombieParticle;</code><br/>
  &#160;&#160;&#160;<code>}</code></p>
 <p>Note that you can assign multiple behaviors to a group or particle. Use the | ("bitwise OR") operator to chain behavior flags. For example, for a group:</p>
 <p>&#160;&#160;&#160;<code>pd.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup;</code></p>
@@ -244,17 +318,15 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>&#160;&#160;&#160;<code>pd.color.Set(r, g, b, a);</code></p>
 <p>whose parameters set red, green, blue, and opacity, respectively. Each parameter takes a value of 0-255.</p>
 <h3>Size</h3>
+<p>There are two points to keep in mind when using small particles. First, in the case of particle groups, particle size can affect performance. This is because particle size is inversely proportional to the number of particles generated to constitute a group. Having a large number of particles, in turn, can diminish performance.</p>
 <p>Set particle size using the statement</p>
-<p>&#160;&#160;&#160;<code>m_world-&gt;SetParticleRadius®;</code></p>
-<p>where <code>r</code> is a float32 value greater than 0.0f. Its default value is 1.0f.<br/>
- There are two points to keep in mind when using small particles. First, in the case of particle groups, that particle size can affect performance. This is because the smaller the particle size, the larger the number of particles generated to constitute a group. Having a large number of particles, in turn, can diminish performance.<br/>
-</p>
-<p>Second, small particles may behave unpredictably (i.e., break conservation of momentum) in scenarios such as explosions. Slowing these particles down by reducing gravity scale can stabilize their behavior.<br/>
- <br/>
- Note that</p>
+<p>&#160;&#160;&#160;<code>m_world-&gt;SetParticleRadius(r);</code></p>
+<p>where <code>r</code> is a float32 value greater than 0.0f. Default particle radius is 1.0f.</p>
+<p>Small particles may also behave unpredictably (i.e., break conservation of momentum) in scenarios such as explosions. Slowing these particles down by reducing gravity scale can stabilize their behavior.</p>
 <p>Set gravity scale using the statement</p>
-<p>&#160;&#160;&#160;<code>m_world-&gt;SetParticleGravityScale(g);</code></p>
-<p>where <code>g</code> is a float32 value.</p>
+<p>&#160;&#160;&#160;<code>m_world-&gt;SetGravityScale(g);</code></p>
+<p>, where g is a float32 value greater than 0.0f. Default gravity scale is 1.0f.</p>
+<p>It is worth noting that adjusting the number of particle iterations per solver step can also affect the effect of gravity on particles. Larger iteration sizes confer greater resistance to gravity. The most common use case for an increased particle-iteration size is to prevent particle deformation due to gravity.</p>
 <h3>Position</h3>
 <p>Set particle or particle-group position using the statement</p>
 <p>&#160;&#160;&#160;<code>pd.position.Set(x, y);</code></p>
@@ -270,7 +342,7 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>where <code>x</code> is the group's velocity along the x-axis, <code>y</code> is velocity along the y-axis, and <code>aV</code> is the group's angular (i.e., rotational) velocity (expressed as radians per second).</p>
 <h3>Angle (Groups Only)</h3>
 <p>This property applies only to rigid particle groups. It indicates the angle at which a group is tilted. Set angle with the statement</p>
-<p>&#160;&#160;&#160;<code>pd.angle = a;</code></p>
+<p>&#160;&#160;&#160;<code>pd.angle =checkout a;</code></p>
 <p>where <code>a</code> is the angle of tilt, expressed in radians. Left unspecified, the value defaults to 0.</p>
 <h3>Strength (Groups Only)</h3>
 <p>Strength describes the cohesion of a group of particles. Set strength with the statement</p>
@@ -298,7 +370,14 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 </table>
 <p>OpenGL can use these buffers directly in rendering.<br/>
  In this example, OpenGL 1.1 would use glVertexPointer and glColorPointer to get the values from memory. OpenGL 2.0 would use glVertexAttribPointer.<br/>
- OpenGL can be used to render either individual particles or particle groups. </p>
+ OpenGL can be used to render either individual particles or particle groups.</p>
+<p><a class="anchor" id="sa"></a> </p>
+<h2>Sample Applications</h2>
+<p>Among the samples included in the LiquidFun distribution are two applications that offer a quick look into the capabilities of the library.</p>
+<p>Testbed includes a large number of demos that provide examples of different types of particle behavior. While some of the demos are "look only," others are interactive, allowing you to use your mouse or touchscreen to affect the behavior on screen.</p>
+<p>Experimenting with each of the demos, and comparing their behavior against the source code, can provide useful insights into how different particles behave under various conditions. Testbed builds and runs on Android, MacOSX, Linux, and Windows.</p>
+<p>EyeCandy is an Android-only application and is twofold in purpose: It provides a simple Android example of how to use LiquidFun; and, it seeks to inspire developers with its demonstration of the powerful liquid shaders it brings to mobile hardware.</p>
+<p>When running the program, you can slosh the fluid around by changing the orientation of the Android device. You can also toggle bewteen shaders by tapping the screen. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->

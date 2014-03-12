@@ -19,7 +19,6 @@ var searchData=
   ['islocked',['IsLocked',['../classb2_world.html#ae50c318304546c9cc066ee382668c4a1',1,'b2World']]],
   ['ismotorenabled',['IsMotorEnabled',['../classb2_prismatic_joint.html#a236650664554a4d81f8644e9a9d19c65',1,'b2PrismaticJoint::IsMotorEnabled()'],['../classb2_revolute_joint.html#a9477b305db080e17dce8f2c6da0babb0',1,'b2RevoluteJoint::IsMotorEnabled()'],['../classb2_wheel_joint.html#a419bc80e17cc4c1062a692ea79396d19',1,'b2WheelJoint::IsMotorEnabled()']]],
   ['issensor',['isSensor',['../structb2_fixture_def.html#ac8cfcc6208663c92861eaab3b3fdc57e',1,'b2FixtureDef::isSensor()'],['../classb2_fixture.html#a91758c9dca818ca45f3f6427c7e3fc19',1,'b2Fixture::IsSensor()']]],
-  ['issimulationpaused',['IsSimulationPaused',['../classb2_particle_system.html#ac28605bbd4a9b5f244002fde0620e609',1,'b2ParticleSystem']]],
   ['issleepingallowed',['IsSleepingAllowed',['../classb2_body.html#ac0b0c558008bda8cf7984dbaf2ee3aea',1,'b2Body']]],
   ['istouching',['IsTouching',['../classb2_contact.html#a367dc9a563ad7db5547f4247777a33c9',1,'b2Contact']]],
   ['isvalid',['IsValid',['../structb2_a_a_b_b.html#a8d170a2de7a267c3e19f5365685b713d',1,'b2AABB::IsValid()'],['../structb2_vec2.html#aafb971cf7cc726f91fc3a8215fb0aa17',1,'b2Vec2::IsValid()']]],

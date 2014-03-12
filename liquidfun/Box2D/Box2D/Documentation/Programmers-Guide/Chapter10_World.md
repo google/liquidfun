@@ -96,7 +96,8 @@ b->GetNext())`<br/>
 (GameActor*)b->GetUserData();`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`if (myActor->IsDead())`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myWorld->DestroyBody(b); // ERROR: now GetNext returns garbage.`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myWorld->DestroyBody(b);
+// ERROR: now GetNext returns garbage.`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
 
@@ -114,7 +115,8 @@ the body.
 (GameActor*)b->GetUserData();`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`if (myActor->IsDead())`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myWorld->DestroyBody(b);`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myWorld->DestroyBody(b);`
+<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`}`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
 
@@ -165,7 +167,8 @@ fixture)`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`b2Body* body =
 fixture->GetBody();`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`body->SetAwake(true);`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`body->SetAwake(true);`<br
+/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`// Return true to
 continue the query.`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`return true;`<br/>
@@ -264,6 +267,17 @@ following code.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`myBody->ApplyForce(myForce,
 myPoint);`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
+
+You can apply forces and impulses to particles and particle groups, as well.
+Unlike with bodies, however, the load is not applied to an arbitrary world
+point. Instead, it acts upon the center of each particle.
+
+You can apply forces and impulses to individual particles or to particle groups.
+The following example spreads an impulse of (0.7, 0.3) kg m/s across the
+particles in myParticleGroup:
+
+&nbsp;&nbsp;&nbsp;`const b2Vec2 impulse(0.7f, 0.3f);`
+&nbsp;&nbsp;&nbsp;`myParticleGroup->ApplyLinearImpulse(impulse);`
 
 <a name="ct"></a><br/>
 ## Coordinate Transformations

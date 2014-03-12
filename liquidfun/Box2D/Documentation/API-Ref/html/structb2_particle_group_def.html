@@ -123,6 +123,14 @@ float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 const <a class="el" href="classb2_shape.html">b2Shape</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_group_def.html#a97817383da54ee1b44c635de2ff272ce">shape</a></td></tr>
 <tr class="memdesc:a97817383da54ee1b44c635de2ff272ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">The shape where particles will be added. <br/></td></tr>
 <tr class="separator:a97817383da54ee1b44c635de2ff272ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d5b5ea15b45f9bc9c8b41840915b495"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d5b5ea15b45f9bc9c8b41840915b495"></a>
+const <a class="el" href="classb2_shape.html">b2Shape</a> *const *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_group_def.html#a5d5b5ea15b45f9bc9c8b41840915b495">shapes</a></td></tr>
+<tr class="memdesc:a5d5b5ea15b45f9bc9c8b41840915b495"><td class="mdescLeft">&#160;</td><td class="mdescRight">A array of shapes where particles will be added. <br/></td></tr>
+<tr class="separator:a5d5b5ea15b45f9bc9c8b41840915b495"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3164082e9b1b3bf8d7bfc4d52fd52db5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3164082e9b1b3bf8d7bfc4d52fd52db5"></a>
+int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_group_def.html#a3164082e9b1b3bf8d7bfc4d52fd52db5">shapeCount</a></td></tr>
+<tr class="memdesc:a3164082e9b1b3bf8d7bfc4d52fd52db5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of shapes. <br/></td></tr>
+<tr class="separator:a3164082e9b1b3bf8d7bfc4d52fd52db5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9882ac9001f1a6c279385b65b7f13d0"><td class="memItemLeft" align="right" valign="top">float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_group_def.html#ae9882ac9001f1a6c279385b65b7f13d0">stride</a></td></tr>
 <tr class="separator:ae9882ac9001f1a6c279385b65b7f13d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a243ab984330b83be6febd8cd6a6384a9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a243ab984330b83be6febd8cd6a6384a9"></a>
@@ -133,6 +141,8 @@ int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="str
 const <a class="el" href="structb2_vec2.html">b2Vec2</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_group_def.html#ae7643e86cefe12b1468faa5e871a5d81">positionData</a></td></tr>
 <tr class="memdesc:ae7643e86cefe12b1468faa5e871a5d81"><td class="mdescLeft">&#160;</td><td class="mdescRight">The initial positions of the particleCount particles. <br/></td></tr>
 <tr class="separator:ae7643e86cefe12b1468faa5e871a5d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4caa3e45a21ef860060fddc994a07828"><td class="memItemLeft" align="right" valign="top">float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_group_def.html#a4caa3e45a21ef860060fddc994a07828">lifetime</a></td></tr>
+<tr class="separator:a4caa3e45a21ef860060fddc994a07828"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6adc12d9288cc77ace1df5c04f9fa5cd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6adc12d9288cc77ace1df5c04f9fa5cd"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_group_def.html#a6adc12d9288cc77ace1df5c04f9fa5cd">userData</a></td></tr>
 <tr class="memdesc:a6adc12d9288cc77ace1df5c04f9fa5cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this to store application-specific group data. <br/></td></tr>
@@ -155,6 +165,19 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="st
       </table>
 </div><div class="memdoc">
 <p>The world angle of the group in radians. Rotates the shape by an angle equal to the value of angle. </p>
+
+</div>
+</div>
+<a class="anchor" id="a4caa3e45a21ef860060fddc994a07828"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float32 b2ParticleGroupDef::lifetime</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Lifetime of the particle group in seconds. A value &lt;= 0.0f indicates a particle group with infinite lifetime. </p>
 
 </div>
 </div>

@@ -16,9 +16,9 @@ var searchData=
   ['angularvelocity',['angularVelocity',['../structb2_body_def.html#add7809f7a29656b8c4b643ad8c2f34a9',1,'b2BodyDef::angularVelocity()'],['../structb2_particle_group_def.html#a8d3f92839a7940d74b00b54d1b8281a8',1,'b2ParticleGroupDef::angularVelocity()']]],
   ['appendflags',['AppendFlags',['../classb2_draw.html#acc2fd4648ee0a65574770c64528f7166',1,'b2Draw']]],
   ['applyangularimpulse',['ApplyAngularImpulse',['../classb2_body.html#a65384cfad8db2376cdf3fab38cac06e5',1,'b2Body']]],
-  ['applyforce',['ApplyForce',['../classb2_body.html#a942be8e1cd2bcd06f53c4638c45a9525',1,'b2Body']]],
+  ['applyforce',['ApplyForce',['../classb2_body.html#a942be8e1cd2bcd06f53c4638c45a9525',1,'b2Body::ApplyForce()'],['../classb2_particle_group.html#a5f008489140d65a0a311629aa9ea808e',1,'b2ParticleGroup::ApplyForce()'],['../classb2_particle_system.html#aea90f19fb0aa9bcbba649529aa6503f0',1,'b2ParticleSystem::ApplyForce()']]],
   ['applyforcetocenter',['ApplyForceToCenter',['../classb2_body.html#abeba04911f7a2a141169bb06fe98d06a',1,'b2Body']]],
-  ['applylinearimpulse',['ApplyLinearImpulse',['../classb2_body.html#a7f677e93efb3c4c065087aff317274a3',1,'b2Body']]],
+  ['applylinearimpulse',['ApplyLinearImpulse',['../classb2_body.html#a7f677e93efb3c4c065087aff317274a3',1,'b2Body::ApplyLinearImpulse()'],['../classb2_particle_group.html#abd4c22ee10720c08247517b7d92ebbcd',1,'b2ParticleGroup::ApplyLinearImpulse()'],['../classb2_particle_system.html#a3d7b55d6ff599bbb1f3f748a4192e85e',1,'b2ParticleSystem::ApplyLinearImpulse()']]],
   ['applytorque',['ApplyTorque',['../classb2_body.html#a54a354447ac3b4cc224c8327a5abc0e8',1,'b2Body']]],
   ['awake',['awake',['../structb2_body_def.html#a17a8102638aac41e7ab94278651a45bd',1,'b2BodyDef']]]
 ];

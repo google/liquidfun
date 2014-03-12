@@ -2,6 +2,7 @@
 
 [About](#About)<br/>
 [Particles](#Particles)<br/>
+[Particle Systems](#ps)<br/>
 [Particle Groups](#pg)<br/>
 [Discrete Particles vs. Particle Groups](#dp)<br/>
 [Creating and Destroying Particles](#cdp)<br/>
@@ -32,19 +33,49 @@ color.<br/>
 The `b2Particle.h` file contains the enumerated behavior values, as well as
 the
 variables specifying other particle properties. The corresponding enum is
-named
-`b2ParticleFlag.`
+named `b2ParticleFlag.`
+
+<a name="ps">
+## Particle Systems
+
+The "world" that particles inhabit is called a particle system. A particle
+system describes a wide variety of physical coefficients that help dictate
+how particles interact with the world around them. A few examples of these
+conditions are default particle radius, elasticity, and viscosity. For more
+detail, see the API Reference description of the b2ParticleSystemDef struct.
+
+The following example creates a particle system:
+
+&nbsp;&nbsp;&nbsp;`const b2ParticleSystemDef particleSystemDef;`
+&nbsp;&nbsp;&nbsp;`   m_particleSystems[0] =`
+&nbsp;&nbsp;&nbsp;`      m_world->CreateParticleSystem(&particleSystemDef);`
+
+You can also create more than one particle system: Thus, one "world's"
+particles may have a certain default radius, elasticity, etc., while the other
+"world" has different default values for these properties. The following sample
+shows the creation of multiple particle systems:
+
+&nbsp;&nbsp;&nbsp;`const b2ParticleSystemDef particleSystemDef;`
+&nbsp;&nbsp;&nbsp;`for (int i = 0; i < NUM_PARTICLE_SYSTEMS; ++i) {`
+&nbsp;&nbsp;&nbsp;   `m_particleSystems[i] =`
+&nbsp;&nbsp;&nbsp;      `m_world->CreateParticleSystem(&particleSystemDef);`
+
+In many, if not most,
+cases, it will not be necessary to adjust the default values or create multiple
+particle systems. You may find it useful in some cases, however.
+
+For example, dividing particles into multiple systems can yield a performance
+gain by allowing you to simulate only the visible systems while putting all
+other systems in a "paused" state using `b2ParticleSystem::SetPaused()`.
 
 <a name="pg">
 ## Particle Groups
 
 Instead of creating particles individually, you can create a group of
 particles to manipulate en masse. Some of the particle-group properties that
-you
-can set are the same as those for discrete particles: behavior, position,
-linear
-velocity, and color. There are also properties specific to groups: rotational
-angle, rotational velocity, and strength.<br/>
+you can set are the same as those for discrete particles: behavior, position,
+linear velocity, and color. There are also properties specific to groups:
+rotational angle, rotational velocity, and strength.<br/>
 The `b2ParticleGroup.h` file contains the declarations for all of these
 variables, as well as the enum for particle-group behavior:
 `b2ParticleGroupFlag`.
@@ -71,8 +102,7 @@ particles at once.
 
 To create individual particles, create a `b2ParticleDef`-struct object. Next,
 specify the behavior and properties of the particle. Finally, call the method
-to
-create the particle.<br/>
+to create the particle.<br/>
 The following example creates an individual particle.
 
 &nbsp;&nbsp;&nbsp;`b2ParticleDef pd;`<br>
@@ -92,6 +122,118 @@ The following example destroys the particle created above.
 
 &nbsp;&nbsp;&nbsp;`m_world->DestroyParticle(tempIndex);`<br/>
 
+### Particle lifetimes
+
+In addition to manual destruction of particles as described above, particles
+can also expire and be destroyed due to age.
+
+The following example tells the system to track particle ages for the purpose
+of destroying them.
+
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetParticleDestructionByAge(true);`
+
+A particle can die one of two "age-related" deaths. First, you can set a
+lifetime for a particle--a period of time after which it expires.  The following
+example does this:
+
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetParticleLifetime(`
+&nbsp;&nbsp;&nbsp;`             index, Random() *`
+&nbsp;&nbsp;&nbsp;`                             (k_particleLifetimeMax -
+k_particleLifetimeMin) +`
+&nbsp;&nbsp;&nbsp;`                             k_particleLifetimeMin);`
+
+where `index` specifies the number of the particle whose lifetime is being
+assigned, and the `Random()` function generates a random value for that
+lifetime.
+
+You do not need to set a specific lifetime for a particle for it to have an
+age-related death. If you set a maximum number of particles that can exist in a
+particle system, and you have have told the system to track particle ages, the
+system clamps particle count by culling "excess" particles. Particle culling
+takes place in age order, with the oldest ones destroyed first.
+
+The following example sets a maximum particle count for a particle system.
+
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetParticleMaxCount(k_maxParticleCount);`
+
+The Faucet example in the Testbed provides an example of both types of
+lifetime-driven particle destruction.
+
+### Stuck Particles
+
+Particles may get stuck and become obstructions that need to be destroyed or
+relocated. A particle is identified as possibly stuck if it remains in contact
+with two or more surfaces for a user-specified number (threshold) of particle
+iterations. Once "candidates" are identified, you can implement your own logic
+to decide whether they are actually stuck, and how to deal with them.
+
+The ability to implement your own logic gives you flexibility in deciding
+when you want to consider a particle stuck. For instance, a ball may
+be traveling down a chute, making contact with walls on multiple sides. This
+state satisfies the "possibly stuck" condition described in the previous
+paragraph. But you could implement logic judging the ball not stuck as long
+as it keeps traveling down the chute.
+
+On the other hand, you could also decide that not only an immobile particle,
+but even a mobile one trapped in a certain spatial range, is stuck. The system
+relies on you to judge the candidates.
+
+The following example shows one possible implementation for such a case.
+
+<pre>
+&nbsp;&nbsp;&nbsp;// This code example of app logic deciding whether or not to
+&nbsp;&nbsp;&nbsp;// eliminate stuck
+&nbsp;&nbsp;&nbsp;// particles shows a user who set up a global array of sensor
+&nbsp;&nbsp;&nbsp;// fixtures covering
+&nbsp;&nbsp;&nbsp;// areas they know to be "problematic" for stuck particles in
+&nbsp;&nbsp;&nbsp;// their geometry,
+&nbsp;&nbsp;&nbsp;// and then at each step testing any stuck particles against
+&nbsp;&nbsp;&nbsp;// those sensors,
+&nbsp;&nbsp;&nbsp;// eliminating any stuck particles that lie inside a known
+&nbsp;&nbsp;&nbsp;// problem region.
+&nbsp;&nbsp;&nbsp;void DestroyStuckParticlesInSensors(const b2Fixture * const
+&nbsp;&nbsp;&nbsp;// *sensors, int32 num)
+&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;	const int32 stuck = gParticleSystem-
+&nbsp;&nbsp;&nbsp;>GetStuckCandidateCount();
+&nbsp;&nbsp;&nbsp;	if (stuck > 0)
+&nbsp;&nbsp;&nbsp;	{
+&nbsp;&nbsp;&nbsp;		const int32 *candidates = gParticleSystem-
+&nbsp;&nbsp;&nbsp;>GetStuckCandidates();
+&nbsp;&nbsp;&nbsp;		const b2Vec2 *positions = gParticleSystem-
+&nbsp;&nbsp;&nbsp;>GetParticlePositionBuffer();
+&nbsp;&nbsp;&nbsp;		for (int32 i = 0; i < stuck; ++i)
+&nbsp;&nbsp;&nbsp;		{
+&nbsp;&nbsp;&nbsp;			const int32 particle = candidates[i];
+&nbsp;&nbsp;&nbsp;			const b2Vec2 &position = positions
+&nbsp;&nbsp;&nbsp;[particle];
+&nbsp;&nbsp;&nbsp;			for (int32 j = 0; j < num; ++j)
+&nbsp;&nbsp;&nbsp;			{
+&nbsp;&nbsp;&nbsp;				if(sensors[j]->TestPoint
+&nbsp;&nbsp;&nbsp;(position))
+&nbsp;&nbsp;&nbsp;				{
+&nbsp;&nbsp;&nbsp;					gParticleSystem-
+&nbsp;&nbsp;&nbsp;>DestroyParticle(particle);
+&nbsp;&nbsp;&nbsp;				}
+&nbsp;&nbsp;&nbsp;			}
+&nbsp;&nbsp;&nbsp;		}
+&nbsp;&nbsp;&nbsp;	}
+&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;// particles in multiple contacts for 5 or more iterations are
+&nbsp;&nbsp;&nbsp;// candidates
+&nbsp;&nbsp;&nbsp;gParticleSystem->SetStuckThreshold(5);
+
+&nbsp;&nbsp;&nbsp;// step the world (assuming the timestep, velocity iterations,
+&nbsp;&nbsp;&nbsp;// and position iterations have been set globally).
+
+&nbsp;&nbsp;&nbsp;gWorld->Step(gTimeStep, gVelocityIterations,
+gPositionIterations);
+
+&nbsp;&nbsp;&nbsp;// Perform the above check for stuck particles against sensors
+&nbsp;&nbsp;&nbsp;// in this global array.
+&nbsp;&nbsp;&nbsp;DestroyStuckParticlesInSensors(gProblemAreaSensors,
+gNumSensors);
+</pre>
 
 <a name="cdpg">
 ## Creating and Destroying Particle Groups
@@ -99,7 +241,8 @@ The following example destroys the particle created above.
 A particle group begins life in a shaped container. You must therefore start a
 particle group definition by specifying a shape. Next, create a
 b2ParticleGroupDef-struct object. Then, specify the behavior and properties of
-the particle. Finally, call the method to create a particle group.<br/>
+the particles themselves. Finally, call the method to create a particle
+group.<br/>
 The following example creates five differently colored, box-shaped groups of
 particles.
 
@@ -381,33 +524,36 @@ Set particle or particle-group color using the statement
 &nbsp;&nbsp;&nbsp;`pd.color.Set(r, g, b, a);`
 
 whose parameters set red, green, blue, and opacity, respectively. Each
-parameter
-takes a value of 0-255.
+parameter takes a value of 0-255.
 
 ### Size
 
+There are two points to keep in mind when using small particles. First, in the
+case of particle groups, particle size can affect performance. This is
+because particle size is inversely proportional to the number of particles
+generated to constitute a group. Having a large number of particles, in turn,
+can diminish performance.
+
 Set particle size using the statement
 
-&nbsp;&nbsp;&nbsp;`m_world->SetRadius®;`
+&nbsp;&nbsp;&nbsp;`m_world->SetParticleRadius(r);`
 
-where `r` is a float32 value greater than 0.0f. Its default value is 1.0f.<br/>
-There are two points to keep in mind when using small particles. First, in the
-case of particle groups, that particle size can affect performance. This is
-because the smaller the particle size, the larger the number of particles
-generated to constitute a group. Having a large number of particles, in turn,
-can diminish performance.<br/>
+where `r` is a float32 value greater than 0.0f. Default particle radius is 1.0f.
 
-Second, small particles may behave unpredictably (i.e., break conservation of
+Small particles may also behave unpredictably (i.e., break conservation of
 momentum) in scenarios such as explosions. Slowing these particles down by
-reducing gravity scale can stabilize their behavior.<br/>
-<br/>
-Note that
+reducing gravity scale can stabilize their behavior.
 
 Set gravity scale using the statement
 
 &nbsp;&nbsp;&nbsp;`m_world->SetGravityScale(g);`
 
-where `g` is a float32 value.
+, where g is a float32 value greater than 0.0f. Default gravity scale is 1.0f.
+
+It is worth noting that adjusting the number of particle iterations per solver
+step can also affect the effect of gravity on particles. Larger iteration sizes
+confer greater resistance to gravity. The most common use case for an increased
+particle-iteration size is to prevent particle deformation due to gravity.
 
 ### Position
 

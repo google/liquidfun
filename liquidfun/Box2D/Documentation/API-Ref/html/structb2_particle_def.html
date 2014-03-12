@@ -108,6 +108,8 @@ Public Attributes</h2></td></tr>
 <a class="el" href="classb2_particle_color.html">b2ParticleColor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_def.html#af6b2180a2f76fba5f8fc3cff6f9acd91">color</a></td></tr>
 <tr class="memdesc:af6b2180a2f76fba5f8fc3cff6f9acd91"><td class="mdescLeft">&#160;</td><td class="mdescRight">The color of the particle. <br/></td></tr>
 <tr class="separator:af6b2180a2f76fba5f8fc3cff6f9acd91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5561a5615e30e6ab3af9bb2048dbd467"><td class="memItemLeft" align="right" valign="top">float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_def.html#a5561a5615e30e6ab3af9bb2048dbd467">lifetime</a></td></tr>
+<tr class="separator:a5561a5615e30e6ab3af9bb2048dbd467"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af293c58640b3b403746d861b0b04e2f8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af293c58640b3b403746d861b0b04e2f8"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_def.html#af293c58640b3b403746d861b0b04e2f8">userData</a></td></tr>
 <tr class="memdesc:af293c58640b3b403746d861b0b04e2f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this to store application-specific body data. <br/></td></tr>
@@ -132,6 +134,19 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="st
 
 <p>Specifies the type of particle (see <a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50" title="The particle type. Can be combined with the | operator. ">b2ParticleFlag</a>). </p>
 <p>A particle may be more than one type. Multiple types are chained by logical sums, for example: pd.flags = b2_elasticParticle | b2_viscousParticle </p>
+
+</div>
+</div>
+<a class="anchor" id="a5561a5615e30e6ab3af9bb2048dbd467"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float32 b2ParticleDef::lifetime</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Lifetime of the particle in seconds. A value &lt;= 0.0f indicates a particle with infinite lifetime. </p>
 
 </div>
 </div>
