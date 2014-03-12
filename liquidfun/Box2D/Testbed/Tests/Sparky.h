@@ -29,8 +29,9 @@ public:
 	// Size is how big of a particle splash to make (in meters)
 	// Speed is the scale of how fast to make the particles shoot out
 	// Lifetime in seconds.
-	ParticleVFX(b2ParticleSystem *particleSystem, const b2Vec2 &origin, float32 size,
-				float32 speed, float32 lifetime, uint32 particleFlags)
+	ParticleVFX(b2ParticleSystem *particleSystem, const b2Vec2 &origin,
+				float32 size, float32 speed, float32 lifetime,
+				uint32 particleFlags)
 	{
 
 		// Create a circle to house the particles of size size
@@ -134,7 +135,7 @@ public:
 		}
 
 		CreateWalls();
-		m_particleSystem->SetRadius(0.1f);
+		m_particleSystem->SetRadius(0.25f);
 
 		// Create a list of circles that will spark.
 		for (int i = 0; i < c_maxCircles; i++)
