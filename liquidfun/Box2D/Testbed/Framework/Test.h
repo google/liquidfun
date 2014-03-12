@@ -67,7 +67,7 @@ struct Settings
 		particleIterations = b2CalculateParticleIterations(10, 0.04f, 1 / hz);
 		drawShapes = 1;
 		drawParticles = 1;
-		drawJoints = 1;
+		drawJoints = 0;
 		drawAABBs = 0;
 		drawContactPoints = 0;
 		drawContactNormals = 0;

@@ -18,6 +18,9 @@
 
 #include "ParticleParameter.h"
 
+const uint32 ParticleParameter::k_DefaultOptions =
+	OptionDrawShapes | OptionDrawParticles;
+
 const ParticleParameter::Value ParticleParameter::k_particleTypes[] =
 {
 	{ b2_waterParticle, ParticleParameter::k_DefaultOptions, "water" },
@@ -31,8 +34,8 @@ const ParticleParameter::Value ParticleParameter::k_particleTypes[] =
 	{ b2_colorMixingParticle, ParticleParameter::k_DefaultOptions,
 		"color mixing" },
 	{ b2_wallParticle, ParticleParameter::k_DefaultOptions, "wall" },
-	{ b2_barrierParticle | b2_wallParticle, ParticleParameter::k_DefaultOptions,
-		"barrier" },
+	{ b2_barrierParticle | b2_wallParticle,
+	    ParticleParameter::k_DefaultOptions, "barrier" },
 	{ b2_staticPressureParticle, ParticleParameter::k_DefaultOptions,
 		"static pressure" },
 	{ b2_waterParticle, ParticleParameter::k_DefaultOptions |

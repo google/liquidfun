@@ -41,9 +41,7 @@ public:
 		OptionDrawProfile = 1 << 11
 	};
 
-	static const uint32 k_DefaultOptions = OptionDrawShapes |
-										   OptionDrawParticles |
-										   OptionDrawJoints;
+	static const uint32 k_DefaultOptions;
 
 	// Value of a particle parameter.
 	struct Value
