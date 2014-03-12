@@ -205,23 +205,26 @@ for %%a in (%android_root%) do (
   set android_root=%%~da%%~pa
 )
 set cmake_prebuilts_root=%android_root%prebuilts\cmake\windows
+set cmake_prebuilt=
 for /F %%a in ('dir /b %cmake_prebuilts_root%\cmake-*') do (
   if exist %cmake_prebuilts_root%\%%a\bin\cmake.exe (
     set cmake_prebuilt=%cmake_prebuilts_root%\%%a\bin\cmake.exe
     goto found_cmake_prebuilt
   )
 )
-:found_cmake_prebuilt
+if "%cmake_prebuilt%"=="" goto no_cmake_prebuilt
 
-if exist %cmake_prebuilt% (
-  set cmake=%cmake_prebuilt%
-  goto check_cmake_version
-)
+:found_cmake_prebuilt
+set cmake=%cmake_prebuilt%
+goto check_cmake_version
+
+:no_cmake_prebuilt
 echo Searching PATH for cmake. >&2
 for /F "delims=;" %%a in ('where cmake') do set cmake=%%a
 if exist "%cmake%" goto check_cmake_version
 echo Unable to find cmake %cmake_minversion_minmaj% on this machine.>&2
 exit /B -1
+
 :check_cmake_version
 rem Get the absolute path of cmake.
 for /F "delims=;" %%a in ("%cmake%") do set cmake="%%~da%%~pa%%~na%%~xa"
