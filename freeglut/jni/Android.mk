@@ -20,7 +20,8 @@ ${eval \
                 -DNEED_XPARSEGEOMETRY_IMPL \
                 -DVERSION_MAJOR=$(VERSION_MAJOR) \
                 -DVERSION_MINOR=$(VERSION_MINOR) \
-                -DVERSION_PATCH=$(VERSION_PATCH)
+                -DVERSION_PATCH=$(VERSION_PATCH) \
+                -DFREEGLUT_VIRTUAL_PAD=0
   LOCAL_ARM_MODE:=arm
   ifeq ($1,1)
     gllibsuffix:=_CM

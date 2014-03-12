@@ -238,6 +238,7 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
     float x = AMotionEvent_getX(event, 0);
     float y = AMotionEvent_getY(event, 0);
 
+#if FREEGLUT_VIRTUAL_PAD
     /* Virtual arrows PAD */
     /* Don't interfere with existing mouse move event */
     if (!touchscreen.in_mmotion) {
@@ -290,6 +291,7 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
 	return EVENT_HANDLED;
       }
     }
+#endif // FREEGLUT_VIRTUAL_PAD
     
     /* Normal mouse events */
     if (!touchscreen.vpad.on) {
