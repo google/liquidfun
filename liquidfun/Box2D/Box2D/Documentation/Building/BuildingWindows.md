@@ -32,8 +32,14 @@ When working directly with the source, use [cmake][] to generate the
 [Visual Studio][] solution and project files.  For example, the following
 generates the [Visual Studio][] solution in the `liquidfun/Box2D` directory:
 
-    cd liquidfun/Box2D
+    cd liquidfun\Box2D
     cmake -G "Visual Studio 11"
+
+Running [cmake][] under [cygwin][] requires empty TMP, TEMP, tmp and temp
+variables.  To generate a [Visual Studio][] from a [cygwin][] bash shell use:
+
+    $ cd liquidfun/Box2D
+    $ ( unset {temp,tmp,TEMP,TMP} ; cmake -G "Visual Studio 11" )
 
 ### Running Unit Tests
 
@@ -47,3 +53,4 @@ Use the run\_tests.bat batch file to execute unit tests:
   [cmake]: http://www.cmake.org
   [Visual Studio]: http://www.visualstudio.com/
   [Windows]: http://windows.microsoft.com/
+  [cygwin]: http://www.cygwin.com/

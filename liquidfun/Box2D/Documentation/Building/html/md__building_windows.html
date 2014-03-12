@@ -73,8 +73,11 @@ $(document).ready(function(){initNavTree('md__building_windows.html','');});
 </ul>
 <h3>Building using <a href="http://www.cmake.org">cmake</a></h3>
 <p>When working directly with the source, use <a href="http://www.cmake.org">cmake</a> to generate the <a href="http://www.visualstudio.com/">Visual Studio</a> solution and project files. For example, the following generates the <a href="http://www.visualstudio.com/">Visual Studio</a> solution in the <code>liquidfun/Box2D</code> directory: </p>
-<pre class="fragment">cd liquidfun/Box2D
+<pre class="fragment">cd liquidfun\Box2D
 cmake -G "Visual Studio 11"
+</pre><p>Running <a href="http://www.cmake.org">cmake</a> under <a href="http://www.cygwin.com/">cygwin</a> requires empty TMP, TEMP, tmp and temp variables. To generate a <a href="http://www.visualstudio.com/">Visual Studio</a> from a <a href="http://www.cygwin.com/">cygwin</a> bash shell use: </p>
+<pre class="fragment">$ cd liquidfun/Box2D
+$ ( unset {temp,tmp,TEMP,TMP} ; cmake -G "Visual Studio 11" )
 </pre><h3>Running Unit Tests</h3>
 <p>Developers modifying the LiquidFun library can verify that it is still working correctly by executing the provided unit tests.</p>
 <p>Use the run_tests.bat batch file to execute unit tests: </p>
