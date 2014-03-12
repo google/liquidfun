@@ -773,6 +773,79 @@ void b2ParticleSystem::CreateParticlesWithShapeForGroup(
 	}
 }
 
+void b2ParticleSystem::CreateParticlesWithShapesForGroup(
+	const b2Shape* const* shapes, int32 shapeCount,
+	const b2ParticleGroupDef& groupDef, const b2Transform& xf)
+{
+	class CompositeShape : public b2Shape
+	{
+	public:
+		CompositeShape(const b2Shape* const* shapes, int32 shapeCount)
+		{
+			m_shapes = shapes;
+			m_shapeCount = shapeCount;
+		}
+		b2Shape* Clone(b2BlockAllocator* allocator) const
+		{
+			b2Assert(false);
+			return NULL;
+		}
+		int32 GetChildCount() const
+		{
+			return 1;
+		}
+		bool TestPoint(const b2Transform& xf, const b2Vec2& p) const
+		{
+			for (int32 i = 0; i < m_shapeCount; i++)
+			{
+				if (m_shapes[i]->TestPoint(xf, p))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		void ComputeDistance(const b2Transform& xf, const b2Vec2& p,
+					float32* distance, b2Vec2* normal, int32 childIndex) const
+		{
+			b2Assert(false);
+		}
+		bool RayCast(b2RayCastOutput* output, const b2RayCastInput& input,
+						const b2Transform& transform, int32 childIndex) const
+		{
+			b2Assert(false);
+			return false;
+		}
+		void ComputeAABB(
+				b2AABB* aabb, const b2Transform& xf, int32 childIndex) const
+		{
+			aabb->lowerBound.x = +FLT_MAX;
+			aabb->lowerBound.y = +FLT_MAX;
+			aabb->upperBound.x = -FLT_MAX;
+			aabb->upperBound.y = -FLT_MAX;
+			b2Assert(childIndex == 0);
+			for (int32 i = 0; i < m_shapeCount; i++)
+			{
+				int32 childCount = m_shapes[i]->GetChildCount();
+				for (int32 j = 0; j < childCount; j++)
+				{
+					b2AABB subaabb;
+					m_shapes[i]->ComputeAABB(&subaabb, xf, j);
+					aabb->Combine(subaabb);
+				}
+			}
+		}
+		void ComputeMass(b2MassData* massData, float32 density) const
+		{
+			b2Assert(false);
+		}
+	private:
+		const b2Shape* const* m_shapes;
+		int32 m_shapeCount;
+	} compositeShape(shapes, shapeCount);
+	CreateParticlesFillShapeForGroup(&compositeShape, groupDef, xf);
+}
+
 b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
 	const b2ParticleGroupDef& groupDef)
 {
@@ -791,11 +864,8 @@ b2ParticleGroup* b2ParticleSystem::CreateParticleGroup(
 	}
 	if (groupDef.shapes)
 	{
-		for (int32 i = 0; i < groupDef.shapeCount; i++)
-		{
-			CreateParticlesWithShapeForGroup(
-									groupDef.shapes[i], groupDef, transform);
-		}
+		CreateParticlesWithShapesForGroup(
+					groupDef.shapes, groupDef.shapeCount, groupDef, transform);
 	}
 	if (groupDef.particleCount)
 	{

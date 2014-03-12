@@ -680,6 +680,9 @@ private:
 	void CreateParticlesWithShapeForGroup(
 		const b2Shape* shape,
 		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
+	void CreateParticlesWithShapesForGroup(
+		const b2Shape* const* shapes, int32 shapeCount,
+		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
 	void DestroyParticleGroup(b2ParticleGroup* group);
 
 	void UpdatePairsAndTriads(
