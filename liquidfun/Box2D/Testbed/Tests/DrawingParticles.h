@@ -214,9 +214,9 @@ public:
 			b2ParticleGroupDef pd;
 			pd.shape = &shape;
 			pd.flags = m_particleFlags;
-			if ((m_particleFlags & (b2_wallParticle | b2_springParticle |
-				b2_elasticParticle | b2_barrierParticle)) ||
-				(m_groupFlags & b2_rigidParticleGroup))
+			if ((m_particleFlags &
+				(b2_wallParticle | b2_springParticle | b2_elasticParticle)) ||
+				(m_particleFlags == (b2_wallParticle | b2_barrierParticle)))
 			{
 				pd.flags |= b2_reactiveParticle;
 			}
