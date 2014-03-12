@@ -97,6 +97,7 @@ struct b2ParticleSystemDef
 		viscousStrength = 0.25f;
 		surfaceTensionPressureStrength = 0.2f;
 		surfaceTensionNormalStrength = 0.2f;
+		repulsiveStrength = 1.0f;
 		powderStrength = 0.5f;
 		ejectionStrength = 0.5f;
 		staticPressureStrength = 0.2f;
@@ -137,6 +138,12 @@ struct b2ParticleSystemDef
 	/// Smoothes outline of tensile particles
 	/// TODO: document further
 	float32 surfaceTensionNormalStrength;
+
+	/// Produces additional pressure on repulsive particles
+	/// Larger values repulse more
+	/// Negative values mean attraction. The range where particles behave stably
+	/// is about -0.2 to 2.0.
+	float32 repulsiveStrength;
 
 	/// Produces repulsion between powder particles
 	/// Larger values repulse more
@@ -884,6 +891,7 @@ private:
 	void SolveSpring(const b2TimeStep& step);
 	void SolveTensile(const b2TimeStep& step);
 	void SolveViscous();
+	void SolveRepulsive(const b2TimeStep& step);
 	void SolvePowder(const b2TimeStep& step);
 	void SolveSolid(const b2TimeStep& step);
 	void SolveForce(const b2TimeStep& step);

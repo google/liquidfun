@@ -1848,6 +1848,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		{
 			SolveViscous();
 		}
+		if (m_allParticleFlags & b2_repulsiveParticle)
+		{
+			SolveRepulsive(subStep);
+		}
 		if (m_allParticleFlags & b2_powderParticle)
 		{
 			SolvePowder(subStep);
@@ -2334,6 +2338,29 @@ void b2ParticleSystem::SolveViscous()
 			b2Vec2 f = viscousStrength * w * v;
 			m_velocityBuffer.data[a] += f;
 			m_velocityBuffer.data[b] -= f;
+		}
+	}
+}
+
+void b2ParticleSystem::SolveRepulsive(const b2TimeStep& step)
+{
+	float32 repulsiveStrength =
+		m_def.repulsiveStrength * GetCriticalVelocity(step);
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		if (contact.flags & b2_repulsiveParticle)
+		{
+			int32 a = contact.indexA;
+			int32 b = contact.indexB;
+			if (m_groupBuffer[a] != m_groupBuffer[b])
+			{
+				float32 w = contact.weight;
+				b2Vec2 n = contact.normal;
+				b2Vec2 f = repulsiveStrength * w * n;
+				m_velocityBuffer.data[a] -= f;
+				m_velocityBuffer.data[b] += f;
+			}
 		}
 	}
 }
