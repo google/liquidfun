@@ -332,38 +332,55 @@ install_apk() {
 # to the host system.
 launch_package() {
   (
-    # Clear logs from previous runs.
-    # Note that logcat does not just 'tail' the logs, it dumps the entire log
-    # history.
-    adb ${adb_device} logcat -c
-
-    # Display logcat in the background.
-    # Stop displaying the log when the app launch / execution completes.
-    local finished_msg='Displayed '"${package_name}"
-    local timeout_msg='Activity destroy timeout.*'"${package_name}"
-    adb ${adb_device} logcat | \
-      awk "
-        {
-          print \$0
-        }
-
-        /ActivityManager.*: ${finished_msg}/ {
-          exit 0
-        }
-
-        /ActivityManager.*: ${timeout_msg}/ {
-          exit 0
-        }" &
-    logcat_pid=$!
-    # Kill adb logcat if this shell exits.
-    trap "kill_process_group ${logcat_pid}" SIGINT SIGTERM EXIT
-
     # Determine the SDK version of Android on the device.
     local -r android_sdk_version=$(
       adb ${adb_device} shell cat system/build.prop | \
       awk -F= '/ro.build.version.sdk/ {
                  v=$2; sub(/[ \r\n]/, "", v); print v
                }')
+
+    # Clear logs from previous runs.
+    # Note that logcat does not just 'tail' the logs, it dumps the entire log
+    # history.
+    adb ${adb_device} logcat -c
+
+    local finished_msg='Displayed '"${package_name}"
+    local timeout_msg='Activity destroy timeout.*'"${package_name}"
+    # Maximum time to wait before stopping log monitoring.  0 = infinity.
+    local launch_timeout=0
+    # If this is a Gingerbread device, kill log monitoring after 10 seconds.
+    if [[ $((android_sdk_version)) -le 10 ]]; then
+      launch_timeout=10
+    fi
+    # Display logcat in the background.
+    # Stop displaying the log when the app launch / execution completes or the
+    # logcat
+    (
+      adb ${adb_device} logcat | \
+        awk "
+          {
+            print \$0
+          }
+
+          /ActivityManager.*: ${finished_msg}/ {
+            exit 0
+          }
+
+          /ActivityManager.*: ${timeout_msg}/ {
+            exit 0
+          }" &
+      adb_logcat_pid=$!;
+      if [[ $((launch_timeout)) -gt 0 ]]; then
+        sleep $((launch_timeout));
+        kill ${adb_logcat_pid};
+      else
+        wait ${adb_logcat_pid};
+      fi
+    ) &
+    logcat_pid=$!
+    # Kill adb logcat if this shell exits.
+    trap "kill_process_group ${logcat_pid}" SIGINT SIGTERM EXIT
+
     # If the SDK is newer than 10, "am" supports stopping an activity.
     adb_stop_activity=
     if [[ $((android_sdk_version)) -gt 10 ]]; then
