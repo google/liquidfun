@@ -66,6 +66,8 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added option to pause particle simulations. Paused simluations don't
     consume cycles in b2World::Step.
 *   Added option to enable a more strict check for Particle/Body interactions
+*   Added option to call a contact listener or filter on particle / fixture
+    or particle / particle interactions.
     in cases where complex world geometry may cause false positive contacts.
 *   Added "EyeCandy" sample to demonstrate different particle rendering methods
     on Android.

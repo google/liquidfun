@@ -41,6 +41,7 @@ enum b2ParticleGroupFlag
 	b2_particleGroupWillBeDestroyed = 1 << 3,
 	/// Updates depth data on next simulation step.
 	b2_particleGroupNeedsUpdateDepth = 1 << 4,
+	/// Call b2ContactListener when this group interacts with rigid bodies.
 	b2_particleGroupInternalMask =
 		b2_particleGroupWillBeDestroyed |
 		b2_particleGroupNeedsUpdateDepth,

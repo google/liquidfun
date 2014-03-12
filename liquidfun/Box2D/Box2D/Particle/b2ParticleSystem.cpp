@@ -264,6 +264,7 @@ b2ParticleSystem::~b2ParticleSystem()
 	FreeBuffer(&m_bodyContactBuffer, m_bodyContactCapacity);
 	FreeBuffer(&m_pairBuffer, m_pairCapacity);
 	FreeBuffer(&m_triadBuffer, m_triadCapacity);
+	FreeBuffer(&m_stuckParticleBuffer, m_stuckParticleCapacity);
 }
 
 template <typename T> void b2ParticleSystem::FreeBuffer(T** b, int capacity)
@@ -409,8 +410,8 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 		// not enabled.
 		const bool stuck = m_stuckThreshold > 0;
 		m_lastBodyContactStepBuffer.data = ReallocateBuffer(
-			&m_lastBodyContactStepBuffer, m_internalAllocatedCapacity, capacity,
-			stuck);
+			&m_lastBodyContactStepBuffer, m_internalAllocatedCapacity,
+			capacity, stuck);
 		m_bodyContactCountBuffer.data = ReallocateBuffer(
 			&m_bodyContactCountBuffer, m_internalAllocatedCapacity, capacity,
 			stuck);
@@ -1326,12 +1327,26 @@ void b2ParticleSystem::ComputeDepth()
 	m_world->m_stackAllocator.Free(contactGroups);
 }
 
-inline void b2ParticleSystem::AddContact(int32 a, int32 b)
+inline void b2ParticleSystem::AddContact(
+	int32 a, int32 b, b2ContactFilter* const contactFilter,
+	b2ContactListener* const contactListener,
+	ParticlePairSet* const particlePairSet)
 {
 	b2Vec2 d = m_positionBuffer.data[b] - m_positionBuffer.data[a];
 	float32 distBtParticlesSq = b2Dot(d, d);
 	if (distBtParticlesSq < m_squaredDiameter)
 	{
+        // Optionally filter the contact.
+        if (contactFilter)
+        {
+            const uint32* const flags = GetFlagsBuffer();
+            if (((flags[a] | flags[b]) & b2_particleContactFilterParticle) &&
+                !contactFilter->ShouldCollide(this, a, b))
+            {
+                return;
+            }
+        }
+
 		m_contactBuffer = RequestGrowableBuffer(m_contactBuffer,
 												m_contactCount,
 												&m_contactCapacity);
@@ -1344,12 +1359,52 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 		contact.weight = 1 - distBtParticlesSq * invD * m_inverseDiameter;
 		contact.normal = invD * d;
 		m_contactCount++;
+
+		if (contactListener)
+		{
+			ParticlePair pair;
+			pair.first = a;
+			pair.second = b;
+			int32 itemIndex = particlePairSet->Find(pair);
+			if (itemIndex < 0)
+			{
+				pair.first = b;
+				pair.second = a;
+				itemIndex = particlePairSet->Find(pair);
+			}
+			if (itemIndex >= 0)
+			{
+				// Already touching, ignore this contact.
+				particlePairSet->Invalidate(itemIndex);
+			}
+			else
+			{
+				// Just started touching, inform the listener.
+				contactListener->BeginContact(this, &contact);
+			}
+		}
 	}
 }
 
 static inline bool b2ParticleContactIsZombie(const b2ParticleContact& contact)
 {
 	return (contact.flags & b2_zombieParticle) == b2_zombieParticle;
+}
+
+// Get the world's contact filter if any particles with the
+// b2_particleContactFilterParticle flag are present in the system.
+inline b2ContactFilter* b2ParticleSystem::GetParticleContactFilter() const
+{
+	return (m_allParticleFlags & b2_particleContactFilterParticle) ?
+		m_world->m_contactManager.m_contactFilter : NULL;
+}
+
+// Get the world's contact listener if any particles with the
+// b2_particleContactListenerParticle flag are present in the system.
+inline b2ContactListener* b2ParticleSystem::GetParticleContactListener() const
+{
+	return (m_allParticleFlags & b2_particleContactListenerParticle) ?
+		m_world->m_contactManager.m_contactListener : NULL;
 }
 
 void b2ParticleSystem::UpdateContacts(bool exceptZombie)
@@ -1364,14 +1419,25 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 								m_inverseDiameter * p.y);
 	}
 	std::sort(beginProxy, endProxy);
+
+	b2ContactListener* const contactListener = GetParticleContactListener();
+	ParticlePairSet particlePairs(&m_world->m_stackAllocator);
+	if (contactListener)
+	{
+		particlePairs.Initialize(m_contactBuffer, m_contactCount,
+								 GetFlagsBuffer());
+	}
+
 	m_contactCount = 0;
+	b2ContactFilter* const contactFilter = GetParticleContactFilter();
 	for (Proxy *a = beginProxy, *c = beginProxy; a < endProxy; a++)
 	{
 		uint32 rightTag = computeRelativeTag(a->tag, 1, 0);
 		for (Proxy* b = a + 1; b < endProxy; b++)
 		{
 			if (rightTag < b->tag) break;
-			AddContact(a->index, b->index);
+			AddContact(a->index, b->index, contactFilter,
+					   contactListener, &particlePairs);
 		}
 		uint32 bottomLeftTag = computeRelativeTag(a->tag, -1, 1);
 		for (; c < endProxy; c++)
@@ -1382,7 +1448,8 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 		for (Proxy* b = c; b < endProxy; b++)
 		{
 			if (bottomRightTag < b->tag) break;
-			AddContact(a->index, b->index);
+			AddContact(a->index, b->index, contactFilter,
+					   contactListener, &particlePairs);
 		}
 	}
 	if (exceptZombie)
@@ -1391,6 +1458,21 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 			m_contactBuffer, m_contactBuffer + m_contactCount,
 			b2ParticleContactIsZombie);
 		m_contactCount = (int32) (lastContact - m_contactBuffer);
+	}
+	// Report particles that are no longer touching.
+	if (contactListener)
+	{
+		const int32 pairCount = particlePairs.GetCount();
+		const ParticlePair* pairs = particlePairs.GetBuffer();
+		const int8* valid = particlePairs.GetValidBuffer();
+		for (int32 i = 0; i < pairCount; ++i)
+		{
+			if (valid[i])
+			{
+				contactListener->EndContact(this, pairs[i].first,
+											pairs[i].second);
+			}
+		}
 	}
 }
 
@@ -1437,21 +1519,190 @@ void b2ParticleSystem::DetectStuckParticle(int32 particle)
 	*lastStep = m_timestamp;
 }
 
-void b2ParticleSystem::UpdateBodyContacts()
+// Get the world's contact listener if any particles with the
+// b2_fixtureContactListenerParticle flag are present in the system.
+inline b2ContactListener* b2ParticleSystem::GetFixtureContactListener() const
 {
-	b2AABB aabb;
-	aabb.lowerBound.x = +b2_maxFloat;
-	aabb.lowerBound.y = +b2_maxFloat;
-	aabb.upperBound.x = -b2_maxFloat;
-	aabb.upperBound.y = -b2_maxFloat;
+	return (m_allParticleFlags & b2_fixtureContactListenerParticle) ?
+		m_world->m_contactManager.m_contactListener : NULL;
+}
 
-	for (int32 i = 0; i < m_count; i++)
+// Get the world's contact filter if any particles with the
+// b2_fixtureContactFilterParticle flag are present in the system.
+inline b2ContactFilter* b2ParticleSystem::GetFixtureContactFilter() const
+{
+	return (m_allParticleFlags & b2_fixtureContactFilterParticle) ?
+		m_world->m_contactManager.m_contactFilter : NULL;
+}
+
+/// Compute the axis-aligned bounding box for all particles contained
+/// within this particle system.
+/// @param aabb Returns the axis-aligned bounding box of the system.
+void b2ParticleSystem::ComputeAABB(b2AABB* const aabb) const
+{
+	const int32 particleCount = GetParticleCount();
+	b2Assert(aabb);
+	aabb->lowerBound.x = +b2_maxFloat;
+	aabb->lowerBound.y = +b2_maxFloat;
+	aabb->upperBound.x = -b2_maxFloat;
+	aabb->upperBound.y = -b2_maxFloat;
+
+	for (int32 i = 0; i < particleCount; i++)
 	{
 		b2Vec2 p = m_positionBuffer.data[i];
-		aabb.lowerBound = b2Min(aabb.lowerBound, p);
-		aabb.upperBound = b2Max(aabb.upperBound, p);
+		aabb->lowerBound = b2Min(aabb->lowerBound, p);
+		aabb->upperBound = b2Max(aabb->upperBound, p);
+	}
+	aabb->lowerBound.x -= m_particleDiameter;
+	aabb->lowerBound.y -= m_particleDiameter;
+	aabb->upperBound.x += m_particleDiameter;
+	aabb->upperBound.y += m_particleDiameter;
+}
 
-		if (m_stuckThreshold > 0)
+// Associate a memory allocator with this object.
+b2ParticleSystem::FixedSetAllocator::FixedSetAllocator(
+		b2StackAllocator* allocator) :
+	m_buffer(NULL), m_valid(NULL), m_count(0), m_allocator(allocator)
+{
+	b2Assert(allocator);
+}
+
+// Allocate internal storage for this object.
+int32 b2ParticleSystem::FixedSetAllocator::Allocate(
+	const int32 itemSize, const int32 count)
+{
+	Clear();
+	if (count)
+	{
+		m_buffer = m_allocator->Allocate(
+			(itemSize + sizeof(*m_valid)) * count);
+		b2Assert(m_buffer);
+		m_valid = (int8*)m_buffer + (itemSize * count);
+		memset(m_valid, 1, sizeof(*m_valid) * count);
+		m_count = count;
+	}
+	return m_count;
+}
+
+// Deallocate the internal buffer if it's allocated.
+void b2ParticleSystem::FixedSetAllocator::Clear()
+{
+	if (m_buffer)
+	{
+		m_allocator->Free(m_buffer);
+		m_buffer = NULL;
+        m_count = 0;
+	}
+}
+
+// Search set for item returning the index of the item if it's found, -1
+// otherwise.
+template<typename T>
+int32 FindItemIndexInFixedSet(
+	const b2ParticleSystem::TypedFixedSetAllocator<T>& set, const T& item)
+{
+	if (set.GetCount())
+	{
+        const T* buffer = set.GetBuffer();
+		return set.GetIndex(std::lower_bound(
+								buffer, buffer + set.GetCount(), item,
+								T::Compare));
+	}
+	return -1;
+}
+
+// Initialize from a set of particle / body contacts for particles
+// that have the b2_fixtureContactListenerParticle flag set.
+void b2ParticleSystem::FixtureParticleSet::Initialize(
+	const b2ParticleBodyContact * const bodyContacts,
+	const int32 numBodyContacts,
+	const uint32 * const particleFlagsBuffer)
+{
+	Clear();
+	if (Allocate(numBodyContacts))
+	{
+		FixtureParticle* set = GetBuffer();
+		int32 insertedContacts = 0;
+		for (int32 i = 0; i < numBodyContacts; ++i)
+		{
+			FixtureParticle* const fixtureParticle = &set[i];
+			const b2ParticleBodyContact& bodyContact = bodyContacts[i];
+			if (bodyContact.index == b2_invalidParticleIndex ||
+				!(particleFlagsBuffer[bodyContact.index] &
+				  b2_fixtureContactListenerParticle))
+			{
+				continue;
+			}
+			fixtureParticle->first = bodyContact.fixture;
+			fixtureParticle->second = bodyContact.index;
+			insertedContacts++;
+		}
+		SetCount(insertedContacts);
+		std::sort(set, set + insertedContacts, FixtureParticle::Compare);
+	}
+}
+
+// Find the index of a particle / fixture pair in the set or -1 if it's not
+// present.
+int32 b2ParticleSystem::FixtureParticleSet::Find(
+	const FixtureParticle& fixtureParticle) const
+{
+	return FindItemIndexInFixedSet(*this, fixtureParticle);
+}
+
+// Initialize from a set of particle contacts.
+void b2ParticleSystem::ParticlePairSet::Initialize(
+	const b2ParticleContact * const contacts, const int32 numContacts,
+	const uint32 * const particleFlagsBuffer)
+{
+	Clear();
+	if (Allocate(numContacts))
+	{
+		ParticlePair* set = GetBuffer();
+		int32 insertedContacts = 0;
+		for (int32 i = 0; i < numContacts; ++i)
+		{
+			ParticlePair* const pair = &set[i];
+			const b2ParticleContact& contact = contacts[i];
+			if (contact.indexA == b2_invalidParticleIndex ||
+				contact.indexB == b2_invalidParticleIndex ||
+				!((particleFlagsBuffer[contact.indexA] |
+				   particleFlagsBuffer[contact.indexB]) &
+				  b2_particleContactListenerParticle))
+			{
+				continue;
+			}
+			pair->first = contact.indexA;
+			pair->second = contact.indexB;
+			insertedContacts++;
+		}
+		SetCount(insertedContacts);
+		std::sort(set, set + insertedContacts, ParticlePair::Compare);
+	}
+}
+
+// Find the index of a particle pair in the set or -1 if it's not present.
+int32 b2ParticleSystem::ParticlePairSet::Find(const ParticlePair& pair) const
+{
+	return FindItemIndexInFixedSet(*this, pair);
+}
+
+void b2ParticleSystem::UpdateBodyContacts()
+{
+	// If the particle contact listener is enabled, generate a set of
+	// fixture / particle contacts.
+	b2ContactListener* const contactListener = GetFixtureContactListener();
+	FixtureParticleSet fixtureSet(&m_world->m_stackAllocator);
+	if (contactListener)
+	{
+		fixtureSet.Initialize(m_bodyContactBuffer, m_bodyContactCount,
+							  GetFlagsBuffer());
+	}
+
+	if (m_stuckThreshold > 0)
+	{
+		const int32 particleCount = GetParticleCount();
+		for (int32 i = 0; i < particleCount; i++)
 		{
 			// Detect stuck particles, see comment in
 			// b2ParticleSystem::DetectStuckParticle()
@@ -1462,15 +1713,57 @@ void b2ParticleSystem::UpdateBodyContacts()
 			}
 		}
 	}
-	aabb.lowerBound.x -= m_particleDiameter;
-	aabb.lowerBound.y -= m_particleDiameter;
-	aabb.upperBound.x += m_particleDiameter;
-	aabb.upperBound.y += m_particleDiameter;
 	m_bodyContactCount = 0;
 	m_stuckParticleCount = 0;
 
 	class UpdateBodyContactsCallback : public b2QueryCallback
 	{
+		// Call the contact filter if it's set, to determine whether to
+		// filter this contact.  Returns true if contact calculations should
+		// be performed, false otherwise.
+		inline bool ShouldCollide(b2Fixture * const fixture,
+								  int32 particleIndex)
+		{
+			if (m_contactFilter)
+			{
+				const uint32* const flags = m_system->GetFlagsBuffer();
+				if (flags[particleIndex] & b2_fixtureContactFilterParticle)
+				{
+					return m_contactFilter->ShouldCollide(fixture, m_system,
+														  particleIndex);
+				}
+			}
+			return true;
+		}
+
+		// If a contact listener is present and the contact is just starting
+		// report the contact.  If the contact is already in progress invalid
+		// the contact from m_fixtureSet.
+		inline void ReportContact(
+			b2ParticleBodyContact* const particleBodyContact)
+		{
+			// Optionally report this contact.
+			if (m_contactListener)
+			{
+				b2Assert(particleBodyContact);
+				FixtureParticle fixtureParticleToFind;
+				fixtureParticleToFind.first = particleBodyContact->fixture;
+				fixtureParticleToFind.second = particleBodyContact->index;
+				const int32 index = m_fixtureSet->Find(fixtureParticleToFind);
+				if (index >= 0)
+				{
+					// Already touching remove this from the set.
+					m_fixtureSet->Invalidate(index);
+				}
+				else
+				{
+					// Just started touching, report it!
+					m_contactListener->BeginContact(
+						m_system, particleBodyContact);
+				}
+			}
+		}
+
 		bool ReportFixture(b2Fixture* fixture)
 		{
 			if (fixture->IsSensor())
@@ -1520,6 +1813,10 @@ void b2ParticleSystem::UpdateBodyContacts()
 						fixture->ComputeDistance(ap, &d, &n, childIndex);
 						if (d < m_system->m_particleDiameter)
 						{
+							if (!ShouldCollide(fixture, a))
+							{
+								continue;
+							}
 							float32 invAm =
 								m_system->m_flagsBuffer.data[a] &
 								b2_wallParticle ? 0 :
@@ -1544,6 +1841,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 								1 - d * m_system->m_inverseDiameter;
 							contact.normal = -n;
 							contact.mass = invM > 0 ? 1 / invM : 0;
+							ReportContact(&contact);
 							m_system->m_bodyContactCount++;
 							m_system->DetectStuckParticle(a);
 						}
@@ -1554,19 +1852,53 @@ void b2ParticleSystem::UpdateBodyContacts()
 		}
 
 		b2ParticleSystem* m_system;
+		b2World* m_world;
+		b2ContactFilter* m_contactFilter;
+		b2ContactListener* m_contactListener;
+		FixtureParticleSet* m_fixtureSet;
 
 	public:
-		UpdateBodyContactsCallback(b2ParticleSystem* system)
+		UpdateBodyContactsCallback(
+			b2ParticleSystem* system, b2World* world,
+			b2ContactFilter* contactFilter, b2ContactListener* contactListener,
+			FixtureParticleSet* fixtureSet)
 		{
 			m_system = system;
+			m_world = world;
+			m_contactFilter = contactFilter;
+			m_contactListener = contactListener;
+			m_fixtureSet = fixtureSet;
 		}
-	} callback(this);
+	} callback(this, m_world, GetFixtureContactFilter(),
+			   GetFixtureContactListener(), &fixtureSet);
 
+	b2AABB aabb;
+	ComputeAABB(&aabb);
 	m_world->QueryAABB(&callback, aabb);
 
 	if (m_strictContactCheck)
 	{
 		RemoveSpuriousBodyContacts();
+	}
+
+	// If the contact listener is enabled, report all fixtures that are no
+	// longer in contact with particles.
+	if (contactListener)
+	{
+		const FixtureParticle* const fixtureParticles =
+			fixtureSet.GetBuffer();
+		const int8* const fixtureParticlesValid = fixtureSet.GetValidBuffer();
+		const int32 fixtureParticleCount = fixtureSet.GetCount();
+		for (int32 i = 0; i < fixtureParticleCount; ++i)
+		{
+			if (fixtureParticlesValid[i])
+			{
+				const FixtureParticle* const fixtureParticle =
+					&fixtureParticles[i];
+				contactListener->EndContact(fixtureParticle->first, this,
+											fixtureParticle->second);
+			}
+		}
 	}
 }
 

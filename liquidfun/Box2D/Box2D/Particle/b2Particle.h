@@ -58,6 +58,23 @@ enum b2ParticleFlag
 	b2_reactiveParticle = 1 << 12,
 	/// With high repulsive force.
 	b2_repulsiveParticle = 1 << 13,
+	/// Call b2ContactListener when this particle is about to interact with
+	/// a rigid body or stops interacting with a rigid body.
+	/// This results in an expensive operation compared to using
+	/// b2_fixtureContactFilterParticle to detect collisions between
+	/// particles.
+	b2_fixtureContactListenerParticle = 1 << 14,
+	/// Call b2ContactListener when this particle is about to interact with
+	/// another particle or stops interacting with another particle.
+	/// This results in an expensive operation compared to using
+	/// b2_particleContactFilterParticle to detect collisions between
+	/// particles.
+	b2_particleContactListenerParticle = 1 << 15,
+	/// Call b2ContactFilter when this particle interacts with rigid bodies.
+	b2_fixtureContactFilterParticle = 1 << 16,
+	/// Call b2ContactFilter when this particle interacts with other
+	/// particles.
+	b2_particleContactFilterParticle = 1 << 17,
 };
 
 /// Small color object for each particle
