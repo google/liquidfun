@@ -38,11 +38,14 @@ public:
 	// Initialize a particle emitter.
 	RadialEmitter() :
 		m_particleSystem(NULL), m_callback(NULL), m_speed(0.0f),
-		m_emitRemainder(0.0f), m_flags(b2_waterParticle)
+		m_emitRemainder(0.0f), m_flags(b2_waterParticle), m_group(NULL)
 	{
 	}
 
-	~RadialEmitter() {}
+	~RadialEmitter()
+	{
+		SetGroup(NULL);
+	}
 
 	// Set the center of the emitter.
 	void SetPosition(const b2Vec2& origin)
@@ -154,6 +157,31 @@ public:
 		return m_callback;
 	}
 
+	// This class sets the group flags to b2_particleGroupCanBeEmpty so that
+	// it isn't destroyed and clears the b2_particleGroupCanBeEmpty on the
+	// group when the emitter no longer references it so that the group
+	// can potentially be cleaned up.
+	void SetGroup(b2ParticleGroup * const group)
+	{
+		if (m_group)
+		{
+			m_group->SetGroupFlags(m_group->GetGroupFlags() &
+								   ~b2_particleGroupCanBeEmpty);
+		}
+		m_group = group;
+		if (m_group)
+		{
+			m_group->SetGroupFlags(m_group->GetGroupFlags() |
+								   b2_particleGroupCanBeEmpty);
+		}
+	}
+
+	// Get the group particles should be created within.
+	b2ParticleGroup* GetGroup() const
+	{
+		return m_group;
+	}
+
 	// dt is seconds that have passed, particleIndices is an optional pointer
 	// to an array which tracks which particles have been created and
 	// particleIndicesCount is the size of the particleIndices array.
@@ -170,6 +198,7 @@ public:
 		b2ParticleDef pd;
 		pd.color = m_color;
 		pd.flags = m_flags;
+		pd.group = m_group;
 
 		// Keep emitting particles on this frame until we only have a
 		// fractional particle left.
@@ -236,6 +265,8 @@ private:
 	float32 m_emitRemainder;
 	// Flags for created particles, see b2ParticleFlag.
 	uint32 m_flags;
+	// Group to put newly created particles in.
+	b2ParticleGroup* m_group;
 };
 
 #endif  // PARTICLE_EMITTER_H

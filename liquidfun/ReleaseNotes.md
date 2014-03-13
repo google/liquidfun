@@ -73,6 +73,8 @@ TODO describe the cool new stuff we have in this release TODO
     illustrate the difference with strict contact checking.
 *   Added "Maxwell" test to the Testbed to demonstrate the direct modification
     of particle velocities.
+*   Added "Fracker" test to demonstrate particle viscous fluids and particle
+    destruction callbacks.
 
 #### API Modifications
 
