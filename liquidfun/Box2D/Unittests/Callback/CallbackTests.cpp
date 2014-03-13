@@ -232,7 +232,8 @@ public:
 		m_destroyedParticleGroups.push_back(group);
 	}
 
-	virtual void SayGoodbye(int32 index) {
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index) {
+		B2_NOT_USED(particleSystem);
 		m_destroyedParticles.push_back(index);
 	}
 

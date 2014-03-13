@@ -2438,7 +2438,7 @@ void b2ParticleSystem::SolveZombie()
 			if ((flags & b2_destructionListenerParticle) &&
 				destructionListener)
 			{
-				destructionListener->SayGoodbye(i);
+				destructionListener->SayGoodbye(this, i);
 			}
 			// Destroy particle handle.
 			if (m_handleIndexBuffer.data)

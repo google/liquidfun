@@ -80,7 +80,11 @@ public:
 	virtual void SayGoodbye(b2ParticleGroup* group) { B2_NOT_USED(group); }
 
 	// Verify destruction of particles.
-	virtual void SayGoodbye(int32 index) { B2_NOT_USED(index); }
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
+	{
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(index);
+	}
 
 protected:
 	b2World *m_world;
@@ -104,8 +108,11 @@ public:
 	virtual ~UserDataDestructionTracker() { }
 
 	// Add the user data of the destroyed particle in a vector.
-	virtual void SayGoodbye(int32 index)
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
 	{
+		if (particleSystem != m_particleSystem)
+			return;
+
 		m_userData.push_back(
 			m_particleSystem->GetUserDataBuffer()[index]);
 	}
@@ -141,8 +148,11 @@ public:
 	virtual ~LifetimeDestructionChecker() { }
 
 	// Verify the destroyed particle was destroyed in time.
-	virtual void SayGoodbye(int32 index)
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
 	{
+		if (particleSystem != m_particleSystem)
+			return;
+
 		void *handle =
 			reinterpret_cast<void*>(
 				m_particleSystem->GetUserDataBuffer()[index]);
@@ -209,8 +219,11 @@ public:
 	virtual ~OldestParticleDestroyedChecker() { }
 
 	// Verify the destroyed particle is the oldest particle in the system.
-	virtual void SayGoodbye(int32 index)
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
 	{
+		if (particleSystem != m_particleSystem)
+			return;
+
 		const int32 numberOfParticles =
 			m_particleSystem->GetParticleCount();
 		const int32* const expirationTimes =

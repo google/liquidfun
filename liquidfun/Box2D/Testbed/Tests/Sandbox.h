@@ -134,8 +134,11 @@ public:
 
 	// When a particle is about to be destroyed, remove it from the list of
 	// special particles as the handle will become invalid.
-	virtual void SayGoodbye(int32 index)
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
 	{
+		if (particleSystem != m_particleSystem)
+			return;
+
 		// NOTE: user data could be used as an alternative method to look up
 		// the local handle pointer from the index.
 		size_t erased = m_particles.erase(

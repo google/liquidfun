@@ -60,7 +60,7 @@ public:
 	/// b2ParticleSystem::GetUserDataBuffer() or
 	/// b2ParticleSystem::GetParticleHandleFromIndex() to determine which
 	/// particle has been destroyed.
-	virtual void SayGoodbye(int32 index)
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
 	{
 		B2_NOT_USED(index);
 	}
