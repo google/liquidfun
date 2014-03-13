@@ -63,6 +63,8 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added support for multiple independent particle systems.
 *   Added option to create particles in an existing particle group.
 *   Added option to detect stuck particles.
+*   Added option to pause particle simulations. Paused simluations don't
+    consume cycles in b2World::Step.
 *   Added option to enable a more strict check for Particle/Body interactions
     in cases where complex world geometry may cause false positive contacts.
 *   Added "EyeCandy" sample to demonstrate different particle rendering methods
@@ -100,14 +102,57 @@ TODO describe the cool new stuff we have in this release TODO
     physical coefficients.  Previously, only one particle system existed, and
     it always existed. Use b2World::CreateParticleSystem to create particle
     systems, and b2World::DestroyParticleSystem to destroy them.
+*   b2DestructionListener::SayGoodbye, b2QueryCallback::ReportParticle, and
+    b2RayCastCallback::ReportParticle each now takes a b2ParticleSystem pointer
+    as its first parameter. This change is necessary since multiple particle
+    systems can now exist.
 *   The particle system API has moved from b2World to b2ParticleSystem.
     For example, b2ParticleSystem::DestroyParticlesInShape replaces
     b2World::DestroyParticlesInShape.  You can use
     b2World::CreateParticleSystem or b2World::GetParticleSystemList() to
     acquire references to b2ParticleSystem.
-*   b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle each
-    now takes a b2ParticleSystem pointer as its first parameter. This change is
-    necessary since multiple particle systems can now exist.
+*   Removed "Particle" from many of the functions in the particle system API.
+    The word is redundant now that the API is under b2ParticleSystem. The API
+    now has the following naming convention:
+    *   Each function that takes a particle index or handle has a "Particle"
+        component (e.g. "SetParticle").
+    *   Each function that operates on the entire system has _no_ "Particle"
+        component (e.g. "SetRadius").
+
+            GetParticleMaxCount ==> GetMaxParticleCount
+            SetParticleMaxCount ==> SetMaxParticleCount
+            GetParticleDensity ==> GetDensity
+            SetParticleDensity ==> SetDensity
+            SetParticleGravityScale ==> SetGravityScale
+            GetParticleGravityScale ==> GetGravityScale
+            SetParticleDamping ==> SetDamping
+            GetParticleDamping ==> GetDamping
+            GetParticleStaticPressureIterations ==> GetStaticPressureIterations
+            SetParticleStaticPressureIterations ==> SetStaticPressureIterations
+            SetParticleRadius ==> SetRadius
+            GetParticleRadius ==> GetRadius
+            GetParticlePositionBuffer ==> GetPositionBuffer
+            GetParticlePositionBuffer ==> GetPositionBuffer
+            GetParticleVelocityBuffer ==> GetVelocityBuffer
+            GetParticleVelocityBuffer ==> GetVelocityBuffer
+            GetParticleColorBuffer ==> GetColorBuffer
+            GetParticleColorBuffer ==> GetColorBuffer
+            GetParticleGroupBuffer ==> GetGroupBuffer
+            GetParticleGroupBuffer ==> GetGroupBuffer
+            GetParticleUserDataBuffer ==> GetUserDataBuffer
+            GetParticleUserDataBuffer ==> GetUserDataBuffer
+            GetParticleFlagsBuffer ==> GetFlagsBuffer
+            SetParticleFlagsBuffer ==> SetFlagsBuffer
+            SetParticlePositionBuffer ==> SetPositionBuffer
+            SetParticleVelocityBuffer ==> SetVelocityBuffer
+            SetParticleColorBuffer ==> SetColorBuffer
+            SetParticleUserDataBuffer ==> SetUserDataBuffer
+            GetParticleContacts ==> GetContacts
+            GetParticleContactCount ==> GetContactCount
+            GetParticleBodyContacts ==> GetBodyContacts
+            GetParticleBodyContactCount ==> GetBodyContactCount
+            DestroyParticlesInGroup ==> DestroyParticles (moved to b2ParticleGroup)
+
 *   Renamed `b2ParticleFlag` `b2DestructionListener` to
     `b2DestructionListenerParticle` to be consistent with other particle flag
     names.

@@ -80,6 +80,7 @@
 <li>Added support for multiple independent particle systems.</li>
 <li>Added option to create particles in an existing particle group.</li>
 <li>Added option to detect stuck particles.</li>
+<li>Added option to pause particle simulations. Paused simluations don't consume cycles in b2World::Step.</li>
 <li>Added option to enable a more strict check for Particle/Body interactions in cases where complex world geometry may cause false positive contacts.</li>
 <li>Added "EyeCandy" sample to demonstrate different particle rendering methods on Android.</li>
 <li>Added "Sparky", "Sandbox" and "Soup Stirrer" tests to the Testbed example to demonstrate particle and rigid body interaction.</li>
@@ -98,8 +99,46 @@
 <p class="startli">For example, the output executable of the Testbed example is now written to Box2D/Testbed/Release/Testbed when building using the Release configuration.</p>
 </li>
 <li>Multiple independent particle systems can now exist, each with its own physical coefficients. Previously, only one particle system existed, and it always existed. Use b2World::CreateParticleSystem to create particle systems, and b2World::DestroyParticleSystem to destroy them.</li>
+<li>b2DestructionListener::SayGoodbye, b2QueryCallback::ReportParticle, and b2RayCastCallback::ReportParticle each now takes a b2ParticleSystem pointer as its first parameter. This change is necessary since multiple particle systems can now exist.</li>
 <li>The particle system API has moved from b2World to b2ParticleSystem. For example, b2ParticleSystem::DestroyParticlesInShape replaces b2World::DestroyParticlesInShape. You can use b2World::CreateParticleSystem or b2World::GetParticleSystemList() to acquire references to b2ParticleSystem.</li>
-<li>b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle each now takes a b2ParticleSystem pointer as its first parameter. This change is necessary since multiple particle systems can now exist.</li>
+<li>Removed "Particle" from many of the functions in the particle system API. The word is redundant now that the API is under b2ParticleSystem. The API now has the following naming convention:<ul>
+<li>Each function that takes a particle index or handle has a "Particle" component (e.g. "SetParticle").</li>
+<li>Each function that operates on the entire system has <em>no</em> "Particle" component (e.g. "SetRadius"). <pre class="fragment">GetParticleMaxCount ==&gt; GetMaxParticleCount
+SetParticleMaxCount ==&gt; SetMaxParticleCount
+GetParticleDensity ==&gt; GetDensity
+SetParticleDensity ==&gt; SetDensity
+SetParticleGravityScale ==&gt; SetGravityScale
+GetParticleGravityScale ==&gt; GetGravityScale
+SetParticleDamping ==&gt; SetDamping
+GetParticleDamping ==&gt; GetDamping
+GetParticleStaticPressureIterations ==&gt; GetStaticPressureIterations
+SetParticleStaticPressureIterations ==&gt; SetStaticPressureIterations
+SetParticleRadius ==&gt; SetRadius
+GetParticleRadius ==&gt; GetRadius
+GetParticlePositionBuffer ==&gt; GetPositionBuffer
+GetParticlePositionBuffer ==&gt; GetPositionBuffer
+GetParticleVelocityBuffer ==&gt; GetVelocityBuffer
+GetParticleVelocityBuffer ==&gt; GetVelocityBuffer
+GetParticleColorBuffer ==&gt; GetColorBuffer
+GetParticleColorBuffer ==&gt; GetColorBuffer
+GetParticleGroupBuffer ==&gt; GetGroupBuffer
+GetParticleGroupBuffer ==&gt; GetGroupBuffer
+GetParticleUserDataBuffer ==&gt; GetUserDataBuffer
+GetParticleUserDataBuffer ==&gt; GetUserDataBuffer
+GetParticleFlagsBuffer ==&gt; GetFlagsBuffer
+SetParticleFlagsBuffer ==&gt; SetFlagsBuffer
+SetParticlePositionBuffer ==&gt; SetPositionBuffer
+SetParticleVelocityBuffer ==&gt; SetVelocityBuffer
+SetParticleColorBuffer ==&gt; SetColorBuffer
+SetParticleUserDataBuffer ==&gt; SetUserDataBuffer
+GetParticleContacts ==&gt; GetContacts
+GetParticleContactCount ==&gt; GetContactCount
+GetParticleBodyContacts ==&gt; GetBodyContacts
+GetParticleBodyContactCount ==&gt; GetBodyContactCount
+DestroyParticlesInGroup ==&gt; DestroyParticles (moved to b2ParticleGroup)
+</pre></li>
+</ul>
+</li>
 <li>Renamed <code>b2ParticleFlag</code> <code>b2DestructionListener</code> to <code>b2DestructionListenerParticle</code> to be consistent with other particle flag names.</li>
 </ul>
 <h4>Other Changes</h4>
