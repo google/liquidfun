@@ -721,6 +721,7 @@ private:
 	void ComputeWeight();
 	void SolvePressure(const b2TimeStep& step);
 	void SolveDamping(const b2TimeStep& step);
+	void SolveRigidDamping();
 	void SolveExtraDamping();
 	void SolveWall();
 	void SolveRigid(const b2TimeStep& step);
@@ -783,6 +784,23 @@ private:
 
 	bool ForceCanBeApplied(uint32 flags) const;
 	void PrepareForceBuffer();
+
+	void InitDampingParameter(
+		float32* invMass, float32* invInertia, float32* tangentDistance,
+		float32 mass, float32 inertia, const b2Vec2& center,
+		const b2Vec2& point, const b2Vec2& normal) const;
+	void InitDampingParameterWithRigidGroupOrParticle(
+		float32* invMass, float32* invInertia, float32* tangentDistance,
+		bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
+		const b2Vec2& point, const b2Vec2& normal) const;
+	float32 ComputeDampingImpulse(
+		float32 invMassA, float32 invInertiaA, float32 tangentDistanceA,
+		float32 invMassB, float32 invInertiaB, float32 tangentDistanceB,
+		float32 normalVelocity, const b2Vec2& normal) const;
+	void ApplyDamping(
+		float32 invMass, float32 invInertia, float32 tangentDistance,
+		bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
+		float32 impulse, const b2Vec2& normal);
 
 	bool m_paused;
 	int32 m_timestamp;
