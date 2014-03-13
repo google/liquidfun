@@ -3284,17 +3284,3 @@ void b2ParticleSystem::SetStuckThreshold(int32 steps)
 			m_consecutiveContactStepsBuffer.data);
 	}
 }
-
-#if ALLOW_OLD_API_NAMES
-void b2ParticleSystem::DestroyParticlesInGroup(b2ParticleGroup* group,
-							 bool callDestructionListener)
-{
-	group->DestroyParticles(callDestructionListener);
-}
-
-void b2ParticleSystem::DestroyParticlesInGroup(b2ParticleGroup* group)
-{
-	group->DestroyParticles();
-}
-#endif // ALLOW_OLD_API_NAMES
-

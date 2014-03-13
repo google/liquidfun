@@ -118,7 +118,7 @@ public:
 		// Initialize the particle emitter.
 		{
 			const float32 faucetLength =
-				m_particleSystem->GetParticleRadius() * 2.0f * k_faucetLength;
+				m_particleSystem->GetRadius() * 2.0f * k_faucetLength;
 			m_emitter.SetParticleSystem(m_particleSystem);
 			m_emitter.SetCallback(&m_lifetimeRandomizer);
 			m_emitter.SetPosition(b2Vec2(k_containerWidth * k_faucetWidth,

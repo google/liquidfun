@@ -32,7 +32,7 @@ public:
 		m_joint(NULL),
 		m_oscillationOffset(0.0f)
 	{
-		m_particleSystem->SetParticleDamping(1.0f);
+		m_particleSystem->SetDamping(1.0f);
 
 		// Shape of the stirrer.
 		b2CircleShape shape;

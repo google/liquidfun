@@ -107,11 +107,11 @@ public:
 	{
 		if (m_particleGroup != NULL)
 		{
-			m_particleSystem->DestroyParticlesInGroup(m_particleGroup);
+			m_particleGroup->DestroyParticles();
 			m_particleGroup = NULL;
 		}
 
-		m_particleSystem->SetParticleRadius(k_containerHalfWidth / 20.0f);
+		m_particleSystem->SetRadius(k_containerHalfWidth / 20.0f);
 		{
 			b2PolygonShape shape;
 			shape.SetAsBox(m_density * k_containerHalfWidth,
@@ -122,7 +122,7 @@ public:
 			pd.shape = &shape;
 			m_particleGroup = m_particleSystem->CreateParticleGroup(pd);
 			b2Vec2* velocities =
-				m_particleSystem->GetParticleVelocityBuffer() +
+				m_particleSystem->GetVelocityBuffer() +
 				m_particleGroup->GetBufferIndex();
 			for (int i = 0; i < m_particleGroup->GetParticleCount(); ++i)
 			{
@@ -143,9 +143,9 @@ public:
 		int32 bottom = 0;
 		const int32 index = m_particleGroup->GetBufferIndex();
 		b2Vec2* const velocities =
-			m_particleSystem->GetParticleVelocityBuffer() + index;
+			m_particleSystem->GetVelocityBuffer() + index;
 		b2Vec2* const positions =
-			m_particleSystem->GetParticlePositionBuffer() + index;
+			m_particleSystem->GetPositionBuffer() + index;
 
 		for (int32 i = 0; i < m_particleGroup->GetParticleCount(); i++)
 		{
