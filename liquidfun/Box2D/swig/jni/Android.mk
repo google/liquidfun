@@ -14,6 +14,8 @@
 # misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
+ifneq ($(NDK_PROJECT_PATH),)
+
 LOCAL_PATH:=$(call my-dir)/..
 
 include $(CLEAR_VARS)
@@ -112,3 +114,5 @@ include $(BUILD_SHARED_LIBRARY)
 
 # Import Box2D libraries
 $(call import-module,Box2D/jni)
+
+endif #ifneq ($(NDK_PROJECT_PATH),)
