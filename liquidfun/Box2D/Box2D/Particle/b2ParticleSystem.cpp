@@ -183,7 +183,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_density = 1;
 	m_inverseDensity = 1;
 	m_gravityScale = 1;
-	SetRadius(def->particleRadius);
+	SetRadius(def->radius);
 
 	m_count = 0;
 	m_internalAllocatedCapacity = 0;

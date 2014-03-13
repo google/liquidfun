@@ -86,7 +86,7 @@ struct b2ParticleSystemDef
 {
 	b2ParticleSystemDef()
 	{
-		particleRadius = 1.0f;
+		radius = 1.0f;
 
 		// Initialize physical coefficients to the maximum values that
 		// maintain numerical stability.
@@ -109,7 +109,7 @@ struct b2ParticleSystemDef
 	}
 
 	/// Particles behave as circles with this radius. In Box2D units.
-	float32 particleRadius;
+	float32 radius;
 
 	/// Increases pressure in response to compression
 	/// Smaller values allow more compression

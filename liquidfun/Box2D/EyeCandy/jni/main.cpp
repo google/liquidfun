@@ -618,7 +618,7 @@ public:
 
     b2ParticleSystemDef particleSystemDef;
     particleSystemDef.dampingStrength = 0.2f;
-    particleSystemDef.particleRadius = 0.3f;
+    particleSystemDef.radius = 0.3f;
     particleSystem_ = world_->CreateParticleSystem(&particleSystemDef);
     particleSystem_->SetGravityScale(0.4f);
     particleSystem_->SetDensity(1.2f);
