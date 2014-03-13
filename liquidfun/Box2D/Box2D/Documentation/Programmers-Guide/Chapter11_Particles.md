@@ -46,19 +46,21 @@ detail, see the API Reference description of the b2ParticleSystemDef struct.
 
 The following example creates a particle system:
 
-&nbsp;&nbsp;&nbsp;`const b2ParticleSystemDef particleSystemDef;`
-&nbsp;&nbsp;&nbsp;`   m_particleSystems[0] =`
-&nbsp;&nbsp;&nbsp;`      m_world->CreateParticleSystem(&particleSystemDef);`
+&nbsp;&nbsp;&nbsp;`const b2ParticleSystemDef particleSystemDef;`<br/>
+&nbsp;&nbsp;&nbsp;`m_particleSystems[0] =
+`m_world->CreateParticleSystem(&particleSystemDef);`<br/>
 
 You can also create more than one particle system: Thus, one "world's"
 particles may have a certain default radius, elasticity, etc., while the other
 "world" has different default values for these properties. The following sample
 shows the creation of multiple particle systems:
 
-&nbsp;&nbsp;&nbsp;`const b2ParticleSystemDef particleSystemDef;`
-&nbsp;&nbsp;&nbsp;`for (int i = 0; i < NUM_PARTICLE_SYSTEMS; ++i) {`
-&nbsp;&nbsp;&nbsp;   `m_particleSystems[i] =`
-&nbsp;&nbsp;&nbsp;      `m_world->CreateParticleSystem(&particleSystemDef);`
+&nbsp;&nbsp;&nbsp;`const b2ParticleSystemDef particleSystemDef;`<br/>
+&nbsp;&nbsp;&nbsp;`for (int i = 0; i < NUM_PARTICLE_SYSTEMS; ++i) {`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+`m_particleSystems[i] = m_world->CreateParticleSystem(&particleSystemDef);`
+<br/>
+&nbsp;&nbsp;&nbsp;`}`<br/>
 
 In many, if not most,
 cases, it will not be necessary to adjust the default values or create multiple
@@ -109,7 +111,7 @@ The following example creates an individual particle.
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`<br/>
 &nbsp;&nbsp;&nbsp;`pd.color.Set(0, 0, 255, 255);`<br/>
 &nbsp;&nbsp;&nbsp;`pd.position.Set(i, 0);`<br/>
-&nbsp;&nbsp;&nbsp;`int tempIndex = m_world->CreateParticle(pd);`<br/>
+&nbsp;&nbsp;&nbsp;`int tempIndex = m_particleSystem->CreateParticle(pd);`<br/>
 
 Particle lists are self-compacting. Therefore, the index returned by
 CreateParticle is only valid until a lower-indexed particle, or a group
@@ -120,7 +122,7 @@ To destroy an individual particle, invoke the function
 
 The following example destroys the particle created above.
 
-&nbsp;&nbsp;&nbsp;`m_world->DestroyParticle(tempIndex);`<br/>
+&nbsp;&nbsp;&nbsp;`m_particleSystem->DestroyParticle(tempIndex);`<br/>
 
 ### Particle lifetimes
 
@@ -136,11 +138,11 @@ A particle can die one of two "age-related" deaths. First, you can set a
 lifetime for a particle--a period of time after which it expires.  The following
 example does this:
 
-&nbsp;&nbsp;&nbsp;`m_particleSystem->SetParticleLifetime(`
-&nbsp;&nbsp;&nbsp;`             index, Random() *`
-&nbsp;&nbsp;&nbsp;`                             (k_particleLifetimeMax -
-k_particleLifetimeMin) +`
-&nbsp;&nbsp;&nbsp;`                             k_particleLifetimeMin);`
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetParticleLifetime(`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`index, Random() *`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+`(k_particleLifetimeMax - k_particleLifetimeMin) +`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`k_particleLifetimeMin);`<br/>
 
 where `index` specifies the number of the particle whose lifetime is being
 assigned, and the `Random()` function generates a random value for that
@@ -154,7 +156,7 @@ takes place in age order, with the oldest ones destroyed first.
 
 The following example sets a maximum particle count for a particle system.
 
-&nbsp;&nbsp;&nbsp;`m_particleSystem->SetParticleMaxCount(k_maxParticleCount);`
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetMaxParticleCount(k_maxParticleCount);`
 
 The Faucet example in the Testbed provides an example of both types of
 lifetime-driven particle destruction.
@@ -181,58 +183,45 @@ relies on you to judge the candidates.
 The following example shows one possible implementation for such a case.
 
 <pre>
-&nbsp;&nbsp;&nbsp;// This code example of app logic deciding whether or not to
-&nbsp;&nbsp;&nbsp;// eliminate stuck
-&nbsp;&nbsp;&nbsp;// particles shows a user who set up a global array of sensor
-&nbsp;&nbsp;&nbsp;// fixtures covering
-&nbsp;&nbsp;&nbsp;// areas they know to be "problematic" for stuck particles in
-&nbsp;&nbsp;&nbsp;// their geometry,
-&nbsp;&nbsp;&nbsp;// and then at each step testing any stuck particles against
-&nbsp;&nbsp;&nbsp;// those sensors,
-&nbsp;&nbsp;&nbsp;// eliminating any stuck particles that lie inside a known
-&nbsp;&nbsp;&nbsp;// problem region.
-&nbsp;&nbsp;&nbsp;void DestroyStuckParticlesInSensors(const b2Fixture * const
-&nbsp;&nbsp;&nbsp;// *sensors, int32 num)
-&nbsp;&nbsp;&nbsp;{
-&nbsp;&nbsp;&nbsp;	const int32 stuck = gParticleSystem-
-&nbsp;&nbsp;&nbsp;>GetStuckCandidateCount();
-&nbsp;&nbsp;&nbsp;	if (stuck > 0)
-&nbsp;&nbsp;&nbsp;	{
-&nbsp;&nbsp;&nbsp;		const int32 *candidates = gParticleSystem-
-&nbsp;&nbsp;&nbsp;>GetStuckCandidates();
-&nbsp;&nbsp;&nbsp;		const b2Vec2 *positions = gParticleSystem-
-&nbsp;&nbsp;&nbsp;>GetParticlePositionBuffer();
-&nbsp;&nbsp;&nbsp;		for (int32 i = 0; i < stuck; ++i)
-&nbsp;&nbsp;&nbsp;		{
-&nbsp;&nbsp;&nbsp;			const int32 particle = candidates[i];
-&nbsp;&nbsp;&nbsp;			const b2Vec2 &position = positions
-&nbsp;&nbsp;&nbsp;[particle];
-&nbsp;&nbsp;&nbsp;			for (int32 j = 0; j < num; ++j)
-&nbsp;&nbsp;&nbsp;			{
-&nbsp;&nbsp;&nbsp;				if(sensors[j]->TestPoint
-&nbsp;&nbsp;&nbsp;(position))
-&nbsp;&nbsp;&nbsp;				{
-&nbsp;&nbsp;&nbsp;					gParticleSystem-
-&nbsp;&nbsp;&nbsp;>DestroyParticle(particle);
-&nbsp;&nbsp;&nbsp;				}
-&nbsp;&nbsp;&nbsp;			}
-&nbsp;&nbsp;&nbsp;		}
-&nbsp;&nbsp;&nbsp;	}
-&nbsp;&nbsp;&nbsp;}
-&nbsp;&nbsp;&nbsp;// particles in multiple contacts for 5 or more iterations are
-&nbsp;&nbsp;&nbsp;// candidates
-&nbsp;&nbsp;&nbsp;gParticleSystem->SetStuckThreshold(5);
+  // This code example of app logic deciding whether or not to eliminate stuck
+  // particles shows a user who set up a global array of sensor fixtures
+  // covering areas they know to be "problematic" for stuck particles in
+  // their geometry, and then at each step testing any stuck particles against
+  // those sensors, eliminating any stuck particles that lie inside a known
+  // problem region.
+  void DestroyStuckParticlesInSensors(
+      const b2Fixture * const *sensors, int32 num)
+  {
+  	const int32 stuck = gParticleSystem->GetStuckCandidateCount();
+  	if (stuck > 0)
+  	{
+  		const int32 *candidates = gParticleSystem->GetStuckCandidates();
+  		const b2Vec2 *positions = gParticleSystem->GetPositionBuffer();
+  		for (int32 i = 0; i < stuck; ++i)
+  		{
+  			const int32 particle = candidates[i];
+  			const b2Vec2 &position = positions[particle];
+  			for (int32 j = 0; j < num; ++j)
+  			{
+  				if(sensors[j]->TestPoint(position))
+  				{
+  					gParticleSystem->DestroyParticle(particle);
+  				}
+  			}
+  		}
+  	}
+  }
+  // particles in multiple contacts for 5 or more iterations are
+  // candidates
+  gParticleSystem->SetStuckThreshold(5);
 
-&nbsp;&nbsp;&nbsp;// step the world (assuming the timestep, velocity iterations,
-&nbsp;&nbsp;&nbsp;// and position iterations have been set globally).
+  // step the world (assuming the timestep, velocity iterations,
+  // and position iterations have been set globally).
+  gWorld->Step(gTimeStep, gVelocityIterations, gPositionIterations);
 
-&nbsp;&nbsp;&nbsp;gWorld->Step(gTimeStep, gVelocityIterations,
-gPositionIterations);
-
-&nbsp;&nbsp;&nbsp;// Perform the above check for stuck particles against sensors
-&nbsp;&nbsp;&nbsp;// in this global array.
-&nbsp;&nbsp;&nbsp;DestroyStuckParticlesInSensors(gProblemAreaSensors,
-gNumSensors);
+  // Perform the above check for stuck particles against sensors
+  // in this global array.
+  DestroyStuckParticlesInSensors(gProblemAreaSensors, gNumSensors);
 </pre>
 
 <a name="cdpg">
@@ -258,26 +247,31 @@ particles.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`pd.position.Set(10 + 20 * i, 40);`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`pd.color.Set(i * 255 / 5, 255 - i * 255 /
 5, 128, 255);`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`world->CreateParticleGroup(pd);`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`m_world->CreateParticleGroup(pd);`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+`m_particleSystem->CreateParticleGroup(pd);`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
 
-To destroy a group of particles, invoke the function
+To destroy a particles in a group, invoke the function
 
-&nbsp;&nbsp;&nbsp;`DestroyParticleGroup(b2ParticleGroup* group);`<br/>
+&nbsp;&nbsp;&nbsp;`DestroyParticles(bool callDestructionListener);`<br/>
 
-The following example destroys all particle groups in the world.
+Groups are automatically destroyed when they contain no particles if the
+`b2_particleGroupCanBeEmpty` is not set in the group's flags.
 
-&nbsp;&nbsp;&nbsp;`b2ParticleGroup* group =
-m_world->GetParticleGroupList();`<br/>
-&nbsp;&nbsp;&nbsp;`while (group)`<br/>
-&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	b2ParticleGroup* nextGroup =
-group->GetNext(); // access this before we destroy the group`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	m_world->DestroyParticleGroup(group);`
-<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	group = nextGroup;`<br/>
-&nbsp;&nbsp;&nbsp;`}`
+The following example destroys all particle groups in the particle system.
+
+<pre>
+  b2ParticleGroup* group = m_particleSystem->GetParticleGroupList();
+  while (group)
+  {
+      m_particleSystem->SetGroupFlags(
+          m_particleSystem->GetGroupFlags() & ~b2_particleGroupCanBeEmpty);
+      group->DestroyParticles(false);
+      // The destruction of particle groups are deferred to the next call of
+      // Step() so it's safe to reference the group here.
+      group = group->GetNext();
+  }
+</pre>
 
 The next several sections provide more information on how to define particle
 behaviors and properties.
@@ -297,9 +291,8 @@ A solid particle group prevents other bodies from lodging inside of it. Should
 anything penetrate it, the solid particle group pushes the offending body back
 out to its surface.
 
-A solid particle group also possesses an especially strong repulsive force. It 
-is
-useful, for example, in a case where:
+A solid particle group also possesses an especially strong repulsive force. It
+is useful, for example, in a case where:
 
 * Something should be expected to bounce with unusual vigor
 ** As when a racquetball strikes the wall of a court
@@ -341,7 +334,7 @@ Set particle behavior as elastic using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`
 
-The green circle and the blue box in the "Elastic Particles" demo of the 
+The green circle and the blue box in the "Elastic Particles" demo of the
 Testbed application comprise elastic particles.
 
 ### Color-mixing
@@ -352,7 +345,7 @@ one,
 the other particle retains its pre-collision color.<br/>
 <br/>
 The following example shows how color mixture is calculated. It shows the
-collision of two color-mixing particles: one red ("R") and one green ("G).
+collision of two color-mixing particles: one red ("R") and one green ("G").
 
 1. First, the system calculates deltaColor, which is the value by which each
    color will change.
@@ -379,7 +372,7 @@ system uses the absolute value of that number. When it results in a value over
 Set particle behavior as color-mixing using the statement<br/>
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_colorMixingParticle;`
 
-The "Surface Tension" demo of the Testbed application uses color-mixing 
+The "Surface Tension" demo of the Testbed application uses color-mixing
 particles.
 
 ### Powder
@@ -406,7 +399,7 @@ Set spring behavior using the statement<br/>
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_springParticle;`
 
-The red circle in the "Elastic Particles" demo of the Testbed application 
+The red circle in the "Elastic Particles" demo of the Testbed application
 comprises spring particles.
 
 ### Tensile
@@ -435,12 +428,12 @@ The "Liquid Timer" demo of the Testbed application uses viscous particles.
 
 ### Static Pressure
 
-Particles are subject to compression when pressure acts upon them. For example, 
-when particles pour into a container, the ones at the bottom of the container 
-are "crushed" under the weight of those above them and packed more tightly 
+Particles are subject to compression when pressure acts upon them. For example,
+when particles pour into a container, the ones at the bottom of the container
+are "crushed" under the weight of those above them and packed more tightly
 together than the ones at the top of the pile.
 
-The static-pressure particle eliminates this differential; the same amount of 
+The static-pressure particle eliminates this differential; the same amount of
 pressure acts upon each particle in the group.
 
 The following example sets static-pressure behavior.
@@ -457,15 +450,15 @@ Set wall behavior using the statement
 
 ### Barrier
 
-Solid or rigid particle groups are not inherently tunneling-proof. Particles 
-traveling at high enough velocities may penetrate them. Barrier particles, 
-used in conjunction with other particle types, provide particle groups 
-with protection against tunneling. This functionality is useful when, for 
-example, you want to ensure that liquid particles will not leak out of a 
+Solid or rigid particle groups are not inherently tunneling-proof. Particles
+traveling at high enough velocities may penetrate them. Barrier particles,
+used in conjunction with other particle types, provide particle groups
+with protection against tunneling. This functionality is useful when, for
+example, you want to ensure that liquid particles will not leak out of a
 container formed of wall particles.
 
-Barrier particles only prevent penetration of the particle groups they inhabit. 
-They cannot prevent particles from getting between groups of particles, even if 
+Barrier particles only prevent penetration of the particle groups they inhabit.
+They cannot prevent particles from getting between groups of particles, even if
 the groups' positions make them look as if they are contiguous.
 
 You can use barrier particles with elastic, spring, or wall particles.
@@ -491,7 +484,7 @@ zombie, and will be destroyed in the next step of the solver. (For more
 information on the LiquidFun solver, see Chapter 1. Introduction.)
 
 &nbsp;&nbsp;&nbsp;`b2ParticleGroup*group=
-m_world->CreateParticleGroup(pd);`<br/>
+m_particleSystem->CreateParticleGroup(pd);`<br/>
 &nbsp;&nbsp;&nbsp;`for (int32 i=0;i<group->GetParticleCount();i+=2)`<br/>
 &nbsp;&nbsp;&nbsp;`{`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`group->GetFlagsBuffer()[i] |=`
@@ -501,7 +494,7 @@ m_world->CreateParticleGroup(pd);`<br/>
 Note that you can assign multiple behaviors to a group or particle. Use
 the | ("bitwise OR") operator to chain behavior flags. For example, for a group:
 
-&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup | 
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup |
 b2_rigidParticleGroup;`
 
 And for particles:
@@ -536,9 +529,10 @@ can diminish performance.
 
 Set particle size using the statement
 
-&nbsp;&nbsp;&nbsp;`m_world->SetParticleRadius(r);`
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetRadius(r);`
 
-where `r` is a float32 value greater than 0.0f. Default particle radius is 1.0f.
+where `r` is a float32 value greater than 0.0f. Default particle radius is
+1.0f.
 
 Small particles may also behave unpredictably (i.e., break conservation of
 momentum) in scenarios such as explosions. Slowing these particles down by
@@ -546,7 +540,7 @@ reducing gravity scale can stabilize their behavior.
 
 Set gravity scale using the statement
 
-&nbsp;&nbsp;&nbsp;`m_world->SetGravityScale(g);`
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetGravityScale(g);`
 
 , where g is a float32 value greater than 0.0f. Default gravity scale is 1.0f.
 
