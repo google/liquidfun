@@ -89,7 +89,11 @@ public:
 	virtual ~ParticleGroupTracker() {}
 	virtual void SayGoodbye(b2Joint* joint) { B2_NOT_USED(joint); }
 	virtual void SayGoodbye(b2Fixture* fixture) { B2_NOT_USED(fixture); }
-	virtual void SayGoodbye(int32 index) { B2_NOT_USED(index); }
+	virtual void SayGoodbye(b2ParticleSystem* system, int32 index)
+	{
+		B2_NOT_USED(system);
+		B2_NOT_USED(index);
+	}
 
 	// Called when any particle group is about to be destroyed.
 	virtual void SayGoodbye(b2ParticleGroup* group)
@@ -210,7 +214,6 @@ private:
 			m_score(0),
 			m_oil(0),
 			m_world(NULL),
-			m_particleSystem(NULL),
 			m_previousListener(NULL)
 		{
 		}
@@ -225,13 +228,10 @@ private:
 
 		// Initialize the particle system and world, setting this class as
 		// a destruction listener for the world.
-		void Initialize(b2World* const world,
-						b2ParticleSystem* const particleSystem)
+		void Initialize(b2World* const world)
 		{
 			b2Assert(world);
-			b2Assert(particleSystem);
 			m_world = world;
-			m_particleSystem = particleSystem;
 			m_world->SetDestructionListener(this);
 		}
 
@@ -260,11 +260,11 @@ private:
 		}
 
 		// Update the score when certain particles are destroyed.
-		virtual void SayGoodbye(int32 index)
+		virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
 		{
-			b2Assert(m_particleSystem);
+			b2Assert(particleSystem);
 			const void * const userData =
-				m_particleSystem->GetParticleUserDataBuffer()[index];
+				particleSystem->GetUserDataBuffer()[index];
 			if (userData)
 			{
 				const Material material = *((Material*)userData);
@@ -287,7 +287,6 @@ private:
 		int32 m_score;
 		int32 m_oil;
 		b2World *m_world;
-		b2ParticleSystem* m_particleSystem;
 		b2DestructionListener* m_previousListener;
 	};
 
@@ -300,8 +299,8 @@ public:
 		m_allowInput(false),
 		m_frackingFluidChargeTime(-1.0f)
 	{
-		m_listener.Initialize(m_world, m_particleSystem);
-		m_particleSystem->SetParticleRadius(FrackerSettings::k_particleRadius);
+		m_listener.Initialize(m_world);
+		m_particleSystem->SetRadius(FrackerSettings::k_particleRadius);
 		InitializeLayout();
 		// Create the boundaries of the play area.
 		CreateGround();
@@ -470,8 +469,7 @@ public:
 		// Tag each particle with its type.
 		const int32 particleCount = group->GetParticleCount();
 		void** const userDataBuffer =
-			m_particleSystem->GetParticleUserDataBuffer() +
-			group->GetBufferIndex();;
+			m_particleSystem->GetUserDataBuffer() + group->GetBufferIndex();;
 		for (int32 i = 0; i < particleCount; ++i)
 		{
 			userDataBuffer[i] = GetMaterialStorage(x, y);
@@ -695,9 +693,9 @@ public:
 			b2ParticleGroup * const particleGroup = *it;
 			const int32 index = particleGroup->GetBufferIndex();
 			const b2Vec2* const positionBuffer =
-				m_particleSystem->GetParticlePositionBuffer() + index;
+				m_particleSystem->GetPositionBuffer() + index;
 			b2Vec2* const velocityBuffer =
-				m_particleSystem->GetParticleVelocityBuffer() + index;
+				m_particleSystem->GetVelocityBuffer() + index;
 			const int32 particleCount = particleGroup->GetParticleCount();
 			for (int32 i = 0; i < particleCount; ++i)
 			{
