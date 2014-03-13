@@ -76,6 +76,7 @@
 <li>Added option to substep particle simulation independently of <code>b2World</code>.</li>
 <li>Added barrier particles which can be used to prevent particle tunneling due to large particle velocities or simulation steps.</li>
 <li>Added static pressure particles to reduce compression of fluids.</li>
+<li>Added repulsive particles to separate particle groups from each other.</li>
 <li>Added support for multiple independent particle systems.</li>
 <li>Added option to create particles in an existing particle group.</li>
 <li>Added option to detect stuck particles.</li>
@@ -98,6 +99,7 @@
 <li>Multiple independent particle systems can now exist, each with its own physical coefficients. Previously, only one particle system existed, and it always existed. Use b2World::CreateParticleSystem to create particle systems, and b2World::DestroyParticleSystem to destroy them.</li>
 <li>The particle system API has moved from b2World to b2ParticleSystem. For example, b2ParticleSystem::DestroyParticlesInShape replaces b2World::DestroyParticlesInShape. You can use b2World::CreateParticleSystem or b2World::GetParticleSystemList() to acquire references to b2ParticleSystem.</li>
 <li>b2QueryCallback::ReportParticle and b2RayCastCallback::ReportParticle each now takes a b2ParticleSystem pointer as its first parameter. This change is necessary since multiple particle systems can now exist.</li>
+<li>Renamed <code>b2ParticleFlag</code> <code>b2DestructionListener</code> to <code>b2DestructionListenerParticle</code> to be consistent with other particle flag names.</li>
 </ul>
 <h4>Other Changes</h4>
 <ul>
