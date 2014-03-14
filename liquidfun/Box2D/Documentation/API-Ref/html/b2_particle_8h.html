@@ -127,7 +127,12 @@ Enumerations</h2></td></tr>
 <a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a189a78e47cb348efe3d4f2913841fc5e">b2_staticPressureParticle</a> = 1 &lt;&lt; 11, 
 <br/>
 &#160;&#160;<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50acc9479dc00efdc07365ab91ecbc892f6">b2_reactiveParticle</a> = 1 &lt;&lt; 12, 
-<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a2ce5aed5f02565af61e12af5606b6fd3">b2_repulsiveParticle</a> = 1 &lt;&lt; 13
+<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a2ce5aed5f02565af61e12af5606b6fd3">b2_repulsiveParticle</a> = 1 &lt;&lt; 13, 
+<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50af0d6622e0501640f6aa93837065b6bcd">b2_fixtureContactListenerParticle</a> = 1 &lt;&lt; 14, 
+<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a2c39ee73d6368a4ce730d5de685e06a1">b2_particleContactListenerParticle</a> = 1 &lt;&lt; 15, 
+<br/>
+&#160;&#160;<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50a07a239a37329255f4af644cb32170a66">b2_fixtureContactFilterParticle</a> = 1 &lt;&lt; 16, 
+<a class="el" href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50ad18ef2352a748a2c9d1ed826557b7f49">b2_particleContactFilterParticle</a> = 1 &lt;&lt; 17
 <br/>
  }</td></tr>
 <tr class="memdesc:a73d3b011893cb87452253b1b67a5cf50"><td class="mdescLeft">&#160;</td><td class="mdescRight">The particle type. Can be combined with the | operator.  <a href="b2_particle_8h.html#a73d3b011893cb87452253b1b67a5cf50">More...</a><br/></td></tr>
@@ -200,6 +205,18 @@ Variables</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="a73d3b011893cb87452253b1b67a5cf50a2ce5aed5f02565af61e12af5606b6fd3"></a>b2_repulsiveParticle</em>&nbsp;</td><td class="fielddoc">
 <p>With high repulsive force. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a73d3b011893cb87452253b1b67a5cf50af0d6622e0501640f6aa93837065b6bcd"></a>b2_fixtureContactListenerParticle</em>&nbsp;</td><td class="fielddoc">
+<p>Call <a class="el" href="classb2_contact_listener.html">b2ContactListener</a> when this particle is about to interact with a rigid body or stops interacting with a rigid body. This results in an expensive operation compared to using b2_fixtureContactFilterParticle to detect collisions between particles. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a73d3b011893cb87452253b1b67a5cf50a2c39ee73d6368a4ce730d5de685e06a1"></a>b2_particleContactListenerParticle</em>&nbsp;</td><td class="fielddoc">
+<p>Call <a class="el" href="classb2_contact_listener.html">b2ContactListener</a> when this particle is about to interact with another particle or stops interacting with another particle. This results in an expensive operation compared to using b2_particleContactFilterParticle to detect collisions between particles. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a73d3b011893cb87452253b1b67a5cf50a07a239a37329255f4af644cb32170a66"></a>b2_fixtureContactFilterParticle</em>&nbsp;</td><td class="fielddoc">
+<p>Call <a class="el" href="classb2_contact_filter.html">b2ContactFilter</a> when this particle interacts with rigid bodies. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a73d3b011893cb87452253b1b67a5cf50ad18ef2352a748a2c9d1ed826557b7f49"></a>b2_particleContactFilterParticle</em>&nbsp;</td><td class="fielddoc">
+<p>Call <a class="el" href="classb2_contact_filter.html">b2ContactFilter</a> when this particle interacts with other particles. </p>
 </td></tr>
 </table>
 

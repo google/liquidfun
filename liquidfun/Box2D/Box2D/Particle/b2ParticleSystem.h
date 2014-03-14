@@ -135,8 +135,8 @@ struct b2ParticleSystemDef
 	float32 surfaceTensionPressureStrength;
 
 	/// Smoothes outline of tensile particles
-	/// 0~0.2. Larger values create rounder, smoother, water-drop-like groups of
-	/// particles.
+	/// 0~0.2. Larger values result in rounder, smoother, water-drop-like
+	/// clusters of particles.
 	float32 surfaceTensionNormalStrength;
 
 	/// Produces additional pressure on repulsive particles
