@@ -1534,13 +1534,7 @@ inline void b2ParticleSystem::AddContact(
 			ParticlePair pair;
 			pair.first = a;
 			pair.second = b;
-			int32 itemIndex = particlePairSet->Find(pair);
-			if (itemIndex < 0)
-			{
-				pair.first = b;
-				pair.second = a;
-				itemIndex = particlePairSet->Find(pair);
-			}
+			const int32 itemIndex = particlePairSet->Find(pair);
 			if (itemIndex >= 0)
 			{
 				// Already touching, ignore this contact.
@@ -1853,7 +1847,15 @@ void b2ParticlePairSet::Initialize(
 // Find the index of a particle pair in the set or -1 if it's not present.
 int32 b2ParticlePairSet::Find(const ParticlePair& pair) const
 {
-	return FindItemIndexInFixedSet(*this, pair);
+	int32 index = FindItemIndexInFixedSet(*this, pair);
+	if (index < 0)
+	{
+		ParticlePair swapped;
+		swapped.first = pair.second;
+		swapped.second = pair.first;
+		index = FindItemIndexInFixedSet(*this, swapped);
+	}
+	return index;
 }
 
 void b2ParticleSystem::UpdateBodyContacts()
