@@ -130,11 +130,12 @@ struct b2ParticleSystemDef
 	float32 viscousStrength;
 
 	/// Produces pressure on tensile particles
-	/// TODO: document further
+	/// 0~0.2. Larger values increase the amount of surface tension.
 	float32 surfaceTensionPressureStrength;
 
 	/// Smoothes outline of tensile particles
-	/// TODO: document further
+	/// 0~0.2. Larger values create rounder, smoother, water-drop-like groups of
+	/// particles.
 	float32 surfaceTensionNormalStrength;
 
 	/// Produces additional pressure on repulsive particles
