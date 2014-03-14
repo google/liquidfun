@@ -77,6 +77,7 @@ swig_src_files+=\
 namespace:=$(if $(NDK_PROJECT_PATH),,_liquidfun)
 LOCAL_MODULE:=libliquidfun_jni${namespace}
 LOCAL_C_INCLUDES:=$(LOCAL_PATH)/../
+LOCAL_CFLAGS:=-frtti
 
 LOCAL_SRC_FILES+=$(swig_cpp_out_buildsrc)
 LOCAL_STATIC_LIBRARIES+=libliquidfun
