@@ -43,10 +43,10 @@ static const uint32 yMask = (1 << yTruncBits) - 1;
 // to implement the algorithm described there.  It was hoisted out and friended
 // as it would not compile with g++ 4.6.3 as a local class.  It is only used in
 // that function.
-class b2ParticleBodyContactRemovePredicate
+class ParticleBodyContactRemovePredicate
 {
 public:
-	b2ParticleBodyContactRemovePredicate(b2ParticleSystem* system,
+	ParticleBodyContactRemovePredicate(b2ParticleSystem* system,
 										 int32* discarded)
 		: m_system(system), m_lastIndex(-1), m_currentContacts(0),
 		  m_discarded(discarded) {}
@@ -118,6 +118,8 @@ private:
 	int32* m_discarded;
 };
 
+namespace {
+
 // Compares the expiration time of two particle indices.
 class ExpirationTimeComparator
 {
@@ -154,6 +156,173 @@ public:
 
 private:
 	const int32* m_expirationTimes;
+};
+
+// *Very* lightweight pair implementation.
+template<typename A, typename B>
+struct LightweightPair
+{
+	A first;
+	B second;
+
+	// Compares the value of two FixtureParticle objects returning
+	// true if left is a smaller value than right.
+	static bool Compare(const LightweightPair& left,
+						const LightweightPair& right)
+	{
+		return left.first < right.first &&
+			left.second < right.second;
+	}
+
+};
+
+// Allocator for a fixed set of items.
+class FixedSetAllocator
+{
+public:
+	// Associate a memory allocator with this object.
+	FixedSetAllocator(b2StackAllocator* allocator);
+	// Deallocate storage for this class.
+	~FixedSetAllocator()
+	{
+		Clear();
+	}
+
+	// Allocate internal storage for this object returning the size.
+	int32 Allocate(const int32 itemSize, const int32 count);
+
+	// Deallocate the internal buffer if it's allocated.
+	void Clear();
+
+	// Get the number of items in the set.
+	int32 GetCount() const { return m_count; }
+
+	// Invalidate an item from the set by index.
+	void Invalidate(const int32 itemIndex)
+	{
+		b2Assert(m_valid);
+		m_valid[itemIndex] = 0;
+	}
+
+	// Get the buffer which indicates whether items are valid in the set.
+	const int8* GetValidBuffer() const { return m_valid; }
+
+protected:
+	// Get the internal buffer.
+	void* GetBuffer() const { return m_buffer; }
+	void* GetBuffer() { return m_buffer; }
+
+	// Reduce the number of items in the set.
+	void SetCount(int32 count)
+	{
+		b2Assert(count <= m_count);
+		m_count = count;
+	}
+
+private:
+	// Set buffer.
+	void* m_buffer;
+	// Array of size m_count which indicates whether an item is in the
+	// corresponding index of m_set (1) or the item is invalid (0).
+	int8* m_valid;
+	// Number of items in m_set.
+	int32 m_count;
+	// Allocator used to allocate / free the set.
+	b2StackAllocator* m_allocator;
+};
+
+// Allocator for a fixed set of objects.
+template<typename T>
+class TypedFixedSetAllocator : public FixedSetAllocator
+{
+public:
+	// Initialize members of this class.
+	TypedFixedSetAllocator(b2StackAllocator* allocator) :
+		FixedSetAllocator(allocator) { }
+
+	// Allocate a set of objects, returning the new size of the set.
+	int32 Allocate(const int32 numberOfObjects)
+	{
+		Clear();
+		return FixedSetAllocator::Allocate(sizeof(T), numberOfObjects);
+	}
+
+	// Get the index of an item in the set if it's valid return an index
+	// >= 0, -1 otherwise.
+	int32 GetIndex(const T* item) const
+	{
+		if (item)
+		{
+			b2Assert(item >= GetBuffer() &&
+					 item < GetBuffer() + GetCount());
+			const int32 index =
+				(int32)(((uint8*)item - (uint8*)GetBuffer()) /
+						sizeof(*item));
+			if (GetValidBuffer()[index])
+			{
+				return index;
+			}
+		}
+		return -1;
+	}
+
+	// Get the internal buffer.
+	const T* GetBuffer() const
+	{
+		return (const T*)FixedSetAllocator::GetBuffer();
+	}
+	T* GetBuffer() { return (T*)FixedSetAllocator::GetBuffer(); }
+};
+
+// Associates a fixture with a particle index.
+typedef LightweightPair<b2Fixture*,int32> FixtureParticle;
+
+// Set of fixture / particle indices.
+class FixtureParticleSet :
+	public TypedFixedSetAllocator<FixtureParticle>
+{
+public:
+	// Initialize members of this class.
+	FixtureParticleSet(b2StackAllocator* allocator) :
+		TypedFixedSetAllocator<FixtureParticle>(allocator) { }
+
+
+	// Initialize from a set of particle / body contacts for particles
+	// that have the b2_fixtureContactListenerParticle flag set.
+	void Initialize(const b2ParticleBodyContact * const bodyContacts,
+					const int32 numBodyContacts,
+					const uint32 * const particleFlagsBuffer);
+
+	// Find the index of a particle / fixture pair in the set or -1
+	// if it's not present.
+	// NOTE: This was not written as a template function to avoid
+	// exposing any dependencies via this header.
+	int32 Find(const FixtureParticle& fixtureParticle) const;
+};
+
+// Associates a fixture with a particle index.
+typedef LightweightPair<int32,int32> ParticlePair;
+
+}  // namespace
+
+// Set of particle / particle pairs.
+class b2ParticlePairSet : public TypedFixedSetAllocator<ParticlePair>
+{
+public:
+	// Initialize members of this class.
+	b2ParticlePairSet(b2StackAllocator* allocator) :
+		TypedFixedSetAllocator<ParticlePair>(allocator) { }
+
+	// Initialize from a set of particle contacts.
+	void Initialize(const b2ParticleContact * const contacts,
+					const int32 numContacts,
+					const uint32 * const particleFlagsBuffer);
+
+	// Find the index of a particle pair in the set or -1
+	// if it's not present.
+	// NOTE: This was not written as a template function to avoid
+	// exposing any dependencies via this header.
+	int32 Find(const ParticlePair& pair) const;
 };
 
 static inline uint32 computeTag(float32 x, float32 y)
@@ -1330,7 +1499,7 @@ void b2ParticleSystem::ComputeDepth()
 inline void b2ParticleSystem::AddContact(
 	int32 a, int32 b, b2ContactFilter* const contactFilter,
 	b2ContactListener* const contactListener,
-	ParticlePairSet* const particlePairSet)
+	b2ParticlePairSet* const particlePairSet)
 {
 	b2Vec2 d = m_positionBuffer.data[b] - m_positionBuffer.data[a];
 	float32 distBtParticlesSq = b2Dot(d, d);
@@ -1421,7 +1590,7 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 	std::sort(beginProxy, endProxy);
 
 	b2ContactListener* const contactListener = GetParticleContactListener();
-	ParticlePairSet particlePairs(&m_world->m_stackAllocator);
+	b2ParticlePairSet particlePairs(&m_world->m_stackAllocator);
 	if (contactListener)
 	{
 		particlePairs.Initialize(m_contactBuffer, m_contactCount,
@@ -1560,7 +1729,7 @@ void b2ParticleSystem::ComputeAABB(b2AABB* const aabb) const
 }
 
 // Associate a memory allocator with this object.
-b2ParticleSystem::FixedSetAllocator::FixedSetAllocator(
+FixedSetAllocator::FixedSetAllocator(
 		b2StackAllocator* allocator) :
 	m_buffer(NULL), m_valid(NULL), m_count(0), m_allocator(allocator)
 {
@@ -1568,7 +1737,7 @@ b2ParticleSystem::FixedSetAllocator::FixedSetAllocator(
 }
 
 // Allocate internal storage for this object.
-int32 b2ParticleSystem::FixedSetAllocator::Allocate(
+int32 FixedSetAllocator::Allocate(
 	const int32 itemSize, const int32 count)
 {
 	Clear();
@@ -1585,7 +1754,7 @@ int32 b2ParticleSystem::FixedSetAllocator::Allocate(
 }
 
 // Deallocate the internal buffer if it's allocated.
-void b2ParticleSystem::FixedSetAllocator::Clear()
+void FixedSetAllocator::Clear()
 {
 	if (m_buffer)
 	{
@@ -1598,8 +1767,8 @@ void b2ParticleSystem::FixedSetAllocator::Clear()
 // Search set for item returning the index of the item if it's found, -1
 // otherwise.
 template<typename T>
-int32 FindItemIndexInFixedSet(
-	const b2ParticleSystem::TypedFixedSetAllocator<T>& set, const T& item)
+static int32 FindItemIndexInFixedSet(const TypedFixedSetAllocator<T>& set,
+									 const T& item)
 {
 	if (set.GetCount())
 	{
@@ -1613,7 +1782,7 @@ int32 FindItemIndexInFixedSet(
 
 // Initialize from a set of particle / body contacts for particles
 // that have the b2_fixtureContactListenerParticle flag set.
-void b2ParticleSystem::FixtureParticleSet::Initialize(
+void FixtureParticleSet::Initialize(
 	const b2ParticleBodyContact * const bodyContacts,
 	const int32 numBodyContacts,
 	const uint32 * const particleFlagsBuffer)
@@ -1644,14 +1813,14 @@ void b2ParticleSystem::FixtureParticleSet::Initialize(
 
 // Find the index of a particle / fixture pair in the set or -1 if it's not
 // present.
-int32 b2ParticleSystem::FixtureParticleSet::Find(
+int32 FixtureParticleSet::Find(
 	const FixtureParticle& fixtureParticle) const
 {
 	return FindItemIndexInFixedSet(*this, fixtureParticle);
 }
 
 // Initialize from a set of particle contacts.
-void b2ParticleSystem::ParticlePairSet::Initialize(
+void b2ParticlePairSet::Initialize(
 	const b2ParticleContact * const contacts, const int32 numContacts,
 	const uint32 * const particleFlagsBuffer)
 {
@@ -1682,7 +1851,7 @@ void b2ParticleSystem::ParticlePairSet::Initialize(
 }
 
 // Find the index of a particle pair in the set or -1 if it's not present.
-int32 b2ParticleSystem::ParticlePairSet::Find(const ParticlePair& pair) const
+int32 b2ParticlePairSet::Find(const ParticlePair& pair) const
 {
 	return FindItemIndexInFixedSet(*this, pair);
 }
@@ -1927,7 +2096,7 @@ void b2ParticleSystem::RemoveSpuriousBodyContacts()
 	int32 discarded = 0;
 	std::remove_if(m_bodyContactBuffer,
 					m_bodyContactBuffer + m_bodyContactCount,
-					b2ParticleBodyContactRemovePredicate(this, &discarded));
+					ParticleBodyContactRemovePredicate(this, &discarded));
 
 	m_bodyContactCount -= discarded;
 }
