@@ -21,12 +21,30 @@ following:
     view all changes present in the [0.9.0][] release.
 
 
-### 0.9.1 TODO update prior to release.
+<a name="1.0.0"></a>
+### 1.0.0
 
 #### Overview
 
-TODO describe the cool new stuff we have in this release TODO
+The [1.0.0 release][] of LiquidFun introduces a number of new features to the
+API described <a href="#newfeatures1.0.0">below</a>.  Some of the highlights
+are:
 
+*   Multiple particle systems.
+*   New particle behaviors: barrier, static-pressure, and repulsive.
+*   Particle lifetimes.
+*   Detection of stuck particles.
+*   The ability to apply forces and impulses to particles.
+*   Java support via SWIG.
+*   A host of new demos: inside the existing Testbed application, and gorgeous
+    new "EyeCandy" demo for Android.
+
+Users of [0.9.0][] should carefully read through the
+<a href="#apimods1.0.0">API Modifications</a> section to understand what they
+need to change to get their existing applications to work with the latest
+release of LiquidFun.
+
+<a name="newfeatures1.0.0"></a>
 #### New Features
 
 *   Added option to substep particle simulation independently of `b2World`.
@@ -40,9 +58,9 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added option to pause particle simulations. Paused simluations don't
     consume cycles in b2World::Step.
 *   Added option to enable a more strict check for Particle/Body interactions
+    in cases where complex world geometry may cause false positive contacts.
 *   Added option to call a contact listener or filter on particle / fixture
     or particle / particle interactions.
-    in cases where complex world geometry may cause false positive contacts.
 *   Added the ability to apply forces and impulses to particles.
 *   Added "EyeCandy" sample to demonstrate different particle rendering methods
     on Android.
@@ -56,8 +74,10 @@ TODO describe the cool new stuff we have in this release TODO
     destruction callbacks.
 *   Added Java Native Interface support via SWIG. It covers a subset of the
     API.
-*   Added the ability to pass a list of shapes to be passed in for particle-group
-    creation.
+*   Added the ability to pass a list of shapes to be passed in for
+    particle-group creation.
+
+<a name="apimods1.0.0"></a>
 #### API Modifications
 
 *   `b2Draw::e_particleBit` flag now enables/disables
@@ -168,7 +188,8 @@ TODO describe the cool new stuff we have in this release TODO
 *   Added option to archive build artifacts from build scripts.
 *   Changed Android C++ runtime library to gnustl_static.
 
-### 0.9.0 <a name="0.9.0"></a>
+<a name="0.9.0"></a>
+### 0.9.0
 
 #### Overview
 
@@ -196,6 +217,10 @@ The initial release of LiquidFun is available for download from the
   [LiquidFun source]: http://github.com/google/liquidfun
   [0.9.0]: #0.9.0
   [0.9.0 release]: http://github.com/google/liquidfun/releases/tag/v0.9.0
+  [1.0.0]: #1.0.0
+  [1.0.0 release]: http://github.com/google/liquidfun/releases/tag/v1.0.0
+  [apimods1.0.0]: #apimods1.0.0
+  [newfeatures1.0.0]: #newfeatures1.0.0
   [Box2D]: http://box2d.org
   [Box2D revision 280]: http://code.google.com/p/box2d/source/detail?r=280
   [Box2D revision 255]: http://code.google.com/p/box2d/source/detail?r=255

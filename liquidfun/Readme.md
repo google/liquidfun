@@ -1,4 +1,4 @@
-LiquidFun Version [0.9.1][]
+LiquidFun Version [1.0.0][]
 
 # Welcome to LiquidFun!
 
@@ -31,5 +31,5 @@ you would leave it in.
   [LiquidFun Issues Tracker]: http://github.com/google/liquidfun/issues
   [stackoverflow.com]: http://www.stackoverflow.com
   [landing page]: http://google.github.io/liquidfun
-  [0.9.1]: http://google.github.io/liquidfun/ReleaseNotes.html
+  [1.0.0]: http://google.github.io/liquidfun/ReleaseNotes.html
   [Box2D]: http://box2d.org
