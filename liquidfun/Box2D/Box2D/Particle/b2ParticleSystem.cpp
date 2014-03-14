@@ -958,6 +958,7 @@ void b2ParticleSystem::CreateParticlesWithShapesForGroup(
 		b2Shape* Clone(b2BlockAllocator* allocator) const
 		{
 			b2Assert(false);
+			B2_NOT_USED(allocator);
 			return NULL;
 		}
 		int32 GetChildCount() const
@@ -979,16 +980,26 @@ void b2ParticleSystem::CreateParticlesWithShapesForGroup(
 					float32* distance, b2Vec2* normal, int32 childIndex) const
 		{
 			b2Assert(false);
+			B2_NOT_USED(xf);
+			B2_NOT_USED(p);
+			B2_NOT_USED(distance);
+			B2_NOT_USED(normal);
+			B2_NOT_USED(childIndex);
 		}
 		bool RayCast(b2RayCastOutput* output, const b2RayCastInput& input,
 						const b2Transform& transform, int32 childIndex) const
 		{
 			b2Assert(false);
+			B2_NOT_USED(output);
+			B2_NOT_USED(input);
+			B2_NOT_USED(transform);
+			B2_NOT_USED(childIndex);
 			return false;
 		}
 		void ComputeAABB(
 				b2AABB* aabb, const b2Transform& xf, int32 childIndex) const
 		{
+			B2_NOT_USED(childIndex);
 			aabb->lowerBound.x = +FLT_MAX;
 			aabb->lowerBound.y = +FLT_MAX;
 			aabb->upperBound.x = -FLT_MAX;
@@ -1008,6 +1019,8 @@ void b2ParticleSystem::CreateParticlesWithShapesForGroup(
 		void ComputeMass(b2MassData* massData, float32 density) const
 		{
 			b2Assert(false);
+			B2_NOT_USED(massData);
+			B2_NOT_USED(density);
 		}
 	private:
 		const b2Shape* const* m_shapes;

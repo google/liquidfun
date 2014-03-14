@@ -589,6 +589,7 @@ public:
 	// Start preparing the fracking fluid.
 	virtual void MouseDown(const b2Vec2& p)
 	{
+		B2_NOT_USED(p);
 		m_frackingFluidChargeTime = 0.0f;
 	}
 
@@ -767,8 +768,8 @@ public:
 	void DrawScore()
 	{
 		char score[512];
-		snprintf(score, sizeof(score), "Score: %d, Remaining Oil %d",
-				 m_listener.GetScore(), m_listener.GetOil());
+		sprintf(score, "Score: %d, Remaining Oil %d",
+		        m_listener.GetScore(), m_listener.GetOil());
 		const char *lines[] = { score,  "Move: a,s,d,w   Fracking Fluid: e" };
 		for (uint32 i = 0; i < B2_ARRAY_SIZE(lines); ++i)
 		{

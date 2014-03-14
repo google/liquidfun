@@ -64,6 +64,7 @@ public:
 	/// particle has been destroyed.
 	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
 	{
+		B2_NOT_USED(particleSystem);
 		B2_NOT_USED(index);
 	}
 };
