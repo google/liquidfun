@@ -43,10 +43,10 @@ static const uint32 yMask = (1 << yTruncBits) - 1;
 // to implement the algorithm described there.  It was hoisted out and friended
 // as it would not compile with g++ 4.6.3 as a local class.  It is only used in
 // that function.
-class ParticleBodyContactRemovePredicate
+class b2ParticleBodyContactRemovePredicate
 {
 public:
-	ParticleBodyContactRemovePredicate(b2ParticleSystem* system,
+	b2ParticleBodyContactRemovePredicate(b2ParticleSystem* system,
 										 int32* discarded)
 		: m_system(system), m_lastIndex(-1), m_currentContacts(0),
 		  m_discarded(discarded) {}
@@ -2111,7 +2111,7 @@ void b2ParticleSystem::RemoveSpuriousBodyContacts()
 	int32 discarded = 0;
 	std::remove_if(m_bodyContactBuffer,
 					m_bodyContactBuffer + m_bodyContactCount,
-					ParticleBodyContactRemovePredicate(this, &discarded));
+					b2ParticleBodyContactRemovePredicate(this, &discarded));
 
 	m_bodyContactCount -= discarded;
 }

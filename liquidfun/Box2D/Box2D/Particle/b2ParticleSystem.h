@@ -556,7 +556,7 @@ public:
 private:
 	friend class b2World;
 	friend class b2ParticleGroup;
-	friend class ParticleBodyContactRemovePredicate;
+	friend class b2ParticleBodyContactRemovePredicate;
 #ifdef LIQUIDFUN_UNIT_TESTS
 	FRIEND_TEST(FunctionTests, GetParticleMass);
 #endif // LIQUIDFUN_UNIT_TESTS
