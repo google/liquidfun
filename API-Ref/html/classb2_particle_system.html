@@ -278,6 +278,8 @@ const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#
 <tr class="separator:a036f009bf8d329675061aa0687b06bb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4759f4e8f04494e32051385e72ebd332"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a4759f4e8f04494e32051385e72ebd332">RayCast</a> (<a class="el" href="classb2_ray_cast_callback.html">b2RayCastCallback</a> *callback, const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;point1, const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;point2) const </td></tr>
 <tr class="separator:a4759f4e8f04494e32051385e72ebd332"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af79da05e11294c694c7e1c1a1205f29c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#af79da05e11294c694c7e1c1a1205f29c">ComputeAABB</a> (<a class="el" href="structb2_a_a_b_b.html">b2AABB</a> *const aabb) const </td></tr>
+<tr class="separator:af79da05e11294c694c7e1c1a1205f29c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -368,6 +370,29 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
     <tr><td class="paramname">firstIndex</td><td>the first particle to be modified. </td></tr>
     <tr><td class="paramname">lastIndex</td><td>the last particle to be modified. </td></tr>
     <tr><td class="paramname">impulse</td><td>the world impulse vector, usually in N-seconds or kg-m/s. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="af79da05e11294c694c7e1c1a1205f29c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2ParticleSystem::ComputeAABB </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structb2_a_a_b_b.html">b2AABB</a> *const&#160;</td>
+          <td class="paramname"><em>aabb</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Compute the axis-aligned bounding box for all particles contained within this particle system. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">aabb</td><td>Returns the axis-aligned bounding box of the system. </td></tr>
   </table>
   </dd>
 </dl>

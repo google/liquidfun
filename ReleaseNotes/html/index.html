@@ -45,29 +45,6 @@
 <li>Checkout the <a href="http://github.com/google/liquidfun">LiquidFun source</a> and run <code>git log --oneline --decorate=full</code> to view the list of changes.</li>
 <li>Go to <a href="http://github.com/google/liquidfun/commits/vVERSION_NUMBER">http://github.com/google/liquidfun/commits/vVERSION_NUMBER</a> where <em>VERSION_NUMBER</em> is the version number of the release. For example, go to <a href="http://github.com/google/liquidfun/commits/v0.9.0">http://github.com/google/liquidfun/commits/v0.9.0</a> to view all changes present in the <a href="#0.9.0">0.9.0</a> release.</li>
 </ul>
-<h3>1.0</h3>
-<p>TODO Flesh out further.</p>
-<h3>Overview</h3>
-<p>LiquidFun 1.0 is available for download from the <a href="http://github.com/google/liquidfun/releases/tag/v0.9.0">0.9.0 release</a> release page.</p>
-<h4>New Features</h4>
-<ul>
-<li>Barrier, static-pressure, and repulsive particles.</li>
-<li>Detection of stuck particles.</li>
-<li>The ability to create multiple particle systems.</li>
-<li>The ability to apply forces and impulses to particles.</li>
-<li>Java support via SWIG.</li>
-<li>"EyeCandy" sample application.</li>
-</ul>
-<h4>API Modifications</h4>
-<ul>
-<li>Improved performance</li>
-<li>Better particle-behavior stability</li>
-<li>Improved API stability</li>
-</ul>
-<h4>Other Changes</h4>
-<ul>
-<li>Improved documentation</li>
-</ul>
 <h3>0.9.1 TODO update prior to release.</h3>
 <h4>Overview</h4>
 <p>TODO describe the cool new stuff we have in this release TODO</p>
@@ -83,14 +60,16 @@
 <li>Added option to pause particle simulations. Paused simluations don't consume cycles in b2World::Step.</li>
 <li>Added option to enable a more strict check for Particle/Body interactions</li>
 <li>Added option to call a contact listener or filter on particle / fixture or particle / particle interactions. in cases where complex world geometry may cause false positive contacts.</li>
+<li>Added the ability to apply forces and impulses to particles.</li>
 <li>Added "EyeCandy" sample to demonstrate different particle rendering methods on Android.</li>
 <li>Added "Sparky", "Sandbox" and "Soup Stirrer" tests to the Testbed example to demonstrate particle and rigid body interaction.</li>
 <li>Added "Ramp", "Pointy", and "AntiPointy" tests to the Testbed example to illustrate the difference with strict contact checking.</li>
 <li>Added "Maxwell" test to the Testbed to demonstrate the direct modification of particle velocities.</li>
 <li>Added "Fracker" test to demonstrate particle viscous fluids and particle destruction callbacks.</li>
 <li>Added Java Native Interface support via SWIG. It covers a subset of the API.</li>
+<li>Added the ability to pass a list of shapes to be passed in for particle-group creation. <h4>API Modifications</h4>
+</li>
 </ul>
-<h4>API Modifications</h4>
 <ul>
 <li><p class="startli"><code>b2Draw::e_particleBit</code> flag now enables/disables <code>b2World::DrawDebugData()</code> drawing the particle system.</p>
 <p class="startli">To render the particle system using <code>b2World::DrawDebugData()</code>, the <code>b2Draw::e_particleBit</code> flag must be set on the <code>b2Draw</code> object passed to <code>b2World::SetDebugDraw()</code>. It is possible to set flags on <code>b2Draw</code> objects using <code>b2Draw::SetFlags()</code>.</p>
@@ -141,6 +120,7 @@ DestroyParticlesInGroup ==&gt; DestroyParticles (moved to b2ParticleGroup)
 </ul>
 </li>
 <li>Renamed <code>b2ParticleFlag</code> <code>b2DestructionListener</code> to <code>b2DestructionListenerParticle</code> to be consistent with other particle flag names.</li>
+<li>Better particle-behavior stability.</li>
 </ul>
 <h4>Other Changes</h4>
 <ul>

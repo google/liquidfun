@@ -101,6 +101,14 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_listener.html#afb3059058e5c47903a3947c2eef5826b">EndContact</a> (<a class="el" href="classb2_contact.html">b2Contact</a> *contact)</td></tr>
 <tr class="memdesc:afb3059058e5c47903a3947c2eef5826b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when two fixtures cease to touch. <br/></td></tr>
 <tr class="separator:afb3059058e5c47903a3947c2eef5826b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb9deb8af4d5d1cffbe150913b086bf1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_listener.html#afb9deb8af4d5d1cffbe150913b086bf1">BeginContact</a> (<a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, <a class="el" href="structb2_particle_body_contact.html">b2ParticleBodyContact</a> *particleBodyContact)</td></tr>
+<tr class="separator:afb9deb8af4d5d1cffbe150913b086bf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab265d63bdd7908f4e00e6ef06f3c99f6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_listener.html#ab265d63bdd7908f4e00e6ef06f3c99f6">EndContact</a> (<a class="el" href="classb2_fixture.html">b2Fixture</a> *fixture, <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, int32 index)</td></tr>
+<tr class="separator:ab265d63bdd7908f4e00e6ef06f3c99f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a514865000359ffb1a099f7dee871faea"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_listener.html#a514865000359ffb1a099f7dee871faea">BeginContact</a> (<a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, <a class="el" href="structb2_particle_contact.html">b2ParticleContact</a> *particleContact)</td></tr>
+<tr class="separator:a514865000359ffb1a099f7dee871faea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75d45130bf779d2cb766e26da0e4836b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_listener.html#a75d45130bf779d2cb766e26da0e4836b">EndContact</a> (<a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, int32 indexA, int32 indexB)</td></tr>
+<tr class="separator:a75d45130bf779d2cb766e26da0e4836b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a416f85eb45a1099053402b15a19a7de0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_listener.html#a416f85eb45a1099053402b15a19a7de0">PreSolve</a> (<a class="el" href="classb2_contact.html">b2Contact</a> *contact, const <a class="el" href="structb2_manifold.html">b2Manifold</a> *oldManifold)</td></tr>
 <tr class="separator:a416f85eb45a1099053402b15a19a7de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd58ec96f7569b95eec65b8ca3f8013d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_listener.html#acd58ec96f7569b95eec65b8ca3f8013d">PostSolve</a> (<a class="el" href="classb2_contact.html">b2Contact</a> *contact, const <a class="el" href="structb2_contact_impulse.html">b2ContactImpulse</a> *impulse)</td></tr>
@@ -110,6 +118,158 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <div class="textblock"><p>Implement this class to get contact information. You can use these results for things like sounds and game logic. You can also get contact results by traversing the contact lists after the time step. However, you might miss some contacts because continuous physics leads to sub-stepping. Additionally you may receive multiple callbacks for the same contact in a single time step. You should strive to make your callbacks efficient because there may be many callbacks per time step. </p>
 <dl class="section warning"><dt>Warning</dt><dd>You cannot create/destroy Box2D entities inside these callbacks. </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="afb9deb8af4d5d1cffbe150913b086bf1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void b2ContactListener::BeginContact </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structb2_particle_body_contact.html">b2ParticleBodyContact</a> *&#160;</td>
+          <td class="paramname"><em>particleBodyContact</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Called when a fixture and particle start touching if the b2_fixtureContactFilterParticle flag is set on the particle. </p>
+
+</div>
+</div>
+<a class="anchor" id="a514865000359ffb1a099f7dee871faea"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void b2ContactListener::BeginContact </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structb2_particle_contact.html">b2ParticleContact</a> *&#160;</td>
+          <td class="paramname"><em>particleContact</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Called when two particles start touching if b2_particleContactFilterParticle flag is set on either particle. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab265d63bdd7908f4e00e6ef06f3c99f6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void b2ContactListener::EndContact </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_fixture.html">b2Fixture</a> *&#160;</td>
+          <td class="paramname"><em>fixture</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Called when a fixture and particle stop touching if the b2_fixtureContactFilterParticle flag is set on the particle. </p>
+
+</div>
+</div>
+<a class="anchor" id="a75d45130bf779d2cb766e26da0e4836b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void b2ContactListener::EndContact </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>indexA</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>indexB</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Called when two particles start touching if b2_particleContactFilterParticle flag is set on either particle. </p>
+
+</div>
+</div>
 <a class="anchor" id="acd58ec96f7569b95eec65b8ca3f8013d"></a>
 <div class="memitem">
 <div class="memproto">

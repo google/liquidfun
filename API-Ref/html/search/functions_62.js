@@ -34,5 +34,5 @@ var searchData=
   ['b2vec3',['b2Vec3',['../structb2_vec3.html#a837423f66d6fb72d815e7390c09938b9',1,'b2Vec3::b2Vec3()'],['../structb2_vec3.html#a47df55b26ab254dcf42a16638c7feeeb',1,'b2Vec3::b2Vec3(float32 x, float32 y, float32 z)']]],
   ['b2vec4',['b2Vec4',['../structb2_vec4.html#ae1bd17259d4ffee8e247d3e83a12f586',1,'b2Vec4::b2Vec4()'],['../structb2_vec4.html#a06491a0e1dc9dd65e312ec7de649482d',1,'b2Vec4::b2Vec4(float32 x, float32 y, float32 z, float32 w)']]],
   ['b2world',['b2World',['../classb2_world.html#aeccc87fd9e36702c821a8244ca7cd875',1,'b2World']]],
-  ['begincontact',['BeginContact',['../classb2_contact_listener.html#a35148fc56fb9eac12077200fbd928f65',1,'b2ContactListener']]]
+  ['begincontact',['BeginContact',['../classb2_contact_listener.html#a35148fc56fb9eac12077200fbd928f65',1,'b2ContactListener::BeginContact(b2Contact *contact)'],['../classb2_contact_listener.html#afb9deb8af4d5d1cffbe150913b086bf1',1,'b2ContactListener::BeginContact(b2ParticleSystem *particleSystem, b2ParticleBodyContact *particleBodyContact)'],['../classb2_contact_listener.html#a514865000359ffb1a099f7dee871faea',1,'b2ContactListener::BeginContact(b2ParticleSystem *particleSystem, b2ParticleContact *particleContact)']]]
 ];

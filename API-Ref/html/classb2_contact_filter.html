@@ -95,6 +95,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aac8f6155d1f577d125db587f5269289b"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_filter.html#aac8f6155d1f577d125db587f5269289b">ShouldCollide</a> (<a class="el" href="classb2_fixture.html">b2Fixture</a> *fixtureA, <a class="el" href="classb2_fixture.html">b2Fixture</a> *fixtureB)</td></tr>
 <tr class="separator:aac8f6155d1f577d125db587f5269289b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf0b82ab569c9141d0448fd916a064e6"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_filter.html#abf0b82ab569c9141d0448fd916a064e6">ShouldCollide</a> (<a class="el" href="classb2_fixture.html">b2Fixture</a> *fixture, <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, int32 particleIndex)</td></tr>
+<tr class="separator:abf0b82ab569c9141d0448fd916a064e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae378036ea35fa5e01b305c8c85d53f7e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_contact_filter.html#ae378036ea35fa5e01b305c8c85d53f7e">ShouldCollide</a> (<a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, int32 particleIndexA, int32 particleIndexB)</td></tr>
+<tr class="separator:ae378036ea35fa5e01b305c8c85d53f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implement this class to provide collision filtering. In other words, you can implement this class if you want finer control over contact creation. </p>
@@ -132,6 +136,88 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Return true if contact calculations should be performed between these two shapes. </p>
 <dl class="section warning"><dt>Warning</dt><dd>for performance reasons this is only called when the AABBs begin to overlap. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="abf0b82ab569c9141d0448fd916a064e6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool b2ContactFilter::ShouldCollide </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_fixture.html">b2Fixture</a> *&#160;</td>
+          <td class="paramname"><em>fixture</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>particleIndex</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Return true if contact calculations should be performed between a fixture and particle. This is only called if the b2_fixtureContactListenerParticle flag is set on the particle. </p>
+
+</div>
+</div>
+<a class="anchor" id="ae378036ea35fa5e01b305c8c85d53f7e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool b2ContactFilter::ShouldCollide </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>particleIndexA</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>particleIndexB</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Return true if contact calculations should be performed between two particles. This is only called if the b2_particleContactListenerParticle flag is set on the particle. </p>
 
 </div>
 </div>
