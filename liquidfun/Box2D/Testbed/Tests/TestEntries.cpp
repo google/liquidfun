@@ -88,6 +88,7 @@
 #include "Impulse.h"
 #include "LiquidTimer.h"
 #include "Maxwell.h"
+#include "MultipleParticleSystems.h"
 #include "Particles.h"
 #include "ParticlesSurfaceTension.h"
 #include "Pointy.h"
@@ -113,6 +114,7 @@ TestEntry g_testEntries[] =
 	{"Surface Tension", ParticlesSurfaceTension::Create},
 	{"Elastic Particles", ElasticParticles::Create},
 	{"Rigid Particles", RigidParticles::Create},
+	{"Multiple Systems", MultipleParticleSystems::Create},
 	{"Impulse", Impulse::Create},
 	{"Soup Stirrer", SoupStirrer::Create},
 	{"Fracker", Fracker::Create},

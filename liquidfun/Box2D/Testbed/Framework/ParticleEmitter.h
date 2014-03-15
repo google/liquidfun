@@ -38,7 +38,8 @@ public:
 	// Initialize a particle emitter.
 	RadialEmitter() :
 		m_particleSystem(NULL), m_callback(NULL), m_speed(0.0f),
-		m_emitRemainder(0.0f), m_flags(b2_waterParticle), m_group(NULL)
+		m_emitRate(1.0f), m_emitRemainder(0.0f), m_flags(b2_waterParticle),
+		m_group(NULL)
 	{
 	}
 

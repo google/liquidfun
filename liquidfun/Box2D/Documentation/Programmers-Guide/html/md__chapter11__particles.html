@@ -87,6 +87,7 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 </p>
 <p>In many, if not most, cases, it will not be necessary to adjust the default values or create multiple particle systems. You may find it useful in some cases, however.</p>
 <p>For example, dividing particles into multiple systems can yield a performance gain by allowing you to simulate only the visible systems while putting all other systems in a "paused" state using <code>b2ParticleSystem::SetPaused()</code>.</p>
+<p>The "Multiple Systems" example in the Testbed provides an example of two particle systems influencing a rigid body while not interacting with each other.</p>
 <p><a class="anchor" id="pg"></a> </p>
 <h2>Particle Groups</h2>
 <p>Instead of creating particles individually, you can create a group of particles to manipulate en masse. Some of the particle-group properties that you can set are the same as those for discrete particles: behavior, position, linear velocity, and color. There are also properties specific to groups: rotational angle, rotational velocity, and strength.<br/>

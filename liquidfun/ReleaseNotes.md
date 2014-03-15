@@ -72,6 +72,8 @@ release of LiquidFun.
     of particle velocities.
 *   Added "Fracker" test to demonstrate particle viscous fluids and particle
     destruction callbacks.
+*   Added "Multiple Systems" test to the Testbed to demonstrate multiple
+    particle systems.
 *   Added Java Native Interface support via SWIG. It covers a subset of the
     API.
 *   Added the ability to pass a list of shapes to be passed in for

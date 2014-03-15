@@ -70,6 +70,10 @@ For example, dividing particles into multiple systems can yield a performance
 gain by allowing you to simulate only the visible systems while putting all
 other systems in a "paused" state using `b2ParticleSystem::SetPaused()`.
 
+The "Multiple Systems" example in the Testbed provides an example of
+two particle systems influencing a rigid body while not interacting with each
+other.
+
 <a name="pg">
 ## Particle Groups
 

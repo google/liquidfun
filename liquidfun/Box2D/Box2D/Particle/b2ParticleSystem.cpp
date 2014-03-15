@@ -339,6 +339,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 								   b2World* world) :
 	m_handleAllocator(b2_minParticleSystemBufferCapacity)
 {
+	b2Assert(def);
 	m_paused = false;
 	m_timestamp = 0;
 	m_allParticleFlags = 0;
@@ -388,7 +389,6 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_groupCount = 0;
 	m_groupList = NULL;
 
-	b2Assert(def);
 	b2Assert(def->lifetimeGranularity > 0.0f);
 	m_def = *def;
 
@@ -401,6 +401,8 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 
 	m_timeElapsed = 0;
 	m_expirationTimeBufferRequiresSorting = false;
+
+	SetDestructionByAge(m_def.destroyByAge);
 }
 
 b2ParticleSystem::~b2ParticleSystem()
