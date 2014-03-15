@@ -1,8 +1,8 @@
-# LiquidFun JNI
+# Getting Started with SWIG
 
 LiquidFun JNI is a project that contains JNI (Java Native Interface) bindings
-for LiquidFun. [SWIG](http://www.swig.org) generates these bindings, and is required for this
-project.
+for LiquidFun. [SWIG](http://www.swig.org) generates these bindings, and is
+required for this project.
 
 This document describes how to set up a Java project to use LiquidFun. It
 comprises the following sections:
@@ -24,13 +24,17 @@ bindings produced.
 ### Installation
 
 Current [SWIG](http://www.swig.org) version tested: 2.0.11
-To learn more about [SWIG](http://www.swig.org), and to install it, please visit their [website]
-(http://www.swig.org).
-In addition, you have to install PCRE, as SWIG depends on it:
+To learn more about [SWIG](http://www.swig.org), and to install it, please
+visit their [website](http://www.swig.org).
+
+In addition, on Linux, you have to install PCRE, as SWIG depends on it:<br>
+
 &nbsp;&nbsp;&nbsp;`apt-get install libpcre3-dev`
 
-Set up an environment variable to point to your swig installation. One way to
-do this is to add the following to your `~/.bashrc` file:
+Set up an environment variable to point to your swig installation.
+One way to do this (on Linux / OSX / Cygwin) is to add the following to your
+`~/.bashrc` file:<br>
+
 &nbsp;&nbsp;&nbsp;`export SWIG_BIN=$("which" swig)`
 
 ### Build Instructions
@@ -39,10 +43,10 @@ do this is to add the following to your `~/.bashrc` file:
 
 Include the library in your `jni/Android.mk` file as a shared library:
 
-&nbsp;&nbsp;&nbsp;`LOCAL_SHARED_LIBRARIES := libliquidfun_jni`
-&nbsp;&nbsp;&nbsp;`include $(BUILD_SHARED_LIBRARY)`
-&nbsp;&nbsp;&nbsp;`$(call import-add-path,/path/to/liquidfun/)`
-&nbsp;&nbsp;&nbsp;`$(call import-module,Box2D/swig/jni)`
+        LOCAL_SHARED_LIBRARIES := libliquidfun_jni
+        include $(BUILD_SHARED_LIBRARY)
+        $(call import-add-path,/path/to/liquidfun/)
+        $(call import-module,Box2D/swig/jni)
 
 This will invoke SWIG, and build the C++ components of the library.
 
@@ -78,49 +82,50 @@ points are critical in order to facilitate efficient JNI memory management.
 ##### Use the delete() method in generated Java classes
 
 The user must use the SWIG-generated delete() method to clean up all LiquidFun
-objects exposed through [SWIG](http://www.swig.org). This is because SWIG-generated (Java) proxy
-classes--not the JVM--are allocating C++ memory through every new object.
+objects exposed through [SWIG](http://www.swig.org). This is because
+SWIG-generated (Java) proxy classes--not the JVM--are allocating C++ memory
+through every new object.
 
 For example:
 
-&nbsp;&nbsp;&nbsp;`BodyDef* bodyDef = new BodyDef();`
-    ...
-&nbsp;&nbsp;&nbsp;``bodyDef.delete();`
+&nbsp;&nbsp;&nbsp;`BodyDef* bodyDef = new BodyDef();`<br>
+    ...<br>
+&nbsp;&nbsp;&nbsp;``bodyDef.delete();`<br>
 
 For a member variable that is a native object:
 
-&nbsp;&nbsp;&nbsp;`private World mWorld = new World(0, 0);`
-    ...
-&nbsp;&nbsp;&nbsp;`@Override`
-&nbsp;&nbsp;&nbsp;`protected void finalize() {`
-    &nbsp;&nbsp;&nbsp;`mWorld.delete();`
-&nbsp;&nbsp;&nbsp;`}`
+&nbsp;&nbsp;&nbsp;`private World mWorld = new World(0, 0);`<br>
+    ...<br>
+&nbsp;&nbsp;&nbsp;`@Override`<br>
+&nbsp;&nbsp;&nbsp;`protected void finalize() {`<br>
+    &nbsp;&nbsp;&nbsp;`mWorld.delete();`<br>
+&nbsp;&nbsp;&nbsp;`}`<br>
 
 ##### Use primitive types whenever possible
 
 Because the user has to be conscientious about cleaning up any new objects,
-directly exposing to Java a C++ function signature like
+directly exposing to Java a C++ function signature like<br>
 
-&nbsp;&nbsp;&nbsp;`void SetPosition(const b2Vec2& pos);`
+&nbsp;&nbsp;&nbsp;`void SetPosition(const b2Vec2& pos);`<br>
 
-will create this method:
+will create this method:<br>
 
-&nbsp;&nbsp;&nbsp;`void setPosition(Vec2 pos);`
+&nbsp;&nbsp;&nbsp;`void setPosition(Vec2 pos);`<br>
 
 This method requires that the user creates Vec2 objects. Since Vec2 objects are
 native objects, you must clean them up using a delete() method, which can be
 quite unwieldy when you are initializing large amounts of data.
 
 Instead, use SWIG to extend the interface. Do this by adding a new function to
-the corresponding SWIG interface file:
+the corresponding SWIG interface file:<br>
 
-&nbsp;&nbsp;&nbsp;`%extend b2ParticleDef {`
-    &nbsp;&nbsp;&nbsp;`void setPosition(float32 x, float32 y) {`
-        &nbsp;&nbsp;&nbsp;`$self->position.Set(x, y);`
-    &nbsp;&nbsp;&nbsp;`}`
-&nbsp;&nbsp;&nbsp;`};`
+&nbsp;&nbsp;&nbsp;`%extend b2ParticleDef {`<br>
+    &nbsp;&nbsp;&nbsp;`void setPosition(float32 x, float32 y) {`<br>
+        &nbsp;&nbsp;&nbsp;`$self->position.Set(x, y);`<br>
+    &nbsp;&nbsp;&nbsp;`}`<br>
+&nbsp;&nbsp;&nbsp;`};`<br>
 
-This file generates the following Java code:
+This file generates the following Java code:<br>
 
     void setPosition(float x, float y);
 
