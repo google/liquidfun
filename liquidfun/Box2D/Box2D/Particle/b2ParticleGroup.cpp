@@ -17,6 +17,7 @@
 */
 #include <Box2D/Particle/b2ParticleGroup.h>
 #include <Box2D/Particle/b2ParticleSystem.h>
+#include <Box2D/Dynamics/b2World.h>
 
 b2ParticleGroup::b2ParticleGroup()
 {
@@ -37,86 +38,15 @@ b2ParticleGroup::b2ParticleGroup()
 	m_angularVelocity = 0;
 	m_transform.SetIdentity();
 
-	m_destroyAutomatically = true;
-	m_toBeDestroyed = false;
-	m_toBeSplit = false;
-
 	m_userData = NULL;
 
 }
 
-b2ParticleGroup::~b2ParticleGroup()
-{
-}
-
-int32 b2ParticleGroup::GetBufferIndex() const
-{
-  return m_firstIndex;
-}
-
-int32 b2ParticleGroup::GetGroupFlags() const
-{
-	return m_groupFlags;
-}
-
 void b2ParticleGroup::SetGroupFlags(int32 flags)
 {
-	m_groupFlags = flags;
-}
-
-float32 b2ParticleGroup::GetMass() const
-{
-	UpdateStatistics();
-	return m_mass;
-}
-
-float32 b2ParticleGroup::GetInertia() const
-{
-	UpdateStatistics();
-	return m_inertia;
-}
-
-b2Vec2 b2ParticleGroup::GetCenter() const
-{
-	UpdateStatistics();
-	return m_center;
-}
-
-b2Vec2 b2ParticleGroup::GetLinearVelocity() const
-{
-	UpdateStatistics();
-	return m_linearVelocity;
-}
-
-float32 b2ParticleGroup::GetAngularVelocity() const
-{
-	UpdateStatistics();
-	return m_angularVelocity;
-}
-
-const b2Transform& b2ParticleGroup::GetTransform() const
-{
-	return m_transform;
-}
-
-const b2Vec2& b2ParticleGroup::GetPosition() const
-{
-	return m_transform.p;
-}
-
-float32 b2ParticleGroup::GetAngle() const
-{
-	return m_transform.q.GetAngle();
-}
-
-void* b2ParticleGroup::GetUserData() const
-{
-	return m_userData;
-}
-
-void b2ParticleGroup::SetUserData(void* data)
-{
-	m_userData = data;
+	b2Assert((flags & b2_particleGroupInternalMask) == 0);
+	flags |= m_groupFlags & b2_particleGroupInternalMask;
+	m_system->SetGroupFlags(this, flags);
 }
 
 void b2ParticleGroup::UpdateStatistics() const
@@ -154,3 +84,27 @@ void b2ParticleGroup::UpdateStatistics() const
 		m_timestamp = m_system->m_timestamp;
 	}
 }
+
+void b2ParticleGroup::ApplyForce(const b2Vec2& force)
+{
+	m_system->ApplyForce(m_firstIndex, m_lastIndex, force);
+}
+
+void b2ParticleGroup::ApplyLinearImpulse(const b2Vec2& impulse)
+{
+	m_system->ApplyLinearImpulse(m_firstIndex, m_lastIndex, impulse);
+}
+
+void b2ParticleGroup::DestroyParticles(bool callDestructionListener)
+{
+	b2Assert(m_system->m_world->IsLocked() == false);
+	if (m_system->m_world->IsLocked())
+	{
+		return;
+	}
+
+	for (int32 i = m_firstIndex; i < m_lastIndex; i++) {
+		m_system->DestroyParticle(i, callDestructionListener);
+	}
+}
+

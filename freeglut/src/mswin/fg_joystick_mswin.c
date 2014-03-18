@@ -259,6 +259,7 @@ void fgPlatformJoystickInit( SFG_Joystick *fgJoystick[], int ident )
 void fgPlatformJoystickClose ( int ident )
 {
     /* Do nothing special */
+    (void)ident;
 }
 #endif
 

@@ -16,6 +16,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 #include <android/log.h>
+#include <stdio.h>
 #include "AndroidLogPrint.h"
 
 // The size of the buffer used to log printing from this module.

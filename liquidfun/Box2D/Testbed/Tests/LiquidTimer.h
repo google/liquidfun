@@ -24,36 +24,42 @@ public:
 
 	LiquidTimer()
 	{
+		// Setup particle parameters.
+		TestMain::SetParticleParameters(k_paramDef, k_paramDefCount);
+
 		{
 			b2BodyDef bd;
 			b2Body* ground = m_world->CreateBody(&bd);
 
 			b2ChainShape shape;
 			const b2Vec2 vertices[4] = {
-				b2Vec2(-20, 0),
-				b2Vec2(20, 0),
-				b2Vec2(20, 40),
-				b2Vec2(-20, 40)};
+				b2Vec2(-2, 0),
+				b2Vec2(2, 0),
+				b2Vec2(2, 4),
+				b2Vec2(-2, 4)};
 			shape.CreateLoop(vertices, 4);
 			ground->CreateFixture(&shape, 0.0f);
 
 		}
 
-		m_world->SetParticleRadius(0.15f);
+		m_particleSystem->SetRadius(0.025f);
 		{
 			b2PolygonShape shape;
-			shape.SetAsBox(20, 4, b2Vec2(0, 36), 0);
+			shape.SetAsBox(2, 0.4f, b2Vec2(0, 3.6f), 0);
 			b2ParticleGroupDef pd;
-			pd.flags = b2_tensileParticle | b2_viscousParticle;
+			pd.flags = TestMain::GetParticleParameterValue();
 			pd.shape = &shape;
-			m_world->CreateParticleGroup(pd);
+			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
+			if (pd.flags & b2_colorMixingParticle) {
+				ColorParticleGroup(group, 0);
+			}
 		}
 
 		{
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(-20, 32), b2Vec2(-12, 32));
+			shape.Set(b2Vec2(-2, 3.2f), b2Vec2(-1.2f, 3.2f));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -61,7 +67,7 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(-11, 32), b2Vec2(20, 32));
+			shape.Set(b2Vec2(-1.1f, 3.2f), b2Vec2(2, 3.2f));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -69,7 +75,7 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(-12, 32), b2Vec2(-12, 28));
+			shape.Set(b2Vec2(-1.2f, 3.2f), b2Vec2(-1.2f, 2.8f));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -77,7 +83,7 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(-11, 32), b2Vec2(-11, 28));
+			shape.Set(b2Vec2(-1.1f, 3.2f), b2Vec2(-1.1f, 2.8f));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -85,7 +91,7 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(-16, 24), b2Vec2(8, 20));
+			shape.Set(b2Vec2(-1.6f, 2.4f), b2Vec2(0.8f, 2));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -93,7 +99,7 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(16, 16), b2Vec2(-8, 12));
+			shape.Set(b2Vec2(1.6f, 1.6f), b2Vec2(-0.8f, 1.2f));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -101,7 +107,7 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(-12, 8), b2Vec2(-12, 0));
+			shape.Set(b2Vec2(-1.2f, 0.8f), b2Vec2(-1.2f, 0));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -109,7 +115,7 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(-4, 8), b2Vec2(-4, 0));
+			shape.Set(b2Vec2(-0.4f, 0.8f), b2Vec2(-0.4f, 0));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -117,7 +123,7 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(4, 8), b2Vec2(4, 0));
+			shape.Set(b2Vec2(0.4f, 0.8f), b2Vec2(0.4f, 0));
 			body->CreateFixture(&shape, 0.1f);
 		}
 
@@ -125,15 +131,44 @@ public:
 			b2BodyDef bd;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2EdgeShape shape;
-			shape.Set(b2Vec2(12, 8), b2Vec2(12, 0));
+			shape.Set(b2Vec2(1.2f, 0.8f), b2Vec2(1.2f, 0));
 			body->CreateFixture(&shape, 0.1f);
 		}
+	}
+
+	float32 GetDefaultViewZoom() const
+	{
+		return 0.1f;
 	}
 
 	static Test* Create()
 	{
 		return new LiquidTimer;
 	}
+
+	static const ParticleParameter::Value k_paramValues[];
+	static const ParticleParameter::Definition k_paramDef[];
+	static const uint32 k_paramDefCount;
 };
+
+const ParticleParameter::Value LiquidTimer::k_paramValues[] =
+{
+	{b2_tensileParticle | b2_viscousParticle,
+		ParticleParameter::k_DefaultOptions, "tensile + viscous"},
+};
+const ParticleParameter::Definition LiquidTimer::k_paramDef[] =
+{
+	{
+		LiquidTimer::k_paramValues,
+		B2_ARRAY_SIZE(LiquidTimer::k_paramValues)
+	},
+	{
+		ParticleParameter::k_particleTypesPtr,
+		ParticleParameter::k_particleTypesCount
+	},
+};
+const uint32 LiquidTimer::k_paramDefCount =
+	B2_ARRAY_SIZE(LiquidTimer::k_paramDef);
+
 
 #endif

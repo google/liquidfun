@@ -1,5 +1,6 @@
 /*
 * Copyright (c) 2006-2011 Erin Catto http://www.box2d.org
+* Copyright (c) 2014 Google, Inc.
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -650,6 +651,15 @@ struct b2PositionSolverManifold
 
 				// Ensure normal points from A to B
 				normal = -normal;
+			}
+			break;
+		default:
+			{
+				// This shouldn't be executed if pc->type is valid.
+				separation = 0.0f;
+				normal = b2Vec2_zero;
+				point = b2Vec2_zero;
+				b2Assert(false);
 			}
 			break;
 		}

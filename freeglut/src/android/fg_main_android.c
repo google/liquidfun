@@ -29,6 +29,7 @@
 #include <GL/freeglut.h>
 #include "fg_internal.h"
 #include "egl/fg_window_egl.h"
+#include "fg_main_android.h"
 
 #include <android/log.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FreeGLUT", __VA_ARGS__))
@@ -237,6 +238,7 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
     float x = AMotionEvent_getX(event, 0);
     float y = AMotionEvent_getY(event, 0);
 
+#if FREEGLUT_VIRTUAL_PAD
     /* Virtual arrows PAD */
     /* Don't interfere with existing mouse move event */
     if (!touchscreen.in_mmotion) {
@@ -289,6 +291,7 @@ int32_t handle_input(struct android_app* app, AInputEvent* event) {
 	return EVENT_HANDLED;
       }
     }
+#endif // FREEGLUT_VIRTUAL_PAD
     
     /* Normal mouse events */
     if (!touchscreen.vpad.on) {

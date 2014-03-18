@@ -47,7 +47,7 @@ void fgPlatformInitialize( const char* displayName )
     /* What we need to do is to initialize the fgDisplay global structure here. */
     fgDisplay.pDisplay.Instance = GetModuleHandle( NULL );
     fgDisplay.pDisplay.DisplayName= displayName ? strdup(displayName) : 0 ;
-    atom = GetClassInfo( fgDisplay.pDisplay.Instance, _T("FREEGLUT"), &wc );
+    atom = (ATOM)GetClassInfo( fgDisplay.pDisplay.Instance, _T("FREEGLUT"), &wc );
 
     if( atom == 0 )
     {
@@ -164,6 +164,8 @@ void fgPlatformCloseDisplay ( void )
 void fgPlatformDestroyContext ( SFG_PlatformDisplay pDisplay, SFG_WindowContextType MContext )
 {
 	/* Do nothing -- this is required for X11 */
+    (void)pDisplay;
+    (void)MContext;
 }
 
 /* -- PLATFORM-SPECIFIC INTERFACE FUNCTION -------------------------------------------------- */

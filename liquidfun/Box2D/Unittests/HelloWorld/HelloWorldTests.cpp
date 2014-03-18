@@ -89,9 +89,9 @@ HelloWorldTests::TearDown()
 }
 
 TEST_F(HelloWorldTests, Allocation) {
-	EXPECT_TRUE(m_world != NULL)       << "Failed allocation of b2World";
+	EXPECT_TRUE(m_world != NULL) << "Failed allocation of b2World";
 	EXPECT_TRUE(m_groundBody  != NULL) << "Failed allocation of static b2Body";
-	EXPECT_TRUE(m_body !=  NULL)       << "Failed allocation of dynamic b2Body";
+	EXPECT_TRUE(m_body !=  NULL) << "Failed allocation of dynamic b2Body";
 }
 
 TEST_F(HelloWorldTests, PositionAngleTest) {
@@ -104,7 +104,8 @@ TEST_F(HelloWorldTests, PositionAngleTest) {
 
 	tracker.TrackBody(m_body, "DynamicBody");
 
-	// Check that the tracker engaged properly and call the test failed if it doesn't.
+	// Check that the tracker engaged properly and call the test failed if it
+	// doesn't.
 	EXPECT_TRUE(tracker.BeginTracking()) << "Problems setting up BodyTracker";
 
 	for (int32 i = 0; i < 60; ++i)

@@ -48,13 +48,15 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, FGCBTimer callback, int tim
 
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutTimerFunc" );
 
-    if( (timer = fgState.FreeTimers.Last) )
+    timer = (SFG_Timer*)fgState.FreeTimers.Last;
+    if( timer )
     {
         fgListRemove( &fgState.FreeTimers, &timer->Node );
     }
     else
     {
-        if( ! (timer = malloc(sizeof(SFG_Timer))) ) {
+        timer = (SFG_Timer*)malloc(sizeof(SFG_Timer));
+        if( ! timer ) {
             fgError( "Fatal error: "
                      "Memory allocation failure in glutTimerFunc()" );
             return;
@@ -66,7 +68,8 @@ void FGAPIENTRY glutTimerFunc( unsigned int timeOut, FGCBTimer callback, int tim
     timer->TriggerTime = fgElapsedTime() + timeOut;
 
     /* Insert such that timers are sorted by end-time */
-    for( node = fgState.Timers.First; node; node = node->Node.Next )
+    for( node = (SFG_Timer*)fgState.Timers.First; node;
+         node = (SFG_Timer*)node->Node.Next )
     {
         if( node->TriggerTime > timer->TriggerTime )
             break;
@@ -106,12 +109,11 @@ void FGAPIENTRY glutMenuDestroyFunc( FGCBDestroy callback )
  * All of the window-specific callbacks setting methods can be generalized to this:
  */
 #define SET_CALLBACK(a)                                         \
-do                                                              \
-{                                                               \
+FG_MACRO_START                                                  \
     if( fgStructure.CurrentWindow == NULL )                     \
         return;                                                 \
     SET_WCB( ( *( fgStructure.CurrentWindow ) ), a, callback ); \
-} while( 0 )
+FG_MACRO_END
 /*
  * And almost every time the callback setter function can be implemented like this:
  */

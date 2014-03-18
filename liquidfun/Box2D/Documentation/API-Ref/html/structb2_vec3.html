@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,7 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>A 2D column vector with 3 elements.  
+<p>A 3D column vector with 3 elements.  
  <a href="structb2_vec3.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="b2_math_8h_source.html">b2Math.h</a>&gt;</code></p>
@@ -129,6 +129,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_vec3.html#aaa9aa20195cd0ee53c7176a9a9b02389">operator*=</a> (float32 s)</td></tr>
 <tr class="memdesc:aaa9aa20195cd0ee53c7176a9a9b02389"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply this vector by a scalar. <br/></td></tr>
 <tr class="separator:aaa9aa20195cd0ee53c7176a9a9b02389"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0680445e6e0a959b5575a861b34314a5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0680445e6e0a959b5575a861b34314a5"></a>
+float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_vec3.html#a0680445e6e0a959b5575a861b34314a5">Length</a> () const </td></tr>
+<tr class="memdesc:a0680445e6e0a959b5575a861b34314a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of this vector (the norm). <br/></td></tr>
+<tr class="separator:a0680445e6e0a959b5575a861b34314a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a791d57a5fe85240df3aa892702360fa6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a791d57a5fe85240df3aa892702360fa6"></a>
+float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_vec3.html#a791d57a5fe85240df3aa892702360fa6">Normalize</a> ()</td></tr>
+<tr class="memdesc:a791d57a5fe85240df3aa892702360fa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert this vector into a unit vector. Returns the length. <br/></td></tr>
+<tr class="separator:a791d57a5fe85240df3aa892702360fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -143,7 +151,7 @@ float32&#160;</td><td class="memItemRight" valign="bottom"><b>z</b></td></tr>
 <tr class="separator:a7cb88968ff10fa500df0b10f5c425536"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A 2D column vector with 3 elements. </p>
+<div class="textblock"><p>A 3D column vector with 3 elements. </p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="b2_math_8h_source.html">b2Math.h</a></li>
 </ul>

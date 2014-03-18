@@ -1,5 +1,6 @@
 /*
 * Copyright (c) 2011 Erin Catto http://box2d.org
+* Copyright (c) 2014 Google, Inc.
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -37,14 +38,13 @@ public:
 	float32 GetMilliseconds() const;
 
 private:
+	/// Get platform specific tick count
+	static int64 GetTicks();
 
 #if defined(_WIN32)
-	float64 m_start;
 	static float64 s_invFrequency;
-#elif defined(__linux__) || defined (__APPLE__)
-	unsigned long m_start_sec;
-	unsigned long m_start_usec;
 #endif
+	int64 m_start;
 };
 
 #endif

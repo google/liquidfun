@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Google, Inc.
+# Copyright (c) 2014 Google, Inc.
 #
 # This software is provided 'as-is', without any express or implied
 # warranty.  In no event will the authors be held liable for any damages
@@ -15,3 +15,4 @@
 # 3. This notice may not be removed or altered from any source distribution.
 include $(NDK_PROJECT_PATH)/../application_common.mk
 APP_MODULES:=TEST_NAME_TO_REPLACE
+APP_CFLAGS+=-Wall -Werror -Wno-long-long -Wno-variadic-macros

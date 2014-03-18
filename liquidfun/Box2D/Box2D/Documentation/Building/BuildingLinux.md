@@ -1,21 +1,30 @@
 # Building for Linux
 
+### Version Requirements
+
+Following are the minimum required versions for the tools and libraries you
+need for building LiquidFun for Linux:
+
+-   OpenGL: libglapi-mesa 8.0.4 (tested with libglapi-mesa 8.0.4-0ubuntu0)
+-   GLU: libglu1-mesa-dev 8.0.4 (tested with libglu1-mesa-dev 8.0.4.0ubuntu0)
+-   cmake (when building from source): 2.8.12.1
+
 ### Before Building
 
 Prior to building, install the following components using the [Linux][]
 distribution's package manager:
--    Install [cmake][] using the package manager or download and manually
-     install from [cmake.org](http://cmake.org).
--    Install OpenGL (`libglapi-mesa`).
--    Install GLU (`libglu1-mesa-dev`).
+-    [cmake][]. You can also manually install from [cmake.org]
+     (http://cmake.org).
+-    OpenGL (`libglapi-mesa`).
+-    GLU (`libglu1-mesa-dev`).
 
-For example on Ubuntu:
+For example, on Ubuntu:
 
     sudo apt-get install cmake
     sudo apt-get install libglapi-mesa
     sudo apt-get install libglu1-mesa-dev
 
-OpenGL and GLU are required by the sample applications.
+The sample applications require OpenGL and GLU.
 
 ### Building
 
@@ -28,15 +37,33 @@ For example:
     cmake -G'Unix Makefiles'
     make
 
+To perform a debug build:
+
+    cd liquidfun/Box2D
+    cmake -G'Unix Makefiles' -DCMAKE_BUILD_TYPE=Debug
+    make
+
 Build targets can be configured using options exposed in
 `liquidfun/Box2D/CMakeLists.txt` by using cmake's `-D` option.
+Build configuration set using the `-D` option is sticky across subsequent
+builds.
+
+For example, if a build is performed using:
+
+    cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
+    make
+
+to switch to a release build CMAKE_BUILD_TYPE must be explicitly specified:
+
+    cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+    make
 
 ### Executing a Sample
 
 After building the project, you can execute the samples from the command line.
 For example:
 
-    ./liquidfun/Box2D/Testbed/Testbed
+    ./liquidfun/Box2D/Testbed/Release/Testbed
 
 ### Running Unit Tests
 

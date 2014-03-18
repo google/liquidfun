@@ -33,5 +33,6 @@
 
 void fgPlatformGlutSwapBuffers( SFG_PlatformDisplay *pDisplayPtr, SFG_Window* CurrentWindow )
 {
+    (void)pDisplayPtr;
     SwapBuffers( CurrentWindow->Window.pContext.Device );
 }

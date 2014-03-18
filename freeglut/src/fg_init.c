@@ -246,13 +246,13 @@ void fgDeinitialize( void )
 
     fgDestroyStructure( );
 
-    while( ( timer = fgState.Timers.First) )
+    for (timer = fgState.Timers.First; timer; timer = fgState.Timers.First)
     {
         fgListRemove( &fgState.Timers, &timer->Node );
         free( timer );
     }
 
-    while( ( timer = fgState.FreeTimers.First) )
+    for (timer = fgState.FreeTimers.First; timer; timer = fgState.FreeTimers.First)
     {
         fgListRemove( &fgState.FreeTimers, &timer->Node );
         free( timer );

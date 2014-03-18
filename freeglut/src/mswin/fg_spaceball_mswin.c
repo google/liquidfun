@@ -54,5 +54,6 @@ int fgPlatformSpaceballNumButtons(void)
 
 void fgPlatformSpaceballSetWindow(SFG_Window *window)
 {
+	(void)window;
 	return;
 }

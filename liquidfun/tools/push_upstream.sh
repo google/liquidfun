@@ -146,6 +146,7 @@ main() {
   git init
   # Suppress warnings about changes to line endings.
   git config --local core.safecrlf false
+  git config --local core.autocrlf input
 
   local first_branch=
   local first_remote=
@@ -156,9 +157,9 @@ main() {
     local remote=
     local branch=
     eval $(echo "${remote_description}" | \
-           sed -r 's/([^|]*)\|([^|]*)\|([^.]*)/url=\1; remote=\2; branch=\3;/')
+           sed -r 's/([^|]*)\|([^|]*)\|([^ \t]*)/url=\1; remote=\2; branch=\3;/')
     if [[ "${url}" == "" || "${remote}" == "" || "${branch}" == "" ]]; then
-      echo "Invalid remote format: ${remote}" >&2
+      echo "Invalid remote format: ${remote_description}" >&2
       usage
     fi
     # Split branch and start field.
@@ -228,7 +229,9 @@ main() {
     upstream_branch=upstream_${branch}
     git remote add -f upstream "${url}"
     git checkout -b ${upstream_branch} upstream/${branch}
-    git merge -m "Merge ${first_remote}" ${first_branch}
+    # Resolve conflicts by taking the downstream version.
+    # We should have already brought in all the upstream changes.
+    git merge -s recursive -Xtheirs -m "Merge ${first_remote}" ${first_branch}
     echo "
 The source has been staged in ${temp_dir} for inspection.
 

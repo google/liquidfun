@@ -226,13 +226,17 @@ void b2Body::DestroyFixture(b2Fixture* fixture)
 	// Remove the fixture from this body's singly linked list.
 	b2Assert(m_fixtureCount > 0);
 	b2Fixture** node = &m_fixtureList;
+#if DEBUG
 	bool found = false;
+#endif // DEBUG
 	while (*node != NULL)
 	{
 		if (*node == fixture)
 		{
 			*node = fixture->m_next;
+#if DEBUG
 			found = true;
+#endif // DEBUG
 			break;
 		}
 
@@ -439,8 +443,6 @@ void b2Body::SetTransform(const b2Vec2& position, float32 angle)
 	{
 		f->Synchronize(broadPhase, m_xf, m_xf);
 	}
-
-	m_world->m_contactManager.FindNewContacts();
 }
 
 void b2Body::SynchronizeFixtures()

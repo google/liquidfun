@@ -27,7 +27,8 @@
 
 std::string BodyTracker::s_baselineRootDir;
 
-BodyTracker::BodyTracker(const std::string &baselineFile, const std::string &outputFile, int32 flags) :
+BodyTracker::BodyTracker(const std::string &baselineFile,
+						 const std::string &outputFile, int32 flags) :
 	m_tracking(true),
 	m_baselineRead(false),
 	m_flags(flags),
@@ -40,15 +41,13 @@ BodyTracker::~BodyTracker()
 {
 }
 
-void
-BodyTracker::TrackBody(const b2Body *body, const std::string &name)
+void BodyTracker::TrackBody(const b2Body *body, const std::string &name)
 {
 	m_bodyNames[body] = name;
 	m_samples[body] = SampleVec();
 }
 
-bool
-BodyTracker::TrackStep(const b2Body *body, float32 timeStep)
+bool BodyTracker::TrackStep(const b2Body *body, float32 timeStep)
 {
 	Sample sample;
 	sample.timeStep = timeStep;
@@ -75,16 +74,14 @@ BodyTracker::TrackStep(const b2Body *body, float32 timeStep)
 	return true;
 }
 
-std::ostream&
-operator<<(std::ostream& out, const b2Vec2& vec)
+std::ostream& operator<<(std::ostream& out, const b2Vec2& vec)
 {
 	out << std::setprecision(PRINT_PRECISION) << vec.x << " "
 	    << std::setprecision(PRINT_PRECISION) << vec.y;
 	return out;
 }
 
-bool
-BodyTracker::BeginTracking()
+bool BodyTracker::BeginTracking()
 {
 	if (m_flags == 0) {
 		return false;
@@ -96,8 +93,7 @@ BodyTracker::BeginTracking()
 	return true;
 }
 
-bool
-BodyTracker::EndTracking()
+bool BodyTracker::EndTracking()
 {
 	m_tracking = false;
 
@@ -127,7 +123,8 @@ BodyTracker::EndTracking()
 			if (m_flags & TRACK_POSITION)
 				out << "," << sample.position;
 			if (m_flags & TRACK_ANGLE)
-				out << "," << std::setprecision(PRINT_PRECISION) << sample.angle;
+				out << "," << std::setprecision(PRINT_PRECISION) <<
+					sample.angle;
 			if (m_flags & TRACK_WORLD_CENTER)
 				out << "," << sample.worldCenter;
 			if (m_flags & TRACK_LOCAL_CENTER)
@@ -146,8 +143,7 @@ BodyTracker::EndTracking()
 	return true;
 }
 
-static
-b2Vec2 parseVec(const std::string str)
+static b2Vec2 parseVec(const std::string str)
 {
 	b2Vec2 ret;
 	std::istringstream buf(str);
@@ -159,8 +155,7 @@ b2Vec2 parseVec(const std::string str)
 	return ret;
 }
 
-std::string
-BodyTracker::TrackFlagsToString(int32 flags) const
+std::string BodyTracker::TrackFlagsToString(int32 flags) const
 {
 	// Create string with all the flags, or "[unknown]". Add a space at the
 	// end and then delete it if necessary.  This is simply meant as a clean
@@ -179,8 +174,7 @@ BodyTracker::TrackFlagsToString(int32 flags) const
 	return ret;
 }
 
-bool
-BodyTracker::ReadBaseline()
+bool BodyTracker::ReadBaseline()
 {
 	std::ifstream in(const_cast<const char *>(m_baselineFile.c_str()));
 
@@ -196,21 +190,26 @@ BodyTracker::ReadBaseline()
 		else if (tok == "ANGLE") flagVals.push_back(TRACK_ANGLE);
 		else if (tok == "WORLD_CENTER") flagVals.push_back(TRACK_WORLD_CENTER);
 		else if (tok == "LOCAL_CENTER") flagVals.push_back(TRACK_LOCAL_CENTER);
-		else if (tok == "LINEAR_VELOCITY") flagVals.push_back(TRACK_LINEAR_VELOCITY);
-		else if (tok == "ANGULAR_VELOCITY") flagVals.push_back(TRACK_ANGULAR_VELOCITY);
+		else if (tok == "LINEAR_VELOCITY")
+			flagVals.push_back(TRACK_LINEAR_VELOCITY);
+		else if (tok == "ANGULAR_VELOCITY")
+			flagVals.push_back(TRACK_ANGULAR_VELOCITY);
 		else {
 			m_errors.push_back("Illegal token '" + tok + "' in header");
 			return false;
 		}
 	}
 
-	// Create mask of all baseline flags and enforce that it matches generated samples.
+	// Create mask of all baseline flags and enforce that it matches generated
+	// samples.
 	m_baselineFlags = 0;
 	for (size_t i = 0 ; i < flagVals.size() ; i++ )
 		m_baselineFlags |= flagVals[i];
 	if (m_baselineFlags != m_flags) {
-		m_errors.push_back("Error: baseline data does not match generated data");
-		m_errors.push_back("\tBaseline:  " + TrackFlagsToString(m_baselineFlags));
+		m_errors.push_back("Error: baseline data does not match generated "
+						   "data");
+		m_errors.push_back("\tBaseline:  " +
+						   TrackFlagsToString(m_baselineFlags));
 		m_errors.push_back("\tGenerated: " + TrackFlagsToString(m_flags));
 		return false;
 	}
@@ -235,7 +234,8 @@ BodyTracker::ReadBaseline()
 				sample.timeStep = (float)atof(tok.c_str());
 				continue;
 			}
-			const TrackFlags flagVal = static_cast<TrackFlags>(flagVals[field-1]);
+			const TrackFlags flagVal = static_cast<TrackFlags>(
+				flagVals[field-1]);
 			switch (flagVal) {
 			case TRACK_POSITION:
 				sample.position = parseVec(tok);
@@ -257,24 +257,23 @@ BodyTracker::ReadBaseline()
 	return true;
 }
 
-static bool
-floatsEqual(float32 a, float32 b, float32 epsilon)
+static bool floatsEqual(float32 a, float32 b, float32 epsilon)
 {
 	return fabs(a - b) < epsilon;
 }
 
-static bool
-vecsEqual(const b2Vec2 &a, const b2Vec2 &b, float32 epsilon)
+static bool vecsEqual(const b2Vec2 &a, const b2Vec2 &b, float32 epsilon)
 {
 	return floatsEqual(a.x, b.x, epsilon) && floatsEqual(a.y, b.y, epsilon);
 }
 
-bool
-BodyTracker::CompareToBaseline(const b2Body *body, int32 flag, float32 epsilon) const
+bool BodyTracker::CompareToBaseline(const b2Body *body, int32 flag,
+									float32 epsilon) const
 {
 	const std::string &bodyName = m_bodyNames.find(body)->second;
 
-	std::map<const b2Body *, SampleVec>::const_iterator it = m_samples.find(body);
+	std::map<const b2Body *, SampleVec>::const_iterator it =
+		m_samples.find(body);
 	if (it == m_samples.end()) {
 		m_errors.push_back("Could not find data for body " + bodyName);
 		return false;
@@ -284,7 +283,8 @@ BodyTracker::CompareToBaseline(const b2Body *body, int32 flag, float32 epsilon) 
 	std::map<const std::string, SampleVec>::const_iterator it2 =
 			m_baselineSamples.find(bodyName);
 	if (it2 == m_baselineSamples.end()) {
-		m_errors.push_back("Could not find baseline data for body " + bodyName);
+		m_errors.push_back("Could not find baseline data for body " +
+						   bodyName);
 		return false;
 	}
 
@@ -299,35 +299,46 @@ BodyTracker::CompareToBaseline(const b2Body *body, int32 flag, float32 epsilon) 
 		return false;
 	}
 
-	// Assume that each sample in each of the two arrays represent the same sample.
+	// Assume that each sample in each of the two arrays represent the same
+	// sample.
 	std::stringstream diffs;
 	const SampleVec &baselineSamples = it2->second;
 	for (size_t i = 0 ; i < samples.size() ; i++ ) {
 		const Sample &sample = samples[i];
 		const Sample &baselineSample = baselineSamples[i];
-		if ((flag & TRACK_POSITION) && !vecsEqual(sample.position, baselineSample.position, epsilon))
-			diffs << "\t\tsample = " << i << ", TRACK_POSITION: (" << sample.position
+		if ((flag & TRACK_POSITION) &&
+			!vecsEqual(sample.position, baselineSample.position, epsilon))
+			diffs << "\t\tsample = " << i << ", TRACK_POSITION: (" <<
+				sample.position
 				      << ") != (" << baselineSample.position << ")\n";
-		else if ((flag & TRACK_ANGLE)
-				&& !floatsEqual(sample.angle, baselineSample.angle, epsilon))
+		else if ((flag & TRACK_ANGLE) &&
+				 !floatsEqual(sample.angle, baselineSample.angle, epsilon))
 			diffs << "\t\tsample = " << i << ", TRACK_ANGLE: " << sample.angle
 				      << " != " << baselineSample.angle << "\n";
-		else if ((flag & TRACK_WORLD_CENTER)
-				&& !vecsEqual(sample.worldCenter, baselineSample.worldCenter, epsilon))
-			diffs << "\t\tsample = " << i << ", TRACK_WORLD_CENTER: (" << sample.worldCenter
+		else if ((flag & TRACK_WORLD_CENTER) &&
+				 !vecsEqual(sample.worldCenter, baselineSample.worldCenter,
+							epsilon))
+			diffs << "\t\tsample = " << i << ", TRACK_WORLD_CENTER: (" <<
+				sample.worldCenter
 				      << ") != (" << baselineSample.worldCenter << ")\n";
-		else if ((flag & TRACK_LOCAL_CENTER)
-				&& !vecsEqual(sample.localCenter, baselineSample.localCenter, epsilon))
-			diffs << "\t\tsample = " << i << ", TRACK_LOCAL_CENTER: (" << sample.localCenter
+		else if ((flag & TRACK_LOCAL_CENTER) &&
+				 !vecsEqual(sample.localCenter, baselineSample.localCenter,
+							epsilon))
+			diffs << "\t\tsample = " << i << ", TRACK_LOCAL_CENTER: (" <<
+				sample.localCenter
 				      << ") != (" << baselineSample.localCenter << ")\n";
-		else if ((flag & TRACK_LINEAR_VELOCITY)
-				&& !vecsEqual(sample.linearVelocity, baselineSample.linearVelocity, epsilon))
-			diffs << "\t\tsample = " << i << ", TRACK_LINEAR_VELOCITY: (" << sample.linearVelocity
+		else if ((flag & TRACK_LINEAR_VELOCITY) &&
+				 !vecsEqual(sample.linearVelocity,
+							baselineSample.linearVelocity, epsilon))
+			diffs << "\t\tsample = " << i << ", TRACK_LINEAR_VELOCITY: (" <<
+				sample.linearVelocity
 				      << ") != (" << baselineSample.linearVelocity << ")\n";
-		else if ((flag & TRACK_ANGULAR_VELOCITY)
-				&& !floatsEqual(sample.angularVelocity, baselineSample.angularVelocity, epsilon))
-			diffs << "\t\tsample = " << i << ", TRACK_ANGULAR_VELOCITY: " << sample.angularVelocity
-				      << " != " << baselineSample.angularVelocity << "\n";
+		else if ((flag & TRACK_ANGULAR_VELOCITY) &&
+				 !floatsEqual(sample.angularVelocity,
+							  baselineSample.angularVelocity, epsilon))
+			diffs << "\t\tsample = " << i << ", TRACK_ANGULAR_VELOCITY: " <<
+				sample.angularVelocity << " != " <<
+				baselineSample.angularVelocity << "\n";
 
 	}
 	const std::string diffsStr = diffs.str();
@@ -340,12 +351,13 @@ BodyTracker::CompareToBaseline(const b2Body *body, int32 flag, float32 epsilon) 
 	return false;
 }
 
-const std::vector<std::string> &
-BodyTracker::GetErrors() const
+const std::vector<std::string> &BodyTracker::GetErrors() const
 {
-	// If an error occurred, make sure you print out a line stating the filenames.
+	// If an error occurred, make sure you print out a line stating the
+	// filenames.
 	if (!m_errors.empty()) {
-		m_errors.insert(m_errors.begin(), "Mismatch with baseline '" + m_baselineFile + "':");
+		m_errors.insert(m_errors.begin(), "Mismatch with baseline '" +
+						m_baselineFile + "':");
 	}
 	return m_errors;
 }

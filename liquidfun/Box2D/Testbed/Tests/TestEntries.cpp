@@ -19,15 +19,14 @@
 
 #include "../Framework/Test.h"
 #include "../Framework/Render.h"
+#include "../Framework/Main.h"
+#include "../Framework/ParticleParameter.h"
 
 #ifdef __APPLE__
 	#include <GLUT/glut.h>
 #else
 	#include "GL/freeglut.h"
 #endif
-
-#include <cstring>
-using namespace std;
 
 #include "AddPair.h"
 #include "ApplyForce.h"
@@ -79,39 +78,64 @@ using namespace std;
 #include "VerticalStack.h"
 #include "Web.h"
 
-#include "Particles.h"
-#include "DrawingParticles.h"
-#include "RigidParticles.h"
-#include "ElasticParticles.h"
-#include "ParticlesSurfaceTension.h"
-#include "WaveMachine.h"
+#include "AntiPointy.h"
+#include "CornerCase.h"
 #include "DamBreak.h"
-#include "Soup.h"
+#include "DrawingParticles.h"
+#include "ElasticParticles.h"
+#include "Faucet.h"
+#include "Fracker.h"
+#include "Impulse.h"
 #include "LiquidTimer.h"
+#include "Maxwell.h"
+#include "MultipleParticleSystems.h"
+#include "Particles.h"
+#include "ParticlesSurfaceTension.h"
+#include "Pointy.h"
+#include "Ramp.h"
+#include "RigidParticles.h"
+#include "Sandbox.h"
+#include "Soup.h"
+#include "SoupStirrer.h"
+#include "Sparky.h"
+#include "WaveMachine.h"
 
 TestEntry g_testEntries[] =
 {
+	{"Sandbox", Sandbox::Create},
+	{"Sparky", Sparky::Create},
 	{"DamBreak", DamBreak::Create},
 	{"Liquid Timer", LiquidTimer::Create},
 	{"Wave Machine", WaveMachine::Create},
 	{"Particles", Particles::Create},
+	{"Faucet", Faucet::Create},
 	{"Particle Drawing", DrawingParticles::Create},
 	{"Soup", Soup::Create},
-	{"Rigid Particles", RigidParticles::Create},
-	{"Elastic Particles", ElasticParticles::Create},
 	{"Surface Tension", ParticlesSurfaceTension::Create},
+	{"Elastic Particles", ElasticParticles::Create},
+	{"Rigid Particles", RigidParticles::Create},
+	{"Multiple Systems", MultipleParticleSystems::Create},
+	{"Impulse", Impulse::Create},
+	{"Soup Stirrer", SoupStirrer::Create},
+	{"Fracker", Fracker::Create},
+	{"Maxwell", Maxwell::Create},
+	{"Ramp", Ramp::Create},
+	{"Pointy", Pointy::Create},
+	{"AntiPointy", AntiPointy::Create},
+	{"Corner Case", CornerCase::Create},
 
+	{"Ray-Cast", RayCast::Create},
+	{"Dump Shell", DumpShell::Create},
+	{"Convex Hull", ConvexHull::Create},
+	{"Apply Force", ApplyForce::Create},
 	{"Continuous Test", ContinuousTest::Create},
 	{"Time of Impact", TimeOfImpact::Create},
 	{"Motor Joint", MotorJoint::Create},
 	{"One-Sided Platform", OneSidedPlatform::Create},
-	{"Dump Shell", DumpShell::Create},
 	{"Mobile", Mobile::Create},
 	{"MobileBalanced", MobileBalanced::Create},
-	{"Ray-Cast", RayCast::Create},
 	{"Conveyor Belt", ConveyorBelt::Create},
 	{"Gears", Gears::Create},
-	{"Convex Hull", ConvexHull::Create},
 	{"Varying Restitution", VaryingRestitution::Create},
 	{"Tumbler", Tumbler::Create},
 	{"Tiles", Tiles::Create},
@@ -121,7 +145,6 @@ TestEntry g_testEntries[] =
 	{"Body Types", BodyTypes::Create},
 	{"Shape Editing", ShapeEditing::Create},
 	{"Car", Car::Create},
-	{"Apply Force", ApplyForce::Create},
 	{"Prismatic", Prismatic::Create},
 	{"Vertical Stack", VerticalStack::Create},
 	{"SphereStack", SphereStack::Create},

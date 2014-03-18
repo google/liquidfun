@@ -345,6 +345,7 @@ int fgPlatformGlutDeviceGet ( GLenum eWhat )
  */
 int *fgPlatformGlutGetModeValues(GLenum eWhat, int *size)
 {
+  (void)eWhat;
   *size = 0;
   return NULL;
 }

@@ -28,9 +28,12 @@ class b2Fixture;
 class b2Body;
 class b2Joint;
 class b2Contact;
+class b2ParticleSystem;
 struct b2ContactResult;
 struct b2Manifold;
 class b2ParticleGroup;
+struct b2ParticleBodyContact;
+struct b2ParticleContact;
 
 /// Joints and fixtures are destroyed when their associated
 /// body is destroyed. Implement this listener so that you
@@ -56,10 +59,12 @@ public:
 
 	/// Called when a particle is about to be destroyed.
 	/// The index can be used in conjunction with
-	/// b2World::GetParticleUserDataBuffer() to determine which particle has
-	/// been destroyed.
-	virtual void SayGoodbye(int32 index)
+	/// b2ParticleSystem::GetUserDataBuffer() or
+	/// b2ParticleSystem::GetParticleHandleFromIndex() to determine which
+	/// particle has been destroyed.
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index)
 	{
+		B2_NOT_USED(particleSystem);
 		B2_NOT_USED(index);
 	}
 };
@@ -74,6 +79,31 @@ public:
 	/// Return true if contact calculations should be performed between these two shapes.
 	/// @warning for performance reasons this is only called when the AABBs begin to overlap.
 	virtual bool ShouldCollide(b2Fixture* fixtureA, b2Fixture* fixtureB);
+
+	/// Return true if contact calculations should be performed between a
+	/// fixture and particle.  This is only called if the
+	/// b2_fixtureContactListenerParticle flag is set on the particle.
+	virtual bool ShouldCollide(b2Fixture* fixture,
+							   b2ParticleSystem* particleSystem,
+							   int32 particleIndex)
+	{
+		B2_NOT_USED(fixture);
+		B2_NOT_USED(particleIndex);
+		B2_NOT_USED(particleSystem);
+		return true;
+	}
+
+	/// Return true if contact calculations should be performed between two
+	/// particles.  This is only called if the
+	/// b2_particleContactListenerParticle flag is set on the particle.
+	virtual bool ShouldCollide(b2ParticleSystem* particleSystem,
+							   int32 particleIndexA, int32 particleIndexB)
+	{
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(particleIndexA);
+		B2_NOT_USED(particleIndexB);
+		return true;
+	}
 };
 
 /// Contact impulses for reporting. Impulses are used instead of forces because
@@ -105,6 +135,44 @@ public:
 
 	/// Called when two fixtures cease to touch.
 	virtual void EndContact(b2Contact* contact) { B2_NOT_USED(contact); }
+
+	/// Called when a fixture and particle start touching if the
+	/// b2_fixtureContactFilterParticle flag is set on the particle.
+	virtual void BeginContact(b2ParticleSystem* particleSystem,
+							  b2ParticleBodyContact* particleBodyContact)
+	{
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(particleBodyContact);
+	}
+
+	/// Called when a fixture and particle stop touching if the
+	/// b2_fixtureContactFilterParticle flag is set on the particle.
+	virtual void EndContact(b2Fixture* fixture,
+							b2ParticleSystem* particleSystem, int32 index)
+	{
+		B2_NOT_USED(fixture);
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(index);
+	}
+
+	/// Called when two particles start touching if
+	/// b2_particleContactFilterParticle flag is set on either particle.
+	virtual void BeginContact(b2ParticleSystem* particleSystem,
+							  b2ParticleContact* particleContact)
+	{
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(particleContact);
+	}
+
+	/// Called when two particles start touching if
+	/// b2_particleContactFilterParticle flag is set on either particle.
+	virtual void EndContact(b2ParticleSystem* particleSystem,
+							int32 indexA, int32 indexB)
+	{
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(indexA);
+		B2_NOT_USED(indexB);
+	}
 
 	/// This is called after a contact is updated. This allows you to inspect a
 	/// contact before it goes to the solver. If you are careful, you can modify the
@@ -148,10 +216,23 @@ public:
 
 	/// Called for each particle found in the query AABB.
 	/// @return false to terminate the query.
-	virtual bool ReportParticle(int32 index)
+	virtual bool ReportParticle(const b2ParticleSystem* particleSystem,
+								int32 index)
 	{
+		B2_NOT_USED(particleSystem);
 		B2_NOT_USED(index);
 		return false;
+	}
+
+	/// Cull an entire particle system from b2World::QueryAABB. Ignored for
+	/// b2ParticleSystem::QueryAABB.
+	/// @return true if you want to include particleSystem in the AABB query,
+	/// or false to cull particleSystem from the AABB query.
+	virtual bool ShouldQueryParticleSystem(
+		const b2ParticleSystem* particleSystem)
+	{
+		B2_NOT_USED(particleSystem);
+		return true;
 	}
 };
 
@@ -176,11 +257,42 @@ public:
 	virtual float32 ReportFixture(	b2Fixture* fixture, const b2Vec2& point,
 									const b2Vec2& normal, float32 fraction) = 0;
 
-	/// Called for each particle found in the query.
-	virtual float32 ReportParticle(	int32 index, const b2Vec2& point,
-									const b2Vec2& normal, float32 fraction)
+	/// Called for each particle found in the query. You control how the ray
+	/// cast proceeds by returning a float:
+	/// return <=0: ignore the remaining particles in this particle system
+	/// return fraction: ignore particles that are 'fraction' percent farther
+	///   along the line from 'point1' to 'point2'. Note that 'point1' and
+	///   'point2' are parameters to b2World::RayCast.
+	/// @param particleSystem the particle system containing the particle
+	/// @param index the index of the particle in particleSystem
+	/// @param point the point of intersection bt the ray and the particle
+	/// @param normal the normal vector at the point of intersection
+	/// @param fraction percent (0.0~1.0) from 'point0' to 'point1' along the
+	///   ray. Note that 'point1' and 'point2' are parameters to
+	///   b2World::RayCast.
+	/// @return <=0 to ignore rest of particle system, fraction to ignore
+	/// particles that are farther away.
+	virtual float32 ReportParticle(const b2ParticleSystem* particleSystem,
+								   int32 index, const b2Vec2& point,
+								   const b2Vec2& normal, float32 fraction)
 	{
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(index);
+		B2_NOT_USED(&point);
+		B2_NOT_USED(&normal);
+		B2_NOT_USED(fraction);
 		return 0;
+	}
+
+	/// Cull an entire particle system from b2World::RayCast. Ignored in
+	/// b2ParticleSystem::RayCast.
+	/// @return true if you want to include particleSystem in the RayCast, or
+	/// false to cull particleSystem from the RayCast.
+	virtual bool ShouldQueryParticleSystem(
+		const b2ParticleSystem* particleSystem)
+	{
+		B2_NOT_USED(particleSystem);
+		return true;
 	}
 };
 

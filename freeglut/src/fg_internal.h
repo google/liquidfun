@@ -492,6 +492,13 @@ struct tagSFG_WindowState   /* as per notes above, sizes always refer to the cli
  */
 typedef void (*SFG_Proc)();
 
+#if TARGET_HOST_MS_WINDOWS
+#define FG_MACRO_START {
+#define FG_MACRO_END }
+#else
+#define FG_MACRO_START do {
+#define FG_MACRO_END } while(0)
+#endif /* TARGET_HOST_MS_WINDOWS */
 
 /*
  * SET_WCB() is used as:
@@ -511,11 +518,10 @@ typedef void (*SFG_Proc)();
  * ugliness is felt to be rather benign.
  */
 #define SET_WCB(window,cbname,func)                            \
-do                                                             \
-{                                                              \
+FG_MACRO_START                                                 \
     if( FETCH_WCB( window, cbname ) != (SFG_Proc)(func) )      \
         (((window).CallBacks[WCB_ ## cbname]) = (SFG_Proc)(func)); \
-} while( 0 )
+FG_MACRO_END
 
 /*
  * FETCH_WCB() is used as:
@@ -552,25 +558,23 @@ do                                                             \
  */
 #if TARGET_HOST_MS_WINDOWS && !defined(_WIN32_WCE) /* FIXME: also WinCE? */
 #define INVOKE_WCB(window,cbname,arg_list)    \
-do                                            \
-{                                             \
+FG_MACRO_START                                \
     if( FETCH_WCB( window, cbname ) )         \
     {                                         \
         FGCB ## cbname func = (FGCB ## cbname)(FETCH_WCB( window, cbname )); \
         fgSetWindow( &window );               \
         func arg_list;                        \
     }                                         \
-} while( 0 )
+FG_MACRO_END
 #else
 #define INVOKE_WCB(window,cbname,arg_list)    \
-do                                            \
-{                                             \
+FG_MACRO_START                                \
     if( FETCH_WCB( window, cbname ) )         \
     {                                         \
         fgSetWindow( &window );               \
         ((FGCB ## cbname)FETCH_WCB( window, cbname )) arg_list; \
     }                                         \
-} while( 0 )
+FG_MACRO_END
 #endif
 
 /*

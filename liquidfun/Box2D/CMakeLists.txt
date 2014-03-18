@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 project(Box2D)
 
 if(UNIX)
-	set(BOX2D_INSTALL_BY_DEFAULT ON)
+  set(BOX2D_INSTALL_BY_DEFAULT ON)
 else(UNIX)
-	set(BOX2D_INSTALL_BY_DEFAULT OFF)
+  set(BOX2D_INSTALL_BY_DEFAULT OFF)
 endif(UNIX)
 
 # LiquidFun build configuration.
@@ -24,8 +24,16 @@ option(BOX2D_BUILD_SHARED "Build Box2D shared libraries" OFF)
 option(BOX2D_BUILD_STATIC "Build Box2D static libraries" ON)
 option(BOX2D_BUILD_EXAMPLES "Build Box2D examples" ON)
 option(BOX2D_BUILD_UNITTESTS "Build Box2D Unit Tests" ON)
+# NOTE: Code coverage only works on Linux & OSX.
+option(BOX2D_CODE_COVERAGE "Enable the code coverage build option." OFF)
 
 set(BOX2D_VERSION 2.3.0)
+set(LIB_INSTALL_DIR lib${LIB_SUFFIX})
+
+# Detect clang
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGXX 1)
+endif()
 
 # Enable / disable debug code depending upon the build configuration.
 set(DEBUG_FLAGS "-DDEBUG=1")
@@ -52,6 +60,53 @@ foreach(FLAGS_TYPE C CXX)
 endforeach(FLAGS_TYPE)
 include("flags.cmake")
 
+set(C_FLAGS_WARNINGS "")
+if(MSVC)
+  set(C_FLAGS_WARNINGS "/W4 /WX")
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
+       CMAKE_COMPILER_IS_CLANGXX)
+  # Set the maximum warning level for gcc.
+  set(C_FLAGS_WARNINGS "-Wall -Werror -Wno-long-long -Wno-variadic-macros")
+endif()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS_WARNINGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS_WARNINGS}")
+
+# Configure flags for gcov when the code coverage config is enabled.
+if (BOX2D_CODE_COVERAGE AND
+    (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR
+     CMAKE_COMPILER_IS_CLANGXX))
+  set(GCOV_FLAGS "-fprofile-arcs -ftest-coverage")
+  set(GCOV_COMPILER_FLAGS "-g ${GCOV_FLAGS}")
+  # DEBUG and RELEASE flags are set explicitly here as CMAKE_C*_FLAGS get
+  # used to perform check compiles for cmake's configure step which fails on
+  # OSX when gcov flags are specified.
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${GCOV_COMPILER_FLAGS}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCOV_COMPILER_FLAGS}")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${GCOV_COMPILER_FLAGS}")
+  set(CMAKE_CXX_FLAGS_RELEASE
+        "${CMAKE_CXX_FLAGS_RELEASE} ${GCOV_COMPILER_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCOV_FLAGS}")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${GCOV_FLAGS}")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${GCOV_FLAGS}")
+endif()
+
+# The XCode generator ignores CMAKE_C_FLAGS AND CMAKE_CXX_FLAGS so flags
+# need to be added with target properties.
+# The following functions track the list of targets so that it's possible to
+# add flags to all targets using target properties.
+set(ALL_TARGETS "" CACHE INTERNAL "")
+# Override add_library() and adding the target to the ALL_TARGETS variable.
+function(add_library name)
+  _add_library(${name} ${ARGN})
+  set(ALL_TARGETS "${ALL_TARGETS}" "${name}" CACHE INTERNAL "")
+endfunction(add_library)
+
+# Override add_executable() and adding the target to the ALL_TARGETS variable.
+function(add_executable name)
+  _add_executable(${name} ${ARGN})
+  set(ALL_TARGETS "${ALL_TARGETS}" "${name}" CACHE INTERNAL "")
+endfunction(add_executable)
+
 # The Box2D library.
 add_subdirectory(Box2D)
 
@@ -74,3 +129,33 @@ endif(BOX2D_BUILD_UNITTESTS)
 if(BOX2D_INSTALL_DOC)
   install(DIRECTORY Documentation DESTINATION share/doc/Box2D PATTERN ".svn" EXCLUDE)
 endif(BOX2D_INSTALL_DOC)
+
+# Set the warning flags for all targets when using the Xcode generator.
+if(CMAKE_COMPILER_IS_CLANGXX)
+  foreach(target ${ALL_TARGETS})
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_WARNING_CFLAGS
+                          "${C_FLAGS_WARNINGS}")
+  endforeach(target)
+endif()
+
+# Create a subdirectory for each build configuration when building using
+# makefiles.  This makes it possible to keep multiple build artifacts
+set(OUTPUT_SUBDIR "")
+if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+  if(CMAKE_BUILD_TYPE STREQUAL "")
+    set(OUTPUT_SUBDIR "Release/")
+  else()
+    set(OUTPUT_SUBDIR "${CMAKE_BUILD_TYPE}/")
+  endif()
+endif()
+
+# Override / reset the output directory for all targets.
+set(LIB_OUTPUT_DIR "${OUTPUT_SUBDIR}")
+set(EXE_OUTPUT_DIR "${OUTPUT_SUBDIR}")
+foreach(target ${ALL_TARGETS})
+  set_target_properties(
+    ${target} PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${LIB_OUTPUT_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${LIB_OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${EXE_OUTPUT_DIR}")
+endforeach(target)

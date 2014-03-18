@@ -2,6 +2,7 @@
 
 [About](#About)<br/>
 [Particles](#Particles)<br/>
+[Particle Systems](#ps)<br/>
 [Particle Groups](#pg)<br/>
 [Discrete Particles vs. Particle Groups](#dp)<br/>
 [Creating and Destroying Particles](#cdp)<br/>
@@ -9,6 +10,7 @@
 [Particle Behaviors](#pb)<br/>
 [Particle Properties](#pp)<br/>
 [Rendering with OpenGL](#gl)<br/>
+[Sample Applications](#sa)<br/>
 
 <a name="About">
 ## About
@@ -31,19 +33,55 @@ color.<br/>
 The `b2Particle.h` file contains the enumerated behavior values, as well as
 the
 variables specifying other particle properties. The corresponding enum is
-named
-`b2ParticleFlag.`
+named `b2ParticleFlag.`
+
+<a name="ps">
+## Particle Systems
+
+The "world" that particles inhabit is called a particle system. A particle
+system describes a wide variety of physical coefficients that help dictate
+how particles interact with the world around them. A few examples of these
+conditions are default particle radius, elasticity, and viscosity. For more
+detail, see the API Reference description of the b2ParticleSystemDef struct.
+
+The following example creates a particle system:
+
+&nbsp;&nbsp;&nbsp;`const b2ParticleSystemDef particleSystemDef;`<br/>
+&nbsp;&nbsp;&nbsp;`m_particleSystems[0] =
+`m_world->CreateParticleSystem(&particleSystemDef);`<br/>
+
+You can also create more than one particle system: Thus, one "world's"
+particles may have a certain default radius, elasticity, etc., while the other
+"world" has different default values for these properties. The following sample
+shows the creation of multiple particle systems:
+
+&nbsp;&nbsp;&nbsp;`const b2ParticleSystemDef particleSystemDef;`<br/>
+&nbsp;&nbsp;&nbsp;`for (int i = 0; i < NUM_PARTICLE_SYSTEMS; ++i) {`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+`m_particleSystems[i] = m_world->CreateParticleSystem(&particleSystemDef);`
+<br/>
+&nbsp;&nbsp;&nbsp;`}`<br/>
+
+In many, if not most,
+cases, it will not be necessary to adjust the default values or create multiple
+particle systems. You may find it useful in some cases, however.
+
+For example, dividing particles into multiple systems can yield a performance
+gain by allowing you to simulate only the visible systems while putting all
+other systems in a "paused" state using `b2ParticleSystem::SetPaused()`.
+
+The "Multiple Systems" example in the Testbed provides an example of
+two particle systems influencing a rigid body while not interacting with each
+other.
 
 <a name="pg">
 ## Particle Groups
 
 Instead of creating particles individually, you can create a group of
 particles to manipulate en masse. Some of the particle-group properties that
-you
-can set are the same as those for discrete particles: behavior, position,
-linear
-velocity, and color. There are also properties specific to groups: rotational
-angle, rotational velocity, and strength.<br/>
+you can set are the same as those for discrete particles: behavior, position,
+linear velocity, and color. There are also properties specific to groups:
+rotational angle, rotational velocity, and strength.<br/>
 The `b2ParticleGroup.h` file contains the declarations for all of these
 variables, as well as the enum for particle-group behavior:
 `b2ParticleGroupFlag`.
@@ -70,15 +108,14 @@ particles at once.
 
 To create individual particles, create a `b2ParticleDef`-struct object. Next,
 specify the behavior and properties of the particle. Finally, call the method
-to
-create the particle.<br/>
+to create the particle.<br/>
 The following example creates an individual particle.
 
 &nbsp;&nbsp;&nbsp;`b2ParticleDef pd;`<br>
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`<br/>
 &nbsp;&nbsp;&nbsp;`pd.color.Set(0, 0, 255, 255);`<br/>
 &nbsp;&nbsp;&nbsp;`pd.position.Set(i, 0);`<br/>
-&nbsp;&nbsp;&nbsp;`int tempIndex = m_world->CreateParticle(pd);`<br/>
+&nbsp;&nbsp;&nbsp;`int tempIndex = m_particleSystem->CreateParticle(pd);`<br/>
 
 Particle lists are self-compacting. Therefore, the index returned by
 CreateParticle is only valid until a lower-indexed particle, or a group
@@ -89,8 +126,107 @@ To destroy an individual particle, invoke the function
 
 The following example destroys the particle created above.
 
-&nbsp;&nbsp;&nbsp;`m_world->DestroyParticle(tempIndex);`<br/>
+&nbsp;&nbsp;&nbsp;`m_particleSystem->DestroyParticle(tempIndex);`<br/>
 
+### Particle lifetimes
+
+In addition to manual destruction of particles as described above, particles
+can also expire and be destroyed due to age.
+
+The following example tells the system to track particle ages for the purpose
+of destroying them.
+
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetParticleDestructionByAge(true);`
+
+A particle can die one of two "age-related" deaths. First, you can set a
+lifetime for a particle--a period of time after which it expires.  The following
+example does this:
+
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetParticleLifetime(`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`index, Random() *`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+`(k_particleLifetimeMax - k_particleLifetimeMin) +`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`k_particleLifetimeMin);`<br/>
+
+where `index` specifies the number of the particle whose lifetime is being
+assigned, and the `Random()` function generates a random value for that
+lifetime.
+
+You do not need to set a specific lifetime for a particle for it to have an
+age-related death. If you set a maximum number of particles that can exist in a
+particle system, and you have have told the system to track particle ages, the
+system clamps particle count by culling "excess" particles. Particle culling
+takes place in age order, with the oldest ones destroyed first.
+
+The following example sets a maximum particle count for a particle system.
+
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetMaxParticleCount(k_maxParticleCount);`
+
+The Faucet example in the Testbed provides an example of both types of
+lifetime-driven particle destruction.
+
+### Stuck Particles
+
+Particles may get stuck and become obstructions that need to be destroyed or
+relocated. A particle is identified as possibly stuck if it remains in contact
+with two or more surfaces for a user-specified number (threshold) of particle
+iterations. Once "candidates" are identified, you can implement your own logic
+to decide whether they are actually stuck, and how to deal with them.
+
+The ability to implement your own logic gives you flexibility in deciding
+when you want to consider a particle stuck. For instance, a ball may
+be traveling down a chute, making contact with walls on multiple sides. This
+state satisfies the "possibly stuck" condition described in the previous
+paragraph. But you could implement logic judging the ball not stuck as long
+as it keeps traveling down the chute.
+
+On the other hand, you could also decide that not only an immobile particle,
+but even a mobile one trapped in a certain spatial range, is stuck. The system
+relies on you to judge the candidates.
+
+The following example shows one possible implementation for such a case.
+
+<pre>
+  // This code example of app logic deciding whether or not to eliminate stuck
+  // particles shows a user who set up a global array of sensor fixtures
+  // covering areas they know to be "problematic" for stuck particles in
+  // their geometry, and then at each step testing any stuck particles against
+  // those sensors, eliminating any stuck particles that lie inside a known
+  // problem region.
+  void DestroyStuckParticlesInSensors(
+      const b2Fixture * const *sensors, int32 num)
+  {
+  	const int32 stuck = gParticleSystem->GetStuckCandidateCount();
+  	if (stuck > 0)
+  	{
+  		const int32 *candidates = gParticleSystem->GetStuckCandidates();
+  		const b2Vec2 *positions = gParticleSystem->GetPositionBuffer();
+  		for (int32 i = 0; i < stuck; ++i)
+  		{
+  			const int32 particle = candidates[i];
+  			const b2Vec2 &position = positions[particle];
+  			for (int32 j = 0; j < num; ++j)
+  			{
+  				if(sensors[j]->TestPoint(position))
+  				{
+  					gParticleSystem->DestroyParticle(particle);
+  				}
+  			}
+  		}
+  	}
+  }
+  // particles in multiple contacts for 5 or more iterations are
+  // candidates
+  gParticleSystem->SetStuckThreshold(5);
+
+  // step the world (assuming the timestep, velocity iterations,
+  // and position iterations have been set globally).
+  gWorld->Step(gTimeStep, gVelocityIterations, gPositionIterations);
+
+  // Perform the above check for stuck particles against sensors
+  // in this global array.
+  DestroyStuckParticlesInSensors(gProblemAreaSensors, gNumSensors);
+</pre>
 
 <a name="cdpg">
 ## Creating and Destroying Particle Groups
@@ -98,7 +234,8 @@ The following example destroys the particle created above.
 A particle group begins life in a shaped container. You must therefore start a
 particle group definition by specifying a shape. Next, create a
 b2ParticleGroupDef-struct object. Then, specify the behavior and properties of
-the particle. Finally, call the method to create a particle group.<br/>
+the particles themselves. Finally, call the method to create a particle
+group.<br/>
 The following example creates five differently colored, box-shaped groups of
 particles.
 
@@ -114,26 +251,31 @@ particles.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`pd.position.Set(10 + 20 * i, 40);`<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`pd.color.Set(i * 255 / 5, 255 - i * 255 /
 5, 128, 255);`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`world->CreateParticleGroup(pd);`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`m_world->CreateParticleGroup(pd);`<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+`m_particleSystem->CreateParticleGroup(pd);`<br/>
 &nbsp;&nbsp;&nbsp;`}`<br/>
 
-To destroy a group of particles, invoke the function
+To destroy a particles in a group, invoke the function
 
-&nbsp;&nbsp;&nbsp;`DestroyParticleGroup(b2ParticleGroup* group);`<br/>
+&nbsp;&nbsp;&nbsp;`DestroyParticles(bool callDestructionListener);`<br/>
 
-The following example destroys all particle groups in the world.
+Groups are automatically destroyed when they contain no particles if the
+`b2_particleGroupCanBeEmpty` is not set in the group's flags.
 
-&nbsp;&nbsp;&nbsp;`b2ParticleGroup* group =
-m_world->GetParticleGroupList();`<br/>
-&nbsp;&nbsp;&nbsp;`while (group)`<br/>
-&nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	b2ParticleGroup* nextGroup =
-group->GetNext(); // access this before we destroy the group`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	m_world->DestroyParticleGroup(group);`
-<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`	group = nextGroup;`<br/>
-&nbsp;&nbsp;&nbsp;`}`
+The following example destroys all particle groups in the particle system.
+
+<pre>
+  b2ParticleGroup* group = m_particleSystem->GetParticleGroupList();
+  while (group)
+  {
+      m_particleSystem->SetGroupFlags(
+          m_particleSystem->GetGroupFlags() & ~b2_particleGroupCanBeEmpty);
+      group->DestroyParticles(false);
+      // The destruction of particle groups are deferred to the next call of
+      // Step() so it's safe to reference the group here.
+      group = group->GetNext();
+  }
+</pre>
 
 The next several sections provide more information on how to define particle
 behaviors and properties.
@@ -153,33 +295,16 @@ A solid particle group prevents other bodies from lodging inside of it. Should
 anything penetrate it, the solid particle group pushes the offending body back
 out to its surface.
 
-You cannot define a particle group as only solid. It must have one of four
-other behaviors, as well: it must either be combined with the rigid-group
-behavior, or with the wall, spring, or elastic particle behavior.
-
-To define a group combining solid- and rigid-group behaviors, use a single
-statement. For example:
-
-&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup | b2_rigidParticleGroup;`
-
-To define a group combining solid-group behavior with a given particle
-behavior, use two statements. For example:
-
-&nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`<br/>
-&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`<br/>
-
-A solid particle group possesses especially strong repulsive force. It is
-useful, for example, in a case where:
+A solid particle group also possesses an especially strong repulsive force. It
+is useful, for example, in a case where:
 
 * Something should be expected to bounce with unusual vigor
 ** As when a racquetball strikes the wall of a court
 
 Use the `b2_SolidParticleGroup` flag of the `b2ParticleGroupFlag` enum to
-specify a solid particle group. In many cases, a group will be defined as not
-only solid, but with additional behaviors, as well. For example, solid and
-elastic
+specify a solid particle group. For example:
 
-
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`
 
 ###Rigid
 
@@ -213,6 +338,9 @@ Set particle behavior as elastic using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`
 
+The green circle and the blue box in the "Elastic Particles" demo of the
+Testbed application comprise elastic particles.
+
 ### Color-mixing
 
 Color-mixing particles take on some of the color of other particles with which
@@ -221,7 +349,7 @@ one,
 the other particle retains its pre-collision color.<br/>
 <br/>
 The following example shows how color mixture is calculated. It shows the
-collision of two color-mixing particles: one red ("R") and one green ("G).
+collision of two color-mixing particles: one red ("R") and one green ("G").
 
 1. First, the system calculates deltaColor, which is the value by which each
    color will change.
@@ -248,6 +376,8 @@ system uses the absolute value of that number. When it results in a value over
 Set particle behavior as color-mixing using the statement<br/>
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_colorMixingParticle;`
 
+The "Surface Tension" demo of the Testbed application uses color-mixing
+particles.
 
 ### Powder
 
@@ -257,6 +387,8 @@ dust.<br/>
 Set particle behavior as powder using the statement<br/>
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_powderParticle;`
+
+The "Sparky" demo of the Testbed application uses powder particles.
 
 ### Spring
 
@@ -271,6 +403,9 @@ Set spring behavior using the statement<br/>
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_springParticle;`
 
+The red circle in the "Elastic Particles" demo of the Testbed application
+comprises spring particles.
+
 ### Tensile
 
 Tensile particles are used to produce the effect of surface tension, or the
@@ -284,12 +419,30 @@ Set tensile behavior using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_tensileParticle;`
 
+The "Surface Tension" demo of the Testbed application uses tensile particles.
+
 ### Viscous
 
 Viscous particles exhibit clinginess or stickiness, like oil.<br/>
 Set viscous behavior using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_viscousParticle;`
+
+The "Liquid Timer" demo of the Testbed application uses viscous particles.
+
+### Static Pressure
+
+Particles are subject to compression when pressure acts upon them. For example,
+when particles pour into a container, the ones at the bottom of the container
+are "crushed" under the weight of those above them and packed more tightly
+together than the ones at the top of the pile.
+
+The static-pressure particle eliminates this differential; the same amount of
+pressure acts upon each particle in the group.
+
+The following example sets static-pressure behavior.
+
+&nbsp;&nbsp;&nbsp;`pd.flags = b2_staticPressureParticle;`
 
 ### Wall
 
@@ -299,7 +452,27 @@ Set wall behavior using the statement
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_wallParticle;`
 
-### Zombie Particles
+### Barrier
+
+Solid or rigid particle groups are not inherently tunneling-proof. Particles
+traveling at high enough velocities may penetrate them. Barrier particles,
+used in conjunction with other particle types, provide particle groups
+with protection against tunneling. This functionality is useful when, for
+example, you want to ensure that liquid particles will not leak out of a
+container formed of wall particles.
+
+Barrier particles only prevent penetration of the particle groups they inhabit.
+They cannot prevent particles from getting between groups of particles, even if
+the groups' positions make them look as if they are contiguous.
+
+You can use barrier particles with elastic, spring, or wall particles.
+
+The following example creates an impermeable group of wall particles:
+
+&nbsp;&nbsp;&nbsp;`pd.flags = b2_wallParticle | b_barrierParticle;`
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`
+
+### Zombie
 
 Zombie particles are useful when you want efficiently to destroy multiple
 particles in a single step. All of the particles that you designate as zombies
@@ -307,7 +480,7 @@ are destroyed at the same time, in a single iteration of the solver.
 Destroying
 particles in a batch, after designating them as zombies, yields better
 performance than destroying them one by one: Whereas destroying particles
-one-by-one takes (number of particles) * (time per particle) to complete,
+one-by-one takes (number of parti`cles) * (time per particle) to complete,
 destroying them all in a batch takes the same time as it would to destroy a
 single particle.<br/>
 In the following example, every other particle in a group is designated as a
@@ -315,20 +488,30 @@ zombie, and will be destroyed in the next step of the solver. (For more
 information on the LiquidFun solver, see Chapter 1. Introduction.)
 
 &nbsp;&nbsp;&nbsp;`b2ParticleGroup*group=
-m_world->CreateParticleGroup(pd);`<br/>
+m_particleSystem->CreateParticleGroup(pd);`<br/>
 &nbsp;&nbsp;&nbsp;`for (int32 i=0;i<group->GetParticleCount();i+=2)`<br/>
 &nbsp;&nbsp;&nbsp;`{`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`group->GetParticleFlagsBuffer()[i] |=`
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`group->GetFlagsBuffer()[i] |=`
 `b2_zombieParticle;`<br/>
 &nbsp;&nbsp;&nbsp;`}`
 
-<a name="pp">
+Note that you can assign multiple behaviors to a group or particle. Use
+the | ("bitwise OR") operator to chain behavior flags. For example, for a group:
 
-Note that you can assign multiple behaviors to a particle or group. Use
-the | ("bitwise OR") operator to chain behavior flags. For example:
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup |
+b2_rigidParticleGroup;`
+
+And for particles:
 
 &nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle | b2_viscousParticle;`
 
+To define a group combining a specific group behavior with a specific particle
+behavior, use two statements. For example:
+
+&nbsp;&nbsp;&nbsp;`pd.flags = b2_elasticParticle;`<br/>
+&nbsp;&nbsp;&nbsp;`pd.groupFlags = b2_solidParticleGroup;`<br/>
+
+<a name="pp">
 ## Particle Properties
 
 ### Color
@@ -338,33 +521,37 @@ Set particle or particle-group color using the statement
 &nbsp;&nbsp;&nbsp;`pd.color.Set(r, g, b, a);`
 
 whose parameters set red, green, blue, and opacity, respectively. Each
-parameter
-takes a value of 0-255.
+parameter takes a value of 0-255.
 
 ### Size
 
+There are two points to keep in mind when using small particles. First, in the
+case of particle groups, particle size can affect performance. This is
+because particle size is inversely proportional to the number of particles
+generated to constitute a group. Having a large number of particles, in turn,
+can diminish performance.
+
 Set particle size using the statement
 
-&nbsp;&nbsp;&nbsp;`m_world->SetParticleRadius®;`
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetRadius(r);`
 
-where `r` is a float32 value greater than 0.0f. Its default value is 1.0f.<br/>
-There are two points to keep in mind when using small particles. First, in the
-case of particle groups, that particle size can affect performance. This is
-because the smaller the particle size, the larger the number of particles
-generated to constitute a group. Having a large number of particles, in turn,
-can diminish performance.<br/>
+where `r` is a float32 value greater than 0.0f. Default particle radius is
+1.0f.
 
-Second, small particles may behave unpredictably (i.e., break conservation of
+Small particles may also behave unpredictably (i.e., break conservation of
 momentum) in scenarios such as explosions. Slowing these particles down by
-reducing gravity scale can stabilize their behavior.<br/>
-<br/>
-Note that
+reducing gravity scale can stabilize their behavior.
 
 Set gravity scale using the statement
 
-&nbsp;&nbsp;&nbsp;`m_world->SetParticleGravityScale(g);`
+&nbsp;&nbsp;&nbsp;`m_particleSystem->SetGravityScale(g);`
 
-where `g` is a float32 value.
+, where g is a float32 value greater than 0.0f. Default gravity scale is 1.0f.
+
+It is worth noting that adjusting the number of particle iterations per solver
+step can also affect the effect of gravity on particles. Larger iteration sizes
+confer greater resistance to gravity. The most common use case for an increased
+particle-iteration size is to prevent particle deformation due to gravity.
 
 ### Position
 
@@ -398,7 +585,7 @@ as radians per second).
 This property applies only to rigid particle groups. It indicates the angle at
 which a group is tilted. Set angle with the statement
 
-&nbsp;&nbsp;&nbsp;`pd.angle = a;`
+&nbsp;&nbsp;&nbsp;`pd.angle =checkout a;`
 
 where `a` is the angle of tilt, expressed in radians. Left unspecified, the
 value defaults to 0.
@@ -472,3 +659,28 @@ In this example, OpenGL 1.1 would use glVertexPointer and glColorPointer to
 get
 the values from memory. OpenGL 2.0 would use glVertexAttribPointer.<br/>
 OpenGL can be used to render either individual particles or particle groups.
+
+<a name="sa">
+## Sample Applications
+
+Among the samples included in the LiquidFun distribution are two applications 
+that offer a quick look into the capabilities of the library.
+
+Testbed includes a large number of demos that provide examples of different 
+types of particle behavior. While some of the demos are "look only," others are 
+interactive, allowing you to use your mouse or touchscreen to affect the 
+behavior on screen. 
+
+Experimenting with each of the demos, and comparing their behavior against the 
+source code, can provide useful insights into how different particles behave 
+under various conditions. Testbed builds and runs on Android, MacOSX, Linux, 
+and Windows.
+
+EyeCandy is an Android-only application and is twofold in purpose: It provides
+a simple Android example of how to use LiquidFun; and, it seeks to inspire
+developers with its demonstration of the powerful liquid shaders it brings to
+mobile hardware.
+ 
+When running the program, you can slosh the fluid around by changing the
+orientation of the Android device. You can also toggle bewteen shaders by
+tapping the screen.

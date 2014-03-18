@@ -13,21 +13,49 @@
 @rem 2. Altered source versions must be plainly marked as such, and must not be
 @rem misrepresented as being the original software.
 @rem 3. This notice may not be removed or altered from any source distribution.
+
 @echo off
-rem Execute LiquidFun unit tests on Windows.
-rem
-rem This assumes LiquidFun test executables have been built for Windows and are
-rem located in the following folders:
-rem * Box2D\Unittests\Debug
-rem * Box2D\Unittests\Release
-rem * Box2D\Unittests\MinSizeRel
-rem * Box2D\Unittests\RelWithDebInfo
-rem
-rem It's possible to build tests for one build configuration and execute
-rem all tests under the output directory using this script.
 
 set this_path=%~dp0
 cd %this_path%
+
+rem Display help.
+goto display_help_end
+:display_help
+  echo Execute LiquidFun unit tests on Windows.
+  echo.
+  echo Usage: %~n0 [-h] [-n]
+  echo.
+  echo -h: Display this help message.
+  echo -n: Disable the unit test build step.
+  echo.
+  exit /B 1
+:display_help_end
+
+rem Whether to build the tests.
+set build_tests=1
+
+rem Parse switches.
+:parse_args
+  set current_arg=%1
+  rem Determine whether this is a switch (starts with "-").
+  set arg_first_character=%current_arg:~0,1%
+  if not "%arg_first_character%"=="-" (
+    rem Not a switch, continue to positional argument parsing.
+    goto parse_args_end
+  )
+  shift
+  if "%current_arg%"=="-h" goto display_help
+  if "%current_arg%"=="-n" set build_tests=0
+  goto parse_args
+:parse_args_end
+
+rem Build tests if they're not built already.
+if "%build_tests%"=="1" (
+  cmd /c %this_path%\..\AutoBuild\build.bat -n
+  if not ERRORLEVEL 0 exit /B 1
+)
+
 set failed=
 rem For all test directories.
 for %%c in (Debug Release MinSizeRel RelWithDebInfo) do (

@@ -22,8 +22,9 @@
 
 #include <Box2D/Box2D.h>
 #include "Render.h"
+#include "ParticleParameter.h"
 
-#include <cstdlib>
+#include <stdlib.h>
 
 class Test;
 struct Settings;
@@ -36,7 +37,7 @@ typedef Test* TestCreateFcn();
 /// Random number in range [-1,1]
 inline float32 RandomFloat()
 {
-	float32 r = (float32)(std::rand() & (RAND_LIMIT));
+	float32 r = (float32)(rand() & (RAND_LIMIT));
 	r /= RAND_LIMIT;
 	r = 2.0f * r - 1.0f;
 	return r;
@@ -45,7 +46,7 @@ inline float32 RandomFloat()
 /// Random floating point number in range [lo, hi]
 inline float32 RandomFloat(float32 lo, float32 hi)
 {
-	float32 r = (float32)(std::rand() & (RAND_LIMIT));
+	float32 r = (float32)(rand() & (RAND_LIMIT));
 	r /= RAND_LIMIT;
 	r = (hi - lo) * r + lo;
 	return r;
@@ -60,8 +61,13 @@ struct Settings
 		hz = 60.0f;
 		velocityIterations = 8;
 		positionIterations = 3;
+		// Particle iterations are needed for numerical stability in particle
+		// simulations with small particles and relatively high gravity.
+		// b2CalculateParticleIterations helps to determine the number.
+		particleIterations = b2CalculateParticleIterations(10, 0.04f, 1 / hz);
 		drawShapes = 1;
-		drawJoints = 1;
+		drawParticles = 1;
+		drawJoints = 0;
 		drawAABBs = 0;
 		drawContactPoints = 0;
 		drawContactNormals = 0;
@@ -76,13 +82,18 @@ struct Settings
 		enableSleep = 1;
 		pause = 0;
 		singleStep = 0;
+		printStepTimeStats = 1;
+		stepTimeOut = 0;
+		strictContacts = 0;
 	}
 
 	b2Vec2 viewCenter;
 	float32 hz;
 	int32 velocityIterations;
 	int32 positionIterations;
+	int32 particleIterations;
 	int32 drawShapes;
+	int32 drawParticles;
 	int32 drawJoints;
 	int32 drawAABBs;
 	int32 drawContactPoints;
@@ -98,6 +109,11 @@ struct Settings
 	int32 enableSleep;
 	int32 pause;
 	int32 singleStep;
+	int32 printStepTimeStats;
+	int32 strictContacts;
+
+	/// Measures how long did the world step took, in ms
+	float32 stepTimeOut;
 };
 
 struct TestEntry
@@ -131,6 +147,7 @@ struct ContactPoint
 	b2PointState state;
 	float32 normalImpulse;
 	float32 tangentImpulse;
+	float32 separation;
 };
 
 class Test : public b2ContactListener
@@ -171,6 +188,22 @@ public:
 	}
 
 	void ShiftOrigin(const b2Vec2& newOrigin);
+	virtual float32 GetDefaultViewZoom() const;
+
+	// Apply a preset range of colors to a particle group.
+	// A different color out of k_ParticleColors is applied to each
+	// particlesPerColor particles in the specified group.
+	// If particlesPerColor is 0, the particles in the group are divided into
+	// k_ParticleColorsCount equal sets of colored particles.
+	void ColorParticleGroup(b2ParticleGroup * const group,
+							uint32 particlesPerColor);
+
+	// Remove particle parameters matching "filterMask" from the set of
+	// particle parameters available for this test.
+	void InitializeParticleParameters(const uint32 filterMask);
+
+	// Restore default particle parameters.
+	void RestoreParticleParameters();
 
 protected:
 	friend class DestructionListener;
@@ -185,6 +218,7 @@ protected:
 	DebugDraw m_debugDraw;
 	int32 m_textLine;
 	b2World* m_world;
+	b2ParticleSystem* m_particleSystem;
 	b2Body* m_bomb;
 	b2MouseJoint* m_mouseJoint;
 	b2Vec2 m_bombSpawnPoint;
@@ -197,8 +231,13 @@ protected:
 
 	b2Profile m_maxProfile;
 	b2Profile m_totalProfile;
-};
 
-extern int TestParticleType();
+	// Valid particle parameters for this test.
+	ParticleParameter::Value* m_particleParameters;
+	ParticleParameter::Definition m_particleParameterDef;
+
+	static const b2ParticleColor k_ParticleColors[];
+	static const uint32 k_ParticleColorsCount;
+};
 
 #endif

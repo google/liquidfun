@@ -53,18 +53,25 @@ $(document).ready(function(){initNavTree('md__building_linux.html','');});
 <div class="title">Building for Linux </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h3>Before Building</h3>
+<div class="textblock"><h3>Version Requirements</h3>
+<p>Following are the minimum required versions for the tools and libraries you need for building LiquidFun for Linux:</p>
+<ul>
+<li>OpenGL: libglapi-mesa 8.0.4 (tested with libglapi-mesa 8.0.4-0ubuntu0)</li>
+<li>GLU: libglu1-mesa-dev 8.0.4 (tested with libglu1-mesa-dev 8.0.4.0ubuntu0)</li>
+<li>cmake (when building from source): 2.8.12.1</li>
+</ul>
+<h3>Before Building</h3>
 <p>Prior to building, install the following components using the <a href="http://en.wikipedia.org/wiki/Linux">Linux</a> distribution's package manager:</p>
 <ul>
-<li>Install <a href="http://www.cmake.org">cmake</a> using the package manager or download and manually install from <a href="http://cmake.org">cmake.org</a>.</li>
-<li>Install OpenGL (<code>libglapi-mesa</code>).</li>
-<li>Install GLU (<code>libglu1-mesa-dev</code>).</li>
+<li><a href="http://www.cmake.org">cmake</a>. You can also manually install from <a href="http://cmake.org">cmake.org</a>.</li>
+<li>OpenGL (<code>libglapi-mesa</code>).</li>
+<li>GLU (<code>libglu1-mesa-dev</code>).</li>
 </ul>
-<p>For example on Ubuntu: </p>
+<p>For example, on Ubuntu: </p>
 <pre class="fragment">sudo apt-get install cmake
 sudo apt-get install libglapi-mesa
 sudo apt-get install libglu1-mesa-dev
-</pre><p>OpenGL and GLU are required by the sample applications.</p>
+</pre><p>The sample applications require OpenGL and GLU.</p>
 <h3>Building</h3>
 <ul>
 <li>Generate makefiles from the <a href="http://www.cmake.org">cmake</a> project in <code>liquidfun/Box2D</code>.</li>
@@ -74,10 +81,20 @@ sudo apt-get install libglu1-mesa-dev
 <pre class="fragment">cd liquidfun/Box2D
 cmake -G'Unix Makefiles'
 make
-</pre><p>Build targets can be configured using options exposed in <code>liquidfun/Box2D/CMakeLists.txt</code> by using cmake's <code>-D</code> option.</p>
-<h3>Executing a Sample</h3>
+</pre><p>To perform a debug build: </p>
+<pre class="fragment">cd liquidfun/Box2D
+cmake -G'Unix Makefiles' -DCMAKE_BUILD_TYPE=Debug
+make
+</pre><p>Build targets can be configured using options exposed in <code>liquidfun/Box2D/CMakeLists.txt</code> by using cmake's <code>-D</code> option. Build configuration set using the <code>-D</code> option is sticky across subsequent builds.</p>
+<p>For example, if a build is performed using: </p>
+<pre class="fragment">cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
+make
+</pre><p>to switch to a release build CMAKE_BUILD_TYPE must be explicitly specified: </p>
+<pre class="fragment">cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+make
+</pre><h3>Executing a Sample</h3>
 <p>After building the project, you can execute the samples from the command line. For example: </p>
-<pre class="fragment">./liquidfun/Box2D/Testbed/Testbed
+<pre class="fragment">./liquidfun/Box2D/Testbed/Release/Testbed
 </pre><h3>Running Unit Tests</h3>
 <p>Developers modifying the LiquidFun library can verify that it still working correctly by executing the provided unit tests.</p>
 <p>Use the run_tests.sh script to execute unit tests: </p>

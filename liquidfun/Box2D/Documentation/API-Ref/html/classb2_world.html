@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -116,16 +116,24 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5cba9d0653149eb62504154e6fb35021"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add5942aef171e54cfa384c8975746dca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#add5942aef171e54cfa384c8975746dca">DestroyJoint</a> (<a class="el" href="classb2_joint.html">b2Joint</a> *joint)</td></tr>
 <tr class="separator:add5942aef171e54cfa384c8975746dca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68b967ae71d8363fe01d37781323e07e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a68b967ae71d8363fe01d37781323e07e">CreateParticleSystem</a> (const <a class="el" href="structb2_particle_system_def.html">b2ParticleSystemDef</a> *def)</td></tr>
+<tr class="separator:a68b967ae71d8363fe01d37781323e07e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a9cdb868bd65cb171696a005ab17205"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a4a9cdb868bd65cb171696a005ab17205">DestroyParticleSystem</a> (<a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *p)</td></tr>
+<tr class="separator:a4a9cdb868bd65cb171696a005ab17205"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2e8f623c5bae23fd47ae234a0e96420"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420">Step</a> (float32 timeStep, int32 velocityIterations, int32 positionIterations, int32 particleIterations)</td></tr>
+<tr class="separator:aa2e8f623c5bae23fd47ae234a0e96420"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a8eff61af98461f978fe43f3af7be90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a7a8eff61af98461f978fe43f3af7be90">Step</a> (float32 timeStep, int32 velocityIterations, int32 positionIterations)</td></tr>
 <tr class="separator:a7a8eff61af98461f978fe43f3af7be90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac082ab4c4ad0b1c5ec4674315eeec643"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ac082ab4c4ad0b1c5ec4674315eeec643">ClearForces</a> ()</td></tr>
 <tr class="separator:ac082ab4c4ad0b1c5ec4674315eeec643"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a293d9865e407fd463e168b0a29856acc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a293d9865e407fd463e168b0a29856acc"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a293d9865e407fd463e168b0a29856acc">DrawDebugData</a> ()</td></tr>
-<tr class="memdesc:a293d9865e407fd463e168b0a29856acc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call this to draw shapes and other debug draw data. <br/></td></tr>
+<tr class="memdesc:a293d9865e407fd463e168b0a29856acc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call this to draw shapes and other debug draw data. This is intentionally non-const. <br/></td></tr>
 <tr class="separator:a293d9865e407fd463e168b0a29856acc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a711e55d2c6e68400f93472f807c3775b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a711e55d2c6e68400f93472f807c3775b">QueryAABB</a> (<a class="el" href="classb2_query_callback.html">b2QueryCallback</a> *callback, const <a class="el" href="structb2_a_a_b_b.html">b2AABB</a> &amp;aabb) const </td></tr>
 <tr class="separator:a711e55d2c6e68400f93472f807c3775b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b05f1812b65fb1540dd2054a10a8da6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a8b05f1812b65fb1540dd2054a10a8da6">QueryShapeAABB</a> (<a class="el" href="classb2_query_callback.html">b2QueryCallback</a> *callback, const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;shape, const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;xf) const </td></tr>
+<tr class="separator:a8b05f1812b65fb1540dd2054a10a8da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad902548be84df9cc36eced0f4c89ab0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ad902548be84df9cc36eced0f4c89ab0a">RayCast</a> (<a class="el" href="classb2_ray_cast_callback.html">b2RayCastCallback</a> *callback, const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;point1, const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;point2) const </td></tr>
 <tr class="separator:ad902548be84df9cc36eced0f4c89ab0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b87c03955e3312d308ddf679adf3c85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classb2_body.html">b2Body</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a1b87c03955e3312d308ddf679adf3c85">GetBodyList</a> ()</td></tr>
@@ -138,6 +146,11 @@ const <a class="el" href="classb2_body.html">b2Body</a> *&#160;</td><td class="m
 <tr class="memitem:a966ceb42d968a8a544d60826ce0ed925"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a966ceb42d968a8a544d60826ce0ed925"></a>
 const <a class="el" href="classb2_joint.html">b2Joint</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetJointList</b> () const </td></tr>
 <tr class="separator:a966ceb42d968a8a544d60826ce0ed925"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c16a172a265ef6ee282d7a69650caeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a6c16a172a265ef6ee282d7a69650caeb">GetParticleSystemList</a> ()</td></tr>
+<tr class="separator:a6c16a172a265ef6ee282d7a69650caeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfe0118c5ac7a7f47e7ace3e37303691"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfe0118c5ac7a7f47e7ace3e37303691"></a>
+const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleSystemList</b> () const </td></tr>
+<tr class="separator:acfe0118c5ac7a7f47e7ace3e37303691"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1e1c59fd7534c0268c2a3e31370a425"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classb2_contact.html">b2Contact</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ab1e1c59fd7534c0268c2a3e31370a425">GetContactList</a> ()</td></tr>
 <tr class="separator:ab1e1c59fd7534c0268c2a3e31370a425"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15e9281350c0494954197801372e3dbb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a15e9281350c0494954197801372e3dbb"></a>
@@ -229,138 +242,6 @@ const <a class="el" href="structb2_profile.html">b2Profile</a> &amp;&#160;</td><
 <tr class="separator:af41b3f1a21efc854b485d311911e24b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73c1fec260d460514edd335d4c235893"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a73c1fec260d460514edd335d4c235893">Dump</a> ()</td></tr>
 <tr class="separator:a73c1fec260d460514edd335d4c235893"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4570ed2da970744aa229cf83deb8b3e9"><td class="memItemLeft" align="right" valign="top">int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a4570ed2da970744aa229cf83deb8b3e9">CreateParticle</a> (const <a class="el" href="structb2_particle_def.html">b2ParticleDef</a> &amp;def)</td></tr>
-<tr class="separator:a4570ed2da970744aa229cf83deb8b3e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a330e39581d60103f0b23ed4abe7db593"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a330e39581d60103f0b23ed4abe7db593">DestroyParticle</a> (int32 index)</td></tr>
-<tr class="separator:a330e39581d60103f0b23ed4abe7db593"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fd9dcf4a5d500cfbdf0e7257772e6ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a0fd9dcf4a5d500cfbdf0e7257772e6ad">DestroyParticle</a> (int32 index, bool callDestructionListener)</td></tr>
-<tr class="separator:a0fd9dcf4a5d500cfbdf0e7257772e6ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a829e19e59cc0a580d2214529f7280734"><td class="memItemLeft" align="right" valign="top">int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a829e19e59cc0a580d2214529f7280734">DestroyParticlesInShape</a> (const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;shape, const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;xf)</td></tr>
-<tr class="separator:a829e19e59cc0a580d2214529f7280734"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc047a7c17fb8634e68f083cdd2bdf1a"><td class="memItemLeft" align="right" valign="top">int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#afc047a7c17fb8634e68f083cdd2bdf1a">DestroyParticlesInShape</a> (const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;shape, const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;xf, bool callDestructionListener)</td></tr>
-<tr class="separator:afc047a7c17fb8634e68f083cdd2bdf1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a287385e587d831aca401d6ef89d3c9a4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a287385e587d831aca401d6ef89d3c9a4">CreateParticleGroup</a> (const <a class="el" href="structb2_particle_group_def.html">b2ParticleGroupDef</a> &amp;def)</td></tr>
-<tr class="separator:a287385e587d831aca401d6ef89d3c9a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8718482f4a5d414e6abad4a0df356e17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a8718482f4a5d414e6abad4a0df356e17">JoinParticleGroups</a> (<a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *groupA, <a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *groupB)</td></tr>
-<tr class="separator:a8718482f4a5d414e6abad4a0df356e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac804342a163fbc74653bcc50bab8b6ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ac804342a163fbc74653bcc50bab8b6ba">DestroyParticlesInGroup</a> (<a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *group, bool callDestructionListener)</td></tr>
-<tr class="separator:ac804342a163fbc74653bcc50bab8b6ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd53ca4936d566129ec8a6b74e2dd859"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#acd53ca4936d566129ec8a6b74e2dd859">DestroyParticlesInGroup</a> (<a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *group)</td></tr>
-<tr class="separator:acd53ca4936d566129ec8a6b74e2dd859"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae03ff1a3b338b36b8af0afe1389f6d6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ae03ff1a3b338b36b8af0afe1389f6d6b">GetParticleGroupList</a> ()</td></tr>
-<tr class="separator:ae03ff1a3b338b36b8af0afe1389f6d6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f179e0b8afaddfb65dc6a38b0efef52"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f179e0b8afaddfb65dc6a38b0efef52"></a>
-const <a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleGroupList</b> () const </td></tr>
-<tr class="separator:a8f179e0b8afaddfb65dc6a38b0efef52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abffd5a36e73bf3c8618698921630ae66"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abffd5a36e73bf3c8618698921630ae66"></a>
-int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#abffd5a36e73bf3c8618698921630ae66">GetParticleGroupCount</a> () const </td></tr>
-<tr class="memdesc:abffd5a36e73bf3c8618698921630ae66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of particle groups. <br/></td></tr>
-<tr class="separator:abffd5a36e73bf3c8618698921630ae66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a8e9589584f35bc7606257e551cd0b2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4a8e9589584f35bc7606257e551cd0b2"></a>
-int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a4a8e9589584f35bc7606257e551cd0b2">GetParticleCount</a> () const </td></tr>
-<tr class="memdesc:a4a8e9589584f35bc7606257e551cd0b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of particles. <br/></td></tr>
-<tr class="separator:a4a8e9589584f35bc7606257e551cd0b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a359bc56de7be91cc6192352e3223f2d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a359bc56de7be91cc6192352e3223f2d1"></a>
-int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a359bc56de7be91cc6192352e3223f2d1">GetParticleMaxCount</a> () const </td></tr>
-<tr class="memdesc:a359bc56de7be91cc6192352e3223f2d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum number of particles. <br/></td></tr>
-<tr class="separator:a359bc56de7be91cc6192352e3223f2d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af882be7b8af037869ad32a37c940469e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af882be7b8af037869ad32a37c940469e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#af882be7b8af037869ad32a37c940469e">SetParticleMaxCount</a> (int32 count)</td></tr>
-<tr class="memdesc:af882be7b8af037869ad32a37c940469e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of particles. <br/></td></tr>
-<tr class="separator:af882be7b8af037869ad32a37c940469e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acdbe82f8ffeb9156edba723db0e90eb1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acdbe82f8ffeb9156edba723db0e90eb1"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#acdbe82f8ffeb9156edba723db0e90eb1">SetParticleDensity</a> (float32 density)</td></tr>
-<tr class="memdesc:acdbe82f8ffeb9156edba723db0e90eb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the particle density. <br/></td></tr>
-<tr class="separator:acdbe82f8ffeb9156edba723db0e90eb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac369f07f357585e2f494ca56412914ee"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac369f07f357585e2f494ca56412914ee"></a>
-float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ac369f07f357585e2f494ca56412914ee">GetParticleDensity</a> () const </td></tr>
-<tr class="memdesc:ac369f07f357585e2f494ca56412914ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the particle density. <br/></td></tr>
-<tr class="separator:ac369f07f357585e2f494ca56412914ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3d8663e6d941d15e87bba007367f654"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ad3d8663e6d941d15e87bba007367f654">SetParticleGravityScale</a> (float32 gravityScale)</td></tr>
-<tr class="separator:ad3d8663e6d941d15e87bba007367f654"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95905dffb5faa859297d18cc9c76701c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a95905dffb5faa859297d18cc9c76701c"></a>
-float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a95905dffb5faa859297d18cc9c76701c">GetParticleGravityScale</a> () const </td></tr>
-<tr class="memdesc:a95905dffb5faa859297d18cc9c76701c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the particle gravity scale. <br/></td></tr>
-<tr class="separator:a95905dffb5faa859297d18cc9c76701c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a071412b63699e2a224532acaa7986bf2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a071412b63699e2a224532acaa7986bf2">SetParticleDamping</a> (float32 damping)</td></tr>
-<tr class="separator:a071412b63699e2a224532acaa7986bf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5a0ad6c26d52ebd29a19ad27cdad406"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac5a0ad6c26d52ebd29a19ad27cdad406"></a>
-float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ac5a0ad6c26d52ebd29a19ad27cdad406">GetParticleDamping</a> () const </td></tr>
-<tr class="memdesc:ac5a0ad6c26d52ebd29a19ad27cdad406"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get damping for particles. <br/></td></tr>
-<tr class="separator:ac5a0ad6c26d52ebd29a19ad27cdad406"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ffcf623803bb3898870f775f8b90532"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a2ffcf623803bb3898870f775f8b90532">SetParticleRadius</a> (float32 radius)</td></tr>
-<tr class="separator:a2ffcf623803bb3898870f775f8b90532"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29f644e30363bf5544d8e82ecb3722ed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29f644e30363bf5544d8e82ecb3722ed"></a>
-float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a29f644e30363bf5544d8e82ecb3722ed">GetParticleRadius</a> () const </td></tr>
-<tr class="memdesc:a29f644e30363bf5544d8e82ecb3722ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the particle radius. <br/></td></tr>
-<tr class="separator:a29f644e30363bf5544d8e82ecb3722ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a536029f92c4306cb3bd0f9ae2730f2aa"><td class="memItemLeft" align="right" valign="top">uint32 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a536029f92c4306cb3bd0f9ae2730f2aa">GetParticleFlagsBuffer</a> ()</td></tr>
-<tr class="separator:a536029f92c4306cb3bd0f9ae2730f2aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5903e6c73fe903e0744ca410a001ef83"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5903e6c73fe903e0744ca410a001ef83"></a>
-<a class="el" href="structb2_vec2.html">b2Vec2</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticlePositionBuffer</b> ()</td></tr>
-<tr class="separator:a5903e6c73fe903e0744ca410a001ef83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec5816d86277bb275dddb904405a4164"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec5816d86277bb275dddb904405a4164"></a>
-<a class="el" href="structb2_vec2.html">b2Vec2</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleVelocityBuffer</b> ()</td></tr>
-<tr class="separator:aec5816d86277bb275dddb904405a4164"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d2033babec153bbef8aad3f19d01db4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7d2033babec153bbef8aad3f19d01db4"></a>
-<a class="el" href="structb2_particle_color.html">b2ParticleColor</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleColorBuffer</b> ()</td></tr>
-<tr class="separator:a7d2033babec153bbef8aad3f19d01db4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90abffdb3723ef651a9ecffaa5aa254a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a90abffdb3723ef651a9ecffaa5aa254a"></a>
-<a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *const *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleGroupBuffer</b> ()</td></tr>
-<tr class="separator:a90abffdb3723ef651a9ecffaa5aa254a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9cc29a6f136843a661478d20fede4dbf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9cc29a6f136843a661478d20fede4dbf"></a>
-void **&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleUserDataBuffer</b> ()</td></tr>
-<tr class="separator:a9cc29a6f136843a661478d20fede4dbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3d75587cc12863bb9e39d87934ab55c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa3d75587cc12863bb9e39d87934ab55c"></a>
-const uint32 *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleFlagsBuffer</b> () const </td></tr>
-<tr class="separator:aa3d75587cc12863bb9e39d87934ab55c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8da5d7b757ede7532f09450c68173885"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8da5d7b757ede7532f09450c68173885"></a>
-const <a class="el" href="structb2_vec2.html">b2Vec2</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticlePositionBuffer</b> () const </td></tr>
-<tr class="separator:a8da5d7b757ede7532f09450c68173885"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f72fda9f8060915690864f266ef07e5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f72fda9f8060915690864f266ef07e5"></a>
-const <a class="el" href="structb2_vec2.html">b2Vec2</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleVelocityBuffer</b> () const </td></tr>
-<tr class="separator:a3f72fda9f8060915690864f266ef07e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a779a177b8932af3fa552566d7a709aa1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a779a177b8932af3fa552566d7a709aa1"></a>
-const <a class="el" href="structb2_particle_color.html">b2ParticleColor</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleColorBuffer</b> () const </td></tr>
-<tr class="separator:a779a177b8932af3fa552566d7a709aa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92e796c931a33acfcc9ca3becb7d25bc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92e796c931a33acfcc9ca3becb7d25bc"></a>
-const <a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *const *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleGroupBuffer</b> () const </td></tr>
-<tr class="separator:a92e796c931a33acfcc9ca3becb7d25bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ef9bbf9a561200dd3f54668d59f9f48"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2ef9bbf9a561200dd3f54668d59f9f48"></a>
-void *const *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleUserDataBuffer</b> () const </td></tr>
-<tr class="separator:a2ef9bbf9a561200dd3f54668d59f9f48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a129967839b540175cfba58c69d008629"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a129967839b540175cfba58c69d008629">SetParticleFlagsBuffer</a> (uint32 *buffer, int32 capacity)</td></tr>
-<tr class="separator:a129967839b540175cfba58c69d008629"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9439cf53865d3bb09d2d5ebac432d89e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9439cf53865d3bb09d2d5ebac432d89e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetParticlePositionBuffer</b> (<a class="el" href="structb2_vec2.html">b2Vec2</a> *buffer, int32 capacity)</td></tr>
-<tr class="separator:a9439cf53865d3bb09d2d5ebac432d89e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8ccc3783965b4e8fc34bfb83ac748e4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8ccc3783965b4e8fc34bfb83ac748e4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetParticleVelocityBuffer</b> (<a class="el" href="structb2_vec2.html">b2Vec2</a> *buffer, int32 capacity)</td></tr>
-<tr class="separator:ac8ccc3783965b4e8fc34bfb83ac748e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a92e1a8fc9f348eadaaf770118c567a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5a92e1a8fc9f348eadaaf770118c567a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetParticleColorBuffer</b> (<a class="el" href="structb2_particle_color.html">b2ParticleColor</a> *buffer, int32 capacity)</td></tr>
-<tr class="separator:a5a92e1a8fc9f348eadaaf770118c567a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a054a50792d56bbbeda9ce0d1b7c08a9a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a054a50792d56bbbeda9ce0d1b7c08a9a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetParticleUserDataBuffer</b> (void **buffer, int32 capacity)</td></tr>
-<tr class="separator:a054a50792d56bbbeda9ce0d1b7c08a9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0285224abf4c1fb53d6d8b528a7e738"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0285224abf4c1fb53d6d8b528a7e738"></a>
-const <a class="el" href="structb2_particle_contact.html">b2ParticleContact</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#aa0285224abf4c1fb53d6d8b528a7e738">GetParticleContacts</a> ()</td></tr>
-<tr class="memdesc:aa0285224abf4c1fb53d6d8b528a7e738"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get contacts between particles. <br/></td></tr>
-<tr class="separator:aa0285224abf4c1fb53d6d8b528a7e738"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af049efbabd4bc132fea0a40fa980cef7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af049efbabd4bc132fea0a40fa980cef7"></a>
-int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleContactCount</b> ()</td></tr>
-<tr class="separator:af049efbabd4bc132fea0a40fa980cef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a198904dc1ba11797d97ceec213b45a3e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a198904dc1ba11797d97ceec213b45a3e"></a>
-const <a class="el" href="structb2_particle_body_contact.html">b2ParticleBodyContact</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a198904dc1ba11797d97ceec213b45a3e">GetParticleBodyContacts</a> ()</td></tr>
-<tr class="memdesc:a198904dc1ba11797d97ceec213b45a3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get contacts between particles and bodies. <br/></td></tr>
-<tr class="separator:a198904dc1ba11797d97ceec213b45a3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6699866f593088014e8c1c49b1bcbe6c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6699866f593088014e8c1c49b1bcbe6c"></a>
-int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleBodyContactCount</b> ()</td></tr>
-<tr class="separator:a6699866f593088014e8c1c49b1bcbe6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79551978e76de7bbf71155d5be92229a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a79551978e76de7bbf71155d5be92229a"></a>
-float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a79551978e76de7bbf71155d5be92229a">ComputeParticleCollisionEnergy</a> () const </td></tr>
-<tr class="memdesc:a79551978e76de7bbf71155d5be92229a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the kinetic energy that can be lost by damping force. <br/></td></tr>
-<tr class="separator:a79551978e76de7bbf71155d5be92229a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac53c490edf0b775fb21c865df3414eb1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac53c490edf0b775fb21c865df3414eb1"></a>
 const <a class="el" href="structb2_version.html">b2Version</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ac53c490edf0b775fb21c865df3414eb1">GetVersion</a> () const </td></tr>
 <tr class="memdesc:ac53c490edf0b775fb21c865df3414eb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get API version. <br/></td></tr>
@@ -468,39 +349,20 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
 
 </div>
 </div>
-<a class="anchor" id="a4570ed2da970744aa229cf83deb8b3e9"></a>
+<a class="anchor" id="a68b967ae71d8363fe01d37781323e07e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int32 b2World::CreateParticle </td>
+          <td class="memname"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> * b2World::CreateParticleSystem </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structb2_particle_def.html">b2ParticleDef</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structb2_particle_system_def.html">b2ParticleSystemDef</a> *&#160;</td>
           <td class="paramname"><em>def</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create a particle whose properties have been defined. No reference to the definition is retained. A simulation step must occur before it's possible to interact with a newly created particle. For example, DestroyParticleInShape() will not destroy a particle until <a class="el" href="classb2_world.html#a7a8eff61af98461f978fe43f3af7be90">Step()</a> has been called. </p>
-<dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>the index of the particle. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a287385e587d831aca401d6ef89d3c9a4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> * b2World::CreateParticleGroup </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structb2_particle_group_def.html">b2ParticleGroupDef</a> &amp;&#160;</td>
-          <td class="paramname"><em>def</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Create a particle group whose properties have been defined. No reference to the definition is retained. </p>
+<p>Create a particle system given a definition. No reference to the definition is retained. </p>
 <dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
 
 </div>
@@ -543,216 +405,21 @@ This function is locked during callbacks. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a330e39581d60103f0b23ed4abe7db593"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void b2World::DestroyParticle </td>
-          <td>(</td>
-          <td class="paramtype">int32&#160;</td>
-          <td class="paramname"><em>index</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Destroy a particle. The particle is removed after the next step. </p>
-
-</div>
-</div>
-<a class="anchor" id="a0fd9dcf4a5d500cfbdf0e7257772e6ad"></a>
+<a class="anchor" id="a4a9cdb868bd65cb171696a005ab17205"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void b2World::DestroyParticle </td>
+          <td class="memname">void b2World::DestroyParticleSystem </td>
           <td>(</td>
-          <td class="paramtype">int32&#160;</td>
-          <td class="paramname"><em>index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>callDestructionListener</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Destroy a particle. The particle is removed after the next step. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Index</td><td>of the particle to destroy. </td></tr>
-    <tr><td class="paramname">Whether</td><td>to call the destruction listener just before the particle is destroyed. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ac804342a163fbc74653bcc50bab8b6ba"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void b2World::DestroyParticlesInGroup </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td>
-          <td class="paramname"><em>group</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>callDestructionListener</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Destroy particles in a group. This function is locked during callbacks. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">The</td><td>particle group to destroy. </td></tr>
-    <tr><td class="paramname">Whether</td><td>to call the world <a class="el" href="classb2_destruction_listener.html">b2DestructionListener</a> for each particle is destroyed. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Destroy a particle system. </p>
 <dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="acd53ca4936d566129ec8a6b74e2dd859"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void b2World::DestroyParticlesInGroup </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td>
-          <td class="paramname"><em>group</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Destroy particles in a group without enabling the destruction callback for destroyed particles. This function is locked during callbacks. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">The</td><td>particle group to destroy. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a829e19e59cc0a580d2214529f7280734"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int32 b2World::DestroyParticlesInShape </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;&#160;</td>
-          <td class="paramname"><em>shape</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;&#160;</td>
-          <td class="paramname"><em>xf</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Destroy particles inside a shape without enabling the destruction callback for destroyed particles. This function is locked during callbacks. For more information see DestroyParticleInShape(const b2Shape&amp;, const b2Transform&amp;,bool). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Shape</td><td>which encloses particles that should be destroyed. </td></tr>
-    <tr><td class="paramname">Transform</td><td>applied to the shape. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>Number of particles destroyed. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="afc047a7c17fb8634e68f083cdd2bdf1a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int32 b2World::DestroyParticlesInShape </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;&#160;</td>
-          <td class="paramname"><em>shape</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;&#160;</td>
-          <td class="paramname"><em>xf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>callDestructionListener</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Destroy particles inside a shape. This function is locked during callbacks. In addition, this function immediately destroys particles in the shape in constrast to <a class="el" href="classb2_world.html#a330e39581d60103f0b23ed4abe7db593">DestroyParticle()</a> which defers the destruction until the next simulation step. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Shape</td><td>which encloses particles that should be destroyed. </td></tr>
-    <tr><td class="paramname">Transform</td><td>applied to the shape. </td></tr>
-    <tr><td class="paramname">Whether</td><td>to call the world <a class="el" href="classb2_destruction_listener.html">b2DestructionListener</a> for each particle destroyed. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>Number of particles destroyed. </dd></dl>
 
 </div>
 </div>
@@ -849,24 +516,7 @@ This function is locked during callbacks. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a536029f92c4306cb3bd0f9ae2730f2aa"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32 * b2World::GetParticleFlagsBuffer </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Get the particle data. </p>
-<dl class="section return"><dt>Returns</dt><dd>the pointer to the head of the particle data. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ae03ff1a3b338b36b8af0afe1389f6d6b"></a>
+<a class="anchor" id="a6c16a172a265ef6ee282d7a69650caeb"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -874,7 +524,7 @@ This function is locked during callbacks. </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> * b2World::GetParticleGroupList </td>
+          <td class="memname"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> * b2World::GetParticleSystemList </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -886,8 +536,8 @@ This function is locked during callbacks. </dd></dl>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the world particle group list. With the returned group, use <a class="el" href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9" title="Get the next particle group from the list in b2_World. ">b2ParticleGroup::GetNext</a> to get the next group in the world list. A NULL group indicates the end of the list. </p>
-<dl class="section return"><dt>Returns</dt><dd>the head of the world particle group list. </dd></dl>
+<p>Get the world particle-system list. With the returned body, use <a class="el" href="classb2_particle_system.html#a74c0d2611c61375dbcd8cd7b79fb362a" title="Get the next particle-system in the world&#39;s particle-system list. ">b2ParticleSystem::GetNext</a> to get the next particle-system in the world list. A NULL particle-system indicates the end of the list. </p>
+<dl class="section return"><dt>Returns</dt><dd>the head of the world particle-system list. </dd></dl>
 
 </div>
 </div>
@@ -904,41 +554,6 @@ This function is locked during callbacks. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>Get the quality metric of the dynamic tree. The smaller the better. The minimum is 1. </p>
-
-</div>
-</div>
-<a class="anchor" id="a8718482f4a5d414e6abad4a0df356e17"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void b2World::JoinParticleGroups </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td>
-          <td class="paramname"><em>groupA</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td>
-          <td class="paramname"><em>groupB</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Join two particle groups. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">the</td><td>first group. Expands to encompass the second group. </td></tr>
-    <tr><td class="paramname">the</td><td>second group. It is destroyed. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
 
 </div>
 </div>
@@ -970,6 +585,47 @@ This function is locked during callbacks. </dd></dl>
   <table class="params">
     <tr><td class="paramname">callback</td><td>a user implemented callback class. </td></tr>
     <tr><td class="paramname">aabb</td><td>the query box. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a8b05f1812b65fb1540dd2054a10a8da6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2World::QueryShapeAABB </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_query_callback.html">b2QueryCallback</a> *&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classb2_shape.html">b2Shape</a> &amp;&#160;</td>
+          <td class="paramname"><em>shape</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structb2_transform.html">b2Transform</a> &amp;&#160;</td>
+          <td class="paramname"><em>xf</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Query the world for all fixtures that potentially overlap the provided shape's AABB. Calls QueryAABB internally. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>a user implemented callback class. </td></tr>
+    <tr><td class="paramname">shape</td><td>the query shape </td></tr>
+    <tr><td class="paramname">xf</td><td>the transform of the AABB </td></tr>
   </table>
   </dd>
 </dl>
@@ -1064,7 +720,7 @@ This function is locked during callbacks. </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Register a routine for debug drawing. The debug draw functions are called inside with <a class="el" href="classb2_world.html#a293d9865e407fd463e168b0a29856acc" title="Call this to draw shapes and other debug draw data. ">b2World::DrawDebugData</a> method. The debug draw object is owned by you and must remain in scope. </p>
+<p>Register a routine for debug drawing. The debug draw functions are called inside with <a class="el" href="classb2_world.html#a293d9865e407fd463e168b0a29856acc" title="Call this to draw shapes and other debug draw data. This is intentionally non-const. ">b2World::DrawDebugData</a> method. The debug draw object is owned by you and must remain in scope. </p>
 
 </div>
 </div>
@@ -1082,91 +738,6 @@ This function is locked during callbacks. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>Register a destruction listener. The listener is owned by you and must remain in scope. </p>
-
-</div>
-</div>
-<a class="anchor" id="a071412b63699e2a224532acaa7986bf2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void b2World::SetParticleDamping </td>
-          <td>(</td>
-          <td class="paramtype">float32&#160;</td>
-          <td class="paramname"><em>damping</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Damping is used to reduce the velocity of particles. The damping parameter can be larger than 1.0f but the damping effect becomes sensitive to the time step when the damping parameter is large. </p>
-
-</div>
-</div>
-<a class="anchor" id="a129967839b540175cfba58c69d008629"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void b2World::SetParticleFlagsBuffer </td>
-          <td>(</td>
-          <td class="paramtype">uint32 *&#160;</td>
-          <td class="paramname"><em>buffer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int32&#160;</td>
-          <td class="paramname"><em>capacity</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Set a buffer for particle data. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">buffer</td><td>is a pointer to a block of memory. </td></tr>
-    <tr><td class="paramname">size</td><td>is the number of values in the block. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ad3d8663e6d941d15e87bba007367f654"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void b2World::SetParticleGravityScale </td>
-          <td>(</td>
-          <td class="paramtype">float32&#160;</td>
-          <td class="paramname"><em>gravityScale</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Change the particle gravity scale. Adjusts the effect of the global gravity vector on particles. Default value is 1.0f. </p>
-
-</div>
-</div>
-<a class="anchor" id="a2ffcf623803bb3898870f775f8b90532"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void b2World::SetParticleRadius </td>
-          <td>(</td>
-          <td class="paramtype">float32&#160;</td>
-          <td class="paramname"><em>radius</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Change the particle radius. You should set this only once, on world start. If you change the radius during execution, existing particles may explode, shrink, or behave unexpectedly. </p>
 
 </div>
 </div>
@@ -1193,9 +764,60 @@ This function is locked during callbacks. </dd></dl>
 
 </div>
 </div>
+<a class="anchor" id="aa2e8f623c5bae23fd47ae234a0e96420"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2World::Step </td>
+          <td>(</td>
+          <td class="paramtype">float32&#160;</td>
+          <td class="paramname"><em>timeStep</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>velocityIterations</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>positionIterations</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>particleIterations</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Take a time step. This performs collision detection, integration, and constraint solution. For the numerical stability of particles, minimize the following dimensionless gravity acceleration: gravity / particleRadius * (timeStep / particleIterations)^2 <a class="el" href="b2_particle_8h.html#a26da50c12eeabaa662fb0ccdf624b570" title="A helper function to calculate the optimal number of iterations. ">b2CalculateParticleIterations()</a> helps to determine the optimal particleIterations. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timeStep</td><td>the amount of time to simulate, this should not vary. </td></tr>
+    <tr><td class="paramname">velocityIterations</td><td>for the velocity constraint solver. </td></tr>
+    <tr><td class="paramname">positionIterations</td><td>for the position constraint solver. </td></tr>
+    <tr><td class="paramname">particleIterations</td><td>for the particle simulation. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a7a8eff61af98461f978fe43f3af7be90"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void b2World::Step </td>
@@ -1221,6 +843,11 @@ This function is locked during callbacks. </dd></dl>
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Take a time step. This performs collision detection, integration, and constraint solution. </p>
 <dl class="params"><dt>Parameters</dt><dd>

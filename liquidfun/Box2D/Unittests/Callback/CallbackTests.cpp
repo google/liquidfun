@@ -36,15 +36,20 @@ protected:
 		// Construct a world object, which will hold and simulate the rigid
 		// bodies.
 		m_world = new b2World(gravity);
+
+		const b2ParticleSystemDef particleSystemDef;
+		m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 	}
 
 	virtual void TearDown()
 	{
 		// Clean up the world after each test.
+		m_world->DestroyParticleSystem(m_particleSystem);
 		delete m_world;
 	}
 
 	b2World *m_world;
+	b2ParticleSystem *m_particleSystem;
 };
 
 // Query callback which counts the number of times ReportParticle() is called.
@@ -54,19 +59,37 @@ public:
 	QueryCallback()
 	{
 		m_count = 0;
+		m_shouldQueryParticleSystem = true;
+	}
+	void ResetCount()
+	{
+		m_count = 0;
 	}
 	bool ReportFixture(b2Fixture* fixture)
 	{
+		B2_NOT_USED(fixture);
 		return false;
 	}
-	bool ReportParticle(int32 index)
+	bool ReportParticle(const b2ParticleSystem* particleSystem, int32 index)
 	{
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(index);
 		m_count++;
 		return true;
+	}
+	bool ShouldQueryParticleSystem(const b2ParticleSystem* particleSystem)
+	{
+		B2_NOT_USED(particleSystem);
+		return m_shouldQueryParticleSystem;
+	}
+	void SetShouldQueryParticleSystem(bool shouldQueryParticleSystem)
+	{
+		m_shouldQueryParticleSystem = shouldQueryParticleSystem;
 	}
 
 public:
 	int32 m_count;
+	bool m_shouldQueryParticleSystem;
 };
 
 // Verify that it's possible to determine the set of particles within an
@@ -74,15 +97,41 @@ public:
 TEST_F(CallbackTests, QueryCallback) {
 	QueryCallback callback;
 	b2AABB aabb;
-	CreateBoxShapedParticleGroup(m_world);
+	CreateBoxShapedParticleGroup(m_particleSystem);
+
+	// This AABB query should miss all particles.
 	aabb.lowerBound.Set(10, -10);
 	aabb.upperBound.Set(20, 10);
-	m_world->QueryAABB(&callback, aabb);
+	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_EQ(callback.m_count, 0);
+
+	// This AABB query should hit some particles.
 	aabb.lowerBound.Set(-10, -10);
 	aabb.upperBound.Set(10, 10);
-	m_world->QueryAABB(&callback, aabb);
+	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_NE(callback.m_count, 0);
+}
+
+// Verify that b2QueryCallback::SetShouldQueryParticleSystem is working,
+// but only when QueryAABB is called through b2World.
+TEST_F(CallbackTests, QueryCallback_ShouldQueryParticleSystem) {
+	QueryCallback callback;
+	b2AABB aabb;
+	CreateBoxShapedParticleGroup(m_particleSystem);
+
+	// This AABB query should still check the particle system,
+	// because we're calling b2ParticleSystem::QueryAABB directly.
+	aabb.lowerBound.Set(-10, -10);
+	aabb.upperBound.Set(10, 10);
+	callback.SetShouldQueryParticleSystem(false);
+	m_particleSystem->QueryAABB(&callback, aabb);
+	EXPECT_NE(callback.m_count, 0);
+
+	// This AABB query shouldn't check the particle system at all,
+	// because we're calling b2World::QueryAABB.
+	callback.ResetCount();
+	m_world->QueryAABB(&callback, aabb);
+	EXPECT_EQ(callback.m_count, 0);
 }
 
 // Ray cast callback which counts the number of times ReportParticle() is
@@ -93,32 +142,81 @@ public:
 	RayCastCallback()
 	{
 		m_count = 0;
+		m_shouldQueryParticleSystem = true;
+	}
+	void ResetCount()
+	{
+		m_count = 0;
 	}
 	float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 	                      const b2Vec2& normal, float32 fraction)
 	{
+		B2_NOT_USED(fixture);
+		B2_NOT_USED(point);
+		B2_NOT_USED(normal);
+		B2_NOT_USED(fraction);
 		return 0;
 	}
-	float32 ReportParticle(int32 index, const b2Vec2& point,
-	                       const b2Vec2& normal, float32 fraction)
+	float32 ReportParticle(const b2ParticleSystem* particleSystem, int32 index,
+						   const b2Vec2& point, const b2Vec2& normal,
+						   float32 fraction)
 	{
+		B2_NOT_USED(particleSystem);
+		B2_NOT_USED(index);
+		B2_NOT_USED(point);
+		B2_NOT_USED(normal);
+		B2_NOT_USED(fraction);
 		m_count++;
 		return 0;
+	}
+	bool ShouldQueryParticleSystem(
+		const b2ParticleSystem* particleSystem)
+	{
+		B2_NOT_USED(particleSystem);
+		return m_shouldQueryParticleSystem;
+	}
+	void SetShouldQueryParticleSystem(bool shouldQueryParticleSystem)
+	{
+		m_shouldQueryParticleSystem = shouldQueryParticleSystem;
 	}
 
 public:
 	int32 m_count;
+	bool m_shouldQueryParticleSystem;
 };
 
 // Verify that it's possible to determine the set of particles intersected by
 // a ray using a ray cast callback.
 TEST_F(CallbackTests, RayCastCallback) {
 	RayCastCallback callback;
-	CreateBoxShapedParticleGroup(m_world);
+	CreateBoxShapedParticleGroup(m_particleSystem);
+
+	// This ray cast should miss all particles.
 	m_world->RayCast(&callback, b2Vec2(21, 0), b2Vec2(0, 21));
 	EXPECT_EQ(callback.m_count, 0);
+
+	// This ray cast should hit a particle.
 	m_world->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
 	EXPECT_NE(callback.m_count, 0);
+}
+
+// Verify that ShouldQueryParticleSystem disables ray casts against particle
+// systems, but only when called through b2World::RayCast.
+TEST_F(CallbackTests, RayCast_ShouldQueryParticleSystem) {
+	RayCastCallback callback;
+	CreateBoxShapedParticleGroup(m_particleSystem);
+
+	// This ray cast should still hit a particle, since we're calling
+	// b2ParticleSystem::RayCast directly.
+	callback.SetShouldQueryParticleSystem(false);
+	m_particleSystem->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	EXPECT_NE(callback.m_count, 0);
+
+	// This ray cast shouldn't even cast against the particle system,
+	// since we're calling b2World::RayCast.
+	callback.ResetCount();
+	m_world->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	EXPECT_EQ(callback.m_count, 0);
 }
 
 // Destruction listener which records references to particles or particle
@@ -127,14 +225,15 @@ class DestructionListener : public b2DestructionListener {
 public:
 	virtual ~DestructionListener() {}
 
-	virtual void SayGoodbye(b2Joint* joint) {}
-	virtual void SayGoodbye(b2Fixture* fixture) {}
+	virtual void SayGoodbye(b2Joint* joint) { B2_NOT_USED(joint); }
+	virtual void SayGoodbye(b2Fixture* fixture) { B2_NOT_USED(fixture); }
 
 	virtual void SayGoodbye(b2ParticleGroup* group) {
 		m_destroyedParticleGroups.push_back(group);
 	}
 
-	virtual void SayGoodbye(int32 index) {
+	virtual void SayGoodbye(b2ParticleSystem* particleSystem, int32 index) {
+		B2_NOT_USED(particleSystem);
 		m_destroyedParticles.push_back(index);
 	}
 
@@ -151,11 +250,11 @@ TEST_F(CallbackTests, DestroyParticleWithNoCallback) {
 	m_world->SetDestructionListener(&listener);
 
 	b2ParticleDef def;
-	m_world->DestroyParticle(m_world->CreateParticle(def));
+	m_particleSystem->DestroyParticle(m_particleSystem->CreateParticle(def));
 	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 
-	CreateAndDestroyParticle(m_world, 0, false);
+	CreateAndDestroyParticle(m_world, m_particleSystem, 0, false);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 }
 
@@ -165,13 +264,14 @@ TEST_F(CallbackTests, DestroyParticleWithCallback) {
 	int32 index;
 	DestructionListener listenerNoFlags;
 	m_world->SetDestructionListener(&listenerNoFlags);
-	index = CreateAndDestroyParticle(m_world, 0, true);
+	index = CreateAndDestroyParticle(m_world, m_particleSystem, 0, true);
 	EXPECT_EQ(listenerNoFlags.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listenerNoFlags.m_destroyedParticles[0], index);
 
 	DestructionListener listenerFlag;
 	m_world->SetDestructionListener(&listenerFlag);
-	index = CreateAndDestroyParticle(m_world, b2_destructionListener, false);
+	index = CreateAndDestroyParticle(m_world, m_particleSystem,
+                                     b2_destructionListenerParticle, false);
 	EXPECT_EQ(listenerFlag.m_destroyedParticles.size(), 1U);
 	EXPECT_EQ(listenerFlag.m_destroyedParticles[0], index);
 }
@@ -188,15 +288,15 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithNoCallback) {
 
 	int32 destroyed;
 	b2ParticleDef def;
-	m_world->CreateParticle(def);
+	m_particleSystem->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 
-	m_world->CreateParticle(def);
+	m_particleSystem->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf, false);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf, false);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 }
@@ -213,9 +313,9 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithCallback) {
 
 	int32 destroyed;
 	b2ParticleDef def;
-	int32 index = m_world->CreateParticle(def);
+	int32 index = m_particleSystem->CreateParticle(def);
 	m_world->Step(0.001f, 1, 1);
-	destroyed = m_world->DestroyParticlesInShape(shape, xf, true);
+	destroyed = m_particleSystem->DestroyParticlesInShape(shape, xf, true);
 	EXPECT_EQ(destroyed, 1);
 	EXPECT_EQ(listener.m_destroyedParticles.size(), 0U);
 	m_world->Step(0.001f, 1, 1);
@@ -228,8 +328,8 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithCallback) {
 TEST_F(CallbackTests, DestroyParticleGroupWithCallback) {
 	DestructionListener listener;
 	m_world->SetDestructionListener(&listener);
-	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_world);
-	m_world->DestroyParticlesInGroup(group);
+	b2ParticleGroup *group = CreateBoxShapedParticleGroup(m_particleSystem);
+	group->DestroyParticles();
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 0U);
 	m_world->Step(0.001f, 1, 1);
 	EXPECT_EQ(listener.m_destroyedParticleGroups.size(), 1U);

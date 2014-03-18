@@ -24,6 +24,7 @@ public:
 
 	Particles()
 	{
+
 		{
 			b2BodyDef bd;
 			b2Body* ground = m_world->CreateBody(&bd);
@@ -31,10 +32,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(-40, -10),
-					b2Vec2(40, -10),
-					b2Vec2(40, 0),
-					b2Vec2(-40, 0)};
+					b2Vec2(-4, -1),
+					b2Vec2(4, -1),
+					b2Vec2(4, 0),
+					b2Vec2(-4, 0)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -42,10 +43,10 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(-40, -1),
-					b2Vec2(-20, -1),
-					b2Vec2(-20, 20),
-					b2Vec2(-40, 30)};
+					b2Vec2(-4, -0.1f),
+					b2Vec2(-2, -0.1f),
+					b2Vec2(-2, 2),
+					b2Vec2(-4, 3)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
@@ -53,29 +54,31 @@ public:
 			{
 				b2PolygonShape shape;
 				const b2Vec2 vertices[4] = {
-					b2Vec2(20, -1),
-					b2Vec2(40, -1),
-					b2Vec2(40, 30),
-					b2Vec2(20, 20)};
+					b2Vec2(2, -0.1f),
+					b2Vec2(4, -0.1f),
+					b2Vec2(4, 3),
+					b2Vec2(2, 2)};
 				shape.Set(vertices, 4);
 				ground->CreateFixture(&shape, 0.0f);
 			}
 		}
 
-		m_world->SetParticleRadius(0.35f);
-		if (TestParticleType() == b2_waterParticle)
-		{
-			m_world->SetParticleDamping(0.2f);
-		}
+		m_particleSystem->SetRadius(0.035f);
+		const uint32 particleType = TestMain::GetParticleParameterValue();
+		m_particleSystem->SetDamping(0.2f);
 
 		{
 			b2CircleShape shape;
-			shape.m_p.Set(0, 30);
-			shape.m_radius = 20;
+			shape.m_p.Set(0, 3);
+			shape.m_radius = 2;
 			b2ParticleGroupDef pd;
-			pd.flags = TestParticleType();
+			pd.flags = particleType;
 			pd.shape = &shape;
-			m_world->CreateParticleGroup(pd);
+			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
+			if (pd.flags & b2_colorMixingParticle)
+			{
+				ColorParticleGroup(group, 0);
+			}
 		}
 
 		{
@@ -83,10 +86,15 @@ public:
 			bd.type = b2_dynamicBody;
 			b2Body* body = m_world->CreateBody(&bd);
 			b2CircleShape shape;
-			shape.m_p.Set(0, 80);
-			shape.m_radius = 5;
+			shape.m_p.Set(0, 8);
+			shape.m_radius = 0.5f;
 			body->CreateFixture(&shape, 0.5f);
 		}
+	}
+
+	float32 GetDefaultViewZoom() const
+	{
+		return 0.1f;
 	}
 
 	static Test* Create()

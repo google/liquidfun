@@ -53,7 +53,14 @@ $(document).ready(function(){initNavTree('md__building_windows.html','');});
 <div class="title">Building for Windows </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>LiquidFun releases include a <a href="http://www.visualstudio.com/">Visual Studio</a> solution (<code>liquidfun/Box2D/Box2D.sln</code>) and project files to build the library and examples on <a href="http://windows.microsoft.com/">Windows</a>. The Visual Studio solution has been generated using <a href="http://www.cmake.org">cmake</a>, and modified to remove any host-specific dependencies. It has been tested with Microsoft <a href="http://www.visualstudio.com/">Visual Studio</a> 2012.</p>
+<div class="textblock"><p>LiquidFun releases include a <a href="http://www.visualstudio.com/">Visual Studio</a> solution (<code>liquidfun/Box2D/Box2D.sln</code>) and project files to build the library and examples on <a href="http://windows.microsoft.com/">Windows</a>. The Visual Studio solution has been generated using <a href="http://www.cmake.org">cmake</a>, and is free of any host-specific dependencies. It has been tested with Microsoft <a href="http://www.visualstudio.com/">Visual Studio</a> 2012.</p>
+<h3>Version Requirements</h3>
+<p>Following are the minimum required versions for the tools and libraries you need for building LiquidFun for Windows:</p>
+<ul>
+<li>Windows: 7</li>
+<li>Visual Studio: 2012</li>
+<li>cmake: 2.8.12.1</li>
+</ul>
 <h3>Building with <a href="http://www.visualstudio.com/">Visual Studio</a></h3>
 <ul>
 <li>Double-click on <code>liquidfun/Box2D/Box2D.sln</code> to open the solution.</li>
@@ -61,15 +68,18 @@ $(document).ready(function(){initNavTree('md__building_windows.html','');});
 </ul>
 <h3>Executing a Sample</h3>
 <ul>
-<li>Right-click on an example project (e.g Testbed) in the Solution Explorer pane and select "Set as StartUp Project".</li>
+<li>Right-click on an example project (e.g Testbed) in the Solution Explorer pane, and select "Set as StartUp Project".</li>
 <li>Select "Debug--&gt;Start Debugging" from the menu.</li>
 </ul>
 <h3>Building using <a href="http://www.cmake.org">cmake</a></h3>
-<p>When working directly with the source, generate the <a href="http://www.visualstudio.com/">Visual Studio</a> solution and project files using <a href="http://www.cmake.org">cmake</a>. For example, the following generates the <a href="http://www.visualstudio.com/">Visual Studio</a> solution in the <code>liquidfun/Box2D</code> directory. </p>
-<pre class="fragment">cd liquidfun/Box2D
-cmake -G"Visual Studio 11"
+<p>When working directly with the source, use <a href="http://www.cmake.org">cmake</a> to generate the <a href="http://www.visualstudio.com/">Visual Studio</a> solution and project files. For example, the following generates the <a href="http://www.visualstudio.com/">Visual Studio</a> solution in the <code>liquidfun/Box2D</code> directory: </p>
+<pre class="fragment">cd liquidfun\Box2D
+cmake -G "Visual Studio 11"
+</pre><p>Running <a href="http://www.cmake.org">cmake</a> under <a href="http://www.cygwin.com/">cygwin</a> requires empty TMP, TEMP, tmp and temp variables. To generate a <a href="http://www.visualstudio.com/">Visual Studio</a> from a <a href="http://www.cygwin.com/">cygwin</a> bash shell use: </p>
+<pre class="fragment">$ cd liquidfun/Box2D
+$ ( unset {temp,tmp,TEMP,TMP} ; cmake -G "Visual Studio 11" )
 </pre><h3>Running Unit Tests</h3>
-<p>Developers modifying the LiquidFun library can verify that it still working correctly by executing the provided unit tests.</p>
+<p>Developers modifying the LiquidFun library can verify that it is still working correctly by executing the provided unit tests.</p>
 <p>Use the run_tests.bat batch file to execute unit tests: </p>
 <pre class="fragment">liquidfun\Box2D\Unittests\run_tests.bat
 </pre> </div></div><!-- contents -->

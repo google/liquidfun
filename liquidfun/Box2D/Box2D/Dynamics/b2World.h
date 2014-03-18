@@ -57,7 +57,7 @@ public:
 
 	/// Register a contact filter to provide specific control over collision.
 	/// Otherwise the default filter is used (b2_defaultFilter). The listener is
-	/// owned by you and must remain in scope. 
+	/// owned by you and must remain in scope.
 	void SetContactFilter(b2ContactFilter* filter);
 
 	/// Register a contact event listener. The listener is owned by you and must
@@ -89,6 +89,31 @@ public:
 	/// @warning This function is locked during callbacks.
 	void DestroyJoint(b2Joint* joint);
 
+	/// Create a particle system given a definition. No reference to the
+	/// definition is retained.
+	/// @warning This function is locked during callbacks.
+	b2ParticleSystem* CreateParticleSystem(const b2ParticleSystemDef* def);
+
+	/// Destroy a particle system.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticleSystem(b2ParticleSystem* p);
+
+	/// Take a time step. This performs collision detection, integration,
+	/// and constraint solution.
+	/// For the numerical stability of particles, minimize the following
+	/// dimensionless gravity acceleration:
+	///     gravity / particleRadius * (timeStep / particleIterations)^2
+	/// b2CalculateParticleIterations() helps to determine the optimal
+	/// particleIterations.
+	/// @param timeStep the amount of time to simulate, this should not vary.
+	/// @param velocityIterations for the velocity constraint solver.
+	/// @param positionIterations for the position constraint solver.
+	/// @param particleIterations for the particle simulation.
+	void Step(	float32 timeStep,
+				int32 velocityIterations,
+				int32 positionIterations,
+				int32 particleIterations);
+
 	/// Take a time step. This performs collision detection, integration,
 	/// and constraint solution.
 	/// @param timeStep the amount of time to simulate, this should not vary.
@@ -96,7 +121,10 @@ public:
 	/// @param positionIterations for the position constraint solver.
 	void Step(	float32 timeStep,
 				int32 velocityIterations,
-				int32 positionIterations);
+				int32 positionIterations)
+	{
+		Step(timeStep, velocityIterations, positionIterations, 1);
+	}
 
 	/// Manually clear the force buffer on all bodies. By default, forces are cleared automatically
 	/// after each call to Step. The default behavior is modified by calling SetAutoClearForces.
@@ -107,7 +135,7 @@ public:
 	/// @see SetAutoClearForces
 	void ClearForces();
 
-	/// Call this to draw shapes and other debug draw data.
+	/// Call this to draw shapes and other debug draw data. This is intentionally non-const.
 	void DrawDebugData();
 
 	/// Query the world for all fixtures that potentially overlap the
@@ -115,6 +143,14 @@ public:
 	/// @param callback a user implemented callback class.
 	/// @param aabb the query box.
 	void QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const;
+
+	/// Query the world for all fixtures that potentially overlap the
+	/// provided shape's AABB. Calls QueryAABB internally.
+	/// @param callback a user implemented callback class.
+	/// @param shape the query shape
+	/// @param xf the transform of the AABB
+	void QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
+	                    const b2Transform& xf) const;
 
 	/// Ray-cast the world for all fixtures in the path of the ray. Your callback
 	/// controls whether you get the closest point, any point, or n-points.
@@ -135,6 +171,13 @@ public:
 	/// @return the head of the world joint list.
 	b2Joint* GetJointList();
 	const b2Joint* GetJointList() const;
+
+	/// Get the world particle-system list. With the returned body, use
+	/// b2ParticleSystem::GetNext to get the next particle-system in the world
+	/// list. A NULL particle-system indicates the end of the list.
+	/// @return the head of the world particle-system list.
+	b2ParticleSystem* GetParticleSystemList();
+	const b2ParticleSystem* GetParticleSystemList() const;
 
 	/// Get the world contact list. With the returned contact, use b2Contact::GetNext to get
 	/// the next contact in the world list. A NULL contact indicates the end of the list.
@@ -184,7 +227,7 @@ public:
 
 	/// Change the global gravity vector.
 	void SetGravity(const b2Vec2& gravity);
-	
+
 	/// Get the global gravity vector.
 	b2Vec2 GetGravity() const;
 
@@ -211,170 +254,6 @@ public:
 	/// Dump the world into the log file.
 	/// @warning this should be called outside of a time step.
 	void Dump();
-
-	/// Create a particle whose properties have been defined.
-	/// No reference to the definition is retained.
-	/// A simulation step must occur before it's possible to interact with a
-	/// newly created particle.  For example, DestroyParticleInShape() will
-	/// not destroy a particle until Step() has been called.
-	/// @warning This function is locked during callbacks.
-	/// @return the index of the particle.
-	int32 CreateParticle(const b2ParticleDef& def);
-
-	/// Destroy a particle.
-	/// The particle is removed after the next step.
-	void DestroyParticle(int32 index)
-	{
-		DestroyParticle(index, false);
-	}
-
-	/// Destroy a particle.
-	/// The particle is removed after the next step.
-	/// @param Index of the particle to destroy.
-	/// @param Whether to call the destruction listener just before the
-	/// particle is destroyed.
-	void DestroyParticle(int32 index, bool callDestructionListener);
-
-	/// Destroy particles inside a shape without enabling the destruction
-	/// callback for destroyed particles.
-	/// This function is locked during callbacks.
-	/// For more information see
-	/// DestroyParticleInShape(const b2Shape&, const b2Transform&,bool).
-	/// @param Shape which encloses particles that should be destroyed.
-	/// @param Transform applied to the shape.
-	/// @warning This function is locked during callbacks.
-	/// @return Number of particles destroyed.
-	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf)
-	{
-		return DestroyParticlesInShape(shape, xf, false);
-	}
-
-	/// Destroy particles inside a shape.
-	/// This function is locked during callbacks.
-	/// In addition, this function immediately destroys particles in the shape
-	/// in constrast to DestroyParticle() which defers the destruction until
-	/// the next simulation step.
-	/// @param Shape which encloses particles that should be destroyed.
-	/// @param Transform applied to the shape.
-	/// @param Whether to call the world b2DestructionListener for each
-	/// particle destroyed.
-	/// @warning This function is locked during callbacks.
-	/// @return Number of particles destroyed.
-	int32 DestroyParticlesInShape(const b2Shape& shape, const b2Transform& xf,
-	                              bool callDestructionListener);
-
-
-	/// Create a particle group whose properties have been defined. No reference
-	/// to the definition is retained.
-	/// @warning This function is locked during callbacks.
-	b2ParticleGroup* CreateParticleGroup(const b2ParticleGroupDef& def);
-
-	/// Join two particle groups.
-	/// @param the first group. Expands to encompass the second group.
-	/// @param the second group. It is destroyed.
-	/// @warning This function is locked during callbacks.
-	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
-
-	/// Destroy particles in a group.
-	/// This function is locked during callbacks.
-	/// @param The particle group to destroy.
-	/// @param Whether to call the world b2DestructionListener for each
-	/// particle is destroyed.
-	/// @warning This function is locked during callbacks.
-	void DestroyParticlesInGroup(b2ParticleGroup* group, bool callDestructionListener);
-
-	/// Destroy particles in a group without enabling the destruction
-	/// callback for destroyed particles.
-	/// This function is locked during callbacks.
-	/// @param The particle group to destroy.
-	/// @warning This function is locked during callbacks.
-	void DestroyParticlesInGroup(b2ParticleGroup* group)
-	{
-		DestroyParticlesInGroup(group, false);
-	}
-
-	/// Get the world particle group list. With the returned group, use
-	/// b2ParticleGroup::GetNext to get the next group in the world list.
-	/// A NULL group indicates the end of the list.
-	/// @return the head of the world particle group list.
-	b2ParticleGroup* GetParticleGroupList();
-	const b2ParticleGroup* GetParticleGroupList() const;
-
-	/// Get the number of particle groups.
-	int32 GetParticleGroupCount() const;
-
-	/// Get the number of particles.
-	int32 GetParticleCount() const;
-
-	/// Get the maximum number of particles.
-	int32 GetParticleMaxCount() const;
-
-	/// Set the maximum number of particles.
-	void SetParticleMaxCount(int32 count);
-
-	/// Change the particle density.
-	void SetParticleDensity(float32 density);
-
-	/// Get the particle density.
-	float32 GetParticleDensity() const;
-
-	/// Change the particle gravity scale. Adjusts the effect of the global
-	/// gravity vector on particles. Default value is 1.0f.
-	void SetParticleGravityScale(float32 gravityScale);
-
-	/// Get the particle gravity scale.
-	float32 GetParticleGravityScale() const;
-
-	/// Damping is used to reduce the velocity of particles. The damping
-	/// parameter can be larger than 1.0f but the damping effect becomes
-	/// sensitive to the time step when the damping parameter is large.
-	void SetParticleDamping(float32 damping);
-
-	/// Get damping for particles
-	float32 GetParticleDamping() const;
-
-	/// Change the particle radius.
-	/// You should set this only once, on world start.
-	/// If you change the radius during execution, existing particles may explode, shrink, or behave unexpectedly.
-	void SetParticleRadius(float32 radius);
-
-	/// Get the particle radius.
-	float32 GetParticleRadius() const;
-
-	/// Get the particle data.
-	/// @return the pointer to the head of the particle data.
-	uint32* GetParticleFlagsBuffer();
-	b2Vec2* GetParticlePositionBuffer();
-	b2Vec2* GetParticleVelocityBuffer();
-	b2ParticleColor* GetParticleColorBuffer();
-	b2ParticleGroup* const* GetParticleGroupBuffer();
-	void** GetParticleUserDataBuffer();
-	const uint32* GetParticleFlagsBuffer() const;
-	const b2Vec2* GetParticlePositionBuffer() const;
-	const b2Vec2* GetParticleVelocityBuffer() const;
-	const b2ParticleColor* GetParticleColorBuffer() const;
-	const b2ParticleGroup* const* GetParticleGroupBuffer() const;
-	void* const* GetParticleUserDataBuffer() const;
-
-	/// Set a buffer for particle data.
-	/// @param buffer is a pointer to a block of memory.
-	/// @param size is the number of values in the block.
-	void SetParticleFlagsBuffer(uint32* buffer, int32 capacity);
-	void SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity);
-	void SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity);
-	void SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity);
-	void SetParticleUserDataBuffer(void** buffer, int32 capacity);
-
-	/// Get contacts between particles
-	const b2ParticleContact* GetParticleContacts();
-	int32 GetParticleContactCount();
-
-	/// Get contacts between particles and bodies
-	const b2ParticleBodyContact* GetParticleBodyContacts();
-	int32 GetParticleBodyContactCount();
-
-	/// Compute the kinetic energy that can be lost by damping force
-	float32 ComputeParticleCollisionEnergy() const;
 
 	/// Get API version.
 	const b2Version* GetVersion() const {
@@ -419,6 +298,7 @@ private:
 
 	b2Body* m_bodyList;
 	b2Joint* m_jointList;
+	b2ParticleSystem* m_particleSystemList;
 
 	int32 m_bodyCount;
 	int32 m_jointCount;
@@ -441,8 +321,6 @@ private:
 	bool m_stepComplete;
 
 	b2Profile m_profile;
-
-	b2ParticleSystem m_particleSystem;
 
 	/// Used to reference b2_LiquidFunVersion so that it's not stripped from
 	/// the static library.
@@ -468,6 +346,16 @@ inline b2Joint* b2World::GetJointList()
 inline const b2Joint* b2World::GetJointList() const
 {
 	return m_jointList;
+}
+
+inline b2ParticleSystem* b2World::GetParticleSystemList()
+{
+	return m_particleSystemList;
+}
+
+inline const b2ParticleSystem* b2World::GetParticleSystemList() const
+{
+	return m_particleSystemList;
 }
 
 inline b2Contact* b2World::GetContactList()
@@ -536,26 +424,6 @@ inline const b2ContactManager& b2World::GetContactManager() const
 inline const b2Profile& b2World::GetProfile() const
 {
 	return m_profile;
-}
-
-inline b2ParticleGroup* b2World::GetParticleGroupList()
-{
-	return m_particleSystem.GetParticleGroupList();
-}
-
-inline const b2ParticleGroup* b2World::GetParticleGroupList() const
-{
-	return m_particleSystem.GetParticleGroupList();
-}
-
-inline int32 b2World::GetParticleGroupCount() const
-{
-	return m_particleSystem.GetParticleGroupCount();
-}
-
-inline int32 b2World::GetParticleCount() const
-{
-	return m_particleSystem.GetParticleCount();
 }
 
 #endif

@@ -24,16 +24,30 @@ class b2Shape;
 class b2World;
 class b2ParticleSystem;
 class b2ParticleGroup;
-struct b2ParticleColor;
+class b2ParticleColor;
 
+/// @file
+
+/// The particle group type.  Can be combined with the | operator.
 enum b2ParticleGroupFlag
 {
-	b2_solidParticleGroup =   1 << 0, // resists penetration
-	b2_rigidParticleGroup =   1 << 1, // keeps its shape
+	/// Prevents overlapping or leaking.
+	b2_solidParticleGroup = 1 << 0,
+	/// Keeps its shape.
+	b2_rigidParticleGroup = 1 << 1,
+	/// Won't be destroyed if it gets empty.
+	b2_particleGroupCanBeEmpty = 1 << 2,
+	/// Will be destroyed on next simulation step.
+	b2_particleGroupWillBeDestroyed = 1 << 3,
+	/// Updates depth data on next simulation step.
+	b2_particleGroupNeedsUpdateDepth = 1 << 4,
+	b2_particleGroupInternalMask =
+		b2_particleGroupWillBeDestroyed |
+		b2_particleGroupNeedsUpdateDepth,
 };
 
-/// A particle group definition holds all the data needed to construct a particle group.
-/// You can safely re-use these definitions.
+/// A particle group definition holds all the data needed to construct a
+/// particle group.  You can safely re-use these definitions.
 struct b2ParticleGroupDef
 {
 
@@ -48,14 +62,20 @@ struct b2ParticleGroupDef
 		color = b2ParticleColor_zero;
 		strength = 1;
 		shape = NULL;
-		destroyAutomatically = true;
+		shapes = NULL;
+		shapeCount = 0;
+		stride = 0;
+		particleCount = 0;
+		positionData = NULL;
+		lifetime = 0.0f;
 		userData = NULL;
+		group = NULL;
 	}
 
-	/// The particle-behavior flags.
+	/// The particle-behavior flags (See #b2ParticleFlag).
 	uint32 flags;
 
-	/// The group-construction flags.
+	/// The group-construction flags (See #b2ParticleGroupFlag).
 	uint32 groupFlags;
 
 	/// The world position of the group.
@@ -75,21 +95,42 @@ struct b2ParticleGroupDef
 	/// The color of all particles in the group.
 	b2ParticleColor color;
 
-	/// The strength of cohesion among the particles in a group with flag b2_elasticParticle or b2_springParticle.
+	/// The strength of cohesion among the particles in a group with flag
+	/// b2_elasticParticle or b2_springParticle.
 	float32 strength;
 
-	/// Shape containing the particle group.
+	/// The shape where particles will be added.
 	const b2Shape* shape;
 
-	/// If true, destroy the group automatically after its last particle has been destroyed.
-	bool destroyAutomatically;
+	/// A array of shapes where particles will be added.
+	const b2Shape* const* shapes;
+
+	/// The number of shapes.
+	int32 shapeCount;
+
+	/// The interval of particles in the shape.
+	/// If it is 0, b2_particleStride * particleDiameter is used instead.
+	float32 stride;
+
+	/// The number of particles in addition to ones added in the shape.
+	int32 particleCount;
+
+	/// The initial positions of the particleCount particles.
+	const b2Vec2* positionData;
+
+	/// Lifetime of the particle group in seconds.  A value <= 0.0f indicates a
+	/// particle group with infinite lifetime.
+	float32 lifetime;
 
 	/// Use this to store application-specific group data.
 	void* userData;
 
+	/// An existing particle group to which the particles will be added.
+	b2ParticleGroup* group;
+
 };
 
-/// A group of particles. These are created via b2World::CreateParticleGroup.
+/// A group of particles. b2ParticleGroup::CreateParticleGroup creates these.
 class b2ParticleGroup
 {
 
@@ -99,11 +140,18 @@ public:
 	b2ParticleGroup* GetNext();
 	const b2ParticleGroup* GetNext() const;
 
+	/// Get the particle system that holds this particle group.
+	b2ParticleSystem* GetParticleSystem();
+	const b2ParticleSystem* GetParticleSystem() const;
+
 	/// Get the number of particles.
 	int32 GetParticleCount() const;
 
 	/// Get the offset of this group in the global particle buffer
 	int32 GetBufferIndex() const;
+
+	/// Does this group contain the particle.
+	bool ContainsParticle(int32 index) const;
 
 	/// Get the construction flags for the group.
 	int32 GetGroupFlags() const;
@@ -144,6 +192,26 @@ public:
 	/// Set the user data. Use this to store your application specific data.
 	void SetUserData(void* data);
 
+	/// Call b2ParticleSystem::ApplyForce for every particle in the group.
+	void ApplyForce(const b2Vec2& force);
+
+	/// Call b2ParticleSystem::ApplyLinearImpulse for every particle in the
+	/// group.
+	void ApplyLinearImpulse(const b2Vec2& impulse);
+
+	/// Destroy all the particles in this group.
+	/// This function is locked during callbacks.
+	/// @param Whether to call the world b2DestructionListener for each
+	/// particle is destroyed.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticles(bool callDestructionListener);
+
+	/// Destroy all particles in this group without enabling the destruction
+	/// callback for destroyed particles.
+	/// This function is locked during callbacks.
+	/// @warning This function is locked during callbacks.
+	void DestroyParticles();
+
 private:
 
 	friend class b2ParticleSystem;
@@ -163,10 +231,6 @@ private:
 	mutable float32 m_angularVelocity;
 	mutable b2Transform m_transform;
 
-	unsigned m_destroyAutomatically:1;
-	unsigned m_toBeDestroyed:1;
-	unsigned m_toBeSplit:1;
-
 	void* m_userData;
 
 	b2ParticleGroup();
@@ -185,9 +249,98 @@ inline const b2ParticleGroup* b2ParticleGroup::GetNext() const
 	return m_next;
 }
 
+inline b2ParticleSystem* b2ParticleGroup::GetParticleSystem()
+{
+	return m_system;
+}
+
+inline const b2ParticleSystem* b2ParticleGroup::GetParticleSystem() const
+{
+	return m_system;
+}
+
 inline int32 b2ParticleGroup::GetParticleCount() const
 {
 	return m_lastIndex - m_firstIndex;
+}
+
+inline bool b2ParticleGroup::ContainsParticle(int32 index) const
+{
+	return m_firstIndex <= index && index < m_lastIndex;
+}
+
+inline b2ParticleGroup::~b2ParticleGroup()
+{
+}
+
+inline int32 b2ParticleGroup::GetBufferIndex() const
+{
+  return m_firstIndex;
+}
+
+inline int32 b2ParticleGroup::GetGroupFlags() const
+{
+	return m_groupFlags & ~b2_particleGroupInternalMask;
+}
+
+inline float32 b2ParticleGroup::GetMass() const
+{
+	UpdateStatistics();
+	return m_mass;
+}
+
+inline float32 b2ParticleGroup::GetInertia() const
+{
+	UpdateStatistics();
+	return m_inertia;
+}
+
+inline b2Vec2 b2ParticleGroup::GetCenter() const
+{
+	UpdateStatistics();
+	return m_center;
+}
+
+inline b2Vec2 b2ParticleGroup::GetLinearVelocity() const
+{
+	UpdateStatistics();
+	return m_linearVelocity;
+}
+
+inline float32 b2ParticleGroup::GetAngularVelocity() const
+{
+	UpdateStatistics();
+	return m_angularVelocity;
+}
+
+inline const b2Transform& b2ParticleGroup::GetTransform() const
+{
+	return m_transform;
+}
+
+inline const b2Vec2& b2ParticleGroup::GetPosition() const
+{
+	return m_transform.p;
+}
+
+inline float32 b2ParticleGroup::GetAngle() const
+{
+	return m_transform.q.GetAngle();
+}
+
+inline void* b2ParticleGroup::GetUserData() const
+{
+	return m_userData;
+}
+
+inline void b2ParticleGroup::SetUserData(void* data)
+{
+	m_userData = data;
+}
+
+inline void b2ParticleGroup::DestroyParticles()
+{
+	DestroyParticles(false);
 }
 
 #endif

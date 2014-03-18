@@ -33,6 +33,7 @@
 
 GLvoid fgPlatformGetGameModeVMaxExtent( SFG_Window* window, int* x, int* y )
 {
+    (void)window;
     *x = glutGet ( GLUT_SCREEN_WIDTH );
     *y = glutGet ( GLUT_SCREEN_HEIGHT );
 }

@@ -31,4 +31,5 @@
 
 void fgPlatformCreateWindow ( SFG_Window *window )
 {
+	(void)window;
 }

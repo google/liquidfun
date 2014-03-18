@@ -32,36 +32,30 @@ public:
 	b2VoronoiDiagram(b2StackAllocator* allocator, int32 generatorCapacity);
 	~b2VoronoiDiagram();
 
-	void AddGenerator(const b2Vec2& center, int32 tag);
+	/// Add a generator.
+	/// @param the position of the generator.
+	/// @param a tag used to identify the generator in callback functions.
+	/// @param whether to callback for nodes associated with the generator.
+	void AddGenerator(const b2Vec2& center, int32 tag, bool necessary);
 
-	void Generate(float32 radius);
+	/// Generate the Voronoi diagram. It is rasterized with a given interval
+	/// in the same range as the necessary generators exist.
+	/// @param the interval of the diagram.
+	/// @param margin for which the range of the diagram is extended.
+	void Generate(float32 radius, float32 margin);
 
-	template<class Callback>
-	void GetNodes(const Callback& callback) const
+	/// Callback used by GetNodes().
+	class NodeCallback
 	{
-		for (int32 y = 0; y < m_countY - 1; y++)
-		{
-			for (int32 x = 0; x < m_countX - 1; x++)
-			{
-				int32 i = x + y * m_countX;
-				const Generator* a = m_diagram[i];
-				const Generator* b = m_diagram[i + 1];
-				const Generator* c = m_diagram[i + m_countX];
-				const Generator* d = m_diagram[i + 1 + m_countX];
-				if (b != c)
-				{
-					if (a != b && a != c)
-					{
-						callback(a->tag, b->tag, c->tag);
-					}
-					if (d != b && d != c)
-					{
-						callback(b->tag, d->tag, c->tag);
-					}
-				}
-			}
-		}
-	}
+	public:
+		virtual ~NodeCallback() {}
+		/// Receive tags for generators associated with a node.
+		virtual void operator()(int32 a, int32 b, int32 c) = 0;
+	};
+
+	/// Enumerate all nodes that contain at least one necessary generator.
+	/// @param a callback function object called for each node.
+	void GetNodes(NodeCallback& callback) const;
 
 private:
 
@@ -69,6 +63,7 @@ private:
 	{
 		b2Vec2 center;
 		int32 tag;
+		bool necessary;
 	};
 
 	struct b2VoronoiDiagramTask
@@ -88,6 +83,7 @@ private:
 
 	b2StackAllocator *m_allocator;
 	Generator* m_generatorBuffer;
+	int32 m_generatorCapacity;
 	int32 m_generatorCount;
 	int32 m_countX, m_countY;
 	Generator** m_diagram;

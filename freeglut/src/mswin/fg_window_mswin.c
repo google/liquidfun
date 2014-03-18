@@ -233,7 +233,7 @@ static void fghFillPFD( PIXELFORMATDESCRIPTOR *ppfd, HDC hdc, unsigned char laye
   ppfd->cDepthBits = 24;
   ppfd->cStencilBits = 8;
 
-  ppfd->cAuxBuffers = fghNumberOfAuxBuffersRequested();
+  ppfd->cAuxBuffers = (BYTE)fghNumberOfAuxBuffersRequested();
   ppfd->iLayerType = layer_type;
   ppfd->bReserved = 0;
   ppfd->dwLayerMask = 0;
@@ -504,6 +504,8 @@ static BOOL CALLBACK m_proc(HMONITOR mon,
       m_proc_t *dp=(m_proc_t *)data;
       MONITORINFOEX info;
       BOOL res;
+      (void)hdc;
+      (void)rect;
       info.cbSize=sizeof(info);
       res=GetMonitorInfo(mon,(LPMONITORINFO)&info);
       if( res )
@@ -573,7 +575,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     ATOM atom;
 
     /* Grab the window class we have registered on glutInit(): */
-    atom = GetClassInfo( fgDisplay.pDisplay.Instance, _T("FREEGLUT"), &wc );
+    atom = (ATOM)GetClassInfo( fgDisplay.pDisplay.Instance, _T("FREEGLUT"), &wc );
     FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Info Not Found",
                                    "fgOpenWindow" );
 

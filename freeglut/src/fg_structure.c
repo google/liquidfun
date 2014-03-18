@@ -653,7 +653,8 @@ void fgListInsert(SFG_List *list, SFG_Node *next, SFG_Node *node)
 {
     SFG_Node *prev;
 
-    if( (node->Next = next) )
+    node->Next = next;
+    if( node->Next )
     {
         prev = next->Prev;
         next->Prev = node;
@@ -664,7 +665,8 @@ void fgListInsert(SFG_List *list, SFG_Node *next, SFG_Node *node)
         list->Last = node;
     }
 
-    if( (node->Prev = prev) )
+    node->Prev = prev;
+    if( node->Prev )
         prev->Next = node;
     else
         list->First = node;

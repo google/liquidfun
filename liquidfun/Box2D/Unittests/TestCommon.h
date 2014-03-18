@@ -17,30 +17,54 @@
 */
 #include <assert.h>
 #include <Box2D/Box2D.h>
+#include <Box2D/Common/b2IntrusiveList.h>
 
 #define EPSILON 0.001f
 
 // Create a 10x10 box shaped particle group.
-b2ParticleGroup* CreateBoxShapedParticleGroup(b2World * const world)
+b2ParticleGroup* CreateBoxShapedParticleGroup(
+	b2ParticleSystem *const particleSystem)
 {
-	assert(world);
+	assert(particleSystem);
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
-	return world->CreateParticleGroup(def);
+	return particleSystem->CreateParticleGroup(def);
 }
 
 // Create and destroy a particle, returning an index to the particle that
 // was destroyed.
-int32 CreateAndDestroyParticle(b2World *const world, uint32 additionalFlags,
-                               bool callDestructionListener)
+int32 CreateAndDestroyParticle(
+	b2World *const world,
+	b2ParticleSystem *const particleSystem,
+	uint32 additionalFlags,
+    bool callDestructionListener)
 {
-	assert(world);
+	assert(particleSystem);
 	b2ParticleDef def;
 	def.flags |= additionalFlags;
-	int32 index = world->CreateParticle(def);
-	world->DestroyParticle(index, callDestructionListener);
+	int32 index = particleSystem->CreateParticle(def);
+	particleSystem->DestroyParticle(index, callDestructionListener);
 	world->Step(0.001f, 1, 1);
 	return index;
 }
+
+/// Item that can be placed in an intrusive list.
+class ListItem
+{
+public:
+	/// Construct an item and assign a value to it.
+	ListItem(const char *value) : m_value(value) { }
+	~ListItem() { }
+
+	/// Get the value assigned to this item.
+	const char* GetValue() const { return m_value; }
+
+	B2_INTRUSIVE_LIST_GET_NODE(m_node);
+	B2_INTRUSIVE_LIST_NODE_GET_CLASS(ListItem, m_node);
+
+private:
+	const char *m_value;
+	b2IntrusiveListNode m_node;
+};

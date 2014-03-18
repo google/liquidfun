@@ -14,13 +14,14 @@ SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 # setup version numbers
 FILE(STRINGS "version.mk" MAJOR_MINOR_PATCH_MK)
-FILE(WRITE "version.cmake" "")
+SET(VERSION_FILE "version.cmake_${CMAKE_BUILD_TYPE}")
+FILE(WRITE "${VERSION_FILE}" "")
 FOREACH(LINE ${MAJOR_MINOR_PATCH_MK})
     STRING(REGEX REPLACE "(.*):=(.*)" "set(\\1 \\2)"
            LINE_CMAKE "${LINE}")
-    FILE(APPEND "version.cmake" "${LINE_CMAKE}\n")
+    FILE(APPEND "${VERSION_FILE}" "${LINE_CMAKE}\n")
 ENDFOREACH(LINE)
-INCLUDE("version.cmake")
+INCLUDE("${VERSION_FILE}")
 
 # FREEGLUT_BUILD_SHARED_LIBS is already a standard CMake variable, but we need to
 # re-declare it here so it will show up in the GUI.

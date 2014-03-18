@@ -18,6 +18,7 @@
 #include "gtest/gtest.h"
 #include "Box2D/Box2D.h"
 #include <stdio.h>
+#include <complex>
 #include "BodyTracker.h"
 #include "AndroidUtil/AndroidMainWrapper.h"
 #define EPSILON 0.001f
@@ -31,6 +32,7 @@ class ConservationTests : public ::testing::Test {
 	virtual void TearDown();
 
 	b2World *m_world;
+	b2ParticleSystem *m_particleSystem;
 };
 
 void
@@ -42,6 +44,9 @@ ConservationTests::SetUp()
 	// Construct a world object, which will hold and simulate the rigid bodies.
 	m_world = new b2World(gravity);
 
+	const b2ParticleSystemDef particleSystemDef;
+	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
+
 	// Create two particle groups colliding each other
 	b2ParticleGroupDef pd;
 	b2PolygonShape shape;
@@ -50,11 +55,11 @@ ConservationTests::SetUp()
 
 	pd.position = b2Vec2(-10, 0);
 	pd.linearVelocity = b2Vec2(1, 0);
-	m_world->CreateParticleGroup(pd);
+	m_particleSystem->CreateParticleGroup(pd);
 
 	pd.position = b2Vec2(10, 0);
 	pd.linearVelocity = b2Vec2(-1, 0);
-	m_world->CreateParticleGroup(pd);
+	m_particleSystem->CreateParticleGroup(pd);
 }
 
 void
@@ -64,8 +69,8 @@ ConservationTests::TearDown()
 }
 
 TEST_F(ConservationTests, GravityCenter) {
-	int32 particleCount = m_world->GetParticleCount();
-	const b2Vec2 *positionBuffer = m_world->GetParticlePositionBuffer();
+	int32 particleCount = m_particleSystem->GetParticleCount();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
 	float64 beforeX = 0;
 	float64 beforeY = 0;
 	for (int32 i = 0; i < particleCount; i++) {
@@ -85,13 +90,15 @@ TEST_F(ConservationTests, GravityCenter) {
 	}
 	afterX /= particleCount;
 	afterY /= particleCount;
-	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON && std::abs(beforeY - afterY) < EPSILON) <<
-		"the gravity center changed from (" << beforeX << "," << beforeY << ") to (" << afterX << "," << afterY << ")";
+	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON &&
+				std::abs(beforeY - afterY) < EPSILON) <<
+		"the gravity center changed from (" << beforeX << "," <<
+		beforeY << ") to (" << afterX << "," << afterY << ")";
 }
 
 TEST_F(ConservationTests, LinearMomentum) {
-	int32 particleCount = m_world->GetParticleCount();
-	const b2Vec2 *velocityBuffer = m_world->GetParticleVelocityBuffer();
+	int32 particleCount = m_particleSystem->GetParticleCount();
+	const b2Vec2 *velocityBuffer = m_particleSystem->GetVelocityBuffer();
 	float64 beforeX = 0;
 	float64 beforeY = 0;
 	for (int32 i = 0; i < particleCount; i++) {
@@ -107,14 +114,16 @@ TEST_F(ConservationTests, LinearMomentum) {
 		afterX += velocityBuffer[i].x;
 		afterY += velocityBuffer[i].y;
 	}
-	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON && std::abs(beforeY - afterY) < EPSILON) <<
-		"the linear momentum changed from (" << beforeX << "," << beforeY << ") to (" << afterX << "," << afterY << ")";
+	EXPECT_TRUE(std::abs(beforeX - afterX) < EPSILON &&
+				std::abs(beforeY - afterY) < EPSILON) <<
+		"the linear momentum changed from (" << beforeX << "," <<
+		beforeY << ") to (" << afterX << "," << afterY << ")";
 }
 
 TEST_F(ConservationTests, AngularMomentum) {
-	int32 particleCount = m_world->GetParticleCount();
-	const b2Vec2 *positionBuffer = m_world->GetParticlePositionBuffer();
-	const b2Vec2 *velocityBuffer = m_world->GetParticleVelocityBuffer();
+	int32 particleCount = m_particleSystem->GetParticleCount();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
+	const b2Vec2 *velocityBuffer = m_particleSystem->GetVelocityBuffer();
 	float64 before = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		before += b2Cross(positionBuffer[i], velocityBuffer[i]);
@@ -131,8 +140,8 @@ TEST_F(ConservationTests, AngularMomentum) {
 }
 
 TEST_F(ConservationTests, KineticEnergy) {
-	int32 particleCount = m_world->GetParticleCount();
-	const b2Vec2 *velocityBuffer = m_world->GetParticleVelocityBuffer();
+	int32 particleCount = m_particleSystem->GetParticleCount();
+	const b2Vec2 *velocityBuffer = m_particleSystem->GetVelocityBuffer();
 	float64 before = 0;
 	for (int32 i = 0; i < particleCount; i++) {
 		b2Vec2 v = velocityBuffer[i];

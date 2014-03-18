@@ -42,6 +42,7 @@ b2World::b2World(const b2Vec2& gravity)
 
 	m_bodyList = NULL;
 	m_jointList = NULL;
+	m_particleSystemList = NULL;
 
 	m_bodyCount = 0;
 	m_jointCount = 0;
@@ -61,11 +62,8 @@ b2World::b2World(const b2Vec2& gravity)
 
 	m_contactManager.m_allocator = &m_blockAllocator;
 
-	m_particleSystem.m_world = this;
-
 	m_liquidFunVersion = &b2_liquidFunVersion;
 	m_liquidFunVersionString = b2_liquidFunVersionString;
-
 
 	memset(&m_profile, 0, sizeof(b2Profile));
 }
@@ -89,6 +87,15 @@ b2World::~b2World()
 
 		b = bNext;
 	}
+
+	while (m_particleSystemList)
+	{
+		DestroyParticleSystem(m_particleSystemList);
+	}
+
+	// Even though the block allocator frees them for us, for safety,
+	// we should ensure that all buffers have been freed.
+	b2Assert(m_blockAllocator.GetNumGiantAllocations() == 0);
 }
 
 void b2World::SetDestructionListener(b2DestructionListener* listener)
@@ -369,6 +376,58 @@ void b2World::DestroyJoint(b2Joint* j)
 			edge = edge->next;
 		}
 	}
+}
+
+b2ParticleSystem* b2World::CreateParticleSystem(const b2ParticleSystemDef* def)
+{
+	b2Assert(IsLocked() == false);
+	if (IsLocked())
+	{
+		return NULL;
+	}
+
+	void* mem = m_blockAllocator.Allocate(sizeof(b2ParticleSystem));
+	b2ParticleSystem* p = new (mem) b2ParticleSystem(def, this);
+
+	// Add to world doubly linked list.
+	p->m_prev = NULL;
+	p->m_next = m_particleSystemList;
+	if (m_particleSystemList)
+	{
+		m_particleSystemList->m_prev = p;
+	}
+	m_particleSystemList = p;
+
+	return p;
+}
+
+void b2World::DestroyParticleSystem(b2ParticleSystem* p)
+{
+	b2Assert(m_particleSystemList != NULL);
+	b2Assert(IsLocked() == false);
+	if (IsLocked())
+	{
+		return;
+	}
+
+	// Remove world particleSystem list.
+	if (p->m_prev)
+	{
+		p->m_prev->m_next = p->m_next;
+	}
+
+	if (p->m_next)
+	{
+		p->m_next->m_prev = p->m_prev;
+	}
+
+	if (p == m_particleSystemList)
+	{
+		m_particleSystemList = p->m_next;
+	}
+
+	p->~b2ParticleSystem();
+	m_blockAllocator.Free(p, sizeof(b2ParticleSystem));
 }
 
 //
@@ -872,6 +931,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 		subStep.dtRatio = 1.0f;
 		subStep.positionIterations = 20;
 		subStep.velocityIterations = step.velocityIterations;
+		subStep.particleIterations = step.particleIterations;
 		subStep.warmStarting = false;
 		island.SolveTOI(subStep, bA->m_islandIndex, bB->m_islandIndex);
 
@@ -907,7 +967,11 @@ void b2World::SolveTOI(const b2TimeStep& step)
 	}
 }
 
-void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIterations)
+void b2World::Step(
+	float32 dt,
+	int32 velocityIterations,
+	int32 positionIterations,
+	int32 particleIterations)
 {
 	b2Timer stepTimer;
 
@@ -924,6 +988,7 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 	step.dt = dt;
 	step.velocityIterations	= velocityIterations;
 	step.positionIterations = positionIterations;
+	step.particleIterations = particleIterations;
 	if (dt > 0.0f)
 	{
 		step.inv_dt = 1.0f / dt;
@@ -948,7 +1013,10 @@ void b2World::Step(float32 dt, int32 velocityIterations, int32 positionIteration
 	if (m_stepComplete && step.dt > 0.0f)
 	{
 		b2Timer timer;
-		m_particleSystem.Solve(step); // Particle Simulation
+		for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+		{
+			p->Solve(step); // Particle Simulation
+		}
 		Solve(step);
 		m_profile.solve = timer.GetMilliseconds();
 	}
@@ -1003,7 +1071,21 @@ void b2World::QueryAABB(b2QueryCallback* callback, const b2AABB& aabb) const
 	wrapper.broadPhase = &m_contactManager.m_broadPhase;
 	wrapper.callback = callback;
 	m_contactManager.m_broadPhase.Query(&wrapper, aabb);
-	m_particleSystem.QueryAABB(callback, aabb);
+	for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+	{
+		if (callback->ShouldQueryParticleSystem(p))
+		{
+			p->QueryAABB(callback, aabb);
+		}
+	}
+}
+
+void b2World::QueryShapeAABB(b2QueryCallback* callback, const b2Shape& shape,
+                             const b2Transform& xf) const
+{
+	b2AABB aabb;
+	shape.ComputeAABB(&aabb, xf, 0);
+	QueryAABB(callback, aabb);
 }
 
 struct b2WorldRayCastWrapper
@@ -1041,7 +1123,13 @@ void b2World::RayCast(b2RayCastCallback* callback, const b2Vec2& point1, const b
 	input.p1 = point1;
 	input.p2 = point2;
 	m_contactManager.m_broadPhase.RayCast(&wrapper, input);
-	m_particleSystem.RayCast(callback, point1, point2);
+	for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+	{
+		if (callback->ShouldQueryParticleSystem(p))
+		{
+			p->RayCast(callback, point1, point2);
+		}
+	}
 }
 
 void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color& color)
@@ -1153,16 +1241,16 @@ void b2World::DrawParticleSystem(const b2ParticleSystem& system)
 	int32 particleCount = system.GetParticleCount();
 	if (particleCount)
 	{
-		float32 particleRadius = system.GetParticleRadius();
-		const b2Vec2* positionBuffer = system.GetParticlePositionBuffer();
+		float32 radius = system.GetRadius();
+		const b2Vec2* positionBuffer = system.GetPositionBuffer();
 		if (system.m_colorBuffer.data)
 		{
-			const b2ParticleColor* colorBuffer = system.GetParticleColorBuffer();
-			m_debugDraw->DrawParticles(positionBuffer, particleRadius, colorBuffer, particleCount);
+			const b2ParticleColor* colorBuffer = system.GetColorBuffer();
+			m_debugDraw->DrawParticles(positionBuffer, radius, colorBuffer, particleCount);
 		}
 		else
 		{
-			m_debugDraw->DrawParticles(positionBuffer, particleRadius, NULL, particleCount);
+			m_debugDraw->DrawParticles(positionBuffer, radius, NULL, particleCount);
 		}
 	}
 }
@@ -1205,13 +1293,21 @@ void b2World::DrawDebugData()
 				}
 			}
 		}
-		DrawParticleSystem(m_particleSystem);
+	}
+
+	if (flags & b2Draw::e_particleBit)
+	{
+		for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+		{
+			DrawParticleSystem(*p);
+		}
 	}
 
 	if (flags & b2Draw::e_jointBit)
 	{
 		for (b2Joint* j = m_jointList; j; j = j->GetNext())
 		{
+
 			DrawJoint(j);
 		}
 	}
@@ -1372,223 +1468,4 @@ void b2World::Dump()
 	b2Log("b2Free(bodies);\n");
 	b2Log("joints = NULL;\n");
 	b2Log("bodies = NULL;\n");
-}
-
-int32 b2World::GetParticleMaxCount() const
-{
-	return m_particleSystem.GetParticleMaxCount();
-}
-
-void b2World::SetParticleMaxCount(int32 count)
-{
-	m_particleSystem.SetParticleMaxCount(count);
-}
-
-void b2World::SetParticleDensity(float32 density)
-{
-	m_particleSystem.SetParticleDensity(density);
-}
-
-float32 b2World::GetParticleDensity() const
-{
-	return m_particleSystem.GetParticleDensity();
-}
-
-void b2World::SetParticleGravityScale(float32 gravityScale)
-{
-	m_particleSystem.SetParticleGravityScale(gravityScale);
-}
-
-float32 b2World::GetParticleGravityScale() const
-{
-	return m_particleSystem.GetParticleGravityScale();
-}
-
-void b2World::SetParticleDamping(float32 damping)
-{
-	m_particleSystem.SetParticleDamping(damping);
-}
-
-float32 b2World::GetParticleDamping() const
-{
-	return m_particleSystem.GetParticleDamping();
-}
-
-void b2World::SetParticleRadius(float32 radius)
-{
-	m_particleSystem.SetParticleRadius(radius);
-}
-
-float32 b2World::GetParticleRadius() const
-{
-	return m_particleSystem.GetParticleRadius();
-}
-
-int32 b2World::CreateParticle(const b2ParticleDef& def)
-{
-	b2Assert(IsLocked() == false);
-	if (IsLocked())
-	{
-		return 0;
-	}
-	int32 p = m_particleSystem.CreateParticle(def);
-	return p;
-}
-
-void b2World::DestroyParticle(int32 index, bool callDestructionListener)
-{
-	m_particleSystem.DestroyParticle(index, callDestructionListener);
-}
-
-int32 b2World::DestroyParticlesInShape(
-	const b2Shape& shape, const b2Transform& xf, bool callDestructionListener)
-{
-	b2Assert(IsLocked() == false);
-	if (IsLocked())
-	{
-		return 0;
-	}
-	return m_particleSystem.DestroyParticlesInShape(shape, xf,
-													callDestructionListener);
-}
-
-b2ParticleGroup* b2World::CreateParticleGroup(const b2ParticleGroupDef& def)
-{
-	b2Assert(IsLocked() == false);
-	if (IsLocked())
-	{
-		return NULL;
-	}
-	b2ParticleGroup* g = m_particleSystem.CreateParticleGroup(def);
-	return g;
-}
-
-void b2World::JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB)
-{
-	b2Assert(IsLocked() == false);
-	if (IsLocked())
-	{
-		return;
-	}
-	m_particleSystem.JoinParticleGroups(groupA, groupB);
-}
-
-void b2World::DestroyParticlesInGroup(b2ParticleGroup* group, bool callDestructionListener)
-{
-	b2Assert(IsLocked() == false);
-	if (IsLocked())
-	{
-		return;
-	}
-	m_particleSystem.DestroyParticlesInGroup(group, callDestructionListener);
-}
-
-uint32* b2World::GetParticleFlagsBuffer()
-{
-	return m_particleSystem.GetParticleFlagsBuffer();
-}
-
-b2Vec2* b2World::GetParticlePositionBuffer()
-{
-	return m_particleSystem.GetParticlePositionBuffer();
-}
-
-b2Vec2* b2World::GetParticleVelocityBuffer()
-{
-	return m_particleSystem.GetParticleVelocityBuffer();
-}
-
-b2ParticleColor* b2World::GetParticleColorBuffer()
-{
-	return m_particleSystem.GetParticleColorBuffer();
-}
-
-void** b2World::GetParticleUserDataBuffer()
-{
-	return m_particleSystem.GetParticleUserDataBuffer();
-}
-
-const uint32* b2World::GetParticleFlagsBuffer() const
-{
-	return m_particleSystem.GetParticleFlagsBuffer();
-}
-
-const b2Vec2* b2World::GetParticlePositionBuffer() const
-{
-	return m_particleSystem.GetParticlePositionBuffer();
-}
-
-const b2Vec2* b2World::GetParticleVelocityBuffer() const
-{
-	return m_particleSystem.GetParticleVelocityBuffer();
-}
-
-const b2ParticleColor* b2World::GetParticleColorBuffer() const
-{
-	return m_particleSystem.GetParticleColorBuffer();
-}
-
-const b2ParticleGroup* const* b2World::GetParticleGroupBuffer() const
-{
-	return m_particleSystem.GetParticleGroupBuffer();
-}
-
-void* const* b2World::GetParticleUserDataBuffer() const
-{
-	return m_particleSystem.GetParticleUserDataBuffer();
-}
-
-void b2World::SetParticleFlagsBuffer(uint32* buffer, int32 capacity)
-{
-	m_particleSystem.SetParticleFlagsBuffer(buffer, capacity);
-}
-
-void b2World::SetParticlePositionBuffer(b2Vec2* buffer, int32 capacity)
-{
-	m_particleSystem.SetParticlePositionBuffer(buffer, capacity);
-}
-
-void b2World::SetParticleVelocityBuffer(b2Vec2* buffer, int32 capacity)
-{
-	m_particleSystem.SetParticleVelocityBuffer(buffer, capacity);
-}
-
-void b2World::SetParticleColorBuffer(b2ParticleColor* buffer, int32 capacity)
-{
-	m_particleSystem.SetParticleColorBuffer(buffer, capacity);
-}
-
-b2ParticleGroup* const* b2World::GetParticleGroupBuffer()
-{
-	return m_particleSystem.GetParticleGroupBuffer();
-}
-
-void b2World::SetParticleUserDataBuffer(void** buffer, int32 capacity)
-{
-	m_particleSystem.SetParticleUserDataBuffer(buffer, capacity);
-}
-
-const b2ParticleContact* b2World::GetParticleContacts()
-{
-	return m_particleSystem.m_contactBuffer;
-}
-
-int32 b2World::GetParticleContactCount()
-{
-	return m_particleSystem.m_contactCount;
-}
-
-const b2ParticleBodyContact* b2World::GetParticleBodyContacts()
-{
-	return m_particleSystem.m_bodyContactBuffer;
-}
-
-int32 b2World::GetParticleBodyContactCount()
-{
-	return m_particleSystem.m_bodyContactCount;
-}
-
-float32 b2World::ComputeParticleCollisionEnergy() const
-{
-	return m_particleSystem.ComputeParticleCollisionEnergy();
 }

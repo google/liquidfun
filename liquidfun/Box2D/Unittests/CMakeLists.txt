@@ -48,6 +48,10 @@ if(NOT MSVC)
 endif()
 set(COMMON_LIBS "gtest;Box2D;${CMAKE_THREAD_LIBS_INIT}")
 
+# This define allows for test-specific code. For example, you can use it with
+# the FRIEND_TEST macro to expose private member functions for testing.
+add_definitions(-DLIQUIDFUN_UNIT_TESTS)
+
 # PUT ADDITIONAL UNIT TEST BINARIES BELOW!
 # The commands should be of the form:
 #
@@ -63,8 +67,16 @@ function(test_executable name)
                             ${name}/${name}Tests.cpp ${SUPPORT_SRCS})
 endfunction()
 
+test_executable(BlockAllocator)
+test_executable(BodyContacts)
 test_executable(Callback)
+test_executable(Color)
+test_executable(Common)
 test_executable(Confinement)
 test_executable(Conservation)
+test_executable(FreeList)
 test_executable(Function)
 test_executable(HelloWorld)
+test_executable(IntrusiveList)
+test_executable(SlabAllocator)
+test_executable(TrackedBlock)

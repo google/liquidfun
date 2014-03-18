@@ -103,7 +103,7 @@ When everything looks good, run the following command from
 ${temp_dir} to push the current branch to
 ${upstream_master}:
 
-git push upstream_docs HEAD:${upstream_master/*|/}
+git push upstream_docs HEAD:${upstream_docs/*|/}
 " >&2
 }
 

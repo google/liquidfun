@@ -816,7 +816,7 @@ void     GLUI_TextBox::draw_insertion_pt( void )
                                           between the text and the box       **/
   
   curr_x += substring_width(sol,insertion_pt-1);
-  if ((insertion_pt == text.length() && text[text.length()-1] == '\n')
+  if ((insertion_pt == (int)text.length() && text[text.length()-1] == '\n')
       || curr_x-this->x_abs > (w - 2 - GLUI_TEXTBOX_BOXINNERMARGINX)) { // Insert on the next line 
     curr_x = this->x_abs + GLUI_TEXTBOX_BOXINNERMARGINX;
     line++;

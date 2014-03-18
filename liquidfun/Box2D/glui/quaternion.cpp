@@ -112,7 +112,7 @@ quat operator - (const quat &a )
 
 quat operator * ( const quat &a, const quat &b)
 {
-    return quat( a.s*b.s - a.v*b.v, a.s*b.v + b.s*a.v + a.v^b.v );
+    return quat( a.s*b.s - a.v*b.v, (a.s*b.v + b.s*a.v + a.v)^b.v );
 }
 
 quat operator * ( const quat &a, const float t)

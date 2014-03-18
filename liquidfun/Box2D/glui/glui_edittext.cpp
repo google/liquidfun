@@ -1176,7 +1176,7 @@ void   GLUI_EditText::dump( FILE *out, const char *name )
 {
   fprintf( out, 
            "%s (edittext@%p):  ins_pt:%d  subs:%d/%d  sel:%d/%d   len:%d\n",
-           name, this, 
+           name, (void*)this,
            insertion_pt,
            substring_start,
            substring_end,

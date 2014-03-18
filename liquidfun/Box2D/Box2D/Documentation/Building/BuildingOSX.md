@@ -1,15 +1,25 @@
 # Building for OS X
 
-LiquidFun releases contain a [Xcode][] project to build the library and
+LiquidFun releases contain an [Xcode][] project to build the library and
 samples on [OS X][].  The [Xcode][] project has been generated using
-[cmake][], and is modified to remove any host-specific dependencies.
+[cmake][], and is free of any host-specific dependencies.
+
+### Version Requirements
+
+Following are the minimum required versions for the tools and libraries you
+need for building LiquidFun for OS X:
+
+-   OS X: Mavericks 10.9.1.
+-   Xcode: 5.0.1
+-   Xquartz: 2.7.5 (xorg-server 1.14.4)
+-   cmake (when building from source) 2.8.12.1
 
 ### Before Building
 
 -   Install [Xquartz][] to run LiquidFun sample applications.
-    [Xquartz][] is required by [freeglut][]
--   Reboot your machine.  This sets the `DISPLAY` environment variable for
-    [Xquartz][] which enables sample applications to run correctly.
+    [freeglut][] requires [Xquartz][].
+-   Reboot your machine.  Rebooting sets the `DISPLAY` environment variable for
+    [Xquartz][], which enables sample applications to run correctly.
 
 ### Building with [Xcode][]
 
@@ -19,7 +29,7 @@ samples on [OS X][].  The [Xcode][] project has been generated using
 
 ### Executing a Sample
 
--   Select a sample `Scheme`, for example "Testbed-->My Mac 64-bit" from the
+-   Select a sample `Scheme`, for example "Testbed-->My Mac 64-bit", from the
     combo box to the right of the "Run" button.
 -   Click the "Run" button.
 
@@ -31,11 +41,11 @@ build this project on [OS X][] 10.9 (Mavericks).  For example, the following
 generates the Xcode project in the liquidfun/Box2D directory.
 
     cd liquidfun/Box2D
-    cmake -G"Xcode"
+    cmake -G "Xcode"
 
 ### Running Unit Tests
 
-Developers modifying the LiquidFun library can verify that it still working
+Developers modifying the LiquidFun library can verify that it is still working
 correctly by executing the provided unit tests.
 
 Use the run\_tests.sh script to execute unit tests:

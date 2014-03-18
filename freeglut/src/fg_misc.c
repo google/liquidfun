@@ -62,7 +62,7 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
    */
   freeglut_return_val_if_fail( extensions != NULL, 0 );
 
-  while (1) {
+  for ( ; ; ) {
      const char *p = strstr(extensions, extension);
      if (!p)
         return 0;  /* not found */
@@ -72,8 +72,6 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
      /* skip the false match and continue */
      extensions = p + len;
   }
-
-  return 0 ;
 }
 
 #ifndef GL_INVALID_FRAMEBUFFER_OPERATION
@@ -179,6 +177,10 @@ void FGAPIENTRY glutSetColor( int nColor, GLfloat red, GLfloat green, GLfloat bl
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetColor" );
     /* We really need to do something here. */
+    (void)nColor;
+    (void)red;
+    (void)green;
+    (void)blue;
 }
 
 /*
@@ -188,6 +190,8 @@ GLfloat FGAPIENTRY glutGetColor( int color, int component )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetColor" );
     /* We really need to do something here. */
+    (void)color;
+    (void)component;
     return( 0.0f );
 }
 
@@ -198,6 +202,7 @@ void FGAPIENTRY glutCopyColormap( int window )
 {
     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCopyColormap" );
     /* We really need to do something here. */
+    (void)window;
 }
 
 /*** END OF FILE ***/

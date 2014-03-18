@@ -24,6 +24,7 @@ public:
 
 	WaveMachine()
 	{
+
 		b2Body* ground = NULL;
 		{
 			b2BodyDef bd;
@@ -34,23 +35,23 @@ public:
 			b2BodyDef bd;
 			bd.type = b2_dynamicBody;
 			bd.allowSleep = false;
-			bd.position.Set(0.0f, 10.0f);
+			bd.position.Set(0.0f, 1.0f);
 			b2Body* body = m_world->CreateBody(&bd);
 
 			b2PolygonShape shape;
-			shape.SetAsBox(0.5f, 10.0f, b2Vec2( 20.0f, 0.0f), 0.0);
+			shape.SetAsBox(0.05f, 1.0f, b2Vec2( 2.0f, 0.0f), 0.0);
 			body->CreateFixture(&shape, 5.0f);
-			shape.SetAsBox(0.5f, 10.0f, b2Vec2(-20.0f, 0.0f), 0.0);
+			shape.SetAsBox(0.05f, 1.0f, b2Vec2(-2.0f, 0.0f), 0.0);
 			body->CreateFixture(&shape, 5.0f);
-			shape.SetAsBox(20.0f, 0.5f, b2Vec2(0.0f, 10.0f), 0.0);
+			shape.SetAsBox(2.0f, 0.05f, b2Vec2(0.0f, 1.0f), 0.0);
 			body->CreateFixture(&shape, 5.0f);
-			shape.SetAsBox(20.0f, 0.5f, b2Vec2(0.0f, -10.0f), 0.0);
+			shape.SetAsBox(2.0f, 0.05f, b2Vec2(0.0f, -1.0f), 0.0);
 			body->CreateFixture(&shape, 5.0f);
 
 			b2RevoluteJointDef jd;
 			jd.bodyA = ground;
 			jd.bodyB = body;
-			jd.localAnchorA.Set(0.0f, 10.0f);
+			jd.localAnchorA.Set(0.0f, 1.0f);
 			jd.localAnchorB.Set(0.0f, 0.0f);
 			jd.referenceAngle = 0.0f;
 			jd.motorSpeed = 0.05f * b2_pi;
@@ -59,22 +60,23 @@ public:
 			m_joint = (b2RevoluteJoint*)m_world->CreateJoint(&jd);
 		}
 
-		m_world->SetParticleRadius(0.15f);
-		if (TestParticleType() == b2_waterParticle)
-		{
-			m_world->SetParticleDamping(0.2f);
-		}
+		m_particleSystem->SetRadius(0.025f);
+		const uint32 particleType = TestMain::GetParticleParameterValue();
+		m_particleSystem->SetDamping(0.2f);
 
 		{
 			b2ParticleGroupDef pd;
-			pd.flags = TestParticleType();
+			pd.flags = particleType;
 
 			b2PolygonShape shape;
-			shape.SetAsBox(9.0f, 9.0f, b2Vec2(0.0f, 10.0f), 0.0);
+			shape.SetAsBox(0.9f, 0.9f, b2Vec2(0.0f, 1.0f), 0.0);
 
 			pd.shape = &shape;
-			m_world->CreateParticleGroup(pd);
-
+			b2ParticleGroup * const group = m_particleSystem->CreateParticleGroup(pd);
+			if (pd.flags & b2_colorMixingParticle)
+			{
+				ColorParticleGroup(group, 0);
+			}
 		}
 
 		m_time = 0;
@@ -88,6 +90,11 @@ public:
 			m_time += 1 / settings->hz;
 		}
 		m_joint->SetMotorSpeed(0.05f * cosf(m_time) * b2_pi);
+	}
+
+	float32 GetDefaultViewZoom() const
+	{
+		return 0.1f;
 	}
 
 	static Test* Create()

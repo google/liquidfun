@@ -656,13 +656,17 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
     case VK_DELETE:
         /* The delete key should be treated as an ASCII keypress: */
         if (keydown)
+        {
             INVOKE_WCB( *window, Keyboard,
                         ( 127, window->State.MouseX, window->State.MouseY )
             );
+        }
         else
+        {
             INVOKE_WCB( *window, KeyboardUp,
                         ( 127, window->State.MouseX, window->State.MouseY )
             );
+        }
         break;
 
 #if !defined(_WIN32_WCE)
@@ -710,15 +714,19 @@ static LRESULT fghWindowProcKeyPress(SFG_Window *window, UINT uMsg, GLboolean ke
     
     if( keypress != -1 )
         if (keydown)
+        {
             INVOKE_WCB( *window, Special,
                         ( keypress,
                             window->State.MouseX, window->State.MouseY )
             );
+        }
         else
+        {
             INVOKE_WCB( *window, SpecialUp,
                         ( keypress,
                             window->State.MouseX, window->State.MouseY )
             );
+        }
 
     fgState.Modifiers = INVALID_MODIFIERS;
 
@@ -744,7 +752,9 @@ SFG_Window* fghWindowUnderCursor(SFG_Window *window)
 
         /* Get mouse position at time of message */
         DWORD mouse_pos_dw = GetMessagePos();
-        POINT mouse_pos = {GET_X_LPARAM(mouse_pos_dw), GET_Y_LPARAM(mouse_pos_dw)};
+        POINT mouse_pos;
+        mouse_pos.x = GET_X_LPARAM(mouse_pos_dw);
+        mouse_pos.y = GET_Y_LPARAM(mouse_pos_dw);
         ScreenToClient( window->Window.Handle, &mouse_pos );
         
         hwnd = ChildWindowFromPoint(window->Window.Handle, mouse_pos);
@@ -939,7 +949,9 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                     /* For child window, we should return relative to upper-left
                      * of parent's client area.
                      */
-                    POINT topleft = {windowRect.left,windowRect.top};
+                    POINT topleft;
+                    topleft.x = windowRect.left;
+                    topleft.y = windowRect.top;
 
                     ScreenToClient(window->Parent->Window.Handle,&topleft);
                     windowRect.left = topleft.x;
@@ -988,9 +1000,13 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
     case WM_NCRBUTTONDOWN:
         {
             SFG_Menu *menu;
-            if (fgState.ActiveMenus && (menu = fgGetActiveMenu()))
-                /* user clicked non-client area of window while a menu is open. Close menu */
-                fgDeactivateMenu(menu->ParentWindow);
+            if (fgState.ActiveMenus)
+            {
+                menu = fgGetActiveMenu();
+                if (menu)
+                  /* user clicked non-client area of window while a menu is open. Close menu */
+                  fgDeactivateMenu(menu->ParentWindow);
+            }
 
             /* and always pass to DefWindowProc */
             lRet = DefWindowProc( hWnd, uMsg, wParam, lParam );
@@ -1136,11 +1152,15 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
         if( ( wParam & MK_LBUTTON ) ||
             ( wParam & MK_MBUTTON ) ||
             ( wParam & MK_RBUTTON ) )
+        {
             INVOKE_WCB( *window, Motion, ( window->State.MouseX,
                                            window->State.MouseY ) );
+        }
         else
+        {
             INVOKE_WCB( *window, Passive, ( window->State.MouseX,
                                             window->State.MouseY ) );
+        }
 
         fgState.Modifiers = INVALID_MODIFIERS;
     }
@@ -1299,6 +1319,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             while( abs ( fgState.MouseWheelTicks ) >= WHEEL_DELTA )
 			{
                 if( FETCH_WCB( *window, MouseWheel ) )
+                {
                     INVOKE_WCB( *window, MouseWheel,
                                 ( wheel_number,
                                   direction,
@@ -1306,6 +1327,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                                   window->State.MouseY
                                 )
                     );
+                }
                 else  /* No mouse wheel, call the mouse button callback twice */
 				{
                     /*

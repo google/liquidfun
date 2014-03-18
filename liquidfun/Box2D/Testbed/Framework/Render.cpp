@@ -26,10 +26,8 @@
 #include <android/log.h>
 #endif // __ANDROID__
 
-#include <cstdio>
-#include <cstdarg>
-#include <cstring>
-using namespace std;
+#include <stdio.h>
+#include <stdarg.h>
 
 float currentscale = 1;	// amount of pixels that corresponds to one world unit, needed to use glPointSize correctly
 
@@ -369,12 +367,4 @@ float ComputeFPS()
 	}
 
 	return dsmooth;
-}
-
-void DebugDraw::DrawArrow(const b2Color& color)
-{
-    b2Vec2 square[4] = { b2Vec2(1, 1), b2Vec2(1, -1), b2Vec2(-1, -1), b2Vec2(-1, 1) };
-    DrawFlatPolygon(square, 4, color);
-    b2Vec2 tri[3] = { b2Vec2(1, 1.75f), b2Vec2(2.5f, 0), b2Vec2(1, -1.75f) };
-    DrawFlatPolygon(tri, 3, color);
 }

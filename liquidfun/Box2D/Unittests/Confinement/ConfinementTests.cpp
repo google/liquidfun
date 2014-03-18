@@ -18,10 +18,11 @@
 #include "gtest/gtest.h"
 #include "Box2D/Box2D.h"
 #include <stdio.h>
+#include <complex>
 #include "BodyTracker.h"
 #include "AndroidUtil/AndroidMainWrapper.h"
 #define EPSILON 0.001f
-#define DELTA_T 0.01f
+#define DELTA_T 1.0f
 #define NUMBER_OF_STEPS 210
 #define WIDTH 10.0f
 #define HEIGHT 10.0f
@@ -34,6 +35,8 @@ class ConfinementTests : public ::testing::Test {
 
 	b2World *m_world;
 	b2Body *m_groundBody;
+	b2ParticleSystem *m_particleSystem;
+	b2ParticleGroup *m_particleGroup;
 };
 
 void
@@ -46,16 +49,19 @@ ConfinementTests::SetUp()
 	m_world = new b2World(gravity);
 
 	// Create the ground body
-	b2BodyDef groundBodyDef;
+	const b2BodyDef groundBodyDef;
 	m_groundBody = m_world->CreateBody(&groundBodyDef);
+
+	// Create the particle system
+	const b2ParticleSystemDef particleSystemDef;
+	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 
 	// Create particles
 	b2ParticleGroupDef particleDef;
 	b2PolygonShape particleShape;
 	particleShape.SetAsBox(WIDTH, HEIGHT);
 	particleDef.shape = &particleShape;
-	m_world->CreateParticleGroup(particleDef);
-
+	m_particleGroup = m_particleSystem->CreateParticleGroup(particleDef);
 }
 
 void
@@ -70,11 +76,12 @@ ConfinementTests::TestLeakCount()
 	for (int32 t = 0; t < NUMBER_OF_STEPS; t++) {
 		m_world->Step(DELTA_T, 1, 1);
 	}
-	int32 particleCount = m_world->GetParticleCount();
-	const b2Vec2 *positionBuffer = m_world->GetParticlePositionBuffer();
+	int32 bufferIndex = m_particleGroup->GetBufferIndex();
+	int32 particleCount = m_particleGroup->GetParticleCount();
+	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
 	int32 leakCount = 0;
 	for (int32 i = 0; i < particleCount; i++) {
-		b2Vec2 p = positionBuffer[i];
+		b2Vec2 p = positionBuffer[bufferIndex + i];
 		if (std::abs(p.x) > WIDTH || std::abs(p.y) > HEIGHT) {
 			leakCount++;
 		}
@@ -83,7 +90,7 @@ ConfinementTests::TestLeakCount()
 }
 
 TEST_F(ConfinementTests, NoShapes) {
-	ASSERT_EQ(TestLeakCount(), m_world->GetParticleCount());
+	ASSERT_EQ(TestLeakCount(), m_particleSystem->GetParticleCount());
 }
 
 TEST_F(ConfinementTests, PolygonShapes) {
@@ -143,6 +150,36 @@ TEST_F(ConfinementTests, ChainShape) {
 		b2Vec2(-WIDTH, HEIGHT)};
 	shape.CreateLoop(vertices, 4);
 	m_groundBody->CreateFixture(&shape, 0.0f);
+	ASSERT_EQ(TestLeakCount(), 0);
+}
+
+TEST_F(ConfinementTests, WallParticle) {
+	b2ParticleGroupDef particleDef;
+	particleDef.flags = b2_wallParticle;
+	b2ChainShape shape;
+	const b2Vec2 vertices[4] = {
+		b2Vec2(-WIDTH, -HEIGHT),
+		b2Vec2(WIDTH, -HEIGHT),
+		b2Vec2(WIDTH, HEIGHT),
+		b2Vec2(-WIDTH, HEIGHT)};
+	shape.CreateLoop(vertices, 4);
+	particleDef.shape = &shape;
+	m_particleSystem->CreateParticleGroup(particleDef);
+	ASSERT_EQ(TestLeakCount(), m_particleGroup->GetParticleCount());
+}
+
+TEST_F(ConfinementTests, BarrierWallParticle) {
+	b2ParticleGroupDef particleDef;
+	particleDef.flags = b2_barrierParticle | b2_wallParticle;
+	b2ChainShape shape;
+	const b2Vec2 vertices[4] = {
+		b2Vec2(-WIDTH, -HEIGHT),
+		b2Vec2(WIDTH, -HEIGHT),
+		b2Vec2(WIDTH, HEIGHT),
+		b2Vec2(-WIDTH, HEIGHT)};
+	shape.CreateLoop(vertices, 4);
+	particleDef.shape = &shape;
+	m_particleSystem->CreateParticleGroup(particleDef);
 	ASSERT_EQ(TestLeakCount(), 0);
 }
 

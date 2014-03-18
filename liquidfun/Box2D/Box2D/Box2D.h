@@ -29,6 +29,7 @@
 
 #include <Box2D/Common/b2Settings.h>
 #include <Box2D/Common/b2Draw.h>
+#include <Box2D/Common/b2Stat.h>
 #include <Box2D/Common/b2Timer.h>
 
 #include <Box2D/Collision/Shapes/b2CircleShape.h>

@@ -18,28 +18,43 @@
 #include <Box2D/Particle/b2Particle.h>
 #include <Box2D/Common/b2Draw.h>
 
+#define B2PARTICLECOLOR_BITS_PER_COMPONENT (sizeof(uint8) << 3)
+// Maximum value of a b2ParticleColor component.
+#define B2PARTICLECOLOR_MAX_VALUE \
+	((1U << B2PARTICLECOLOR_BITS_PER_COMPONENT) - 1)
+
+/// Number of bits used to store each b2ParticleColor component.
+const uint8 b2ParticleColor::k_bitsPerComponent =
+	B2PARTICLECOLOR_BITS_PER_COMPONENT;
+const float32 b2ParticleColor::k_maxValue = (float)B2PARTICLECOLOR_MAX_VALUE;
+const float32 b2ParticleColor::k_inverseMaxValue =
+	1.0f / (float)B2PARTICLECOLOR_MAX_VALUE;
+
 b2ParticleColor b2ParticleColor_zero(0, 0, 0, 0);
 
 b2ParticleColor::b2ParticleColor(const b2Color& color)
 {
-	r = (int8) (255 * color.r);
-	g = (int8) (255 * color.g);
-	b = (int8) (255 * color.b);
-	a = (int8) 255;
+	Set(color);
 }
 
 b2Color b2ParticleColor::GetColor() const
 {
-	return b2Color(
-		(float32) 1 / 255 * r,
-		(float32) 1 / 255 * g,
-		(float32) 1 / 255 * b);
+	return b2Color(k_inverseMaxValue * r,
+				   k_inverseMaxValue * g,
+				   k_inverseMaxValue * b);
 }
 
 void b2ParticleColor::Set(const b2Color& color)
 {
-	r = (int8) (255 * color.r);
-	g = (int8) (255 * color.g);
-	b = (int8) (255 * color.b);
-	a = (int8) 255;
+	Set((uint8)(k_maxValue * color.r),
+		(uint8)(k_maxValue * color.g),
+		(uint8)(k_maxValue * color.b),
+		B2PARTICLECOLOR_MAX_VALUE);
+}
+
+int32 b2CalculateParticleIterations(
+	float32 gravity, float32 radius, float32 timeStep)
+{
+	float32 threshold = 0.01f;
+	return (int32) ceilf(b2Sqrt(gravity / (threshold * radius)) * timeStep);
 }

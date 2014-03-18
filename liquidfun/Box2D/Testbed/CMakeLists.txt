@@ -1,13 +1,21 @@
 # Some flags for Freeglut and GLUI.
-add_definitions( -DFREEGLUT_EXPORTS -DFREEGLUT_STATIC -D_CRT_SECURE_NO_WARNINGS )
+add_definitions( -DFREEGLUT_EXPORTS -DFREEGLUT_STATIC
+                 -DGLUT_DISABLE_ATEXIT_HACK -D_CRT_SECURE_NO_WARNINGS )
 
 # Define the framework files.
 set(Testbed_Framework_SRCS
 	Framework/Main.cpp
+	Framework/Main.h
 	Framework/Render.cpp
 	Framework/Render.h
 	Framework/Test.cpp
 	Framework/Test.h
+	Framework/Arrow.cpp
+	Framework/Arrow.h
+	Framework/FullscreenUI.cpp
+	Framework/FullscreenUI.h
+	Framework/ParticleParameter.cpp
+	Framework/ParticleParameter.h
 )
 
 #define the test files.
@@ -64,15 +72,27 @@ set(Testbed_Tests_SRCS
 	Tests/VerticalStack.h
 	Tests/Web.h
 
-	Tests/Particles.h
-	Tests/DrawingParticles.h
-	Tests/RigidParticles.h
-	Tests/ElasticParticles.h
-	Tests/ParticlesSurfaceTension.h
-	Tests/WaveMachine.h
+	Tests/AntiPointy.h
+	Tests/CornerCase.h
 	Tests/DamBreak.h
-	Tests/Soup.h
+	Tests/DrawingParticles.h
+	Tests/ElasticParticles.h
+	Tests/Faucet.h
+	Tests/Fracker.h
+	Tests/Impulse.h
 	Tests/LiquidTimer.h
+	Tests/Maxwell.h
+	Tests/MultipleParticleSystems.h
+	Tests/Particles.h
+	Tests/ParticlesSurfaceTension.h
+	Tests/Pointy.h
+	Tests/Ramp.h
+	Tests/RigidParticles.h
+	Tests/Sandbox.h
+	Tests/Soup.h
+	Tests/SoupStirrer.h
+	Tests/Sparky.h
+	Tests/WaveMachine.h
 )
 
 # These are used to create visual studio folders.
@@ -106,4 +126,4 @@ target_link_libraries (
 	glui
 	${ADDITIONAL_LIBRARIES}
 	${OPENGL_LIBRARIES}
-) 
+)
