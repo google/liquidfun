@@ -53,7 +53,16 @@ $(document).ready(function(){initNavTree('md__building_android.html','');});
 <div class="title">Building for Android </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h3>Before Building</h3>
+<div class="textblock"><h3>Version Requirements</h3>
+<p>Following are the minimum required versions for the tools and libraries you need for building LiquidFun for Android:</p>
+<ul>
+<li>Android SDK: Android 2.3.3 (API Level 10)</li>
+<li>ADT: 20130917</li>
+<li>NDK: android-ndk-r9</li>
+<li>NDK plugn for Eclipse: bundled with ADT</li>
+<li>cmake (when building from source): 2.8.12.1</li>
+</ul>
+<h3>Before Building</h3>
 <ul>
 <li>Install the <a href="http://developer.android.com/sdk/index.html">Android SDK</a>.</li>
 <li>Install the <a href="http://developer.android.com/tools/sdk/ndk/index.html">Android NDK</a>.</li>
@@ -63,7 +72,7 @@ $(document).ready(function(){initNavTree('md__building_android.html','');});
 <p>The following <a href="http://developer.android.com/tools/sdk/ndk/index.html">Android NDK</a> projects live in the liquidfun directory tree.</p>
 <ul>
 <li><code>liquidfun/Box2D</code> - liquidfun dynamic and static libraries.</li>
-<li><code>liquidfun/Box2D/HelloWorld</code> - Non-interactive Helloworld sample application.</li>
+<li><code>liquidfun/Box2D/HelloWorld</code> - Non-interactive Hello World sample application.</li>
 <li><code>liquidfun/Box2D/Testbed</code> - Interactive Testbed sample application.</li>
 </ul>
 <p>To build an <a href="http://developer.android.com/tools/sdk/ndk/index.html">Android NDK</a> project:</p>
@@ -72,7 +81,7 @@ $(document).ready(function(){initNavTree('md__building_android.html','');});
 <li>Go to the working directory containing the project to build.</li>
 <li>Execute ndk-build.</li>
 </ul>
-<p>For example, to build the liquidfun dynamic and static libraries: </p>
+<p>For example, to build the LiquidFun dynamic and static libraries: </p>
 <pre class="fragment">cd liquidfun/Box2D
 ndk-build
 </pre><h3>Executing a Sample</h3>
@@ -82,31 +91,31 @@ ndk-build
 <li>Build a project using <code>ndk-build</code> (see above).</li>
 <li>Open <a href="http://developer.android.com/tools/sdk/eclipse-adt.html">ADT</a> Eclipse.</li>
 <li>Select "File-&gt;Import..." from the menu.</li>
-<li>Select "Android &gt; Existing Android Code Into Workspace", click "Next".</li>
+<li>Select "Android &gt; Existing Android Code Into Workspace", and click "Next".</li>
 <li>Click the "Browse..." button next to <code>Root Directory:</code> and select the project folder (e.g. <code>liquidfun/Box2D/Testbed</code>).</li>
-<li>Click "Finish" and the project should be imported into Eclipse and visible in the Package Explorer pane.</li>
-<li>Right-click the project in the Package Explorer pane and select "Run-&gt;Run As-&gt;Android Application" from the menu.</li>
+<li>Click "Finish". Eclipse imports the project, and displays it in the Package Explorer pane.</li>
+<li>Right-click the project, and select "Run-&gt;Run As-&gt;Android Application" from the menu.</li>
 <li>If you do not have a physical device, you must define a virtual one. For details about how to define a virtual device, see <a href="http://developer.android.com/tools/devices/managing-avds.html">managing avds</a>. We don’t recommend a virtual device for development.</li>
 <li>If the target is a physical device, unlock the device and observe the application executing.</li>
 </ul>
 <h4>Build and Run from the Command Line:</h4>
-<p>It's also possible to build, deploy and execute an application using <code>build_apk.sh</code>. <code>build_apk.sh</code> requires the installation of the <a href="http://developer.android.com/tools/sdk/ndk/index.html">Android NDK</a> and <a href="http://developer.android.com/sdk/index.html">Android SDK</a> along with the Android SDK's prerequisites. On Windows the script requires a <a href="http://www.cygwin.com/">Cygwin installation</a> as it makes use of bash and common unix utilities. In addition, <code>build_apk.sh</code> requires the addition of the <a href="http://developer.android.com/sdk/index.html">Android SDK</a> <code>sdk/tools</code>, <a href="http://developer.android.com/sdk/index.html">Android SDK</a> <code>sdk/platform-tools</code> and <a href="http://developer.android.com/tools/sdk/ndk/index.html">Android NDK</a> root directories to the <code>PATH</code> environment variable.</p>
-<p>Building and running an application using <code>build_apk.sh</code>:</p>
+<p>It's also possible to use <code>build_apk.sh</code> to build, deploy, and execute an application. <code>build_apk.sh</code> requires the installation of the <a href="http://developer.android.com/tools/sdk/ndk/index.html">Android NDK</a> and <a href="http://developer.android.com/sdk/index.html">Android SDK</a>. On Windows the script requires that you install [Cygwin][], as it makes use of Bash and common UNIX utilities. In addition, <code>build_apk.sh</code> requires the addition of the <a href="http://developer.android.com/sdk/index.html">Android SDK</a> <code>sdk/tools</code>, <a href="http://developer.android.com/sdk/index.html">Android SDK</a> <code>sdk/platform-tools</code> and <a href="http://developer.android.com/tools/sdk/ndk/index.html">Android NDK</a> root directories to the <code>PATH</code> environment variable.</p>
+<p>To build and run an application using <code>build_apk.sh</code>:</p>
 <ul>
 <li>Change into the directory containing the project to build.</li>
 <li>Run build_apk.sh.</li>
 </ul>
-<p>For example, the following will build the Testbed application, deploy it to the connected device and start it: </p>
+<p>For example, the following will build the Testbed application, deploy it to the connected device, and start it: </p>
 <pre class="fragment">cd liquidfun/Box2D/Testbed
 ../AndroidUtil/build_apk.sh
 </pre><h3>Code Generation</h3>
-<p>By default code is generated for devices that support the <code>armeabi-v7a</code> ABI. To generate code for all ABIs to include in a fat <code>.apk</code> override APP_ABI on ndk-build's command line: </p>
+<p>By default, code is generated for devices that support the <code>armeabi-v7a</code> ABI. Alternatively, you can generate a fat <code>.apk</code> that includes code for all ABIs. To do so, override APP_ABI on ndk-build's command line: </p>
 <pre class="fragment">ndk-build APP_ABI=all
 </pre><h3>Running Unit Tests</h3>
-<p>Developers modifying the LiquidFun library can verify that it still working correctly by executing the provided unit tests.</p>
+<p>Developers modifying the LiquidFun library can verify that it is still working correctly by executing the provided unit tests.</p>
 <p>Use the run_tests_android.sh script to execute unit tests: </p>
 <pre class="fragment">./liquidfun/Box2D/Unittests/run_tests_android.sh
-</pre><p><code>run_tests_android.sh</code> will build, deploy and execute each unit test on the connected device using <code>build_apk.sh</code>. <code>run_tests_android.sh</code> makes use of <code>build_apk.sh</code> which has setup requirements as described in the "Build and Run from the Command Line" section above. </p>
+</pre><p><code>run_tests_android.sh</code> uses <code>build_apk.sh</code> to build, deploy, and execute each unit test on the connected device. The "Build and Run from the Command Line" section above describes the setup requirements for <code>build_apk.sh</code>. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->

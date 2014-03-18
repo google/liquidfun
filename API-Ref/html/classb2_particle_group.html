@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,7 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>A group of particles. These are created via <a class="el" href="classb2_world.html#a287385e587d831aca401d6ef89d3c9a4">b2World::CreateParticleGroup</a>.  
+<p>A group of particles. b2ParticleGroup::CreateParticleGroup creates these.  
  <a href="classb2_particle_group.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="b2_particle_group_8h_source.html">b2ParticleGroup.h</a>&gt;</code></p>
@@ -104,6 +104,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a19fb89ace82e21f25c48b60e62ceb6a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a19fb89ace82e21f25c48b60e62ceb6a3"></a>
 const <a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetNext</b> () const </td></tr>
 <tr class="separator:a19fb89ace82e21f25c48b60e62ceb6a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a726a64987dee61753ea84c16e5cfcbba"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a726a64987dee61753ea84c16e5cfcbba"></a>
+<a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">GetParticleSystem</a> ()</td></tr>
+<tr class="memdesc:a726a64987dee61753ea84c16e5cfcbba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the particle system that holds this particle group. <br/></td></tr>
+<tr class="separator:a726a64987dee61753ea84c16e5cfcbba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacc4e141635b67b6fb72c02e38bb2296"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aacc4e141635b67b6fb72c02e38bb2296"></a>
+const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleSystem</b> () const </td></tr>
+<tr class="separator:aacc4e141635b67b6fb72c02e38bb2296"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cd67ba68b3ced16cf4a6d1ffd9ef260"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0cd67ba68b3ced16cf4a6d1ffd9ef260"></a>
 int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#a0cd67ba68b3ced16cf4a6d1ffd9ef260">GetParticleCount</a> () const </td></tr>
 <tr class="memdesc:a0cd67ba68b3ced16cf4a6d1ffd9ef260"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of particles. <br/></td></tr>
@@ -112,6 +119,10 @@ int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#ad88e1201a5ddf430f5b07a621fc26a9f">GetBufferIndex</a> () const </td></tr>
 <tr class="memdesc:ad88e1201a5ddf430f5b07a621fc26a9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the offset of this group in the global particle buffer. <br/></td></tr>
 <tr class="separator:ad88e1201a5ddf430f5b07a621fc26a9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb5d4e5e2a1814bdff36c97221be8337"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb5d4e5e2a1814bdff36c97221be8337"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337">ContainsParticle</a> (int32 index) const </td></tr>
+<tr class="memdesc:abb5d4e5e2a1814bdff36c97221be8337"><td class="mdescLeft">&#160;</td><td class="mdescRight">Does this group contain the particle. <br/></td></tr>
+<tr class="separator:abb5d4e5e2a1814bdff36c97221be8337"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bdc4a7d34ef7f8de12a009b41c96a55"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4bdc4a7d34ef7f8de12a009b41c96a55"></a>
 int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#a4bdc4a7d34ef7f8de12a009b41c96a55">GetGroupFlags</a> () const </td></tr>
 <tr class="memdesc:a4bdc4a7d34ef7f8de12a009b41c96a55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the construction flags for the group. <br/></td></tr>
@@ -154,6 +165,16 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">SetUserData</a> (void *data)</td></tr>
 <tr class="memdesc:ae7f00d2018617994666bcdf9efb82b0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the user data. Use this to store your application specific data. <br/></td></tr>
 <tr class="separator:ae7f00d2018617994666bcdf9efb82b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f008489140d65a0a311629aa9ea808e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f008489140d65a0a311629aa9ea808e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#a5f008489140d65a0a311629aa9ea808e">ApplyForce</a> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;force)</td></tr>
+<tr class="memdesc:a5f008489140d65a0a311629aa9ea808e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="classb2_particle_system.html#aea90f19fb0aa9bcbba649529aa6503f0">b2ParticleSystem::ApplyForce</a> for every particle in the group. <br/></td></tr>
+<tr class="separator:a5f008489140d65a0a311629aa9ea808e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd4c22ee10720c08247517b7d92ebbcd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#abd4c22ee10720c08247517b7d92ebbcd">ApplyLinearImpulse</a> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;impulse)</td></tr>
+<tr class="separator:abd4c22ee10720c08247517b7d92ebbcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39a772c98fb2f0c1c203118d5cb6a860"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#a39a772c98fb2f0c1c203118d5cb6a860">DestroyParticles</a> (bool callDestructionListener)</td></tr>
+<tr class="separator:a39a772c98fb2f0c1c203118d5cb6a860"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bea52175e7b16a56a3c7b1d14723d04"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">DestroyParticles</a> ()</td></tr>
+<tr class="separator:a9bea52175e7b16a56a3c7b1d14723d04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -162,11 +183,80 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
 <tr class="separator:a794c652370872a38130e7ed5120468f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A group of particles. These are created via <a class="el" href="classb2_world.html#a287385e587d831aca401d6ef89d3c9a4">b2World::CreateParticleGroup</a>. </p>
+<div class="textblock"><p>A group of particles. b2ParticleGroup::CreateParticleGroup creates these. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="abd4c22ee10720c08247517b7d92ebbcd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2ParticleGroup::ApplyLinearImpulse </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;&#160;</td>
+          <td class="paramname"><em>impulse</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Call <a class="el" href="classb2_particle_system.html#a3d7b55d6ff599bbb1f3f748a4192e85e">b2ParticleSystem::ApplyLinearImpulse</a> for every particle in the group. </p>
+
+</div>
+</div>
+<a class="anchor" id="a39a772c98fb2f0c1c203118d5cb6a860"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2ParticleGroup::DestroyParticles </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>callDestructionListener</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Destroy all the particles in this group. This function is locked during callbacks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Whether</td><td>to call the world <a class="el" href="classb2_destruction_listener.html">b2DestructionListener</a> for each particle is destroyed. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9bea52175e7b16a56a3c7b1d14723d04"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2ParticleGroup::DestroyParticles </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Destroy all particles in this group without enabling the destruction callback for destroyed particles. This function is locked during callbacks. </p>
+<dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a9f89e452e667f8ba5eae117fa96e1b31"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">float32 b2ParticleGroup::GetAngle </td>
@@ -175,6 +265,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Get the rotational angle of the particle group as a whole. Used only with groups of rigid particles. </p>
 
@@ -183,6 +278,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
 <a class="anchor" id="ae104146814fd8b3e3671f71442037c6d"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp; b2ParticleGroup::GetPosition </td>
@@ -191,6 +289,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Get position of the particle group as a whole. Used only with groups of rigid particles. </p>
 
@@ -199,6 +302,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
 <a class="anchor" id="aa5d6cae1da3ce4cdca64356adb7db742"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">const <a class="el" href="structb2_transform.html">b2Transform</a> &amp; b2ParticleGroup::GetTransform </td>
@@ -207,6 +313,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Get the position of the group's origin and rotation. Used only with groups of rigid particles. </p>
 

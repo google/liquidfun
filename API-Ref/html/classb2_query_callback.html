@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -95,8 +95,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a187dd04dd0f5164fb05c2ce2cbfd9ee5"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_query_callback.html#a187dd04dd0f5164fb05c2ce2cbfd9ee5">ReportFixture</a> (<a class="el" href="classb2_fixture.html">b2Fixture</a> *fixture)=0</td></tr>
 <tr class="separator:a187dd04dd0f5164fb05c2ce2cbfd9ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18f529729f5bbf01d059199eb359e992"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_query_callback.html#a18f529729f5bbf01d059199eb359e992">ReportParticle</a> (int32 index)</td></tr>
-<tr class="separator:a18f529729f5bbf01d059199eb359e992"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58ce027d6d74c6b552ea001febb92f06"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_query_callback.html#a58ce027d6d74c6b552ea001febb92f06">ReportParticle</a> (const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, int32 index)</td></tr>
+<tr class="separator:a58ce027d6d74c6b552ea001febb92f06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace46c6328f9edace4818da61bad4903a"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_query_callback.html#ace46c6328f9edace4818da61bad4903a">ShouldQueryParticleSystem</a> (const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem)</td></tr>
+<tr class="separator:ace46c6328f9edace4818da61bad4903a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Callback class for AABB queries. See b2World::Query </p>
@@ -127,7 +129,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a18f529729f5bbf01d059199eb359e992"></a>
+<a class="anchor" id="a58ce027d6d74c6b552ea001febb92f06"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -137,9 +139,19 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual bool b2QueryCallback::ReportParticle </td>
           <td>(</td>
-          <td class="paramtype">int32&#160;</td>
-          <td class="paramname"><em>index</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -150,6 +162,32 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Called for each particle found in the query AABB. </p>
 <dl class="section return"><dt>Returns</dt><dd>false to terminate the query. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ace46c6328f9edace4818da61bad4903a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool b2QueryCallback::ShouldQueryParticleSystem </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Cull an entire particle system from <a class="el" href="classb2_world.html#a711e55d2c6e68400f93472f807c3775b">b2World::QueryAABB</a>. Ignored for <a class="el" href="classb2_particle_system.html#af31818150a338125c9f84c9ae9003196">b2ParticleSystem::QueryAABB</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if you want to include particleSystem in the AABB query, or false to cull particleSystem from the AABB query. </dd></dl>
 
 </div>
 </div>

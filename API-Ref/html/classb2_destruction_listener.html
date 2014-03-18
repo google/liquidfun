@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -101,8 +101,8 @@ Public Member Functions</h2></td></tr>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_destruction_listener.html#a5e468eeabbadcd7e55f673e545b49959">SayGoodbye</a> (<a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *group)</td></tr>
 <tr class="memdesc:a5e468eeabbadcd7e55f673e545b49959"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when any particle group is about to be destroyed. <br/></td></tr>
 <tr class="separator:a5e468eeabbadcd7e55f673e545b49959"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55217878b7554478b23ce7fadf5cdbcd"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_destruction_listener.html#a55217878b7554478b23ce7fadf5cdbcd">SayGoodbye</a> (int32 index)</td></tr>
-<tr class="separator:a55217878b7554478b23ce7fadf5cdbcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0621bfa1d4782b7d558cf316792572af"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_destruction_listener.html#a0621bfa1d4782b7d558cf316792572af">SayGoodbye</a> (<a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *particleSystem, int32 index)</td></tr>
+<tr class="separator:a0621bfa1d4782b7d558cf316792572af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Joints and fixtures are destroyed when their associated body is destroyed. Implement this listener so that you may nullify references to these joints and shapes. </p>
@@ -157,7 +157,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
-<a class="anchor" id="a55217878b7554478b23ce7fadf5cdbcd"></a>
+<a class="anchor" id="a0621bfa1d4782b7d558cf316792572af"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -167,9 +167,19 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
         <tr>
           <td class="memname">virtual void b2DestructionListener::SayGoodbye </td>
           <td>(</td>
-          <td class="paramtype">int32&#160;</td>
-          <td class="paramname"><em>index</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classb2_particle_system.html">b2ParticleSystem</a> *&#160;</td>
+          <td class="paramname"><em>particleSystem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int32&#160;</td>
+          <td class="paramname"><em>index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -178,7 +188,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Called when a particle is about to be destroyed. The index can be used in conjunction with b2World::GetParticleUserDataBuffer() to determine which particle has been destroyed. </p>
+<p>Called when a particle is about to be destroyed. The index can be used in conjunction with <a class="el" href="classb2_particle_system.html#af03d38254a2cfd6de142c61bb3ec754b">b2ParticleSystem::GetUserDataBuffer()</a> or <a class="el" href="classb2_particle_system.html#aa5a120786c332f35916d8a01620c4967" title="Retrieve a handle to the particle at the specified index. ">b2ParticleSystem::GetParticleHandleFromIndex()</a> to determine which particle has been destroyed. </p>
 
 </div>
 </div>

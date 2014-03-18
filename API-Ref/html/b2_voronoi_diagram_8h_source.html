@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -120,73 +120,62 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="classb2_voronoi_diagram.html">b2VoronoiDiagram</a>(<a class="code" href="classb2_stack_allocator.html">b2StackAllocator</a>* allocator, int32 generatorCapacity);</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    ~<a class="code" href="classb2_voronoi_diagram.html">b2VoronoiDiagram</a>();</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">void</span> AddGenerator(<span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; center, int32 tag);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">void</span> Generate(float32 radius);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Callback&gt;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">void</span> GetNodes(<span class="keyword">const</span> Callback&amp; callback)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordflow">for</span> (int32 y = 0; y &lt; m_countY - 1; y++)</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;            <span class="keywordflow">for</span> (int32 x = 0; x &lt; m_countX - 1; x++)</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                int32 i = x + y * m_countX;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                <span class="keyword">const</span> Generator* a = m_diagram[i];</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                <span class="keyword">const</span> Generator* b = m_diagram[i + 1];</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                <span class="keyword">const</span> Generator* c = m_diagram[i + m_countX];</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                <span class="keyword">const</span> Generator* d = m_diagram[i + 1 + m_countX];</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                <span class="keywordflow">if</span> (b != c)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                    <span class="keywordflow">if</span> (a != b &amp;&amp; a != c)</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                    {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                        callback(a-&gt;tag, b-&gt;tag, c-&gt;tag);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                    }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                    <span class="keywordflow">if</span> (d != b &amp;&amp; d != c)</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                    {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                        callback(b-&gt;tag, d-&gt;tag, c-&gt;tag);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                    }</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                }</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            }</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        }</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">struct </span>Generator</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <a class="code" href="structb2_vec2.html">b2Vec2</a> center;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        int32 tag;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    };</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_voronoi_diagram.html#a15c68762b1984fcd0d7b5a814d19e49b">AddGenerator</a>(<span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; center, int32 tag, <span class="keywordtype">bool</span> necessary);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_voronoi_diagram.html#affc5f0031e8283bb38fa0b59b5ed32d1">Generate</a>(float32 radius, float32 margin);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classb2_voronoi_diagram_1_1_node_callback.html">   48</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classb2_voronoi_diagram_1_1_node_callback.html">NodeCallback</a></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keyword">virtual</span> ~<a class="code" href="classb2_voronoi_diagram_1_1_node_callback.html">NodeCallback</a>() {}</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classb2_voronoi_diagram_1_1_node_callback.html#ac5635af18d3aecf0baff77e057984c5e">operator()</a>(int32 a, int32 b, int32 c) = 0;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    };</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_voronoi_diagram.html#ac941c83e66aa071bb813fb80bb9aacae">GetNodes</a>(<a class="code" href="classb2_voronoi_diagram_1_1_node_callback.html">NodeCallback</a>&amp; callback) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">struct </span>Generator</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <a class="code" href="structb2_vec2.html">b2Vec2</a> center;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        int32 tag;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordtype">bool</span> necessary;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    };</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">struct </span>b2VoronoiDiagramTask</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        int32 m_x, m_y, m_i;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        Generator* m_generator;</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keyword">struct </span>b2VoronoiDiagramTask</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    {</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        int32 m_x, m_y, m_i;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        Generator* m_generator;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        b2VoronoiDiagramTask() {}</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        b2VoronoiDiagramTask(int32 x, int32 y, int32 i, Generator* g)</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            m_x = x;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;            m_y = y;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            m_i = i;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            m_generator = g;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        }</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    };</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="classb2_stack_allocator.html">b2StackAllocator</a> *m_allocator;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    Generator* m_generatorBuffer;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    int32 m_generatorCount;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    int32 m_countX, m_countY;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    Generator** m_diagram;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;};</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        b2VoronoiDiagramTask() {}</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        b2VoronoiDiagramTask(int32 x, int32 y, int32 i, Generator* g)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            m_x = x;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            m_y = y;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            m_i = i;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            m_generator = g;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        }</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    };</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="classb2_stack_allocator.html">b2StackAllocator</a> *m_allocator;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    Generator* m_generatorBuffer;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    int32 m_generatorCapacity;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    int32 m_generatorCount;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    int32 m_countX, m_countY;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    Generator** m_diagram;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;};</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classb2_voronoi_diagram_html_a15c68762b1984fcd0d7b5a814d19e49b"><div class="ttname"><a href="classb2_voronoi_diagram.html#a15c68762b1984fcd0d7b5a814d19e49b">b2VoronoiDiagram::AddGenerator</a></div><div class="ttdeci">void AddGenerator(const b2Vec2 &amp;center, int32 tag, bool necessary)</div><div class="ttdef"><b>Definition:</b> b2VoronoiDiagram.cpp:45</div></div>
 <div class="ttc" id="classb2_stack_allocator_html"><div class="ttname"><a href="classb2_stack_allocator.html">b2StackAllocator</a></div><div class="ttdef"><b>Definition:</b> b2StackAllocator.h:37</div></div>
+<div class="ttc" id="classb2_voronoi_diagram_1_1_node_callback_html_ac5635af18d3aecf0baff77e057984c5e"><div class="ttname"><a href="classb2_voronoi_diagram_1_1_node_callback.html#ac5635af18d3aecf0baff77e057984c5e">b2VoronoiDiagram::NodeCallback::operator()</a></div><div class="ttdeci">virtual void operator()(int32 a, int32 b, int32 c)=0</div><div class="ttdoc">Receive tags for generators associated with a node. </div></div>
 <div class="ttc" id="classb2_voronoi_diagram_html"><div class="ttname"><a href="classb2_voronoi_diagram.html">b2VoronoiDiagram</a></div><div class="ttdoc">A field representing the nearest generator from each point. </div><div class="ttdef"><b>Definition:</b> b2VoronoiDiagram.h:27</div></div>
-<div class="ttc" id="structb2_a_a_b_b_html"><div class="ttname"><a href="structb2_a_a_b_b.html">b2AABB</a></div><div class="ttdoc">An axis aligned bounding box. </div><div class="ttdef"><b>Definition:</b> b2Collision.h:161</div></div>
-<div class="ttc" id="structb2_vec2_html"><div class="ttname"><a href="structb2_vec2.html">b2Vec2</a></div><div class="ttdoc">A 2D column vector. </div><div class="ttdef"><b>Definition:</b> b2Math.h:64</div></div>
+<div class="ttc" id="classb2_voronoi_diagram_1_1_node_callback_html"><div class="ttname"><a href="classb2_voronoi_diagram_1_1_node_callback.html">b2VoronoiDiagram::NodeCallback</a></div><div class="ttdoc">Callback used by GetNodes(). </div><div class="ttdef"><b>Definition:</b> b2VoronoiDiagram.h:48</div></div>
+<div class="ttc" id="structb2_a_a_b_b_html"><div class="ttname"><a href="structb2_a_a_b_b.html">b2AABB</a></div><div class="ttdoc">An axis aligned bounding box. </div><div class="ttdef"><b>Definition:</b> b2Collision.h:162</div></div>
+<div class="ttc" id="classb2_voronoi_diagram_html_affc5f0031e8283bb38fa0b59b5ed32d1"><div class="ttname"><a href="classb2_voronoi_diagram.html#affc5f0031e8283bb38fa0b59b5ed32d1">b2VoronoiDiagram::Generate</a></div><div class="ttdeci">void Generate(float32 radius, float32 margin)</div><div class="ttdef"><b>Definition:</b> b2VoronoiDiagram.cpp:55</div></div>
+<div class="ttc" id="structb2_vec2_html"><div class="ttname"><a href="structb2_vec2.html">b2Vec2</a></div><div class="ttdoc">A 2D column vector. </div><div class="ttdef"><b>Definition:</b> b2Math.h:56</div></div>
+<div class="ttc" id="classb2_voronoi_diagram_html_ac941c83e66aa071bb813fb80bb9aacae"><div class="ttname"><a href="classb2_voronoi_diagram.html#ac941c83e66aa071bb813fb80bb9aacae">b2VoronoiDiagram::GetNodes</a></div><div class="ttdeci">void GetNodes(NodeCallback &amp;callback) const </div><div class="ttdef"><b>Definition:</b> b2VoronoiDiagram.cpp:195</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Google Analytics -->
 <script>

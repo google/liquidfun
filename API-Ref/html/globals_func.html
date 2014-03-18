@@ -68,6 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="globals.html"><span>All</span></a></li>
       <li class="current"><a href="globals_func.html"><span>Functions</span></a></li>
       <li><a href="globals_vars.html"><span>Variables</span></a></li>
+      <li><a href="globals_type.html"><span>Typedefs</span></a></li>
       <li><a href="globals_enum.html"><span>Enumerations</span></a></li>
       <li><a href="globals_eval.html"><span>Enumerator</span></a></li>
       <li><a href="globals_defs.html"><span>Macros</span></a></li>
@@ -79,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,6 +93,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 &#160;<ul>
 <li>b2Alloc()
 : <a class="el" href="b2_settings_8h.html#a2dca9b286e9b9d6d022055fd61534bd7">b2Settings.h</a>
+</li>
+<li>b2CalculateParticleIterations()
+: <a class="el" href="b2_particle_8h.html#a26da50c12eeabaa662fb0ccdf624b570">b2Particle.h</a>
 </li>
 <li>b2ClipSegmentToLine()
 : <a class="el" href="b2_collision_8h.html#a8b36e651798f55f2533f9837462ded41">b2Collision.h</a>
@@ -114,11 +118,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>b2Free()
 : <a class="el" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d">b2Settings.h</a>
 </li>
+<li>b2GetNumAllocs()
+: <a class="el" href="b2_settings_8h.html#a60375fb093d9f8f71f2d98f9129f9858">b2Settings.h</a>
+</li>
 <li>b2GetPointStates()
 : <a class="el" href="b2_collision_8h.html#a401e2747d276e9fbfd131989e02ff568">b2Collision.h</a>
 </li>
 <li>b2Log()
 : <a class="el" href="b2_settings_8h.html#a9f10095d05c74eebfe535931c9061ab2">b2Settings.h</a>
+</li>
+<li>b2SetAllocFreeCallbacks()
+: <a class="el" href="b2_settings_8h.html#a9e1c46d4c0c37382656bfb2c79e4508a">b2Settings.h</a>
+</li>
+<li>b2SetNumAllocs()
+: <a class="el" href="b2_settings_8h.html#a0cd45e29c4e5b126cf16b8d88c24a00e">b2Settings.h</a>
 </li>
 <li>b2TestOverlap()
 : <a class="el" href="b2_collision_8h.html#ae7601420d0b42c1ee494e879dd2009a5">b2Collision.h</a>

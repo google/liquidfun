@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -101,7 +101,8 @@ Public Types</h2></td></tr>
 <a class="el" href="classb2_draw.html#ae23c5d6c4f5230621f736593469cf7f2acdf1370108930182a45f39e7cc9b0cc7">e_aabbBit</a> = 0x0004, 
 <a class="el" href="classb2_draw.html#ae23c5d6c4f5230621f736593469cf7f2ac86bb64ac65e555db28827407f2f2d43">e_pairBit</a> = 0x0008, 
 <br/>
-&#160;&#160;<a class="el" href="classb2_draw.html#ae23c5d6c4f5230621f736593469cf7f2a7f1494d816479c7d23997a6c292cd8b6">e_centerOfMassBit</a> = 0x0010
+&#160;&#160;<a class="el" href="classb2_draw.html#ae23c5d6c4f5230621f736593469cf7f2a7f1494d816479c7d23997a6c292cd8b6">e_centerOfMassBit</a> = 0x0010, 
+<a class="el" href="classb2_draw.html#ae23c5d6c4f5230621f736593469cf7f2a18298aec5bd774df153615741e0dab55">e_particleBit</a> = 0x0020
 <br/>
  }</td></tr>
 <tr class="separator:ae23c5d6c4f5230621f736593469cf7f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,7 +142,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memdesc:a775a1d0472c5980d597904c7b596a0a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a solid circle. <br/></td></tr>
 <tr class="separator:a775a1d0472c5980d597904c7b596a0a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a650dc6b8d2d097497d1a956db1d9561a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a650dc6b8d2d097497d1a956db1d9561a"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_draw.html#a650dc6b8d2d097497d1a956db1d9561a">DrawParticles</a> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> *centers, float32 radius, const <a class="el" href="structb2_particle_color.html">b2ParticleColor</a> *colors, int32 count)=0</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_draw.html#a650dc6b8d2d097497d1a956db1d9561a">DrawParticles</a> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> *centers, float32 radius, const <a class="el" href="classb2_particle_color.html">b2ParticleColor</a> *colors, int32 count)=0</td></tr>
 <tr class="memdesc:a650dc6b8d2d097497d1a956db1d9561a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a particle array. <br/></td></tr>
 <tr class="separator:a650dc6b8d2d097497d1a956db1d9561a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1de5aaf50db875d1c644c596832af57d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1de5aaf50db875d1c644c596832af57d"></a>
@@ -184,6 +185,9 @@ uint32&#160;</td><td class="memItemRight" valign="bottom"><b>m_drawFlags</b></td
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="ae23c5d6c4f5230621f736593469cf7f2a7f1494d816479c7d23997a6c292cd8b6"></a>e_centerOfMassBit</em>&nbsp;</td><td class="fielddoc">
 <p>draw center of mass frame </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ae23c5d6c4f5230621f736593469cf7f2a18298aec5bd774df153615741e0dab55"></a>e_particleBit</em>&nbsp;</td><td class="fielddoc">
+<p>draw particles </p>
 </td></tr>
 </table>
 
