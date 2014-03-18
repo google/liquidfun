@@ -3,6 +3,8 @@ var searchData=
   ['length',['length',['../structb2_distance_joint_def.html#ac2c48ad52de91c804c386c12c5bf3714',1,'b2DistanceJointDef']]],
   ['lengtha',['lengthA',['../structb2_pulley_joint_def.html#a51d945882c1d7a78af2b0e9ffb31a33b',1,'b2PulleyJointDef']]],
   ['lengthb',['lengthB',['../structb2_pulley_joint_def.html#a5857d5b5b9880b6c8201ce3ee8c3eef0',1,'b2PulleyJointDef']]],
+  ['lifetime',['lifetime',['../structb2_particle_def.html#a5561a5615e30e6ab3af9bb2048dbd467',1,'b2ParticleDef::lifetime()'],['../structb2_particle_group_def.html#a4caa3e45a21ef860060fddc994a07828',1,'b2ParticleGroupDef::lifetime()']]],
+  ['lifetimegranularity',['lifetimeGranularity',['../structb2_particle_system_def.html#a7464b9934b877bf5876d9ed14c022ac4',1,'b2ParticleSystemDef']]],
   ['lineardamping',['linearDamping',['../structb2_body_def.html#a728f6df3be7dedb331455105e3659d46',1,'b2BodyDef']]],
   ['linearoffset',['linearOffset',['../structb2_motor_joint_def.html#a2c957cffc2af66c6c8077c069b906bc4',1,'b2MotorJointDef']]],
   ['linearvelocity',['linearVelocity',['../structb2_body_def.html#a25fa5aa78d93159c344241af95bec2bf',1,'b2BodyDef::linearVelocity()'],['../structb2_particle_group_def.html#acba1075b361641d6984c448cbb95fc8a',1,'b2ParticleGroupDef::linearVelocity()']]],

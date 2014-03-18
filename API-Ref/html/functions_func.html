@@ -104,7 +104,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -117,11 +117,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 &#160;
 
 <h3><a class="anchor" id="index_a"></a>- a -</h3><ul>
+<li>AddGenerator()
+: <a class="el" href="classb2_voronoi_diagram.html#a15c68762b1984fcd0d7b5a814d19e49b">b2VoronoiDiagram</a>
+</li>
+<li>AddToFreeList()
+: <a class="el" href="classb2_free_list.html#a8068b95c06caf411cdb7180029c8ec2a">b2FreeList</a>
+, <a class="el" href="classb2_typed_free_list.html#a753f41e60a6ea64f22ee33c74c5617d7">b2TypedFreeList&lt; T &gt;</a>
+</li>
 <li>Advance()
 : <a class="el" href="structb2_sweep.html#a35eb9b976ca87c9b8d758bec070c6c06">b2Sweep</a>
 </li>
 <li>Allocate()
-: <a class="el" href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">b2BlockAllocator</a>
+: <a class="el" href="classb2_slab_allocator.html#a0855486c61a5e3345ae4ffce8d7ff20f">b2SlabAllocator&lt; T &gt;</a>
+, <a class="el" href="classb2_tracked_block.html#ae057d940443021985b2cefbc928af2a4">b2TrackedBlock</a>
+, <a class="el" href="classb2_block_allocator.html#a437bf775c23f6e36af11a6d1653d7040">b2BlockAllocator</a>
+, <a class="el" href="classb2_tracked_block_allocator.html#a9590c3f44c58a1ca44b81910927ca4a9">b2TrackedBlockAllocator</a>
+, <a class="el" href="classb2_free_list.html#ad1e8c4f276273754005e150c93f18075">b2FreeList</a>
+, <a class="el" href="classb2_typed_free_list.html#a2b8c7550c1baad711d3af374b6602d1c">b2TypedFreeList&lt; T &gt;</a>
+</li>
+<li>AllocateSlab()
+: <a class="el" href="classb2_slab_allocator.html#a45c7b00371773856ab4bc2b1a5e43b17">b2SlabAllocator&lt; T &gt;</a>
 </li>
 <li>AppendFlags()
 : <a class="el" href="classb2_draw.html#acc2fd4648ee0a65574770c64528f7166">b2Draw</a>
@@ -130,13 +145,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classb2_body.html#a65384cfad8db2376cdf3fab38cac06e5">b2Body</a>
 </li>
 <li>ApplyForce()
-: <a class="el" href="classb2_body.html#a942be8e1cd2bcd06f53c4638c45a9525">b2Body</a>
+: <a class="el" href="classb2_particle_system.html#aea90f19fb0aa9bcbba649529aa6503f0">b2ParticleSystem</a>
+, <a class="el" href="classb2_particle_group.html#a5f008489140d65a0a311629aa9ea808e">b2ParticleGroup</a>
+, <a class="el" href="classb2_body.html#a942be8e1cd2bcd06f53c4638c45a9525">b2Body</a>
 </li>
 <li>ApplyForceToCenter()
 : <a class="el" href="classb2_body.html#abeba04911f7a2a141169bb06fe98d06a">b2Body</a>
 </li>
 <li>ApplyLinearImpulse()
-: <a class="el" href="classb2_body.html#a7f677e93efb3c4c065087aff317274a3">b2Body</a>
+: <a class="el" href="classb2_particle_group.html#abd4c22ee10720c08247517b7d92ebbcd">b2ParticleGroup</a>
+, <a class="el" href="classb2_particle_system.html#a3d7b55d6ff599bbb1f3f748a4192e85e">b2ParticleSystem</a>
+, <a class="el" href="classb2_body.html#a7f677e93efb3c4c065087aff317274a3">b2Body</a>
 </li>
 <li>ApplyTorque()
 : <a class="el" href="classb2_body.html#a54a354447ac3b4cc224c8327a5abc0e8">b2Body</a>

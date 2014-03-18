@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -93,8 +93,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">b2Settings.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;cassert&gt;</code><br/>
-<code>#include &lt;cmath&gt;</code><br/>
+<div class="textblock"><code>#include &lt;stddef.h&gt;</code><br/>
+<code>#include &lt;assert.h&gt;</code><br/>
+<code>#include &lt;float.h&gt;</code><br/>
 </div>
 <p><a href="b2_settings_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -114,6 +115,12 @@ Macros</h2></td></tr>
 <tr class="memitem:a0415c90facf60c6a0c71750231fd9841"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0415c90facf60c6a0c71750231fd9841"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>B2_ASSERT_ENABLED</b>&#160;&#160;&#160;0</td></tr>
 <tr class="separator:a0415c90facf60c6a0c71750231fd9841"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f16cb0d5a6e45e034b44e7474f3785d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f16cb0d5a6e45e034b44e7474f3785d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>B2_DEBUG_STATEMENT</b>(A)</td></tr>
+<tr class="separator:a0f16cb0d5a6e45e034b44e7474f3785d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c006e377f04fb08e5c63620ed0c4fe4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c006e377f04fb08e5c63620ed0c4fe4"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>B2_ARRAY_SIZE</b>(x)&#160;&#160;&#160;(sizeof(x) / sizeof((x)[0]))</td></tr>
+<tr class="separator:a5c006e377f04fb08e5c63620ed0c4fe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a034400dadc97431610fe4a0f38d5c1c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a034400dadc97431610fe4a0f38d5c1c7"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>b2_maxFloat</b>&#160;&#160;&#160;FLT_MAX</td></tr>
 <tr class="separator:a034400dadc97431610fe4a0f38d5c1c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,6 +130,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a3f1872f3fc3c46abc809e7f7d467eb6c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f1872f3fc3c46abc809e7f7d467eb6c"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>b2_pi</b>&#160;&#160;&#160;3.14159265359f</td></tr>
 <tr class="separator:a3f1872f3fc3c46abc809e7f7d467eb6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade71acda4472b5b16d6ef87e53d63e38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade71acda4472b5b16d6ef87e53d63e38"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>b2Inline</b>&#160;&#160;&#160;inline</td></tr>
+<tr class="separator:ade71acda4472b5b16d6ef87e53d63e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5f44cc9edf711433dea2b2ec94f3c42"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#aa5f44cc9edf711433dea2b2ec94f3c42">b2_maxManifoldPoints</a>&#160;&#160;&#160;2</td></tr>
 <tr class="separator:aa5f44cc9edf711433dea2b2ec94f3c42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09d71ee1993bee28b5b2e6d893b41884"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a09d71ee1993bee28b5b2e6d893b41884">b2_maxPolygonVertices</a>&#160;&#160;&#160;8</td></tr>
@@ -172,27 +182,33 @@ Macros</h2></td></tr>
 <tr class="separator:adc056d2ee984ceb388fcd38e257e71b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67092aba35939215cea0213618591031"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67092aba35939215cea0213618591031"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a67092aba35939215cea0213618591031">b2_particleStride</a>&#160;&#160;&#160;0.75f</td></tr>
-<tr class="memdesc:a67092aba35939215cea0213618591031"><td class="mdescLeft">&#160;</td><td class="mdescRight">The standard distance between particles, divided by the particle radius. <br/></td></tr>
+<tr class="memdesc:a67092aba35939215cea0213618591031"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default distance between particles, multiplied by the particle diameter. <br/></td></tr>
 <tr class="separator:a67092aba35939215cea0213618591031"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ca77d20adfeafed68bb71041a68a41f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ca77d20adfeafed68bb71041a68a41f"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a8ca77d20adfeafed68bb71041a68a41f">b2_minParticleWeight</a>&#160;&#160;&#160;1.0f</td></tr>
 <tr class="memdesc:a8ca77d20adfeafed68bb71041a68a41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The minimum particle weight that produces pressure. <br/></td></tr>
 <tr class="separator:a8ca77d20adfeafed68bb71041a68a41f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e778f4a96009b55da173daddb9c2b59"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e778f4a96009b55da173daddb9c2b59"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a9e778f4a96009b55da173daddb9c2b59">b2_maxParticleWeight</a>&#160;&#160;&#160;5.0f</td></tr>
-<tr class="memdesc:a9e778f4a96009b55da173daddb9c2b59"><td class="mdescLeft">&#160;</td><td class="mdescRight">The upper limit for particle weight used in pressure calculation. <br/></td></tr>
-<tr class="separator:a9e778f4a96009b55da173daddb9c2b59"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31415738c2d85a958b43b3086141fc85"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a31415738c2d85a958b43b3086141fc85"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">b2_maxTriadDistance</a>&#160;&#160;&#160;2</td></tr>
-<tr class="memdesc:a31415738c2d85a958b43b3086141fc85"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum distance between particles in a triad, divided by the particle radius. <br/></td></tr>
+<tr class="memitem:a06b74a32a69d07543c724a728afbe906"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06b74a32a69d07543c724a728afbe906"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a06b74a32a69d07543c724a728afbe906">b2_maxParticlePressure</a>&#160;&#160;&#160;0.25f</td></tr>
+<tr class="memdesc:a06b74a32a69d07543c724a728afbe906"><td class="mdescLeft">&#160;</td><td class="mdescRight">The upper limit for particle pressure. <br/></td></tr>
+<tr class="separator:a06b74a32a69d07543c724a728afbe906"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae727d446572abad0a53820309404fa47"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae727d446572abad0a53820309404fa47"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#ae727d446572abad0a53820309404fa47">b2_maxParticleForce</a>&#160;&#160;&#160;0.5f</td></tr>
+<tr class="memdesc:ae727d446572abad0a53820309404fa47"><td class="mdescLeft">&#160;</td><td class="mdescRight">The upper limit for force between particles. <br/></td></tr>
+<tr class="separator:ae727d446572abad0a53820309404fa47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31415738c2d85a958b43b3086141fc85"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">b2_maxTriadDistance</a>&#160;&#160;&#160;2</td></tr>
 <tr class="separator:a31415738c2d85a958b43b3086141fc85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a46d82b5b300a5c89badc678bd38534"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a46d82b5b300a5c89badc678bd38534"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>b2_maxTriadDistanceSquared</b>&#160;&#160;&#160;(<a class="el" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">b2_maxTriadDistance</a> * <a class="el" href="b2_settings_8h.html#a31415738c2d85a958b43b3086141fc85">b2_maxTriadDistance</a>)</td></tr>
 <tr class="separator:a9a46d82b5b300a5c89badc678bd38534"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9c3e8b6741fe313258a942dd421a4b9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9c3e8b6741fe313258a942dd421a4b9"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#ae9c3e8b6741fe313258a942dd421a4b9">b2_minParticleBufferCapacity</a>&#160;&#160;&#160;256</td></tr>
-<tr class="memdesc:ae9c3e8b6741fe313258a942dd421a4b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The initial size of particle data buffers. <br/></td></tr>
-<tr class="separator:ae9c3e8b6741fe313258a942dd421a4b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70a95f8fdc7c5eb5538a06640486c150"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70a95f8fdc7c5eb5538a06640486c150"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a70a95f8fdc7c5eb5538a06640486c150">b2_minParticleSystemBufferCapacity</a>&#160;&#160;&#160;256</td></tr>
+<tr class="memdesc:a70a95f8fdc7c5eb5538a06640486c150"><td class="mdescLeft">&#160;</td><td class="mdescRight">The initial size of particle data buffers. <br/></td></tr>
+<tr class="separator:a70a95f8fdc7c5eb5538a06640486c150"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45311f1895abdb7ea82a04829384d9c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45311f1895abdb7ea82a04829384d9c7"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a45311f1895abdb7ea82a04829384d9c7">b2_barrierCollisionTime</a>&#160;&#160;&#160;2.5f</td></tr>
+<tr class="memdesc:a45311f1895abdb7ea82a04829384d9c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time into the future that collisions against barrier particles will be detected. <br/></td></tr>
+<tr class="separator:a45311f1895abdb7ea82a04829384d9c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab021adb740e4a5e1f5f7d9913ed94781"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab021adb740e4a5e1f5f7d9913ed94781"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#ab021adb740e4a5e1f5f7d9913ed94781">b2_timeToSleep</a>&#160;&#160;&#160;0.5f</td></tr>
 <tr class="memdesc:ab021adb740e4a5e1f5f7d9913ed94781"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time that a body must be still before it will go to sleep. <br/></td></tr>
@@ -232,6 +248,20 @@ typedef float&#160;</td><td class="memItemRight" valign="bottom"><b>float32</b><
 <tr class="memitem:a232fad1b0d6dcc7c16aabde98b2e2a80"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a232fad1b0d6dcc7c16aabde98b2e2a80"></a>
 typedef double&#160;</td><td class="memItemRight" valign="bottom"><b>float64</b></td></tr>
 <tr class="separator:a232fad1b0d6dcc7c16aabde98b2e2a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecfc3c54bd29ad5964e1c1c3ccbf89df"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aecfc3c54bd29ad5964e1c1c3ccbf89df"></a>
+typedef long long&#160;</td><td class="memItemRight" valign="bottom"><b>int64</b></td></tr>
+<tr class="separator:aecfc3c54bd29ad5964e1c1c3ccbf89df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29940ae63ec06c9998bba873e25407ad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29940ae63ec06c9998bba873e25407ad"></a>
+typedef unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><b>uint64</b></td></tr>
+<tr class="separator:a29940ae63ec06c9998bba873e25407ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac58fac80aa13e098a0e9e6c72c5179ca"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac58fac80aa13e098a0e9e6c72c5179ca"></a>
+typedef void *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#ac58fac80aa13e098a0e9e6c72c5179ca">b2AllocFunction</a> )(int32 size, void *callbackData)</td></tr>
+<tr class="memdesc:ac58fac80aa13e098a0e9e6c72c5179ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this function to override <a class="el" href="b2_settings_8h.html#a2dca9b286e9b9d6d022055fd61534bd7" title="Implement this function to use your own memory allocator. ">b2Alloc()</a> without recompiling this library. <br/></td></tr>
+<tr class="separator:ac58fac80aa13e098a0e9e6c72c5179ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c4c0e67a45d8e9b1feb096973195c2c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7c4c0e67a45d8e9b1feb096973195c2c"></a>
+typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a7c4c0e67a45d8e9b1feb096973195c2c">b2FreeFunction</a> )(void *mem, void *callbackData)</td></tr>
+<tr class="memdesc:a7c4c0e67a45d8e9b1feb096973195c2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this function to override <a class="el" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d" title="If you implement b2Alloc, you should also implement this function. ">b2Free()</a> without recompiling this library. <br/></td></tr>
+<tr class="separator:a7c4c0e67a45d8e9b1feb096973195c2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -243,6 +273,14 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a50f4abf5edeabd0300946edbd542e24d">b2Free</a> (void *mem)</td></tr>
 <tr class="memdesc:a50f4abf5edeabd0300946edbd542e24d"><td class="mdescLeft">&#160;</td><td class="mdescRight">If you implement b2Alloc, you should also implement this function. <br/></td></tr>
 <tr class="separator:a50f4abf5edeabd0300946edbd542e24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e1c46d4c0c37382656bfb2c79e4508a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a9e1c46d4c0c37382656bfb2c79e4508a">b2SetAllocFreeCallbacks</a> (<a class="el" href="b2_settings_8h.html#ac58fac80aa13e098a0e9e6c72c5179ca">b2AllocFunction</a> allocCallback, <a class="el" href="b2_settings_8h.html#a7c4c0e67a45d8e9b1feb096973195c2c">b2FreeFunction</a> freeCallback, void *callbackData)</td></tr>
+<tr class="separator:a9e1c46d4c0c37382656bfb2c79e4508a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cd45e29c4e5b126cf16b8d88c24a00e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a0cd45e29c4e5b126cf16b8d88c24a00e">b2SetNumAllocs</a> (const int32 numAllocs)</td></tr>
+<tr class="separator:a0cd45e29c4e5b126cf16b8d88c24a00e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60375fb093d9f8f71f2d98f9129f9858"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60375fb093d9f8f71f2d98f9129f9858"></a>
+int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a60375fb093d9f8f71f2d98f9129f9858">b2GetNumAllocs</a> ()</td></tr>
+<tr class="memdesc:a60375fb093d9f8f71f2d98f9129f9858"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get number of calls to b2Alloc minus number of calls to b2Free. <br/></td></tr>
+<tr class="separator:a60375fb093d9f8f71f2d98f9129f9858"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f10095d05c74eebfe535931c9061ab2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9f10095d05c74eebfe535931c9061ab2"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a9f10095d05c74eebfe535931c9061ab2">b2Log</a> (const char *string,...)</td></tr>
 <tr class="memdesc:a9f10095d05c74eebfe535931c9061ab2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logging function. <br/></td></tr>
@@ -405,6 +443,19 @@ const <a class="el" href="structb2_version.html">b2Version</a>&#160;</td><td cla
 
 </div>
 </div>
+<a class="anchor" id="a31415738c2d85a958b43b3086141fc85"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define b2_maxTriadDistance&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The maximum distance between particles in a triad, multiplied by the particle diameter. </p>
+
+</div>
+</div>
 <a class="anchor" id="afc0f934dabffb1e83e081249133ad860"></a>
 <div class="memitem">
 <div class="memproto">
@@ -428,6 +479,57 @@ const <a class="el" href="structb2_version.html">b2Version</a>&#160;</td><td cla
       </table>
 </div><div class="memdoc">
 <p>A velocity threshold for elastic collisions. Any collision with a relative linear velocity below this threshold will be treated as inelastic. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a9e1c46d4c0c37382656bfb2c79e4508a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2SetAllocFreeCallbacks </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="b2_settings_8h.html#ac58fac80aa13e098a0e9e6c72c5179ca">b2AllocFunction</a>&#160;</td>
+          <td class="paramname"><em>allocCallback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="b2_settings_8h.html#a7c4c0e67a45d8e9b1feb096973195c2c">b2FreeFunction</a>&#160;</td>
+          <td class="paramname"><em>freeCallback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>callbackData</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set alloc and free callbacks to override the default behavior of using malloc() and free() for dynamic memory allocation. Set allocCallback and freeCallback to NULL to restore the default allocator (malloc / free). </p>
+
+</div>
+</div>
+<a class="anchor" id="a0cd45e29c4e5b126cf16b8d88c24a00e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2SetNumAllocs </td>
+          <td>(</td>
+          <td class="paramtype">const int32&#160;</td>
+          <td class="paramname"><em>numAllocs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set the number of calls to b2Alloc minus the number of calls to b2Free. This can be used to disable the empty heap check in <a class="el" href="b2_settings_8h.html#a9e1c46d4c0c37382656bfb2c79e4508a">b2SetAllocFreeCallbacks()</a> which can be useful for testing. </p>
 
 </div>
 </div>
