@@ -12,7 +12,7 @@ built for many different systems (Android, Windows, OS X, Linux), see
 
 Discuss LiquidFun with other developers and users on the
 [LiquidFun Google Group][].  File issues on the [LiquidFun Issues Tracker][]
-or post your questions to [stackoverflow.com][] with a mention of
+or post your questions to [stackoverflow.com](http://stackoverflow.com/questions/tagged/liquidfun) with a mention of
 **liquidfun**.
 
 Please see `Box2D/Documentation/Building/` to learn how to build LiquidFun and
