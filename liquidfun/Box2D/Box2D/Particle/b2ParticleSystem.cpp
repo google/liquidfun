@@ -36,6 +36,8 @@ static const uint32 yShift = tagBits - yTruncBits;
 static const uint32 xShift = tagBits - yTruncBits - xTruncBits;
 static const uint32 xScale = 1 << xShift;
 static const uint32 xOffset = xScale * (1 << (xTruncBits - 1));
+static const uint32 yMask = ((1 << yTruncBits) - 1) << yShift;
+static const uint32 xMask = ~yMask;
 
 // This functor is passed to std::remove_if in RemoveSpuriousBodyContacts
 // to implement the algorithm described there.  It was hoisted out and friended
@@ -331,6 +333,37 @@ static inline uint32 computeTag(float32 x, float32 y)
 static inline uint32 computeRelativeTag(uint32 tag, int32 x, int32 y)
 {
 	return tag + (y << yShift) + (x << xShift);
+}
+
+b2ParticleSystem::InsideBoundsEnumerator::InsideBoundsEnumerator(
+	uint32 lower, uint32 upper, const Proxy* first, const Proxy* last)
+{
+	m_xLower = lower & xMask;
+	m_xUpper = upper & xMask;
+	m_yLower = lower & yMask;
+	m_yUpper = upper & yMask;
+	m_first = first;
+	m_last = last;
+	b2Assert(m_first <= m_last);
+}
+
+int32 b2ParticleSystem::InsideBoundsEnumerator::GetNext()
+{
+	while (m_first < m_last)
+	{
+		uint32 xTag = m_first->tag & xMask;
+#if B2_ASSERT_ENABLED
+		uint32 yTag = m_first->tag & yMask;
+		b2Assert(yTag >= m_yLower);
+		b2Assert(yTag <= m_yUpper);
+#endif
+		if (xTag >= m_xLower && xTag <= m_xUpper)
+		{
+			return (m_first++)->index;
+		}
+		m_first++;
+	}
+	return b2_invalidParticleIndex;
 }
 
 b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
@@ -1471,6 +1504,20 @@ void b2ParticleSystem::ComputeDepth()
 	m_world->m_stackAllocator.Free(contactGroups);
 }
 
+b2ParticleSystem::InsideBoundsEnumerator
+b2ParticleSystem::GetInsideBoundsEnumerator(const b2AABB& aabb) const
+{
+	uint32 lowerTag = computeTag(m_inverseDiameter * aabb.lowerBound.x - 1,
+								 m_inverseDiameter * aabb.lowerBound.y - 1);
+	uint32 upperTag = computeTag(m_inverseDiameter * aabb.upperBound.x + 1,
+								 m_inverseDiameter * aabb.upperBound.y + 1);
+	const Proxy* beginProxy = m_proxyBuffer.Begin();
+	const Proxy* endProxy = m_proxyBuffer.End();
+	const Proxy* firstProxy = std::lower_bound(beginProxy, endProxy, lowerTag);
+	const Proxy* lastProxy = std::upper_bound(firstProxy, endProxy, upperTag);
+	return InsideBoundsEnumerator(lowerTag, upperTag, firstProxy, lastProxy);
+}
+
 inline void b2ParticleSystem::AddContact(int32 a, int32 b,
 	b2GrowableBuffer<b2ParticleContact>& contacts) const
 {
@@ -1894,6 +1941,55 @@ int32 b2ParticlePairSet::Find(const ParticlePair& pair) const
 	return index;
 }
 
+/// Callback class to receive pairs of fixtures and particles which may be
+/// overlapping. Used as an argument of b2World::QueryAABB.
+class b2FixtureParticleQueryCallback : public b2QueryCallback
+{
+public:
+	explicit b2FixtureParticleQueryCallback(b2ParticleSystem* system)
+	{
+		m_system = system;
+	}
+
+private:
+	// Skip reporting particles.
+	bool ShouldQueryParticleSystem(const b2ParticleSystem* system)
+	{
+		return false;
+	}
+
+	// Receive a fixture and call ReportFixtureAndParticle() for each particle
+	// inside aabb of the fixture.
+	bool ReportFixture(b2Fixture* fixture)
+	{
+		if (fixture->IsSensor())
+		{
+			return true;
+		}
+		const b2Shape* shape = fixture->GetShape();
+		int32 childCount = shape->GetChildCount();
+		for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+		{
+			b2AABB aabb = fixture->GetAABB(childIndex);
+			b2ParticleSystem::InsideBoundsEnumerator enumerator =
+								m_system->GetInsideBoundsEnumerator(aabb);
+			int32 index;
+			while ((index = enumerator.GetNext()) >= 0)
+			{
+				ReportFixtureAndParticle(fixture, childIndex, index);
+			}
+		}
+		return true;
+	}
+
+	// Receive a fixture and a particle which may be overlapping.
+	virtual void ReportFixtureAndParticle(
+						b2Fixture* fixture, int32 childIndex, int32 index) = 0;
+
+protected:
+	b2ParticleSystem* m_system;
+};
+
 void b2ParticleSystem::UpdateBodyContacts()
 {
 	// If the particle contact listener is enabled, generate a set of
@@ -1924,7 +2020,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 	m_bodyContactBuffer.SetCount(0);
 	m_stuckParticleBuffer.SetCount(0);
 
-	class UpdateBodyContactsCallback : public b2QueryCallback
+	class UpdateBodyContactsCallback : public b2FixtureParticleQueryCallback
 	{
 		// Call the contact filter if it's set, to determine whether to
 		// filter this contact.  Returns true if contact calculations should
@@ -1972,86 +2068,42 @@ void b2ParticleSystem::UpdateBodyContacts()
 			}
 		}
 
-		bool ReportFixture(b2Fixture* fixture)
+		void ReportFixtureAndParticle(
+								b2Fixture* fixture, int32 childIndex, int32 a)
 		{
-			if (fixture->IsSensor())
+			b2Vec2 ap = m_system->m_positionBuffer.data[a];
+			float32 d;
+			b2Vec2 n;
+			fixture->ComputeDistance(ap, &d, &n, childIndex);
+			if (d < m_system->m_particleDiameter && ShouldCollide(fixture, a))
 			{
-				return true;
-			}
-			const b2Shape* shape = fixture->GetShape();
-			b2Body* b = fixture->GetBody();
-			b2Vec2 bp = b->GetWorldCenter();
-			float32 bm = b->GetMass();
-			float32 bI = b->GetInertia() -
-						 bm * b->GetLocalCenter().LengthSquared();
-			float32 invBm = bm > 0 ? 1 / bm : 0;
-			float32 invBI = bI > 0 ? 1 / bI : 0;
-			int32 childCount = shape->GetChildCount();
-			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
-			{
-				b2AABB aabb = fixture->GetAABB(childIndex);
-				aabb.lowerBound.x -= m_system->m_particleDiameter;
-				aabb.lowerBound.y -= m_system->m_particleDiameter;
-				aabb.upperBound.x += m_system->m_particleDiameter;
-				aabb.upperBound.y += m_system->m_particleDiameter;
-				Proxy* beginProxy = m_system->m_proxyBuffer.Begin();
-				Proxy* endProxy = m_system->m_proxyBuffer.End();
-				Proxy* firstProxy = std::lower_bound(
-					beginProxy, endProxy,
-					computeTag(
-						m_system->m_inverseDiameter * aabb.lowerBound.x,
-						m_system->m_inverseDiameter * aabb.lowerBound.y));
-				Proxy* lastProxy = std::upper_bound(
-					firstProxy, endProxy,
-					computeTag(
-						m_system->m_inverseDiameter * aabb.upperBound.x,
-						m_system->m_inverseDiameter * aabb.upperBound.y));
+				b2Body* b = fixture->GetBody();
+				b2Vec2 bp = b->GetWorldCenter();
+				float32 bm = b->GetMass();
+				float32 bI =
+					b->GetInertia() - bm * b->GetLocalCenter().LengthSquared();
+				float32 invBm = bm > 0 ? 1 / bm : 0;
+				float32 invBI = bI > 0 ? 1 / bI : 0;
+				float32 invAm =
+					m_system->m_flagsBuffer.data[a] &
+					b2_wallParticle ? 0 : m_system->GetParticleInvMass();
+				b2Vec2 rp = ap - bp;
+				float32 rpn = b2Cross(rp, n);
+				float32 invM = invAm + invBm + invBI * rpn * rpn;
 
-				for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
-				{
-					int32 a = proxy->index;
-					b2Vec2 ap = m_system->m_positionBuffer.data[a];
-					if (aabb.lowerBound.x <= ap.x &&
-							ap.x <= aabb.upperBound.x &&
-						aabb.lowerBound.y <= ap.y &&
-							ap.y <= aabb.upperBound.y)
-					{
-						float32 d;
-						b2Vec2 n;
-						fixture->ComputeDistance(ap, &d, &n, childIndex);
-						if (d < m_system->m_particleDiameter)
-						{
-							if (!ShouldCollide(fixture, a))
-							{
-								continue;
-							}
-							float32 invAm =
-								m_system->m_flagsBuffer.data[a] &
-								b2_wallParticle ? 0 :
-									m_system->GetParticleInvMass();
-							b2Vec2 rp = ap - bp;
-							float32 rpn = b2Cross(rp, n);
-							float32 invM = invAm + invBm + invBI * rpn * rpn;
-
-							b2ParticleBodyContact& contact =
-								m_system->m_bodyContactBuffer.Append();
-							contact.index = a;
-							contact.body = b;
-							contact.fixture = fixture;
-							contact.weight =
-								1 - d * m_system->m_inverseDiameter;
-							contact.normal = -n;
-							contact.mass = invM > 0 ? 1 / invM : 0;
-							ReportContact(&contact);
-							m_system->DetectStuckParticle(a);
-						}
-					}
-				}
+				b2ParticleBodyContact& contact =
+					m_system->m_bodyContactBuffer.Append();
+				contact.index = a;
+				contact.body = b;
+				contact.fixture = fixture;
+				contact.weight = 1 - d * m_system->m_inverseDiameter;
+				contact.normal = -n;
+				contact.mass = invM > 0 ? 1 / invM : 0;
+				ReportContact(&contact);
+				m_system->DetectStuckParticle(a);
 			}
-			return true;
 		}
 
-		b2ParticleSystem* m_system;
 		b2World* m_world;
 		b2ContactFilter* m_contactFilter;
 		b2ContactListener* m_contactListener;
@@ -2061,9 +2113,9 @@ void b2ParticleSystem::UpdateBodyContacts()
 		UpdateBodyContactsCallback(
 			b2ParticleSystem* system, b2World* world,
 			b2ContactFilter* contactFilter, b2ContactListener* contactListener,
-			FixtureParticleSet* fixtureSet)
+			FixtureParticleSet* fixtureSet):
+			b2FixtureParticleQueryCallback(system)
 		{
-			m_system = system;
 			m_world = world;
 			m_contactFilter = contactFilter;
 			m_contactListener = contactListener;
@@ -2163,101 +2215,63 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 		aabb.lowerBound = b2Min(aabb.lowerBound, b2Min(p1, p2));
 		aabb.upperBound = b2Max(aabb.upperBound, b2Max(p1, p2));
 	}
-	class SolveCollisionCallback : public b2QueryCallback
+	class SolveCollisionCallback : public b2FixtureParticleQueryCallback
 	{
-		bool ReportFixture(b2Fixture* fixture)
+		void ReportFixtureAndParticle(
+								b2Fixture* fixture, int32 childIndex, int32 a)
 		{
-			if (fixture->IsSensor())
-			{
-				return true;
-			}
-			const b2Shape* shape = fixture->GetShape();
 			b2Body* body = fixture->GetBody();
-			Proxy* beginProxy = m_system->m_proxyBuffer.Begin();
-			Proxy* endProxy = m_system->m_proxyBuffer.End();
-			int32 childCount = shape->GetChildCount();
-			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+			b2Vec2 ap = m_system->m_positionBuffer.data[a];
+			b2Vec2 av = m_system->m_velocityBuffer.data[a];
+			b2RayCastOutput output;
+			b2RayCastInput input;
+			if (m_system->m_iterationIndex == 0)
 			{
-				b2AABB aabb = fixture->GetAABB(childIndex);
-				aabb.lowerBound.x -= m_system->m_particleDiameter;
-				aabb.lowerBound.y -= m_system->m_particleDiameter;
-				aabb.upperBound.x += m_system->m_particleDiameter;
-				aabb.upperBound.y += m_system->m_particleDiameter;
-				Proxy* firstProxy = std::lower_bound(
-					beginProxy, endProxy,
-					computeTag(
-						m_system->m_inverseDiameter * aabb.lowerBound.x,
-						m_system->m_inverseDiameter * aabb.lowerBound.y));
-				Proxy* lastProxy = std::upper_bound(
-					firstProxy, endProxy,
-					computeTag(
-						m_system->m_inverseDiameter * aabb.upperBound.x,
-						m_system->m_inverseDiameter * aabb.upperBound.y));
-				for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
+				// Put 'ap' in the local space of the previous frame
+				b2Vec2 p1 = b2MulT(body->m_xf0, ap);
+				if (fixture->GetShape()->GetType() == b2Shape::e_circle)
 				{
-					int32 a = proxy->index;
-					b2Vec2 ap = m_system->m_positionBuffer.data[a];
-					if (aabb.lowerBound.x <= ap.x &&
-							ap.x <= aabb.upperBound.x &&
-						aabb.lowerBound.y <= ap.y &&
-							ap.y <= aabb.upperBound.y)
-					{
-						b2Vec2 av = m_system->m_velocityBuffer.data[a];
-						b2RayCastOutput output;
-						b2RayCastInput input;
-						if (m_system->m_iterationIndex == 0)
-						{
-							// Put 'ap' in the local space of the previous frame
-							b2Vec2 p1 = b2MulT(body->m_xf0, ap);
-							if (shape->GetType() == b2Shape::e_circle)
-							{
-								// Make relative to the center of the circle
-								p1 -= body->GetLocalCenter();
-								// Re-apply rotation about the center of the
-								// circle
-								p1 = b2Mul(body->m_xf0.q, p1);
-								// Subtract rotation of the current frame
-								p1 = b2MulT(body->m_xf.q, p1);
-								// Return to local space
-								p1 += body->GetLocalCenter();
-							}
-							// Return to global space and apply rotation of
-							// current frame
-							input.p1 = b2Mul(body->m_xf, p1);
-						}
-						else
-						{
-							input.p1 = ap;
-						}
-						input.p2 = ap + m_step.dt * av;
-						input.maxFraction = 1;
-						if (fixture->RayCast(&output, input, childIndex))
-						{
-							b2Vec2 n = output.normal;
-							b2Vec2 p =
-								(1 - output.fraction) * input.p1 +
-								output.fraction * input.p2 +
-								b2_linearSlop * n;
-							b2Vec2 v = m_step.inv_dt * (p - ap);
-							m_system->m_velocityBuffer.data[a] = v;
-							b2Vec2 f = m_step.inv_dt *
-								m_system->GetParticleMass() * (av - v);
-							m_system->ParticleApplyForce(a, f);
-						}
-					}
+					// Make relative to the center of the circle
+					p1 -= body->GetLocalCenter();
+					// Re-apply rotation about the center of the
+					// circle
+					p1 = b2Mul(body->m_xf0.q, p1);
+					// Subtract rotation of the current frame
+					p1 = b2MulT(body->m_xf.q, p1);
+					// Return to local space
+					p1 += body->GetLocalCenter();
 				}
+				// Return to global space and apply rotation of current frame
+				input.p1 = b2Mul(body->m_xf, p1);
 			}
-			return true;
+			else
+			{
+				input.p1 = ap;
+			}
+			input.p2 = ap + m_step.dt * av;
+			input.maxFraction = 1;
+			if (fixture->RayCast(&output, input, childIndex))
+			{
+				b2Vec2 n = output.normal;
+				b2Vec2 p =
+					(1 - output.fraction) * input.p1 +
+					output.fraction * input.p2 +
+					b2_linearSlop * n;
+				b2Vec2 v = m_step.inv_dt * (p - ap);
+				m_system->m_velocityBuffer.data[a] = v;
+				b2Vec2 f = m_step.inv_dt *
+					m_system->GetParticleMass() * (av - v);
+				m_system->ParticleApplyForce(a, f);
+			}
 		}
 
-		b2ParticleSystem* m_system;
 		b2TimeStep m_step;
 
 	public:
-		SolveCollisionCallback(b2ParticleSystem* system,
-							   const b2TimeStep& step)
+		SolveCollisionCallback(
+			b2ParticleSystem* system, const b2TimeStep& step):
+			b2FixtureParticleQueryCallback(system)
 		{
-			m_system = system;
 			m_step = step;
 		}
 	} callback(this, step);
@@ -2287,8 +2301,6 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 			}
 		}
 	}
-	Proxy* beginProxy = m_proxyBuffer.Begin();
-	Proxy* endProxy = m_proxyBuffer.End();
 	float32 tmax = b2_barrierCollisionTime * step.dt;
 	for (int32 k = 0; k < m_pairBuffer.GetCount(); k++)
 	{
@@ -2299,42 +2311,28 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 			int32 b = pair.indexB;
 			b2Vec2 pa = m_positionBuffer.data[a];
 			b2Vec2 pb = m_positionBuffer.data[b];
-			b2Vec2 lower = b2Min(pa, pb);
-			b2Vec2 upper = b2Max(pa, pb);
-			lower.x -= m_particleDiameter;
-			lower.y -= m_particleDiameter;
-			upper.x += m_particleDiameter;
-			upper.y += m_particleDiameter;
-			Proxy* firstProxy = std::lower_bound(
-				beginProxy, endProxy,
-				computeTag(
-					m_inverseDiameter * lower.x,
-					m_inverseDiameter * lower.y));
-			Proxy* lastProxy = std::upper_bound(
-				firstProxy, endProxy,
-				computeTag(
-					m_inverseDiameter * upper.x,
-					m_inverseDiameter * upper.y));
-			b2Vec2 va = m_velocityBuffer.data[a];
-			b2Vec2 vb = m_velocityBuffer.data[b];
-			b2Vec2 pba = pb - pa;
-			b2Vec2 vba = vb - va;
-			for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
+			b2AABB aabb;
+			aabb.lowerBound = b2Min(pa, pb);
+			aabb.upperBound = b2Max(pa, pb);
+			InsideBoundsEnumerator enumerator = GetInsideBoundsEnumerator(aabb);
+			int32 c;
+			while ((c = enumerator.GetNext()) >= 0)
 			{
-				int32 c = proxy->index;
 				b2Vec2 pc = m_positionBuffer.data[c];
-				if (lower.x <= pc.x && pc.x <= upper.x &&
-					lower.y <= pc.y && pc.y <= upper.y &&
-					m_groupBuffer[a] != m_groupBuffer[c] &&
+				if (m_groupBuffer[a] != m_groupBuffer[c] &&
 					m_groupBuffer[b] != m_groupBuffer[c])
 				{
+					b2Vec2 va = m_velocityBuffer.data[a];
+					b2Vec2 vb = m_velocityBuffer.data[b];
 					b2Vec2& vc = m_velocityBuffer.data[c];
 					// Solve the equation below:
 					//   (1-s)*(pa+t*va)+s*(pb+t*vb) = pc+t*vc
 					// which expresses that the particle c will pass a line
 					// connecting the particles a and b at the time of t.
 					// if s is between 0 and 1, c will pass between a and b.
+					b2Vec2 pba = pb - pa;
 					b2Vec2 pca = pc - pa;
+					b2Vec2 vba = vb - va;
 					b2Vec2 vca = vc - va;
 					float32 e2 = b2Cross(vba, vca);
 					float32 e1 = b2Cross(pba, vca) - b2Cross(pca, vba);
@@ -2421,8 +2419,8 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		b2TimeStep subStep = step;
 		subStep.dt /= step.particleIterations;
 		subStep.inv_dt *= step.particleIterations;
-		UpdateBodyContacts();
 		UpdateContacts(false);
+		UpdateBodyContacts();
 		ComputeWeight();
 		if (m_allGroupFlags & b2_particleGroupNeedsUpdateDepth)
 		{
@@ -3958,27 +3956,19 @@ void b2ParticleSystem::RayCast(b2RayCastCallback* callback,
 	{
 		return;
 	}
-	const Proxy* beginProxy = m_proxyBuffer.Begin();
-	const Proxy* endProxy = m_proxyBuffer.End();
-	const Proxy* firstProxy = std::lower_bound(
-		beginProxy, endProxy,
-		computeTag(
-			m_inverseDiameter * b2Min(point1.x, point2.x) - 1,
-			m_inverseDiameter * b2Min(point1.y, point2.y) - 1));
-	const Proxy* lastProxy = std::upper_bound(
-		firstProxy, endProxy,
-		computeTag(
-			m_inverseDiameter * b2Max(point1.x, point2.x) + 1,
-			m_inverseDiameter * b2Max(point1.y, point2.y) + 1));
+	b2AABB aabb;
+	aabb.lowerBound = b2Min(point1, point2);
+	aabb.upperBound = b2Max(point1, point2);
 	float32 fraction = 1;
 	// solving the following equation:
 	// ((1-t)*point1+t*point2-position)^2=diameter^2
 	// where t is a potential fraction
 	b2Vec2 v = point2 - point1;
 	float32 v2 = b2Dot(v, v);
-	for (const Proxy* proxy = firstProxy; proxy < lastProxy; ++proxy)
+	InsideBoundsEnumerator enumerator = GetInsideBoundsEnumerator(aabb);
+	int32 i;
+	while ((i = enumerator.GetNext()) >= 0)
 	{
-		int32 i = proxy->index;
 		b2Vec2 p = point1 - m_positionBuffer.data[i];
 		float32 pv = b2Dot(p, v);
 		float32 p2 = b2Dot(p, p);
