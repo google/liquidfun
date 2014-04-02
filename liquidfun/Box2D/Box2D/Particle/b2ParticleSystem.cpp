@@ -2193,8 +2193,23 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 						b2RayCastInput input;
 						if (m_system->m_iterationIndex == 0)
 						{
-							input.p1 = b2Mul(body->m_xf,
-											 b2MulT(body->m_xf0, ap));
+							// Put 'ap' in the local space of the previous frame
+							b2Vec2 p1 = b2MulT(body->m_xf0, ap);
+							if (shape->GetType() == b2Shape::e_circle)
+							{
+								// Make relative to the center of the circle
+								p1 -= body->GetLocalCenter();
+								// Re-apply rotation about the center of the
+								// circle
+								p1 = b2Mul(body->m_xf0.q, p1);
+								// Subtract rotation of the current frame
+								p1 = b2MulT(body->m_xf.q, p1);
+								// Return to local space
+								p1 += body->GetLocalCenter();
+							}
+							// Return to global space and apply rotation of
+							// current frame
+							input.p1 = b2Mul(body->m_xf, p1);
 						}
 						else
 						{
