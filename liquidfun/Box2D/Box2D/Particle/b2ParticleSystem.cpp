@@ -36,8 +36,6 @@ static const uint32 yShift = tagBits - yTruncBits;
 static const uint32 xShift = tagBits - yTruncBits - xTruncBits;
 static const uint32 xScale = 1 << xShift;
 static const uint32 xOffset = xScale * (1 << (xTruncBits - 1));
-static const uint32 xMask = (1 << xTruncBits) - 1;
-static const uint32 yMask = (1 << yTruncBits) - 1;
 
 // This functor is passed to std::remove_if in RemoveSpuriousBodyContacts
 // to implement the algorithm described there.  It was hoisted out and friended
