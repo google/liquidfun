@@ -168,3 +168,6 @@ public:
 /// Include original .h file for SWIG
 /// The original file is simple enough we will just pull it in
 %include "../../../Box2D/Box2D/Particle/b2ParticleSystem.h"
+
+/// Clear the typemaps
+%clear (void* outBuf, int size);
