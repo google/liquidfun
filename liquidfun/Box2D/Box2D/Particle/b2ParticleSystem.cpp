@@ -3575,7 +3575,7 @@ template <typename T> void b2ParticleSystem::SetUserOverridableBuffer(
 	UserOverridableBuffer<T>* buffer, T* newData, int32 newCapacity)
 {
 	b2Assert((newData && newCapacity) || (!newData && !newCapacity));
-	if (!buffer->userSuppliedCapacity)
+	if (!buffer->userSuppliedCapacity && buffer->data)
 	{
 		m_world->m_blockAllocator.Free(
 			buffer->data, sizeof(T) * m_internalAllocatedCapacity);
