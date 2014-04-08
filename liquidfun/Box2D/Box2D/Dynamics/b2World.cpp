@@ -1368,6 +1368,29 @@ void b2World::DrawDebugData()
 	}
 }
 
+static float32 GetSmallestRadius(const b2World* world)
+{
+	float32 smallestRadius = b2_maxFloat;
+	for (const b2ParticleSystem* system = world->GetParticleSystemList();
+		 system != NULL;
+		 system = system->GetNext())
+	{
+		smallestRadius = b2Min(smallestRadius, system->GetRadius());
+	}
+	return smallestRadius;
+}
+
+int b2World::CalculateDefaultParticleIterations(float32 timeStep) const
+{
+	if (m_particleSystemList == NULL)
+		return 1;
+
+	// Use the smallest radius, since that represents the worst-case.
+	return b2CalculateParticleIterations(m_gravity.Length(),
+										 GetSmallestRadius(this),
+										 timeStep);
+}
+
 int32 b2World::GetProxyCount() const
 {
 	return m_contactManager.m_broadPhase.GetProxyCount();
