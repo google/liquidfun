@@ -58,6 +58,7 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
  <a href="#ps">Particle Systems</a><br/>
  <a href="#pg">Particle Groups</a><br/>
  <a href="#dp">Discrete Particles vs. Particle Groups</a><br/>
+ <a href="#stw">Stepping the World</a><br/>
  <a href="#cdp">Creating and Destroying Particles</a><br/>
  <a href="#cdpg">Creating and Destroying Particle Groups</a><br/>
  <a href="#pb">Particle Behaviors</a><br/>
@@ -96,6 +97,12 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <h2>Discrete Particles vs. Particle Groups</h2>
 <p>With one main exception, there is no functional difference between working with individual particles and groups of particles. The exception is rigid particles: Because of the internal algorithm used to make particles rigid, you must define them as a group.</p>
 <p>Particle groups do offer several conveniences. First, they allow you to create and destroy large numbers of particles automatically. If you do not create a group, you must create all of the particles individually. Also, a group allows you to assign the same property, such as angle of rotation, to all of its particles at once.</p>
+<p><a class="anchor" id="stw"></a> </p>
+<h2>Stepping the World</h2>
+<p>The particle solver can iterate multiple times per step. Larger numbers of steps improve the stability and fidelity of the particle simulation.</p>
+<p>Use the <code>particleIterations</code> parameter in <code>b2World::Step</code> to set the number of iterations. The default value of <code>particleIterations</code> is 1.</p>
+<p>Gravity, particle radius, and simulation timestep can all affect the optimal number of iterations. Call <code>b2CalculateParticleIterations</code> to get a recommended value.</p>
+<p>Regardless of the recommended value, you may also increase particle iterations to stabilize a simulation that seems overly bouncy or energetic. Of course, as you add iterations, the simulation becomes more expensive. You should experiment to find the right balance of stability and cost for your application.</p>
 <p><a class="anchor" id="cdp"></a> </p>
 <h2>Creating and Destroying Particles</h2>
 <p>To create individual particles, create a <code>b2ParticleDef</code>-struct object. Next, specify the behavior and properties of the particle. Finally, call the method to create the particle.<br/>
@@ -329,8 +336,8 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>Small particles may also behave unpredictably (i.e., break conservation of momentum) in scenarios such as explosions. Slowing these particles down by reducing gravity scale can stabilize their behavior.</p>
 <p>Set gravity scale using the statement</p>
 <p>&#160;&#160;&#160;<code>m_particleSystem-&gt;SetGravityScale(g);</code></p>
-<p>, where g is a float32 value greater than 0.0f. Default gravity scale is 1.0f.</p>
-<p>It is worth noting that adjusting the number of particle iterations per solver step can also affect the effect of gravity on particles. Larger iteration sizes confer greater resistance to gravity. The most common use case for an increased particle-iteration size is to prevent particle deformation due to gravity.</p>
+<p>where <code>g</code> is a <code>float32</code> value greater than 0.0f. Default gravity scale is 1.0f.</p>
+<p>It is worth noting that adjusting the number of particle iterations per solver step can also affect the effect of gravity on particles. Larger iteration sizes confer greater resistance to gravity. A common reason for increasing the number of particle-iterations is to prevent volume loss (i.e. compression) due to gravity.</p>
 <h3>Position</h3>
 <p>Set particle or particle-group position using the statement</p>
 <p>&#160;&#160;&#160;<code>pd.position.Set(x, y);</code></p>
