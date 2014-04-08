@@ -5,6 +5,7 @@
 [Particle Systems](#ps)<br/>
 [Particle Groups](#pg)<br/>
 [Discrete Particles vs. Particle Groups](#dp)<br/>
+[Stepping the World](#stw)<br/>
 [Creating and Destroying Particles](#cdp)<br/>
 [Creating and Destroying Particle Groups](#cdpg)<br/>
 [Particle Behaviors](#pb)<br/>
@@ -102,6 +103,24 @@ and destroy large numbers of particles automatically. If you do not create a
 group, you must create all of the particles individually. Also, a group allows
 you to assign the same property, such as angle of rotation, to all of its
 particles at once.
+
+<a name="stw">
+## Stepping the World
+
+The particle solver can iterate multiple times per step. Larger numbers of steps
+improve the stability and fidelity of the particle simulation.
+
+Use the `particleIterations` parameter in `b2World::Step` to set the number
+of iterations. The default value of `particleIterations` is 1.
+
+Gravity, particle radius, and simulation timestep can all affect the optimal
+number of iterations. Call `b2CalculateParticleIterations` to get a
+recommended value.
+
+Regardless of the recommended value, you may also increase particle iterations
+to stabilize a simulation that seems overly bouncy or energetic. Of course, as
+you add iterations, the simulation becomes more expensive. You should experiment
+to find the right balance of stability and cost for your application.
 
 <a name="cdp">
 ## Creating and Destroying Particles
@@ -546,12 +565,14 @@ Set gravity scale using the statement
 
 &nbsp;&nbsp;&nbsp;`m_particleSystem->SetGravityScale(g);`
 
-, where g is a float32 value greater than 0.0f. Default gravity scale is 1.0f.
+where `g` is a `float32` value greater than 0.0f. Default gravity scale is
+1.0f.
 
 It is worth noting that adjusting the number of particle iterations per solver
 step can also affect the effect of gravity on particles. Larger iteration sizes
-confer greater resistance to gravity. The most common use case for an increased
-particle-iteration size is to prevent particle deformation due to gravity.
+confer greater resistance to gravity. A common reason for increasing the number
+of particle-iterations is to prevent volume loss (i.e. compression) due to
+gravity.
 
 ### Position
 
