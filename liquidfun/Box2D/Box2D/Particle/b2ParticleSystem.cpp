@@ -1222,7 +1222,7 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 				m_pairBuffer = RequestGrowableBuffer(m_pairBuffer,
 													m_pairCount,
 													&m_pairCapacity);
-				Pair& pair = m_pairBuffer[m_pairCount];
+				b2ParticlePair& pair = m_pairBuffer[m_pairCount];
 				pair.indexA = a;
 				pair.indexB = b;
 				pair.flags = contact.flags;
@@ -1236,7 +1236,7 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 		}
 		std::stable_sort(
 			m_pairBuffer, m_pairBuffer + m_pairCount, ComparePairIndices);
-		Pair* lastPair = std::unique(
+		b2ParticlePair* lastPair = std::unique(
 			m_pairBuffer, m_pairBuffer + m_pairCount, MatchPairIndices);
 		m_pairCount = (int32) (lastPair - m_pairBuffer);
 	}
@@ -1288,7 +1288,8 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 					b2ParticleGroup* groupA = m_system->m_groupBuffer[a];
 					b2ParticleGroup* groupB = m_system->m_groupBuffer[b];
 					b2ParticleGroup* groupC = m_system->m_groupBuffer[c];
-					Triad& triad = m_system->m_triadBuffer[m_system->m_triadCount];
+					b2ParticleTriad& triad =
+								m_system->m_triadBuffer[m_system->m_triadCount];
 					triad.indexA = a;
 					triad.indexB = b;
 					triad.indexC = c;
@@ -1321,25 +1322,28 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 		diagram.GetNodes(callback);
 		std::stable_sort(
 			m_triadBuffer, m_triadBuffer + m_triadCount, CompareTriadIndices);
-		Triad* lastTriad = std::unique(
+		b2ParticleTriad* lastTriad = std::unique(
 			m_triadBuffer, m_triadBuffer + m_triadCount, MatchTriadIndices);
 		m_triadCount = (int32) (lastTriad - m_triadBuffer);
 	}
 }
 
-bool b2ParticleSystem::ComparePairIndices(const Pair& a, const Pair& b)
+bool b2ParticleSystem::ComparePairIndices(
+							const b2ParticlePair& a, const b2ParticlePair& b)
 {
 	int32 diffA = a.indexA - b.indexA;
 	if (diffA != 0) return diffA < 0;
 	return a.indexB < b.indexB;
 }
 
-bool b2ParticleSystem::MatchPairIndices(const Pair& a, const Pair& b)
+bool b2ParticleSystem::MatchPairIndices(
+							const b2ParticlePair& a, const b2ParticlePair& b)
 {
 	return a.indexA == b.indexA && a.indexB == b.indexB;
 }
 
-bool b2ParticleSystem::CompareTriadIndices(const Triad& a, const Triad& b)
+bool b2ParticleSystem::CompareTriadIndices(
+							const b2ParticleTriad& a, const b2ParticleTriad& b)
 {
 	int32 diffA = a.indexA - b.indexA;
 	if (diffA != 0) return diffA < 0;
@@ -1348,7 +1352,8 @@ bool b2ParticleSystem::CompareTriadIndices(const Triad& a, const Triad& b)
 	return a.indexC < b.indexC;
 }
 
-bool b2ParticleSystem::MatchTriadIndices(const Triad& a, const Triad& b)
+bool b2ParticleSystem::MatchTriadIndices(
+							const b2ParticleTriad& a, const b2ParticleTriad& b)
 {
 	return a.indexA == b.indexA && a.indexB == b.indexB && a.indexC == b.indexC;
 }
@@ -2263,7 +2268,7 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 	float32 tmax = b2_barrierCollisionTime * step.dt;
 	for (int32 k = 0; k < m_pairCount; k++)
 	{
-		const Pair& pair = m_pairBuffer[k];
+		const b2ParticlePair& pair = m_pairBuffer[k];
 		if (pair.flags & b2_barrierParticle)
 		{
 			int32 a = pair.indexA;
@@ -2757,7 +2762,7 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 	float32 elasticStrength = step.inv_dt * m_def.elasticStrength;
 	for (int32 k = 0; k < m_triadCount; k++)
 	{
-		const Triad& triad = m_triadBuffer[k];
+		const b2ParticleTriad& triad = m_triadBuffer[k];
 		if (triad.flags & b2_elasticParticle)
 		{
 			int32 a = triad.indexA;
@@ -2799,7 +2804,7 @@ void b2ParticleSystem::SolveSpring(const b2TimeStep& step)
 	float32 springStrength = step.inv_dt * m_def.springStrength;
 	for (int32 k = 0; k < m_pairCount; k++)
 	{
-		const Pair& pair = m_pairBuffer[k];
+		const b2ParticlePair& pair = m_pairBuffer[k];
 		if (pair.flags & b2_springParticle)
 		{
 			int32 a = pair.indexA;
@@ -3118,11 +3123,11 @@ void b2ParticleSystem::SolveZombie()
 		{
 			return contact.index < 0;
 		}
-		static bool IsPairInvalid(const Pair& pair)
+		static bool IsPairInvalid(const b2ParticlePair& pair)
 		{
 			return pair.indexA < 0 || pair.indexB < 0;
 		}
-		static bool IsTriadInvalid(const Triad& triad)
+		static bool IsTriadInvalid(const b2ParticleTriad& triad)
 		{
 			return triad.indexA < 0 || triad.indexB < 0 || triad.indexC < 0;
 		}
@@ -3165,23 +3170,23 @@ void b2ParticleSystem::SolveZombie()
 	// update pairs
 	for (int32 k = 0; k < m_pairCount; k++)
 	{
-		Pair& pair = m_pairBuffer[k];
+		b2ParticlePair& pair = m_pairBuffer[k];
 		pair.indexA = newIndices[pair.indexA];
 		pair.indexB = newIndices[pair.indexB];
 	}
-	Pair* lastPair = std::remove_if(
+	b2ParticlePair* lastPair = std::remove_if(
 		m_pairBuffer, m_pairBuffer + m_pairCount, Test::IsPairInvalid);
 	m_pairCount = (int32) (lastPair - m_pairBuffer);
 
 	// update triads
 	for (int32 k = 0; k < m_triadCount; k++)
 	{
-		Triad& triad = m_triadBuffer[k];
+		b2ParticleTriad& triad = m_triadBuffer[k];
 		triad.indexA = newIndices[triad.indexA];
 		triad.indexB = newIndices[triad.indexB];
 		triad.indexC = newIndices[triad.indexC];
 	}
-	Triad* lastTriad = std::remove_if(
+	b2ParticleTriad* lastTriad = std::remove_if(
 		m_triadBuffer, m_triadBuffer + m_triadCount,
 		Test::IsTriadInvalid);
 	m_triadCount = (int32) (lastTriad - m_triadBuffer);
@@ -3444,7 +3449,7 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	// update pairs
 	for (int32 k = 0; k < m_pairCount; k++)
 	{
-		Pair& pair = m_pairBuffer[k];
+		b2ParticlePair& pair = m_pairBuffer[k];
 		pair.indexA = newIndices[pair.indexA];
 		pair.indexB = newIndices[pair.indexB];
 	}
@@ -3452,7 +3457,7 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	// update triads
 	for (int32 k = 0; k < m_triadCount; k++)
 	{
-		Triad& triad = m_triadBuffer[k];
+		b2ParticleTriad& triad = m_triadBuffer[k];
 		triad.indexA = newIndices[triad.indexA];
 		triad.indexB = newIndices[triad.indexB];
 		triad.indexC = newIndices[triad.indexC];
