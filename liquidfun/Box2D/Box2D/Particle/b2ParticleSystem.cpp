@@ -4058,3 +4058,36 @@ void b2ParticleSystem::SetStuckThreshold(int32 steps)
 			m_consecutiveContactStepsBuffer.data);
 	}
 }
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
+b2ParticleSystem::b2ExceptionType b2ParticleSystem::IsBufCopyValid(
+	int startIndex, int numParticles, int copySize, int bufSize) const
+{
+	const int maxNumParticles = GetParticleCount();
+
+	// are we actually copying?
+	if (copySize == 0)
+	{
+		return b2_noExceptions;
+	}
+
+	// is the index out of bounds?
+	if (startIndex < 0 ||
+		startIndex >= maxNumParticles ||
+		numParticles < 0 ||
+		numParticles + startIndex > maxNumParticles)
+	{
+		return b2_particleIndexOutOfBounds;
+	}
+
+	// are we copying within the boundaries?
+	if (copySize > bufSize)
+	{
+		return b2_bufferTooSmall;
+	}
+
+	return b2_noExceptions;
+}
+
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API

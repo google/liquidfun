@@ -265,6 +265,15 @@ public:
 		return m_liquidFunVersionString;
 	}
 
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+public:
+	/// Constructor which takes direct floats.
+	b2World(float32 gravityX, float32 gravityY);
+
+	/// Set gravity with direct floats.
+	void SetGravity(float32 gravityX, float32 gravityY);
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
 private:
 
 	// m_flags
@@ -280,6 +289,8 @@ private:
 	friend class b2ContactManager;
 	friend class b2Controller;
 	friend class b2ParticleSystem;
+
+	void Init(const b2Vec2& gravity);
 
 	void Solve(const b2TimeStep& step);
 	void SolveTOI(const b2TimeStep& step);
@@ -425,5 +436,17 @@ inline const b2Profile& b2World::GetProfile() const
 {
 	return m_profile;
 }
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+inline b2World::b2World(float32 gravityX, float32 gravityY)
+{
+	Init(b2Vec2(gravityX, gravityY));
+}
+
+inline void b2World::SetGravity(float32 gravityX, float32 gravityY)
+{
+	SetGravity(b2Vec2(gravityX, gravityY));
+}
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 
 #endif

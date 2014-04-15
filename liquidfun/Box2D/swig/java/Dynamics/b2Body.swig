@@ -18,20 +18,14 @@
 
 %module b2Body
 
+/// We are going to use b2ParticleFlag as bitfields for C++ and Java, so it
+/// makes more sense to just expose them as final ints in Java
+%include "enums.swg"
+%javaconst(1);
+
 /// b2BodyDef class
 // Ignore userData
 %ignore b2BodyDef::userData;
-
-// b2BodyDef extensions for easier Java access
-%extend b2BodyDef {
-    void SetPosition(float32 posX, float32 posY) {
-        $self->position.x = posX;
-        $self->position.y = posY;
-    }
-    void SetType(int type) {
-        $self->type = (b2BodyType)type;
-    }
-};
 
 /// b2Body class
 /// C++ implementation does not have default public ctors and dtors. Don't
@@ -52,21 +46,6 @@
 %ignore b2Body::m_userData;
 %ignore b2Body::GetUserData;
 %ignore b2Body::SetUserData;
-
-// b2Body extensions for easier Java access
-%extend b2Body {
-    float32 GetPosX() {
-        return $self->GetPosition().x;
-    }
-
-    float32 GetPosY() {
-        return $self->GetPosition().y;
-    }
-
-    void SetTransform(float32 posX, float32 posY, float32 angle) {
-        $self->SetTransform(b2Vec2(posX, posY), angle);
-    }
-};
 
 /// Include original .h file for SWIG
 /// The original file is simple enough we will just pull it in

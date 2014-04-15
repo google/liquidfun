@@ -50,7 +50,7 @@ set(COMMON_LIBS "gtest;Box2D;${CMAKE_THREAD_LIBS_INIT}")
 
 # This define allows for test-specific code. For example, you can use it with
 # the FRIEND_TEST macro to expose private member functions for testing.
-add_definitions(-DLIQUIDFUN_UNIT_TESTS)
+add_definitions(-DLIQUIDFUN_UNIT_TESTS=1)
 
 # PUT ADDITIONAL UNIT TEST BINARIES BELOW!
 # The commands should be of the form:
@@ -60,7 +60,7 @@ add_definitions(-DLIQUIDFUN_UNIT_TESTS)
 # Where <test-name> is the name of the output test executable and the basename
 # of the source file for the test.  For example, test_executable(CallbackTests)
 # generates an executable called CallbackTests which is the result of compiling
-# CallbackTests.cpp along with any files specified by the SOURCE_SRCS variable.
+# CallbackTests.cpp along with any files specified by the SUPPORT_SRCS variable.
 
 function(test_executable name)
   cxx_executable_with_flags(${name}Tests "${cxx_default}" "${COMMON_LIBS}"

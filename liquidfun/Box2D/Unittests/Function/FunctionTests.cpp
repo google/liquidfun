@@ -1308,6 +1308,280 @@ TEST_F(FunctionTests, GetParticleMass) {
 	EXPECT_NEAR(mass * invMass, 1.0f, 0.000001f);
 }
 
+#if !LIQUIDFUN_EXTERNAL_LANGUAGE_API
+#error The external language API should be defined for unit tests
+#endif
+
+static const b2Vec2 kParticlePositions[] = {
+	b2Vec2(1.0f, 1.0f),
+	b2Vec2(0.0f, 0.0f),
+	b2Vec2(2.0f, -1.0f),
+	b2Vec2(-4.1f, 3.5f),
+	b2Vec2(-2.2f, -1.0f),
+};
+
+static const b2ParticleColor kParticleColors[] = {
+	b2ParticleColor(100, 0, 0, 200),
+	b2ParticleColor(0, 64, 0, 128),
+	b2ParticleColor(0, 0, 32, 64),
+	b2ParticleColor(0, 0, 0, 0),
+	b2ParticleColor(255, 255, 255, 255),
+};
+
+TEST_F(FunctionTests, CircleShapeSetPosition) {
+	b2CircleShape shape;
+	b2CircleShape shape2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		shape.SetPosition(kParticlePositions[i].x, kParticlePositions[i].y);
+		shape2.m_p = kParticlePositions[i];
+		EXPECT_EQ(shape2.m_p, shape.m_p);
+	}
+}
+
+TEST_F(FunctionTests, CircleShapeGetPosition) {
+	b2CircleShape shape;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		shape.m_p = kParticlePositions[i];
+		EXPECT_EQ(shape.m_p.x, shape.GetPositionX());
+		EXPECT_EQ(shape.m_p.y, shape.GetPositionY());
+	}
+}
+
+TEST_F(FunctionTests, EdgeShapeSet) {
+	b2EdgeShape shape;
+	b2EdgeShape shape2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions) - 1; ++i)
+	{
+		shape.Set(kParticlePositions[i].x, kParticlePositions[i].y,
+				  kParticlePositions[i + 1].x, kParticlePositions[i + 1].y);
+		shape2.Set(kParticlePositions[i], kParticlePositions[i + 1]);
+		EXPECT_EQ(shape2.m_vertex1, shape.m_vertex1);
+		EXPECT_EQ(shape2.m_vertex2, shape.m_vertex2);
+	}
+}
+
+TEST_F(FunctionTests, PolygonShapeSetCentroid) {
+	b2PolygonShape shape;
+	b2PolygonShape shape2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		shape.SetCentroid(kParticlePositions[i].x, kParticlePositions[i].y);
+		shape2.m_centroid = kParticlePositions[i];
+		EXPECT_EQ(shape2.m_centroid, shape.m_centroid);
+	}
+}
+
+TEST_F(FunctionTests, PolygonShapeSetAsBox) {
+	b2PolygonShape shape;
+	b2PolygonShape shape2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		float halfWidth = 10.0f;
+		float halfHeight = 5.0f;
+		float angle = 3.0f;
+		shape.SetAsBox(halfWidth, halfHeight, kParticlePositions[i].x,
+									 kParticlePositions[i].y, angle);
+		shape2.SetAsBox(halfWidth, halfHeight, kParticlePositions[i], angle);
+		EXPECT_EQ(shape2.m_centroid, shape.m_centroid);
+		EXPECT_EQ(shape2.m_count, shape.m_count);
+		for (int32 j = 0; j < shape.m_count; ++j) {
+			EXPECT_EQ(shape2.m_vertices[j], shape.m_vertices[j]);
+			EXPECT_EQ(shape2.m_normals[j], shape.m_normals[j]);
+		}
+	}
+}
+
+TEST_F(FunctionTests, TransformGetPos) {
+	b2Transform xf;
+	float angle = 3.0f;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		xf.Set(kParticlePositions[i], angle);
+		EXPECT_EQ(xf.p.x, xf.GetPositionX());
+		EXPECT_EQ(xf.p.y, xf.GetPositionY());
+		EXPECT_EQ(xf.q.s, xf.GetRotationSin());
+		EXPECT_EQ(xf.q.c, xf.GetRotationCos());
+	}
+}
+
+TEST_F(FunctionTests, BodyDefSetPosition) {
+	b2BodyDef bd;
+	b2BodyDef bd2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		bd.SetPosition(kParticlePositions[i].x, kParticlePositions[i].y);
+		bd2.position = kParticlePositions[i];
+		EXPECT_EQ(bd2.position, bd.position);
+	}
+}
+
+TEST_F(FunctionTests, BodyGetPosition) {
+	b2BodyDef bodyDef;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		bodyDef.position = kParticlePositions[i];
+		b2Body *body = m_world->CreateBody(&bodyDef);
+		EXPECT_EQ(body->GetPosition().x, body->GetPositionX());
+		EXPECT_EQ(body->GetPosition().y, body->GetPositionY());
+	}
+}
+
+TEST_F(FunctionTests, BodySetTransform) {
+	b2BodyDef bodyDef;
+	b2Body *body = m_world->CreateBody(&bodyDef);
+	b2Body *body2 = m_world->CreateBody(&bodyDef);
+	float angle = 3.0f;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		body->SetTransform(kParticlePositions[i].x, kParticlePositions[i].y, angle);
+		body2->SetTransform(kParticlePositions[i], angle);
+		EXPECT_EQ(body2->GetTransform().p, body->GetTransform().p);
+		EXPECT_EQ(body2->GetTransform().q.GetAngle(),
+							body->GetTransform().q.GetAngle());
+	}
+}
+
+TEST_F(FunctionTests, WorldConstruct) {
+	b2Vec2 gravity = m_world->GetGravity();
+	b2World* world = new b2World(gravity.x, gravity.y);
+	EXPECT_EQ(m_world->GetGravity(), world->GetGravity());
+	delete world;
+}
+
+TEST_F(FunctionTests, WorldSetGravity) {
+	b2Vec2 gravity = m_world->GetGravity();
+	b2World* world = new b2World(b2Vec2(0.0f, 0.0f));
+	world->SetGravity(gravity.x, gravity.y);
+	EXPECT_EQ(m_world->GetGravity(), world->GetGravity());
+	delete world;
+}
+
+TEST_F(FunctionTests, ParticleDefSetPositionColor) {
+	b2ParticleDef def;
+	b2ParticleDef def2;
+	def2.position.Set(1.0f, 2.0f);
+	def2.color.Set(3, 4, 5, 6);
+	def.SetPosition(def2.position.x, def2.position.y);
+	def.SetColor(def2.color.r, def2.color.g, def2.color.b, def2.color.a);
+	EXPECT_EQ(def2.position, def.position);
+	EXPECT_EQ(def2.color, def.color);
+}
+
+TEST_F(FunctionTests, ParticleSystemSetParticleVelocity) {
+	b2ParticleDef def;
+	def.velocity.Set(0.0f, 0.0f);
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		int index = m_particleSystem->CreateParticle(def);
+		m_particleSystem->SetParticleVelocity(index,
+											  kParticlePositions[i].x,
+											  kParticlePositions[i].y);
+		EXPECT_EQ(kParticlePositions[i].x,
+				  m_particleSystem->GetVelocityBuffer()[index].x);
+		EXPECT_EQ(kParticlePositions[i].y,
+				  m_particleSystem->GetVelocityBuffer()[index].y);
+	}
+}
+
+TEST_F(FunctionTests, ParticleSystemGetParticlePosition) {
+	b2ParticleDef def;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		def.position.Set(kParticlePositions[i].x, kParticlePositions[i].y);
+		int index = m_particleSystem->CreateParticle(def);
+		EXPECT_EQ(m_particleSystem->GetPositionBuffer()[index].x,
+				  m_particleSystem->GetParticlePositionX(index));
+		EXPECT_EQ(m_particleSystem->GetPositionBuffer()[index].y,
+				  m_particleSystem->GetParticlePositionY(index));
+	}
+}
+
+TEST_F(FunctionTests, CopyParticleBuffer) {
+	b2ParticleDef def;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		def.position = kParticlePositions[i];
+		def.color = kParticleColors[i];
+		m_particleSystem->CreateParticle(def);
+	}
+
+	// Test position buffer
+	b2Vec2 positionsByValue[B2_ARRAY_SIZE(kParticlePositions)];
+	int exceptionType = m_particleSystem->CopyPositionBuffer(
+		0, B2_ARRAY_SIZE(kParticlePositions), positionsByValue,
+		sizeof(positionsByValue));
+
+	EXPECT_EQ(exceptionType, b2ParticleSystem::b2_noExceptions)
+		<< "Position buffer not read";
+
+	const b2Vec2* positionsByReference = m_particleSystem->GetPositionBuffer();
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		EXPECT_EQ(positionsByReference[i], positionsByValue[i])
+			<< "Buffer positions different";
+	}
+
+	// Test color buffer
+	b2ParticleColor colorsByValue[B2_ARRAY_SIZE(kParticlePositions)];
+	exceptionType = m_particleSystem->CopyColorBuffer(
+		0, B2_ARRAY_SIZE(kParticlePositions), colorsByValue,
+		sizeof(colorsByValue));
+
+	EXPECT_EQ(exceptionType, b2ParticleSystem::b2_noExceptions)
+		<< "Color buffer not read";
+
+	const b2ParticleColor* colorsByReference = m_particleSystem->GetColorBuffer();
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		EXPECT_EQ(colorsByReference[i], colorsByValue[i])
+			<< "Buffer colors different";
+	}
+
+	m_world->Step(0.001f, 1, 1);
+
+	// Test weight buffer after stepping
+	float32 weightsByValue[B2_ARRAY_SIZE(kParticlePositions)];
+	exceptionType = m_particleSystem->CopyWeightBuffer(
+		0, B2_ARRAY_SIZE(kParticlePositions), weightsByValue,
+		sizeof(weightsByValue));
+
+	EXPECT_EQ(exceptionType, b2ParticleSystem::b2_noExceptions)
+		<< "Weight buffer not read";
+
+	const float32* weightsByReference = m_particleSystem->GetWeightBuffer();
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		EXPECT_EQ(weightsByReference[i], weightsByValue[i])
+			<< "Buffer weights different";
+	}
+}
+
+TEST_F(FunctionTests, CreateParticleGroupWithVertexList) {
+	b2ParticleGroupDef def;
+	const int shapeCount = B2_ARRAY_SIZE(kParticlePositions);
+	def.SetCircleShapesFromVertexList((void*) kParticlePositions,
+	                                  shapeCount, 1);
+	def.shapeCount = 1;
+	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_GT(group1->GetParticleCount(), 0);
+	def.shapeCount = shapeCount;
+	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_GT(group2->GetParticleCount(), group1->GetParticleCount());
+}
+
+TEST_F(FunctionTests, ParticleGroupDefSetPositionColor) {
+	b2ParticleGroupDef def;
+	b2ParticleGroupDef def2;
+	def2.position.Set(1.0f, 2.0f);
+	def2.color.Set(3, 4, 5, 6);
+	def.SetPosition(def2.position.x, def2.position.y);
+	def.SetColor(def2.color.r, def2.color.g, def2.color.b, def2.color.a);
+	EXPECT_EQ(def2.position, def.position);
+	EXPECT_EQ(def2.color, def.color);
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

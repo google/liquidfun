@@ -72,6 +72,16 @@ typedef unsigned long long uint64;
 #endif // defined(__GNUC__)
 #endif // !defined(b2Inline)
 
+// We expand the API so that other languages (e.g. Java) can call into
+// our C++ more easily. Only set if when the flag is not externally defined.
+#if !defined(LIQUIDFUN_EXTERNAL_LANGUAGE_API)
+#if SWIG || LIQUIDFUN_UNIT_TESTS
+#define LIQUIDFUN_EXTERNAL_LANGUAGE_API 1
+#else
+#define LIQUIDFUN_EXTERNAL_LANGUAGE_API 0
+#endif
+#endif
+
 /// @file
 /// Global tuning constants based on meters-kilograms-seconds (MKS) units.
 ///

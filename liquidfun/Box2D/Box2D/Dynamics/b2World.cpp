@@ -37,35 +37,7 @@
 
 b2World::b2World(const b2Vec2& gravity)
 {
-	m_destructionListener = NULL;
-	m_debugDraw = NULL;
-
-	m_bodyList = NULL;
-	m_jointList = NULL;
-	m_particleSystemList = NULL;
-
-	m_bodyCount = 0;
-	m_jointCount = 0;
-
-	m_warmStarting = true;
-	m_continuousPhysics = true;
-	m_subStepping = false;
-
-	m_stepComplete = true;
-
-	m_allowSleep = true;
-	m_gravity = gravity;
-
-	m_flags = e_clearForces;
-
-	m_inv_dt0 = 0.0f;
-
-	m_contactManager.m_allocator = &m_blockAllocator;
-
-	m_liquidFunVersion = &b2_liquidFunVersion;
-	m_liquidFunVersionString = b2_liquidFunVersionString;
-
-	memset(&m_profile, 0, sizeof(b2Profile));
+	Init(gravity);
 }
 
 b2World::~b2World()
@@ -446,6 +418,40 @@ void b2World::SetAllowSleeping(bool flag)
 			b->SetAwake(true);
 		}
 	}
+}
+
+// Initialize the world with a specified gravity.
+void b2World::Init(const b2Vec2& gravity)
+{
+	m_destructionListener = NULL;
+	m_debugDraw = NULL;
+
+	m_bodyList = NULL;
+	m_jointList = NULL;
+	m_particleSystemList = NULL;
+
+	m_bodyCount = 0;
+	m_jointCount = 0;
+
+	m_warmStarting = true;
+	m_continuousPhysics = true;
+	m_subStepping = false;
+
+	m_stepComplete = true;
+
+	m_allowSleep = true;
+	m_gravity = gravity;
+
+	m_flags = e_clearForces;
+
+	m_inv_dt0 = 0.0f;
+
+	m_contactManager.m_allocator = &m_blockAllocator;
+
+	m_liquidFunVersion = &b2_liquidFunVersion;
+	m_liquidFunVersionString = b2_liquidFunVersionString;
+
+	memset(&m_profile, 0, sizeof(b2Profile));
 }
 
 // Find islands, integrate and solve constraints, solve position constraints

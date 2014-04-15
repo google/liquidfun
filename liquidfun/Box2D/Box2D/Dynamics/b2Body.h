@@ -70,6 +70,11 @@ struct b2BodyDef
 		gravityScale = 1.0f;
 	}
 
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+	/// Set position with direct floats.
+	void SetPosition(float32 positionX, float32 positionY);
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
 	/// The body type: static, kinematic, or dynamic.
 	/// Note: if a dynamic body would have zero mass, the mass is set to one.
 	b2BodyType type;
@@ -384,6 +389,18 @@ public:
 	/// Dump this body to a log file
 	void Dump();
 
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+public:
+	/// Get x-coordinate of position.
+	float32 GetPositionX() const { return GetPosition().x; }
+
+	/// Get y-coordinate of position.
+	float32 GetPositionY() const { return GetPosition().y; }
+
+	/// Set b2Transform using direct floats.
+	void SetTransform(float32 positionX, float32 positionY, float32 angle);
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
 private:
 
 	friend class b2World;
@@ -391,7 +408,7 @@ private:
 	friend class b2ContactManager;
 	friend class b2ContactSolver;
 	friend class b2Contact;
-	
+
 	friend class b2DistanceJoint;
 	friend class b2FrictionJoint;
 	friend class b2GearJoint;
@@ -861,5 +878,17 @@ inline const b2World* b2Body::GetWorld() const
 {
 	return m_world;
 }
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+inline void b2BodyDef::SetPosition(float32 positionX, float32 positionY)
+{
+	position.Set(positionX, positionY);
+}
+
+inline void b2Body::SetTransform(float32 positionX, float32 positionY, float32 angle)
+{
+	SetTransform(b2Vec2(positionX, positionY), angle);
+}
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 
 #endif
