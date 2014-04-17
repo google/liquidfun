@@ -156,6 +156,18 @@ public:
         memcpy(outBuf, $self->GetColorBuffer() + startIndex, copySize);
         return NO_EXCEPTIONS;
     }
+
+    int GetWeightBuffer(
+            int startIndex, int numParticles, void* outBuf, int size) {
+        int copySize = numParticles * sizeof(float32);
+        b2ExceptionType isValid = b2ParticleSystem_IsBufCopyValid(
+                $self, startIndex, numParticles, copySize, size);
+        if (isValid != NO_EXCEPTIONS) {
+            return isValid;
+        }
+        memcpy(outBuf, $self->GetWeightBuffer() + startIndex, copySize);
+        return NO_EXCEPTIONS;
+    }
 };
 
 /// Ignore other classes

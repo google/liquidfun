@@ -547,6 +547,8 @@ TEST_F(FunctionTests, GetParticleBuffer) {
 			  constParticleSystem->GetGroupBuffer());
 	EXPECT_EQ(m_particleSystem->GetColorBuffer(),
 			  constParticleSystem->GetColorBuffer());
+	EXPECT_EQ(m_particleSystem->GetWeightBuffer(),
+			  constParticleSystem->GetWeightBuffer());
 	EXPECT_EQ(m_particleSystem->GetUserDataBuffer(),
 			  constParticleSystem->GetUserDataBuffer());
 	const b2ParticleGroup *constGroup = group;
