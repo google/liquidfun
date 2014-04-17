@@ -2251,10 +2251,8 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 			if (group->m_groupFlags & b2_rigidParticleGroup)
 			{
 				m_velocityBuffer.data[i] =
-					group->GetLinearVelocity() +
-					b2Cross(
-						group->GetAngularVelocity(),
-						m_positionBuffer.data[i] - group->GetCenter());
+					group->GetLinearVelocityFromWorldPoint(
+													m_positionBuffer.data[i]);
 			}
 		}
 	}
@@ -2453,6 +2451,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 			SolveSpring(subStep);
 		}
 		LimitVelocity(subStep);
+		if (m_allGroupFlags & b2_rigidParticleGroup)
+		{
+			SolveRigidDamping();
+		}
 		if (m_allParticleFlags & b2_barrierParticle)
 		{
 			SolveBarrier(subStep);
@@ -2682,6 +2684,162 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 			b2Vec2 f = damping * vn * n;
 			m_velocityBuffer.data[a] += f;
 			m_velocityBuffer.data[b] -= f;
+		}
+	}
+}
+
+inline void b2ParticleSystem::InitDampingParameter(
+	float32* invMass, float32* invInertia, float32* tangentDistance,
+	float32 mass, float32 inertia, const b2Vec2& center,
+	const b2Vec2& point, const b2Vec2& normal) const
+{
+	*invMass = mass > 0 ? 1 / mass : 0;
+	*invInertia = inertia > 0 ? 1 / inertia : 0;
+	*tangentDistance = b2Cross(point - center, normal);
+}
+
+inline void b2ParticleSystem::InitDampingParameterWithRigidGroupOrParticle(
+	float32* invMass, float32* invInertia, float32* tangentDistance,
+	bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
+	const b2Vec2& point, const b2Vec2& normal) const
+{
+	if (isRigidGroup)
+	{
+		InitDampingParameter(
+			invMass, invInertia, tangentDistance,
+			group->GetMass(), group->GetInertia(), group->GetCenter(),
+			point, normal);
+	}
+	else
+	{
+		uint32 flags = m_flagsBuffer.data[particleIndex];
+		InitDampingParameter(
+			invMass, invInertia, tangentDistance,
+			flags & b2_wallParticle ? 0 : GetParticleMass(), 0, point,
+			point, normal);
+	}
+}
+
+inline float32 b2ParticleSystem::ComputeDampingImpulse(
+	float32 invMassA, float32 invInertiaA, float32 tangentDistanceA,
+	float32 invMassB, float32 invInertiaB, float32 tangentDistanceB,
+	float32 normalVelocity, const b2Vec2& normal) const
+{
+	float32 invMass =
+		invMassA + invInertiaA * tangentDistanceA * tangentDistanceA +
+		invMassB + invInertiaB * tangentDistanceB * tangentDistanceB;
+	return invMass > 0 ? normalVelocity / invMass : 0;
+}
+
+inline void b2ParticleSystem::ApplyDamping(
+	float32 invMass, float32 invInertia, float32 tangentDistance,
+	bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
+	float32 impulse, const b2Vec2& normal)
+{
+	if (isRigidGroup)
+	{
+		group->m_linearVelocity += impulse * invMass * normal;
+		group->m_angularVelocity += impulse * tangentDistance * invInertia;
+	}
+	else
+	{
+		m_velocityBuffer.data[particleIndex] += impulse * invMass * normal;
+	}
+}
+
+void b2ParticleSystem::SolveRigidDamping()
+{
+	// Apply impulse to rigid particle groups colliding with other objects
+	// to reduce relative velocity at the colliding point.
+	float32 damping = m_def.dampingStrength;
+	for (int32 k = 0; k < m_bodyContactCount; k++)
+	{
+		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		int32 a = contact.index;
+		b2ParticleGroup* aGroup = m_groupBuffer[a];
+		if (aGroup && (aGroup->m_groupFlags & b2_rigidParticleGroup))
+		{
+			b2Body* b = contact.body;
+			b2Vec2 n = contact.normal;
+			float32 w = contact.weight;
+			b2Vec2 p = m_positionBuffer.data[a];
+			b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) -
+					   aGroup->GetLinearVelocityFromWorldPoint(p);
+			float32 vn = b2Dot(v, n);
+			if (vn < 0)
+			// The group's average velocity at particle position 'p' is pushing
+			// the particle into the body.
+			{
+				float32 invMassA, invInertiaA, tangentDistanceA;
+				float32 invMassB, invInertiaB, tangentDistanceB;
+				InitDampingParameterWithRigidGroupOrParticle(
+					&invMassA, &invInertiaA, &tangentDistanceA,
+					true, aGroup, a, p, n);
+				InitDampingParameter(
+					&invMassB, &invInertiaB, &tangentDistanceB,
+					b->GetMass(),
+					// Calculate b->m_I from public functions of b2Body.
+					b->GetInertia() -
+							b->GetMass() * b->GetLocalCenter().LengthSquared(),
+					b->GetWorldCenter(),
+					p, n);
+				float32 f = damping * b2Min(w, 1.0f) * ComputeDampingImpulse(
+					invMassA, invInertiaA, tangentDistanceA,
+					invMassB, invInertiaB, tangentDistanceB,
+					vn, n);
+				ApplyDamping(
+					invMassA, invInertiaA, tangentDistanceA,
+					true, aGroup, a, f, n);
+				b->ApplyLinearImpulse(-f * n, p, true);
+			}
+		}
+	}
+	for (int32 k = 0; k < m_contactCount; k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		b2Vec2 n = contact.normal;
+		float32 w = contact.weight;
+		b2ParticleGroup* aGroup = m_groupBuffer[a];
+		b2ParticleGroup* bGroup = m_groupBuffer[b];
+		bool aRigid = aGroup && (aGroup->m_groupFlags & b2_rigidParticleGroup);
+		bool bRigid = bGroup && (bGroup->m_groupFlags & b2_rigidParticleGroup);
+		if (aGroup != bGroup && (aRigid || bRigid))
+		{
+			b2Vec2 p =
+				0.5f * (m_positionBuffer.data[a] + m_positionBuffer.data[b]);
+			b2Vec2 v =
+				(bRigid ?
+					bGroup->GetLinearVelocityFromWorldPoint(p) :
+					m_velocityBuffer.data[b]) -
+				(aRigid ?
+					aGroup->GetLinearVelocityFromWorldPoint(p) :
+					m_velocityBuffer.data[a]);
+			float32 vn = b2Dot(v, n);
+			if (vn < 0)
+			{
+				float32 invMassA, invInertiaA, tangentDistanceA;
+				float32 invMassB, invInertiaB, tangentDistanceB;
+				InitDampingParameterWithRigidGroupOrParticle(
+					&invMassA, &invInertiaA, &tangentDistanceA,
+					aRigid, aGroup, a,
+					p, n);
+				InitDampingParameterWithRigidGroupOrParticle(
+					&invMassB, &invInertiaB, &tangentDistanceB,
+					bRigid, bGroup, b,
+					p, n);
+				float32 f = damping * w * ComputeDampingImpulse(
+					invMassA, invInertiaA, tangentDistanceA,
+					invMassB, invInertiaB, tangentDistanceB,
+					vn, n);
+				ApplyDamping(
+					invMassA, invInertiaA, tangentDistanceA,
+					aRigid, aGroup, a, f, n);
+				ApplyDamping(
+					invMassB, invInertiaB, tangentDistanceB,
+					bRigid, bGroup, b, -f, n);
+			}
 		}
 	}
 }

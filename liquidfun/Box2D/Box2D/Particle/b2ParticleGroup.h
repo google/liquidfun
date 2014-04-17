@@ -186,6 +186,12 @@ public:
 	/// Used only with groups of rigid particles.
 	float32 GetAngle() const;
 
+	/// Get the world linear velocity of a world point, from the average linear
+	/// and angular velocities of the particle group.
+	/// @param a point in world coordinates.
+	/// @return the world velocity of a point.
+	b2Vec2 GetLinearVelocityFromWorldPoint(const b2Vec2& worldPoint) const;
+
 	/// Get the user data pointer that was provided in the group definition.
 	void* GetUserData() const;
 
@@ -326,6 +332,13 @@ inline const b2Vec2& b2ParticleGroup::GetPosition() const
 inline float32 b2ParticleGroup::GetAngle() const
 {
 	return m_transform.q.GetAngle();
+}
+
+inline b2Vec2 b2ParticleGroup::GetLinearVelocityFromWorldPoint(
+												const b2Vec2& worldPoint) const
+{
+	UpdateStatistics();
+	return m_linearVelocity + b2Cross(m_angularVelocity, worldPoint - m_center);
 }
 
 inline void* b2ParticleGroup::GetUserData() const
