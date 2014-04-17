@@ -371,6 +371,12 @@ public:
 	b2ParticleGroup* const* GetGroupBuffer();
 	const b2ParticleGroup* const* GetGroupBuffer() const;
 
+	/// Get the weight of each particle
+	/// Array is length GetParticleCount()
+	/// @return the pointer to the head of the particle positions array.
+	float32* GetWeightBuffer();
+	const float32* GetWeightBuffer() const;
+
 	/// Get the user-specified data of each particle.
 	/// Array is length GetParticleCount()
 	/// @return the pointer to the head of the particle user-data array.
@@ -1084,6 +1090,11 @@ inline b2Vec2* b2ParticleSystem::GetVelocityBuffer()
 	return m_velocityBuffer.data;
 }
 
+inline float32* b2ParticleSystem::GetWeightBuffer()
+{
+	return m_weightBuffer;
+}
+
 inline int32 b2ParticleSystem::GetMaxParticleCount() const
 {
 	return m_maxCount;
@@ -1118,6 +1129,11 @@ inline const b2ParticleColor* b2ParticleSystem::GetColorBuffer() const
 inline const b2ParticleGroup* const* b2ParticleSystem::GetGroupBuffer() const
 {
 	return m_groupBuffer;
+}
+
+inline const float32* b2ParticleSystem::GetWeightBuffer() const
+{
+	return m_weightBuffer;
 }
 
 inline void* const* b2ParticleSystem::GetUserDataBuffer() const
