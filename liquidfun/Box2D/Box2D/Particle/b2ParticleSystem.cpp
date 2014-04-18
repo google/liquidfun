@@ -1446,13 +1446,23 @@ void b2ParticleSystem::ComputeDepth()
 			}
 		}
 	}
+	// Compute sum of weight of contacts except between different groups.
+	for (int32 k = 0; k < contactGroupsCount; k++)
+	{
+		const b2ParticleContact& contact = contactGroups[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		float32 w = contact.weight;
+		m_accumulationBuffer[a] += w;
+		m_accumulationBuffer[b] += w;
+	}
 	b2Assert(m_depthBuffer);
 	for (int32 i = 0; i < groupsToUpdateCount; i++)
 	{
 		const b2ParticleGroup* group = groupsToUpdate[i];
 		for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 		{
-			float32 w = m_weightBuffer[i];
+			float32 w = m_accumulationBuffer[i];
 			m_depthBuffer[i] = w < 0.8f ? 0 : b2_maxFloat;
 		}
 	}
