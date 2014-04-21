@@ -1143,6 +1143,278 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 	DestroyParticleGroup(groupB);
 }
 
+void b2ParticleSystem::SplitParticleGroup(b2ParticleGroup* group)
+{
+	UpdateContacts(true);
+	int32 particleCount = group->GetParticleCount();
+	// We create several linked lists. Each list represents a set of connected
+	// particles.
+	ParticleListNode* nodeBuffer =
+		(ParticleListNode*) m_world->m_stackAllocator.Allocate(
+									sizeof(ParticleListNode) * particleCount);
+	InitializeParticleLists(group, nodeBuffer);
+	MergeParticleListsInContact(group, nodeBuffer);
+	ParticleListNode* survivingList =
+									FindLongestParticleList(group, nodeBuffer);
+	MergeZombieParticleListNodes(group, nodeBuffer, survivingList);
+	CreateParticleGroupsFromParticleList(group, nodeBuffer, survivingList);
+	UpdatePairsAndTriadsWithParticleList(group, nodeBuffer);
+	m_world->m_stackAllocator.Free(nodeBuffer);
+}
+
+void b2ParticleSystem::InitializeParticleLists(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer)
+{
+	int32 bufferIndex = group->GetBufferIndex();
+	int32 particleCount = group->GetParticleCount();
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ParticleListNode* node = &nodeBuffer[i];
+		node->list = node;
+		node->next = NULL;
+		node->count = 1;
+		node->index = i + bufferIndex;
+	}
+}
+
+void b2ParticleSystem::MergeParticleListsInContact(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer) const
+{
+	int32 bufferIndex = group->GetBufferIndex();
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.indexA;
+		int32 b = contact.indexB;
+		if (!group->ContainsParticle(a) || !group->ContainsParticle(b)) {
+			continue;
+		}
+		ParticleListNode* listA = nodeBuffer[a - bufferIndex].list;
+		ParticleListNode* listB = nodeBuffer[b - bufferIndex].list;
+		if (listA == listB) {
+			continue;
+		}
+		// To minimize the cost of insertion, make sure listA is longer than
+		// listB.
+		if (listA->count < listB->count)
+		{
+			b2Swap(listA, listB);
+		}
+		b2Assert(listA->count >= listB->count);
+		MergeParticleLists(listA, listB);
+	}
+}
+
+void b2ParticleSystem::MergeParticleLists(
+	ParticleListNode* listA, ParticleListNode* listB)
+{
+	// Insert listB between index 0 and 1 of listA
+	// Example:
+	//     listA => a1 => a2 => a3 => NULL
+	//     listB => b1 => b2 => NULL
+	// to
+	//     listA => listB => b1 => b2 => a1 => a2 => a3 => NULL
+	b2Assert(listA != listB);
+	for (ParticleListNode* b = listB;;)
+	{
+		b->list = listA;
+		ParticleListNode* nextB = b->next;
+		if (nextB)
+		{
+			b = nextB;
+		}
+		else
+		{
+			b->next = listA->next;
+			break;
+		}
+	}
+	listA->next = listB;
+	listA->count += listB->count;
+	listB->count = 0;
+}
+
+b2ParticleSystem::ParticleListNode* b2ParticleSystem::FindLongestParticleList(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer)
+{
+	int32 particleCount = group->GetParticleCount();
+	ParticleListNode* result = nodeBuffer;
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ParticleListNode* node = &nodeBuffer[i];
+		if (result->count < node->count)
+		{
+			result = node;
+		}
+	}
+	return result;
+}
+
+void b2ParticleSystem::MergeZombieParticleListNodes(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer,
+	ParticleListNode* survivingList) const
+{
+	int32 particleCount = group->GetParticleCount();
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ParticleListNode* node = &nodeBuffer[i];
+		if (node != survivingList &&
+			(m_flagsBuffer.data[node->index] & b2_zombieParticle))
+		{
+			MergeParticleListAndNode(survivingList, node);
+		}
+	}
+}
+
+void b2ParticleSystem::MergeParticleListAndNode(
+	ParticleListNode* list, ParticleListNode* node)
+{
+	// Insert node between index 0 and 1 of list
+	// Example:
+	//     list => a1 => a2 => a3 => NULL
+	//     node => NULL
+	// to
+	//     list => node => a1 => a2 => a3 => NULL
+	b2Assert(node != list);
+	b2Assert(node->list == node);
+	b2Assert(node->count == 1);
+	node->list = list;
+	node->next = list->next;
+	list->next = node;
+	list->count++;
+	node->count = 0;
+}
+
+void b2ParticleSystem::CreateParticleGroupsFromParticleList(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer,
+	const ParticleListNode* survivingList)
+{
+	int32 particleCount = group->GetParticleCount();
+	b2ParticleGroupDef def;
+	def.groupFlags = group->GetGroupFlags();
+	def.userData = group->GetUserData();
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ParticleListNode* list = &nodeBuffer[i];
+		if (!list->count || list == survivingList)
+		{
+			continue;
+		}
+		b2Assert(list->list == list);
+		b2ParticleGroup* newGroup = CreateParticleGroup(def);
+		for (ParticleListNode* node = list; node; node = node->next)
+		{
+			int32 oldIndex = node->index;
+			uint32& flags = m_flagsBuffer.data[oldIndex];
+			b2Assert(!(flags & b2_zombieParticle));
+			int32 newIndex = CloneParticle(oldIndex, newGroup);
+			flags |= b2_zombieParticle;
+			node->index = newIndex;
+		}
+	}
+}
+
+void b2ParticleSystem::UpdatePairsAndTriadsWithParticleList(
+	const b2ParticleGroup* group, const ParticleListNode* nodeBuffer)
+{
+	int32 bufferIndex = group->GetBufferIndex();
+	// Update indices in pairs and triads. If an index belongs to the group,
+	// replace it with the corresponding value in nodeBuffer.
+	// Note that nodeBuffer is allocated only for the group and the index should
+	// be shifted by bufferIndex.
+	for (int32 k = 0; k < m_pairBuffer.GetCount(); k++)
+	{
+		b2ParticlePair& pair = m_pairBuffer[k];
+		int32 a = pair.indexA;
+		int32 b = pair.indexB;
+		if (group->ContainsParticle(a))
+		{
+			pair.indexA = nodeBuffer[a - bufferIndex].index;
+		}
+		if (group->ContainsParticle(b))
+		{
+			pair.indexB = nodeBuffer[b - bufferIndex].index;
+		}
+	}
+	for (int32 k = 0; k < m_triadBuffer.GetCount(); k++)
+	{
+		b2ParticleTriad& triad = m_triadBuffer[k];
+		int32 a = triad.indexA;
+		int32 b = triad.indexB;
+		int32 c = triad.indexC;
+		if (group->ContainsParticle(a))
+		{
+			triad.indexA = nodeBuffer[a - bufferIndex].index;
+		}
+		if (group->ContainsParticle(b))
+		{
+			triad.indexB = nodeBuffer[b - bufferIndex].index;
+		}
+		if (group->ContainsParticle(c))
+		{
+			triad.indexC = nodeBuffer[c - bufferIndex].index;
+		}
+	}
+}
+
+int32 b2ParticleSystem::CloneParticle(int32 oldIndex, b2ParticleGroup* group)
+{
+	b2ParticleDef def;
+	def.flags = m_flagsBuffer.data[oldIndex];
+	def.position = m_positionBuffer.data[oldIndex];
+	def.velocity = m_velocityBuffer.data[oldIndex];
+	if (m_colorBuffer.data)
+	{
+		def.color = m_colorBuffer.data[oldIndex];
+	}
+	if (m_userDataBuffer.data)
+	{
+		def.userData = m_userDataBuffer.data[oldIndex];
+	}
+	def.group = group;
+	int32 newIndex = CreateParticle(def);
+	if (m_handleIndexBuffer.data)
+	{
+		b2ParticleHandle* handle = m_handleIndexBuffer.data[oldIndex];
+		if (handle) handle->SetIndex(newIndex);
+		m_handleIndexBuffer.data[newIndex] = handle;
+		m_handleIndexBuffer.data[oldIndex] = NULL;
+	}
+	if (m_lastBodyContactStepBuffer.data)
+	{
+		m_lastBodyContactStepBuffer.data[newIndex] =
+			m_lastBodyContactStepBuffer.data[oldIndex];
+	}
+	if (m_bodyContactCountBuffer.data)
+	{
+		m_bodyContactCountBuffer.data[newIndex] =
+			m_bodyContactCountBuffer.data[oldIndex];
+	}
+	if (m_consecutiveContactStepsBuffer.data)
+	{
+		m_consecutiveContactStepsBuffer.data[newIndex] =
+			m_consecutiveContactStepsBuffer.data[oldIndex];
+	}
+	if (m_hasForce)
+	{
+		m_forceBuffer[newIndex] = m_forceBuffer[oldIndex];
+	}
+	if (m_staticPressureBuffer)
+	{
+		m_staticPressureBuffer[newIndex] = m_staticPressureBuffer[oldIndex];
+	}
+	if (m_depthBuffer)
+	{
+		m_depthBuffer[newIndex] = m_depthBuffer[oldIndex];
+	}
+	if (m_expirationTimeBuffer.data)
+	{
+		m_expirationTimeBuffer.data[newIndex] =
+			m_expirationTimeBuffer.data[oldIndex];
+	}
+	return newIndex;
+}
+
 void b2ParticleSystem::UpdatePairsAndTriadsWithReactiveParticles()
 {
 	class ReactiveFilter : public ConnectionFilter
@@ -3402,7 +3674,6 @@ void b2ParticleSystem::SolveZombie()
 								  group->m_groupFlags |
 								  b2_particleGroupNeedsUpdateDepth);
 				}
-				// TODO: flag to split if needed
 			}
 		}
 		else
@@ -3431,7 +3702,6 @@ void b2ParticleSystem::SolveZombie()
 		{
 			DestroyParticleGroup(group);
 		}
-		// TODO: split the group if flagged
 		group = next;
 	}
 }

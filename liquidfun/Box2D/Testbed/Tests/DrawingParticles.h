@@ -242,6 +242,22 @@ public:
 		}
 	}
 
+	void SplitParticleGroups()
+	{
+		for (b2ParticleGroup* group = m_particleSystem->
+				GetParticleGroupList(); group; group = group->GetNext())
+		{
+			if (group != m_lastGroup &&
+				(group->GetGroupFlags() & b2_rigidParticleGroup) &&
+				(group->GetAllParticleFlags() & b2_zombieParticle))
+			{
+				// Split a rigid particle group which may be disconnected
+				// by destroying particles.
+				m_particleSystem->SplitParticleGroup(group);
+			}
+		}
+	}
+
 	void Step(Settings* settings)
 	{
 		const uint32 parameterValue = TestMain::GetParticleParameterValue();
@@ -284,6 +300,11 @@ public:
 					m_groupFlags = 0;
 					break;
 			}
+		}
+
+		if (m_particleSystem->GetAllParticleFlags() & b2_zombieParticle)
+		{
+			SplitParticleGroups();
 		}
 
 		Test::Step(settings);
