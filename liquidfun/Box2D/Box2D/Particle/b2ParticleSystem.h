@@ -81,6 +81,39 @@ struct b2ParticleBodyContact
 	float32 mass;
 };
 
+/// Connection between two particles
+struct b2ParticlePair
+{
+	/// Indices of the respective particles making pair.
+	int32 indexA, indexB;
+
+	/// The logical sum of the particle flags. See the b2ParticleFlag enum.
+	uint32 flags;
+
+	/// The strength of cohesion among the particles.
+	float32 strength;
+
+	/// The initial distance of the particles.
+	float32 distance;
+};
+
+/// Connection between three particles
+struct b2ParticleTriad
+{
+	/// Indices of the respective particles making triad.
+	int32 indexA, indexB, indexC;
+
+	/// The logical sum of the particle flags. See the b2ParticleFlag enum.
+	uint32 flags;
+
+	/// The strength of cohesion among the particles.
+	float32 strength;
+
+	/// Values used for calculation.
+	b2Vec2 pa, pb, pc;
+	float32 ka, kb, kc, s;
+};
+
 struct b2ParticleSystemDef
 {
 	b2ParticleSystemDef()
@@ -414,14 +447,22 @@ public:
 	/// Get contacts between particles
 	/// Contact data can be used for many reasons, for example to trigger
 	/// rendering or audio effects.
-	const b2ParticleContact* GetContacts();
-	int32 GetContactCount();
+	const b2ParticleContact* GetContacts() const;
+	int32 GetContactCount() const;
 
 	/// Get contacts between particles and bodies
 	/// Contact data can be used for many reasons, for example to trigger
 	/// rendering or audio effects.
-	const b2ParticleBodyContact* GetBodyContacts();
-	int32 GetBodyContactCount();
+	const b2ParticleBodyContact* GetBodyContacts() const;
+	int32 GetBodyContactCount() const;
+
+	/// Get particle pairs
+	const b2ParticlePair* GetPairs() const;
+	int32 GetPairCount() const;
+
+	/// Get particle triads
+	const b2ParticleTriad* GetTriads() const;
+	int32 GetTriadCount() const;
 
 	/// Set an optional threshold for the maximum number of
 	/// consecutive particle iterations that a particle may contact
@@ -598,25 +639,6 @@ private:
 		}
 	};
 
-	/// Connection between two particles
-	struct Pair
-	{
-		int32 indexA, indexB;
-		uint32 flags;
-		float32 strength;
-		float32 distance;
-	};
-
-	/// Connection between three particles
-	struct Triad
-	{
-		int32 indexA, indexB, indexC;
-		uint32 flags;
-		float32 strength;
-		b2Vec2 pa, pb, pc;
-		float32 ka, kb, kc, s;
-	};
-
 	/// Class for filtering pairs or triads.
 	class ConnectionFilter
 	{
@@ -704,10 +726,10 @@ private:
 	void UpdatePairsAndTriads(
 		int32 firstIndex, int32 lastIndex, const ConnectionFilter& filter);
 	void UpdatePairsAndTriadsWithReactiveParticles();
-	static bool ComparePairIndices(const Pair& a, const Pair& b);
-	static bool MatchPairIndices(const Pair& a, const Pair& b);
-	static bool CompareTriadIndices(const Triad& a, const Triad& b);
-	static bool MatchTriadIndices(const Triad& a, const Triad& b);
+	static bool ComparePairIndices(const b2ParticlePair& a, const b2ParticlePair& b);
+	static bool MatchPairIndices(const b2ParticlePair& a, const b2ParticlePair& b);
+	static bool CompareTriadIndices(const b2ParticleTriad& a, const b2ParticleTriad& b);
+	static bool MatchTriadIndices(const b2ParticleTriad& a, const b2ParticleTriad& b);
 	void ComputeDepth();
 
 	void UpdateAllParticleFlags();
@@ -883,11 +905,11 @@ private:
 
 	int32 m_pairCount;
 	int32 m_pairCapacity;
-	Pair* m_pairBuffer;
+	b2ParticlePair* m_pairBuffer;
 
 	int32 m_triadCount;
 	int32 m_triadCapacity;
-	Triad* m_triadBuffer;
+	b2ParticleTriad* m_triadBuffer;
 
 	/// Time each particle should be destroyed relative to the last time
 	/// m_timeElapsed was initialized.  Each unit of time corresponds to
@@ -942,24 +964,44 @@ inline bool b2ParticleSystem::GetPaused() const
 	return m_paused;
 }
 
-inline const b2ParticleContact* b2ParticleSystem::GetContacts()
+inline const b2ParticleContact* b2ParticleSystem::GetContacts() const
 {
 	return m_contactBuffer;
 }
 
-inline int32 b2ParticleSystem::GetContactCount()
+inline int32 b2ParticleSystem::GetContactCount() const
 {
 	return m_contactCount;
 }
 
-inline const b2ParticleBodyContact* b2ParticleSystem::GetBodyContacts()
+inline const b2ParticleBodyContact* b2ParticleSystem::GetBodyContacts() const
 {
 	return m_bodyContactBuffer;
 }
 
-inline int32 b2ParticleSystem::GetBodyContactCount()
+inline int32 b2ParticleSystem::GetBodyContactCount() const
 {
 	return m_bodyContactCount;
+}
+
+inline const b2ParticlePair* b2ParticleSystem::GetPairs() const
+{
+	return m_pairBuffer;
+}
+
+inline int32 b2ParticleSystem::GetPairCount() const
+{
+	return m_pairCount;
+}
+
+inline const b2ParticleTriad* b2ParticleSystem::GetTriads() const
+{
+	return m_triadBuffer;
+}
+
+inline int32 b2ParticleSystem::GetTriadCount() const
+{
+	return m_triadCount;
 }
 
 inline b2ParticleSystem* b2ParticleSystem::GetNext()

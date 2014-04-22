@@ -748,6 +748,40 @@ TEST_F(FunctionTests, GetParticleBodyContact) {
 			  (const b2ParticleBodyContact *)NULL);
 }
 
+TEST_F(FunctionTests, GetParticlePair) {
+	b2ParticleGroupDef def;
+	b2PolygonShape shape;
+	shape.SetAsBox(10, 10);
+	def.shape = &shape;
+	m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->GetPairCount(), 0);
+	def.flags = b2_springParticle;
+	def.position.Set(20, 0);
+	b2ParticleGroup* group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_NE(m_particleSystem->GetPairCount(), 0);
+	group->DestroyParticles();
+	m_world->Step(0.001f, 1, 1);
+	EXPECT_EQ(m_particleSystem->GetPairCount(), 0);
+	EXPECT_NE(m_particleSystem->GetPairs(), (const b2ParticlePair *)NULL);
+}
+
+TEST_F(FunctionTests, GetParticleTriad) {
+	b2ParticleGroupDef def;
+	b2PolygonShape shape;
+	shape.SetAsBox(10, 10);
+	def.shape = &shape;
+	m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->GetTriadCount(), 0);
+	def.flags = b2_elasticParticle;
+	def.position.Set(20, 0);
+	b2ParticleGroup* group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_NE(m_particleSystem->GetTriadCount(), 0);
+	group->DestroyParticles();
+	m_world->Step(0.001f, 1, 1);
+	EXPECT_EQ(m_particleSystem->GetTriadCount(), 0);
+	EXPECT_NE(m_particleSystem->GetTriads(), (const b2ParticleTriad *)NULL);
+}
+
 TEST_F(FunctionTests, ComputeCollisionEnergy) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
