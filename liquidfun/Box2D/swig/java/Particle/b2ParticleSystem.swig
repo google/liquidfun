@@ -50,6 +50,7 @@ public:
     b2ParticleGroup* CreateParticleGroup (const b2ParticleGroupDef &def);
     int32 GetParticleGroupCount() const;
     int32 GetParticleCount() const;
+    void SetMaxParticleCount(int32 count);
     void SetDamping(float32 damping);
     void SetRadius(float32 radius);
 
