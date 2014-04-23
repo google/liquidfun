@@ -58,7 +58,7 @@ void onDisplay(void) {
     glVertexPointer(2, GL_FLOAT, 0, square);
     for (d = 0; d < NUM_DEVICES; d++) {
         int c;
-        for (c = 0; d < NUM_DEVICES; d++) {
+        for (c = 0; c < NUM_CURSORS; c++) {
             Cursor C = &cursors[d][c];
             if (C->on) {
                 glMatrixMode(GL_MODELVIEW);
