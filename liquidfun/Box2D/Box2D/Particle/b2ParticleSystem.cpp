@@ -2752,7 +2752,7 @@ inline void b2ParticleSystem::InitDampingParameterWithRigidGroupOrParticle(
 inline float32 b2ParticleSystem::ComputeDampingImpulse(
 	float32 invMassA, float32 invInertiaA, float32 tangentDistanceA,
 	float32 invMassB, float32 invInertiaB, float32 tangentDistanceB,
-	float32 normalVelocity, const b2Vec2& normal) const
+	float32 normalVelocity) const
 {
 	float32 invMass =
 		invMassA + invInertiaA * tangentDistanceA * tangentDistanceA +
@@ -2815,7 +2815,7 @@ void b2ParticleSystem::SolveRigidDamping()
 				float32 f = damping * b2Min(w, 1.0f) * ComputeDampingImpulse(
 					invMassA, invInertiaA, tangentDistanceA,
 					invMassB, invInertiaB, tangentDistanceB,
-					vn, n);
+					vn);
 				ApplyDamping(
 					invMassA, invInertiaA, tangentDistanceA,
 					true, aGroup, a, f, n);
@@ -2861,7 +2861,7 @@ void b2ParticleSystem::SolveRigidDamping()
 				float32 f = damping * w * ComputeDampingImpulse(
 					invMassA, invInertiaA, tangentDistanceA,
 					invMassB, invInertiaB, tangentDistanceB,
-					vn, n);
+					vn);
 				ApplyDamping(
 					invMassA, invInertiaA, tangentDistanceA,
 					aRigid, aGroup, a, f, n);

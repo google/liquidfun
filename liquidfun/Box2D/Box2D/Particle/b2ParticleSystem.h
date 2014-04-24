@@ -892,7 +892,7 @@ private:
 	float32 ComputeDampingImpulse(
 		float32 invMassA, float32 invInertiaA, float32 tangentDistanceA,
 		float32 invMassB, float32 invInertiaB, float32 tangentDistanceB,
-		float32 normalVelocity, const b2Vec2& normal) const;
+		float32 normalVelocity) const;
 	void ApplyDamping(
 		float32 invMass, float32 invInertia, float32 tangentDistance,
 		bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
