@@ -917,6 +917,10 @@ private:
 	bool ForceCanBeApplied(uint32 flags) const;
 	void PrepareForceBuffer();
 
+	bool IsRigidGroup(b2ParticleGroup *group) const;
+	b2Vec2 GetLinearVelocity(
+		b2ParticleGroup *group, int32 particleIndex,
+		const b2Vec2 &point) const;
 	void InitDampingParameter(
 		float32* invMass, float32* invInertia, float32* tangentDistance,
 		float32 mass, float32 inertia, const b2Vec2& center,

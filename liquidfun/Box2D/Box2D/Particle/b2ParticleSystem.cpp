@@ -2285,20 +2285,11 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 	for (int32 i = 0; i < m_count; i++)
 	{
 		uint32 flags = m_flagsBuffer.data[i];
-		if (flags & b2_barrierParticle)
+		static const uint32 k_barrierWallFlags =
+										b2_barrierParticle | b2_wallParticle;
+		if ((flags & k_barrierWallFlags) == k_barrierWallFlags)
 		{
-			if (flags & b2_wallParticle)
-			{
-				m_velocityBuffer.data[i].SetZero();
-				continue;
-			}
-			const b2ParticleGroup* group = m_groupBuffer[i];
-			if (group->m_groupFlags & b2_rigidParticleGroup)
-			{
-				m_velocityBuffer.data[i] =
-					group->GetLinearVelocityFromWorldPoint(
-													m_positionBuffer.data[i]);
-			}
+			m_velocityBuffer.data[i].SetZero();
 		}
 	}
 	float32 tmax = b2_barrierCollisionTime * step.dt;
@@ -2314,25 +2305,27 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 			b2AABB aabb;
 			aabb.lowerBound = b2Min(pa, pb);
 			aabb.upperBound = b2Max(pa, pb);
+			b2ParticleGroup *aGroup = m_groupBuffer[a];
+			b2ParticleGroup *bGroup = m_groupBuffer[b];
+			b2Vec2 va = GetLinearVelocity(aGroup, a, pa);
+			b2Vec2 vb = GetLinearVelocity(bGroup, b, pb);
+			b2Vec2 pba = pb - pa;
+			b2Vec2 vba = vb - va;
 			InsideBoundsEnumerator enumerator = GetInsideBoundsEnumerator(aabb);
 			int32 c;
 			while ((c = enumerator.GetNext()) >= 0)
 			{
 				b2Vec2 pc = m_positionBuffer.data[c];
-				if (m_groupBuffer[a] != m_groupBuffer[c] &&
-					m_groupBuffer[b] != m_groupBuffer[c])
+				b2ParticleGroup *cGroup = m_groupBuffer[c];
+				if (aGroup != cGroup && bGroup != cGroup)
 				{
-					b2Vec2 va = m_velocityBuffer.data[a];
-					b2Vec2 vb = m_velocityBuffer.data[b];
-					b2Vec2& vc = m_velocityBuffer.data[c];
+					b2Vec2 vc = GetLinearVelocity(cGroup, c, pc);
 					// Solve the equation below:
 					//   (1-s)*(pa+t*va)+s*(pb+t*vb) = pc+t*vc
 					// which expresses that the particle c will pass a line
 					// connecting the particles a and b at the time of t.
 					// if s is between 0 and 1, c will pass between a and b.
-					b2Vec2 pba = pb - pa;
 					b2Vec2 pca = pc - pa;
-					b2Vec2 vba = vb - va;
 					b2Vec2 vca = vc - va;
 					float32 e2 = b2Cross(vba, vca);
 					float32 e1 = b2Cross(pba, vca) - b2Cross(pca, vba);
@@ -2371,13 +2364,33 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 							if (!(s >= 0 && s <= 1)) continue;
 						}
 					}
-					// Set velocity of particle c to interpolated velocity at
-					// the collision point on line ab, and add force to
-					// particle c after particle movement so that momentum will
-					// be preserved.
-					b2Vec2 f = va + s * vba - vc;
-					ParticleApplyForce(c, -step.inv_dt * GetParticleMass() * f);
-					vc += f;
+					// Apply a force to particle c so that it will have the
+					// interpolated velocity at the collision point on line ab.
+					b2Vec2 dv = va + s * vba - vc;
+					b2Vec2 f = GetParticleMass() * dv;
+					if (IsRigidGroup(cGroup))
+					{
+						// If c belongs to a rigid group, the force will be
+						// distributed in the group.
+						float32 mass = cGroup->GetMass();
+						float32 inertia = cGroup->GetInertia();
+						if (mass > 0)
+						{
+							cGroup->m_linearVelocity += 1 / mass * f;
+						}
+						if (inertia > 0)
+						{
+							cGroup->m_angularVelocity +=
+								b2Cross(pc - cGroup->GetCenter(), f) / inertia;
+						}
+					}
+					else
+					{
+						m_velocityBuffer.data[c] += dv;
+					}
+					// Apply a reversed force to particle c after particle
+					// movement so that momentum will be preserved.
+					ParticleApplyForce(c, -step.inv_dt * f);
 				}
 			}
 		}
@@ -2717,6 +2730,25 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 	}
 }
 
+inline bool b2ParticleSystem::IsRigidGroup(b2ParticleGroup *group) const
+{
+	return group && (group->m_groupFlags & b2_rigidParticleGroup);
+}
+
+inline b2Vec2 b2ParticleSystem::GetLinearVelocity(
+	b2ParticleGroup *group, int32 particleIndex,
+	const b2Vec2 &point) const
+{
+	if (IsRigidGroup(group))
+	{
+		return group->GetLinearVelocityFromWorldPoint(point);
+	}
+	else
+	{
+		return m_velocityBuffer.data[particleIndex];
+	}
+}
+
 inline void b2ParticleSystem::InitDampingParameter(
 	float32* invMass, float32* invInertia, float32* tangentDistance,
 	float32 mass, float32 inertia, const b2Vec2& center,
@@ -2786,7 +2818,7 @@ void b2ParticleSystem::SolveRigidDamping()
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
 		int32 a = contact.index;
 		b2ParticleGroup* aGroup = m_groupBuffer[a];
-		if (aGroup && (aGroup->m_groupFlags & b2_rigidParticleGroup))
+		if (IsRigidGroup(aGroup))
 		{
 			b2Body* b = contact.body;
 			b2Vec2 n = contact.normal;
@@ -2832,19 +2864,15 @@ void b2ParticleSystem::SolveRigidDamping()
 		float32 w = contact.weight;
 		b2ParticleGroup* aGroup = m_groupBuffer[a];
 		b2ParticleGroup* bGroup = m_groupBuffer[b];
-		bool aRigid = aGroup && (aGroup->m_groupFlags & b2_rigidParticleGroup);
-		bool bRigid = bGroup && (bGroup->m_groupFlags & b2_rigidParticleGroup);
+		bool aRigid = IsRigidGroup(aGroup);
+		bool bRigid = IsRigidGroup(bGroup);
 		if (aGroup != bGroup && (aRigid || bRigid))
 		{
 			b2Vec2 p =
 				0.5f * (m_positionBuffer.data[a] + m_positionBuffer.data[b]);
 			b2Vec2 v =
-				(bRigid ?
-					bGroup->GetLinearVelocityFromWorldPoint(p) :
-					m_velocityBuffer.data[b]) -
-				(aRigid ?
-					aGroup->GetLinearVelocityFromWorldPoint(p) :
-					m_velocityBuffer.data[a]);
+				GetLinearVelocity(bGroup, b, p) -
+				GetLinearVelocity(aGroup, a, p);
 			float32 vn = b2Dot(v, n);
 			if (vn < 0)
 			{
