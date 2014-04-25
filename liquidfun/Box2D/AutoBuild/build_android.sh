@@ -36,8 +36,8 @@ usage() {
 Build all ${project_name} libraries and applications for Android.
 
 Usage: ${script_name} [-h] [-n] [-a abi] [-o output_directory] [-z archive] \
-  [-t tests_archive] [-v] [-p projects] [-b build_configuration] \
-  [build_configuration]
+[-t tests_archive] [-v] [-p projects] [-b build_configuration] \
+[build_configuration]
 
 -h:
   Display this help message.
@@ -66,6 +66,9 @@ Usage: ${script_name} [-h] [-n] [-a abi] [-o output_directory] [-z archive] \
 
 build_configuration:
   Legacy form of '-b build_configuration'.
+
+e.g. ${script_name} -a \"x86 mips\" -b \"debug\" -z my_archive.zip -p \
+\"Box2D/Testbed Box2D/EyeCandy\"
 " >&2
   exit 1
 }
@@ -146,7 +149,7 @@ main() {
       z) archive="${OPTARG}";;
       t) tests_archive="${OPTARG}";;
       v) verbose=1;;
-      p) projects_to_build="${OPTARG}" ;;
+      p) projects_to_build=$(echo ${OPTARG} | tr ' ' '\n');;
       *) usage ;;
     esac
   done
