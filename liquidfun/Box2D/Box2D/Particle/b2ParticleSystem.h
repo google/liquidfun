@@ -22,7 +22,7 @@
 #include <Box2D/Particle/b2Particle.h>
 #include <Box2D/Dynamics/b2TimeStep.h>
 
-#ifdef LIQUIDFUN_UNIT_TESTS
+#if LIQUIDFUN_UNIT_TESTS
 #include <gtest/gtest.h>
 #endif // LIQUIDFUN_UNIT_TESTS
 
