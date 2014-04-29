@@ -26,7 +26,7 @@ class b2ParticleSystem;
 class b2ParticleGroup;
 class b2ParticleColor;
 #if LIQUIDFUN_EXTERNAL_LANGUAGE_API
-struct b2CircleShape;
+class b2CircleShape;
 #endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 
 /// @file
