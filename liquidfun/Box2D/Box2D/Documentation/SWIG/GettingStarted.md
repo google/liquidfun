@@ -68,10 +68,10 @@ extends it, and presents it in a way consistent with typical Java style.
 
 #### Function and Variable Renames
 
-*   All b2 class prefixes have been removed.
+*   All b2 class name prefixes have been removed.
 *   All function names have been converted to mixedCase.
 *   All m_ member variable prefixes have been removed.
-*   All enum variables have been converted to uppercase with underscores.
+*   All b2 enum name prefixes have been removed.
 
 #### Memory Management
 
@@ -131,6 +131,13 @@ This file generates the following Java code:<br>
 
 which allows the user to call the function with primitive types (in this case,
 floats) directly.
+
+Starting from [LiquidFun 1.1]
+(http://github.com/google/liquidfun/releases/tag/v1.1.0), the existing extended
+SWIG methods have been moved to LiquidFun header files. These methods will be
+wrapped with the LIQUIDFUN_EXTERNAL_LANGUAGE_API preprocessor. This is so we
+could provide users with a unified API regardless of the programming language
+they elect to use.
 
   [SWIG]: http://http://www.swig.org
 
