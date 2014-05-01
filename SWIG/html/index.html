@@ -70,10 +70,10 @@
 <p>The LiquidFun SWIG interface files pulls in a subset of the LiquidFun API, extends it, and presents it in a way consistent with typical Java style.</p>
 <h4>Function and Variable Renames</h4>
 <ul>
-<li>All b2 class prefixes have been removed.</li>
+<li>All b2 class name prefixes have been removed.</li>
 <li>All function names have been converted to mixedCase.</li>
 <li>All m_ member variable prefixes have been removed.</li>
-<li>All enum variables have been converted to uppercase with underscores.</li>
+<li>All b2 enum name prefixes have been removed.</li>
 </ul>
 <h4>Memory Management</h4>
 <p>JVM (Java Virtual Machine) uses garbage collection to clean up memory, which is very different from the user-managed memory model in C++. The following points are critical in order to facilitate efficient JNI memory management.</p>
@@ -113,7 +113,8 @@
 <p>This file generates the following Java code:<br/>
  </p>
 <pre class="fragment">void setPosition(float x, float y);
-</pre><p>which allows the user to call the function with primitive types (in this case, floats) directly. </p>
+</pre><p>which allows the user to call the function with primitive types (in this case, floats) directly.</p>
+<p>Starting from <a href="http://github.com/google/liquidfun/releases/tag/v1.1.0">LiquidFun 1.1</a>, the existing extended SWIG methods have been moved to LiquidFun header files. These methods will be wrapped with the LIQUIDFUN_EXTERNAL_LANGUAGE_API preprocessor. This is so we could provide users with a unified API regardless of the programming language they elect to use. </p>
 </div></div><!-- contents -->
 <!-- Google Analytics -->
 <script>
