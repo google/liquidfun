@@ -20,6 +20,18 @@ following:
     For example, go to http://github.com/google/liquidfun/commits/v0.9.0 to
     view all changes present in the [0.9.0][] release.
 
+<a name="1.1.0"></a>
+### 1.1.0
+
+#### Overview
+
+<a name="newfeatures1.1.0"></a>
+#### New Features
+
+<a name="apimods1.1.0"></a>
+#### API Modifications
+*   Extended API in SWIG has now been moved to LiquidFun header files, wrapped
+    with the LIQUIDFUN_EXTERNAL_LANGUAGE_API preprocessor.
 
 <a name="1.0.0"></a>
 ### 1.0.0
