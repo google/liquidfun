@@ -346,16 +346,15 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_needsUpdateAllGroupFlags = false;
 	m_hasForce = false;
 	m_iterationIndex = 0;
-	m_strictContactCheck = false;
 
-	m_density = 1;
-	m_inverseDensity = 1;
-	m_gravityScale = 1;
+	SetStrictContactCheck(def->strictContactCheck);
+	SetDensity(def->density);
+	SetGravityScale(def->gravityScale);
 	SetRadius(def->radius);
+	SetMaxParticleCount(def->maxCount);
 
 	m_count = 0;
 	m_internalAllocatedCapacity = 0;
-	m_maxCount = 0;
 	m_forceBuffer = NULL;
 	m_weightBuffer = NULL;
 	m_staticPressureBuffer = NULL;
@@ -563,7 +562,7 @@ static int32 LimitCapacity(int32 capacity, int32 maxCount)
 void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 {
 	// Don't increase capacity beyond the smallest user-supplied buffer size.
-	capacity = LimitCapacity(capacity, m_maxCount);
+	capacity = LimitCapacity(capacity, m_def.maxCount);
 	capacity = LimitCapacity(capacity, m_flagsBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_positionBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_velocityBuffer.userSuppliedCapacity);
@@ -2075,7 +2074,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 	ComputeAABB(&aabb);
 	m_world->QueryAABB(&callback, aabb);
 
-	if (m_strictContactCheck)
+	if (m_def.strictContactCheck)
 	{
 		RemoveSpuriousBodyContacts();
 	}
@@ -2546,7 +2545,7 @@ void b2ParticleSystem::LimitVelocity(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveGravity(const b2TimeStep& step)
 {
-	b2Vec2 gravity = step.dt * m_gravityScale * m_world->GetGravity();
+	b2Vec2 gravity = step.dt * m_def.gravityScale * m_world->GetGravity();
 	for (int32 i = 0; i < m_count; i++)
 	{
 		m_velocityBuffer.data[i] += gravity;
@@ -2643,7 +2642,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 		}
 	}
 	// applies pressure between each particles in contact
-	float32 velocityPerPressure = step.dt / (m_density * m_particleDiameter);
+	float32 velocityPerPressure = step.dt / (m_def.density * m_particleDiameter);
 	for (int32 k = 0; k < m_bodyContactCount; k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];

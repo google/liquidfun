@@ -122,7 +122,11 @@ struct b2ParticleSystemDef
 {
 	b2ParticleSystemDef()
 	{
+		strictContactCheck = false;
+		density = 1.0f;
+		gravityScale = 1.0f;
 		radius = 1.0f;
+		maxCount = 0;
 
 		// Initialize physical coefficients to the maximum values that
 		// maintain numerical stability.
@@ -144,8 +148,26 @@ struct b2ParticleSystemDef
 		lifetimeGranularity = 1.0f / 60.0f;
 	}
 
+	/// Enable strict Particle/Body contact check.
+	/// See SetStrictContactCheck for details.
+	bool strictContactCheck;
+
+	/// Set the particle density.
+	/// See SetDensity for details.
+	float32 density;
+
+	/// Change the particle gravity scale. Adjusts the effect of the global
+	/// gravity vector on particles. Default value is 1.0f.
+	float32 gravityScale;
+
 	/// Particles behave as circles with this radius. In Box2D units.
 	float32 radius;
+
+	/// Set the maximum number of particles.
+	/// By default, there is no maximum. The particle buffers can continue to
+	/// grow while b2World's block allocator still has memory.
+	/// See SetMaxParticleCount for details.
+	int32 maxCount;
 
 	/// Increases pressure in response to compression
 	/// Smaller values allow more compression
@@ -319,8 +341,8 @@ public:
 	int32 GetMaxParticleCount() const;
 
 	/// Set the maximum number of particles.
-	/// By default, there is no maximum. The particle buffers can continue to
-	/// grow while b2World's block allocator still has memory.
+	/// A value of 0 means there is no maximum. The particle buffers can
+	/// continue to grow while b2World's block allocator still has memory.
 	/// Note: If you try to CreateParticle() with more than this count,
 	/// b2_invalidParticleIndex is returned unless
 	/// SetDestructionByAge() is used to enable the destruction of the
@@ -340,7 +362,7 @@ public:
 
 	/// Change the particle density.
 	/// Particle density affects the mass of the particles, which in turn
-	/// affects how the partcles interact with b2Bodies. Note that the density
+	/// affects how the particles interact with b2Bodies. Note that the density
 	/// does not affect how the particles interact with each other.
 	void SetDensity(float32 density);
 
@@ -348,7 +370,7 @@ public:
 	float32 GetDensity() const;
 
 	/// Change the particle gravity scale. Adjusts the effect of the global
-	/// gravity vector on particles. Default value is 1.0f.
+	/// gravity vector on particles.
 	void SetGravityScale(float32 gravityScale);
 
 	/// Get the particle gravity scale.
@@ -884,17 +906,13 @@ private:
 	bool m_needsUpdateAllGroupFlags;
 	bool m_hasForce;
 	int32 m_iterationIndex;
-	float32 m_density;
 	float32 m_inverseDensity;
-	float32 m_gravityScale;
 	float32 m_particleDiameter;
 	float32 m_inverseDiameter;
 	float32 m_squaredDiameter;
-	bool m_strictContactCheck;
 
 	int32 m_count;
 	int32 m_internalAllocatedCapacity;
-	int32 m_maxCount;
 	/// Allocator for b2ParticleHandle instances.
 	b2SlabAllocator<b2ParticleHandle> m_handleAllocator;
 	/// Maps particle indicies to  handles.
@@ -1072,12 +1090,12 @@ inline int32 b2ParticleSystem::GetStuckCandidateCount() const
 
 inline void b2ParticleSystem::SetStrictContactCheck(bool enabled)
 {
-	m_strictContactCheck = enabled;
+	m_def.strictContactCheck = enabled;
 }
 
 inline bool b2ParticleSystem::GetStrictContactCheck() const
 {
-	return m_strictContactCheck;
+	return m_def.strictContactCheck;
 }
 
 inline void b2ParticleSystem::SetRadius(float32 radius)
@@ -1089,23 +1107,23 @@ inline void b2ParticleSystem::SetRadius(float32 radius)
 
 inline void b2ParticleSystem::SetDensity(float32 density)
 {
-	m_density = density;
-	m_inverseDensity =  1 / m_density;
+	m_def.density = density;
+	m_inverseDensity =  1 / m_def.density;
 }
 
 inline float32 b2ParticleSystem::GetDensity() const
 {
-	return m_density;
+	return m_def.density;
 }
 
 inline void b2ParticleSystem::SetGravityScale(float32 gravityScale)
 {
-	m_gravityScale = gravityScale;
+	m_def.gravityScale = gravityScale;
 }
 
 inline float32 b2ParticleSystem::GetGravityScale() const
 {
-	return m_gravityScale;
+	return m_def.gravityScale;
 }
 
 inline void b2ParticleSystem::SetDamping(float32 damping)
@@ -1147,7 +1165,7 @@ inline float32 b2ParticleSystem::GetCriticalVelocitySquared(
 
 inline float32 b2ParticleSystem::GetCriticalPressure(const b2TimeStep& step) const
 {
-	return m_density * GetCriticalVelocitySquared(step);
+	return m_def.density * GetCriticalVelocitySquared(step);
 }
 
 inline float32 b2ParticleSystem::GetParticleStride() const
@@ -1158,7 +1176,7 @@ inline float32 b2ParticleSystem::GetParticleStride() const
 inline float32 b2ParticleSystem::GetParticleMass() const
 {
 	float32 stride = GetParticleStride();
-	return m_density * stride * stride;
+	return m_def.density * stride * stride;
 }
 
 inline float32 b2ParticleSystem::GetParticleInvMass() const
@@ -1185,13 +1203,13 @@ inline float32* b2ParticleSystem::GetWeightBuffer()
 
 inline int32 b2ParticleSystem::GetMaxParticleCount() const
 {
-	return m_maxCount;
+	return m_def.maxCount;
 }
 
 inline void b2ParticleSystem::SetMaxParticleCount(int32 count)
 {
 	b2Assert(m_count <= count);
-	m_maxCount = count;
+	m_def.maxCount = count;
 }
 
 inline const uint32* b2ParticleSystem::GetFlagsBuffer() const
