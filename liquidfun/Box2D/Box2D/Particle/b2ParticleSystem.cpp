@@ -1597,18 +1597,41 @@ inline b2ContactListener* b2ParticleSystem::GetParticleContactListener() const
 		m_world->m_contactManager.m_contactListener : NULL;
 }
 
-void b2ParticleSystem::UpdateContacts(bool exceptZombie)
+// Recalculate 'tag' in proxies using m_positionBuffer.
+// The 'tag' is an approximation of position, in left-right, top-bottom order.
+void b2ParticleSystem::UpdateProxies(Proxy* const proxies) const
 {
-	Proxy* beginProxy = m_proxyBuffer;
-	Proxy* endProxy = beginProxy + m_proxyCount;
-	for (Proxy* proxy = beginProxy; proxy < endProxy; ++proxy)
+	const Proxy* const endProxy = proxies + m_proxyCount;
+	for (Proxy* proxy = proxies; proxy < endProxy; ++proxy)
 	{
 		int32 i = proxy->index;
 		b2Vec2 p = m_positionBuffer.data[i];
 		proxy->tag = computeTag(m_inverseDiameter * p.x,
 								m_inverseDiameter * p.y);
 	}
-	std::sort(beginProxy, endProxy);
+}
+
+// Sort the proxy array by 'tag'. This orders the particles into rows that
+// run left-to-right, top-to-bottom. The rows are spaced m_particleDiameter
+// apart, such that a particle in one row can only collide with the rows
+// immediately above and below it. This ordering makes collision computation
+// tractable.
+//
+// TODO OPT: The sort is a hot spot on the profiles. We could use SIMD to
+// speed this up. See http://www.vldb.org/pvldb/1/1454171.pdf for an excellent
+// explanation of a SIMD mergesort algorithm.
+void b2ParticleSystem::SortProxies(Proxy* proxies) const
+{
+	std::sort(proxies, &proxies[m_proxyCount]);
+}
+
+void b2ParticleSystem::UpdateContacts(bool exceptZombie)
+{
+	UpdateProxies(m_proxyBuffer);
+	SortProxies(m_proxyBuffer);
+
+	Proxy* beginProxy = m_proxyBuffer;
+	Proxy* endProxy = beginProxy + m_proxyCount;
 
 	b2ContactListener* const contactListener = GetParticleContactListener();
 	b2ParticlePairSet particlePairs(&m_world->m_stackAllocator);

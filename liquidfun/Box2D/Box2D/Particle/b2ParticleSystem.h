@@ -809,6 +809,8 @@ private:
 	void AddContact(int32 a, int32 b, b2ContactFilter* const contactFilter,
 					b2ContactListener* const contactListener,
 					b2ParticlePairSet* const particlePairSet);
+	void UpdateProxies(Proxy* const outProxies) const;
+	void SortProxies(Proxy* const outProxies) const;
 	void UpdateContacts(bool exceptZombie);
 	void UpdateBodyContacts();
 
