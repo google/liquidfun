@@ -10,6 +10,7 @@ var searchData=
   ['staticpressurerelaxation',['staticPressureRelaxation',['../structb2_particle_system_def.html#a497e6bfc2e22867eda10a5c576972184',1,'b2ParticleSystemDef']]],
   ['staticpressurestrength',['staticPressureStrength',['../structb2_particle_system_def.html#add3df1894038540a311081740dc3e5cb',1,'b2ParticleSystemDef']]],
   ['strength',['strength',['../structb2_particle_group_def.html#a77c3ac47ae906e34e7f3fecf7b8f7aad',1,'b2ParticleGroupDef::strength()'],['../structb2_particle_pair.html#ac192c2a11a0b084ae4065f269ee92719',1,'b2ParticlePair::strength()'],['../structb2_particle_triad.html#a3923a6548d78c52341b0f5e9555194c1',1,'b2ParticleTriad::strength()']]],
+  ['strictcontactcheck',['strictContactCheck',['../structb2_particle_system_def.html#a28132c46831cadcb44eea76dfcf28db8',1,'b2ParticleSystemDef']]],
   ['stride',['stride',['../structb2_particle_group_def.html#ae9882ac9001f1a6c279385b65b7f13d0',1,'b2ParticleGroupDef']]],
   ['surfacetensionnormalstrength',['surfaceTensionNormalStrength',['../structb2_particle_system_def.html#a05d5a189606457a9a6d89dc478a4fb90',1,'b2ParticleSystemDef']]],
   ['surfacetensionpressurestrength',['surfaceTensionPressureStrength',['../structb2_particle_system_def.html#a892b1069f95f9cb45b482a223542add5',1,'b2ParticleSystemDef']]]
