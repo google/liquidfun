@@ -123,7 +123,8 @@ public:
 				int32 velocityIterations,
 				int32 positionIterations)
 	{
-		Step(timeStep, velocityIterations, positionIterations, 1);
+		Step(timeStep, velocityIterations, positionIterations,
+			 CalculateDefaultParticleIterations(timeStep));
 	}
 
 	/// Manually clear the force buffer on all bodies. By default, forces are cleared automatically
@@ -299,6 +300,8 @@ private:
 	void DrawShape(b2Fixture* shape, const b2Transform& xf, const b2Color& color);
 
 	void DrawParticleSystem(const b2ParticleSystem& system);
+
+	int CalculateDefaultParticleIterations(float32 timeStep) const;
 
 	b2BlockAllocator m_blockAllocator;
 	b2StackAllocator m_stackAllocator;
