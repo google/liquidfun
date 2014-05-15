@@ -157,6 +157,8 @@ float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="separator:ae104146814fd8b3e3671f71442037c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f89e452e667f8ba5eae117fa96e1b31"><td class="memItemLeft" align="right" valign="top">float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">GetAngle</a> () const </td></tr>
 <tr class="separator:a9f89e452e667f8ba5eae117fa96e1b31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a370e0ac139af6122e141a922c951a7fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structb2_vec2.html">b2Vec2</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">GetLinearVelocityFromWorldPoint</a> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;worldPoint) const </td></tr>
+<tr class="separator:a370e0ac139af6122e141a922c951a7fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9633e73bf6db361bc4c70be7becaa1b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab9633e73bf6db361bc4c70be7becaa1b"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">GetUserData</a> () const </td></tr>
 <tr class="memdesc:ab9633e73bf6db361bc4c70be7becaa1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the user data pointer that was provided in the group definition. <br/></td></tr>
@@ -272,6 +274,38 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
 </table>
 </div><div class="memdoc">
 <p>Get the rotational angle of the particle group as a whole. Used only with groups of rigid particles. </p>
+
+</div>
+</div>
+<a class="anchor" id="a370e0ac139af6122e141a922c951a7fa"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structb2_vec2.html">b2Vec2</a> b2ParticleGroup::GetLinearVelocityFromWorldPoint </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;&#160;</td>
+          <td class="paramname"><em>worldPoint</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the world linear velocity of a world point, from the average linear and angular velocities of the particle group. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td>point in world coordinates. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the world velocity of a point. </dd></dl>
 
 </div>
 </div>
