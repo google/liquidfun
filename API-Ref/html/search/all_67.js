@@ -153,7 +153,7 @@ var searchData=
   ['getworldvector',['GetWorldVector',['../classb2_body.html#afd44622669b5e45202c23e4a212895fc',1,'b2Body']]],
   ['getxaxis',['GetXAxis',['../structb2_rot.html#ac4ab7f262adb99f161775314852723d8',1,'b2Rot']]],
   ['getyaxis',['GetYAxis',['../structb2_rot.html#ae731c7434fe1754114ee70149df36c7f',1,'b2Rot']]],
-  ['gravityscale',['gravityScale',['../structb2_body_def.html#aadea3fa173ed1014739ec8b023de4336',1,'b2BodyDef']]],
+  ['gravityscale',['gravityScale',['../structb2_body_def.html#aadea3fa173ed1014739ec8b023de4336',1,'b2BodyDef::gravityScale()'],['../structb2_particle_system_def.html#ae1e7b92c07dd5aae0deefe178679a525',1,'b2ParticleSystemDef::gravityScale()']]],
   ['groundanchora',['groundAnchorA',['../structb2_pulley_joint_def.html#aae77c020ce4629ab9e03560e28aa853d',1,'b2PulleyJointDef']]],
   ['groundanchorb',['groundAnchorB',['../structb2_pulley_joint_def.html#aa412b9f3bffd1fb69ace14f9b3e03b82',1,'b2PulleyJointDef']]],
   ['group',['group',['../structb2_particle_def.html#a3eb74579cd73b238e16496086c309770',1,'b2ParticleDef::group()'],['../structb2_particle_group_def.html#ab734a88e0aab7a4aa48e6acbee70e722',1,'b2ParticleGroupDef::group()']]],

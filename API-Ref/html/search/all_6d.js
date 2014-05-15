@@ -10,6 +10,7 @@ var searchData=
   ['major',['major',['../structb2_version.html#a720da8e346364d1cb34d176125380b44',1,'b2Version']]],
   ['maskbits',['maskBits',['../structb2_filter.html#a533cccf85e3ba3d9e3700d73b819f6e2',1,'b2Filter']]],
   ['mass',['mass',['../structb2_mass_data.html#aea85d9595a38d2eed05b8d2ea80d97b1',1,'b2MassData::mass()'],['../structb2_particle_body_contact.html#acb31b9545e0b93686393e2980e9e442e',1,'b2ParticleBodyContact::mass()']]],
+  ['maxcount',['maxCount',['../structb2_particle_system_def.html#aefe0175108a238c4364526504d6213d2',1,'b2ParticleSystemDef']]],
   ['maxforce',['maxForce',['../structb2_friction_joint_def.html#ad30e97a80790d4ca64bac7a1fa7d1b35',1,'b2FrictionJointDef::maxForce()'],['../structb2_motor_joint_def.html#a2f66d1b99c654e112dc68e15375d5ee7',1,'b2MotorJointDef::maxForce()'],['../structb2_mouse_joint_def.html#ae9c52b3afda8ed006eb62fad163cdc3b',1,'b2MouseJointDef::maxForce()']]],
   ['maxlength',['maxLength',['../structb2_rope_joint_def.html#a6efdcae22e2bdcfc3aae62da1a5f0d69',1,'b2RopeJointDef']]],
   ['maxmotorforce',['maxMotorForce',['../structb2_prismatic_joint_def.html#aabeec48af1e49c7f9fed5e0bc8270a1b',1,'b2PrismaticJointDef']]],

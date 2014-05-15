@@ -1282,7 +1282,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Change the particle density. Particle density affects the mass of the particles, which in turn affects how the partcles interact with b2Bodies. Note that the density does not affect how the particles interact with each other. </p>
+<p>Change the particle density. Particle density affects the mass of the particles, which in turn affects how the particles interact with b2Bodies. Note that the density does not affect how the particles interact with each other. </p>
 
 </div>
 </div>
@@ -1359,7 +1359,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Change the particle gravity scale. Adjusts the effect of the global gravity vector on particles. Default value is 1.0f. </p>
+<p>Change the particle gravity scale. Adjusts the effect of the global gravity vector on particles. </p>
 
 </div>
 </div>
@@ -1384,7 +1384,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the maximum number of particles. By default, there is no maximum. The particle buffers can continue to grow while <a class="el" href="classb2_world.html">b2World</a>'s block allocator still has memory. Note: If you try to <a class="el" href="classb2_particle_system.html#a9a52c227fcd0e7bb0346d748f0df0750">CreateParticle()</a> with more than this count, b2_invalidParticleIndex is returned unless <a class="el" href="classb2_particle_system.html#a0400ae753ca56deef6f8b2dfe2ab5fb2">SetDestructionByAge()</a> is used to enable the destruction of the oldest particles in the system. </p>
+<p>Set the maximum number of particles. A value of 0 means there is no maximum. The particle buffers can continue to grow while <a class="el" href="classb2_world.html">b2World</a>'s block allocator still has memory. Note: If you try to <a class="el" href="classb2_particle_system.html#a9a52c227fcd0e7bb0346d748f0df0750">CreateParticle()</a> with more than this count, b2_invalidParticleIndex is returned unless <a class="el" href="classb2_particle_system.html#a0400ae753ca56deef6f8b2dfe2ab5fb2">SetDestructionByAge()</a> is used to enable the destruction of the oldest particles in the system. </p>
 
 </div>
 </div>
@@ -1551,7 +1551,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 ga('create', 'UA-46159502-1', 'google.github.io');
+ga('create', 'UA-49880327-7', 'google.github.io', {'name': 'liquidFunTracker'});
 ga('send', 'pageview');
+ga('liquidFunTracker.send', 'pageview');
 </script>
 </body>
 </html>
