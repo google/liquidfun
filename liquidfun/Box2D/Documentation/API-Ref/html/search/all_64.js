@@ -13,6 +13,7 @@ var searchData=
   ['destroyparticlesinshape',['DestroyParticlesInShape',['../classb2_particle_system.html#a36ef6f6f0eef789e1dee767901030631',1,'b2ParticleSystem::DestroyParticlesInShape(const b2Shape &amp;shape, const b2Transform &amp;xf)'],['../classb2_particle_system.html#aa129bae6fd938bb9b3a041917ba90e41',1,'b2ParticleSystem::DestroyParticlesInShape(const b2Shape &amp;shape, const b2Transform &amp;xf, bool callDestructionListener)']]],
   ['destroyparticlesystem',['DestroyParticleSystem',['../classb2_world.html#a4a9cdb868bd65cb171696a005ab17205',1,'b2World']]],
   ['destroyproxy',['DestroyProxy',['../classb2_broad_phase.html#a84f0fb227dc01a9b9baa55c7b8c68984',1,'b2BroadPhase::DestroyProxy()'],['../classb2_dynamic_tree.html#a62aa451e7d7fe029818dd05f76ea9cdc',1,'b2DynamicTree::DestroyProxy()']]],
+  ['distance',['distance',['../structb2_particle_pair.html#a3a6433b99b74875e99a75239596dfe10',1,'b2ParticlePair']]],
   ['drawcircle',['DrawCircle',['../classb2_draw.html#ae2effe9bca87c8d7cb90e860d13b7e9e',1,'b2Draw']]],
   ['drawdebugdata',['DrawDebugData',['../classb2_world.html#a293d9865e407fd463e168b0a29856acc',1,'b2World']]],
   ['drawparticles',['DrawParticles',['../classb2_draw.html#a650dc6b8d2d097497d1a956db1d9561a',1,'b2Draw']]],
