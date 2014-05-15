@@ -806,11 +806,12 @@ private:
 
 	void UpdateAllParticleFlags();
 	void UpdateAllGroupFlags();
-	void AddContact(int32 a, int32 b, b2ContactFilter* const contactFilter,
-					b2ContactListener* const contactListener,
-					b2ParticlePairSet* const particlePairSet);
+	void AddContact(int32 a, int32 b, b2ContactFilter* const contactFilter);
 	void UpdateProxies(Proxy* const outProxies) const;
 	void SortProxies(Proxy* const outProxies) const;
+	void NotifyContactListenerPreContact(
+		b2ParticlePairSet* particlePairs) const;
+	void NotifyContactListenerPostContact(b2ParticlePairSet& particlePairs);
 	void UpdateContacts(bool exceptZombie);
 	void UpdateBodyContacts();
 

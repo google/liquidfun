@@ -1524,9 +1524,7 @@ void b2ParticleSystem::ComputeDepth()
 }
 
 inline void b2ParticleSystem::AddContact(
-	int32 a, int32 b, b2ContactFilter* const contactFilter,
-	b2ContactListener* const contactListener,
-	b2ParticlePairSet* const particlePairSet)
+	int32 a, int32 b, b2ContactFilter* const contactFilter)
 {
 	b2Vec2 d = m_positionBuffer.data[b] - m_positionBuffer.data[a];
 	float32 distBtParticlesSq = b2Dot(d, d);
@@ -1555,24 +1553,6 @@ inline void b2ParticleSystem::AddContact(
 		contact.weight = 1 - distBtParticlesSq * invD * m_inverseDiameter;
 		contact.normal = invD * d;
 		m_contactCount++;
-
-		if (contactListener)
-		{
-			ParticlePair pair;
-			pair.first = a;
-			pair.second = b;
-			const int32 itemIndex = particlePairSet->Find(pair);
-			if (itemIndex >= 0)
-			{
-				// Already touching, ignore this contact.
-				particlePairSet->Invalidate(itemIndex);
-			}
-			else
-			{
-				// Just started touching, inform the listener.
-				contactListener->BeginContact(this, &contact);
-			}
-		}
 	}
 }
 
@@ -1625,21 +1605,75 @@ void b2ParticleSystem::SortProxies(Proxy* proxies) const
 	std::sort(proxies, &proxies[m_proxyCount]);
 }
 
+void b2ParticleSystem::NotifyContactListenerPreContact(
+	b2ParticlePairSet* particlePairs) const
+{
+	b2ContactListener* const contactListener = GetParticleContactListener();
+	if (contactListener == NULL)
+		return;
+
+	particlePairs->Initialize(m_contactBuffer, m_contactCount,
+						      GetFlagsBuffer());
+}
+
+// Note: This function is not const because 'this' in BeginContact and
+// EndContact callbacks must be non-const. However, this function itself
+// does not change any internal data (though the callbacks might).
+void b2ParticleSystem::NotifyContactListenerPostContact(
+	b2ParticlePairSet& particlePairs)
+{
+	b2ContactListener* const contactListener = GetParticleContactListener();
+	if (contactListener == NULL)
+		return;
+
+	// Loop through all new contacts, reporting any new ones, and
+	// "invalidating" the ones that still exist.
+	const b2ParticleContact* const endContact =
+		&m_contactBuffer[m_contactCount];
+	for (b2ParticleContact* contact = m_contactBuffer;
+		 contact < endContact; ++contact)
+	{
+		ParticlePair pair;
+		pair.first = contact->indexA;
+		pair.second = contact->indexB;
+		const int32 itemIndex = particlePairs.Find(pair);
+		if (itemIndex >= 0)
+		{
+			// Already touching, ignore this contact.
+			particlePairs.Invalidate(itemIndex);
+		}
+		else
+		{
+			// Just started touching, inform the listener.
+			contactListener->BeginContact(this, contact);
+		}
+	}
+
+	// Report particles that are no longer touching.
+	// That is, any pairs that were not invalidated above.
+	const int32 pairCount = particlePairs.GetCount();
+	const ParticlePair* const pairs = particlePairs.GetBuffer();
+	const int8* const valid = particlePairs.GetValidBuffer();
+	for (int32 i = 0; i < pairCount; ++i)
+	{
+		if (valid[i])
+		{
+			contactListener->EndContact(this, pairs[i].first,
+										pairs[i].second);
+		}
+	}
+}
+
 void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 {
 	UpdateProxies(m_proxyBuffer);
 	SortProxies(m_proxyBuffer);
 
+	b2ParticlePairSet particlePairs(&m_world->m_stackAllocator);
+	NotifyContactListenerPreContact(&particlePairs);
+
 	Proxy* beginProxy = m_proxyBuffer;
 	Proxy* endProxy = beginProxy + m_proxyCount;
-
-	b2ContactListener* const contactListener = GetParticleContactListener();
-	b2ParticlePairSet particlePairs(&m_world->m_stackAllocator);
-	if (contactListener)
-	{
-		particlePairs.Initialize(m_contactBuffer, m_contactCount,
-								 GetFlagsBuffer());
-	}
 
 	m_contactCount = 0;
 	b2ContactFilter* const contactFilter = GetParticleContactFilter();
@@ -1649,8 +1683,7 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 		for (Proxy* b = a + 1; b < endProxy; b++)
 		{
 			if (rightTag < b->tag) break;
-			AddContact(a->index, b->index, contactFilter,
-					   contactListener, &particlePairs);
+			AddContact(a->index, b->index, contactFilter);
 		}
 		uint32 bottomLeftTag = computeRelativeTag(a->tag, -1, 1);
 		for (; c < endProxy; c++)
@@ -1661,31 +1694,18 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 		for (Proxy* b = c; b < endProxy; b++)
 		{
 			if (bottomRightTag < b->tag) break;
-			AddContact(a->index, b->index, contactFilter,
-					   contactListener, &particlePairs);
+			AddContact(a->index, b->index, contactFilter);
 		}
 	}
+
+	NotifyContactListenerPostContact(particlePairs);
+
 	if (exceptZombie)
 	{
 		b2ParticleContact* lastContact = std::remove_if(
 			m_contactBuffer, m_contactBuffer + m_contactCount,
 			b2ParticleContactIsZombie);
 		m_contactCount = (int32) (lastContact - m_contactBuffer);
-	}
-	// Report particles that are no longer touching.
-	if (contactListener)
-	{
-		const int32 pairCount = particlePairs.GetCount();
-		const ParticlePair* pairs = particlePairs.GetBuffer();
-		const int8* valid = particlePairs.GetValidBuffer();
-		for (int32 i = 0; i < pairCount; ++i)
-		{
-			if (valid[i])
-			{
-				contactListener->EndContact(this, pairs[i].first,
-											pairs[i].second);
-			}
-		}
 	}
 }
 
