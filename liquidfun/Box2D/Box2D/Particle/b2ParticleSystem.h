@@ -49,11 +49,7 @@ class b2ParticlePairSet;
 struct b2ParticleContact
 {
 	/// Indices of the respective particles making contact.
-	int32 indexA, indexB;
-
-	/// The logical sum of the particle behaviors that have been set.
-	/// See the b2ParticleFlag enum.
-	uint32 flags;
+	uint16 indexA, indexB;
 
 	/// Weight of the contact. A value between 0.0f and 1.0f.
 	/// 0.0f ==> particles are just barely touching
@@ -62,6 +58,14 @@ struct b2ParticleContact
 
 	/// The normalized direction from A to B.
 	b2Vec2 normal;
+
+	/// The logical sum of the particle behaviors that have been set.
+	/// See the b2ParticleFlag enum.
+	uint32 flags;
+
+	bool operator==(const b2ParticleContact& rhs) const;
+	bool operator!=(const b2ParticleContact& rhs) const { return !operator==(rhs); }
+	bool ApproximatelyEqual(const b2ParticleContact& rhs) const;
 };
 
 struct b2ParticleBodyContact
@@ -997,6 +1001,30 @@ private:
 	b2ParticleSystem* m_prev;
 	b2ParticleSystem* m_next;
 };
+
+inline bool b2ParticleContact::operator==(
+	const b2ParticleContact& rhs) const
+{
+	return indexA == rhs.indexA
+		&& indexB == rhs.indexB
+		&& flags == rhs.flags
+		&& weight == rhs.weight
+		&& normal == rhs.normal;
+}
+
+// The reciprocal sqrt function differs between SIMD and non-SIMD, but they
+// should create approximately equal results.
+inline bool b2ParticleContact::ApproximatelyEqual(
+	const b2ParticleContact& rhs) const
+{
+	static const float MAX_WEIGHT_DIFF = 0.01f; // Weight 0 ~ 1, so about 1%
+	static const float MAX_NORMAL_DIFF = 0.01f; // Normal length = 1, so 1%
+	return indexA == rhs.indexA
+		&& indexB == rhs.indexB
+		&& flags == rhs.flags
+		&& b2Abs(weight - rhs.weight) < MAX_WEIGHT_DIFF
+		&& (normal - rhs.normal).Length() < MAX_NORMAL_DIFF;
+}
 
 inline b2ParticleGroup* b2ParticleSystem::GetParticleGroupList()
 {
