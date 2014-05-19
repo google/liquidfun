@@ -1471,24 +1471,12 @@ void b2ParticleSystem::ComputeDepth()
 	m_world->m_stackAllocator.Free(contactGroups);
 }
 
-inline void b2ParticleSystem::AddContact(
-	int32 a, int32 b, b2ContactFilter* const contactFilter)
+inline void b2ParticleSystem::AddContact(int32 a, int32 b)
 {
 	b2Vec2 d = m_positionBuffer.data[b] - m_positionBuffer.data[a];
 	float32 distBtParticlesSq = b2Dot(d, d);
 	if (distBtParticlesSq < m_squaredDiameter)
 	{
-        // Optionally filter the contact.
-        if (contactFilter)
-        {
-            const uint32* const flags = GetFlagsBuffer();
-            if (((flags[a] | flags[b]) & b2_particleContactFilterParticle) &&
-                !contactFilter->ShouldCollide(this, a, b))
-            {
-                return;
-            }
-        }
-
 		float32 invD = b2InvSqrt(distBtParticlesSq);
 		b2ParticleContact& contact = m_contactBuffer.Append();
 		contact.indexA = a;
@@ -1547,6 +1535,41 @@ void b2ParticleSystem::UpdateProxies(b2GrowableBuffer<Proxy>& proxies) const
 void b2ParticleSystem::SortProxies(b2GrowableBuffer<Proxy>& proxies) const
 {
 	std::sort(proxies.Begin(), proxies.End());
+}
+
+class b2ParticleContactRemovePredicate
+{
+public:
+	b2ParticleContactRemovePredicate(
+		b2ParticleSystem* system,
+		b2ContactFilter* const contactFilter) :
+		m_system(system),
+		m_contactFilter(contactFilter)
+	{}
+
+	bool operator()(const b2ParticleContact& contact)
+	{
+	    return (contact.flags & b2_particleContactFilterParticle)
+	        && !m_contactFilter->ShouldCollide(m_system, contact.indexA,
+	        								   contact.indexB);
+	}
+
+private:
+	b2ParticleSystem* m_system;
+	b2ContactFilter* const m_contactFilter;
+};
+
+// Only changes 'contacts', but the contact filter has a non-const 'this'
+// pointer, so this member function cannot be const.
+void b2ParticleSystem::FilterContacts(
+	b2GrowableBuffer<b2ParticleContact>& contacts)
+{
+	// Optionally filter the contact.
+	b2ContactFilter* const contactFilter = GetParticleContactFilter();
+	if (contactFilter == NULL)
+		return;
+
+	contacts.RemoveIf(b2ParticleContactRemovePredicate(this, contactFilter));
 }
 
 void b2ParticleSystem::NotifyContactListenerPreContact(
@@ -1619,14 +1642,13 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 	Proxy* endProxy = m_proxyBuffer.End();
 
 	m_contactBuffer.SetCount(0);
-	b2ContactFilter* const contactFilter = GetParticleContactFilter();
 	for (Proxy *a = beginProxy, *c = beginProxy; a < endProxy; a++)
 	{
 		uint32 rightTag = computeRelativeTag(a->tag, 1, 0);
 		for (Proxy* b = a + 1; b < endProxy; b++)
 		{
 			if (rightTag < b->tag) break;
-			AddContact(a->index, b->index, contactFilter);
+			AddContact(a->index, b->index);
 		}
 		uint32 bottomLeftTag = computeRelativeTag(a->tag, -1, 1);
 		for (; c < endProxy; c++)
@@ -1637,9 +1659,11 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 		for (Proxy* b = c; b < endProxy; b++)
 		{
 			if (bottomRightTag < b->tag) break;
-			AddContact(a->index, b->index, contactFilter);
+			AddContact(a->index, b->index);
 		}
 	}
+
+	FilterContacts(m_contactBuffer);
 
 	NotifyContactListenerPostContact(particlePairs);
 

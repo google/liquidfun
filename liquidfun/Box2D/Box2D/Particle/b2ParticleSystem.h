@@ -806,9 +806,10 @@ private:
 
 	void UpdateAllParticleFlags();
 	void UpdateAllGroupFlags();
-	void AddContact(int32 a, int32 b, b2ContactFilter* const contactFilter);
+	void AddContact(int32 a, int32 b);
 	void UpdateProxies(b2GrowableBuffer<Proxy>& proxies) const;
 	void SortProxies(b2GrowableBuffer<Proxy>& proxies) const;
+	void FilterContacts(b2GrowableBuffer<b2ParticleContact>& contacts);
 	void NotifyContactListenerPreContact(
 		b2ParticlePairSet* particlePairs) const;
 	void NotifyContactListenerPostContact(b2ParticlePairSet& particlePairs);
