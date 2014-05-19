@@ -67,7 +67,7 @@ to track issues and ensures that your issue will not be lost in the depths of
 the forums.
 
 Please file bugs and feature requests here:
-[http://code.google.com/p/LiquidFun/](http://code.google.com/p/LiquidFun/)
+[https://github.com/google/liquidfun/issues](https://github.com/google/liquidfun/issues)
 
  You can help to ensure your issue gets fixed if you provide sufficient
 detail. A testbed example that reproduces the problem is ideal. You can read
