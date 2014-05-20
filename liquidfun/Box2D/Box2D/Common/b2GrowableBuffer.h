@@ -136,7 +136,7 @@ public:
 
 	void SetCount(int32 newCount)
 	{
-		b2Assert(0 <= newCount && newCount < capacity);
+		b2Assert(0 <= newCount && newCount <= capacity);
 		count = newCount;
 	}
 
