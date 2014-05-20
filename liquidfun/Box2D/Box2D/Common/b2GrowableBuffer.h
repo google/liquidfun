@@ -37,6 +37,19 @@ public:
 		allocator(&allocator)
 	{}
 
+	b2GrowableBuffer(const b2GrowableBuffer<T>& rhs) :
+		data(NULL),
+		count(rhs.count),
+		capacity(rhs.capacity),
+		allocator(rhs.allocator)
+	{
+		if (rhs.data != NULL)
+		{
+			data = (T*) allocator->Allocate(sizeof(T) * capacity);
+			memcpy(data, rhs.data, sizeof(T) * count);
+		}
+	}
+
 	~b2GrowableBuffer()
 	{
 		Free();

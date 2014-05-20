@@ -18,6 +18,7 @@
 #include <Box2D/Particle/b2ParticleSystem.h>
 #include <Box2D/Particle/b2ParticleGroup.h>
 #include <Box2D/Particle/b2VoronoiDiagram.h>
+#include <Box2D/Particle/b2ParticleAssembly.h>
 #include <Box2D/Common/b2BlockAllocator.h>
 #include <Box2D/Dynamics/b2World.h>
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
@@ -27,6 +28,18 @@
 #include <Box2D/Collision/Shapes/b2EdgeShape.h>
 #include <Box2D/Collision/Shapes/b2ChainShape.h>
 #include <algorithm>
+
+
+// Define LIQUIDFUN_SIMD_TEST_VS_REFERENCE to run both SIMD and reference
+// versions, and assert that the results are identical. This is useful when
+// modifying one of the functions, to help verify correctness.
+// #define LIQUIDFUN_SIMD_TEST_VS_REFERENCE
+
+// For ease of debugging, remove 'inline'. Then, when an assert hits in the
+// test-vs-reference functions, you can easily jump the instruction pointer
+// to the top of the function to re-run the test.
+#define LIQUIDFUN_SIMD_INLINE inline
+
 
 static const uint32 xTruncBits = 12;
 static const uint32 yTruncBits = 12;
@@ -1860,7 +1873,8 @@ inline b2ContactListener* b2ParticleSystem::GetParticleContactListener() const
 
 // Recalculate 'tag' in proxies using m_positionBuffer.
 // The 'tag' is an approximation of position, in left-right, top-bottom order.
-void b2ParticleSystem::UpdateProxies(b2GrowableBuffer<Proxy>& proxies) const
+void b2ParticleSystem::UpdateProxies_Reference(
+	b2GrowableBuffer<Proxy>& proxies) const
 {
 	const Proxy* const endProxy = proxies.End();
 	for (Proxy* proxy = proxies.Begin(); proxy < endProxy; ++proxy)
@@ -1871,6 +1885,114 @@ void b2ParticleSystem::UpdateProxies(b2GrowableBuffer<Proxy>& proxies) const
 								m_inverseDiameter * p.y);
 	}
 }
+
+#if defined(LIQUIDFUN_SIMD_NEON)
+// static
+void b2ParticleSystem::UpdateProxyTags(
+	const uint32* const tags,
+	b2GrowableBuffer<Proxy>& proxies)
+{
+	const Proxy* const endProxy = proxies.End();
+	for (Proxy* proxy = proxies.Begin(); proxy < endProxy; ++proxy)
+	{
+		proxy->tag = tags[proxy->index];
+	}
+}
+
+void b2ParticleSystem::UpdateProxies_Simd(
+	b2GrowableBuffer<Proxy>& proxies) const
+{
+	uint32* tags = (uint32*)
+		m_world->m_stackAllocator.Allocate(m_count * sizeof(uint32));
+
+	// Calculate tag for every position.
+	// 'tags' array is in position-order.
+	CalculateTags_Simd(m_positionBuffer.data, m_count,
+					   m_inverseDiameter, tags);
+
+	// Update 'tag' element in the 'proxies' array to the new values.
+	UpdateProxyTags(tags, proxies);
+
+	m_world->m_stackAllocator.Free(tags);
+}
+#endif // defined(LIQUIDFUN_SIMD_NEON)
+
+// static
+bool b2ParticleSystem::ProxyBufferHasIndex(
+	int32 index, const Proxy* const a, int count)
+{
+	for (int j = 0; j < count; ++j)
+	{
+		if (a[j].index == index)
+			return true;
+	}
+	return false;
+}
+
+// static
+int b2ParticleSystem::NumProxiesWithSameTag(
+	const Proxy* const a, const Proxy* const b, int count)
+{
+	const uint32 tag = a[0].tag;
+	for (int num = 0; num < count; ++num)
+	{
+		if (a[num].tag != tag || b[num].tag != tag)
+			return num;
+	}
+	return count;
+}
+
+// Precondition: both 'a' and 'b' should be sorted by tag, but don't need to be
+// sorted by index.
+// static
+bool b2ParticleSystem::AreProxyBuffersTheSame(const b2GrowableBuffer<Proxy>& a,
+								   			  const b2GrowableBuffer<Proxy>& b)
+{
+	if (a.GetCount() != b.GetCount())
+		return false;
+
+	// A given tag may have several indices. The order of these indices is
+	// not important, but the set must be equivalent.
+	for (int i = 0; i < a.GetCount();)
+	{
+		const int numWithSameTag = NumProxiesWithSameTag(
+			&a[i], &b[i], a.GetCount() - i);
+		if (numWithSameTag == 0)
+			return false;
+
+		for (int j = 0; j < numWithSameTag; ++j)
+		{
+			const bool hasIndex = ProxyBufferHasIndex(
+				a[i + j].index, &b[i], numWithSameTag);
+			if (!hasIndex)
+				return false;
+		}
+
+		i += numWithSameTag;
+	}
+	return true;
+}
+
+LIQUIDFUN_SIMD_INLINE
+void b2ParticleSystem::UpdateProxies(
+	b2GrowableBuffer<Proxy>& proxies) const
+{
+	#if defined(LIQUIDFUN_SIMD_TEST_VS_REFERENCE)
+		b2GrowableBuffer<Proxy> reference(proxies);
+	#endif
+
+	#if defined(LIQUIDFUN_SIMD_NEON)
+		UpdateProxies_Simd(proxies);
+	#else
+		UpdateProxies_Reference(proxies);
+	#endif
+
+	#if defined(LIQUIDFUN_SIMD_TEST_VS_REFERENCE)
+		UpdateProxies_Reference(reference);
+		b2Assert(AreProxyBuffersTheSame(proxies, reference));
+	#endif
+}
+
 
 // Sort the proxy array by 'tag'. This orders the particles into rows that
 // run left-to-right, top-to-bottom. The rows are spaced m_particleDiameter

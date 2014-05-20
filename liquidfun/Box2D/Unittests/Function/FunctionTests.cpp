@@ -1646,6 +1646,30 @@ TEST_F(FunctionTests, ParticleGroupDefSetPositionColor) {
 	EXPECT_EQ(def2.color, def.color);
 }
 
+TEST_F(FunctionTests, AreProxyBuffersTheSame) {
+	b2BlockAllocator blockAllocator;
+	b2GrowableBuffer<b2ParticleSystem::Proxy> a(blockAllocator);
+	b2GrowableBuffer<b2ParticleSystem::Proxy> b(blockAllocator);
+
+	// Compare proxies with same tags, but indices in different orders.
+	static const int LEN_BUFFERS = 4;
+	for (int i = 0; i < LEN_BUFFERS; ++i)
+	{
+		b2ParticleSystem::Proxy proxy;
+		proxy.tag = 3;
+		proxy.index = i;
+		a.Append() = proxy;
+
+		proxy.index = LEN_BUFFERS - i - 1;
+		b.Append() = proxy;
+	}
+	EXPECT_TRUE(b2ParticleSystem::AreProxyBuffersTheSame(a, b));
+
+	// Compare proxies with same tags, but different indices.
+	b[LEN_BUFFERS / 2].index = LEN_BUFFERS - 1;
+	EXPECT_FALSE(b2ParticleSystem::AreProxyBuffersTheSame(a, b));
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

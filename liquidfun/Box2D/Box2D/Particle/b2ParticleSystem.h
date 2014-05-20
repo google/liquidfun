@@ -693,6 +693,7 @@ private:
 	friend class b2FixtureParticleQueryCallback;
 #ifdef LIQUIDFUN_UNIT_TESTS
 	FRIEND_TEST(FunctionTests, GetParticleMass);
+	FRIEND_TEST(FunctionTests, AreProxyBuffersTheSame);
 #endif // LIQUIDFUN_UNIT_TESTS
 
 	template <typename T>
@@ -882,6 +883,17 @@ private:
 		b2GrowableBuffer<b2ParticleContact>& contacts) const;
 	void FindContacts(
 		b2GrowableBuffer<b2ParticleContact>& contacts) const;
+	static void UpdateProxyTags(
+		const uint32* const tags,
+		b2GrowableBuffer<Proxy>& proxies);
+	static bool ProxyBufferHasIndex(
+		int32 index, const Proxy* const a, int count);
+	static int NumProxiesWithSameTag(
+		const Proxy* const a, const Proxy* const b, int count);
+	static bool AreProxyBuffersTheSame(const b2GrowableBuffer<Proxy>& a,
+								   	   const b2GrowableBuffer<Proxy>& b);
+	void UpdateProxies_Reference(b2GrowableBuffer<Proxy>& proxies) const;
+	void UpdateProxies_Simd(b2GrowableBuffer<Proxy>& proxies) const;
 	void UpdateProxies(b2GrowableBuffer<Proxy>& proxies) const;
 	void SortProxies(b2GrowableBuffer<Proxy>& proxies) const;
 	void FilterContacts(b2GrowableBuffer<b2ParticleContact>& contacts);
