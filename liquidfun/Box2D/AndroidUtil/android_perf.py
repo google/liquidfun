@@ -27,6 +27,58 @@ import sys
 import xml.dom.minidom as minidom
 
 MANIFEST_NAME = 'AndroidManifest.xml'
+SUPPORTED_DEVICES = [
+    'mantaray',  # Nexus 10
+    'nakasi',  # Nexus 7 (2012)
+]
+BROKEN_DEVICES = [
+    'razor',  # Nexus 7 (2013)
+    'hammerhead',  # Nexus 5
+]
+
+
+def get_android_property(adb_device, android_property):
+  """Gets a property on the connected device.
+
+  Args:
+    adb_device: The device to check the version of.
+    android_property: The property to get.
+
+  Returns:
+    The value of the property
+  """
+  process = subprocess.Popen(
+      'adb %s shell getprop %s' % (adb_device, android_property), shell=True,
+      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+  return process.communicate()[0].strip()
+
+
+def get_android_version(adb_device):
+  """Gets the version of android on the connected device.
+
+  Args:
+    adb_device: The device to check the version of.
+
+  Returns:
+    The android version number
+  """
+  return get_android_property(adb_device, 'ro.build.version.release')
+
+
+def get_android_model_and_name(adb_device):
+  """Gets the version of android on the connected device.
+
+  Args:
+    adb_device: The device to check the version of.
+
+  Returns:
+    Tuple of android model and name.
+  """
+  model = get_android_property(adb_device, 'ro.product.model')
+  name = get_android_property(adb_device, 'ro.product.name')
+  return (model, name)
+
 
 def get_number_of_devices_connected():
   """Gets the numer of connected android devices.
@@ -115,6 +167,7 @@ def get_perf_data_file(package_name, adb_device, output_file):
   if output_file:
     shutil.move('perf.data', output_file)
 
+
 def run_perf_remotely(adb_device, apk_directory, perf_args, output_file):
   """Run perf remotely.
 
@@ -161,16 +214,16 @@ def run_perf_remotely(adb_device, apk_directory, perf_args, output_file):
          ' '.join(perf_args[1:])),
         adb_device)[0]
 
+    print out
     if perf_command == 'record':
-      get_perf_data_file(package_name, adb_device, output_file);
-    else:
-      print out
+      get_perf_data_file(package_name, adb_device, output_file)
   else:
     print execute_remote_command(
         '%s %s' % (android_perf_remote, ' '.join(perf_args)), adb_device)[0]
   return 0
 
-#TODO(mlentine): Add Windows/Mac Support
+
+# TODO(mlentine): Add Windows/Mac Support
 def main():
   parser = argparse.ArgumentParser(
       description=('Run Perf for the Android package in the current '
@@ -193,22 +246,48 @@ def main():
   if args.adb_device:
     adb_device = '-s '+args.adb_device
 
-  # Do nothing if no device is specified or can be implicitly found
-  if adb_device == '' and get_number_of_devices_connected() > 1:
-    print (
-        'Multiple Android devices are connected to this host. Please specify '
-        'a device using --adb-device <serial>. The devices connected are: ')
-    subprocess.Popen('adb devices -l', shell=True)
-    return 1
-
   # Run perf remotely
   if (perf_command == 'record' or perf_command == 'stat'
       or perf_command == 'top'):
-      return run_perf_remotely(
-        adb_device, args.apk_directory, perf_args, args.output_file);
-  #Run perf locally
+
+    # Do nothing if no device is specified or can be implicitly found
+    number_of_devices = get_number_of_devices_connected()
+    if adb_device == '' and number_of_devices == 0:
+      print 'No Android devices are connected to this host.'
+      return 1
+
+    if adb_device == '' and number_of_devices > 1:
+      print (
+          'Multiple Android devices are connected to this host. Please specify '
+          'a device using --adb-device <serial>. The devices connected are: ')
+      subprocess.Popen('adb devices -l', shell=True)
+      return 1
+
+    android_version = get_android_version(adb_device)
+    if android_version < 4.4:
+      print (
+          'WARNING: The precompiled perf binary may not be compatable with '
+          'android version %d. If you enounter issues please try version 4.4 '
+          'or higher.' % android_version)
+
+    (model, name) = get_android_model_and_name(adb_device)
+    if name in BROKEN_DEVICES:
+      print (
+          'WARNING: %s is known to have broken performance counters. It is '
+          'recommended that you use a different device to record perf data.'
+          % model)
+    elif name not in SUPPORTED_DEVICES:
+      print (
+          'WARNING: %s is not in the list of supported devices. It is likely '
+          'that the performance counters don\'t work and you may need to try '
+          'a different device.' % model)
+
+    return run_perf_remotely(
+        adb_device, args.apk_directory, perf_args, args.output_file)
+  # Run perf locally
   else:
-    perf_host = os.path.dirname(os.path.realpath(__file__)) + '/perfhost_linux'
+    perf_host = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'perfhost')
     process = subprocess.Popen(
         '%s %s' % (perf_host, ' '.join(perf_args)), shell=True)
     process.wait()
