@@ -42,11 +42,13 @@ class b2RayCastCallback;
 class b2Fixture;
 class b2ContactFilter;
 class b2ContactListener;
+class b2ParticlePairSet;
+class FixtureParticleSet;
 struct b2ParticleGroupDef;
 struct b2Vec2;
 struct b2AABB;
-class b2ParticlePairSet;
-class FixtureParticleSet;
+struct FindContactInput;
+struct FindContactCheck;
 
 struct b2ParticleContact
 {
@@ -880,6 +882,19 @@ private:
 	void UpdateAllParticleFlags();
 	void UpdateAllGroupFlags();
 	void AddContact(int32 a, int32 b,
+		b2GrowableBuffer<b2ParticleContact>& contacts) const;
+	void FindContacts_Reference(
+		b2GrowableBuffer<b2ParticleContact>& contacts) const;
+	void ReorderForFindContact(FindContactInput* reordered,
+		                       int alignedCount) const;
+	void GatherChecksOneParticle(
+		const uint32 bound,
+		const int startIndex,
+		const int particleIndex,
+		int* nextUncheckedIndex,
+		b2GrowableBuffer<FindContactCheck>& checks) const;
+	void GatherChecks(b2GrowableBuffer<FindContactCheck>& checks) const;
+	void FindContacts_Simd(
 		b2GrowableBuffer<b2ParticleContact>& contacts) const;
 	void FindContacts(
 		b2GrowableBuffer<b2ParticleContact>& contacts) const;

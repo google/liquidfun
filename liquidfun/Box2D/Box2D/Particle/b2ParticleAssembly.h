@@ -18,9 +18,25 @@
 #ifndef B2_PARTICLE_ASSEMBLY_H
 #define B2_PARTICLE_ASSEMBLY_H
 
-#include <Box2D/Common/b2Settings.h>
+#include <Box2D/Common/b2GrowableBuffer.h>
+#include <Box2D/Common/b2Math.h>
 
-struct b2Vec2;
+
+struct b2ParticleContact;
+
+struct FindContactCheck
+{
+    uint16 particleIndex;
+    uint16 comparatorIndex;
+};
+
+struct FindContactInput
+{
+    uint32 proxyIndex;
+    b2Vec2 position;
+};
+
+enum { NUM_V32_SLOTS = 4 };
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,6 +46,15 @@ extern int CalculateTags_Simd(const b2Vec2* positions,
                               int count,
                               const float& inverseDiameter,
                               uint32* outTags);
+
+extern void FindContactsFromChecks_Simd(
+	const FindContactInput* reordered,
+	const FindContactCheck* checks,
+	int numChecks,
+  const float& particleDiameterSq,
+  const float& particleDiameterInv,
+  const uint32* flags,
+	b2GrowableBuffer<b2ParticleContact>& contacts);
 
 #ifdef __cplusplus
 } // extern "C"

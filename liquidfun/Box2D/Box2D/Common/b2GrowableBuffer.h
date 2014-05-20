@@ -35,7 +35,16 @@ public:
 		count(0),
 		capacity(0),
 		allocator(&allocator)
-	{}
+	{
+	#if defined(LIQUIDFUN_SIMD_NEON)
+		// b2ParticleAssemply.neon.s assumes these values are at fixed offsets.
+        // If this assert fails, be sure to update the assembly offsets!
+		// ldr r3, [r9, #0] @ r3 = out = contacts.data
+        // ldr r6, [r9, #8] @ r6 = contacts.capacity
+		b2Assert((intptr_t)&data - (intptr_t)(this) == 0
+			  && (intptr_t)&capacity - (intptr_t)(this) == 8);
+	#endif // defined(LIQUIDFUN_SIMD_NEON)
+	}
 
 	b2GrowableBuffer(const b2GrowableBuffer<T>& rhs) :
 		data(NULL),
@@ -64,25 +73,31 @@ public:
 		return data[count++];
 	}
 
-	void Grow()
+	void Reserve(int32 newCapacity)
 	{
-		// Double the capacity.
-		int32 oldCapacity = capacity;
-		int32 newCapacity = count ? 2 * count
-						  : b2_minParticleSystemBufferCapacity;
-		b2Assert(newCapacity > oldCapacity);
+		if (capacity >= newCapacity)
+			return;
 
 		// Reallocate and copy.
 		T* newData = (T*) allocator->Allocate(sizeof(T) * newCapacity);
 		if (data)
 		{
-			memcpy(newData, data, sizeof(T) * oldCapacity);
-			allocator->Free(data, sizeof(T) * oldCapacity);
+			memcpy(newData, data, sizeof(T) * count);
+			allocator->Free(data, sizeof(T) * capacity);
 		}
 
 		// Update pointer and capacity.
 		capacity = newCapacity;
 		data = newData;
+	}
+
+	void Grow()
+	{
+		// Double the capacity.
+		int32 newCapacity = capacity ? 2 * capacity
+						  : b2_minParticleSystemBufferCapacity;
+		b2Assert(newCapacity > capacity);
+		Reserve(newCapacity);
 	}
 
 	void Free()
