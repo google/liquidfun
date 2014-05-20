@@ -25,7 +25,7 @@
 #include <float.h>
 
 #define B2_NOT_USED(x) ((void)(x))
-#if DEBUG
+#if DEBUG && !defined(NDEBUG)
 #define b2Assert(A) assert(A)
 #define B2_ASSERT_ENABLED 1
 #else
