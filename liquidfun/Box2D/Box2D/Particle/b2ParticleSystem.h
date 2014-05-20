@@ -19,6 +19,7 @@
 #define B2_PARTICLE_SYSTEM_H
 
 #include <Box2D/Common/b2SlabAllocator.h>
+#include <Box2D/Common/b2GrowableBuffer.h>
 #include <Box2D/Particle/b2Particle.h>
 #include <Box2D/Dynamics/b2TimeStep.h>
 
@@ -248,6 +249,7 @@ struct b2ParticleSystemDef
 	/// 2.27 years.
 	float32 lifetimeGranularity;
 };
+
 
 class b2ParticleSystem
 {
@@ -770,8 +772,6 @@ private:
 		UserOverridableBuffer<T>* buffer, int32 oldCapacity, int32 newCapacity,
 		bool deferred);
 	template <typename T> T* RequestBuffer(T* buffer);
-	template <typename T> T* RequestGrowableBuffer(T* buffer,
-												int32 count, int32 *capacity);
 
 	/// Reallocate the handle / index map and schedule the allocation of a new
 	/// pool for handle allocation.
@@ -807,8 +807,8 @@ private:
 	void UpdateAllParticleFlags();
 	void UpdateAllGroupFlags();
 	void AddContact(int32 a, int32 b, b2ContactFilter* const contactFilter);
-	void UpdateProxies(Proxy* const outProxies) const;
-	void SortProxies(Proxy* const outProxies) const;
+	void UpdateProxies(b2GrowableBuffer<Proxy>& proxies) const;
+	void SortProxies(b2GrowableBuffer<Proxy>& proxies) const;
 	void NotifyContactListenerPreContact(
 		b2ParticlePairSet* particlePairs) const;
 	void NotifyContactListenerPostContact(b2ParticlePairSet& particlePairs);
@@ -958,29 +958,12 @@ private:
 	UserOverridableBuffer<int32> m_lastBodyContactStepBuffer;
 	UserOverridableBuffer<int32> m_bodyContactCountBuffer;
 	UserOverridableBuffer<int32> m_consecutiveContactStepsBuffer;
-	int32 m_stuckParticleCount;
-	int32 m_stuckParticleCapacity;
-	int32 *m_stuckParticleBuffer;
-
-	int32 m_proxyCount;
-	int32 m_proxyCapacity;
-	Proxy* m_proxyBuffer;
-
-	int32 m_contactCount;
-	int32 m_contactCapacity;
-	b2ParticleContact* m_contactBuffer;
-
-	int32 m_bodyContactCount;
-	int32 m_bodyContactCapacity;
-	b2ParticleBodyContact* m_bodyContactBuffer;
-
-	int32 m_pairCount;
-	int32 m_pairCapacity;
-	b2ParticlePair* m_pairBuffer;
-
-	int32 m_triadCount;
-	int32 m_triadCapacity;
-	b2ParticleTriad* m_triadBuffer;
+	b2GrowableBuffer<int32> m_stuckParticleBuffer;
+	b2GrowableBuffer<Proxy> m_proxyBuffer;
+	b2GrowableBuffer<b2ParticleContact> m_contactBuffer;
+	b2GrowableBuffer<b2ParticleBodyContact> m_bodyContactBuffer;
+	b2GrowableBuffer<b2ParticlePair> m_pairBuffer;
+	b2GrowableBuffer<b2ParticleTriad> m_triadBuffer;
 
 	/// Time each particle should be destroyed relative to the last time
 	/// m_timeElapsed was initialized.  Each unit of time corresponds to
@@ -1061,42 +1044,42 @@ inline bool b2ParticleSystem::GetPaused() const
 
 inline const b2ParticleContact* b2ParticleSystem::GetContacts() const
 {
-	return m_contactBuffer;
+	return m_contactBuffer.Data();
 }
 
 inline int32 b2ParticleSystem::GetContactCount() const
 {
-	return m_contactCount;
+	return m_contactBuffer.GetCount();
 }
 
 inline const b2ParticleBodyContact* b2ParticleSystem::GetBodyContacts() const
 {
-	return m_bodyContactBuffer;
+	return m_bodyContactBuffer.Data();
 }
 
 inline int32 b2ParticleSystem::GetBodyContactCount() const
 {
-	return m_bodyContactCount;
+	return m_bodyContactBuffer.GetCount();
 }
 
 inline const b2ParticlePair* b2ParticleSystem::GetPairs() const
 {
-	return m_pairBuffer;
+	return m_pairBuffer.Data();
 }
 
 inline int32 b2ParticleSystem::GetPairCount() const
 {
-	return m_pairCount;
+	return m_pairBuffer.GetCount();
 }
 
 inline const b2ParticleTriad* b2ParticleSystem::GetTriads() const
 {
-	return m_triadBuffer;
+	return m_triadBuffer.Data();
 }
 
 inline int32 b2ParticleSystem::GetTriadCount() const
 {
-	return m_triadCount;
+	return m_triadBuffer.GetCount();
 }
 
 inline b2ParticleSystem* b2ParticleSystem::GetNext()
@@ -1111,12 +1094,12 @@ inline const b2ParticleSystem* b2ParticleSystem::GetNext() const
 
 inline const int32* b2ParticleSystem::GetStuckCandidates() const
 {
-	return m_stuckParticleBuffer;
+	return m_stuckParticleBuffer.Data();
 }
 
 inline int32 b2ParticleSystem::GetStuckCandidateCount() const
 {
-	return m_stuckParticleCount;
+	return m_stuckParticleBuffer.GetCount();
 }
 
 inline void b2ParticleSystem::SetStrictContactCheck(bool enabled)
