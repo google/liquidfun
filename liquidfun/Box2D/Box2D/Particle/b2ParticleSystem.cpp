@@ -1857,8 +1857,8 @@ void b2ParticlePairSet::Initialize(
 		{
 			ParticlePair* const pair = &set[i];
 			const b2ParticleContact& contact = contacts[i];
-			if (contact.indexA == b2_invalidParticleIndex ||
-				contact.indexB == b2_invalidParticleIndex ||
+			if (contact.indexA == (uint16)b2_invalidParticleIndex ||
+				contact.indexB == (uint16)b2_invalidParticleIndex ||
 				!((particleFlagsBuffer[contact.indexA] |
 				   particleFlagsBuffer[contact.indexB]) &
 				  b2_particleContactListenerParticle))
