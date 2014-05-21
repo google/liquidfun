@@ -1471,20 +1471,50 @@ void b2ParticleSystem::ComputeDepth()
 	m_world->m_stackAllocator.Free(contactGroups);
 }
 
-inline void b2ParticleSystem::AddContact(int32 a, int32 b)
+inline void b2ParticleSystem::AddContact(int32 a, int32 b,
+	b2GrowableBuffer<b2ParticleContact>& contacts) const
 {
 	b2Vec2 d = m_positionBuffer.data[b] - m_positionBuffer.data[a];
 	float32 distBtParticlesSq = b2Dot(d, d);
 	if (distBtParticlesSq < m_squaredDiameter)
 	{
 		float32 invD = b2InvSqrt(distBtParticlesSq);
-		b2ParticleContact& contact = m_contactBuffer.Append();
+		b2ParticleContact& contact = contacts.Append();
 		contact.indexA = a;
 		contact.indexB = b;
 		contact.flags = m_flagsBuffer.data[a] | m_flagsBuffer.data[b];
 		// 1 - distBtParticles / diameter
 		contact.weight = 1 - distBtParticlesSq * invD * m_inverseDiameter;
 		contact.normal = invD * d;
+	}
+}
+
+void b2ParticleSystem::FindContacts(
+	b2GrowableBuffer<b2ParticleContact>& contacts) const
+{
+	const Proxy* beginProxy = m_proxyBuffer.Begin();
+	const Proxy* endProxy = m_proxyBuffer.End();
+
+	contacts.SetCount(0);
+	for (const Proxy *a = beginProxy, *c = beginProxy; a < endProxy; a++)
+	{
+		uint32 rightTag = computeRelativeTag(a->tag, 1, 0);
+		for (const Proxy* b = a + 1; b < endProxy; b++)
+		{
+			if (rightTag < b->tag) break;
+			AddContact(a->index, b->index, contacts);
+		}
+		uint32 bottomLeftTag = computeRelativeTag(a->tag, -1, 1);
+		for (; c < endProxy; c++)
+		{
+			if (bottomLeftTag <= c->tag) break;
+		}
+		uint32 bottomRightTag = computeRelativeTag(a->tag, 1, 1);
+		for (const Proxy* b = c; b < endProxy; b++)
+		{
+			if (bottomRightTag < b->tag) break;
+			AddContact(a->index, b->index, contacts);
+		}
 	}
 }
 
@@ -1638,31 +1668,7 @@ void b2ParticleSystem::UpdateContacts(bool exceptZombie)
 	b2ParticlePairSet particlePairs(&m_world->m_stackAllocator);
 	NotifyContactListenerPreContact(&particlePairs);
 
-	Proxy* beginProxy = m_proxyBuffer.Begin();
-	Proxy* endProxy = m_proxyBuffer.End();
-
-	m_contactBuffer.SetCount(0);
-	for (Proxy *a = beginProxy, *c = beginProxy; a < endProxy; a++)
-	{
-		uint32 rightTag = computeRelativeTag(a->tag, 1, 0);
-		for (Proxy* b = a + 1; b < endProxy; b++)
-		{
-			if (rightTag < b->tag) break;
-			AddContact(a->index, b->index);
-		}
-		uint32 bottomLeftTag = computeRelativeTag(a->tag, -1, 1);
-		for (; c < endProxy; c++)
-		{
-			if (bottomLeftTag <= c->tag) break;
-		}
-		uint32 bottomRightTag = computeRelativeTag(a->tag, 1, 1);
-		for (Proxy* b = c; b < endProxy; b++)
-		{
-			if (bottomRightTag < b->tag) break;
-			AddContact(a->index, b->index);
-		}
-	}
-
+	FindContacts(m_contactBuffer);
 	FilterContacts(m_contactBuffer);
 
 	NotifyContactListenerPostContact(particlePairs);
