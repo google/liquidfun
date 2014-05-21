@@ -415,7 +415,11 @@ main() {
   local build_package=1
   for opt; do
     case ${opt} in
+      # NDK_DEBUG=0 tells ndk-build to build this as debuggable but to not
+      # modify the underlying code whereas NDK_DEBUG=1 also builds as debuggable
+      # but does modify the code
       NDK_DEBUG=1) ant_target=debug ;;
+      NDK_DEBUG=0) ant_target=debug ;;
       ADB_DEVICE*) adb_device="$(\
         echo "${opt}" | sed -E 's/^ADB_DEVICE=([^ ]+)$/-s \1/;t;s/.*//')" ;;
       BUILD=0) disable_build=1 ;;
