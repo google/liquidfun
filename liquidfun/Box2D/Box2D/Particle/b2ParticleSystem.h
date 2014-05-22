@@ -678,6 +678,7 @@ private:
 	friend class b2World;
 	friend class b2ParticleGroup;
 	friend class b2ParticleBodyContactRemovePredicate;
+	friend class b2FixtureParticleQueryCallback;
 #ifdef LIQUIDFUN_UNIT_TESTS
 	FRIEND_TEST(FunctionTests, GetParticleMass);
 #endif // LIQUIDFUN_UNIT_TESTS
@@ -742,6 +743,28 @@ private:
 		}
 	};
 
+	/// InsideBoundsEnumerator enumerates all particles inside the given bounds.
+	class InsideBoundsEnumerator
+	{
+	public:
+		/// Construct an enumerator with bounds of tags and a range of proxies.
+		InsideBoundsEnumerator(
+			uint32 lower, uint32 upper,
+			const Proxy* first, const Proxy* last);
+
+		/// Get index of the next particle. Returns b2_invalidParticleIndex if
+		/// there are no more particles.
+		int32 GetNext();
+	private:
+		/// The lower and upper bound of x component in the tag.
+		uint32 m_xLower, m_xUpper;
+		/// The lower and upper bound of y component in the tag.
+		uint32 m_yLower, m_yUpper;
+		/// The range of proxies.
+		const Proxy* m_first;
+		const Proxy* m_last;
+	};
+
 	/// All particle types that require creating pairs
 	static const int32 k_pairFlags =
 		b2_springParticle |
@@ -803,6 +826,8 @@ private:
 	static bool CompareTriadIndices(const b2ParticleTriad& a, const b2ParticleTriad& b);
 	static bool MatchTriadIndices(const b2ParticleTriad& a, const b2ParticleTriad& b);
 	void ComputeDepth();
+
+	InsideBoundsEnumerator GetInsideBoundsEnumerator(const b2AABB& aabb) const;
 
 	void UpdateAllParticleFlags();
 	void UpdateAllGroupFlags();
