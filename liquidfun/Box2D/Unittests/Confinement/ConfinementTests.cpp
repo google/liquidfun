@@ -24,8 +24,8 @@
 #define EPSILON 0.001f
 #define DELTA_T 1.0f
 #define NUMBER_OF_STEPS 210
-#define WIDTH 10.0f
-#define HEIGHT 10.0f
+#define WIDTH 0.1f
+#define HEIGHT 0.1f
 
 class ConfinementTests : public ::testing::Test {
     protected:
@@ -53,7 +53,8 @@ ConfinementTests::SetUp()
 	m_groundBody = m_world->CreateBody(&groundBodyDef);
 
 	// Create the particle system
-	const b2ParticleSystemDef particleSystemDef;
+	b2ParticleSystemDef particleSystemDef;
+	particleSystemDef.radius = 0.01f;
 	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 
 	// Create particles
