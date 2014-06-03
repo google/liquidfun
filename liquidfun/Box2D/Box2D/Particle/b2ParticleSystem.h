@@ -46,6 +46,7 @@ struct b2ParticleGroupDef;
 struct b2Vec2;
 struct b2AABB;
 class b2ParticlePairSet;
+class FixtureParticleSet;
 
 struct b2ParticleContact
 {
@@ -842,6 +843,9 @@ private:
 		b2ParticlePairSet* particlePairs) const;
 	void NotifyContactListenerPostContact(b2ParticlePairSet& particlePairs);
 	void UpdateContacts(bool exceptZombie);
+	void NotifyBodyContactListenerPreContact(
+		FixtureParticleSet* fixtureSet) const;
+	void NotifyBodyContactListenerPostContact(FixtureParticleSet& fixtureSet);
 	void UpdateBodyContacts();
 
 	void Solve(const b2TimeStep& step);
