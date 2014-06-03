@@ -30,13 +30,13 @@
 
 static const uint32 xTruncBits = 12;
 static const uint32 yTruncBits = 12;
-static const uint32 tagBits = 8 * sizeof(uint32);
-static const uint32 yOffset = 1 << (yTruncBits - 1);
+static const uint32 tagBits = 8u * sizeof(uint32);
+static const uint32 yOffset = 1u << (yTruncBits - 1u);
 static const uint32 yShift = tagBits - yTruncBits;
 static const uint32 xShift = tagBits - yTruncBits - xTruncBits;
-static const uint32 xScale = 1 << xShift;
-static const uint32 xOffset = xScale * (1 << (xTruncBits - 1));
-static const uint32 yMask = ((1 << yTruncBits) - 1) << yShift;
+static const uint32 xScale = 1u << xShift;
+static const uint32 xOffset = xScale * (1u << (xTruncBits - 1u));
+static const uint32 yMask = ((1u << yTruncBits) - 1u) << yShift;
 static const uint32 xMask = ~yMask;
 
 // This functor is passed to std::remove_if in RemoveSpuriousBodyContacts
@@ -1527,8 +1527,8 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b,
 	{
 		float32 invD = b2InvSqrt(distBtParticlesSq);
 		b2ParticleContact& contact = contacts.Append();
-		contact.indexA = a;
-		contact.indexB = b;
+		contact.indexA = (uint16)a;
+		contact.indexB = (uint16)b;
 		contact.flags = m_flagsBuffer.data[a] | m_flagsBuffer.data[b];
 		// 1 - distBtParticles / diameter
 		contact.weight = 1 - distBtParticlesSq * invD * m_inverseDiameter;
@@ -1619,7 +1619,7 @@ class b2ParticleContactRemovePredicate
 public:
 	b2ParticleContactRemovePredicate(
 		b2ParticleSystem* system,
-		b2ContactFilter* const contactFilter) :
+		b2ContactFilter* contactFilter) :
 		m_system(system),
 		m_contactFilter(contactFilter)
 	{}
@@ -1633,7 +1633,7 @@ public:
 
 private:
 	b2ParticleSystem* m_system;
-	b2ContactFilter* const m_contactFilter;
+	b2ContactFilter* m_contactFilter;
 };
 
 // Only changes 'contacts', but the contact filter has a non-const 'this'
@@ -1955,6 +1955,7 @@ private:
 	// Skip reporting particles.
 	bool ShouldQueryParticleSystem(const b2ParticleSystem* system)
 	{
+		B2_NOT_USED(system);
 		return false;
 	}
 
@@ -3327,8 +3328,8 @@ void b2ParticleSystem::SolveZombie()
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		b2ParticleContact& contact = m_contactBuffer[k];
-		contact.indexA = newIndices[contact.indexA];
-		contact.indexB = newIndices[contact.indexB];
+		contact.indexA = (uint16)newIndices[contact.indexA];
+		contact.indexB = (uint16)newIndices[contact.indexB];
 	}
 	m_contactBuffer.RemoveIf(Test::IsContactInvalid);
 
@@ -3603,8 +3604,8 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		b2ParticleContact& contact = m_contactBuffer[k];
-		contact.indexA = newIndices[contact.indexA];
-		contact.indexB = newIndices[contact.indexB];
+		contact.indexA = (uint16)newIndices[contact.indexA];
+		contact.indexB = (uint16)newIndices[contact.indexB];
 	}
 
 	// update particle-body contacts

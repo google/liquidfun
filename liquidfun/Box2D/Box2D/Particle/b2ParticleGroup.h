@@ -402,7 +402,7 @@ inline void b2ParticleGroupDef::SetPosition(float32 x, float32 y)
 
 inline void b2ParticleGroupDef::SetColor(int32 r, int32 g, int32 b, int32 a)
 {
-	color.Set(r, g, b, a);
+	color.Set((uint8)r, (uint8)g, (uint8)b, (uint8)a);
 }
 #endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 
