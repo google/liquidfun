@@ -46,7 +46,17 @@ b2ParticleGroup::b2ParticleGroup()
 
 }
 
-void b2ParticleGroup::SetGroupFlags(int32 flags)
+uint32 b2ParticleGroup::GetAllParticleFlags() const
+{
+	uint32 flags = 0;
+	for (int32 i = m_firstIndex; i < m_lastIndex; i++)
+	{
+		flags |= m_system->m_flagsBuffer.data[i];
+	}
+	return flags;
+}
+
+void b2ParticleGroup::SetGroupFlags(uint32 flags)
 {
 	b2Assert((flags & b2_particleGroupInternalMask) == 0);
 	flags |= m_groupFlags & b2_particleGroupInternalMask;

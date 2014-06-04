@@ -330,6 +330,11 @@ public:
 	/// @warning This function is locked during callbacks.
 	void JoinParticleGroups(b2ParticleGroup* groupA, b2ParticleGroup* groupB);
 
+	/// Split particle group into multiple disconnected groups.
+	/// @param the group to be split.
+	/// @warning This function is locked during callbacks.
+	void SplitParticleGroup(b2ParticleGroup* group);
+
 	/// Get the world particle group list. With the returned group, use
 	/// b2ParticleGroup::GetNext to get the next group in the world list.
 	/// A NULL group indicates the end of the list.
@@ -354,6 +359,12 @@ public:
 	/// SetDestructionByAge() is used to enable the destruction of the
 	/// oldest particles in the system.
 	void SetMaxParticleCount(int32 count);
+
+	/// Get all existing particle flags.
+	uint32 GetAllParticleFlags() const;
+
+	/// Get all existing particle group flags.
+	uint32 GetAllGroupFlags() const;
 
 	/// Pause or unpause the particle system. When paused, b2World::Step()
 	/// skips over this particle system. All b2ParticleSystem function calls
@@ -765,6 +776,20 @@ private:
 		const Proxy* m_last;
 	};
 
+	/// Node of linked lists of connected particles
+	struct ParticleListNode
+	{
+		/// The head of the list.
+		ParticleListNode* list;
+		/// The next node in the list.
+		ParticleListNode* next;
+		/// Number of entries in the list. Valid only for the node at the head
+		/// of the list.
+		int32 count;
+		/// Particle index.
+		int32 index;
+	};
+
 	/// All particle types that require creating pairs
 	static const int32 k_pairFlags =
 		b2_springParticle |
@@ -816,6 +841,7 @@ private:
 	void CreateParticlesWithShapesForGroup(
 		const b2Shape* const* shapes, int32 shapeCount,
 		const b2ParticleGroupDef& groupDef, const b2Transform& xf);
+	int32 CloneParticle(int32 index, b2ParticleGroup* group);
 	void DestroyParticleGroup(b2ParticleGroup* group);
 
 	void UpdatePairsAndTriads(
@@ -825,6 +851,26 @@ private:
 	static bool MatchPairIndices(const b2ParticlePair& a, const b2ParticlePair& b);
 	static bool CompareTriadIndices(const b2ParticleTriad& a, const b2ParticleTriad& b);
 	static bool MatchTriadIndices(const b2ParticleTriad& a, const b2ParticleTriad& b);
+
+	static void InitializeParticleLists(
+		const b2ParticleGroup* group, ParticleListNode* nodeBuffer);
+	void MergeParticleListsInContact(
+		const b2ParticleGroup* group, ParticleListNode* nodeBuffer) const;
+	static void MergeParticleLists(
+		ParticleListNode* listA, ParticleListNode* listB);
+	static ParticleListNode* FindLongestParticleList(
+		const b2ParticleGroup* group, ParticleListNode* nodeBuffer);
+	void MergeZombieParticleListNodes(
+		const b2ParticleGroup* group, ParticleListNode* nodeBuffer,
+		ParticleListNode* survivingList) const;
+	static void MergeParticleListAndNode(
+		ParticleListNode* list, ParticleListNode* node);
+	void CreateParticleGroupsFromParticleList(
+		const b2ParticleGroup* group, ParticleListNode* nodeBuffer,
+		const ParticleListNode* survivingList);
+	void UpdatePairsAndTriadsWithParticleList(
+		const b2ParticleGroup* group, const ParticleListNode* nodeBuffer);
+
 	void ComputeDepth();
 
 	InsideBoundsEnumerator GetInsideBoundsEnumerator(const b2AABB& aabb) const;
@@ -1253,6 +1299,16 @@ inline void b2ParticleSystem::SetMaxParticleCount(int32 count)
 {
 	b2Assert(m_count <= count);
 	m_def.maxCount = count;
+}
+
+inline uint32 b2ParticleSystem::GetAllParticleFlags() const
+{
+	return m_allParticleFlags;
+}
+
+inline uint32 b2ParticleSystem::GetAllGroupFlags() const
+{
+	return m_allGroupFlags;
 }
 
 inline const uint32* b2ParticleSystem::GetFlagsBuffer() const

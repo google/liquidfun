@@ -603,6 +603,7 @@ TEST_F(FunctionTests, SetParticleBuffer) {
 TEST_F(FunctionTests, GroupData) {
 	b2ParticleGroupDef def;
 	def.flags = b2_elasticParticle | b2_springParticle;
+	def.groupFlags = b2_particleGroupCanBeEmpty;
 	def.position.Set(1, 2);
 	def.angle = 3;
 	def.linearVelocity.Set(4, 5);
@@ -612,6 +613,8 @@ TEST_F(FunctionTests, GroupData) {
 	shape.SetAsBox(10, 10);
 	def.shape = &shape;
 	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(group->GetAllParticleFlags(), def.flags);
+	EXPECT_EQ(group->GetGroupFlags(), def.groupFlags);
 	EXPECT_NE(group->GetParticleCount(), 0);
 	EXPECT_EQ(group->GetPosition(), def.position);
 	EXPECT_EQ(group->GetAngle(), def.angle);
@@ -673,6 +676,49 @@ TEST_F(FunctionTests, JoinParticleGroups) {
 	EXPECT_EQ(count1 + count2, group1->GetParticleCount());
 }
 
+TEST_F(FunctionTests, SplitParticleGroup) {
+	b2ParticleGroupDef def;
+	static const int32 shapeCount = 3;
+	b2CircleShape circleShapes[shapeCount];
+	const b2Shape *shapes[shapeCount];
+	for (int32 i = 0; i < shapeCount; i++)
+	{
+		circleShapes[i].m_p.Set(20 * i, 0);
+		circleShapes[i].m_radius = 8;
+		shapes[i] = &circleShapes[i];
+	}
+	def.shapes = shapes;
+	def.shapeCount = shapeCount;
+	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 1);
+	m_particleSystem->SplitParticleGroup(group);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), shapeCount);
+}
+
+TEST_F(FunctionTests, SplitParticleGroupInterminglingWithOtherGroups) {
+	b2ParticleGroupDef def;
+	static const int32 shapeCount = 3;
+	b2CircleShape circleShapes[shapeCount];
+	const b2Shape *shapes[shapeCount];
+	for (int32 i = 0; i < shapeCount; i++)
+	{
+		circleShapes[i].m_p.Set(20 * i, 0);
+		circleShapes[i].m_radius = 8;
+		shapes[i] = &circleShapes[i];
+	}
+	def.shapes = shapes;
+	def.shapeCount = shapeCount;
+	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
+	b2ParticleGroupDef anotherDef;
+	b2PolygonShape polygonShape;
+	polygonShape.SetAsBox(30, 10, b2Vec2(25, 0), 0);
+	anotherDef.shape = &polygonShape;
+	m_particleSystem->CreateParticleGroup(anotherDef);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 2);
+	m_particleSystem->SplitParticleGroup(group);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), shapeCount + 1);
+}
+
 TEST_F(FunctionTests, GroupBuffer) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
@@ -708,6 +754,23 @@ TEST_F(FunctionTests, GroupBuffer) {
 	for (int32 i = 0; i < count; i++) {
 		ASSERT_EQ(group1, groupBuffer[i]);
 	}
+}
+
+TEST_F(FunctionTests, AllFlags) {
+	b2ParticleGroup* group = CreateBoxShapedParticleGroup(m_particleSystem);
+	EXPECT_EQ(m_particleSystem->GetAllParticleFlags(), 0);
+	EXPECT_EQ(m_particleSystem->GetAllGroupFlags(), 0);
+	int32 particleCount = m_particleSystem->GetParticleCount();
+	for (int32 i = 0; i < particleCount / 2; i++) {
+		m_particleSystem->SetParticleFlags(i, b2_elasticParticle);
+	}
+	for (int32 i = particleCount / 2; i < particleCount; i++) {
+		m_particleSystem->SetParticleFlags(i, b2_viscousParticle);
+	}
+	EXPECT_EQ(m_particleSystem->GetAllParticleFlags(),
+									b2_elasticParticle | b2_viscousParticle);
+	group->SetGroupFlags(b2_particleGroupCanBeEmpty);
+	EXPECT_EQ(m_particleSystem->GetAllGroupFlags(), b2_particleGroupCanBeEmpty);
 }
 
 TEST_F(FunctionTests, GroupFlags) {

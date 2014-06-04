@@ -191,11 +191,14 @@ public:
 	/// Does this group contain the particle.
 	bool ContainsParticle(int32 index) const;
 
+	/// Get the logical sum of particle flags.
+	uint32 GetAllParticleFlags() const;
+
 	/// Get the construction flags for the group.
-	int32 GetGroupFlags() const;
+	uint32 GetGroupFlags() const;
 
 	/// Set the construction flags for the group.
-	void SetGroupFlags(int32 flags);
+	void SetGroupFlags(uint32 flags);
 
 	/// Get the total mass of the group: the sum of all particles in it.
 	float32 GetMass() const;
@@ -322,7 +325,7 @@ inline int32 b2ParticleGroup::GetBufferIndex() const
   return m_firstIndex;
 }
 
-inline int32 b2ParticleGroup::GetGroupFlags() const
+inline uint32 b2ParticleGroup::GetGroupFlags() const
 {
 	return m_groupFlags & ~b2_particleGroupInternalMask;
 }
