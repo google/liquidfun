@@ -758,8 +758,8 @@ TEST_F(FunctionTests, GroupBuffer) {
 
 TEST_F(FunctionTests, AllFlags) {
 	b2ParticleGroup* group = CreateBoxShapedParticleGroup(m_particleSystem);
-	EXPECT_EQ(m_particleSystem->GetAllParticleFlags(), 0);
-	EXPECT_EQ(m_particleSystem->GetAllGroupFlags(), 0);
+	EXPECT_EQ(m_particleSystem->GetAllParticleFlags(), 0u);
+	EXPECT_EQ(m_particleSystem->GetAllGroupFlags(), 0u);
 	int32 particleCount = m_particleSystem->GetParticleCount();
 	for (int32 i = 0; i < particleCount / 2; i++) {
 		m_particleSystem->SetParticleFlags(i, b2_elasticParticle);
@@ -768,7 +768,7 @@ TEST_F(FunctionTests, AllFlags) {
 		m_particleSystem->SetParticleFlags(i, b2_viscousParticle);
 	}
 	EXPECT_EQ(m_particleSystem->GetAllParticleFlags(),
-									b2_elasticParticle | b2_viscousParticle);
+									(uint32)(b2_elasticParticle | b2_viscousParticle));
 	group->SetGroupFlags(b2_particleGroupCanBeEmpty);
 	EXPECT_EQ(m_particleSystem->GetAllGroupFlags(), b2_particleGroupCanBeEmpty);
 }
@@ -779,11 +779,12 @@ TEST_F(FunctionTests, GroupFlags) {
 	EXPECT_EQ(group->GetGroupFlags(), b2_rigidParticleGroup);
 	group->SetGroupFlags(b2_rigidParticleGroup | b2_solidParticleGroup);
 	EXPECT_EQ(
-		group->GetGroupFlags(), b2_rigidParticleGroup | b2_solidParticleGroup);
+		group->GetGroupFlags(),
+                (uint32)(b2_rigidParticleGroup | b2_solidParticleGroup));
 	group->SetGroupFlags(b2_particleGroupCanBeEmpty);
 	EXPECT_EQ(group->GetGroupFlags(), b2_particleGroupCanBeEmpty);
 	group->SetGroupFlags(0);
-	EXPECT_EQ(group->GetGroupFlags(), 0);
+	EXPECT_EQ(group->GetGroupFlags(), 0u);
 }
 
 TEST_F(FunctionTests, GetParticleContact) {

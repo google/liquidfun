@@ -337,8 +337,8 @@ public:
 
 	b2ParticleGroup* m_lastGroup;
 	bool m_drawing;
-	int32 m_particleFlags;
-	int32 m_groupFlags;
+	uint32 m_particleFlags;
+	uint32 m_groupFlags;
 	uint32 m_colorIndex;
 
 	static const ParticleParameter::Value k_paramValues[];
