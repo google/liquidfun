@@ -683,7 +683,7 @@ TEST_F(FunctionTests, SplitParticleGroup) {
 	const b2Shape *shapes[shapeCount];
 	for (int32 i = 0; i < shapeCount; i++)
 	{
-		circleShapes[i].m_p.Set(20 * i, 0);
+		circleShapes[i].m_p.Set((float32)(20 * i), 0);
 		circleShapes[i].m_radius = 8;
 		shapes[i] = &circleShapes[i];
 	}
@@ -702,7 +702,7 @@ TEST_F(FunctionTests, SplitParticleGroupInterminglingWithOtherGroups) {
 	const b2Shape *shapes[shapeCount];
 	for (int32 i = 0; i < shapeCount; i++)
 	{
-		circleShapes[i].m_p.Set(20 * i, 0);
+		circleShapes[i].m_p.Set((float32)(20 * i), 0);
 		circleShapes[i].m_radius = 8;
 		shapes[i] = &circleShapes[i];
 	}
