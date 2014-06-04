@@ -277,6 +277,11 @@ public:
 // Associates a fixture with a particle index.
 typedef LightweightPair<b2Fixture*,int32> FixtureParticle;
 
+// Associates a fixture with a particle index.
+typedef LightweightPair<int32,int32> ParticlePair;
+
+}  // namespace
+
 // Set of fixture / particle indices.
 class FixtureParticleSet :
 	public TypedFixedSetAllocator<FixtureParticle>
@@ -299,11 +304,6 @@ public:
 	// exposing any dependencies via this header.
 	int32 Find(const FixtureParticle& fixtureParticle) const;
 };
-
-// Associates a fixture with a particle index.
-typedef LightweightPair<int32,int32> ParticlePair;
-
-}  // namespace
 
 // Set of particle / particle pairs.
 class b2ParticlePairSet : public TypedFixedSetAllocator<ParticlePair>
@@ -2263,18 +2263,74 @@ protected:
 	b2ParticleSystem* m_system;
 };
 
+void b2ParticleSystem::NotifyBodyContactListenerPreContact(
+	FixtureParticleSet* fixtureSet) const
+{
+	b2ContactListener* const contactListener = GetFixtureContactListener();
+	if (contactListener == NULL)
+		return;
+
+	fixtureSet->Initialize(m_bodyContactBuffer.Begin(),
+						   m_bodyContactBuffer.GetCount(),
+						   GetFlagsBuffer());
+}
+
+// If a contact listener is present and the contact is just starting
+// report the contact.  If the contact is already in progress invalid
+// the contact from m_fixtureSet.
+void b2ParticleSystem::NotifyBodyContactListenerPostContact(
+	FixtureParticleSet& fixtureSet)
+{
+	b2ContactListener* const contactListener = GetFixtureContactListener();
+	if (contactListener == NULL)
+		return;
+
+	// Loop through all new contacts, reporting any new ones, and
+	// "invalidating" the ones that still exist.
+	for (b2ParticleBodyContact* contact = m_bodyContactBuffer.Begin();
+		 contact != m_bodyContactBuffer.End(); ++contact)
+	{
+		b2Assert(contact);
+		FixtureParticle fixtureParticleToFind;
+		fixtureParticleToFind.first = contact->fixture;
+		fixtureParticleToFind.second = contact->index;
+		const int32 index = fixtureSet.Find(fixtureParticleToFind);
+		if (index >= 0)
+		{
+			// Already touching remove this from the set.
+			fixtureSet.Invalidate(index);
+		}
+		else
+		{
+			// Just started touching, report it!
+			contactListener->BeginContact(this, contact);
+		}
+	}
+
+	// If the contact listener is enabled, report all fixtures that are no
+	// longer in contact with particles.
+	const FixtureParticle* const fixtureParticles = fixtureSet.GetBuffer();
+	const int8* const fixtureParticlesValid = fixtureSet.GetValidBuffer();
+	const int32 fixtureParticleCount = fixtureSet.GetCount();
+	for (int32 i = 0; i < fixtureParticleCount; ++i)
+	{
+		if (fixtureParticlesValid[i])
+		{
+			const FixtureParticle* const fixtureParticle =
+				&fixtureParticles[i];
+			contactListener->EndContact(fixtureParticle->first, this,
+										fixtureParticle->second);
+		}
+	}
+}
+
+
 void b2ParticleSystem::UpdateBodyContacts()
 {
 	// If the particle contact listener is enabled, generate a set of
 	// fixture / particle contacts.
-	b2ContactListener* const contactListener = GetFixtureContactListener();
 	FixtureParticleSet fixtureSet(&m_world->m_stackAllocator);
-	if (contactListener)
-	{
-		fixtureSet.Initialize(m_bodyContactBuffer.Begin(),
-							  m_bodyContactBuffer.GetCount(),
-							  GetFlagsBuffer());
-	}
+	NotifyBodyContactListenerPreContact(&fixtureSet);
 
 	if (m_stuckThreshold > 0)
 	{
@@ -2313,34 +2369,6 @@ void b2ParticleSystem::UpdateBodyContacts()
 			return true;
 		}
 
-		// If a contact listener is present and the contact is just starting
-		// report the contact.  If the contact is already in progress invalid
-		// the contact from m_fixtureSet.
-		inline void ReportContact(
-			b2ParticleBodyContact* const particleBodyContact)
-		{
-			// Optionally report this contact.
-			if (m_contactListener)
-			{
-				b2Assert(particleBodyContact);
-				FixtureParticle fixtureParticleToFind;
-				fixtureParticleToFind.first = particleBodyContact->fixture;
-				fixtureParticleToFind.second = particleBodyContact->index;
-				const int32 index = m_fixtureSet->Find(fixtureParticleToFind);
-				if (index >= 0)
-				{
-					// Already touching remove this from the set.
-					m_fixtureSet->Invalidate(index);
-				}
-				else
-				{
-					// Just started touching, report it!
-					m_contactListener->BeginContact(
-						m_system, particleBodyContact);
-				}
-			}
-		}
-
 		void ReportFixtureAndParticle(
 								b2Fixture* fixture, int32 childIndex, int32 a)
 		{
@@ -2372,30 +2400,20 @@ void b2ParticleSystem::UpdateBodyContacts()
 				contact.weight = 1 - d * m_system->m_inverseDiameter;
 				contact.normal = -n;
 				contact.mass = invM > 0 ? 1 / invM : 0;
-				ReportContact(&contact);
 				m_system->DetectStuckParticle(a);
 			}
 		}
 
-		b2World* m_world;
 		b2ContactFilter* m_contactFilter;
-		b2ContactListener* m_contactListener;
-		FixtureParticleSet* m_fixtureSet;
 
 	public:
 		UpdateBodyContactsCallback(
-			b2ParticleSystem* system, b2World* world,
-			b2ContactFilter* contactFilter, b2ContactListener* contactListener,
-			FixtureParticleSet* fixtureSet):
+			b2ParticleSystem* system, b2ContactFilter* contactFilter):
 			b2FixtureParticleQueryCallback(system)
 		{
-			m_world = world;
 			m_contactFilter = contactFilter;
-			m_contactListener = contactListener;
-			m_fixtureSet = fixtureSet;
 		}
-	} callback(this, m_world, GetFixtureContactFilter(),
-			   GetFixtureContactListener(), &fixtureSet);
+	} callback(this, GetFixtureContactFilter());
 
 	b2AABB aabb;
 	ComputeAABB(&aabb);
@@ -2406,25 +2424,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 		RemoveSpuriousBodyContacts();
 	}
 
-	// If the contact listener is enabled, report all fixtures that are no
-	// longer in contact with particles.
-	if (contactListener)
-	{
-		const FixtureParticle* const fixtureParticles =
-			fixtureSet.GetBuffer();
-		const int8* const fixtureParticlesValid = fixtureSet.GetValidBuffer();
-		const int32 fixtureParticleCount = fixtureSet.GetCount();
-		for (int32 i = 0; i < fixtureParticleCount; ++i)
-		{
-			if (fixtureParticlesValid[i])
-			{
-				const FixtureParticle* const fixtureParticle =
-					&fixtureParticles[i];
-				contactListener->EndContact(fixtureParticle->first, this,
-											fixtureParticle->second);
-			}
-		}
-	}
+	NotifyBodyContactListenerPostContact(fixtureSet);
 }
 
 void b2ParticleSystem::RemoveSpuriousBodyContacts()
