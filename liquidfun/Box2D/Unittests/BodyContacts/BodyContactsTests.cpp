@@ -606,8 +606,8 @@ TEST_F(BodyContactTests, ParticleContactListener)
 	for (uint32 i = 0; i < listener.m_beginParticleContacts.size(); ++i)
 	{
 		b2ParticleContact contact = listener.m_beginParticleContacts[i];
-		EXPECT_TRUE(contact.indexA == particleA ? contact.indexB == particleB :
-					contact.indexB == particleA);
+		EXPECT_TRUE(contact.GetIndexA() == particleA ? contact.GetIndexB() == particleB :
+					contact.GetIndexB() == particleA);
 	}
 
 	// Push particleB away from particleA.

@@ -159,8 +159,19 @@ typedef unsigned long long uint64;
 
 // Particle
 
+/// NEON SIMD requires 16-bit particle indices
+#if !defined(B2_USE_16_BIT_PARTICLE_INDICES) && defined(LIQUIDFUN_SIMD_NEON)
+#define B2_USE_16_BIT_PARTICLE_INDICES
+#endif
+
 /// A symbolic constant that stands for particle allocation error.
 #define b2_invalidParticleIndex		(-1)
+
+#ifdef B2_USE_16_BIT_PARTICLE_INDICES
+#define b2_maxParticleIndex			0x7FFF
+#else
+#define b2_maxParticleIndex			0x7FFFFFFF
+#endif
 
 /// The default distance between particles, multiplied by the particle diameter.
 #define b2_particleStride			0.75f

@@ -1200,8 +1200,8 @@ void b2ParticleSystem::MergeParticleListsInContact(
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
 		if (!group->ContainsParticle(a) || !group->ContainsParticle(b)) {
 			continue;
 		}
@@ -1486,8 +1486,8 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 		for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 		{
 			const b2ParticleContact& contact = m_contactBuffer[k];
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
 			uint32 af = m_flagsBuffer.data[a];
 			uint32 bf = m_flagsBuffer.data[b];
 			b2ParticleGroup* groupA = m_groupBuffer[a];
@@ -1504,7 +1504,7 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 				b2ParticlePair& pair = m_pairBuffer.Append();
 				pair.indexA = a;
 				pair.indexB = b;
-				pair.flags = contact.flags;
+				pair.flags = contact.GetFlags();
 				pair.strength = b2Min(
 					groupA ? groupA->m_strength : 1,
 					groupB ? groupB->m_strength : 1);
@@ -1676,9 +1676,9 @@ void b2ParticleSystem::ComputeWeight()
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		float32 w = contact.weight;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		float32 w = contact.GetWeight();
 		m_weightBuffer[a] += w;
 		m_weightBuffer[b] += w;
 	}
@@ -1692,8 +1692,8 @@ void b2ParticleSystem::ComputeDepth()
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
 		const b2ParticleGroup* groupA = m_groupBuffer[a];
 		const b2ParticleGroup* groupB = m_groupBuffer[b];
 		if (groupA && groupA == groupB &&
@@ -1723,9 +1723,9 @@ void b2ParticleSystem::ComputeDepth()
 	for (int32 k = 0; k < contactGroupsCount; k++)
 	{
 		const b2ParticleContact& contact = contactGroups[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		float32 w = contact.weight;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		float32 w = contact.GetWeight();
 		m_accumulationBuffer[a] += w;
 		m_accumulationBuffer[b] += w;
 	}
@@ -1749,9 +1749,9 @@ void b2ParticleSystem::ComputeDepth()
 		for (int32 k = 0; k < contactGroupsCount; k++)
 		{
 			const b2ParticleContact& contact = contactGroups[k];
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			float32 r = 1 - contact.weight;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
+			float32 r = 1 - contact.GetWeight();
 			float32& ap0 = m_depthBuffer[a];
 			float32& bp0 = m_depthBuffer[b];
 			float32 ap1 = bp0 + r;
@@ -1815,12 +1815,11 @@ inline void b2ParticleSystem::AddContact(int32 a, int32 b,
 	{
 		float32 invD = b2InvSqrt(distBtParticlesSq);
 		b2ParticleContact& contact = contacts.Append();
-		contact.indexA = (uint16)a;
-		contact.indexB = (uint16)b;
-		contact.flags = m_flagsBuffer.data[a] | m_flagsBuffer.data[b];
+		contact.SetIndices(a, b);
+		contact.SetFlags(m_flagsBuffer.data[a] | m_flagsBuffer.data[b]);
 		// 1 - distBtParticles / diameter
-		contact.weight = 1 - distBtParticlesSq * invD * m_inverseDiameter;
-		contact.normal = invD * d;
+		contact.SetWeight(1 - distBtParticlesSq * invD * m_inverseDiameter);
+		contact.SetNormal(invD * d);
 	}
 }
 
@@ -2006,7 +2005,7 @@ void b2ParticleSystem::FindContacts(
 
 static inline bool b2ParticleContactIsZombie(const b2ParticleContact& contact)
 {
-	return (contact.flags & b2_zombieParticle) == b2_zombieParticle;
+	return (contact.GetFlags() & b2_zombieParticle) == b2_zombieParticle;
 }
 
 // Get the world's contact filter if any particles with the
@@ -2174,9 +2173,9 @@ public:
 
 	bool operator()(const b2ParticleContact& contact)
 	{
-	    return (contact.flags & b2_particleContactFilterParticle)
-	        && !m_contactFilter->ShouldCollide(m_system, contact.indexA,
-	        								   contact.indexB);
+	    return (contact.GetFlags() & b2_particleContactFilterParticle)
+	        && !m_contactFilter->ShouldCollide(m_system, contact.GetIndexA(),
+	        								   contact.GetIndexB());
 	}
 
 private:
@@ -2226,8 +2225,8 @@ void b2ParticleSystem::NotifyContactListenerPostContact(
 		 contact < endContact; ++contact)
 	{
 		ParticlePair pair;
-		pair.first = contact->indexA;
-		pair.second = contact->indexB;
+		pair.first = contact->GetIndexA();
+		pair.second = contact->GetIndexB();
 		const int32 itemIndex = particlePairs.Find(pair);
 		if (itemIndex >= 0)
 		{
@@ -2459,16 +2458,16 @@ void b2ParticlePairSet::Initialize(
 		{
 			ParticlePair* const pair = &set[i];
 			const b2ParticleContact& contact = contacts[i];
-			if (contact.indexA == (uint16)b2_invalidParticleIndex ||
-				contact.indexB == (uint16)b2_invalidParticleIndex ||
-				!((particleFlagsBuffer[contact.indexA] |
-				   particleFlagsBuffer[contact.indexB]) &
+			if (contact.GetIndexA() == b2_invalidParticleIndex ||
+				contact.GetIndexB() == b2_invalidParticleIndex ||
+				!((particleFlagsBuffer[contact.GetIndexA()] |
+				   particleFlagsBuffer[contact.GetIndexB()]) &
 				  b2_particleContactListenerParticle))
 			{
 				continue;
 			}
-			pair->first = contact.indexA;
-			pair->second = contact.indexB;
+			pair->first = contact.GetIndexA();
+			pair->second = contact.GetIndexB();
 			insertedContacts++;
 		}
 		SetCount(insertedContacts);
@@ -3139,11 +3138,11 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 		for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 		{
 			const b2ParticleContact& contact = m_contactBuffer[k];
-			if (contact.flags & b2_staticPressureParticle)
+			if (contact.GetFlags() & b2_staticPressureParticle)
 			{
-				int32 a = contact.indexA;
-				int32 b = contact.indexB;
-				float32 w = contact.weight;
+				int32 a = contact.GetIndexA();
+				int32 b = contact.GetIndexB();
+				float32 w = contact.GetWeight();
 				m_accumulationBuffer[a] +=
 					w * m_staticPressureBuffer[b]; // a <- b
 				m_accumulationBuffer[b] +=
@@ -3223,10 +3222,10 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		float32 w = contact.weight;
-		b2Vec2 n = contact.normal;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		float32 w = contact.GetWeight();
+		b2Vec2 n = contact.GetNormal();
 		float32 h = m_accumulationBuffer[a] + m_accumulationBuffer[b];
 		b2Vec2 f = velocityPerPressure * w * h * n;
 		m_velocityBuffer.data[a] -= f;
@@ -3263,10 +3262,10 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		float32 w = contact.weight;
-		b2Vec2 n = contact.normal;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		float32 w = contact.GetWeight();
+		b2Vec2 n = contact.GetNormal();
 		b2Vec2 v = m_velocityBuffer.data[b] - m_velocityBuffer.data[a];
 		float32 vn = b2Dot(v, n);
 		if (vn < 0)
@@ -3408,10 +3407,10 @@ void b2ParticleSystem::SolveRigidDamping()
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		b2Vec2 n = contact.normal;
-		float32 w = contact.weight;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		b2Vec2 n = contact.GetNormal();
+		float32 w = contact.GetWeight();
 		b2ParticleGroup* aGroup = m_groupBuffer[a];
 		b2ParticleGroup* bGroup = m_groupBuffer[b];
 		bool aRigid = IsRigidGroup(aGroup);
@@ -3596,12 +3595,12 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_tensileParticle)
+		if (contact.GetFlags() & b2_tensileParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			float32 w = contact.weight;
-			b2Vec2 n = contact.normal;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
+			float32 w = contact.GetWeight();
+			b2Vec2 n = contact.GetNormal();
 			b2Vec2 weightedNormal = (1 - w) * w * n;
 			m_accumulation2Buffer[a] -= weightedNormal;
 			m_accumulation2Buffer[b] += weightedNormal;
@@ -3616,12 +3615,12 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_tensileParticle)
+		if (contact.GetFlags() & b2_tensileParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			float32 w = contact.weight;
-			b2Vec2 n = contact.normal;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
+			float32 w = contact.GetWeight();
+			b2Vec2 n = contact.GetNormal();
 			float32 h = m_weightBuffer[a] + m_weightBuffer[b];
 			b2Vec2 s = m_accumulation2Buffer[b] - m_accumulation2Buffer[a];
 			float32 fn = b2Min(
@@ -3657,11 +3656,11 @@ void b2ParticleSystem::SolveViscous()
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_viscousParticle)
+		if (contact.GetFlags() & b2_viscousParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			float32 w = contact.weight;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
+			float32 w = contact.GetWeight();
 			b2Vec2 v = m_velocityBuffer.data[b] - m_velocityBuffer.data[a];
 			b2Vec2 f = viscousStrength * w * v;
 			m_velocityBuffer.data[a] += f;
@@ -3677,14 +3676,14 @@ void b2ParticleSystem::SolveRepulsive(const b2TimeStep& step)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_repulsiveParticle)
+		if (contact.GetFlags() & b2_repulsiveParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
 			if (m_groupBuffer[a] != m_groupBuffer[b])
 			{
-				float32 w = contact.weight;
-				b2Vec2 n = contact.normal;
+				float32 w = contact.GetWeight();
+				b2Vec2 n = contact.GetNormal();
 				b2Vec2 f = repulsiveStrength * w * n;
 				m_velocityBuffer.data[a] -= f;
 				m_velocityBuffer.data[b] += f;
@@ -3700,14 +3699,14 @@ void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_powderParticle)
+		if (contact.GetFlags() & b2_powderParticle)
 		{
-			float32 w = contact.weight;
+			float32 w = contact.GetWeight();
 			if (w > minWeight)
 			{
-				int32 a = contact.indexA;
-				int32 b = contact.indexB;
-				b2Vec2 n = contact.normal;
+				int32 a = contact.GetIndexA();
+				int32 b = contact.GetIndexB();
+				b2Vec2 n = contact.GetNormal();
 				b2Vec2 f = powderStrength * (w - minWeight) * n;
 				m_velocityBuffer.data[a] -= f;
 				m_velocityBuffer.data[b] += f;
@@ -3724,12 +3723,12 @@ void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
 		if (m_groupBuffer[a] != m_groupBuffer[b])
 		{
-			float32 w = contact.weight;
-			b2Vec2 n = contact.normal;
+			float32 w = contact.GetWeight();
+			b2Vec2 n = contact.GetNormal();
 			float32 h = m_depthBuffer[a] + m_depthBuffer[b];
 			b2Vec2 f = ejectionStrength * h * w * n;
 			m_velocityBuffer.data[a] -= f;
@@ -3757,8 +3756,8 @@ void b2ParticleSystem::SolveColorMixing()
 		for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 		{
 			const b2ParticleContact& contact = m_contactBuffer[k];
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
 			if (m_flagsBuffer.data[a] & m_flagsBuffer.data[b] &
 				b2_colorMixingParticle)
 			{
@@ -3877,7 +3876,7 @@ void b2ParticleSystem::SolveZombie()
 		}
 		static bool IsContactInvalid(const b2ParticleContact& contact)
 		{
-			return contact.indexA < 0 || contact.indexB < 0;
+			return contact.GetIndexA() < 0 || contact.GetIndexB() < 0;
 		}
 		static bool IsBodyContactInvalid(const b2ParticleBodyContact& contact)
 		{
@@ -3905,8 +3904,8 @@ void b2ParticleSystem::SolveZombie()
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		b2ParticleContact& contact = m_contactBuffer[k];
-		contact.indexA = (uint16)newIndices[contact.indexA];
-		contact.indexB = (uint16)newIndices[contact.indexB];
+		contact.SetIndices(newIndices[contact.GetIndexA()],
+						   newIndices[contact.GetIndexB()]);
 	}
 	m_contactBuffer.RemoveIf(Test::IsContactInvalid);
 
@@ -4179,8 +4178,8 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		b2ParticleContact& contact = m_contactBuffer[k];
-		contact.indexA = (uint16)newIndices[contact.indexA];
-		contact.indexB = (uint16)newIndices[contact.indexB];
+		contact.SetIndices(newIndices[contact.GetIndexA()],
+						   newIndices[contact.GetIndexB()]);
 	}
 
 	// update particle-body contacts
@@ -4584,9 +4583,9 @@ float32 b2ParticleSystem::ComputeCollisionEnergy() const
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		b2Vec2 n = contact.normal;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		b2Vec2 n = contact.GetNormal();
 		b2Vec2 v = m_velocityBuffer.data[b] - m_velocityBuffer.data[a];
 		float32 vn = b2Dot(v, n);
 		if (vn < 0)

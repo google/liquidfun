@@ -52,8 +52,20 @@ struct FindContactCheck;
 
 struct b2ParticleContact
 {
+private:
+	// 16-bit particle indices consume less memory and thus improve
+	// performance. We iterate through m_contactBuffer many times during
+	// b2ParticleSystem::Solve, so reducing the amount of data we churn
+	// through speeds things up. Also, FindContactsFromChecks_Simd takes
+	// advantage of the reduced size for specific optimizations.
+	#ifdef B2_USE_16_BIT_PARTICLE_INDICES
+		typedef int16 b2ParticleIndex;
+	#else
+		typedef int32 b2ParticleIndex;
+	#endif
+
 	/// Indices of the respective particles making contact.
-	uint16 indexA, indexB;
+	b2ParticleIndex indexA, indexB;
 
 	/// Weight of the contact. A value between 0.0f and 1.0f.
 	/// 0.0f ==> particles are just barely touching
@@ -66,6 +78,18 @@ struct b2ParticleContact
 	/// The logical sum of the particle behaviors that have been set.
 	/// See the b2ParticleFlag enum.
 	uint32 flags;
+
+public:
+	void SetIndices(int32 a, int32 b);
+	void SetWeight(float32 w) { weight = w; }
+	void SetNormal(const b2Vec2& n) { normal = n; }
+	void SetFlags(uint32 f) { flags = f; }
+
+	int32 GetIndexA() const { return indexA; }
+	int32 GetIndexB() const { return indexB; }
+	float32 GetWeight() const { return weight; }
+	const b2Vec2& GetNormal() const { return normal; }
+	uint32 GetFlags() const { return flags; }
 
 	bool operator==(const b2ParticleContact& rhs) const;
 	bool operator!=(const b2ParticleContact& rhs) const { return !operator==(rhs); }
@@ -1097,6 +1121,14 @@ private:
 	b2ParticleSystem* m_prev;
 	b2ParticleSystem* m_next;
 };
+
+inline void b2ParticleContact::SetIndices(int32 a, int32 b)
+{
+	b2Assert(a <= b2_maxParticleIndex && b <= b2_maxParticleIndex);
+	indexA = (b2ParticleIndex)a;
+	indexB = (b2ParticleIndex)b;
+}
+
 
 inline bool b2ParticleContact::operator==(
 	const b2ParticleContact& rhs) const
