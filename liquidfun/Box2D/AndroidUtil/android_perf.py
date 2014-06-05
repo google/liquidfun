@@ -27,6 +27,8 @@ import sys
 import xml.dom.minidom as minidom
 
 MANIFEST_NAME = 'AndroidManifest.xml'
+SCRIPT_OUTPUT = 'perf_script.txt'
+JSON_OUTPUT = 'perf_json.json'
 SUPPORTED_DEVICES = [
     'mantaray',  # Nexus 10
     'nakasi',  # Nexus 7 (2012)
@@ -35,6 +37,35 @@ BROKEN_DEVICES = [
     'razor',  # Nexus 7 (2013)
     'hammerhead',  # Nexus 5
 ]
+
+
+class ProcessFailedException(Exception):
+  pass
+
+
+def version_to_tuple(version):
+  """Convert a version to a tuple of ints.
+
+  Args:
+    version: Version to convert
+
+  Returns:
+    Tuple of ints
+  """
+  return tuple([int(elem) for elem in version.split('.')])
+
+
+def is_version_less_than(version1, version2):
+  """Comare to version strings.
+
+  Args:
+    version1: The first version to compare
+    version2: The second version to compare
+
+  Returns:
+    True if version1 < version2 and false otherwise.
+  """
+  return version_to_tuple(version1) < version_to_tuple(version2)
 
 
 def get_android_property(adb_device, android_property):
@@ -108,6 +139,18 @@ def get_package_name_from_manifest(name):
   return xml.getElementsByTagName('manifest')[0].getAttribute('package')
 
 
+def find_binary(name):
+  """Gets the binary path of the input name.
+
+  Args:
+    name: The name of the binary to find.
+
+  Returns:
+    The path of the binary.
+  """
+  return os.path.join(os.path.dirname(os.path.realpath(__file__)), name)
+
+
 def execute_remote_command(command_str, adb_device=''):
   """Execute a command on the connected android device using adb.
 
@@ -124,6 +167,29 @@ def execute_remote_command(command_str, adb_device=''):
 
   out, err = process.communicate()
   return (out, err, process.returncode)
+
+
+def execute_local_command(command_str, error):
+  """Execute a command and throw an exception on failure.
+
+  Args:
+    command_str: The command to be executed.
+    error: The message to print when failing.
+
+  Returns:
+    The resulting output and err of the command.
+
+  Raises:
+    Exception: An error occured running the command.
+  """
+  process = subprocess.Popen(
+      '%s' % command_str, shell=True,
+      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  out, err = process.communicate()
+  if process.returncode:
+    print '%s %s' % (out, err)
+    raise ProcessFailedException(error)
+  return (out, err)
 
 
 def get_pid(process_name, adb_device=''):
@@ -180,7 +246,7 @@ def run_perf_remotely(adb_device, apk_directory, perf_args, output_file):
   Returns:
     1 for error, 0 for success.
   """
-  android_perf = os.path.dirname(os.path.realpath(__file__)) + '/perf'
+  android_perf = find_binary('perf')
   android_perf_remote = '/data/local/tmp/perf'
   perf_command = perf_args[0]
 
@@ -223,7 +289,54 @@ def run_perf_remotely(adb_device, apk_directory, perf_args, output_file):
   return 0
 
 
-# TODO(mlentine): Add Windows/Mac Support
+def run_perf_visualizer(browser, perf_args):
+  """Generate the visualized html.
+
+  Args:
+    browser: The browser to use for display
+    perf_args: The arguments to run the visualizer with
+
+  Returns:
+    1 for error, 0 for success
+  """
+
+  perf_host = find_binary('perfhost')
+  perf_to_tracing = find_binary('perf_to_tracing_json.py')
+  perf_vis = find_binary(os.path.join('perf-vis', 'perf-vis.py'))
+
+  # Output samples and stacks while including specific attributes that are
+  # read by the visualizer
+  out = execute_local_command(
+      '%s script -f comm,tid,time,cpu,event,ip,sym,dso,period' % perf_host,
+      'Cannot visualize perf data. Please run record using -R')[0]
+
+  output_file = open(SCRIPT_OUTPUT, 'w')
+  output_file.write(out)
+  output_file.close()
+
+  # Generate a common json format from the outputted sample data
+  out = execute_local_command(
+      '%s perf_script.txt' % perf_to_tracing, '')[0]
+
+  output_file = open(JSON_OUTPUT, 'w')
+  output_file.write(out)
+  output_file.close()
+
+  # Generate the html file from the json data
+  out = execute_local_command(
+      '%s %s perf_json.json' % (perf_vis, ' '.join(perf_args)), '')[0]
+
+  os.remove(SCRIPT_OUTPUT)
+  os.remove(JSON_OUTPUT)
+
+  url = re.sub(r'.*output: ', r'', out.replace('\n', ' ')).strip()
+  execute_local_command(
+      '%s %s' % (browser, url), 'Cannot start browser %s' % browser)
+
+  return 0
+
+
+# TODO(mlentine): Add Mac Support
 def main():
   parser = argparse.ArgumentParser(
       description=('Run Perf for the Android package in the current '
@@ -236,6 +349,9 @@ def main():
   parser.add_argument(
       '--apk-directory',
       help='apk-directory specifies the directory of the package to profile')
+  parser.add_argument(
+      '--browser',
+      help='browser specifies which browser to use for visualization')
   # This should hijack the -o option of perf record
   parser.add_argument('-o', '--output-file')
 
@@ -245,6 +361,24 @@ def main():
   adb_device = ''
   if args.adb_device:
     adb_device = '-s '+args.adb_device
+
+  if perf_command == 'visualize':
+    if args.browser:
+      browser = args.browser
+      browser_name = args.browser
+    else:
+      browser = 'xdg-open'
+      browser_name = execute_local_command(
+          'xdg-settings get default-web-browser',
+          ('Cannot find default browser. '
+           'Please specify using --browser.'))[0].strip()
+
+    if not re.match(r'.*chrom.*', browser_name):
+      print (
+          'WARNING: %s is not a version of chrome and may not be able to '
+          'display the resulting performance data.' % browser_name)
+
+    return run_perf_visualizer(browser, perf_args[1:])
 
   # Run perf remotely
   if (perf_command == 'record' or perf_command == 'stat'
@@ -264,10 +398,10 @@ def main():
       return 1
 
     android_version = get_android_version(adb_device)
-    if android_version < 4.4:
+    if is_version_less_than(android_version, '4.4'):
       print (
           'WARNING: The precompiled perf binary may not be compatable with '
-          'android version %d. If you enounter issues please try version 4.4 '
+          'android version %s. If you enounter issues please try version 4.4 '
           'or higher.' % android_version)
 
     (model, name) = get_android_model_and_name(adb_device)
@@ -286,8 +420,7 @@ def main():
         adb_device, args.apk_directory, perf_args, args.output_file)
   # Run perf locally
   else:
-    perf_host = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), 'perfhost')
+    perf_host = find_binary('perfhost')
     process = subprocess.Popen(
         '%s %s' % (perf_host, ' '.join(perf_args)), shell=True)
     process.wait()
