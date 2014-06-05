@@ -25,6 +25,8 @@ Box2D/CMakeScripts/**
 Box2D/HelloWorld/HelloWorld
 Box2D/HelloWorld/Makefile
 Box2D/HelloWorld/Makefile_*
+Box2D/lfjs/Makefile
+Box2D/lfjs/Makefile_*
 Box2D/Makefile
 Box2D/Makefile_*
 Box2D/Testbed/Makefile
