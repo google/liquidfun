@@ -426,7 +426,7 @@ main() {
       DEPLOY=0) disable_deploy=1 ;;
       RUN_DEBUGGER=1) run_debugger=1 ;;
       LAUNCH=0) launch=0 ;;
-      clean) build_package=0 ;;
+      clean) build_package=0 disable_deploy=1 launch=0 ;;
       -h|--help|help) usage ;;
     esac
   done
