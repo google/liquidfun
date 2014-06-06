@@ -210,8 +210,9 @@ main() {
         # can execute to 1.
         for target_dir in ${projects_to_build}; do
           pushd "${target_dir}" >/dev/null
-          build_apk clean ${ndk_debug} ${ndk_verbose} \
-                                    APP_ABI=${build_abi} -j1
+          rm -r bin >/dev/null
+          rm -r obj >/dev/null
+          rm -r libs >/dev/null
           popd >/dev/null
         done
       fi
