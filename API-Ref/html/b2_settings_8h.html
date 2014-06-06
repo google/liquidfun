@@ -179,10 +179,12 @@ Macros</h2></td></tr>
 <tr class="memitem:addf67cb7c89ad8a0370b488e8120a6ed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="addf67cb7c89ad8a0370b488e8120a6ed"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>b2_toiBaugarte</b>&#160;&#160;&#160;0.75f</td></tr>
 <tr class="separator:addf67cb7c89ad8a0370b488e8120a6ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc056d2ee984ceb388fcd38e257e71b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc056d2ee984ceb388fcd38e257e71b6"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#adc056d2ee984ceb388fcd38e257e71b6">b2_invalidParticleIndex</a>&#160;&#160;&#160;(-1)</td></tr>
-<tr class="memdesc:adc056d2ee984ceb388fcd38e257e71b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">A symbolic constant that stands for particle allocation error. <br/></td></tr>
+<tr class="memitem:adc056d2ee984ceb388fcd38e257e71b6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#adc056d2ee984ceb388fcd38e257e71b6">b2_invalidParticleIndex</a>&#160;&#160;&#160;(-1)</td></tr>
+<tr class="memdesc:adc056d2ee984ceb388fcd38e257e71b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">NEON SIMD requires 16-bit particle indices.  <a href="#adc056d2ee984ceb388fcd38e257e71b6">More...</a><br/></td></tr>
 <tr class="separator:adc056d2ee984ceb388fcd38e257e71b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad61937cd7f550f6b879e221694b58a42"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad61937cd7f550f6b879e221694b58a42"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>b2_maxParticleIndex</b>&#160;&#160;&#160;0x7FFFFFFF</td></tr>
+<tr class="separator:ad61937cd7f550f6b879e221694b58a42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67092aba35939215cea0213618591031"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67092aba35939215cea0213618591031"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="b2_settings_8h.html#a67092aba35939215cea0213618591031">b2_particleStride</a>&#160;&#160;&#160;0.75f</td></tr>
 <tr class="memdesc:a67092aba35939215cea0213618591031"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default distance between particles, multiplied by the particle diameter. <br/></td></tr>
@@ -352,6 +354,21 @@ const <a class="el" href="structb2_version.html">b2Version</a>&#160;</td><td cla
       </table>
 </div><div class="memdoc">
 <p>This scale factor controls how fast overlap is resolved. Ideally this would be 1 so that overlap is removed in one time step. However using values close to 1 often lead to overshoot. </p>
+
+</div>
+</div>
+<a class="anchor" id="adc056d2ee984ceb388fcd38e257e71b6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define b2_invalidParticleIndex&#160;&#160;&#160;(-1)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>NEON SIMD requires 16-bit particle indices. </p>
+<p>A symbolic constant that stands for particle allocation error. </p>
 
 </div>
 </div>

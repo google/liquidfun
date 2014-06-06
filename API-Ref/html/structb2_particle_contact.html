@@ -82,58 +82,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="structb2_particle_contact-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">b2ParticleContact Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:aec5286b03f6a974b988e611b99db269e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec5286b03f6a974b988e611b99db269e"></a>
-int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#aec5286b03f6a974b988e611b99db269e">indexA</a></td></tr>
-<tr class="memdesc:aec5286b03f6a974b988e611b99db269e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indices of the respective particles making contact. <br/></td></tr>
-<tr class="separator:aec5286b03f6a974b988e611b99db269e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaaa92ef515be0d06080eef96c8c9d840"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaaa92ef515be0d06080eef96c8c9d840"></a>
-int32&#160;</td><td class="memItemRight" valign="bottom"><b>indexB</b></td></tr>
-<tr class="separator:aaaa92ef515be0d06080eef96c8c9d840"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3890fc65968cc2abd1b90cd1772ef54a"><td class="memItemLeft" align="right" valign="top">uint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#a3890fc65968cc2abd1b90cd1772ef54a">flags</a></td></tr>
-<tr class="separator:a3890fc65968cc2abd1b90cd1772ef54a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77703b9c45215f4058c3bc6493469053"><td class="memItemLeft" align="right" valign="top">float32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#a77703b9c45215f4058c3bc6493469053">weight</a></td></tr>
-<tr class="separator:a77703b9c45215f4058c3bc6493469053"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a777a531b58ee046a33581079c5ce20be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a777a531b58ee046a33581079c5ce20be"></a>
-<a class="el" href="structb2_vec2.html">b2Vec2</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structb2_particle_contact.html#a777a531b58ee046a33581079c5ce20be">normal</a></td></tr>
-<tr class="memdesc:a777a531b58ee046a33581079c5ce20be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The normalized direction from A to B. <br/></td></tr>
-<tr class="separator:a777a531b58ee046a33581079c5ce20be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ab758f74cbc01b9f0bfa0b7d301794e6f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab758f74cbc01b9f0bfa0b7d301794e6f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetIndices</b> (int32 a, int32 b)</td></tr>
+<tr class="separator:ab758f74cbc01b9f0bfa0b7d301794e6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8eeb490138060a373fdc91cbb06ec427"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8eeb490138060a373fdc91cbb06ec427"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetWeight</b> (float32 w)</td></tr>
+<tr class="separator:a8eeb490138060a373fdc91cbb06ec427"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fc4d8be2a3690d098b43ddbbb9e99f1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5fc4d8be2a3690d098b43ddbbb9e99f1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetNormal</b> (const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;n)</td></tr>
+<tr class="separator:a5fc4d8be2a3690d098b43ddbbb9e99f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf532d3c528eea646747b3ca4f65b549"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adf532d3c528eea646747b3ca4f65b549"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetFlags</b> (uint32 f)</td></tr>
+<tr class="separator:adf532d3c528eea646747b3ca4f65b549"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa4126c8e73196f09463de7dc892d9e7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa4126c8e73196f09463de7dc892d9e7"></a>
+int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetIndexA</b> () const </td></tr>
+<tr class="separator:aaa4126c8e73196f09463de7dc892d9e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a590370f3221e907ee7ca191daab04680"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a590370f3221e907ee7ca191daab04680"></a>
+int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetIndexB</b> () const </td></tr>
+<tr class="separator:a590370f3221e907ee7ca191daab04680"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a220de7d2b607376fd9ceee5c72c055b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a220de7d2b607376fd9ceee5c72c055b1"></a>
+float32&#160;</td><td class="memItemRight" valign="bottom"><b>GetWeight</b> () const </td></tr>
+<tr class="separator:a220de7d2b607376fd9ceee5c72c055b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c3fdacafd57ed507dc9be86491b9fb8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c3fdacafd57ed507dc9be86491b9fb8"></a>
+const <a class="el" href="structb2_vec2.html">b2Vec2</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetNormal</b> () const </td></tr>
+<tr class="separator:a2c3fdacafd57ed507dc9be86491b9fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e383401076e2b1f038a0ae14c607173"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e383401076e2b1f038a0ae14c607173"></a>
+uint32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFlags</b> () const </td></tr>
+<tr class="separator:a0e383401076e2b1f038a0ae14c607173"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ec7effa08abde96b93e5ebc3d6ea89"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54ec7effa08abde96b93e5ebc3d6ea89"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="structb2_particle_contact.html">b2ParticleContact</a> &amp;rhs) const </td></tr>
+<tr class="separator:a54ec7effa08abde96b93e5ebc3d6ea89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ae33c376ab46cfc225c9b64aa511a58"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ae33c376ab46cfc225c9b64aa511a58"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="structb2_particle_contact.html">b2ParticleContact</a> &amp;rhs) const </td></tr>
+<tr class="separator:a1ae33c376ab46cfc225c9b64aa511a58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e6ee0ac5c6a5e464d02695a63b15742"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e6ee0ac5c6a5e464d02695a63b15742"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>ApproximatelyEqual</b> (const <a class="el" href="structb2_particle_contact.html">b2ParticleContact</a> &amp;rhs) const </td></tr>
+<tr class="separator:a0e6ee0ac5c6a5e464d02695a63b15742"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a3890fc65968cc2abd1b90cd1772ef54a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32 b2ParticleContact::flags</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The logical sum of the particle behaviors that have been set. See the b2ParticleFlag enum. </p>
-
-</div>
-</div>
-<a class="anchor" id="a77703b9c45215f4058c3bc6493469053"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">float32 b2ParticleContact::weight</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Weight of the contact. A value between 0.0f and 1.0f. 0.0f ==&gt; particles are just barely touching 1.0f ==&gt; particles are perfectly on top of each other </p>
-
-</div>
-</div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="b2_particle_system_8h_source.html">b2ParticleSystem.h</a></li>
 </ul>

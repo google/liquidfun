@@ -113,6 +113,8 @@ const <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> *&#
 <tr class="separator:ae479a020886c1ed270ad17a4ffa2eff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab769e15337167412903ad0f45db480e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#ab769e15337167412903ad0f45db480e5">JoinParticleGroups</a> (<a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *groupA, <a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *groupB)</td></tr>
 <tr class="separator:ab769e15337167412903ad0f45db480e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ad89863a13e4735cc7201a7d6c2ca5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a5ad89863a13e4735cc7201a7d6c2ca5b">SplitParticleGroup</a> (<a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *group)</td></tr>
+<tr class="separator:a5ad89863a13e4735cc7201a7d6c2ca5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3841229174ab3bd3a38cf08a7878231a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a3841229174ab3bd3a38cf08a7878231a">GetParticleGroupList</a> ()</td></tr>
 <tr class="separator:a3841229174ab3bd3a38cf08a7878231a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a274fd128dc2743c634d40b596f27c0ab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a274fd128dc2743c634d40b596f27c0ab"></a>
@@ -132,6 +134,14 @@ int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:a50edb8ad685977747d19e0dfb0bdff6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a711c962a7a2258127a6126eb69a78321"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a711c962a7a2258127a6126eb69a78321">SetMaxParticleCount</a> (int32 count)</td></tr>
 <tr class="separator:a711c962a7a2258127a6126eb69a78321"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a6a2c2aafcf820e9a769433c8bf9d5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a6a2c2aafcf820e9a769433c8bf9d5e"></a>
+uint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a2a6a2c2aafcf820e9a769433c8bf9d5e">GetAllParticleFlags</a> () const </td></tr>
+<tr class="memdesc:a2a6a2c2aafcf820e9a769433c8bf9d5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all existing particle flags. <br/></td></tr>
+<tr class="separator:a2a6a2c2aafcf820e9a769433c8bf9d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab37efd90cf92915b3d072ba4f1496a57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab37efd90cf92915b3d072ba4f1496a57"></a>
+uint32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#ab37efd90cf92915b3d072ba4f1496a57">GetAllGroupFlags</a> () const </td></tr>
+<tr class="memdesc:ab37efd90cf92915b3d072ba4f1496a57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all existing particle group flags. <br/></td></tr>
+<tr class="separator:ab37efd90cf92915b3d072ba4f1496a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba25d65675a3dd022498eb2358ee3504"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#aba25d65675a3dd022498eb2358ee3504">SetPaused</a> (bool paused)</td></tr>
 <tr class="separator:aba25d65675a3dd022498eb2358ee3504"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab16f4e9f7a1c122327de1f06c03d36ce"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#ab16f4e9f7a1c122327de1f06c03d36ce">GetPaused</a> () const </td></tr>
@@ -311,6 +321,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleGroup</b><
 <tr class="memitem:aa9210be7c60a1e5c487f59ee70c12bdf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa9210be7c60a1e5c487f59ee70c12bdf"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContactRemovePredicate</b></td></tr>
 <tr class="separator:aa9210be7c60a1e5c487f59ee70c12bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad921a43aae4fc5fd289bba93d863e35b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad921a43aae4fc5fd289bba93d863e35b"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>b2FixtureParticleQueryCallback</b></td></tr>
+<tr class="separator:ad921a43aae4fc5fd289bba93d863e35b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="aea90f19fb0aa9bcbba649529aa6503f0"></a>
@@ -1536,6 +1549,30 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleBodyContac
       </table>
 </div><div class="memdoc">
 <p>Set an optional threshold for the maximum number of consecutive particle iterations that a particle may contact multiple bodies before it is considered a candidate for being "stuck". Setting to zero or less disables. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5ad89863a13e4735cc7201a7d6c2ca5b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void b2ParticleSystem::SplitParticleGroup </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classb2_particle_group.html">b2ParticleGroup</a> *&#160;</td>
+          <td class="paramname"><em>group</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Split particle group into multiple disconnected groups. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>group to be split. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>This function is locked during callbacks. </dd></dl>
 
 </div>
 </div>

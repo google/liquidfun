@@ -235,192 +235,194 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337">ContainsParticle</a>(int32 index) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    int32 <a class="code" href="classb2_particle_group.html#a4bdc4a7d34ef7f8de12a009b41c96a55">GetGroupFlags</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    uint32 <a class="code" href="classb2_particle_group.html#abb2599a4dd63b9aa70676c052a37e80b">GetAllParticleFlags</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a13a2f310947a2d69d5184805e6eb8bbd">SetGroupFlags</a>(int32 flags);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    uint32 <a class="code" href="classb2_particle_group.html#a53f4cd248ba80596542cfa46722b4826">GetGroupFlags</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    float32 <a class="code" href="classb2_particle_group.html#a3b0faaae566c61d1aa4d79c8db80d96a">GetMass</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#ad607bdfb7e49b25fe6b0a3c487eb8c53">SetGroupFlags</a>(uint32 flags);</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    float32 <a class="code" href="classb2_particle_group.html#a45f1194340988cbd2d4f0e84c86a9d69">GetInertia</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    float32 <a class="code" href="classb2_particle_group.html#a3b0faaae566c61d1aa4d79c8db80d96a">GetMass</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#a1ab22b0028448392de67d88f260619fe">GetCenter</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    float32 <a class="code" href="classb2_particle_group.html#a45f1194340988cbd2d4f0e84c86a9d69">GetInertia</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#afe4cea012fda0f21d896e541829cc51a">GetLinearVelocity</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#a1ab22b0028448392de67d88f260619fe">GetCenter</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    float32 <a class="code" href="classb2_particle_group.html#a5e3feb1429d46feb5d986c3619fbe98b">GetAngularVelocity</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#afe4cea012fda0f21d896e541829cc51a">GetLinearVelocity</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keyword">const</span> <a class="code" href="structb2_transform.html">b2Transform</a>&amp; <a class="code" href="classb2_particle_group.html#aa5d6cae1da3ce4cdca64356adb7db742">GetTransform</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; <a class="code" href="classb2_particle_group.html#ae104146814fd8b3e3671f71442037c6d">GetPosition</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    float32 <a class="code" href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">GetAngle</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">GetLinearVelocityFromWorldPoint</a>(<span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; worldPoint) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordtype">void</span>* <a class="code" href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">GetUserData</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    float32 <a class="code" href="classb2_particle_group.html#a5e3feb1429d46feb5d986c3619fbe98b">GetAngularVelocity</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">const</span> <a class="code" href="structb2_transform.html">b2Transform</a>&amp; <a class="code" href="classb2_particle_group.html#aa5d6cae1da3ce4cdca64356adb7db742">GetTransform</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; <a class="code" href="classb2_particle_group.html#ae104146814fd8b3e3671f71442037c6d">GetPosition</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    float32 <a class="code" href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">GetAngle</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">GetLinearVelocityFromWorldPoint</a>(<span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; worldPoint) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">SetUserData</a>(<span class="keywordtype">void</span>* data);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordtype">void</span>* <a class="code" href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">GetUserData</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a5f008489140d65a0a311629aa9ea808e">ApplyForce</a>(<span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; force);</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">SetUserData</a>(<span class="keywordtype">void</span>* data);</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#abd4c22ee10720c08247517b7d92ebbcd">ApplyLinearImpulse</a>(<span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; impulse);</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">DestroyParticles</a>(<span class="keywordtype">bool</span> callDestructionListener);</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">DestroyParticles</a>();</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classb2_particle_system.html">b2ParticleSystem</a>;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <a class="code" href="classb2_particle_system.html">b2ParticleSystem</a>* m_system;</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    int32 m_firstIndex, m_lastIndex;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    uint32 m_groupFlags;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    float32 m_strength;</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* m_prev;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* m_next;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keyword">mutable</span> int32 m_timestamp;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keyword">mutable</span> float32 m_mass;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="keyword">mutable</span> float32 m_inertia;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keyword">mutable</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> m_center;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keyword">mutable</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> m_linearVelocity;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keyword">mutable</span> float32 m_angularVelocity;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keyword">mutable</span> <a class="code" href="structb2_transform.html">b2Transform</a> m_transform;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keywordtype">void</span>* m_userData;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>();</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    ~<a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>();</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keywordtype">void</span> UpdateStatistics() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;};</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
-<div class="line"><a name="l00286"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9">  286</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* <a class="code" href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9">b2ParticleGroup::GetNext</a>()</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;{</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <span class="keywordflow">return</span> m_next;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;}</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* <a class="code" href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9">b2ParticleGroup::GetNext</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">return</span> m_next;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;}</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;</div>
-<div class="line"><a name="l00296"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">  296</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="classb2_particle_system.html">b2ParticleSystem</a>* <a class="code" href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">b2ParticleGroup::GetParticleSystem</a>()</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;{</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="keywordflow">return</span> m_system;</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;}</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classb2_particle_system.html">b2ParticleSystem</a>* <a class="code" href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">b2ParticleGroup::GetParticleSystem</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">return</span> m_system;</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;}</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;</div>
-<div class="line"><a name="l00306"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a0cd67ba68b3ced16cf4a6d1ffd9ef260">  306</a></span>&#160;<span class="keyword">inline</span> int32 <a class="code" href="classb2_particle_group.html#a0cd67ba68b3ced16cf4a6d1ffd9ef260">b2ParticleGroup::GetParticleCount</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordflow">return</span> m_lastIndex - m_firstIndex;</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;}</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
-<div class="line"><a name="l00311"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337">  311</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337">b2ParticleGroup::ContainsParticle</a>(int32 index)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <span class="keywordflow">return</span> m_firstIndex &lt;= index &amp;&amp; index &lt; m_lastIndex;</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;}</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="keyword">inline</span> b2ParticleGroup::~b2ParticleGroup()</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;{</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;}</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;</div>
-<div class="line"><a name="l00320"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#ad88e1201a5ddf430f5b07a621fc26a9f">  320</a></span>&#160;<span class="keyword">inline</span> int32 <a class="code" href="classb2_particle_group.html#ad88e1201a5ddf430f5b07a621fc26a9f">b2ParticleGroup::GetBufferIndex</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  <span class="keywordflow">return</span> m_firstIndex;</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;}</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;</div>
-<div class="line"><a name="l00325"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a4bdc4a7d34ef7f8de12a009b41c96a55">  325</a></span>&#160;<span class="keyword">inline</span> int32 <a class="code" href="classb2_particle_group.html#a4bdc4a7d34ef7f8de12a009b41c96a55">b2ParticleGroup::GetGroupFlags</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">return</span> m_groupFlags &amp; ~b2_particleGroupInternalMask;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;}</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;</div>
-<div class="line"><a name="l00330"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a3b0faaae566c61d1aa4d79c8db80d96a">  330</a></span>&#160;<span class="keyword">inline</span> float32 <a class="code" href="classb2_particle_group.html#a3b0faaae566c61d1aa4d79c8db80d96a">b2ParticleGroup::GetMass</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    UpdateStatistics();</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="keywordflow">return</span> m_mass;</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;}</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;</div>
-<div class="line"><a name="l00336"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a45f1194340988cbd2d4f0e84c86a9d69">  336</a></span>&#160;<span class="keyword">inline</span> float32 <a class="code" href="classb2_particle_group.html#a45f1194340988cbd2d4f0e84c86a9d69">b2ParticleGroup::GetInertia</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    UpdateStatistics();</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    <span class="keywordflow">return</span> m_inertia;</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;}</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
-<div class="line"><a name="l00342"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a1ab22b0028448392de67d88f260619fe">  342</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#a1ab22b0028448392de67d88f260619fe">b2ParticleGroup::GetCenter</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    UpdateStatistics();</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordflow">return</span> m_center;</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;}</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;</div>
-<div class="line"><a name="l00348"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#afe4cea012fda0f21d896e541829cc51a">  348</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#afe4cea012fda0f21d896e541829cc51a">b2ParticleGroup::GetLinearVelocity</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    UpdateStatistics();</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="keywordflow">return</span> m_linearVelocity;</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;}</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;</div>
-<div class="line"><a name="l00354"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a5e3feb1429d46feb5d986c3619fbe98b">  354</a></span>&#160;<span class="keyword">inline</span> float32 <a class="code" href="classb2_particle_group.html#a5e3feb1429d46feb5d986c3619fbe98b">b2ParticleGroup::GetAngularVelocity</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    UpdateStatistics();</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    <span class="keywordflow">return</span> m_angularVelocity;</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;}</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;</div>
-<div class="line"><a name="l00360"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#aa5d6cae1da3ce4cdca64356adb7db742">  360</a></span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="structb2_transform.html">b2Transform</a>&amp; <a class="code" href="classb2_particle_group.html#aa5d6cae1da3ce4cdca64356adb7db742">b2ParticleGroup::GetTransform</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <span class="keywordflow">return</span> m_transform;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;}</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;</div>
-<div class="line"><a name="l00365"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#ae104146814fd8b3e3671f71442037c6d">  365</a></span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; <a class="code" href="classb2_particle_group.html#ae104146814fd8b3e3671f71442037c6d">b2ParticleGroup::GetPosition</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="keywordflow">return</span> m_transform.p;</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;}</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;</div>
-<div class="line"><a name="l00370"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">  370</a></span>&#160;<span class="keyword">inline</span> float32 <a class="code" href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">b2ParticleGroup::GetAngle</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="keywordflow">return</span> m_transform.q.<a class="code" href="structb2_rot.html#a67a6c08812c009654f00800256c8bfdc">GetAngle</a>();</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;}</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;</div>
-<div class="line"><a name="l00375"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">  375</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">b2ParticleGroup::GetLinearVelocityFromWorldPoint</a>(</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;                                                <span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; worldPoint)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    UpdateStatistics();</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    <span class="keywordflow">return</span> m_linearVelocity + b2Cross(m_angularVelocity, worldPoint - m_center);</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;}</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;</div>
-<div class="line"><a name="l00382"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">  382</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span>* <a class="code" href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">b2ParticleGroup::GetUserData</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keywordflow">return</span> m_userData;</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;}</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;</div>
-<div class="line"><a name="l00387"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">  387</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">b2ParticleGroup::SetUserData</a>(<span class="keywordtype">void</span>* data)</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;{</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    m_userData = data;</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;}</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;</div>
-<div class="line"><a name="l00392"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">  392</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">b2ParticleGroup::DestroyParticles</a>()</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;{</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <a class="code" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">DestroyParticles</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;}</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;<span class="preprocessor">#if LIQUIDFUN_EXTERNAL_LANGUAGE_API</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="preprocessor"></span><span class="keyword">inline</span> <span class="keywordtype">void</span> b2ParticleGroupDef::SetPosition(float32 x, float32 y)</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;{</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <a class="code" href="structb2_particle_group_def.html#a4763a6bb6fc8c59e8c1cee918088f282">position</a>.<a class="code" href="structb2_vec2.html#a4d61640a645e470a50b451307d8e94c3">Set</a>(x, y);</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;}</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> b2ParticleGroupDef::SetColor(int32 r, int32 g, int32 b, int32 a)</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;{</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <a class="code" href="structb2_particle_group_def.html#a4ec788b26160e46cd8874ed1f980e216">color</a>.<a class="code" href="classb2_particle_color.html#a6adfe92cc278aea558e3e70076274fc1">Set</a>(r, g, b, a);</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;}</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="preprocessor">#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API</span></div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a5f008489140d65a0a311629aa9ea808e">ApplyForce</a>(<span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; force);</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#abd4c22ee10720c08247517b7d92ebbcd">ApplyLinearImpulse</a>(<span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; impulse);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">DestroyParticles</a>(<span class="keywordtype">bool</span> callDestructionListener);</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">DestroyParticles</a>();</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classb2_particle_system.html">b2ParticleSystem</a>;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <a class="code" href="classb2_particle_system.html">b2ParticleSystem</a>* m_system;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    int32 m_firstIndex, m_lastIndex;</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    uint32 m_groupFlags;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    float32 m_strength;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* m_prev;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* m_next;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keyword">mutable</span> int32 m_timestamp;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keyword">mutable</span> float32 m_mass;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keyword">mutable</span> float32 m_inertia;</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keyword">mutable</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> m_center;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keyword">mutable</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> m_linearVelocity;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keyword">mutable</span> float32 m_angularVelocity;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keyword">mutable</span> <a class="code" href="structb2_transform.html">b2Transform</a> m_transform;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="keywordtype">void</span>* m_userData;</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>();</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    ~<a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>();</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordtype">void</span> UpdateStatistics() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;};</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div>
+<div class="line"><a name="l00289"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9">  289</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* <a class="code" href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9">b2ParticleGroup::GetNext</a>()</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;{</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="keywordflow">return</span> m_next;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;}</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classb2_particle_group.html">b2ParticleGroup</a>* <a class="code" href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9">b2ParticleGroup::GetNext</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">return</span> m_next;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;}</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;</div>
+<div class="line"><a name="l00299"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">  299</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="classb2_particle_system.html">b2ParticleSystem</a>* <a class="code" href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">b2ParticleGroup::GetParticleSystem</a>()</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;{</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <span class="keywordflow">return</span> m_system;</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;}</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classb2_particle_system.html">b2ParticleSystem</a>* <a class="code" href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">b2ParticleGroup::GetParticleSystem</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keywordflow">return</span> m_system;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;}</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
+<div class="line"><a name="l00309"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a0cd67ba68b3ced16cf4a6d1ffd9ef260">  309</a></span>&#160;<span class="keyword">inline</span> int32 <a class="code" href="classb2_particle_group.html#a0cd67ba68b3ced16cf4a6d1ffd9ef260">b2ParticleGroup::GetParticleCount</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keywordflow">return</span> m_lastIndex - m_firstIndex;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;}</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;</div>
+<div class="line"><a name="l00314"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337">  314</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337">b2ParticleGroup::ContainsParticle</a>(int32 index)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <span class="keywordflow">return</span> m_firstIndex &lt;= index &amp;&amp; index &lt; m_lastIndex;</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;}</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="keyword">inline</span> b2ParticleGroup::~b2ParticleGroup()</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;{</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;}</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;</div>
+<div class="line"><a name="l00323"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#ad88e1201a5ddf430f5b07a621fc26a9f">  323</a></span>&#160;<span class="keyword">inline</span> int32 <a class="code" href="classb2_particle_group.html#ad88e1201a5ddf430f5b07a621fc26a9f">b2ParticleGroup::GetBufferIndex</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keywordflow">return</span> m_firstIndex;</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;}</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
+<div class="line"><a name="l00328"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a53f4cd248ba80596542cfa46722b4826">  328</a></span>&#160;<span class="keyword">inline</span> uint32 <a class="code" href="classb2_particle_group.html#a53f4cd248ba80596542cfa46722b4826">b2ParticleGroup::GetGroupFlags</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="keywordflow">return</span> m_groupFlags &amp; ~b2_particleGroupInternalMask;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;}</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
+<div class="line"><a name="l00333"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a3b0faaae566c61d1aa4d79c8db80d96a">  333</a></span>&#160;<span class="keyword">inline</span> float32 <a class="code" href="classb2_particle_group.html#a3b0faaae566c61d1aa4d79c8db80d96a">b2ParticleGroup::GetMass</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    UpdateStatistics();</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="keywordflow">return</span> m_mass;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;}</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;</div>
+<div class="line"><a name="l00339"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a45f1194340988cbd2d4f0e84c86a9d69">  339</a></span>&#160;<span class="keyword">inline</span> float32 <a class="code" href="classb2_particle_group.html#a45f1194340988cbd2d4f0e84c86a9d69">b2ParticleGroup::GetInertia</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    UpdateStatistics();</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="keywordflow">return</span> m_inertia;</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;}</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;</div>
+<div class="line"><a name="l00345"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a1ab22b0028448392de67d88f260619fe">  345</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#a1ab22b0028448392de67d88f260619fe">b2ParticleGroup::GetCenter</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    UpdateStatistics();</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <span class="keywordflow">return</span> m_center;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;}</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;</div>
+<div class="line"><a name="l00351"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#afe4cea012fda0f21d896e541829cc51a">  351</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#afe4cea012fda0f21d896e541829cc51a">b2ParticleGroup::GetLinearVelocity</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    UpdateStatistics();</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <span class="keywordflow">return</span> m_linearVelocity;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;}</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;</div>
+<div class="line"><a name="l00357"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a5e3feb1429d46feb5d986c3619fbe98b">  357</a></span>&#160;<span class="keyword">inline</span> float32 <a class="code" href="classb2_particle_group.html#a5e3feb1429d46feb5d986c3619fbe98b">b2ParticleGroup::GetAngularVelocity</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    UpdateStatistics();</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    <span class="keywordflow">return</span> m_angularVelocity;</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;}</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;</div>
+<div class="line"><a name="l00363"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#aa5d6cae1da3ce4cdca64356adb7db742">  363</a></span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="structb2_transform.html">b2Transform</a>&amp; <a class="code" href="classb2_particle_group.html#aa5d6cae1da3ce4cdca64356adb7db742">b2ParticleGroup::GetTransform</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="keywordflow">return</span> m_transform;</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;}</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;</div>
+<div class="line"><a name="l00368"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#ae104146814fd8b3e3671f71442037c6d">  368</a></span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; <a class="code" href="classb2_particle_group.html#ae104146814fd8b3e3671f71442037c6d">b2ParticleGroup::GetPosition</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <span class="keywordflow">return</span> m_transform.p;</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;}</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;</div>
+<div class="line"><a name="l00373"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">  373</a></span>&#160;<span class="keyword">inline</span> float32 <a class="code" href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">b2ParticleGroup::GetAngle</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="keywordflow">return</span> m_transform.q.<a class="code" href="structb2_rot.html#a67a6c08812c009654f00800256c8bfdc">GetAngle</a>();</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;}</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;</div>
+<div class="line"><a name="l00378"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">  378</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="structb2_vec2.html">b2Vec2</a> <a class="code" href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">b2ParticleGroup::GetLinearVelocityFromWorldPoint</a>(</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;                                                <span class="keyword">const</span> <a class="code" href="structb2_vec2.html">b2Vec2</a>&amp; worldPoint)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    UpdateStatistics();</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <span class="keywordflow">return</span> m_linearVelocity + b2Cross(m_angularVelocity, worldPoint - m_center);</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;}</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;</div>
+<div class="line"><a name="l00385"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">  385</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span>* <a class="code" href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">b2ParticleGroup::GetUserData</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="keywordflow">return</span> m_userData;</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;}</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;</div>
+<div class="line"><a name="l00390"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">  390</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">b2ParticleGroup::SetUserData</a>(<span class="keywordtype">void</span>* data)</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;{</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    m_userData = data;</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;}</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;</div>
+<div class="line"><a name="l00395"></a><span class="lineno"><a class="line" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">  395</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">b2ParticleGroup::DestroyParticles</a>()</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;{</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    <a class="code" href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">DestroyParticles</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;}</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;<span class="preprocessor">#if LIQUIDFUN_EXTERNAL_LANGUAGE_API</span></div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="preprocessor"></span><span class="keyword">inline</span> <span class="keywordtype">void</span> b2ParticleGroupDef::SetPosition(float32 x, float32 y)</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;{</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <a class="code" href="structb2_particle_group_def.html#a4763a6bb6fc8c59e8c1cee918088f282">position</a>.<a class="code" href="structb2_vec2.html#a4d61640a645e470a50b451307d8e94c3">Set</a>(x, y);</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;}</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> b2ParticleGroupDef::SetColor(int32 r, int32 g, int32 b, int32 a)</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;{</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <a class="code" href="structb2_particle_group_def.html#a4ec788b26160e46cd8874ed1f980e216">color</a>.<a class="code" href="classb2_particle_color.html#a6adfe92cc278aea558e3e70076274fc1">Set</a>((uint8)r, (uint8)g, (uint8)b, (uint8)a);</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;}</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;<span class="preprocessor">#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="structb2_transform_html"><div class="ttname"><a href="structb2_transform.html">b2Transform</a></div><div class="ttdef"><b>Definition:</b> b2Math.h:411</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_acba1075b361641d6984c448cbb95fc8a"><div class="ttname"><a href="structb2_particle_group_def.html#acba1075b361641d6984c448cbb95fc8a">b2ParticleGroupDef::linearVelocity</a></div><div class="ttdeci">b2Vec2 linearVelocity</div><div class="ttdoc">The linear velocity of the group&amp;#39;s origin in world co-ordinates. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:105</div></div>
 <div class="ttc" id="classb2_circle_shape_html"><div class="ttname"><a href="classb2_circle_shape.html">b2CircleShape</a></div><div class="ttdoc">A circle shape. </div><div class="ttdef"><b>Definition:</b> b2CircleShape.h:26</div></div>
@@ -432,52 +434,53 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="structb2_particle_group_def_html"><div class="ttname"><a href="structb2_particle_group_def.html">b2ParticleGroupDef</a></div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:54</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_ad6edb0e2185ca63ffc3f83a914040616"><div class="ttname"><a href="structb2_particle_group_def.html#ad6edb0e2185ca63ffc3f83a914040616">b2ParticleGroupDef::angle</a></div><div class="ttdeci">float32 angle</div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:102</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a5d5b5ea15b45f9bc9c8b41840915b495"><div class="ttname"><a href="structb2_particle_group_def.html#a5d5b5ea15b45f9bc9c8b41840915b495">b2ParticleGroupDef::shapes</a></div><div class="ttdeci">const b2Shape *const * shapes</div><div class="ttdoc">A array of shapes where particles will be added. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:121</div></div>
-<div class="ttc" id="classb2_particle_group_html_a3b0faaae566c61d1aa4d79c8db80d96a"><div class="ttname"><a href="classb2_particle_group.html#a3b0faaae566c61d1aa4d79c8db80d96a">b2ParticleGroup::GetMass</a></div><div class="ttdeci">float32 GetMass() const </div><div class="ttdoc">Get the total mass of the group: the sum of all particles in it. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:330</div></div>
+<div class="ttc" id="classb2_particle_group_html_a3b0faaae566c61d1aa4d79c8db80d96a"><div class="ttname"><a href="classb2_particle_group.html#a3b0faaae566c61d1aa4d79c8db80d96a">b2ParticleGroup::GetMass</a></div><div class="ttdeci">float32 GetMass() const </div><div class="ttdoc">Get the total mass of the group: the sum of all particles in it. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:333</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_ae7643e86cefe12b1468faa5e871a5d81"><div class="ttname"><a href="structb2_particle_group_def.html#ae7643e86cefe12b1468faa5e871a5d81">b2ParticleGroupDef::positionData</a></div><div class="ttdeci">const b2Vec2 * positionData</div><div class="ttdoc">The initial positions of the particleCount particles. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:134</div></div>
 <div class="ttc" id="b2_particle_group_8h_html_abbd0fdb14991c867363eb3ed0c914eb0"><div class="ttname"><a href="b2_particle_group_8h.html#abbd0fdb14991c867363eb3ed0c914eb0">b2ParticleGroupFlag</a></div><div class="ttdeci">b2ParticleGroupFlag</div><div class="ttdoc">The particle group type. Can be combined with the | operator. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:35</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a4763a6bb6fc8c59e8c1cee918088f282"><div class="ttname"><a href="structb2_particle_group_def.html#a4763a6bb6fc8c59e8c1cee918088f282">b2ParticleGroupDef::position</a></div><div class="ttdeci">b2Vec2 position</div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:98</div></div>
 <div class="ttc" id="b2_particle_group_8h_html_abbd0fdb14991c867363eb3ed0c914eb0ae3179985d492bde2894bf94e1c0ab16d"><div class="ttname"><a href="b2_particle_group_8h.html#abbd0fdb14991c867363eb3ed0c914eb0ae3179985d492bde2894bf94e1c0ab16d">b2_particleGroupWillBeDestroyed</a></div><div class="ttdoc">Will be destroyed on next simulation step. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:44</div></div>
-<div class="ttc" id="classb2_particle_group_html_a5f008489140d65a0a311629aa9ea808e"><div class="ttname"><a href="classb2_particle_group.html#a5f008489140d65a0a311629aa9ea808e">b2ParticleGroup::ApplyForce</a></div><div class="ttdeci">void ApplyForce(const b2Vec2 &amp;force)</div><div class="ttdoc">Call b2ParticleSystem::ApplyForce for every particle in the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.cpp:92</div></div>
+<div class="ttc" id="classb2_particle_group_html_a5f008489140d65a0a311629aa9ea808e"><div class="ttname"><a href="classb2_particle_group.html#a5f008489140d65a0a311629aa9ea808e">b2ParticleGroup::ApplyForce</a></div><div class="ttdeci">void ApplyForce(const b2Vec2 &amp;force)</div><div class="ttdoc">Call b2ParticleSystem::ApplyForce for every particle in the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.cpp:102</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_ab734a88e0aab7a4aa48e6acbee70e722"><div class="ttname"><a href="structb2_particle_group_def.html#ab734a88e0aab7a4aa48e6acbee70e722">b2ParticleGroupDef::group</a></div><div class="ttdeci">b2ParticleGroup * group</div><div class="ttdoc">An existing particle group to which the particles will be added. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:144</div></div>
 <div class="ttc" id="b2_particle_group_8h_html_abbd0fdb14991c867363eb3ed0c914eb0a11c463a61294cf93513af44de31900d2"><div class="ttname"><a href="b2_particle_group_8h.html#abbd0fdb14991c867363eb3ed0c914eb0a11c463a61294cf93513af44de31900d2">b2_particleGroupNeedsUpdateDepth</a></div><div class="ttdoc">Updates depth data on next simulation step. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:46</div></div>
-<div class="ttc" id="classb2_particle_group_html_a13a2f310947a2d69d5184805e6eb8bbd"><div class="ttname"><a href="classb2_particle_group.html#a13a2f310947a2d69d5184805e6eb8bbd">b2ParticleGroup::SetGroupFlags</a></div><div class="ttdeci">void SetGroupFlags(int32 flags)</div><div class="ttdoc">Set the construction flags for the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.cpp:49</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a349832981a11a5834b3bac14b32cc1d8"><div class="ttname"><a href="structb2_particle_group_def.html#a349832981a11a5834b3bac14b32cc1d8">b2ParticleGroupDef::groupFlags</a></div><div class="ttdeci">uint32 groupFlags</div><div class="ttdoc">The group-construction flags (See b2ParticleGroupFlag). </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:94</div></div>
-<div class="ttc" id="classb2_particle_group_html_afe4cea012fda0f21d896e541829cc51a"><div class="ttname"><a href="classb2_particle_group.html#afe4cea012fda0f21d896e541829cc51a">b2ParticleGroup::GetLinearVelocity</a></div><div class="ttdeci">b2Vec2 GetLinearVelocity() const </div><div class="ttdoc">Get the linear velocity of the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:348</div></div>
+<div class="ttc" id="classb2_particle_group_html_afe4cea012fda0f21d896e541829cc51a"><div class="ttname"><a href="classb2_particle_group.html#afe4cea012fda0f21d896e541829cc51a">b2ParticleGroup::GetLinearVelocity</a></div><div class="ttdeci">b2Vec2 GetLinearVelocity() const </div><div class="ttdoc">Get the linear velocity of the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:351</div></div>
 <div class="ttc" id="classb2_world_html"><div class="ttname"><a href="classb2_world.html">b2World</a></div><div class="ttdef"><b>Definition:</b> b2World.h:44</div></div>
-<div class="ttc" id="classb2_particle_system_html"><div class="ttname"><a href="classb2_particle_system.html">b2ParticleSystem</a></div><div class="ttdef"><b>Definition:</b> b2ParticleSystem.h:248</div></div>
+<div class="ttc" id="classb2_particle_system_html"><div class="ttname"><a href="classb2_particle_system.html">b2ParticleSystem</a></div><div class="ttdef"><b>Definition:</b> b2ParticleSystem.h:281</div></div>
+<div class="ttc" id="classb2_particle_group_html_abb2599a4dd63b9aa70676c052a37e80b"><div class="ttname"><a href="classb2_particle_group.html#abb2599a4dd63b9aa70676c052a37e80b">b2ParticleGroup::GetAllParticleFlags</a></div><div class="ttdeci">uint32 GetAllParticleFlags() const </div><div class="ttdoc">Get the logical sum of particle flags. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.cpp:49</div></div>
 <div class="ttc" id="b2_particle_group_8h_html_abbd0fdb14991c867363eb3ed0c914eb0a805dd175a2bbaa18b94d6ab50de90afa"><div class="ttname"><a href="b2_particle_group_8h.html#abbd0fdb14991c867363eb3ed0c914eb0a805dd175a2bbaa18b94d6ab50de90afa">b2_particleGroupCanBeEmpty</a></div><div class="ttdoc">Won&amp;#39;t be destroyed if it gets empty. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:42</div></div>
-<div class="ttc" id="classb2_particle_group_html_abb5d4e5e2a1814bdff36c97221be8337"><div class="ttname"><a href="classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337">b2ParticleGroup::ContainsParticle</a></div><div class="ttdeci">bool ContainsParticle(int32 index) const </div><div class="ttdoc">Does this group contain the particle. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:311</div></div>
+<div class="ttc" id="classb2_particle_group_html_abb5d4e5e2a1814bdff36c97221be8337"><div class="ttname"><a href="classb2_particle_group.html#abb5d4e5e2a1814bdff36c97221be8337">b2ParticleGroup::ContainsParticle</a></div><div class="ttdeci">bool ContainsParticle(int32 index) const </div><div class="ttdoc">Does this group contain the particle. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:314</div></div>
 <div class="ttc" id="classb2_shape_html"><div class="ttname"><a href="classb2_shape.html">b2Shape</a></div><div class="ttdef"><b>Definition:</b> b2Shape.h:43</div></div>
-<div class="ttc" id="classb2_particle_group_html_a1ab22b0028448392de67d88f260619fe"><div class="ttname"><a href="classb2_particle_group.html#a1ab22b0028448392de67d88f260619fe">b2ParticleGroup::GetCenter</a></div><div class="ttdeci">b2Vec2 GetCenter() const </div><div class="ttdoc">Get the center of gravity for the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:342</div></div>
+<div class="ttc" id="classb2_particle_group_html_a1ab22b0028448392de67d88f260619fe"><div class="ttname"><a href="classb2_particle_group.html#a1ab22b0028448392de67d88f260619fe">b2ParticleGroup::GetCenter</a></div><div class="ttdeci">b2Vec2 GetCenter() const </div><div class="ttdoc">Get the center of gravity for the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:345</div></div>
 <div class="ttc" id="classb2_particle_color_html"><div class="ttname"><a href="classb2_particle_color.html">b2ParticleColor</a></div><div class="ttdoc">Small color object for each particle. </div><div class="ttdef"><b>Definition:</b> b2Particle.h:81</div></div>
 <div class="ttc" id="structb2_vec2_html_a4d61640a645e470a50b451307d8e94c3"><div class="ttname"><a href="structb2_vec2.html#a4d61640a645e470a50b451307d8e94c3">b2Vec2::Set</a></div><div class="ttdeci">void Set(float32 x_, float32 y_)</div><div class="ttdoc">Set this vector to some specified coordinates. </div><div class="ttdef"><b>Definition:</b> b2Math.h:68</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a8d3f92839a7940d74b00b54d1b8281a8"><div class="ttname"><a href="structb2_particle_group_def.html#a8d3f92839a7940d74b00b54d1b8281a8">b2ParticleGroupDef::angularVelocity</a></div><div class="ttdeci">float32 angularVelocity</div><div class="ttdoc">The angular velocity of the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:108</div></div>
-<div class="ttc" id="classb2_particle_group_html_a9f89e452e667f8ba5eae117fa96e1b31"><div class="ttname"><a href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">b2ParticleGroup::GetAngle</a></div><div class="ttdeci">float32 GetAngle() const </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:370</div></div>
+<div class="ttc" id="classb2_particle_group_html_a9f89e452e667f8ba5eae117fa96e1b31"><div class="ttname"><a href="classb2_particle_group.html#a9f89e452e667f8ba5eae117fa96e1b31">b2ParticleGroup::GetAngle</a></div><div class="ttdeci">float32 GetAngle() const </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:373</div></div>
+<div class="ttc" id="classb2_particle_group_html_a53f4cd248ba80596542cfa46722b4826"><div class="ttname"><a href="classb2_particle_group.html#a53f4cd248ba80596542cfa46722b4826">b2ParticleGroup::GetGroupFlags</a></div><div class="ttdeci">uint32 GetGroupFlags() const </div><div class="ttdoc">Get the construction flags for the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:328</div></div>
+<div class="ttc" id="classb2_particle_group_html_ad607bdfb7e49b25fe6b0a3c487eb8c53"><div class="ttname"><a href="classb2_particle_group.html#ad607bdfb7e49b25fe6b0a3c487eb8c53">b2ParticleGroup::SetGroupFlags</a></div><div class="ttdeci">void SetGroupFlags(uint32 flags)</div><div class="ttdoc">Set the construction flags for the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.cpp:59</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a243ab984330b83be6febd8cd6a6384a9"><div class="ttname"><a href="structb2_particle_group_def.html#a243ab984330b83be6febd8cd6a6384a9">b2ParticleGroupDef::particleCount</a></div><div class="ttdeci">int32 particleCount</div><div class="ttdoc">The number of particles in addition to ones added in the shape. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:131</div></div>
-<div class="ttc" id="classb2_particle_group_html_aa5d6cae1da3ce4cdca64356adb7db742"><div class="ttname"><a href="classb2_particle_group.html#aa5d6cae1da3ce4cdca64356adb7db742">b2ParticleGroup::GetTransform</a></div><div class="ttdeci">const b2Transform &amp; GetTransform() const </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:360</div></div>
+<div class="ttc" id="classb2_particle_group_html_aa5d6cae1da3ce4cdca64356adb7db742"><div class="ttname"><a href="classb2_particle_group.html#aa5d6cae1da3ce4cdca64356adb7db742">b2ParticleGroup::GetTransform</a></div><div class="ttdeci">const b2Transform &amp; GetTransform() const </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:363</div></div>
 <div class="ttc" id="classb2_particle_group_html"><div class="ttname"><a href="classb2_particle_group.html">b2ParticleGroup</a></div><div class="ttdoc">A group of particles. b2ParticleGroup::CreateParticleGroup creates these. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:172</div></div>
-<div class="ttc" id="classb2_particle_group_html_a370e0ac139af6122e141a922c951a7fa"><div class="ttname"><a href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">b2ParticleGroup::GetLinearVelocityFromWorldPoint</a></div><div class="ttdeci">b2Vec2 GetLinearVelocityFromWorldPoint(const b2Vec2 &amp;worldPoint) const </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:375</div></div>
-<div class="ttc" id="classb2_particle_group_html_ae7f00d2018617994666bcdf9efb82b0e"><div class="ttname"><a href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">b2ParticleGroup::SetUserData</a></div><div class="ttdeci">void SetUserData(void *data)</div><div class="ttdoc">Set the user data. Use this to store your application specific data. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:387</div></div>
+<div class="ttc" id="classb2_particle_group_html_a370e0ac139af6122e141a922c951a7fa"><div class="ttname"><a href="classb2_particle_group.html#a370e0ac139af6122e141a922c951a7fa">b2ParticleGroup::GetLinearVelocityFromWorldPoint</a></div><div class="ttdeci">b2Vec2 GetLinearVelocityFromWorldPoint(const b2Vec2 &amp;worldPoint) const </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:378</div></div>
+<div class="ttc" id="classb2_particle_group_html_ae7f00d2018617994666bcdf9efb82b0e"><div class="ttname"><a href="classb2_particle_group.html#ae7f00d2018617994666bcdf9efb82b0e">b2ParticleGroup::SetUserData</a></div><div class="ttdeci">void SetUserData(void *data)</div><div class="ttdoc">Set the user data. Use this to store your application specific data. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:390</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a77c3ac47ae906e34e7f3fecf7b8f7aad"><div class="ttname"><a href="structb2_particle_group_def.html#a77c3ac47ae906e34e7f3fecf7b8f7aad">b2ParticleGroupDef::strength</a></div><div class="ttdeci">float32 strength</div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:115</div></div>
 <div class="ttc" id="classb2_particle_color_html_a6adfe92cc278aea558e3e70076274fc1"><div class="ttname"><a href="classb2_particle_color.html#a6adfe92cc278aea558e3e70076274fc1">b2ParticleColor::Set</a></div><div class="ttdeci">b2Inline void Set(uint8 r_, uint8 g_, uint8 b_, uint8 a_)</div><div class="ttdef"><b>Definition:</b> b2Particle.h:111</div></div>
-<div class="ttc" id="classb2_particle_group_html_abd4c22ee10720c08247517b7d92ebbcd"><div class="ttname"><a href="classb2_particle_group.html#abd4c22ee10720c08247517b7d92ebbcd">b2ParticleGroup::ApplyLinearImpulse</a></div><div class="ttdeci">void ApplyLinearImpulse(const b2Vec2 &amp;impulse)</div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.cpp:97</div></div>
-<div class="ttc" id="classb2_particle_group_html_a0cd67ba68b3ced16cf4a6d1ffd9ef260"><div class="ttname"><a href="classb2_particle_group.html#a0cd67ba68b3ced16cf4a6d1ffd9ef260">b2ParticleGroup::GetParticleCount</a></div><div class="ttdeci">int32 GetParticleCount() const </div><div class="ttdoc">Get the number of particles. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:306</div></div>
+<div class="ttc" id="classb2_particle_group_html_abd4c22ee10720c08247517b7d92ebbcd"><div class="ttname"><a href="classb2_particle_group.html#abd4c22ee10720c08247517b7d92ebbcd">b2ParticleGroup::ApplyLinearImpulse</a></div><div class="ttdeci">void ApplyLinearImpulse(const b2Vec2 &amp;impulse)</div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.cpp:107</div></div>
+<div class="ttc" id="classb2_particle_group_html_a0cd67ba68b3ced16cf4a6d1ffd9ef260"><div class="ttname"><a href="classb2_particle_group.html#a0cd67ba68b3ced16cf4a6d1ffd9ef260">b2ParticleGroup::GetParticleCount</a></div><div class="ttdeci">int32 GetParticleCount() const </div><div class="ttdoc">Get the number of particles. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:309</div></div>
 <div class="ttc" id="b2_particle_group_8h_html_abbd0fdb14991c867363eb3ed0c914eb0a33d547e8551dddbf0f140f2703802b56"><div class="ttname"><a href="b2_particle_group_8h.html#abbd0fdb14991c867363eb3ed0c914eb0a33d547e8551dddbf0f140f2703802b56">b2_solidParticleGroup</a></div><div class="ttdoc">Prevents overlapping or leaking. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:38</div></div>
-<div class="ttc" id="classb2_particle_group_html_a45f1194340988cbd2d4f0e84c86a9d69"><div class="ttname"><a href="classb2_particle_group.html#a45f1194340988cbd2d4f0e84c86a9d69">b2ParticleGroup::GetInertia</a></div><div class="ttdeci">float32 GetInertia() const </div><div class="ttdoc">Get the moment of inertia for the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:336</div></div>
-<div class="ttc" id="classb2_particle_group_html_a726a64987dee61753ea84c16e5cfcbba"><div class="ttname"><a href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">b2ParticleGroup::GetParticleSystem</a></div><div class="ttdeci">b2ParticleSystem * GetParticleSystem()</div><div class="ttdoc">Get the particle system that holds this particle group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:296</div></div>
+<div class="ttc" id="classb2_particle_group_html_a45f1194340988cbd2d4f0e84c86a9d69"><div class="ttname"><a href="classb2_particle_group.html#a45f1194340988cbd2d4f0e84c86a9d69">b2ParticleGroup::GetInertia</a></div><div class="ttdeci">float32 GetInertia() const </div><div class="ttdoc">Get the moment of inertia for the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:339</div></div>
+<div class="ttc" id="classb2_particle_group_html_a726a64987dee61753ea84c16e5cfcbba"><div class="ttname"><a href="classb2_particle_group.html#a726a64987dee61753ea84c16e5cfcbba">b2ParticleGroup::GetParticleSystem</a></div><div class="ttdeci">b2ParticleSystem * GetParticleSystem()</div><div class="ttdoc">Get the particle system that holds this particle group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:299</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a3164082e9b1b3bf8d7bfc4d52fd52db5"><div class="ttname"><a href="structb2_particle_group_def.html#a3164082e9b1b3bf8d7bfc4d52fd52db5">b2ParticleGroupDef::shapeCount</a></div><div class="ttdeci">int32 shapeCount</div><div class="ttdoc">The number of shapes. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:124</div></div>
-<div class="ttc" id="classb2_particle_group_html_ab9633e73bf6db361bc4c70be7becaa1b"><div class="ttname"><a href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">b2ParticleGroup::GetUserData</a></div><div class="ttdeci">void * GetUserData() const </div><div class="ttdoc">Get the user data pointer that was provided in the group definition. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:382</div></div>
-<div class="ttc" id="classb2_particle_group_html_ae104146814fd8b3e3671f71442037c6d"><div class="ttname"><a href="classb2_particle_group.html#ae104146814fd8b3e3671f71442037c6d">b2ParticleGroup::GetPosition</a></div><div class="ttdeci">const b2Vec2 &amp; GetPosition() const </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:365</div></div>
+<div class="ttc" id="classb2_particle_group_html_ab9633e73bf6db361bc4c70be7becaa1b"><div class="ttname"><a href="classb2_particle_group.html#ab9633e73bf6db361bc4c70be7becaa1b">b2ParticleGroup::GetUserData</a></div><div class="ttdeci">void * GetUserData() const </div><div class="ttdoc">Get the user data pointer that was provided in the group definition. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:385</div></div>
+<div class="ttc" id="classb2_particle_group_html_ae104146814fd8b3e3671f71442037c6d"><div class="ttname"><a href="classb2_particle_group.html#ae104146814fd8b3e3671f71442037c6d">b2ParticleGroup::GetPosition</a></div><div class="ttdeci">const b2Vec2 &amp; GetPosition() const </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:368</div></div>
 <div class="ttc" id="b2_particle_8h_html"><div class="ttname"><a href="b2_particle_8h.html">b2Particle.h</a></div></div>
-<div class="ttc" id="classb2_particle_group_html_ad88e1201a5ddf430f5b07a621fc26a9f"><div class="ttname"><a href="classb2_particle_group.html#ad88e1201a5ddf430f5b07a621fc26a9f">b2ParticleGroup::GetBufferIndex</a></div><div class="ttdeci">int32 GetBufferIndex() const </div><div class="ttdoc">Get the offset of this group in the global particle buffer. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:320</div></div>
+<div class="ttc" id="classb2_particle_group_html_ad88e1201a5ddf430f5b07a621fc26a9f"><div class="ttname"><a href="classb2_particle_group.html#ad88e1201a5ddf430f5b07a621fc26a9f">b2ParticleGroup::GetBufferIndex</a></div><div class="ttdeci">int32 GetBufferIndex() const </div><div class="ttdoc">Get the offset of this group in the global particle buffer. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:323</div></div>
 <div class="ttc" id="structb2_vec2_html"><div class="ttname"><a href="structb2_vec2.html">b2Vec2</a></div><div class="ttdoc">A 2D column vector. </div><div class="ttdef"><b>Definition:</b> b2Math.h:56</div></div>
-<div class="ttc" id="classb2_particle_group_html_abe9ee571c1482e65217b7ba33c5ebfa9"><div class="ttname"><a href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9">b2ParticleGroup::GetNext</a></div><div class="ttdeci">b2ParticleGroup * GetNext()</div><div class="ttdoc">Get the next particle group from the list in b2_World. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:286</div></div>
-<div class="ttc" id="classb2_particle_group_html_a9bea52175e7b16a56a3c7b1d14723d04"><div class="ttname"><a href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">b2ParticleGroup::DestroyParticles</a></div><div class="ttdeci">void DestroyParticles()</div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:392</div></div>
+<div class="ttc" id="classb2_particle_group_html_abe9ee571c1482e65217b7ba33c5ebfa9"><div class="ttname"><a href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9">b2ParticleGroup::GetNext</a></div><div class="ttdeci">b2ParticleGroup * GetNext()</div><div class="ttdoc">Get the next particle group from the list in b2_World. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:289</div></div>
+<div class="ttc" id="classb2_particle_group_html_a9bea52175e7b16a56a3c7b1d14723d04"><div class="ttname"><a href="classb2_particle_group.html#a9bea52175e7b16a56a3c7b1d14723d04">b2ParticleGroup::DestroyParticles</a></div><div class="ttdeci">void DestroyParticles()</div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:395</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a4ec788b26160e46cd8874ed1f980e216"><div class="ttname"><a href="structb2_particle_group_def.html#a4ec788b26160e46cd8874ed1f980e216">b2ParticleGroupDef::color</a></div><div class="ttdeci">b2ParticleColor color</div><div class="ttdoc">The color of all particles in the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:111</div></div>
-<div class="ttc" id="classb2_particle_group_html_a5e3feb1429d46feb5d986c3619fbe98b"><div class="ttname"><a href="classb2_particle_group.html#a5e3feb1429d46feb5d986c3619fbe98b">b2ParticleGroup::GetAngularVelocity</a></div><div class="ttdeci">float32 GetAngularVelocity() const </div><div class="ttdoc">Get the angular velocity of the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:354</div></div>
+<div class="ttc" id="classb2_particle_group_html_a5e3feb1429d46feb5d986c3619fbe98b"><div class="ttname"><a href="classb2_particle_group.html#a5e3feb1429d46feb5d986c3619fbe98b">b2ParticleGroup::GetAngularVelocity</a></div><div class="ttdeci">float32 GetAngularVelocity() const </div><div class="ttdoc">Get the angular velocity of the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:357</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a97817383da54ee1b44c635de2ff272ce"><div class="ttname"><a href="structb2_particle_group_def.html#a97817383da54ee1b44c635de2ff272ce">b2ParticleGroupDef::shape</a></div><div class="ttdeci">const b2Shape * shape</div><div class="ttdoc">The shape where particles will be added. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:118</div></div>
 <div class="ttc" id="structb2_particle_group_def_html_a4caa3e45a21ef860060fddc994a07828"><div class="ttname"><a href="structb2_particle_group_def.html#a4caa3e45a21ef860060fddc994a07828">b2ParticleGroupDef::lifetime</a></div><div class="ttdeci">float32 lifetime</div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:138</div></div>
-<div class="ttc" id="classb2_particle_group_html_a4bdc4a7d34ef7f8de12a009b41c96a55"><div class="ttname"><a href="classb2_particle_group.html#a4bdc4a7d34ef7f8de12a009b41c96a55">b2ParticleGroup::GetGroupFlags</a></div><div class="ttdeci">int32 GetGroupFlags() const </div><div class="ttdoc">Get the construction flags for the group. </div><div class="ttdef"><b>Definition:</b> b2ParticleGroup.h:325</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Google Analytics -->
 <script>
