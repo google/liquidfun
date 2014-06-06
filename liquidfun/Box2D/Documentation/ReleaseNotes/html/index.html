@@ -48,12 +48,43 @@
 <p><a class="anchor" id="1.1.0"></a> </p>
 <h3>1.1.0</h3>
 <h4>Overview</h4>
+<p>The [1.1.0 release][] of LiquidFun adds support for new platforms, speeds-up the simulation, and documents the particle simulation algorithm with a fun, visual presentation. Some highlights:</p>
+<ul>
+<li>iOS support.</li>
+<li>JavaScript support via <a href="https://github.com/kripken/emscripten/wiki">Emscripten</a>.</li>
+<li>Improved Java support via more SWIG bindings.</li>
+<li>An "Inside LiquidFun" presentation explaining the particle simulation algorithm.</li>
+<li>ARM optimizations using <a href="http://www.arm.com/products/processors/technologies/neon.php">NEON</a>.</li>
+<li>Stability and collision improvements to the particle simulation.</li>
+<li>More ways to inspect particle contacts.</li>
+<li>A LiquidFun logo to use in your splash screens and documentation, if you like.</li>
+</ul>
+<p>The <a href="#apimods1.1.0">API Modifications</a> are minimal in this release, but please review them carefully before upgrading your project.</p>
+<p>LiquidFun now supports Mac, Windows, Linux, Android, iOS, and browsers. Note that LiquidFun code is portable C++98, so you should be able to compile it for other platforms too.</p>
+<p>Your program can use LiquidFun if it is written in C++, Java, or JavaScript.</p>
+<p>LiquidFun 1.1.0 is based on <a href="http://code.google.com/p/box2d/source/detail?r=280">Box2D revision 280</a>, the 2.3.0 release of Box2D.</p>
 <p><a class="anchor" id="newfeatures1.1.0"></a> </p>
 <h4>New Features</h4>
+<ul>
+<li>Translated LiquidFun into JavaScript using Emscripten. Please see Box2D/lfjs for the JavaScript bindings and a JavaScript version of the Testbed.</li>
+<li>Added iOS XCode projects for the Testbed application and EyeCandy demo.</li>
+<li>Added b2ParticleSystem::SplitParticleGroup, which finds disjoint blobs of particles, and puts each into its own b2ParticleGroup.</li>
+<li>Added several accessor functions that use only int32s, float32s, and void pointers. These accessors are wrapped in the LIQUIDFUN_EXTERNAL_LANGUAGE_API preprocessor define. They enable binding with other languages&ndash;for example, via SWIG.</li>
+<li>Particle indices can be represented with 16-bits instead of 32-bits. This is a nice optimization if you know you will have less than 32k particles per simulation.</li>
+<li>b2ParticleSimulation::UpdateContacts has been rewritten to take advantage of NEON SIMD. The original implementation remains, for reference, and for platforms that do not support NEON SIMD. The NEON SIMD version requires 16-bit particle indices.</li>
+</ul>
 <p><a class="anchor" id="apimods1.1.0"></a> </p>
 <h4>API Modifications</h4>
 <ul>
-<li>Extended API in SWIG has now been moved to LiquidFun header files, wrapped with the LIQUIDFUN_EXTERNAL_LANGUAGE_API preprocessor.</li>
+<li>b2ParticleContact's members are now accessed via <em>Get</em> and <em>Set</em> functions.</li>
+<li>b2ParticleSystemDef now has members for strictContactCheck, density, gravityScale, radius, and maxCount. You can still set these values after b2ParticleSystem creation, however, for example via b2ParticleSystem::SetDensity.</li>
+</ul>
+<h4>Other Changes</h4>
+<ul>
+<li>Added b2ParticleSystem::GetAllParticleFlags, b2ParticleSystem::GetAllGroupFlags, and b2ParticleGroup::GetAllParticleFlags, which OR-together all the flags in a particle system or group.</li>
+<li>Expose the contact weight buffer. The weight represents how closely two particles overlap.</li>
+<li>Expose particle pairs and triads for reading. These arrays indicate which particles are interacting.</li>
+<li>Added b2ParticleGroup::GetLinearVelocityFromWorldPoint, which returns the average velocity of a particle group with respect to a position. The position is used to calculate the angular velocity of the group.</li>
 </ul>
 <p><a class="anchor" id="1.0.0"></a> </p>
 <h3>1.0.0</h3>
