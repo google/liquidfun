@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Google, Inc.
+# Copyright (c) 2014 Google, Inc.
 #
 # This software is provided 'as-is', without any express or implied
 # warranty.  In no event will the authors be held liable for any damages
@@ -14,22 +14,10 @@
 # misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-LOCAL_PATH := $(call my-dir)
+ifneq (,$(findstring armeabi-v7a,$(APP_ABI)))
+  b2_cflags := -DLIQUIDFUN_SIMD_NEON -mfloat-abi=softfp -mfpu=neon
+  b2_extensions := cpp s
+else
+  b2_extensions := cpp
+endif
 
-include ${call my-dir}/../../b2_android_common.mk
-include $(CLEAR_VARS)
-
-LOCAL_MODULE    := EyeCandy
-LOCAL_SRC_FILES := main.cpp ../engine.cpp ../android/platform_android.cpp
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/.. $(LOCAL_PATH)/../android
-LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2
-LOCAL_STATIC_LIBRARIES := android_native_app_glue liquidfun_static
-LOCAL_ARM_MODE:=arm
-LOCAL_CPPFLAGS += -std=c++11 -Wall -Werror $(b2_cflags)
-
-include $(BUILD_SHARED_LIBRARY)
-
-$(call import-module,android/native_app_glue)
-
-$(call import-add-path,../..)
-$(call import-module,Box2D/jni)
