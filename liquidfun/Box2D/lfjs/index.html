@@ -16,7 +16,7 @@
   <script src="testbed/three.js"></script>
   <script src="testbed/testbed.js"></script>
   <script src="testbed/utils.js"></script>
-  <!-- // tests !-->
+  <!-- tests !-->
   <script src="testbed/tests/testAddPair.js"></script>
   <script src="testbed/tests/testAntiPointy.js"></script>
   <script src="testbed/tests/testApplyForce.js"></script>
@@ -29,9 +29,8 @@
   <script src="testbed/tests/testChain.js"></script>
   <script src="testbed/tests/testCharacterCollision.js"></script>
   <script src="testbed/tests/testCollisionFiltering.js"></script>
-  <!--TODO:
   <script src="testbed/tests/testCompoundShapes.js"></script>
-  <script src="testbed/tests/testConfined.js"></script>!-->
+  <script src="testbed/tests/testConfined.js"></script>
   <script src="testbed/tests/testConvexHull.js"></script>
   <script src="testbed/tests/testConveyorBelt.js"></script>
   <script src="testbed/tests/testCornerCase.js"></script>
@@ -87,63 +86,63 @@
   <body onload="initTestbed()"></body>
 
   <div style="position:absolute;float:right;z-index:1;height:1024px;width:200px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;background:white">
-      <input type="radio" onclick="testSwitch(TestAddPair)"/>Add Pair<br/>
-      <input type="radio" onclick="testSwitch(TestAntiPointy)"/>Anti Pointy<br/>
-      <input type="radio" onclick="testSwitch(TestApplyForce)"/>Apply Force<br/>
-      <input type="radio" onclick="testSwitch(TestBodyTypes)"/>Body Types<br/>
-      <input type="radio" onclick="testSwitch(TestBridge)"/>Bridge<br/>
-      <input type="radio" onclick="testSwitch(TestBreakable)"/>Breakable<br/>
-      <input type="radio" onclick="testSwitch(TestBullet)"/>Bullet<br/>
-      <input type="radio" onclick="testSwitch(TestCantilever)"/>Cantilever<br/>
-      <input type="radio" onclick="testSwitch(TestCar)"/>Car<br/>
-      <input type="radio" onclick="testSwitch(TestChain)"/>Chain<br/>
-      <input type="radio" onclick="testSwitch(TestCharacterCollision)"/>Character Collision<br/>
-      <input type="radio" onclick="testSwitch(TestCompoundShapes)"/>Compound Shapes<br/>
-      <input type="radio" onclick="testSwitch(TestConfined)"/>Confined<br/>
-      <input type="radio" onclick="testSwitch(TestConvexHull)"/>Convex Hull<br/>
-      <input type="radio" onclick="testSwitch(TestConveyorBelt)"/>Conveyor belt<br/>
-      <input type="radio" onclick="testSwitch(TestCornerCase)"/>Corner case<br/>
-      <input type="radio" onclick="testSwitch(TestDamBreak)"/>Dam break<br/>
-      <input type="radio" onclick="testSwitch(TestDominos)"/>Dominos<br/>
-      <input type="radio" onclick="testSwitch(TestDrawingParticles)"/>Drawing Particles<br/>
-      <input type="radio" onclick="testSwitch(TestDumpShell)"/>Dump shell<br/>
-      <input type="radio" onclick="testSwitch(TestEdgeShape)"/>Edge Shape<br/>
-      <input type="radio" onclick="testSwitch(TestEdgeTest)"/>Edge Test<br/>
-      <input type="radio" onclick="testSwitch(TestElasticParticles)"/>Elastic Particles<br/>
-      <input type="radio" onclick="testSwitch(TestFaucet)"/>Faucet<br/>
-      <input type="radio" onclick="testSwitch(TestGears)"/>Gears<br/>
-      <input type="radio" onclick="testSwitch(TestHW)"/>Hello World<br/>
-      <input type="radio" onclick="testSwitch(TestImpulse)"/>Impulse<br/>
-      <input type="radio" onclick="testSwitch(TestLiquidTimer)"/>Liquid Timer<br/>
-      <input type="radio" onclick="testSwitch(TestMaxwell)"/>Maxwell<br/>
-      <input type="radio" onclick="testSwitch(TestMobile)"/>Mobile<br/>
-      <input type="radio" onclick="testSwitch(TestMobileBalanced)"/>Mobile balanced<br/>
-      <input type="radio" onclick="testSwitch(TestMotorJoint)"/>MotorJoint<br/>
-      <input type="radio" onclick="testSwitch(TestParticles)"/>Particles<br/>
-      <input type="radio" onclick="testSwitch(TestPinball)"/>Pinball<br/>
-      <input type="radio" onclick="testSwitch(TestPointy)"/>Pointy<br/>
-      <input type="radio" onclick="testSwitch(TestPrismatic)"/>Prismatic<br/>
-      <input type="radio" onclick="testSwitch(TestPulley)"/>Pulley<br/>
-      <input type="radio" onclick="testSwitch(TestPyramid)"/>Pyramid<br/>
-      <input type="radio" onclick="testSwitch(TestRamp)"/>Ramp<br/>
-      <input type="radio" onclick="testSwitch(TestRevolute)"/>Revolute<br/>
-      <input type="radio" onclick="testSwitch(TestRigidParticles)"/>Rigid Particles<br/>
-      <input type="radio" onclick="testSwitch(TestRopeJoint)"/>Rope Joint<br/>
-      <input type="radio" onclick="testSwitch(TestShapeEditing)"/>Shape editing<br/>
-      <input type="radio" onclick="testSwitch(TestSliderCrank)"/>Slider Crank<br/>
-      <input type="radio" onclick="testSwitch(TestSparky)"/>Sparky<br/>
-      <input type="radio" onclick="testSwitch(TestSphereStack)"/>Sphere Stack<br/>
-      <input type="radio" onclick="testSwitch(TestSensorTest)"/>Sensor Test<br/>
-      <input type="radio" onclick="testSwitch(TestSoup)"/>Soup<br/>
-      <input type="radio" onclick="testSwitch(TestSoupStirrer)"/>Soup Stirrer<br/>
-      <input type="radio" onclick="testSwitch(TestSurfaceTension)"/>SurfaceTension<br/>
-      <input type="radio" onclick="testSwitch(TestTheoJansen)"/>Theo Jansen<br/>
-      <input type="radio" onclick="testSwitch(TestTiles)"/>Tiles<br/>
-      <input type="radio" onclick="testSwitch(TestTumbler)"/>Tumbler<br/>
-      <input type="radio" onclick="testSwitch(TestVaryingRestitution)"/>Varying Restitution<br/>
-      <input type="radio" onclick="testSwitch(TestVaryingFriction)"/>Varying Friction<br/>
-      <input type="radio" onclick="testSwitch(TestVerticalStack)"/>Vertical Stack<br/>
-      <input type="radio" onclick="testSwitch(TestWaveMachine)"/>Wave Machine<br/>
-      <input type="radio" onclick="testSwitch(TestWeb)"/>Web<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestAddPair)"/>Add Pair<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestAntiPointy)"/>Anti Pointy<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestApplyForce)"/>Apply Force<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestBodyTypes)"/>Body Types<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestBridge)"/>Bridge<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestBreakable)"/>Breakable<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestBullet)"/>Bullet<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestCantilever)"/>Cantilever<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestCar)"/>Car<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestChain)"/>Chain<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestCharacterCollision)"/>Character Collision<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestCompoundShapes)"/>Compound Shapes<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestConfined)"/>Confined<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestConvexHull)"/>Convex Hull<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestConveyorBelt)"/>Conveyor belt<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestCornerCase)"/>Corner case<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestDamBreak)"/>Dam break<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestDominos)"/>Dominos<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestDrawingParticles)"/>Drawing Particles<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestDumpShell)"/>Dump shell<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestEdgeShape)"/>Edge Shape<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestEdgeTest)"/>Edge Test<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestElasticParticles)"/>Elastic Particles<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestFaucet)"/>Faucet<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestGears)"/>Gears<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestHW)"/>Hello World<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestImpulse)"/>Impulse<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestLiquidTimer)"/>Liquid Timer<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestMaxwell)"/>Maxwell<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestMobile)"/>Mobile<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestMobileBalanced)"/>Mobile balanced<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestMotorJoint)"/>MotorJoint<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestParticles)"/>Particles<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestPinball)"/>Pinball<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestPointy)"/>Pointy<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestPrismatic)"/>Prismatic<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestPulley)"/>Pulley<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestPyramid)"/>Pyramid<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestRamp)"/>Ramp<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestRevolute)"/>Revolute<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestRigidParticles)"/>Rigid Particles<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestRopeJoint)"/>Rope Joint<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestShapeEditing)"/>Shape editing<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestSliderCrank)"/>Slider Crank<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestSparky)"/>Sparky<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestSphereStack)"/>Sphere Stack<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestSensorTest)"/>Sensor Test<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestSoup)"/>Soup<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestSoupStirrer)"/>Soup Stirrer<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestSurfaceTension)"/>SurfaceTension<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestTheoJansen)"/>Theo Jansen<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestTiles)"/>Tiles<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestTumbler)"/>Tumbler<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestVaryingRestitution)"/>Varying Restitution<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestVaryingFriction)"/>Varying Friction<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestVerticalStack)"/>Vertical Stack<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestWaveMachine)"/>Wave Machine<br/>
+      <input name="tests" type="radio" onclick="testSwitch(TestWeb)"/>Web<br/>
   </div>
 </html>
