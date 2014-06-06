@@ -30,7 +30,7 @@ var searchData=
   ['setfriction',['SetFriction',['../classb2_fixture.html#ad0cd91eef5858c8ef1d6b62cc2a34ea2',1,'b2Fixture::SetFriction()'],['../classb2_contact.html#a5e8fbb6bb2966ac84272bb0ea9d2e4c7',1,'b2Contact::SetFriction()']]],
   ['setgravity',['SetGravity',['../classb2_world.html#aeafa43d6580e1dddb0675e672ca2375c',1,'b2World']]],
   ['setgravityscale',['SetGravityScale',['../classb2_body.html#a8e66a570c2aeee93b29d84cae861a612',1,'b2Body::SetGravityScale()'],['../classb2_particle_system.html#a6727500d6d140da6f372c18a482a25e9',1,'b2ParticleSystem::SetGravityScale()']]],
-  ['setgroupflags',['SetGroupFlags',['../classb2_particle_group.html#a13a2f310947a2d69d5184805e6eb8bbd',1,'b2ParticleGroup']]],
+  ['setgroupflags',['SetGroupFlags',['../classb2_particle_group.html#ad607bdfb7e49b25fe6b0a3c487eb8c53',1,'b2ParticleGroup']]],
   ['setidentity',['SetIdentity',['../structb2_mat22.html#a7192f063b771ac9ded060e41df890509',1,'b2Mat22::SetIdentity()'],['../structb2_rot.html#a7f534cb7ece8d325662d7d0e27d4f617',1,'b2Rot::SetIdentity()'],['../structb2_transform.html#af92af4ec6833552b1b22a6ca6d4f5644',1,'b2Transform::SetIdentity()']]],
   ['setitemsperslab',['SetItemsPerSlab',['../classb2_slab_allocator.html#ac017dd277c5e8f6d50933009f7745f39',1,'b2SlabAllocator']]],
   ['setlength',['SetLength',['../classb2_distance_joint.html#a950a0f187ef691208e50de40ed9223fe',1,'b2DistanceJoint']]],
@@ -76,5 +76,6 @@ var searchData=
   ['solve',['Solve',['../structb2_mat22.html#ab511ad33f5abf87351581842628a9dc3',1,'b2Mat22']]],
   ['solve22',['Solve22',['../structb2_mat33.html#a2580ac2afadc48028a63ed4c8a1f16bc',1,'b2Mat33']]],
   ['solve33',['Solve33',['../structb2_mat33.html#a478872c7b6a3bedd13fbedd3ec7a2edb',1,'b2Mat33']]],
+  ['splitparticlegroup',['SplitParticleGroup',['../classb2_particle_system.html#a5ad89863a13e4735cc7201a7d6c2ca5b',1,'b2ParticleSystem']]],
   ['step',['Step',['../classb2_world.html#aa2e8f623c5bae23fd47ae234a0e96420',1,'b2World::Step(float32 timeStep, int32 velocityIterations, int32 positionIterations, int32 particleIterations)'],['../classb2_world.html#a7a8eff61af98461f978fe43f3af7be90',1,'b2World::Step(float32 timeStep, int32 velocityIterations, int32 positionIterations)']]]
 ];
