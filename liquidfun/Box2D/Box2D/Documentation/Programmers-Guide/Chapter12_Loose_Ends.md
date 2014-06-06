@@ -170,3 +170,9 @@ amount of code.
 
 If you use a conversion factor, you should try tweaking it globally to make
 sure nothing breaks. You can also try adjusting it to improve stability.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

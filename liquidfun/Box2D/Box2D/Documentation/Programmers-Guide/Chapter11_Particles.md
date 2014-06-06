@@ -705,3 +705,9 @@ mobile hardware.
 When running the program, you can slosh the fluid around by changing the
 orientation of the Android device. You can also toggle bewteen shaders by
 tapping the screen.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

@@ -431,3 +431,8 @@ creates and manages a broad-phase internally. Also, b2BroadPhase is designed
 with LiquidFun’s simulation loop in mind, so it is likely not suited for
 other use cases.
 
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

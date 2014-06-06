@@ -25,3 +25,9 @@ However it is fast and has good stability.
 6. LiquidFun uses an iterative solver to provide real-time performance. You
 will not get precisely rigid collisions or pixel perfect accuracy. Increasing
 the iterations will improve accuracy.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

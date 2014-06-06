@@ -282,3 +282,9 @@ you learn LiquidFun.
 Note: the testbed is written using freeglut and GLUI. The testbed is not part
 of the LiquidFun library. The LiquidFun library is agnostic about rendering.
 As shown by the HelloWorld example, you don't need a renderer to use LiquidFun.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*
