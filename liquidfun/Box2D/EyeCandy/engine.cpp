@@ -394,8 +394,7 @@ bool Engine::Init() {
   blob_temporal_tex_ = PrecomputeBlobTexture(kEffectTemporalBlend);
   assert(blob_normal_tex_ && blob_temporal_tex_);
 
-  start_time_ = System_getTime(system_);
-  prev_time_ = -0.01f;
+  prev_time_ = System_getTime(system_);
 
   // initialize physics
 
