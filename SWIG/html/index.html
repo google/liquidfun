@@ -41,7 +41,7 @@
 <li>Programmer's Guide: A discussion on how this differs from using LiquidFun in native C++ code.</li>
 </ul>
 <h3>Overview</h3>
-<p>A subset of LiquidFun API has been exposed to <a href="http://www.swig.org">SWIG</a>. The <a href="http://www.swig.org">SWIG</a> interface files are all of the .swig file type. They are located in <code>Box2D/swig/java</code>. For convenience, the file structure mirrors the file structure of Box2D. Some LiquidFun header files are not directly pulled into SWIG, which allows users to pull in only the functionality they need. This reducing the number of JNI bindings produced.</p>
+<p>A subset of the LiquidFun API has been exposed to <a href="http://www.swig.org">SWIG</a>. The <a href="http://www.swig.org">SWIG</a> interface files are all of the .swig file type. They are located in <code>Box2D/swig/java</code>. For convenience, the file structure mirrors the file structure of Box2D. Some LiquidFun header files are not directly pulled into SWIG, which allows users to pull in only the functionality they need. This reducing the number of JNI bindings produced.</p>
 <h3>Installation</h3>
 <p>Current <a href="http://www.swig.org">SWIG</a> version tested: 2.0.11 To learn more about <a href="http://www.swig.org">SWIG</a>, and to install it, please visit their <a href="http://www.swig.org">website</a>.</p>
 <p>In addition, on Linux, you have to install PCRE, as SWIG depends on it:<br/>
@@ -66,6 +66,10 @@
 <li>Browse to the <code>Box2D/swig/gen</code> folder, and give it a name.</li>
 </ol>
 <p>You should now be able to build and run your application using LiquidFun. All generated Java files reside in <code>Liquidfun/Box2D/swig/gen</code>. You can refer to these files to confirm class, method, and other names.</p>
+<p><b>Caution</b></p>
+<p>LiquidFun JNI uses the SWIG director feature, which can introduce the following compiler error:</p>
+<p><code>error: dereferencing type-punned pointer will break strict-aliasing rules</code> <code>[-Werror=strict-aliasing]</code></p>
+<p>To ensure a successful build, you will need to disable strict-aliasing in your makefile. For an Android project, add <code>-fno-strict-aliasing</code> to your <code>Application.mk</code> file.</p>
 <h3>Programmer's Guide</h3>
 <p>The LiquidFun SWIG interface files pulls in a subset of the LiquidFun API, extends it, and presents it in a way consistent with typical Java style.</p>
 <h4>Function and Variable Renames</h4>
