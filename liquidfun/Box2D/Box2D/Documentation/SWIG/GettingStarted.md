@@ -14,8 +14,9 @@ comprises the following sections:
 
 ### Overview
 
-A subset of LiquidFun API has been exposed to [SWIG](http://www.swig.org). The [SWIG](http://www.swig.org) interface
-files are all of the .swig file type. They are located in `Box2D/swig/java`.
+A subset of the LiquidFun API has been exposed to [SWIG](http://www.swig.org).
+The [SWIG](http://www.swig.org) interface files are all of the .swig file type.
+They are located in `Box2D/swig/java`.
 For convenience, the file structure mirrors the file structure of Box2D. Some
 LiquidFun header files are not directly pulled into SWIG, which allows users to
 pull in only the functionality they need. This reducing the number of JNI
@@ -60,6 +61,18 @@ Next, launch Eclipse, and perform the following steps:
 You should now be able to build and run your application using LiquidFun. All
 generated Java files reside in `Liquidfun/Box2D/swig/gen`. You can refer to
 these files to confirm class, method, and other names.
+
+**Caution**
+
+LiquidFun JNI uses the SWIG director feature, which can introduce the following
+compiler error:
+
+`error: dereferencing type-punned pointer will break strict-aliasing rules`
+`[-Werror=strict-aliasing]`
+
+To ensure a successful build, you will need to disable strict-aliasing in your
+makefile. For an Android project, add `-fno-strict-aliasing` to your
+`Application.mk` file.
 
 ### Programmer's Guide
 
