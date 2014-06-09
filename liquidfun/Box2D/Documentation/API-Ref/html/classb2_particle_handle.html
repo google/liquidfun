@@ -157,7 +157,7 @@ static <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> *&
 <tr class="separator:ad8f01da7dc1d8d7743d5051b262c277b inherit pub_static_methods_classb2_typed_intrusive_list_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Handle to a particle. Use <a class="el" href="classb2_particle_system.html#aa5a120786c332f35916d8a01620c4967" title="Retrieve a handle to the particle at the specified index. ">b2ParticleSystem::GetParticleHandleFromIndex()</a> to retrieve the <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> of a particle from the particle system. </p>
+<div class="textblock"><p>Handle to a particle. Particle indices are ephemeral: the same index might refer to a different particle, from frame-to-frame. If you need to keep a reference to a particular particle across frames, you should acquire a <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a>. Use <a class="el" href="classb2_particle_system.html#aa5a120786c332f35916d8a01620c4967" title="Retrieve a handle to the particle at the specified index. ">b2ParticleSystem::GetParticleHandleFromIndex()</a> to retrieve the <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> of a particle from the particle system. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="b2_particle_8h_source.html">b2Particle.h</a></li>
 </ul>

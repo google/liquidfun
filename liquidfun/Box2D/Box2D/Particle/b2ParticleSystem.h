@@ -291,6 +291,7 @@ public:
 	int32 CreateParticle(const b2ParticleDef& def);
 
 	/// Retrieve a handle to the particle at the specified index.
+	/// Please see #b2ParticleHandle for why you might want a handle.
 	const b2ParticleHandle* GetParticleHandleFromIndex(const int32 index);
 
 	/// Destroy a particle.
