@@ -95,9 +95,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a9a52c227fcd0e7bb0346d748f0df0750"><td class="memItemLeft" align="right" valign="top">int32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a9a52c227fcd0e7bb0346d748f0df0750">CreateParticle</a> (const <a class="el" href="structb2_particle_def.html">b2ParticleDef</a> &amp;def)</td></tr>
 <tr class="separator:a9a52c227fcd0e7bb0346d748f0df0750"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5a120786c332f35916d8a01620c4967"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5a120786c332f35916d8a01620c4967"></a>
-const <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#aa5a120786c332f35916d8a01620c4967">GetParticleHandleFromIndex</a> (const int32 index)</td></tr>
-<tr class="memdesc:aa5a120786c332f35916d8a01620c4967"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve a handle to the particle at the specified index. <br/></td></tr>
+<tr class="memitem:aa5a120786c332f35916d8a01620c4967"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#aa5a120786c332f35916d8a01620c4967">GetParticleHandleFromIndex</a> (const int32 index)</td></tr>
+<tr class="memdesc:aa5a120786c332f35916d8a01620c4967"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve a handle to the particle at the specified index.  <a href="#aa5a120786c332f35916d8a01620c4967">More...</a><br/></td></tr>
 <tr class="separator:aa5a120786c332f35916d8a01620c4967"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20d1f9ecb7fcbc287de9b4816dae44e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#a20d1f9ecb7fcbc287de9b4816dae44e1">DestroyParticle</a> (int32 index)</td></tr>
 <tr class="separator:a20d1f9ecb7fcbc287de9b4816dae44e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -881,6 +880,25 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2FixtureParticleQue
 </div><div class="memdoc">
 <p>Get the world particle group list. With the returned group, use <a class="el" href="classb2_particle_group.html#abe9ee571c1482e65217b7ba33c5ebfa9" title="Get the next particle group from the list in b2_World. ">b2ParticleGroup::GetNext</a> to get the next group in the world list. A NULL group indicates the end of the list. </p>
 <dl class="section return"><dt>Returns</dt><dd>the head of the world particle group list. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa5a120786c332f35916d8a01620c4967"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> * b2ParticleSystem::GetParticleHandleFromIndex </td>
+          <td>(</td>
+          <td class="paramtype">const int32&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieve a handle to the particle at the specified index. </p>
+<p>Retrieve a handle to the particle at the specified index. Please see <a class="el" href="classb2_particle_handle.html">b2ParticleHandle</a> for why you might want a handle. </p>
 
 </div>
 </div>
