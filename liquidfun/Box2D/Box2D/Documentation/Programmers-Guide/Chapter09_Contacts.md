@@ -357,3 +357,8 @@ world exists.
 &nbsp;&nbsp;&nbsp;`world->SetContactFilter(&filter);`<br/>
 &nbsp;&nbsp;&nbsp;`// filter remains in scope …`<br/>
 
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

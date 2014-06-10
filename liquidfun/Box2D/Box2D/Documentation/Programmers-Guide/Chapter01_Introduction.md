@@ -14,10 +14,13 @@
 
 ## About
 
-LiquidFun is a 2D rigid body simulation library for games. Programmers can use
-it in their games to make objects move in realistic ways and make the game
-world more interactive. From the game engine's point of view, a physics engine
-is just a system for procedural animation.
+LiquidFun is based on Erin Catto's [Box2D library](www.box2d.org), which
+provides 2D, rigid-body simulation in games. LiquidFun extends Box2D to provide
+[particle physics and fluid dynamics](md__chapter11__particles.html).
+
+Programmers can use LiquidFun in their games to make objects move in realistic
+ways and make the game world more interactive. From the game engine's point of
+view, a physics engine is just a system for procedural animation.
 
 LiquidFun is written in portable C++. Most of the types defined in the engine
 begin with the b2 prefix. Hopefully this is sufficient to avoid name clashing
@@ -230,6 +233,12 @@ float32 density)`<br/>
 
 Factories do not retain references to the definitions. So you can create
 definitions on the stack and keep them in temporary resources.
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*
+
 
 [ ][Chapter02]
 [ ][Chapter03]
