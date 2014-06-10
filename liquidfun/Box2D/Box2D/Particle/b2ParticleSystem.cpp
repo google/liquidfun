@@ -51,8 +51,9 @@ static const uint32 xOffset = xScale * (1u << (xTruncBits - 1u));
 static const uint32 yMask = ((1u << yTruncBits) - 1u) << yShift;
 static const uint32 xMask = ~yMask;
 static const uint32 relativeTagRight = 1u << xShift;
-static const uint32 relativeTagBottomLeft = (1u << yShift)
-										  + ((uint32)(-1) << xShift);
+static const uint32 relativeTagBottomLeft = (uint32)((1 << yShift) +
+                                                    (-1 << xShift));
+
 static const uint32 relativeTagBottomRight = (1u << yShift) + (1u << xShift);
 
 // This functor is passed to std::remove_if in RemoveSpuriousBodyContacts
@@ -1899,8 +1900,8 @@ inline void b2ParticleSystem::GatherChecksOneParticle(
 			break;
 
 		FindContactCheck& out = checks.Append();
-		out.particleIndex = particleIndex;
-		out.comparatorIndex = comparatorIndex;
+		out.particleIndex = (uint16)particleIndex;
+		out.comparatorIndex = (uint16)comparatorIndex;
 
 		// This is faster inside the 'for' since there are so few iterations.
 		if (nextUncheckedIndex != NULL)
