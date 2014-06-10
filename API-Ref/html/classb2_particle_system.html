@@ -240,16 +240,12 @@ int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetContactCount</b> 
 <tr class="memitem:a9d2d9081e1ebf820e1e2e18a41f89686"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d2d9081e1ebf820e1e2e18a41f89686"></a>
 int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetBodyContactCount</b> () const </td></tr>
 <tr class="separator:a9d2d9081e1ebf820e1e2e18a41f89686"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc1154cdf13d7fc82289e23b44c66041"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc1154cdf13d7fc82289e23b44c66041"></a>
-const <a class="el" href="structb2_particle_pair.html">b2ParticlePair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#abc1154cdf13d7fc82289e23b44c66041">GetPairs</a> () const </td></tr>
-<tr class="memdesc:abc1154cdf13d7fc82289e23b44c66041"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get particle pairs. <br/></td></tr>
+<tr class="memitem:abc1154cdf13d7fc82289e23b44c66041"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structb2_particle_pair.html">b2ParticlePair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#abc1154cdf13d7fc82289e23b44c66041">GetPairs</a> () const </td></tr>
 <tr class="separator:abc1154cdf13d7fc82289e23b44c66041"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adabb808d1683bbec9482351eaf698d79"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adabb808d1683bbec9482351eaf698d79"></a>
 int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetPairCount</b> () const </td></tr>
 <tr class="separator:adabb808d1683bbec9482351eaf698d79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbba5223e5f1f342d976c217983b42ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afbba5223e5f1f342d976c217983b42ec"></a>
-const <a class="el" href="structb2_particle_triad.html">b2ParticleTriad</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#afbba5223e5f1f342d976c217983b42ec">GetTriads</a> () const </td></tr>
-<tr class="memdesc:afbba5223e5f1f342d976c217983b42ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get particle triads. <br/></td></tr>
+<tr class="memitem:afbba5223e5f1f342d976c217983b42ec"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structb2_particle_triad.html">b2ParticleTriad</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_particle_system.html#afbba5223e5f1f342d976c217983b42ec">GetTriads</a> () const </td></tr>
 <tr class="separator:afbba5223e5f1f342d976c217983b42ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b7c19555d8689ba3ce4c35ecba3b0aa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9b7c19555d8689ba3ce4c35ecba3b0aa"></a>
 int32&#160;</td><td class="memItemRight" valign="bottom"><b>GetTriadCount</b> () const </td></tr>
@@ -839,6 +835,30 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2FixtureParticleQue
 
 </div>
 </div>
+<a class="anchor" id="abc1154cdf13d7fc82289e23b44c66041"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structb2_particle_pair.html">b2ParticlePair</a> * b2ParticleSystem::GetPairs </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get array of particle pairs. The particles in a pair: (1) are contacting, (2) are in the same particle group, (3) are part of a rigid particle group, or are spring, elastic, or wall particles. (4) have at least one particle that is a spring or barrier particle (i.e. one of the types in k_pairFlags), (5) have at least one particle that returns true for ConnectionFilter::IsNecessary, (6) are not zombie particles. Essentially, this is an array of spring or barrier particles that are interacting. The array is sorted by <a class="el" href="structb2_particle_pair.html" title="Connection between two particles. ">b2ParticlePair</a>'s indexA, and then indexB. There are no duplicate entries. </p>
+
+</div>
+</div>
 <a class="anchor" id="a3841229174ab3bd3a38cf08a7878231a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -952,6 +972,30 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2FixtureParticleQue
 </table>
 </div><div class="memdoc">
 <p>Get potentially stuck particles from the last step; the user must decide if they are stuck or not, and if so, delete or move them </p>
+
+</div>
+</div>
+<a class="anchor" id="afbba5223e5f1f342d976c217983b42ec"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structb2_particle_triad.html">b2ParticleTriad</a> * b2ParticleSystem::GetTriads </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get array of particle triads. The particles in a triad: (1) are in the same particle group, (2) are in a Voronoi triangle together, (3) are within b2_maxTriadDistance particle diameters of each other, (4) return true for ConnectionFilter::ShouldCreateTriad (5) have at least one particle of type elastic (i.e. one of the types in k_triadFlags), (6) are part of a rigid particle group, or are spring, elastic, or wall particles. (7) are not zombie particles. Essentially, this is an array of elastic particles that are interacting. The array is sorted by <a class="el" href="structb2_particle_triad.html" title="Connection between three particles. ">b2ParticleTriad</a>'s indexA, then indexB, then indexC. There are no duplicate entries. </p>
 
 </div>
 </div>
