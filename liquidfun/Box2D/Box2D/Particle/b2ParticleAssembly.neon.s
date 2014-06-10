@@ -358,13 +358,18 @@ FindContactsFromChecks_Simd:
         vmov.32           r12, d16[0]          @ q8[0] ==> r12.
 
         @ If not enough space in output array, grow it.
+        @ This is a heavy operation, but should happen rarely.
         ble               .L_FindContacts_Output
         ldr               r9, [sp, #44]        @ r9 = contacts
         str               r5, [r9, #4]         @ contacts.count = numContacts
         ldr               r10, [r9, #0]        @ r10 = contacts.data
         push              {r0-r3, r9, r10, r12}
+        vpush             {q0, q1, q2, q3}
+        vpush             {q12, q13, q14, q15}
         mov               r0, r9               @ r0 = contacts
         bl                GrowParticleContactBuffer
+        vpop              {q12, q13, q14, q15}
+        vpop              {q0, q1, q2, q3}
         pop               {r0-r3, r9, r10, r12}
 
         @ The output array was reallocated, so update 'out', 'postProcess' and

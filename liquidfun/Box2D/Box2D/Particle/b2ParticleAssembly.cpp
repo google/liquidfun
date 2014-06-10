@@ -24,6 +24,12 @@ extern "C" {
 void GrowParticleContactBuffer(
 	b2GrowableBuffer<b2ParticleContact>& contacts)
 {
+	// Set contacts.count = capacity instead of count because there are
+	// items past the end of the array waiting to be post-processed.
+	// We must maintain the entire contacts array.
+	// TODO: It would be better to have the items awaiting post-processing
+	// in their own array on the stack.
+	contacts.SetCount(contacts.GetCapacity());
 	contacts.Grow();
 }
 
