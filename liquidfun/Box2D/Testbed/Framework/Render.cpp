@@ -21,8 +21,11 @@
 
 #include "GL/freeglut.h"
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__IOS__)
 #include "GLEmu/gl_emu.h"
+#endif // defined(__ANDROID__) || defined(__IOS__)
+
+#ifdef __ANDROID__
 #include <android/log.h>
 #endif // __ANDROID__
 
@@ -277,7 +280,7 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
 {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(__IOS__)
 	char buffer[128];
 
 	va_list arg;
@@ -308,12 +311,12 @@ void DebugDraw::DrawString(int x, int y, const char *string, ...)
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
-#endif // __ANDROID__
+#endif // !defined(__ANDROID__) && !defined(__IOS__)
 }
 
 void DebugDraw::DrawString(const b2Vec2& p, const char *string, ...)
 {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(__IOS__)
 	char buffer[128];
 
 	va_list arg;
@@ -331,7 +334,7 @@ void DebugDraw::DrawString(const b2Vec2& p, const char *string, ...)
 	}
 
 	glPopMatrix();
-#endif // __ANDROID__
+#endif // !defined(__ANDROID__) && !defined(__IOS__)
 }
 
 void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
