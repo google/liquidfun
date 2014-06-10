@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>LiquidFun Build and Run Instructions: Related Pages</title>
+<title>LiquidFun Build and Run Instructions: Porting from Box2D</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -45,24 +45,26 @@
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('pages.html','');});
+$(document).ready(function(){initNavTree('md__porting_from_box2_d.html','');});
 </script>
 <div id="doc-content">
 <div class="header">
   <div class="headertitle">
-<div class="title">Related Pages</div>  </div>
+<div class="title">Porting from Box2D </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock">Here is a list of all related documentation pages:</div><div class="directory">
-<table class="directory">
-<tr id="row_0_" class="even"><td class="entry"><img src="ftv2node.png" alt="o" width="16" height="22" /><a class="el" href="md__porting_from_box2_d.html" target="_self">Porting from Box2D</a></td><td class="desc"></td></tr>
-<tr id="row_1_"><td class="entry"><img src="ftv2node.png" alt="o" width="16" height="22" /><a class="el" href="md__building_android.html" target="_self">Building for Android</a></td><td class="desc"></td></tr>
-<tr id="row_2_" class="even"><td class="entry"><img src="ftv2node.png" alt="o" width="16" height="22" /><a class="el" href="md__building_linux.html" target="_self">Building for Linux</a></td><td class="desc"></td></tr>
-<tr id="row_3_"><td class="entry"><img src="ftv2node.png" alt="o" width="16" height="22" /><a class="el" href="md__building_o_s_x.html" target="_self">Building for OS X</a></td><td class="desc"></td></tr>
-<tr id="row_4_" class="even"><td class="entry"><img src="ftv2lastnode.png" alt="\" width="16" height="22" /><a class="el" href="md__building_windows.html" target="_self">Building for Windows</a></td><td class="desc"></td></tr>
-</table>
-</div><!-- directory -->
-</div><!-- contents -->
+<div class="textblock"><p>LiquidFun extends Erin Catto's popular Box2D physics engine. If your project already uses Box2D, LiquidFun should be a simple drop-in replacement for you.</p>
+<h3>Drop-in LiquidFun Code</h3>
+<p>To port from Box2D to LiquidFun, simply replace your Box2D directory with liquidfun/Box2D/Box2D. Your code should compile and run as it did under Box2D, and you will have access to LiquidFun's particle simulation API.</p>
+<p>LiquidFun is based off of a specific version of Box2D. If your version of Box2D is different from LiquidFun's you may have to adjust your code to match API differences.</p>
+<p>Please see the <a href="../../ReleaseNotes.html">Release Notes</a> to find the version of Box2D that LiquidFun is based on.</p>
+<h3>Specify <code>particleIterations</code></h3>
+<p>LiquidFun adds a <code>particleIterations</code> parameter to b2World::Step. If you don't specify <code>particleIterations</code>, we calculate a default value based on the physical constants in your b2ParticleSystems.</p>
+<p>However, the number of <code>particleIterations</code> affects performance and stability significantly. You should experiment with the number of iterations to find a suitable balance for your situation.</p>
+<h3>Start using b2ParticleSystem</h3>
+<p><code>b2ParticleSystems</code> are created with <code>b2World::CreateParticleSystem</code>, the same way <code>b2Bodys</code> are created with <code>b2World::CreateBody</code>.</p>
+<p>For details, please see <a href="../../Programmers-Guide/html/md__chapter11__particles.html">Particle Module</a> in the <a href="../../Programmers-Guide/html/index.html">Programmer's Guide</a> </p>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->
 <script>
