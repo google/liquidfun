@@ -214,7 +214,7 @@ struct b2ParticleSystemDef
 	float32 elasticStrength;
 
 	/// Restores length of spring particle groups
-	/// Larger values increase sprint particle velocity
+	/// Larger values increase spring particle velocity
 	float32 springStrength;
 
 	/// Reduces relative velocity of viscous particles
@@ -526,11 +526,36 @@ public:
 	const b2ParticleBodyContact* GetBodyContacts() const;
 	int32 GetBodyContactCount() const;
 
-	/// Get particle pairs
+	/// Get array of particle pairs. The particles in a pair:
+	///   (1) are contacting,
+	///   (2) are in the same particle group,
+	///   (3) are part of a rigid particle group, or are spring, elastic,
+	///       or wall particles.
+	///   (4) have at least one particle that is a spring or barrier
+	///       particle (i.e. one of the types in k_pairFlags),
+	///   (5) have at least one particle that returns true for
+	///       ConnectionFilter::IsNecessary,
+	///   (6) are not zombie particles.
+	/// Essentially, this is an array of spring or barrier particles that
+	/// are interacting. The array is sorted by b2ParticlePair's indexA,
+	/// and then indexB. There are no duplicate entries.
 	const b2ParticlePair* GetPairs() const;
 	int32 GetPairCount() const;
 
-	/// Get particle triads
+	/// Get array of particle triads. The particles in a triad:
+	///   (1) are in the same particle group,
+	///   (2) are in a Voronoi triangle together,
+	///   (3) are within b2_maxTriadDistance particle diameters of each
+	///       other,
+	///   (4) return true for ConnectionFilter::ShouldCreateTriad
+	///   (5) have at least one particle of type elastic (i.e. one of the
+	///       types in k_triadFlags),
+	///   (6) are part of a rigid particle group, or are spring, elastic,
+	///       or wall particles.
+	///   (7) are not zombie particles.
+	/// Essentially, this is an array of elastic particles that are
+	/// interacting. The array is sorted by b2ParticleTriad's indexA,
+	/// then indexB, then indexC. There are no duplicate entries.
 	const b2ParticleTriad* GetTriads() const;
 	int32 GetTriadCount() const;
 
