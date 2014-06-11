@@ -7,6 +7,9 @@ for games.
 API documentation is located in the Documentation/ folder and referenced
 by our [landing page](../../index.html).
 
+If your project already uses Box2D, instructions for
+[Porting from Box2D](md__porting_from_box2_d.html).
+
 Instructions on how to build for:
 - [Android](md__building_android.html)
 - [Linux](md__building_linux.html)
