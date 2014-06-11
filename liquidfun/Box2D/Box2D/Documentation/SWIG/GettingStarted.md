@@ -1,43 +1,49 @@
-# Getting Started with SWIG
-
-LiquidFun JNI is a project that contains JNI (Java Native Interface) bindings
-for LiquidFun. [SWIG](http://www.swig.org) generates these bindings, and is
-required for this project.
+# Getting Started with Java and LiquidFun
 
 This document describes how to set up a Java project to use LiquidFun. It
-comprises the following sections:
-*   Overview: A high level description of the project.
-*   Installation: How to install [SWIG](http://www.swig.org).
-*   Build Instructions: How to include LiquidFun JNI in your project.
-*   Programmer's Guide: A discussion on how this differs from using LiquidFun
-    in native C++ code.
+has the following sections:
+*   [Overview](#Overview)
+*   [Installation](#Installation): How to install [SWIG][].
+*   [Build Instructions](#BuildInstructions): How to include LiquidFun JNI in
+    your project.
+*   [Sample](#Sample): A Java program that uses LiquidFun's SWIG bindings.
+*   [Programmer's Guide](#ProgrammersGuide): A discussion on how this differs
+    from using LiquidFun in native C++ code.
 
+
+<a name="Overview"></a>
 ### Overview
 
-A subset of the LiquidFun API has been exposed to [SWIG](http://www.swig.org).
-The [SWIG](http://www.swig.org) interface files are all of the .swig file type.
-They are located in `Box2D/swig/java`.
-For convenience, the file structure mirrors the file structure of Box2D. Some
-LiquidFun header files are not directly pulled into SWIG, which allows users to
-pull in only the functionality they need. This reducing the number of JNI
-bindings produced.
+A subset of the LiquidFun API has been exposed to Java via [SWIG][] bindings.
+The [SWIG][] interface files have the .swig extension.
+They are located in `Box2D/swig/java`. For convenience, the file structure
+mirrors the file structure of Box2D.
 
+Some LiquidFun header files are not pulled directly into SWIG. This allows
+users to pull in only the functionality they need. This, in turn, reduces the
+number of JNI bindings produced.
+
+
+<a name="Installation"></a>
 ### Installation
 
-Current [SWIG](http://www.swig.org) version tested: 2.0.11
-To learn more about [SWIG](http://www.swig.org), and to install it, please
-visit their [website](http://www.swig.org).
+Current [SWIG][] version tested: 2.0.11
 
-In addition, on Linux, you have to install PCRE, as SWIG depends on it:<br>
+To learn more about SWIG, and to install it, please visit their
+[website](http://www.swig.org).
+
+On Linux, you also must install PCRE, as SWIG depends on it:<br>
 
 &nbsp;&nbsp;&nbsp;`apt-get install libpcre3-dev`
 
-Set up an environment variable to point to your swig installation.
-One way to do this (on Linux / OSX / Cygwin) is to add the following to your
+Set up an environment variable to point to your SWIG installation.
+One way to do this (on Linux, OSX, or Cygwin) is to add the following to your
 `~/.bashrc` file:<br>
 
 &nbsp;&nbsp;&nbsp;`export SWIG_BIN=$("which" swig)`
 
+
+<a name="BuildInstructions"></a>
 ### Build Instructions
 
 #### Using LiquidFun JNI in your Eclipse Android project
@@ -53,7 +59,7 @@ This will invoke SWIG, and build the C++ components of the library.
 
 Next, launch Eclipse, and perform the following steps:
 
-1. Right-click your project > Properties.
+1. Right-click project > Properties.
 2. Click on "Java Build Path" on the left panel.
 3. In the Source tab, click "Link Source..."
 4. Browse to the `Box2D/swig/gen` folder, and give it a name.
@@ -74,9 +80,19 @@ To ensure a successful build, you will need to disable strict-aliasing in your
 makefile. For an Android project, add `-fno-strict-aliasing` to your
 `Application.mk` file.
 
+
+<a name="Sample"></a>
+### Sample
+
+The open source app [LiquidFun Paint][] is written in Java, and uses LiquidFun
+via SWIG bindings.
+
+![LiquidFun Paint screenshot](liquidfunpaint.jpg)
+
+<a name="ProgrammersGuide"></a>
 ### Programmer's Guide
 
-The LiquidFun SWIG interface files pulls in a subset of the LiquidFun API,
+The LiquidFun SWIG interface files pull in a subset of the LiquidFun API,
 extends it, and presents it in a way consistent with typical Java style.
 
 #### Function and Variable Renames
@@ -95,7 +111,7 @@ points are critical in order to facilitate efficient JNI memory management.
 ##### Use the delete() method in generated Java classes
 
 The user must use the SWIG-generated delete() method to clean up all LiquidFun
-objects exposed through [SWIG](http://www.swig.org). This is because
+objects exposed through [SWIG][]. This is because
 SWIG-generated (Java) proxy classes--not the JVM--are allocating C++ memory
 through every new object.
 
@@ -152,5 +168,6 @@ wrapped with the LIQUIDFUN_EXTERNAL_LANGUAGE_API preprocessor. This is so we
 could provide users with a unified API regardless of the programming language
 they elect to use.
 
-  [SWIG]: http://http://www.swig.org
+  [SWIG]: http://www.swig.org
+  [LiquidFun Paint]: http://google.github.io/LiquidFunPaint
 
