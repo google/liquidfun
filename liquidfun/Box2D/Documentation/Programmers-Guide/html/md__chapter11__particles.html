@@ -98,11 +98,13 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>With one main exception, there is no functional difference between working with individual particles and groups of particles. The exception is rigid particles: Because of the internal algorithm used to make particles rigid, you must define them as a group.</p>
 <p>Particle groups do offer several conveniences. First, they allow you to create and destroy large numbers of particles automatically. If you do not create a group, you must create all of the particles individually. Also, a group allows you to assign the same property, such as angle of rotation, to all of its particles at once.</p>
 <p><a class="anchor" id="stw"></a> </p>
-<h2>Stepping the World</h2>
-<p>The particle solver can iterate multiple times per step. Larger numbers of steps improve the stability and fidelity of the particle simulation.</p>
-<p>Use the <code>particleIterations</code> parameter in <code>b2World::Step</code> to set the number of iterations. The default value of <code>particleIterations</code> is 1.</p>
-<p>Gravity, particle radius, and simulation timestep can all affect the optimal number of iterations. Call <code>b2CalculateParticleIterations</code> to get a recommended value.</p>
-<p>Regardless of the recommended value, you may also increase particle iterations to stabilize a simulation that seems overly bouncy or energetic. Of course, as you add iterations, the simulation becomes more expensive. You should experiment to find the right balance of stability and cost for your application.</p>
+<h2>Stepping the World (Particle Iterations)</h2>
+<p>The particle solver can iterate multiple times per step. Larger numbers of steps improve the stability and fidelity of the particle simulation. However, more steps also require more processor cycles.</p>
+<p>The cycles cost is almost linear: double the number of particle iterations will almost double the cycles cost of b2ParticleSystem::Solve.</p>
+<p>Use the <code>particleIterations</code> parameter in <code>b2World::Step</code> to set the number of iterations. The default value of <code>particleIterations</code> is calculated based on the physical constants of your particle systems (see <code>b2CalculateParticleIterations</code>).</p>
+<p>You should experiment with <code>particleIterations</code> in your game to find the best balance of stability versus cycles. The calculation performed by <code>b2CalculateParticleIterations</code> is, necessarily, a simplification, and should be used only as a starting point.</p>
+<p>If your simulation seems overly bouncy or energetic, or if the particles in your simulation are passing through contacts, try increasing the number of particle iterations.</p>
+<p>Note that, as particle iterations increases, the affect of pressure on highly-compressed particles also increases. That is, particles get more incompressible as you increase particle iterations.</p>
 <p><a class="anchor" id="cdp"></a> </p>
 <h2>Creating and Destroying Particles</h2>
 <p>To create individual particles, create a <code>b2ParticleDef</code>-struct object. Next, specify the behavior and properties of the particle. Finally, call the method to create the particle.<br/>
