@@ -91,12 +91,9 @@ variables, as well as the enum for particle-group behavior:
 ## Discrete Particles vs. Particle Groups
 
 With one main exception, there is no functional difference between working
-with
-individual particles and groups of particles. The exception is rigid
-particles:
-Because of the internal algorithm used to make particles rigid, you must
-define
-them as a group.
+with individual particles and groups of particles. The exception is rigid
+particles: Because of the internal algorithm used to make particles rigid, you
+must define them as a group.
 
 Particle groups do offer several conveniences. First, they allow you to create
 and destroy large numbers of particles automatically. If you do not create a
@@ -105,22 +102,32 @@ you to assign the same property, such as angle of rotation, to all of its
 particles at once.
 
 <a name="stw">
-## Stepping the World
+## Stepping the World (Particle Iterations)
 
-The particle solver can iterate multiple times per step. Larger numbers of steps
-improve the stability and fidelity of the particle simulation.
+The particle solver can iterate multiple times per step. Larger numbers of
+steps improve the stability and fidelity of the particle simulation. However,
+more steps also require more processor cycles.
+
+The cycles cost is almost linear: double the number of particle iterations
+will almost double the cycles cost of b2ParticleSystem::Solve.
 
 Use the `particleIterations` parameter in `b2World::Step` to set the number
-of iterations. The default value of `particleIterations` is 1.
+of iterations. The default value of `particleIterations` is calculated based
+on the physical constants of your particle systems (see
+`b2CalculateParticleIterations`).
 
-Gravity, particle radius, and simulation timestep can all affect the optimal
-number of iterations. Call `b2CalculateParticleIterations` to get a
-recommended value.
+You should experiment with `particleIterations` in your game to find the best
+balance of stability versus cycles. The calculation performed by
+`b2CalculateParticleIterations` is, necessarily, a simplification, and should
+be used only as a starting point.
 
-Regardless of the recommended value, you may also increase particle iterations
-to stabilize a simulation that seems overly bouncy or energetic. Of course, as
-you add iterations, the simulation becomes more expensive. You should experiment
-to find the right balance of stability and cost for your application.
+If your simulation seems overly bouncy or energetic, or if the particles in
+your simulation are passing through contacts, try increasing the number of
+particle iterations.
+
+Note that, as particle iterations increases, the affect of pressure on
+highly-compressed particles also increases. That is, particles get more
+incompressible as you increase particle iterations.
 
 <a name="cdp">
 ## Creating and Destroying Particles
