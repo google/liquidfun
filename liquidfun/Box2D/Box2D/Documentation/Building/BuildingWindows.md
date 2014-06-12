@@ -1,19 +1,41 @@
 # Building for Windows
 
-LiquidFun releases include a [Visual Studio][] solution
-(`liquidfun/Box2D/Box2D.sln`) and project files to build the library and
-examples on [Windows][].  The Visual Studio solution has been generated using
-[cmake][], and is free of any host-specific dependencies.  It has been
-tested with Microsoft [Visual Studio][] 2012.
+You can use [cmake][] to generate a [Visual Studio][] project for
+LiquidFun's Testbed and Unittests on [Windows][].
+
+Alternatively, you can download a pre-generated Visual Studio solution
+from the [release page][]. The Visual Studio solution is free of
+host-specific dependencies.
 
 ### Version Requirements
 
-Following are the minimum required versions for the tools and libraries you
-need for building LiquidFun for Windows:
+These are the minimum required versions for building LiquidFun for Windows:
 
 -   Windows: 7
--   Visual Studio: 2012
+-   Visual Studio: 2010 or 2012
 -   cmake: 2.8.12.1
+
+### Creating the Visual Studio solution using [cmake][]
+
+When working directly with the source, use [cmake][] to generate the
+[Visual Studio][] solution and project files.  For example, the following
+generates the [Visual Studio][] 2012 solution in the `liquidfun/Box2D`
+directory:
+
+    cd liquidfun\Box2D
+    cmake -G "Visual Studio 11"
+
+To generate a [Visual Studio][] 2010 solution, use this commend:
+
+    cd liquidfun\Box2D
+    cmake -G "Visual Studio 10"
+
+Running [cmake][] under [cygwin][] requires empty TMP, TEMP, tmp and temp
+variables.  To generate a [Visual Studio][] solution from a [cygwin][]
+bash shell use:
+
+    $ cd liquidfun/Box2D
+    $ ( unset {temp,tmp,TEMP,TMP} ; cmake -G "Visual Studio 11" )
 
 ### Building with [Visual Studio][]
 
@@ -25,21 +47,6 @@ need for building LiquidFun for Windows:
 -   Right-click on an example project (e.g Testbed) in the Solution Explorer
     pane, and select "Set as StartUp Project".
 -   Select "Debug-->Start Debugging" from the menu.
-
-### Building using [cmake][]
-
-When working directly with the source, use [cmake][] to generate the
-[Visual Studio][] solution and project files.  For example, the following
-generates the [Visual Studio][] solution in the `liquidfun/Box2D` directory:
-
-    cd liquidfun\Box2D
-    cmake -G "Visual Studio 11"
-
-Running [cmake][] under [cygwin][] requires empty TMP, TEMP, tmp and temp
-variables.  To generate a [Visual Studio][] from a [cygwin][] bash shell use:
-
-    $ cd liquidfun/Box2D
-    $ ( unset {temp,tmp,TEMP,TMP} ; cmake -G "Visual Studio 11" )
 
 ### Running Unit Tests
 
@@ -54,3 +61,4 @@ Use the run\_tests.bat batch file to execute unit tests:
   [Visual Studio]: http://www.visualstudio.com/
   [Windows]: http://windows.microsoft.com/
   [cygwin]: http://www.cygwin.com/
+  [release page]: https://github.com/google/liquidfun/releases
