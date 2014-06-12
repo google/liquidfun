@@ -6,6 +6,7 @@
 [Particle Groups](#pg)<br/>
 [Discrete Particles vs. Particle Groups](#dp)<br/>
 [Stepping the World](#stw)<br/>
+[Maximum Velocity](#mv)<br/>
 [Creating and Destroying Particles](#cdp)<br/>
 [Creating and Destroying Particle Groups](#cdpg)<br/>
 [Particle Behaviors](#pb)<br/>
@@ -128,6 +129,15 @@ particle iterations.
 Note that, as particle iterations increases, the affect of pressure on
 highly-compressed particles also increases. That is, particles get more
 incompressible as you increase particle iterations.
+
+<a name="mv">
+## Maximum Velocity
+
+The particle simulation enforces a maximum velocity on the particles, for
+stability and to prevent excessive interpenetration. The maximum velocity is,
+
+&nbsp;&nbsp;&nbsp;`particle diameter / (particle iterations *
+b2World::Step's dt)`<br/>
 
 <a name="cdp">
 ## Creating and Destroying Particles

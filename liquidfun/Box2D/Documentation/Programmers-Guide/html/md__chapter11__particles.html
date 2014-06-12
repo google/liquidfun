@@ -59,6 +59,7 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
  <a href="#pg">Particle Groups</a><br/>
  <a href="#dp">Discrete Particles vs. Particle Groups</a><br/>
  <a href="#stw">Stepping the World</a><br/>
+ <a href="#mv">Maximum Velocity</a><br/>
  <a href="#cdp">Creating and Destroying Particles</a><br/>
  <a href="#cdpg">Creating and Destroying Particle Groups</a><br/>
  <a href="#pb">Particle Behaviors</a><br/>
@@ -105,6 +106,11 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <p>You should experiment with <code>particleIterations</code> in your game to find the best balance of stability versus cycles. The calculation performed by <code>b2CalculateParticleIterations</code> is, necessarily, a simplification, and should be used only as a starting point.</p>
 <p>If your simulation seems overly bouncy or energetic, or if the particles in your simulation are passing through contacts, try increasing the number of particle iterations.</p>
 <p>Note that, as particle iterations increases, the affect of pressure on highly-compressed particles also increases. That is, particles get more incompressible as you increase particle iterations.</p>
+<p><a class="anchor" id="mv"></a> </p>
+<h2>Maximum Velocity</h2>
+<p>The particle simulation enforces a maximum velocity on the particles, for stability and to prevent excessive interpenetration. The maximum velocity is,</p>
+<p>&#160;&#160;&#160;<code>particle diameter / (particle iterations * b2World::Step's dt)</code><br/>
+</p>
 <p><a class="anchor" id="cdp"></a> </p>
 <h2>Creating and Destroying Particles</h2>
 <p>To create individual particles, create a <code>b2ParticleDef</code>-struct object. Next, specify the behavior and properties of the particle. Finally, call the method to create the particle.<br/>
