@@ -746,6 +746,7 @@ WARN_LOGFILE           =
 INPUT = "Building.md" \
         "PortingFromBox2D.md" \
         "BuildingAndroid.md" \
+        "BuildingiOS.md" \
         "BuildingLinux.md" \
         "BuildingOSX.md" \
         "BuildingWindows.md" 
