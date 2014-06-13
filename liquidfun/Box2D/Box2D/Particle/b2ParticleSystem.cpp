@@ -1781,10 +1781,14 @@ static int32 FindItemIndexInFixedSet(const TypedFixedSetAllocator<T>& set,
 {
 	if (set.GetCount())
 	{
-        const T* buffer = set.GetBuffer();
-		return set.GetIndex(std::lower_bound(
-								buffer, buffer + set.GetCount(), item,
-								T::Compare));
+		const T* buffer = set.GetBuffer();
+		const T* last = buffer + set.GetCount();
+		const T* found = std::lower_bound( buffer, buffer + set.GetCount(),
+											item, T::Compare);
+		if( found != last )
+		{
+			return set.GetIndex( found );
+		}
 	}
 	return -1;
 }
