@@ -1,5 +1,7 @@
 # Introduction
 
+<img src="liquidfun_logo_horizontal.png" alt="LiquidFun logo" style="float:right;"/>
+
 [About](#about)<br/>
 [Prerequisites](#pre)<br/>
 [About this manual](#atm)<br/>

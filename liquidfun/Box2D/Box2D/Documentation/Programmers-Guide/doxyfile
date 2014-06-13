@@ -758,7 +758,8 @@ INPUT                  = "Chapter01_Introduction.md" \
                          "Chapter13_Debug_Drawing.md" \
                          "Chapter14_Limitations.md" \
                          "Chapter15_References.md" \
-                         "ContentLicense.md"
+                         "ContentLicense.md" \
+                         "Logo.md"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1177,7 +1178,9 @@ HTML_EXTRA_FILES       = "image_0.png" \
                          "image_6.png" \
                          "image_7.png" \
                          "image_8.png" \
-                         "image_9.png"
+                         "image_9.png" \
+                         "liquidfun_logo_horizontal.png" \
+                         "liquidfun_paint_splash_screen.png"
 
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
