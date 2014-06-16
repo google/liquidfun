@@ -296,6 +296,8 @@ The initial release of LiquidFun is available for download from the
   [0.9.0 release]: http://github.com/google/liquidfun/releases/tag/v0.9.0
   [1.0.0]: #1.0.0
   [1.0.0 release]: http://github.com/google/liquidfun/releases/tag/v1.0.0
+  [1.1.0]: #1.1.0
+  [1.1.0 release]: http://github.com/google/liquidfun/releases/tag/v1.1.0
   [apimods1.0.0]: #apimods1.0.0
   [newfeatures1.0.0]: #newfeatures1.0.0
   [Box2D]: http://box2d.org
