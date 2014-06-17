@@ -16,5 +16,6 @@ var NAVTREEINDEX0 =
 "md__chapter14__limitations.html":[12],
 "md__chapter15__references.html":[13],
 "md__content_license.html":[14],
+"md__logo.html":[15],
 "pages.html":[]
 };
