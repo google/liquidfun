@@ -124,6 +124,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa2e8f623c5bae23fd47ae234a0e96420"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a8eff61af98461f978fe43f3af7be90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#a7a8eff61af98461f978fe43f3af7be90">Step</a> (float32 timeStep, int32 velocityIterations, int32 positionIterations)</td></tr>
 <tr class="separator:a7a8eff61af98461f978fe43f3af7be90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3fe55d26ad28154627a7785e67e994b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ab3fe55d26ad28154627a7785e67e994b">CalculateReasonableParticleIterations</a> (float32 timeStep) const </td></tr>
+<tr class="separator:ab3fe55d26ad28154627a7785e67e994b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac082ab4c4ad0b1c5ec4674315eeec643"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classb2_world.html#ac082ab4c4ad0b1c5ec4674315eeec643">ClearForces</a> ()</td></tr>
 <tr class="separator:ac082ab4c4ad0b1c5ec4674315eeec643"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a293d9865e407fd463e168b0a29856acc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a293d9865e407fd463e168b0a29856acc"></a>
@@ -296,6 +298,29 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>b2ParticleSystem</b>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ab3fe55d26ad28154627a7785e67e994b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int b2World::CalculateReasonableParticleIterations </td>
+          <td>(</td>
+          <td class="paramtype">float32&#160;</td>
+          <td class="paramname"><em>timeStep</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Recommend a value to be used in <code>Step</code> for <code>particleIterations</code>. This calculation is necessarily a simplification and should only be used as a starting point. Please see "Particle Iterations" in the Programmer's Guide for details. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timeStep</td><td>is the value to be passed into <code>Step</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="ac082ab4c4ad0b1c5ec4674315eeec643"></a>
 <div class="memitem">
 <div class="memproto">
@@ -799,7 +824,7 @@ This function is locked during callbacks. </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Take a time step. This performs collision detection, integration, and constraint solution. For the numerical stability of particles, minimize the following dimensionless gravity acceleration: gravity / particleRadius * (timeStep / particleIterations)^2 <a class="el" href="b2_particle_8h.html#a26da50c12eeabaa662fb0ccdf624b570" title="A helper function to calculate the optimal number of iterations. ">b2CalculateParticleIterations()</a> helps to determine the optimal particleIterations. </p>
+<p>Take a time step. This performs collision detection, integration, and constraint solution. For the numerical stability of particles, minimize the following dimensionless gravity acceleration: gravity / particleRadius * (timeStep / particleIterations)^2 <a class="el" href="b2_particle_8h.html#a26da50c12eeabaa662fb0ccdf624b570" title="A helper function to calculate the optimal number of iterations. ">b2CalculateParticleIterations()</a> or <a class="el" href="classb2_world.html#ab3fe55d26ad28154627a7785e67e994b">CalculateReasonableParticleIterations()</a> help to determine the optimal particleIterations. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">timeStep</td><td>the amount of time to simulate, this should not vary. </td></tr>
