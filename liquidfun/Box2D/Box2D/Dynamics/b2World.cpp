@@ -1386,7 +1386,7 @@ static float32 GetSmallestRadius(const b2World* world)
 	return smallestRadius;
 }
 
-int b2World::CalculateDefaultParticleIterations(float32 timeStep) const
+int b2World::CalculateReasonableParticleIterations(float32 timeStep) const
 {
 	if (m_particleSystemList == NULL)
 		return 1;

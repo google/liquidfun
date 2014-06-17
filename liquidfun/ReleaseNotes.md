@@ -94,6 +94,9 @@ Box2D.
 *   Added b2ParticleGroup::GetLinearVelocityFromWorldPoint, which returns the
     average velocity of a particle group with respect to a position. The
     position is used to calculate the angular velocity of the group.
+*   Added b2World::CalculateReasonableParticleIterations to give a good
+    estimate of the number of particle iterations you should pass into
+    b2World::Step.
 
 
 <a name="1.0.0"></a>

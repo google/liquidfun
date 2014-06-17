@@ -102,8 +102,8 @@ $(document).ready(function(){initNavTree('md__chapter11__particles.html','');});
 <h2>Stepping the World (Particle Iterations)</h2>
 <p>The particle solver can iterate multiple times per step. Larger numbers of steps improve the stability and fidelity of the particle simulation. However, more steps also require more processor cycles.</p>
 <p>The cycles cost is almost linear: double the number of particle iterations will almost double the cycles cost of b2ParticleSystem::Solve.</p>
-<p>Use the <code>particleIterations</code> parameter in <code>b2World::Step</code> to set the number of iterations. The default value of <code>particleIterations</code> is calculated based on the physical constants of your particle systems (see <code>b2CalculateParticleIterations</code>).</p>
-<p>You should experiment with <code>particleIterations</code> in your game to find the best balance of stability versus cycles. The calculation performed by <code>b2CalculateParticleIterations</code> is, necessarily, a simplification, and should be used only as a starting point.</p>
+<p>Use the <code>particleIterations</code> parameter in <code>b2World::Step</code> to set the number of iterations. The default value of <code>particleIterations</code> is 1.</p>
+<p>You should experiment with <code>particleIterations</code> in your game to find the best balance of stability versus cycles. Try calling <code>b2CalculateParticleIterations</code> or <code>b2World::CalculateReasonableParticleIterations</code> to estimate a reasonable value. Note that these functions are, necessarily, a simplification, and should be used only as a starting point.</p>
 <p>If your simulation seems overly bouncy or energetic, or if the particles in your simulation are passing through contacts, try increasing the number of particle iterations.</p>
 <p>Note that, as particle iterations increases, the affect of pressure on highly-compressed particles also increases. That is, particles get more incompressible as you increase particle iterations.</p>
 <p><a class="anchor" id="mv"></a> </p>

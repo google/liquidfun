@@ -113,14 +113,13 @@ The cycles cost is almost linear: double the number of particle iterations
 will almost double the cycles cost of b2ParticleSystem::Solve.
 
 Use the `particleIterations` parameter in `b2World::Step` to set the number
-of iterations. The default value of `particleIterations` is calculated based
-on the physical constants of your particle systems (see
-`b2CalculateParticleIterations`).
+of iterations. The default value of `particleIterations` is 1.
 
 You should experiment with `particleIterations` in your game to find the best
-balance of stability versus cycles. The calculation performed by
-`b2CalculateParticleIterations` is, necessarily, a simplification, and should
-be used only as a starting point.
+balance of stability versus cycles. Try calling `b2CalculateParticleIterations`
+or `b2World::CalculateReasonableParticleIterations` to estimate a reasonable
+value. Note that these functions are, necessarily, a simplification, and
+should be used only as a starting point.
 
 If your simulation seems overly bouncy or energetic, or if the particles in
 your simulation are passing through contacts, try increasing the number of
