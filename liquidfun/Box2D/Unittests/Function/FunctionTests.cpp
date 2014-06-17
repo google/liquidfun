@@ -34,6 +34,7 @@ protected:
 		m_world = new b2World(gravity);
 
 		m_particleSystemDef.radius = 0.01f;
+		m_particleSystemDef.gravityScale = 0.01f;
 		m_particleSystem = m_world->CreateParticleSystem(&m_particleSystemDef);
 	}
 	virtual void TearDown()
@@ -858,7 +859,7 @@ TEST_F(FunctionTests, ComputeCollisionEnergy) {
 	def.position.Set(0.2f, 0);
 	def.linearVelocity.Set(-0.01f, 0);
 	m_particleSystem->CreateParticleGroup(def);
-	for (int32 t = 0; t < 1000; t++)
+	for (int32 t = 0; t < 10; t++)
 	{
 		m_world->Step(0.1f, 1, 1, 1);
 	}
