@@ -16,3 +16,4 @@ Instructions on how to build for:
 - [Linux](md__building_linux.html)
 - [Windows](md__building_windows.html)
 - [OS X](md__building_o_s_x.html)
+- [JavaScript version](md__building_java_script.html)
