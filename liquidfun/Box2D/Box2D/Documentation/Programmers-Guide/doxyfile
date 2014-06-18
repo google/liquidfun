@@ -1179,8 +1179,11 @@ HTML_EXTRA_FILES       = "image_0.png" \
                          "image_7.png" \
                          "image_8.png" \
                          "image_9.png" \
-                         "liquidfun_logo_horizontal.png" \
-                         "liquidfun_paint_splash_screen.png"
+                         "liquidfun-logo.png" \
+                         "liquidfun-logo.ai" \
+                         "liquidfun-logo-small.png" \
+                         "liquidfun-logo-horizontal-small.png" \
+                         "liquidfun-logo-square-small.png"
 
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen

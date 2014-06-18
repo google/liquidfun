@@ -1,6 +1,6 @@
 # Introduction
 
-<img src="liquidfun_logo_horizontal.png" alt="LiquidFun logo" style="float:right;"/>
+<img src="liquidfun-logo-square-small.png" alt="LiquidFun logo" style="float:right;"/>
 
 [About](#about)<br/>
 [Prerequisites](#pre)<br/>

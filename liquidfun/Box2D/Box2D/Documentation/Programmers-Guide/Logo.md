@@ -1,18 +1,17 @@
 # Logo
 
-Please feel free to use the LiquidFun logo, in your splash screens or
-documentation, for example. There is no requirement to include the logo,
-but we appreciate your acknowledgement.
+Please feel free to make fair use the LiquidFun logo in connection with any
+implementations (in your splash screens or documentation, for example).
+There is no requirement to include the logo, but we appreciate your
+acknowledgement. We only ask that you avoid changing the proportions of the
+logo or otherwise modifying it, and that you avoid using the logo in a way
+that suggests your implementation is developed by, sponsored by, or affiliated
+with Fun Propulsion Labs or Google. (For example, you shouldn't use the
+LiquidFun logo as your app icon, and you shouldn't use it more prominently
+than your own logos or icons.)
 
-* [Horizontal LiquidFun Logo bitmap](liquidfun_logo_horizontal.png)
-* [Horizontal LiquidFun Logo in vector format](liquidfun_logo_horizontal.psd)
-* [Square LiquidFun Logo bitmap](liquidfun_logo_square.png)
-* [Square LiquidFun Logo in vector format](liquidfun_logo_square.psd)
+![LiquidFun Logo bitmap](liquidfun-logo-small.png)
 
-![LiquidFun Logo horizontal](liquidfun_logo_horizontal.png)
-
-The [LiquidFun Paint](http:://google.github.io/LiquidFunPaint) splash screen
-is an example of how you might use the LiquidFun logo.
-
-![LiquidFun Logo on LiquidFun Paint Splash Screen](liquidfun_paint_splash_screen.png)
+* [Logo in bitmap format](liquidfun-logo.png)
+* [Logo in vector format](liquidfun-logo.ai)
 
