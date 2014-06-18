@@ -307,4 +307,4 @@ The initial release of LiquidFun is available for download from the
   [Box2D revision 280]: http://code.google.com/p/box2d/source/detail?r=280
   [Box2D revision 255]: http://code.google.com/p/box2d/source/detail?r=255
   [NEON]: http://www.arm.com/products/processors/technologies/neon.php
-  [Emscripten]: https://github.com/kripken/emscripten/wiki
+  [Emscripten]: http://github.com/kripken/emscripten/wiki

@@ -61,4 +61,4 @@ Use the run\_tests.bat batch file to execute unit tests:
   [Visual Studio]: http://www.visualstudio.com/
   [Windows]: http://windows.microsoft.com/
   [cygwin]: http://www.cygwin.com/
-  [release page]: https://github.com/google/liquidfun/releases
+  [release page]: http://github.com/google/liquidfun/releases

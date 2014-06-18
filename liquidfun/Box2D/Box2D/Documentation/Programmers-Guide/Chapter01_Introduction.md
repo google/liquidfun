@@ -16,7 +16,7 @@
 
 ## About
 
-LiquidFun is based on Erin Catto's [Box2D library](www.box2d.org), which
+LiquidFun is based on Erin Catto's [Box2D library](http://www.box2d.org), which
 provides 2D, rigid-body simulation in games. LiquidFun extends Box2D to provide
 [particle physics and fluid dynamics](md__chapter11__particles.html).
 
@@ -72,7 +72,7 @@ to track issues and ensures that your issue will not be lost in the depths of
 the forums.
 
 Please file bugs and feature requests here:
-[https://github.com/google/liquidfun/issues](https://github.com/google/liquidfun/issues)
+[http://github.com/google/liquidfun/issues](http://github.com/google/liquidfun/issues)
 
  You can help to ensure your issue gets fixed if you provide sufficient
 detail. A testbed example that reproduces the problem is ideal. You can read

@@ -59,4 +59,4 @@ Use the run\_tests.sh script to execute unit tests:
   [Xcode]: http://developer.apple.com/xcode/
   [OS X]: http://www.apple.com/osx/
   [freeglut]: http://freeglut.sourceforge.net/
-  [release page]: https://github.com/google/liquidfun/releases
+  [release page]: http://github.com/google/liquidfun/releases
