@@ -1,4 +1,7 @@
 function TestSoupStirrer() {
+  camera.position.y = 2;
+  camera.position.z = 3;
+
   // not real inheritance but it will do
   var parent = new TestSoup();
   this.oscillationOffset = 0;

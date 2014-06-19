@@ -7,7 +7,8 @@ var e_parameterSpringBarrier = e_parameterBegin | (1 << 4);
 var e_parameterRepulsive = e_parameterBegin | (1 << 5);
 
 function TestDrawingParticles() {
-  camera.position.z = 8;
+  camera.position.y = 2;
+  camera.position.z = 3.2;
   var bd = new b2BodyDef;
   var ground = world.CreateBody(bd);
 

@@ -1,4 +1,7 @@
 function TestTheoJansen() {
+  camera.position.y = 10;
+  camera.position.z = 40;
+
   this.offset = new b2Vec2(0.0, 8.0);
   this.motorSpeed = 2.0;
   this.motorOn = true;

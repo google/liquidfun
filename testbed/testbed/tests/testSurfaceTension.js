@@ -1,5 +1,7 @@
 function TestSurfaceTension() {
-  camera.position.z = 10;
+  camera.position.y = 2;
+  camera.position.z = 4;
+
   var bd = new b2BodyDef;
   var ground = world.CreateBody(bd);
 
