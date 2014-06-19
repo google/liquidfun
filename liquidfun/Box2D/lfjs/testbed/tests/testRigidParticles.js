@@ -1,6 +1,7 @@
 // This test is buggy :( todo debug the particle issues
 function TestRigidParticles() {
-  camera.position.z = 10;
+  camera.position.y = 3;
+  camera.position.z = 6;
 
   var bd = new b2BodyDef();
   var ground = world.CreateBody(bd);

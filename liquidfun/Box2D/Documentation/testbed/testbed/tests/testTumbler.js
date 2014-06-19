@@ -1,4 +1,7 @@
 function TestTumbler() {
+  camera.position.y = 10;
+  camera.position.z = 25;
+
   this.maxCount = 800;
 
   var bd = new b2BodyDef;

@@ -1,4 +1,7 @@
 function TestSparky() {
+  camera.position.y = 20;
+  camera.position.z = 30;
+
   this.maxCircles = 6;
   this.shapeHeightOffset = 7;
   this.shapeOffset = 4.5;

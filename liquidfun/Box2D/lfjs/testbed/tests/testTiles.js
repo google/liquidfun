@@ -1,4 +1,7 @@
 function TestTiles() {
+  camera.position.y = 20;
+  camera.position.z = 40;
+
   var count = 20;
   this.fixtureCount = 0;
   var a = 0.5;

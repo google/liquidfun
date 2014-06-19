@@ -1,5 +1,6 @@
 function TestParticles() {
-  camera.position.z = 15;
+  camera.position.y = 4;
+  camera.position.z = 8;
   var bd = new b2BodyDef();
   var ground = world.CreateBody(bd);
 
