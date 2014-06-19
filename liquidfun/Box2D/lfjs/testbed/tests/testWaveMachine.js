@@ -1,5 +1,7 @@
 function TestWaveMachine() {
-  camera.position.z = 10;
+  camera.position.y = 1;
+  camera.position.z = 2.5;
+
   var bd = new b2BodyDef();
   var ground = world.CreateBody(bd);
 

@@ -1,5 +1,6 @@
 function TestSoup() {
-  camera.position.z = 10;
+  camera.position.y = 2;
+  camera.position.z = 3;
   // create groupd
   var bd = new b2BodyDef;
   var ground = world.CreateBody(bd);

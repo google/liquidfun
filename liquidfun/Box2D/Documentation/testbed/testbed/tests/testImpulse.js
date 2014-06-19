@@ -1,5 +1,6 @@
 function TestImpulse() {
-  camera.position.z = 10;
+  camera.position.y = 2;
+  camera.position.z = 3;
   this.boxLeft = -2;
   this.boxRight = 2;
   this.boxBottom = 0;
