@@ -49,3 +49,44 @@ For an example program, try openning `Box2D/lfjs/index.html' in your browser.
 This will load a JavaScript version of the LiquidFun Testbed. It uses
 the liquidfun.js file that you built above.
 
+### Debugging
+
+The default output of `make` and `uglify.sh` is whitespace-optimized
+JavaScript that is difficult to debug. To create an un-optimized version
+of the testbed, please follow the steps below.
+
++ In `lfjs/Makefile` change -O2 to -O0, to disable Emscripten optimizations.
++ In `lfjs/index.html` replace `<script src="liquidfun.js"></script>` with
+  a similar line for every .js file in `lfjs/uglify.sh`. It should look
+  something like,
+
+        <script src="lf_core.js"></script>
+        <script src="jsBindings/offsets.js"></script>
+        <script src="jsBindings/Common/b2Math.js"></script>
+        <script src="jsBindings/Collision/b2Collision.js"></script>
+        <script src="jsBindings/Collision/Shapes/b2EdgeShape.js"></script>
+        <script src="jsBindings/Collision/Shapes/b2PolygonShape.js"></script>
+        <script src="jsBindings/Collision/Shapes/b2Shape.js"></script>
+        <script src="jsBindings/Collision/Shapes/b2ChainShape.js"></script>
+        <script src="jsBindings/Collision/Shapes/b2CircleShape.js"></script>
+        <script src="jsBindings/Dynamics/b2Body.js"></script>
+        <script src="jsBindings/Dynamics/b2World.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2WheelJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2WeldJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2GearJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2Joint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2FrictionJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2RevoluteJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2MotorJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2PulleyJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2DistanceJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2PrismaticJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2RopeJoint.js"></script>
+        <script src="jsBindings/Dynamics/Joints/b2MouseJoint.js"></script>
+        <script src="jsBindings/Dynamics/Contacts/b2Contact.js"></script>
+        <script src="jsBindings/Dynamics/b2Fixture.js"></script>
+        <script src="jsBindings/Dynamics/b2WorldCallbacks.js"></script>
+        <script src="jsBindings/Particle/b2ParticleSystem.js"></script>
+        <script src="jsBindings/Particle/b2ParticleGroup.js"></script>
+        <script src="jsBindings/Particle/b2Particle.js"></script>
+
