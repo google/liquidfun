@@ -87,7 +87,41 @@ $(document).ready(function(){initNavTree('md__building_java_script.html','');});
 make
 ./uglify.sh
 </pre><h3>Executing the Testbed</h3>
-<p>For an example program, try openning `Box2D/lfjs/index.html' in your browser. This will load a JavaScript version of the LiquidFun Testbed. It uses the liquidfun.js file that you built above. </p>
+<p>For an example program, try openning `Box2D/lfjs/index.html' in your browser. This will load a JavaScript version of the LiquidFun Testbed. It uses the liquidfun.js file that you built above.</p>
+<h3>Debugging</h3>
+<p>The default output of <code>make</code> and <code>uglify.sh</code> is whitespace-optimized JavaScript that is difficult to debug. To create an un-optimized version of the testbed, please follow the steps below.</p>
+<ul>
+<li>In <code>lfjs/Makefile</code> change -O2 to -O0, to disable Emscripten optimizations.</li>
+<li>In <code>lfjs/index.html</code> replace <code>&lt;script src="liquidfun.js"&gt;&lt;/script&gt;</code> with a similar line for every .js file in <code>lfjs/uglify.sh</code>. It should look something like, <pre class="fragment">  &lt;script src="lf_core.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/offsets.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Common/b2Math.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Collision/b2Collision.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Collision/Shapes/b2EdgeShape.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Collision/Shapes/b2PolygonShape.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Collision/Shapes/b2Shape.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Collision/Shapes/b2ChainShape.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Collision/Shapes/b2CircleShape.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/b2Body.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/b2World.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2WheelJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2WeldJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2GearJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2Joint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2FrictionJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2RevoluteJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2MotorJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2PulleyJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2DistanceJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2PrismaticJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2RopeJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Joints/b2MouseJoint.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/Contacts/b2Contact.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/b2Fixture.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Dynamics/b2WorldCallbacks.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Particle/b2ParticleSystem.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Particle/b2ParticleGroup.js"&gt;&lt;/script&gt;
+  &lt;script src="jsBindings/Particle/b2Particle.js"&gt;&lt;/script&gt;</pre> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- Google Analytics -->
