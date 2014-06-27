@@ -512,7 +512,7 @@ public:
 	/// Distribute a force across several particles. The particles must not be
 	/// wall particles. Note that the force is distributed across all the
 	/// particles, so calling this function for indices 0..N is not the same as
-	/// calling ApplyForce(i, force) for i in 0..N.
+	/// calling ParticleApplyForce(i, force) for i in 0..N.
 	/// @param firstIndex the first particle to be modified.
 	/// @param lastIndex the last particle to be modified.
 	/// @param force the world force vector, usually in Newtons (N).
