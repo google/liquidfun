@@ -494,9 +494,9 @@ public:
 	/// Apply an impulse to all particles between 'firstIndex' and 'lastIndex'.
 	/// This immediately modifies the velocity. Note that the impulse is
 	/// applied to the total mass of all particles. So, calling
-	/// ApplyLinearImpulse(0, impulse) and ApplyLinearImpulse(1, impulse) will
-	/// impart twice as much velocity as calling just
-	/// ApplyLinearImpulse(0, 1, impulse).
+	/// ParticleApplyLinearImpulse(0, impulse) and
+	/// ParticleApplyLinearImpulse(1, impulse) will impart twice as much
+	/// velocity as calling just ApplyLinearImpulse(0, 1, impulse).
 	/// @param firstIndex the first particle to be modified.
 	/// @param lastIndex the last particle to be modified.
 	/// @param impulse the world impulse vector, usually in N-seconds or
