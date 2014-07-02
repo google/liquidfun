@@ -77,7 +77,8 @@ ConservationTests::SetUp()
 	// Construct a world object, which will hold and simulate the rigid bodies.
 	m_world = new b2World(gravity);
 
-	const b2ParticleSystemDef particleSystemDef;
+	b2ParticleSystemDef particleSystemDef;
+	particleSystemDef.radius = 0.01f;
 	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 
 	// Create two particle groups colliding each other
@@ -86,15 +87,15 @@ ConservationTests::SetUp()
 	pd.flags = param.particleFlags;
 	pd.groupFlags = param.groupFlags;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	pd.shape = &shape;
 
-	pd.position = b2Vec2(-10, 0);
-	pd.linearVelocity = b2Vec2(1, 0);
+	pd.position = b2Vec2(-0.1f, 0);
+	pd.linearVelocity = b2Vec2(0.01f, 0);
 	m_particleSystem->CreateParticleGroup(pd);
 
-	pd.position = b2Vec2(10, 0);
-	pd.linearVelocity = b2Vec2(-1, 0);
+	pd.position = b2Vec2(0.1f, 0);
+	pd.linearVelocity = b2Vec2(-0.01f, 0);
 	m_particleSystem->CreateParticleGroup(pd);
 }
 
@@ -106,6 +107,14 @@ ConservationTests::TearDown()
 
 TEST_P(ConservationTests, GravityCenter) {
 	// Test whether the gravity center is conserved.
+	const ParticleType& param = GetParam();
+	if (param.particleFlags & b2_barrierParticle)
+	{
+		// Barrier particles may move other particles to prevent penetration.
+		// The gravity center is not preserved in that case.
+		SUCCEED();
+		return;
+	}
 	int32 particleCount = m_particleSystem->GetParticleCount();
 	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
 	float64 beforeX = 0;

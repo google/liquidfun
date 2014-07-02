@@ -426,3 +426,9 @@ b2RopeJoint.h and RopeJoint.h for details.
 The friction joint is used for top-down friction. The joint provides 2D
 translational friction and angular friction. See b2FrictionJoint.h and
 ApplyForce.h for details.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

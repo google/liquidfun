@@ -103,7 +103,8 @@ public:
 	/// For the numerical stability of particles, minimize the following
 	/// dimensionless gravity acceleration:
 	///     gravity / particleRadius * (timeStep / particleIterations)^2
-	/// b2CalculateParticleIterations() helps to determine the optimal
+	/// b2CalculateParticleIterations() or
+	/// CalculateReasonableParticleIterations() help to determine the optimal
 	/// particleIterations.
 	/// @param timeStep the amount of time to simulate, this should not vary.
 	/// @param velocityIterations for the velocity constraint solver.
@@ -123,9 +124,15 @@ public:
 				int32 velocityIterations,
 				int32 positionIterations)
 	{
-		Step(timeStep, velocityIterations, positionIterations,
-			 CalculateDefaultParticleIterations(timeStep));
+		Step(timeStep, velocityIterations, positionIterations, 1);
 	}
+
+	/// Recommend a value to be used in `Step` for `particleIterations`.
+	/// This calculation is necessarily a simplification and should only be
+	/// used as a starting point. Please see "Particle Iterations" in the
+	/// Programmer's Guide for details.
+	/// @param timeStep is the value to be passed into `Step`.
+	int CalculateReasonableParticleIterations(float32 timeStep) const;
 
 	/// Manually clear the force buffer on all bodies. By default, forces are cleared automatically
 	/// after each call to Step. The default behavior is modified by calling SetAutoClearForces.
@@ -300,8 +307,6 @@ private:
 	void DrawShape(b2Fixture* shape, const b2Transform& xf, const b2Color& color);
 
 	void DrawParticleSystem(const b2ParticleSystem& system);
-
-	int CalculateDefaultParticleIterations(float32 timeStep) const;
 
 	b2BlockAllocator m_blockAllocator;
 	b2StackAllocator m_stackAllocator;

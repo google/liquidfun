@@ -23,8 +23,8 @@ cmake_minimum_required(VERSION 2.8)
 # Also keep in mind that this will need to be cleaned up were we ever to make
 # this code public domain, we will wish to remove this relative path and
 # replace it with something less google-specific.
-set(GUNIT_INCDIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../googletest/include)
-set(GTEST_LIBDIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../googletest)
+set(GUNIT_INCDIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../googletest/include")
+set(GTEST_LIBDIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../googletest")
 
 # Include helper functions and macros used by Google Test.
 include(${GTEST_LIBDIR}/cmake/internal_utils.cmake)
@@ -34,10 +34,10 @@ string(REPLACE "-Wshadow" "" cxx_default "${cxx_default}")
 string(REPLACE "-Wextra" "" cxx_default "${cxx_default}")
 
 # This is the directory into which the executables are built.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
-include_directories(${GUNIT_INCDIR} ${CMAKE_CURRENT_SOURCE_DIR}
-                                    ${CMAKE_CURRENT_SOURCE_DIR}/..)
+include_directories(${GUNIT_INCDIR} "${CMAKE_CURRENT_SOURCE_DIR}"
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 # These are support sources that are used for unit tests.
 set(SUPPORT_SRCS BodyTracker.cpp)

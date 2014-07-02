@@ -137,7 +137,6 @@ private:
   b2RevoluteJoint *joint_;
   b2Body *mover_;
 
-  double start_time_;
   double prev_time_;
 
   std::vector<float> particle_sizes_;

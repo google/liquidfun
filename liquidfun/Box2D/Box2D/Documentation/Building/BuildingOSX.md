@@ -1,13 +1,15 @@
 # Building for OS X
 
-LiquidFun releases contain an [Xcode][] project to build the library and
-samples on [OS X][].  The [Xcode][] project has been generated using
-[cmake][], and is free of any host-specific dependencies.
+You can use [cmake][] to generate an [Xcode][] project for LiquidFun's
+Testbed and Unittests on [OS X][].
+
+Alternatively, you can download a pre-generated Xcode
+project from the [release page][]. The [Xcode][] project is free of
+host-specific dependencies.
 
 ### Version Requirements
 
-Following are the minimum required versions for the tools and libraries you
-need for building LiquidFun for OS X:
+These are the minimum required versions for building LiquidFun on OS X:
 
 -   OS X: Mavericks 10.9.1.
 -   Xcode: 5.0.1
@@ -17,9 +19,19 @@ need for building LiquidFun for OS X:
 ### Before Building
 
 -   Install [Xquartz][] to run LiquidFun sample applications.
-    [freeglut][] requires [Xquartz][].
+    The Testbed uses [freeglut][], which requires [Xquartz][].
 -   Reboot your machine.  Rebooting sets the `DISPLAY` environment variable for
     [Xquartz][], which enables sample applications to run correctly.
+
+### Creating the Xcode project using [cmake][]
+
+When working directly with the source, you can generate the [Xcode][]
+project using [cmake][].  [cmake][] version 2.8.12.1 or above is required to
+build this project on [OS X][] 10.9 (Mavericks).  For example, the following
+generates the Xcode project in the liquidfun/Box2D directory.
+
+    cd liquidfun/Box2D
+    cmake -G "Xcode"
 
 ### Building with [Xcode][]
 
@@ -32,16 +44,6 @@ need for building LiquidFun for OS X:
 -   Select a sample `Scheme`, for example "Testbed-->My Mac 64-bit", from the
     combo box to the right of the "Run" button.
 -   Click the "Run" button.
-
-### Building using [cmake][]
-
-When working directly with the source, you can generate the [Xcode][]
-project using [cmake][].  [cmake][] version 2.8.12.1 or above is required to
-build this project on [OS X][] 10.9 (Mavericks).  For example, the following
-generates the Xcode project in the liquidfun/Box2D directory.
-
-    cd liquidfun/Box2D
-    cmake -G "Xcode"
 
 ### Running Unit Tests
 
@@ -57,3 +59,4 @@ Use the run\_tests.sh script to execute unit tests:
   [Xcode]: http://developer.apple.com/xcode/
   [OS X]: http://www.apple.com/osx/
   [freeglut]: http://freeglut.sourceforge.net/
+  [release page]: http://github.com/google/liquidfun/releases

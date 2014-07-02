@@ -21,10 +21,28 @@
 
 #include "GL/freeglut.h"
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__IOS__)
 #include "GLEmu/gl_emu.h"
+#endif // defined(__ANDROID__) || defined(__IOS__)
+
+#ifdef __ANDROID__
 #include <android/log.h>
 #endif // __ANDROID__
+
+// We need these 4 from glext.h, and define them here rather than relying on
+// the header, which is not universally available.
+#ifndef GL_POINT_SPRITE
+#define GL_POINT_SPRITE                   0x8861
+#endif
+#ifndef GL_COORD_REPLACE
+#define GL_COORD_REPLACE                  0x8862
+#endif
+#ifndef GL_GENERATE_MIPMAP
+#define GL_GENERATE_MIPMAP                0x8191
+#endif
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE                  0x812F
+#endif
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -38,7 +56,7 @@ void LoadOrtho2DMatrix(double left, double right, double bottom, double top)
 
 #if USE_GL_KIT
 	const GLKMatrix4 matrix = GLKMatrix4MakeOrtho(left, right, bottom, top,
-												  -1.0, 1.0);
+													-1.0, 1.0);
 	glLoadMatrixf((const GLfloat*)&matrix);
 #else
 	// L/R/B/T
@@ -113,7 +131,7 @@ void DebugDraw::DrawParticles(const b2Vec2 *centers, float32 radius, const b2Par
 	static unsigned int particle_texture = 0;
 
 	if (!particle_texture ||
-	    !glIsTexture(particle_texture)) // Android deletes textures upon sleep etc.
+			!glIsTexture(particle_texture)) // Android deletes textures upon sleep etc.
 	{
 		// generate a "gaussian blob" texture procedurally
 		glGenTextures(1, &particle_texture);
@@ -134,15 +152,12 @@ void DebugDraw::DrawParticles(const b2Vec2 *centers, float32 radius, const b2Par
 		}
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, particle_texture);
-		#ifdef __ANDROID__
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-		#endif
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TSIZE, TSIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
-
 		glDisable(GL_TEXTURE_2D);
 
 		glEnable(GL_POINT_SMOOTH);
@@ -154,19 +169,12 @@ void DebugDraw::DrawParticles(const b2Vec2 *centers, float32 radius, const b2Par
 	#ifdef __ANDROID__
 		glEnable(GL_POINT_SPRITE_OES);
 		glTexEnvf(GL_POINT_SPRITE_OES, GL_COORD_REPLACE_OES, GL_TRUE);
-		const float particle_size_multiplier = 3;  // because of falloff
-		const float global_alpha = 1;  // none, baked in texture
 	#else
-		/*
-		// normally this is how we'd enable them on desktop OpenGL,
-		// but for some reason this is not applying textures, so we use alpha instead
 		glEnable(GL_POINT_SPRITE);
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-		*/
-		const float particle_size_multiplier = 2;  // no falloff
-		const float global_alpha = 0.35f;  // instead of texture
 	#endif
 
+	const float particle_size_multiplier = 3;  // because of falloff
 	glPointSize(radius * currentscale * particle_size_multiplier);
 
 	glEnable(GL_BLEND);
@@ -176,20 +184,12 @@ void DebugDraw::DrawParticles(const b2Vec2 *centers, float32 radius, const b2Par
 	glVertexPointer(2, GL_FLOAT, 0, &centers[0].x);
 	if (colors)
 	{
-		#ifndef __ANDROID__
-			// hack to render with proper alpha on desktop for Testbed
-			b2ParticleColor * mcolors = const_cast<b2ParticleColor *>(colors);
-			for (int i = 0; i < count; i++)
-			{
-				mcolors[i].a = static_cast<uint8>(global_alpha * 255);
-			}
-		#endif
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(4, GL_UNSIGNED_BYTE, 0, &colors[0].r);
 	}
 	else
 	{
-		glColor4f(1, 1, 1, global_alpha);
+		glColor4f(1, 1, 1, 1);
 	}
 
 	glDrawArrays(GL_POINTS, 0, count);
@@ -280,7 +280,7 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
 
 void DebugDraw::DrawString(int x, int y, const char *string, ...)
 {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(__IOS__)
 	char buffer[128];
 
 	va_list arg;
@@ -311,12 +311,12 @@ void DebugDraw::DrawString(int x, int y, const char *string, ...)
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
-#endif // __ANDROID__
+#endif // !defined(__ANDROID__) && !defined(__IOS__)
 }
 
 void DebugDraw::DrawString(const b2Vec2& p, const char *string, ...)
 {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(__IOS__)
 	char buffer[128];
 
 	va_list arg;
@@ -334,7 +334,7 @@ void DebugDraw::DrawString(const b2Vec2& p, const char *string, ...)
 	}
 
 	glPopMatrix();
-#endif // __ANDROID__
+#endif // !defined(__ANDROID__) && !defined(__IOS__)
 }
 
 void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)

@@ -85,3 +85,9 @@ designed to suit the internal needs of LiquidFun and the API. All the members
 are exposed, so you may use them freely in your application.
 
 The math library is kept simple to make LiquidFun easy to port and maintain.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

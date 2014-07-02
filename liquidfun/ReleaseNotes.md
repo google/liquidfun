@@ -24,14 +24,80 @@ following:
 ### 1.1.0
 
 #### Overview
+The [1.1.0 release][] of LiquidFun adds support for new platforms, speeds-up
+the simulation, and documents the particle simulation algorithm with a fun,
+visual presentation. Some highlights:
+
+*   iOS support.
+*   JavaScript support via [Emscripten][].
+*   Improved Java support via more SWIG bindings.
+*   An "Inside LiquidFun" presentation explaining the particle simulation
+    algorithm.
+*   ARM optimizations using [NEON][].
+*   Stability and collision improvements to the particle simulation.
+*   More ways to inspect particle contacts.
+*   A LiquidFun logo to use in your splash screens and documentation, if you
+    like.
+
+The <a href="#apimods1.1.0">API Modifications</a> are minimal in this release,
+but please review them carefully before upgrading your project.
+
+LiquidFun now supports Mac, Windows, Linux, Android, iOS, and browsers. Note
+that LiquidFun code is portable C++98, so you should be able to compile it for
+other platforms too.
+
+Your program can use LiquidFun if it is written in C++, Java, or JavaScript.
+
+LiquidFun 1.1.0 is based on [Box2D revision 280][], the 2.3.0 release of
+Box2D.
+
 
 <a name="newfeatures1.1.0"></a>
 #### New Features
 
+*   Translated LiquidFun into JavaScript using Emscripten. Please see Box2D/lfjs
+    for the JavaScript bindings and a JavaScript version of the Testbed.
+*   Added iOS XCode projects for the Testbed application and EyeCandy demo.
+*   Added b2ParticleSystem::SplitParticleGroup, which finds disjoint blobs of
+    particles, and puts each into its own b2ParticleGroup.
+*   Added several accessor functions that use only int32s, float32s, and void
+    pointers. These accessors are wrapped in the
+    LIQUIDFUN_EXTERNAL_LANGUAGE_API preprocessor define. They enable binding
+    with other languages--for example, via SWIG.
+*   Particle indices can be represented with 16-bits instead of 32-bits. This
+    is a nice optimization if you know you will have less than 32k particles
+    per simulation.
+*   b2ParticleSimulation::UpdateContacts has been rewritten to take advantage
+    of NEON SIMD. The original implementation remains, for reference, and for
+    platforms that do not support NEON SIMD. The NEON SIMD version requires
+    16-bit particle indices.
+
 <a name="apimods1.1.0"></a>
 #### API Modifications
-*   Extended API in SWIG has now been moved to LiquidFun header files, wrapped
-    with the LIQUIDFUN_EXTERNAL_LANGUAGE_API preprocessor.
+
+*   b2ParticleContact's members are now accessed via _Get_ and _Set_ functions.
+*   b2ParticleSystemDef now has members for strictContactCheck, density,
+    gravityScale, radius, and maxCount. You can still set these values after
+    b2ParticleSystem creation, however, for example via
+    b2ParticleSystem::SetDensity.
+
+#### Other Changes
+
+*   Added b2ParticleSystem::GetAllParticleFlags,
+    b2ParticleSystem::GetAllGroupFlags, and
+    b2ParticleGroup::GetAllParticleFlags, which OR-together all the flags in
+    a particle system or group.
+*   Expose the contact weight buffer. The weight represents how closely two
+    particles overlap.
+*   Expose particle pairs and triads for reading. These arrays indicate which
+    particles are interacting.
+*   Added b2ParticleGroup::GetLinearVelocityFromWorldPoint, which returns the
+    average velocity of a particle group with respect to a position. The
+    position is used to calculate the angular velocity of the group.
+*   Added b2World::CalculateReasonableParticleIterations to give a good
+    estimate of the number of particle iterations you should pass into
+    b2World::Step.
+
 
 <a name="1.0.0"></a>
 ### 1.0.0
@@ -233,8 +299,12 @@ The initial release of LiquidFun is available for download from the
   [0.9.0 release]: http://github.com/google/liquidfun/releases/tag/v0.9.0
   [1.0.0]: #1.0.0
   [1.0.0 release]: http://github.com/google/liquidfun/releases/tag/v1.0.0
+  [1.1.0]: #1.1.0
+  [1.1.0 release]: http://github.com/google/liquidfun/releases/tag/v1.1.0
   [apimods1.0.0]: #apimods1.0.0
   [newfeatures1.0.0]: #newfeatures1.0.0
   [Box2D]: http://box2d.org
   [Box2D revision 280]: http://code.google.com/p/box2d/source/detail?r=280
   [Box2D revision 255]: http://code.google.com/p/box2d/source/detail?r=255
+  [NEON]: http://www.arm.com/products/processors/technologies/neon.php
+  [Emscripten]: http://github.com/kripken/emscripten/wiki

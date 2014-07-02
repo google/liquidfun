@@ -1,10 +1,13 @@
 var NAVTREE =
 [
   [ "LiquidFun Build and Run Instructions", "index.html", [
+    [ "Porting from Box2D", "md__porting_from_box2_d.html", null ],
     [ "Building for Android", "md__building_android.html", null ],
+    [ "Building for iOS", "md__buildingi_o_s.html", null ],
     [ "Building for Linux", "md__building_linux.html", null ],
     [ "Building for OS X", "md__building_o_s_x.html", null ],
-    [ "Building for Windows", "md__building_windows.html", null ]
+    [ "Building for Windows", "md__building_windows.html", null ],
+    [ "Building JavaScript version", "md__building_java_script.html", null ]
   ] ]
 ];
 
@@ -123,7 +126,7 @@ function createIndent(o,domNode,node,level)
     span.style.display = 'inline-block';
     span.style.width   = 16*(level+1)+'px';
     span.style.height  = '22px';
-    span.innerHTML = '&nbsp;';
+    span.innerHTML = '&#160;';
     domNode.appendChild(span);
   } 
 }

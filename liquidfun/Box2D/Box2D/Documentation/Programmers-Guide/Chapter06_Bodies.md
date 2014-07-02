@@ -355,3 +355,9 @@ the center of the square.
 You can access the linear and angular velocity. The linear velocity is for the
 center of mass. Therefore, the linear velocity may change if the mass
 properties change.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

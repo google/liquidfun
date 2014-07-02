@@ -70,6 +70,7 @@ Box2D/googletest/**
 **/CMakeCache.txt_*
 **/Debug/**
 **/Release/**
+**/xcuserdata/**
 build.xml
 local.properties
 project.properties

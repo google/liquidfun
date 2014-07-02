@@ -314,3 +314,9 @@ You can similarly iterate over the body's joint list.
 The body also provides a list of associated contacts. You can use this to get
 information about the current contacts. Be careful, because the contact list
 may not contain all the contacts that existed during the previous time step.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

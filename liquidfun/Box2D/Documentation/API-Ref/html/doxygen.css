@@ -1,4 +1,4 @@
-/* The standard CSS for doxygen 1.8.5 */
+/* The standard CSS for doxygen 1.8.6 */
 
 body, table, div, p, dl {
 	font: 400 14px/22px Roboto,sans-serif;
@@ -56,8 +56,12 @@ div.multicol {
 	-webkit-column-count: 3;
 }
 
-p.startli, p.startdd, p.starttd {
+p.startli, p.startdd {
 	margin-top: 2px;
+}
+
+p.starttd {
+	margin-top: 0px;
 }
 
 p.endli {
@@ -169,8 +173,8 @@ pre.fragment {
 }
 
 div.fragment {
-        padding: 0px;
-        margin: 0px;
+        padding: 4px 6px;
+        margin: 4px 8px 4px 2px;
 	background-color: #FBFCFD;
 	border: 1px solid #C4CFE5;
 }
@@ -1061,6 +1065,11 @@ dl.section dd {
 }
 
 .mscgraph
+{
+        text-align: center;
+}
+
+.diagraph
 {
         text-align: center;
 }
