@@ -62,7 +62,7 @@ static const fg_bool fg_true = 1;
 
 
 /* -- JOYSTICK-SPECIFIC STRUCTURES AND TYPES ------------------------------- */
-#define _JS_MAX_AXES 1
+#define _JS_MAX_AXES 16
 typedef struct tagSFG_PlatformJoystick SFG_PlatformJoystick;
 struct tagSFG_PlatformJoystick
 {
