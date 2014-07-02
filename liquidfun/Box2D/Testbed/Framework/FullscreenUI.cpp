@@ -20,11 +20,11 @@
 
 #include <GL/freeglut.h>
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__IOS__)
 const bool FullscreenUI::k_enabledDefault = true;
 #else
 const bool FullscreenUI::k_enabledDefault = false;
-#endif // __ANDROID__
+#endif // defined(__ANDROID__) || defined(__IOS__)
 const float32 FullscreenUI::k_arrowScale = 0.15f;
 const float32 FullscreenUI::k_arrowScaleSmall = 0.075f;
 const float32 FullscreenUI::k_arrowSpacing = 0.005f;

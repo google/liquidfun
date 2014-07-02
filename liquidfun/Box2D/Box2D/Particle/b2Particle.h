@@ -322,9 +322,11 @@ struct b2ParticleDef
 int32 b2CalculateParticleIterations(
 	float32 gravity, float32 radius, float32 timeStep);
 
-/// Handle to a particle.
-/// Use #b2ParticleSystem::GetParticleHandleFromIndex() to retrieve the
-/// b2ParticleHandle of a particle from the particle system.
+/// Handle to a particle. Particle indices are ephemeral: the same index might
+/// refer to a different particle, from frame-to-frame. If you need to keep a
+/// reference to a particular particle across frames, you should acquire a
+/// b2ParticleHandle. Use #b2ParticleSystem::GetParticleHandleFromIndex() to
+/// retrieve the b2ParticleHandle of a particle from the particle system.
 class b2ParticleHandle : public b2TypedIntrusiveListNode<b2ParticleHandle>
 {
 	// Allow b2ParticleSystem to use SetIndex() to associate particle handles

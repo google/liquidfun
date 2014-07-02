@@ -78,7 +78,7 @@ var b2PolygonShape_CreateFixture_8 =
       'number', 'number',
       'number', 'number',
       'number', 'number',
-      'numbre', 'number']);
+      'number', 'number']);
 
 // particle group creation wrappers
 var b2PolygonShape_CreateParticleGroup_4 =

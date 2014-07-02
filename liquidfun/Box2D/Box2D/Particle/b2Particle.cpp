@@ -55,6 +55,11 @@ void b2ParticleColor::Set(const b2Color& color)
 int32 b2CalculateParticleIterations(
 	float32 gravity, float32 radius, float32 timeStep)
 {
-	float32 threshold = 0.01f;
-	return (int32) ceilf(b2Sqrt(gravity / (threshold * radius)) * timeStep);
+	// In some situations you may want more particle iterations than this,
+	// but to avoid excessive cycle cost, don't recommend more than this.
+	const int32 B2_MAX_RECOMMENDED_PARTICLE_ITERATIONS = 8;
+	const float32 B2_RADIUS_THRESHOLD = 0.01f;
+	int32 iterations =
+		(int32) ceilf(b2Sqrt(gravity / (B2_RADIUS_THRESHOLD * radius)) * timeStep);
+	return b2Clamp(iterations, 1, B2_MAX_RECOMMENDED_PARTICLE_ITERATIONS);
 }

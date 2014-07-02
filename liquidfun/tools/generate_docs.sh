@@ -28,6 +28,11 @@ declare -r doc_dirs="API-Ref Building Programmers-Guide Readme ReleaseNotes SWIG
 
 declare -r footer_file="${root_dir}/Box2D/Box2D/Documentation/footer.html"
 
+#liquidfun.js paths
+declare -r lfjs_dir=${root_dir}/Box2D/lfjs
+declare -r testbed_output_dir=${docs_output_dir}/testbed
+
+
 usage() {
   echo "
 Build documentation from markdown using doxygen.
@@ -97,6 +102,22 @@ redirected.</a>
          "generated documentation." >&2
     exit 1
   fi
+
+  # transfer liquidfun.js to output
+  mkdir ${testbed_output_dir} >/dev/null
+  mkdir ${testbed_output_dir}/testbed >/dev/null
+  mkdir ${testbed_output_dir}/testbed/tests >/dev/null
+
+  cp ${lfjs_dir}/index.html ${testbed_output_dir}/ >/dev/null
+  cp ${lfjs_dir}/liquidfun.js ${testbed_output_dir}/ >/dev/null
+  for file in $(find ${lfjs_dir}/testbed -maxdepth 1 -name "*.js") ; do
+     cp $file ${testbed_output_dir}/testbed/ >/dev/null
+  done
+
+  for file in $(find ${lfjs_dir}/testbed/tests -name "*.js") ; do
+     cp $file ${testbed_output_dir}/testbed/tests/ >/dev/null
+  done
+
 }
 
 main "${@}"

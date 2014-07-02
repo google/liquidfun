@@ -1,4 +1,4 @@
-var b2GearJoint_GetRatio = Module.cwrap("b2GearJoint_GetRatio", 'number'
+var b2GearJoint_GetRatio = Module.cwrap("b2GearJoint_GetRatio", 'number',
   ['number']);
 
 function b2GearJoint(def) {

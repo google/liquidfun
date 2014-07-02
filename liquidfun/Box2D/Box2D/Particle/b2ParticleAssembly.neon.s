@@ -140,6 +140,8 @@ FindContacts_PostProcess:
         vmul.f32          q9, q8, q1  @ q9 = 1 / dist * distSq -- (appr 'dist')
         vrsqrts.f32       q9, q9, q8  @ q9 = (3 - 1/dist * dist) / 2 -- (error)
         vmul.f32          q8, q8, q9  @ q8 = (error) / dist -- (estimate)
+        vcgt.f32          q9, q8, #0  @ q8 = 1 / dist > 0 (true if not NaN)
+        vand              q8, q8, q9  @ q8 = 1 / dist if valid, or 0 if NaN
 
         @ Since we expand the output to include 'weight', we need to preserve
         @ subsequent contacts. Note that there may be up to 7 contacts waiting
@@ -168,11 +170,11 @@ FindContacts_PostProcess:
         pld               [r7, r12, lsl #2]
 
         @ Calculate normal and weight.
-        vmul.f32          q1, q1, q8     @ q9 = distSq / dist = dist
+        vmul.f32          q1, q1, q8     @ q1 = distSq / dist = dist
         vmul.f32          q2, q2, q8     @ q2 = normX = diffX / dist
-        vmul.f32          q1, q1, q14    @ q9 = dist / diameter
+        vmul.f32          q1, q1, q14    @ q1 = dist / diameter
         vmul.f32          q3, q3, q8     @ q3 = normY = diffY / dist
-        vsub.f32          q1, q12, q1    @ q9 = weight = 1 - dist / diameter
+        vsub.f32          q1, q12, q1    @ q1 = weight = 1 - dist / diameter
 
         @ Store again, making room for 'weight' member variable this time.
         @ TODO OPT: Interleave with 'or' instructions below.
@@ -358,13 +360,18 @@ FindContactsFromChecks_Simd:
         vmov.32           r12, d16[0]          @ q8[0] ==> r12.
 
         @ If not enough space in output array, grow it.
+        @ This is a heavy operation, but should happen rarely.
         ble               .L_FindContacts_Output
         ldr               r9, [sp, #44]        @ r9 = contacts
         str               r5, [r9, #4]         @ contacts.count = numContacts
         ldr               r10, [r9, #0]        @ r10 = contacts.data
         push              {r0-r3, r9, r10, r12}
+        vpush             {q0, q1, q2, q3}
+        vpush             {q12, q13, q14, q15}
         mov               r0, r9               @ r0 = contacts
         bl                GrowParticleContactBuffer
+        vpop              {q12, q13, q14, q15}
+        vpop              {q0, q1, q2, q3}
         pop               {r0-r3, r9, r10, r12}
 
         @ The output array was reallocated, so update 'out', 'postProcess' and

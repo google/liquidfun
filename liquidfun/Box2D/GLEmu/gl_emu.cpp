@@ -17,12 +17,7 @@
 */
 #if defined(ANDROID) || defined(__IOS__)
 
-#ifdef __APPLE__
-	#include <GLUT/glut.h>
-#else
-	#include "GL/freeglut.h"
-#endif
-
+#include <GL/freeglut.h>
 #include "gl_emu.h"
 
 #include <assert.h>
@@ -90,7 +85,7 @@ void glEnd() {
   glEnableClientState(GL_VERTEX_ARRAY);        glVertexPointer  (2, GL_FLOAT,         sizeof(vertex), buf + 0);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY); glTexCoordPointer(2, GL_FLOAT,         sizeof(vertex), buf + 2);
 
-  glDrawArrays(curmode, 0, vertbuf.size());
+  glDrawArrays(curmode, 0, (GLsizei) vertbuf.size());
 
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);

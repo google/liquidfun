@@ -193,3 +193,9 @@ a sensor:
 1. `b2Contact::IsTouching`
 
 2. `b2ContactListener::BeginContact and EndContact`
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

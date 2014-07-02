@@ -37,7 +37,8 @@ protected:
 		// bodies.
 		m_world = new b2World(gravity);
 
-		const b2ParticleSystemDef particleSystemDef;
+		b2ParticleSystemDef particleSystemDef;
+		particleSystemDef.radius = 0.01f;
 		m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 	}
 
@@ -100,14 +101,14 @@ TEST_F(CallbackTests, QueryCallback) {
 	CreateBoxShapedParticleGroup(m_particleSystem);
 
 	// This AABB query should miss all particles.
-	aabb.lowerBound.Set(10, -10);
-	aabb.upperBound.Set(20, 10);
+	aabb.lowerBound.Set(0.1f, -0.1f);
+	aabb.upperBound.Set(0.2f, 0.1f);
 	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_EQ(callback.m_count, 0);
 
 	// This AABB query should hit some particles.
-	aabb.lowerBound.Set(-10, -10);
-	aabb.upperBound.Set(10, 10);
+	aabb.lowerBound.Set(-0.1f, -0.1f);
+	aabb.upperBound.Set(0.1f, 0.1f);
 	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_NE(callback.m_count, 0);
 }
@@ -121,8 +122,8 @@ TEST_F(CallbackTests, QueryCallback_ShouldQueryParticleSystem) {
 
 	// This AABB query should still check the particle system,
 	// because we're calling b2ParticleSystem::QueryAABB directly.
-	aabb.lowerBound.Set(-10, -10);
-	aabb.upperBound.Set(10, 10);
+	aabb.lowerBound.Set(-0.1f, -0.1f);
+	aabb.upperBound.Set(0.1f, 0.1f);
 	callback.SetShouldQueryParticleSystem(false);
 	m_particleSystem->QueryAABB(&callback, aabb);
 	EXPECT_NE(callback.m_count, 0);
@@ -192,11 +193,11 @@ TEST_F(CallbackTests, RayCastCallback) {
 	CreateBoxShapedParticleGroup(m_particleSystem);
 
 	// This ray cast should miss all particles.
-	m_world->RayCast(&callback, b2Vec2(21, 0), b2Vec2(0, 21));
+	m_world->RayCast(&callback, b2Vec2(0.21f, 0), b2Vec2(0, 0.21f));
 	EXPECT_EQ(callback.m_count, 0);
 
 	// This ray cast should hit a particle.
-	m_world->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	m_world->RayCast(&callback, b2Vec2(-0.1f, -0.1f), b2Vec2(0.1f, 0.1f));
 	EXPECT_NE(callback.m_count, 0);
 }
 
@@ -209,13 +210,14 @@ TEST_F(CallbackTests, RayCast_ShouldQueryParticleSystem) {
 	// This ray cast should still hit a particle, since we're calling
 	// b2ParticleSystem::RayCast directly.
 	callback.SetShouldQueryParticleSystem(false);
-	m_particleSystem->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	m_particleSystem->RayCast(
+		&callback, b2Vec2(-0.1f, -0.1f), b2Vec2(0.1f, 0.1f));
 	EXPECT_NE(callback.m_count, 0);
 
 	// This ray cast shouldn't even cast against the particle system,
 	// since we're calling b2World::RayCast.
 	callback.ResetCount();
-	m_world->RayCast(&callback, b2Vec2(-10, -10), b2Vec2(10, 10));
+	m_world->RayCast(&callback, b2Vec2(-0.1f, -0.1f), b2Vec2(0.1f, 0.1f));
 	EXPECT_EQ(callback.m_count, 0);
 }
 
@@ -280,7 +282,7 @@ TEST_F(CallbackTests, DestroyParticleWithCallback) {
 // destruction.
 TEST_F(CallbackTests, DestroyParticlesInShapeWithNoCallback) {
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	b2Transform xf;
 	xf.SetIdentity();
 	DestructionListener listener;
@@ -305,7 +307,7 @@ TEST_F(CallbackTests, DestroyParticlesInShapeWithNoCallback) {
 // destruction.
 TEST_F(CallbackTests, DestroyParticlesInShapeWithCallback) {
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	b2Transform xf;
 	xf.SetIdentity();
 	DestructionListener listener;
