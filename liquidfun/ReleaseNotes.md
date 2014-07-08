@@ -31,7 +31,7 @@ visual presentation. Some highlights:
 *   iOS support.
 *   JavaScript support via [Emscripten][].
 *   Improved Java support via more SWIG bindings.
-*   An "Inside LiquidFun" presentation explaining the particle simulation
+*   An [Inside LiquidFun][] presentation explaining the particle simulation
     algorithm.
 *   ARM optimizations using [NEON][].
 *   Stability and collision improvements to the particle simulation.
@@ -308,3 +308,4 @@ The initial release of LiquidFun is available for download from the
   [Box2D revision 255]: http://code.google.com/p/box2d/source/detail?r=255
   [NEON]: http://www.arm.com/products/processors/technologies/neon.php
   [Emscripten]: http://github.com/kripken/emscripten/wiki
+  [Inside LiquidFun]: http://docs.google.com/presentation/d/1fEAb4-lSyqxlVGNPog3G1LZ7UgtvxfRAwR0dwd19G4g/edit?usp=sharing
