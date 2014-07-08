@@ -1,6 +1,6 @@
 function TestTheoJansen() {
-  camera.position.y = 10;
-  camera.position.z = 40;
+  camera.position.y = 15;
+  camera.position.z = 50;
 
   this.offset = new b2Vec2(0.0, 8.0);
   this.motorSpeed = 2.0;
@@ -88,6 +88,19 @@ function TestTheoJansen() {
   this.wheel.SetTransform(this.wheel.GetPosition(), -120.0 * Math.PI / 180.0);
   this.CreateLeg(-1.0, wheelAnchor);
   this.CreateLeg(1.0, wheelAnchor);
+
+  // Create particle system.
+  var psd = new b2ParticleSystemDef();
+  psd.radius = 0.2;
+  psd.dampingStrength = 0.2;
+  var particleSystem = world.CreateParticleSystem(psd);
+
+  // Create particle group on top of walker.
+  var shape = new b2PolygonShape;
+  shape.SetAsBoxXYCenterAngle(7, 0.5, new b2Vec2(0, 15), 0);
+  var pd = new b2ParticleGroupDef();
+  pd.shape = shape;
+  var group = particleSystem.CreateParticleGroup(pd);
 }
 
 TestTheoJansen.prototype.CreateLeg = function(s, wheelAnchor) {
