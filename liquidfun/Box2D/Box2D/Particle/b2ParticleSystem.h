@@ -637,9 +637,9 @@ public:
 	/// Apply an impulse to all particles between 'firstIndex' and 'lastIndex'.
 	/// This immediately modifies the velocity. Note that the impulse is
 	/// applied to the total mass of all particles. So, calling
-	/// ApplyLinearImpulse(0, impulse) and ApplyLinearImpulse(1, impulse) will
-	/// impart twice as much velocity as calling just
-	/// ApplyLinearImpulse(0, 1, impulse).
+	/// ParticleApplyLinearImpulse(0, impulse) and
+	/// ParticleApplyLinearImpulse(1, impulse) will impart twice as much
+	/// velocity as calling just ApplyLinearImpulse(0, 1, impulse).
 	/// @param firstIndex the first particle to be modified.
 	/// @param lastIndex the last particle to be modified.
 	/// @param impulse the world impulse vector, usually in N-seconds or
@@ -655,7 +655,7 @@ public:
 	/// Distribute a force across several particles. The particles must not be
 	/// wall particles. Note that the force is distributed across all the
 	/// particles, so calling this function for indices 0..N is not the same as
-	/// calling ApplyForce(i, force) for i in 0..N.
+	/// calling ParticleApplyForce(i, force) for i in 0..N.
 	/// @param firstIndex the first particle to be modified.
 	/// @param lastIndex the last particle to be modified.
 	/// @param force the world force vector, usually in Newtons (N).
