@@ -132,18 +132,28 @@
 /* Note: FREEGLUT_GLES1 and FREEGLUT_GLES2 are only used to cleanly
    bootstrap headers inclusion here; use GLES constants directly
    (e.g. GL_ES_VERSION_2_0) for all other needs */
-#ifdef FREEGLUT_GLES2
-#   include <EGL/egl.h>
-#   include <GLES2/gl2.h>
+#if FREEGLUT_GLES2
+#   if __APPLE__
+#      include <OpenGLES/ES2/gl.h>
+#   else
+#      include <EGL/egl.h>
+#      include <GLES2/gl2.h>
+#   endif
 #elif FREEGLUT_GLES1
-#   include <EGL/egl.h>
-#   include <GLES/gl.h>
-#elif __APPLE__
-#   include <OpenGL/gl.h>
-#   include <OpenGL/glu.h>
+#   if __APPLE__
+#      include <OpenGLES/ES1/gl.h>
+#   else
+#      include <EGL/egl.h>
+#      include <GLES/gl.h>
+#   endif
 #else
-#   include <GL/gl.h>
-#   include <GL/glu.h>
+#   if __APPLE__
+#      include <OpenGL/gl.h>
+#      include <OpenGL/glu.h>
+#   else
+#      include <GL/gl.h>
+#      include <GL/glu.h>
+#   endif
 #endif
 
 /*

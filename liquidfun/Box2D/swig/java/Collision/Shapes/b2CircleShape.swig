@@ -25,19 +25,8 @@
 class b2CircleShape : public b2Shape {
 public:
     b2CircleShape();
-};
 
-// b2CircleShape extensions for easier Java access
-%extend b2CircleShape {
-    void SetPosition(float32 x, float32 y) {
-        $self->m_p.Set(x, y);
-    }
-
-    float32 GetPosX() {
-        return $self->m_p.x;
-    }
-
-    float32 GetPosY() {
-        return $self->m_p.y;
-    }
+    void SetPosition(float32 x, float32 y);
+    float32 GetPositionX();
+    float32 GetPositionY();
 };

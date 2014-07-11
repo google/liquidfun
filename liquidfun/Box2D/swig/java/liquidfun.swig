@@ -22,6 +22,7 @@
 #include "Box2D/Box2D.h"
 %}
 
+
 // allow const reference typemaps
 %naturalvar;
 

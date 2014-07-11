@@ -5,6 +5,8 @@
 [Particle Systems](#ps)<br/>
 [Particle Groups](#pg)<br/>
 [Discrete Particles vs. Particle Groups](#dp)<br/>
+[Stepping the World](#stw)<br/>
+[Maximum Velocity](#mv)<br/>
 [Creating and Destroying Particles](#cdp)<br/>
 [Creating and Destroying Particle Groups](#cdpg)<br/>
 [Particle Behaviors](#pb)<br/>
@@ -90,18 +92,51 @@ variables, as well as the enum for particle-group behavior:
 ## Discrete Particles vs. Particle Groups
 
 With one main exception, there is no functional difference between working
-with
-individual particles and groups of particles. The exception is rigid
-particles:
-Because of the internal algorithm used to make particles rigid, you must
-define
-them as a group.
+with individual particles and groups of particles. The exception is rigid
+particles: Because of the internal algorithm used to make particles rigid, you
+must define them as a group.
 
 Particle groups do offer several conveniences. First, they allow you to create
 and destroy large numbers of particles automatically. If you do not create a
 group, you must create all of the particles individually. Also, a group allows
 you to assign the same property, such as angle of rotation, to all of its
 particles at once.
+
+<a name="stw">
+## Stepping the World (Particle Iterations)
+
+The particle solver can iterate multiple times per step. Larger numbers of
+steps improve the stability and fidelity of the particle simulation. However,
+more steps also require more processor cycles.
+
+The cycles cost is almost linear: double the number of particle iterations
+will almost double the cycles cost of b2ParticleSystem::Solve.
+
+Use the `particleIterations` parameter in `b2World::Step` to set the number
+of iterations. The default value of `particleIterations` is 1.
+
+You should experiment with `particleIterations` in your game to find the best
+balance of stability versus cycles. Try calling `b2CalculateParticleIterations`
+or `b2World::CalculateReasonableParticleIterations` to estimate a reasonable
+value. Note that these functions are, necessarily, a simplification, and
+should be used only as a starting point.
+
+If your simulation seems overly bouncy or energetic, or if the particles in
+your simulation are passing through contacts, try increasing the number of
+particle iterations.
+
+Note that, as particle iterations increases, the affect of pressure on
+highly-compressed particles also increases. That is, particles get more
+incompressible as you increase particle iterations.
+
+<a name="mv">
+## Maximum Velocity
+
+The particle simulation enforces a maximum velocity on the particles, for
+stability and to prevent excessive interpenetration. The maximum velocity is,
+
+&nbsp;&nbsp;&nbsp;`particle diameter / (particle iterations *
+b2World::Step's dt)`<br/>
 
 <a name="cdp">
 ## Creating and Destroying Particles
@@ -546,12 +581,14 @@ Set gravity scale using the statement
 
 &nbsp;&nbsp;&nbsp;`m_particleSystem->SetGravityScale(g);`
 
-, where g is a float32 value greater than 0.0f. Default gravity scale is 1.0f.
+where `g` is a `float32` value greater than 0.0f. Default gravity scale is
+1.0f.
 
 It is worth noting that adjusting the number of particle iterations per solver
 step can also affect the effect of gravity on particles. Larger iteration sizes
-confer greater resistance to gravity. The most common use case for an increased
-particle-iteration size is to prevent particle deformation due to gravity.
+confer greater resistance to gravity. A common reason for increasing the number
+of particle-iterations is to prevent volume loss (i.e. compression) due to
+gravity.
 
 ### Position
 
@@ -684,3 +721,9 @@ mobile hardware.
 When running the program, you can slosh the fluid around by changing the
 orientation of the Android device. You can also toggle bewteen shaders by
 tapping the screen.
+
+
+*This content is licensed under
+[Creative Commons Attribution 4.0](http://creativecommons.org/licenses/by/4.0/legalcode).
+For details and restrictions, please see the
+[Content License](md__content_license.html).*

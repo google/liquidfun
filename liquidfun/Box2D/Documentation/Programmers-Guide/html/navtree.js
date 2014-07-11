@@ -14,7 +14,9 @@ var NAVTREE =
     [ "Loose Ends", "md__chapter12__loose__ends.html", null ],
     [ "Debug Drawing", "md__chapter13__debug__drawing.html", null ],
     [ "Limitations", "md__chapter14__limitations.html", null ],
-    [ "References", "md__chapter15__references.html", null ]
+    [ "References", "md__chapter15__references.html", null ],
+    [ "Content License", "md__content_license.html", null ],
+    [ "Logo", "md__logo.html", null ]
   ] ]
 ];
 
@@ -133,7 +135,7 @@ function createIndent(o,domNode,node,level)
     span.style.display = 'inline-block';
     span.style.width   = 16*(level+1)+'px';
     span.style.height  = '22px';
-    span.innerHTML = '&nbsp;';
+    span.innerHTML = '&#160;';
     domNode.appendChild(span);
   } 
 }

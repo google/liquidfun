@@ -18,6 +18,7 @@
 #include <Box2D/Particle/b2ParticleSystem.h>
 #include <Box2D/Particle/b2ParticleGroup.h>
 #include <Box2D/Particle/b2VoronoiDiagram.h>
+#include <Box2D/Particle/b2ParticleAssembly.h>
 #include <Box2D/Common/b2BlockAllocator.h>
 #include <Box2D/Dynamics/b2World.h>
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
@@ -28,16 +29,32 @@
 #include <Box2D/Collision/Shapes/b2ChainShape.h>
 #include <algorithm>
 
+// Define LIQUIDFUN_SIMD_TEST_VS_REFERENCE to run both SIMD and reference
+// versions, and assert that the results are identical. This is useful when
+// modifying one of the functions, to help verify correctness.
+// #define LIQUIDFUN_SIMD_TEST_VS_REFERENCE
+
+// For ease of debugging, remove 'inline'. Then, when an assert hits in the
+// test-vs-reference functions, you can easily jump the instruction pointer
+// to the top of the function to re-run the test.
+#define LIQUIDFUN_SIMD_INLINE inline
+
+
 static const uint32 xTruncBits = 12;
 static const uint32 yTruncBits = 12;
-static const uint32 tagBits = 8 * sizeof(uint32);
-static const uint32 yOffset = 1 << (yTruncBits - 1);
+static const uint32 tagBits = 8u * sizeof(uint32);
+static const uint32 yOffset = 1u << (yTruncBits - 1u);
 static const uint32 yShift = tagBits - yTruncBits;
 static const uint32 xShift = tagBits - yTruncBits - xTruncBits;
-static const uint32 xScale = 1 << xShift;
-static const uint32 xOffset = xScale * (1 << (xTruncBits - 1));
-static const uint32 xMask = (1 << xTruncBits) - 1;
-static const uint32 yMask = (1 << yTruncBits) - 1;
+static const uint32 xScale = 1u << xShift;
+static const uint32 xOffset = xScale * (1u << (xTruncBits - 1u));
+static const uint32 yMask = ((1u << yTruncBits) - 1u) << yShift;
+static const uint32 xMask = ~yMask;
+static const uint32 relativeTagRight = 1u << xShift;
+static const uint32 relativeTagBottomLeft = (uint32)((1 << yShift) +
+                                                    (-1 << xShift));
+
+static const uint32 relativeTagBottomRight = (1u << yShift) + (1u << xShift);
 
 // This functor is passed to std::remove_if in RemoveSpuriousBodyContacts
 // to implement the algorithm described there.  It was hoisted out and friended
@@ -277,6 +294,11 @@ public:
 // Associates a fixture with a particle index.
 typedef LightweightPair<b2Fixture*,int32> FixtureParticle;
 
+// Associates a fixture with a particle index.
+typedef LightweightPair<int32,int32> ParticlePair;
+
+}  // namespace
+
 // Set of fixture / particle indices.
 class FixtureParticleSet :
 	public TypedFixedSetAllocator<FixtureParticle>
@@ -299,11 +321,6 @@ public:
 	// exposing any dependencies via this header.
 	int32 Find(const FixtureParticle& fixtureParticle) const;
 };
-
-// Associates a fixture with a particle index.
-typedef LightweightPair<int32,int32> ParticlePair;
-
-}  // namespace
 
 // Set of particle / particle pairs.
 class b2ParticlePairSet : public TypedFixedSetAllocator<ParticlePair>
@@ -335,9 +352,46 @@ static inline uint32 computeRelativeTag(uint32 tag, int32 x, int32 y)
 	return tag + (y << yShift) + (x << xShift);
 }
 
+b2ParticleSystem::InsideBoundsEnumerator::InsideBoundsEnumerator(
+	uint32 lower, uint32 upper, const Proxy* first, const Proxy* last)
+{
+	m_xLower = lower & xMask;
+	m_xUpper = upper & xMask;
+	m_yLower = lower & yMask;
+	m_yUpper = upper & yMask;
+	m_first = first;
+	m_last = last;
+	b2Assert(m_first <= m_last);
+}
+
+int32 b2ParticleSystem::InsideBoundsEnumerator::GetNext()
+{
+	while (m_first < m_last)
+	{
+		uint32 xTag = m_first->tag & xMask;
+#if B2_ASSERT_ENABLED
+		uint32 yTag = m_first->tag & yMask;
+		b2Assert(yTag >= m_yLower);
+		b2Assert(yTag <= m_yUpper);
+#endif
+		if (xTag >= m_xLower && xTag <= m_xUpper)
+		{
+			return (m_first++)->index;
+		}
+		m_first++;
+	}
+	return b2_invalidParticleIndex;
+}
+
 b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 								   b2World* world) :
-	m_handleAllocator(b2_minParticleSystemBufferCapacity)
+	m_handleAllocator(b2_minParticleSystemBufferCapacity),
+	m_stuckParticleBuffer(world->m_blockAllocator),
+	m_proxyBuffer(world->m_blockAllocator),
+	m_contactBuffer(world->m_blockAllocator),
+	m_bodyContactBuffer(world->m_blockAllocator),
+	m_pairBuffer(world->m_blockAllocator),
+	m_triadBuffer(world->m_blockAllocator)
 {
 	b2Assert(def);
 	m_paused = false;
@@ -348,16 +402,15 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_needsUpdateAllGroupFlags = false;
 	m_hasForce = false;
 	m_iterationIndex = 0;
-	m_strictContactCheck = false;
 
-	m_density = 1;
-	m_inverseDensity = 1;
-	m_gravityScale = 1;
+	SetStrictContactCheck(def->strictContactCheck);
+	SetDensity(def->density);
+	SetGravityScale(def->gravityScale);
 	SetRadius(def->radius);
+	SetMaxParticleCount(def->maxCount);
 
 	m_count = 0;
 	m_internalAllocatedCapacity = 0;
-	m_maxCount = 0;
 	m_forceBuffer = NULL;
 	m_weightBuffer = NULL;
 	m_staticPressureBuffer = NULL;
@@ -365,26 +418,6 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_accumulation2Buffer = NULL;
 	m_depthBuffer = NULL;
 	m_groupBuffer = NULL;
-
-	m_proxyCount = 0;
-	m_proxyCapacity = 0;
-	m_proxyBuffer = NULL;
-
-	m_contactCount = 0;
-	m_contactCapacity = 0;
-	m_contactBuffer = NULL;
-
-	m_bodyContactCount = 0;
-	m_bodyContactCapacity = 0;
-	m_bodyContactBuffer = NULL;
-
-	m_pairCount = 0;
-	m_pairCapacity = 0;
-	m_pairBuffer = NULL;
-
-	m_triadCount = 0;
-	m_triadCapacity = 0;
-	m_triadBuffer = NULL;
 
 	m_groupCount = 0;
 	m_groupList = NULL;
@@ -395,9 +428,6 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_world = world;
 
 	m_stuckThreshold = 0;
-	m_stuckParticleCount = 0;
-	m_stuckParticleCapacity = 0;
-	m_stuckParticleBuffer = NULL;
 
 	m_timeElapsed = 0;
 	m_expirationTimeBufferRequiresSorting = false;
@@ -430,12 +460,6 @@ b2ParticleSystem::~b2ParticleSystem()
 	FreeBuffer(&m_accumulation2Buffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_depthBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_groupBuffer, m_internalAllocatedCapacity);
-	FreeBuffer(&m_proxyBuffer, m_proxyCapacity);
-	FreeBuffer(&m_contactBuffer, m_contactCapacity);
-	FreeBuffer(&m_bodyContactBuffer, m_bodyContactCapacity);
-	FreeBuffer(&m_pairBuffer, m_pairCapacity);
-	FreeBuffer(&m_triadBuffer, m_triadCapacity);
-	FreeBuffer(&m_stuckParticleBuffer, m_stuckParticleCapacity);
 }
 
 template <typename T> void b2ParticleSystem::FreeBuffer(T** b, int capacity)
@@ -531,20 +555,6 @@ template <typename T> T* b2ParticleSystem::RequestBuffer(T* buffer)
 	return buffer;
 }
 
-template <typename T> T* b2ParticleSystem::RequestGrowableBuffer(T* buffer,
-	int32 count, int32 *capacity)
-{
-	if (count >= *capacity)
-	{
-		int32 oldCapacity = *capacity;
-		int32 newCapacity = count ?
-			2 * count : b2_minParticleSystemBufferCapacity;
-		buffer = ReallocateBuffer(buffer, oldCapacity, newCapacity);
-		*capacity = newCapacity;
-	}
-	return buffer;
-}
-
 b2ParticleColor* b2ParticleSystem::GetColorBuffer()
 {
 	m_colorBuffer.data = RequestBuffer(m_colorBuffer.data);
@@ -565,7 +575,7 @@ static int32 LimitCapacity(int32 capacity, int32 maxCount)
 void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 {
 	// Don't increase capacity beyond the smallest user-supplied buffer size.
-	capacity = LimitCapacity(capacity, m_maxCount);
+	capacity = LimitCapacity(capacity, m_def.maxCount);
 	capacity = LimitCapacity(capacity, m_flagsBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_positionBuffer.userSuppliedCapacity);
 	capacity = LimitCapacity(capacity, m_velocityBuffer.userSuppliedCapacity);
@@ -694,8 +704,7 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	{
 		m_handleIndexBuffer.data[index] = NULL;
 	}
-	m_proxyBuffer = RequestGrowableBuffer(m_proxyBuffer, m_proxyCount,
-											&m_proxyCapacity);
+	Proxy& proxy = m_proxyBuffer.Append();
 
 	// If particle lifetimes are enabled or the lifetime is set in the particle
 	// definition, initialize the lifetime.
@@ -710,7 +719,7 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 		m_indexByExpirationTimeBuffer.data[index] = index;
 	}
 
-	m_proxyBuffer[m_proxyCount++].index = index;
+	proxy.index = index;
 	b2ParticleGroup* group = def.group;
 	m_groupBuffer[index] = group;
 	if (group)
@@ -1151,6 +1160,278 @@ void b2ParticleSystem::JoinParticleGroups(b2ParticleGroup* groupA,
 	DestroyParticleGroup(groupB);
 }
 
+void b2ParticleSystem::SplitParticleGroup(b2ParticleGroup* group)
+{
+	UpdateContacts(true);
+	int32 particleCount = group->GetParticleCount();
+	// We create several linked lists. Each list represents a set of connected
+	// particles.
+	ParticleListNode* nodeBuffer =
+		(ParticleListNode*) m_world->m_stackAllocator.Allocate(
+									sizeof(ParticleListNode) * particleCount);
+	InitializeParticleLists(group, nodeBuffer);
+	MergeParticleListsInContact(group, nodeBuffer);
+	ParticleListNode* survivingList =
+									FindLongestParticleList(group, nodeBuffer);
+	MergeZombieParticleListNodes(group, nodeBuffer, survivingList);
+	CreateParticleGroupsFromParticleList(group, nodeBuffer, survivingList);
+	UpdatePairsAndTriadsWithParticleList(group, nodeBuffer);
+	m_world->m_stackAllocator.Free(nodeBuffer);
+}
+
+void b2ParticleSystem::InitializeParticleLists(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer)
+{
+	int32 bufferIndex = group->GetBufferIndex();
+	int32 particleCount = group->GetParticleCount();
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ParticleListNode* node = &nodeBuffer[i];
+		node->list = node;
+		node->next = NULL;
+		node->count = 1;
+		node->index = i + bufferIndex;
+	}
+}
+
+void b2ParticleSystem::MergeParticleListsInContact(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer) const
+{
+	int32 bufferIndex = group->GetBufferIndex();
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		if (!group->ContainsParticle(a) || !group->ContainsParticle(b)) {
+			continue;
+		}
+		ParticleListNode* listA = nodeBuffer[a - bufferIndex].list;
+		ParticleListNode* listB = nodeBuffer[b - bufferIndex].list;
+		if (listA == listB) {
+			continue;
+		}
+		// To minimize the cost of insertion, make sure listA is longer than
+		// listB.
+		if (listA->count < listB->count)
+		{
+			b2Swap(listA, listB);
+		}
+		b2Assert(listA->count >= listB->count);
+		MergeParticleLists(listA, listB);
+	}
+}
+
+void b2ParticleSystem::MergeParticleLists(
+	ParticleListNode* listA, ParticleListNode* listB)
+{
+	// Insert listB between index 0 and 1 of listA
+	// Example:
+	//     listA => a1 => a2 => a3 => NULL
+	//     listB => b1 => b2 => NULL
+	// to
+	//     listA => listB => b1 => b2 => a1 => a2 => a3 => NULL
+	b2Assert(listA != listB);
+	for (ParticleListNode* b = listB;;)
+	{
+		b->list = listA;
+		ParticleListNode* nextB = b->next;
+		if (nextB)
+		{
+			b = nextB;
+		}
+		else
+		{
+			b->next = listA->next;
+			break;
+		}
+	}
+	listA->next = listB;
+	listA->count += listB->count;
+	listB->count = 0;
+}
+
+b2ParticleSystem::ParticleListNode* b2ParticleSystem::FindLongestParticleList(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer)
+{
+	int32 particleCount = group->GetParticleCount();
+	ParticleListNode* result = nodeBuffer;
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ParticleListNode* node = &nodeBuffer[i];
+		if (result->count < node->count)
+		{
+			result = node;
+		}
+	}
+	return result;
+}
+
+void b2ParticleSystem::MergeZombieParticleListNodes(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer,
+	ParticleListNode* survivingList) const
+{
+	int32 particleCount = group->GetParticleCount();
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ParticleListNode* node = &nodeBuffer[i];
+		if (node != survivingList &&
+			(m_flagsBuffer.data[node->index] & b2_zombieParticle))
+		{
+			MergeParticleListAndNode(survivingList, node);
+		}
+	}
+}
+
+void b2ParticleSystem::MergeParticleListAndNode(
+	ParticleListNode* list, ParticleListNode* node)
+{
+	// Insert node between index 0 and 1 of list
+	// Example:
+	//     list => a1 => a2 => a3 => NULL
+	//     node => NULL
+	// to
+	//     list => node => a1 => a2 => a3 => NULL
+	b2Assert(node != list);
+	b2Assert(node->list == node);
+	b2Assert(node->count == 1);
+	node->list = list;
+	node->next = list->next;
+	list->next = node;
+	list->count++;
+	node->count = 0;
+}
+
+void b2ParticleSystem::CreateParticleGroupsFromParticleList(
+	const b2ParticleGroup* group, ParticleListNode* nodeBuffer,
+	const ParticleListNode* survivingList)
+{
+	int32 particleCount = group->GetParticleCount();
+	b2ParticleGroupDef def;
+	def.groupFlags = group->GetGroupFlags();
+	def.userData = group->GetUserData();
+	for (int32 i = 0; i < particleCount; i++)
+	{
+		ParticleListNode* list = &nodeBuffer[i];
+		if (!list->count || list == survivingList)
+		{
+			continue;
+		}
+		b2Assert(list->list == list);
+		b2ParticleGroup* newGroup = CreateParticleGroup(def);
+		for (ParticleListNode* node = list; node; node = node->next)
+		{
+			int32 oldIndex = node->index;
+			uint32& flags = m_flagsBuffer.data[oldIndex];
+			b2Assert(!(flags & b2_zombieParticle));
+			int32 newIndex = CloneParticle(oldIndex, newGroup);
+			flags |= b2_zombieParticle;
+			node->index = newIndex;
+		}
+	}
+}
+
+void b2ParticleSystem::UpdatePairsAndTriadsWithParticleList(
+	const b2ParticleGroup* group, const ParticleListNode* nodeBuffer)
+{
+	int32 bufferIndex = group->GetBufferIndex();
+	// Update indices in pairs and triads. If an index belongs to the group,
+	// replace it with the corresponding value in nodeBuffer.
+	// Note that nodeBuffer is allocated only for the group and the index should
+	// be shifted by bufferIndex.
+	for (int32 k = 0; k < m_pairBuffer.GetCount(); k++)
+	{
+		b2ParticlePair& pair = m_pairBuffer[k];
+		int32 a = pair.indexA;
+		int32 b = pair.indexB;
+		if (group->ContainsParticle(a))
+		{
+			pair.indexA = nodeBuffer[a - bufferIndex].index;
+		}
+		if (group->ContainsParticle(b))
+		{
+			pair.indexB = nodeBuffer[b - bufferIndex].index;
+		}
+	}
+	for (int32 k = 0; k < m_triadBuffer.GetCount(); k++)
+	{
+		b2ParticleTriad& triad = m_triadBuffer[k];
+		int32 a = triad.indexA;
+		int32 b = triad.indexB;
+		int32 c = triad.indexC;
+		if (group->ContainsParticle(a))
+		{
+			triad.indexA = nodeBuffer[a - bufferIndex].index;
+		}
+		if (group->ContainsParticle(b))
+		{
+			triad.indexB = nodeBuffer[b - bufferIndex].index;
+		}
+		if (group->ContainsParticle(c))
+		{
+			triad.indexC = nodeBuffer[c - bufferIndex].index;
+		}
+	}
+}
+
+int32 b2ParticleSystem::CloneParticle(int32 oldIndex, b2ParticleGroup* group)
+{
+	b2ParticleDef def;
+	def.flags = m_flagsBuffer.data[oldIndex];
+	def.position = m_positionBuffer.data[oldIndex];
+	def.velocity = m_velocityBuffer.data[oldIndex];
+	if (m_colorBuffer.data)
+	{
+		def.color = m_colorBuffer.data[oldIndex];
+	}
+	if (m_userDataBuffer.data)
+	{
+		def.userData = m_userDataBuffer.data[oldIndex];
+	}
+	def.group = group;
+	int32 newIndex = CreateParticle(def);
+	if (m_handleIndexBuffer.data)
+	{
+		b2ParticleHandle* handle = m_handleIndexBuffer.data[oldIndex];
+		if (handle) handle->SetIndex(newIndex);
+		m_handleIndexBuffer.data[newIndex] = handle;
+		m_handleIndexBuffer.data[oldIndex] = NULL;
+	}
+	if (m_lastBodyContactStepBuffer.data)
+	{
+		m_lastBodyContactStepBuffer.data[newIndex] =
+			m_lastBodyContactStepBuffer.data[oldIndex];
+	}
+	if (m_bodyContactCountBuffer.data)
+	{
+		m_bodyContactCountBuffer.data[newIndex] =
+			m_bodyContactCountBuffer.data[oldIndex];
+	}
+	if (m_consecutiveContactStepsBuffer.data)
+	{
+		m_consecutiveContactStepsBuffer.data[newIndex] =
+			m_consecutiveContactStepsBuffer.data[oldIndex];
+	}
+	if (m_hasForce)
+	{
+		m_forceBuffer[newIndex] = m_forceBuffer[oldIndex];
+	}
+	if (m_staticPressureBuffer)
+	{
+		m_staticPressureBuffer[newIndex] = m_staticPressureBuffer[oldIndex];
+	}
+	if (m_depthBuffer)
+	{
+		m_depthBuffer[newIndex] = m_depthBuffer[oldIndex];
+	}
+	if (m_expirationTimeBuffer.data)
+	{
+		m_expirationTimeBuffer.data[newIndex] =
+			m_expirationTimeBuffer.data[oldIndex];
+	}
+	return newIndex;
+}
+
 void b2ParticleSystem::UpdatePairsAndTriadsWithReactiveParticles()
 {
 	class ReactiveFilter : public ConnectionFilter
@@ -1203,11 +1484,11 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 	}
 	if (particleFlags & k_pairFlags)
 	{
-		for (int32 k = 0; k < m_contactCount; k++)
+		for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 		{
 			const b2ParticleContact& contact = m_contactBuffer[k];
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
 			uint32 af = m_flagsBuffer.data[a];
 			uint32 bf = m_flagsBuffer.data[b];
 			b2ParticleGroup* groupA = m_groupBuffer[a];
@@ -1221,26 +1502,20 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 				ParticleCanBeConnected(bf, groupB) &&
 				filter.ShouldCreatePair(a, b))
 			{
-				m_pairBuffer = RequestGrowableBuffer(m_pairBuffer,
-													m_pairCount,
-													&m_pairCapacity);
-				Pair& pair = m_pairBuffer[m_pairCount];
+				b2ParticlePair& pair = m_pairBuffer.Append();
 				pair.indexA = a;
 				pair.indexB = b;
-				pair.flags = contact.flags;
+				pair.flags = contact.GetFlags();
 				pair.strength = b2Min(
 					groupA ? groupA->m_strength : 1,
 					groupB ? groupB->m_strength : 1);
 				pair.distance = b2Distance(m_positionBuffer.data[a],
 										   m_positionBuffer.data[b]);
-				m_pairCount++;
 			}
 		}
 		std::stable_sort(
-			m_pairBuffer, m_pairBuffer + m_pairCount, ComparePairIndices);
-		Pair* lastPair = std::unique(
-			m_pairBuffer, m_pairBuffer + m_pairCount, MatchPairIndices);
-		m_pairCount = (int32) (lastPair - m_pairBuffer);
+			m_pairBuffer.Begin(), m_pairBuffer.End(), ComparePairIndices);
+		m_pairBuffer.Unique(MatchPairIndices);
 	}
 	if (particleFlags & k_triadFlags)
 	{
@@ -1283,14 +1558,10 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 					{
 						return;
 					}
-					m_system->m_triadBuffer = m_system->RequestGrowableBuffer(
-													m_system->m_triadBuffer,
-													m_system->m_triadCount,
-													&m_system->m_triadCapacity);
 					b2ParticleGroup* groupA = m_system->m_groupBuffer[a];
 					b2ParticleGroup* groupB = m_system->m_groupBuffer[b];
 					b2ParticleGroup* groupC = m_system->m_groupBuffer[c];
-					Triad& triad = m_system->m_triadBuffer[m_system->m_triadCount];
+					b2ParticleTriad& triad = m_system->m_triadBuffer.Append();
 					triad.indexA = a;
 					triad.indexB = b;
 					triad.indexC = c;
@@ -1307,7 +1578,6 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 					triad.kb = -b2Dot(dab, dbc);
 					triad.kc = -b2Dot(dbc, dca);
 					triad.s = b2Cross(pa, pb) + b2Cross(pb, pc) + b2Cross(pc, pa);
-					m_system->m_triadCount++;
 				}
 			}
 			b2ParticleSystem* m_system;
@@ -1322,26 +1592,27 @@ void b2ParticleSystem::UpdatePairsAndTriads(
 		} callback(this, &filter);
 		diagram.GetNodes(callback);
 		std::stable_sort(
-			m_triadBuffer, m_triadBuffer + m_triadCount, CompareTriadIndices);
-		Triad* lastTriad = std::unique(
-			m_triadBuffer, m_triadBuffer + m_triadCount, MatchTriadIndices);
-		m_triadCount = (int32) (lastTriad - m_triadBuffer);
+			m_triadBuffer.Begin(), m_triadBuffer.End(), CompareTriadIndices);
+		m_triadBuffer.Unique(MatchTriadIndices);
 	}
 }
 
-bool b2ParticleSystem::ComparePairIndices(const Pair& a, const Pair& b)
+bool b2ParticleSystem::ComparePairIndices(
+							const b2ParticlePair& a, const b2ParticlePair& b)
 {
 	int32 diffA = a.indexA - b.indexA;
 	if (diffA != 0) return diffA < 0;
 	return a.indexB < b.indexB;
 }
 
-bool b2ParticleSystem::MatchPairIndices(const Pair& a, const Pair& b)
+bool b2ParticleSystem::MatchPairIndices(
+							const b2ParticlePair& a, const b2ParticlePair& b)
 {
 	return a.indexA == b.indexA && a.indexB == b.indexB;
 }
 
-bool b2ParticleSystem::CompareTriadIndices(const Triad& a, const Triad& b)
+bool b2ParticleSystem::CompareTriadIndices(
+							const b2ParticleTriad& a, const b2ParticleTriad& b)
 {
 	int32 diffA = a.indexA - b.indexA;
 	if (diffA != 0) return diffA < 0;
@@ -1350,7 +1621,8 @@ bool b2ParticleSystem::CompareTriadIndices(const Triad& a, const Triad& b)
 	return a.indexC < b.indexC;
 }
 
-bool b2ParticleSystem::MatchTriadIndices(const Triad& a, const Triad& b)
+bool b2ParticleSystem::MatchTriadIndices(
+							const b2ParticleTriad& a, const b2ParticleTriad& b)
 {
 	return a.indexA == b.indexA && a.indexB == b.indexB && a.indexC == b.indexC;
 }
@@ -1395,19 +1667,19 @@ void b2ParticleSystem::ComputeWeight()
 	// calculates the sum of contact-weights for each particle
 	// that means dimensionless density
 	memset(m_weightBuffer, 0, sizeof(*m_weightBuffer) * m_count);
-	for (int32 k = 0; k < m_bodyContactCount; k++)
+	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
 		int32 a = contact.index;
 		float32 w = contact.weight;
 		m_weightBuffer[a] += w;
 	}
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		float32 w = contact.weight;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		float32 w = contact.GetWeight();
 		m_weightBuffer[a] += w;
 		m_weightBuffer[b] += w;
 	}
@@ -1416,13 +1688,13 @@ void b2ParticleSystem::ComputeWeight()
 void b2ParticleSystem::ComputeDepth()
 {
 	b2ParticleContact* contactGroups = (b2ParticleContact*) m_world->
-		m_stackAllocator.Allocate(sizeof(b2ParticleContact) * m_contactCount);
+		m_stackAllocator.Allocate(sizeof(b2ParticleContact) * m_contactBuffer.GetCount());
 	int32 contactGroupsCount = 0;
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
 		const b2ParticleGroup* groupA = m_groupBuffer[a];
 		const b2ParticleGroup* groupB = m_groupBuffer[b];
 		if (groupA && groupA == groupB &&
@@ -1448,13 +1720,23 @@ void b2ParticleSystem::ComputeDepth()
 			}
 		}
 	}
+	// Compute sum of weight of contacts except between different groups.
+	for (int32 k = 0; k < contactGroupsCount; k++)
+	{
+		const b2ParticleContact& contact = contactGroups[k];
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		float32 w = contact.GetWeight();
+		m_accumulationBuffer[a] += w;
+		m_accumulationBuffer[b] += w;
+	}
 	b2Assert(m_depthBuffer);
 	for (int32 i = 0; i < groupsToUpdateCount; i++)
 	{
 		const b2ParticleGroup* group = groupsToUpdate[i];
 		for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 		{
-			float32 w = m_weightBuffer[i];
+			float32 w = m_accumulationBuffer[i];
 			m_depthBuffer[i] = w < 0.8f ? 0 : b2_maxFloat;
 		}
 	}
@@ -1468,9 +1750,9 @@ void b2ParticleSystem::ComputeDepth()
 		for (int32 k = 0; k < contactGroupsCount; k++)
 		{
 			const b2ParticleContact& contact = contactGroups[k];
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			float32 r = 1 - contact.weight;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
+			float32 r = 1 - contact.GetWeight();
 			float32& ap0 = m_depthBuffer[a];
 			float32& bp0 = m_depthBuffer[b];
 			float32 ap1 = bp0 + r;
@@ -1511,62 +1793,220 @@ void b2ParticleSystem::ComputeDepth()
 	m_world->m_stackAllocator.Free(contactGroups);
 }
 
-inline void b2ParticleSystem::AddContact(
-	int32 a, int32 b, b2ContactFilter* const contactFilter,
-	b2ContactListener* const contactListener,
-	b2ParticlePairSet* const particlePairSet)
+b2ParticleSystem::InsideBoundsEnumerator
+b2ParticleSystem::GetInsideBoundsEnumerator(const b2AABB& aabb) const
+{
+	uint32 lowerTag = computeTag(m_inverseDiameter * aabb.lowerBound.x - 1,
+								 m_inverseDiameter * aabb.lowerBound.y - 1);
+	uint32 upperTag = computeTag(m_inverseDiameter * aabb.upperBound.x + 1,
+								 m_inverseDiameter * aabb.upperBound.y + 1);
+	const Proxy* beginProxy = m_proxyBuffer.Begin();
+	const Proxy* endProxy = m_proxyBuffer.End();
+	const Proxy* firstProxy = std::lower_bound(beginProxy, endProxy, lowerTag);
+	const Proxy* lastProxy = std::upper_bound(firstProxy, endProxy, upperTag);
+	return InsideBoundsEnumerator(lowerTag, upperTag, firstProxy, lastProxy);
+}
+
+inline void b2ParticleSystem::AddContact(int32 a, int32 b,
+	b2GrowableBuffer<b2ParticleContact>& contacts) const
 {
 	b2Vec2 d = m_positionBuffer.data[b] - m_positionBuffer.data[a];
 	float32 distBtParticlesSq = b2Dot(d, d);
 	if (distBtParticlesSq < m_squaredDiameter)
 	{
-        // Optionally filter the contact.
-        if (contactFilter)
-        {
-            const uint32* const flags = GetFlagsBuffer();
-            if (((flags[a] | flags[b]) & b2_particleContactFilterParticle) &&
-                !contactFilter->ShouldCollide(this, a, b))
-            {
-                return;
-            }
-        }
-
-		m_contactBuffer = RequestGrowableBuffer(m_contactBuffer,
-												m_contactCount,
-												&m_contactCapacity);
 		float32 invD = b2InvSqrt(distBtParticlesSq);
-		b2ParticleContact& contact = m_contactBuffer[m_contactCount];
-		contact.indexA = a;
-		contact.indexB = b;
-		contact.flags = m_flagsBuffer.data[a] | m_flagsBuffer.data[b];
+		b2ParticleContact& contact = contacts.Append();
+		contact.SetIndices(a, b);
+		contact.SetFlags(m_flagsBuffer.data[a] | m_flagsBuffer.data[b]);
 		// 1 - distBtParticles / diameter
-		contact.weight = 1 - distBtParticlesSq * invD * m_inverseDiameter;
-		contact.normal = invD * d;
-		m_contactCount++;
+		contact.SetWeight(1 - distBtParticlesSq * invD * m_inverseDiameter);
+		contact.SetNormal(invD * d);
+	}
+}
 
-		if (contactListener)
+void b2ParticleSystem::FindContacts_Reference(
+	b2GrowableBuffer<b2ParticleContact>& contacts) const
+{
+	const Proxy* beginProxy = m_proxyBuffer.Begin();
+	const Proxy* endProxy = m_proxyBuffer.End();
+
+	contacts.SetCount(0);
+	for (const Proxy *a = beginProxy, *c = beginProxy; a < endProxy; a++)
+	{
+		uint32 rightTag = computeRelativeTag(a->tag, 1, 0);
+		for (const Proxy* b = a + 1; b < endProxy; b++)
 		{
-			ParticlePair pair;
-			pair.first = a;
-			pair.second = b;
-			const int32 itemIndex = particlePairSet->Find(pair);
-			if (itemIndex >= 0)
-			{
-				// Already touching, ignore this contact.
-				particlePairSet->Invalidate(itemIndex);
-			}
-			else
-			{
-				// Just started touching, inform the listener.
-				contactListener->BeginContact(this, &contact);
-			}
+			if (rightTag < b->tag) break;
+			AddContact(a->index, b->index, contacts);
+		}
+		uint32 bottomLeftTag = computeRelativeTag(a->tag, -1, 1);
+		for (; c < endProxy; c++)
+		{
+			if (bottomLeftTag <= c->tag) break;
+		}
+		uint32 bottomRightTag = computeRelativeTag(a->tag, 1, 1);
+		for (const Proxy* b = c; b < endProxy; b++)
+		{
+			if (bottomRightTag < b->tag) break;
+			AddContact(a->index, b->index, contacts);
 		}
 	}
 }
 
+// Put the positions and indices in proxy-order. This allows us to process
+// particles with SIMD, since adjacent particles are adjacent in memory.
+void b2ParticleSystem::ReorderForFindContact(FindContactInput* reordered,
+	                                         int alignedCount) const
+{
+	int i = 0;
+	for (; i < m_count; ++i)
+	{
+		const int proxyIndex = m_proxyBuffer[i].index;
+		FindContactInput& r = reordered[i];
+		r.proxyIndex = proxyIndex;
+		r.position = m_positionBuffer.data[proxyIndex];
+	}
+
+	// We process multiple elements at a time, so we may read off the end of
+	// the array. Pad the array with a few elements, so we don't end up
+	// outputing spurious contacts.
+	for (; i < alignedCount; ++i)
+	{
+		FindContactInput& r = reordered[i];
+		r.proxyIndex = 0;
+		r.position = b2Vec2(b2_maxFloat, b2_maxFloat);
+	}
+}
+
+// Check particles to the right of 'startIndex', outputing FindContactChecks
+// until we find an index that is greater than 'bound'. We skip over the
+// indices NUM_V32_SLOTS at a time, because they are processed in groups
+// in the SIMD function.
+inline void b2ParticleSystem::GatherChecksOneParticle(
+	const uint32 bound,
+	const int startIndex,
+	const int particleIndex,
+	int* nextUncheckedIndex,
+	b2GrowableBuffer<FindContactCheck>& checks) const
+{
+	// The particles have to be heavily packed together in order for this
+	// loop to iterate more than once. In almost all situations, it will
+	// iterate less than twice.
+	for (int comparatorIndex = startIndex;
+		 comparatorIndex < m_count;
+	     comparatorIndex += NUM_V32_SLOTS)
+	{
+		if (m_proxyBuffer[comparatorIndex].tag > bound)
+			break;
+
+		FindContactCheck& out = checks.Append();
+		out.particleIndex = (uint16)particleIndex;
+		out.comparatorIndex = (uint16)comparatorIndex;
+
+		// This is faster inside the 'for' since there are so few iterations.
+		if (nextUncheckedIndex != NULL)
+		{
+			*nextUncheckedIndex = comparatorIndex + NUM_V32_SLOTS;
+		}
+	}
+}
+
+void b2ParticleSystem::GatherChecks(
+	b2GrowableBuffer<FindContactCheck>& checks) const
+{
+	int bottomLeftIndex = 0;
+	for (int particleIndex = 0; particleIndex < m_count; ++particleIndex)
+	{
+		const uint32 particleTag = m_proxyBuffer[particleIndex].tag;
+
+		// Add checks for particles to the right.
+		const uint32 rightBound = particleTag + relativeTagRight;
+		int nextUncheckedIndex = particleIndex + 1;
+		GatherChecksOneParticle(rightBound,
+								particleIndex + 1,
+								particleIndex,
+								&nextUncheckedIndex,
+								checks);
+
+		// Find comparator index below and to left of particle.
+		const uint32 bottomLeftTag = particleTag + relativeTagBottomLeft;
+		for (; bottomLeftIndex < m_count; ++bottomLeftIndex)
+		{
+			if (bottomLeftTag <= m_proxyBuffer[bottomLeftIndex].tag)
+				break;
+		}
+
+		// Add checks for particles below.
+		const uint32 bottomRightBound = particleTag + relativeTagBottomRight;
+		const int bottomStartIndex = b2Max(bottomLeftIndex, nextUncheckedIndex);
+		GatherChecksOneParticle(bottomRightBound,
+								bottomStartIndex,
+								particleIndex,
+								NULL,
+								checks);
+	}
+}
+
+#if defined(LIQUIDFUN_SIMD_NEON)
+void b2ParticleSystem::FindContacts_Simd(
+	b2GrowableBuffer<b2ParticleContact>& contacts) const
+{
+	contacts.SetCount(0);
+
+	const int alignedCount = m_count + NUM_V32_SLOTS;
+	FindContactInput* reordered = (FindContactInput*)
+		m_world->m_stackAllocator.Allocate(
+			sizeof(FindContactInput) * alignedCount);
+
+	// Put positions and indices into proxy-order.
+	// This allows us to efficiently check for contacts using SIMD.
+	ReorderForFindContact(reordered, alignedCount);
+
+	// Perform broad-band contact check using tags to approximate
+	// positions. This reduces the number of narrow-band contact checks
+	// that use actual positions.
+	static const int MAX_EXPECTED_CHECKS_PER_PARTICLE = 3;
+	b2GrowableBuffer<FindContactCheck> checks(m_world->m_blockAllocator);
+	checks.Reserve(MAX_EXPECTED_CHECKS_PER_PARTICLE * m_count);
+	GatherChecks(checks);
+
+	// Perform narrow-band contact checks using actual positions.
+	// Any particles whose centers are within one diameter of each other are
+	// considered contacting.
+	FindContactsFromChecks_Simd(reordered, checks.Data(), checks.GetCount(),
+								m_squaredDiameter, m_inverseDiameter,
+								m_flagsBuffer.data, contacts);
+
+	m_world->m_stackAllocator.Free(reordered);
+}
+#endif // defined(LIQUIDFUN_SIMD_NEON)
+
+LIQUIDFUN_SIMD_INLINE
+void b2ParticleSystem::FindContacts(
+	b2GrowableBuffer<b2ParticleContact>& contacts) const
+{
+	#if defined(LIQUIDFUN_SIMD_NEON)
+		FindContacts_Simd(contacts);
+	#else
+		FindContacts_Reference(contacts);
+	#endif
+
+	#if defined(LIQUIDFUN_SIMD_TEST_VS_REFERENCE)
+		b2GrowableBuffer<b2ParticleContact>
+			reference(m_world->m_blockAllocator);
+		FindContacts_Reference(reference);
+
+		b2Assert(contacts.GetCount() == reference.GetCount());
+		for (int32 i = 0; i < contacts.GetCount(); ++i)
+		{
+			b2Assert(contacts[i].ApproximatelyEqual(reference[i]));
+		}
+	#endif // defined(LIQUIDFUN_SIMD_TEST_VS_REFERENCE)
+}
+
 static inline bool b2ParticleContactIsZombie(const b2ParticleContact& contact)
 {
-	return (contact.flags & b2_zombieParticle) == b2_zombieParticle;
+	return (contact.GetFlags() & b2_zombieParticle) == b2_zombieParticle;
 }
 
 // Get the world's contact filter if any particles with the
@@ -1585,72 +2025,253 @@ inline b2ContactListener* b2ParticleSystem::GetParticleContactListener() const
 		m_world->m_contactManager.m_contactListener : NULL;
 }
 
-void b2ParticleSystem::UpdateContacts(bool exceptZombie)
+// Recalculate 'tag' in proxies using m_positionBuffer.
+// The 'tag' is an approximation of position, in left-right, top-bottom order.
+void b2ParticleSystem::UpdateProxies_Reference(
+	b2GrowableBuffer<Proxy>& proxies) const
 {
-	Proxy* beginProxy = m_proxyBuffer;
-	Proxy* endProxy = beginProxy + m_proxyCount;
-	for (Proxy* proxy = beginProxy; proxy < endProxy; ++proxy)
+	const Proxy* const endProxy = proxies.End();
+	for (Proxy* proxy = proxies.Begin(); proxy < endProxy; ++proxy)
 	{
 		int32 i = proxy->index;
 		b2Vec2 p = m_positionBuffer.data[i];
 		proxy->tag = computeTag(m_inverseDiameter * p.x,
 								m_inverseDiameter * p.y);
 	}
-	std::sort(beginProxy, endProxy);
+}
 
-	b2ContactListener* const contactListener = GetParticleContactListener();
-	b2ParticlePairSet particlePairs(&m_world->m_stackAllocator);
-	if (contactListener)
+#if defined(LIQUIDFUN_SIMD_NEON)
+// static
+void b2ParticleSystem::UpdateProxyTags(
+	const uint32* const tags,
+	b2GrowableBuffer<Proxy>& proxies)
+{
+	const Proxy* const endProxy = proxies.End();
+	for (Proxy* proxy = proxies.Begin(); proxy < endProxy; ++proxy)
 	{
-		particlePairs.Initialize(m_contactBuffer, m_contactCount,
-								 GetFlagsBuffer());
+		proxy->tag = tags[proxy->index];
+	}
+}
+
+void b2ParticleSystem::UpdateProxies_Simd(
+	b2GrowableBuffer<Proxy>& proxies) const
+{
+	uint32* tags = (uint32*)
+		m_world->m_stackAllocator.Allocate(m_count * sizeof(uint32));
+
+	// Calculate tag for every position.
+	// 'tags' array is in position-order.
+	CalculateTags_Simd(m_positionBuffer.data, m_count,
+					   m_inverseDiameter, tags);
+
+	// Update 'tag' element in the 'proxies' array to the new values.
+	UpdateProxyTags(tags, proxies);
+
+	m_world->m_stackAllocator.Free(tags);
+}
+#endif // defined(LIQUIDFUN_SIMD_NEON)
+
+// static
+bool b2ParticleSystem::ProxyBufferHasIndex(
+	int32 index, const Proxy* const a, int count)
+{
+	for (int j = 0; j < count; ++j)
+	{
+		if (a[j].index == index)
+			return true;
+	}
+	return false;
+}
+
+// static
+int b2ParticleSystem::NumProxiesWithSameTag(
+	const Proxy* const a, const Proxy* const b, int count)
+{
+	const uint32 tag = a[0].tag;
+	for (int num = 0; num < count; ++num)
+	{
+		if (a[num].tag != tag || b[num].tag != tag)
+			return num;
+	}
+	return count;
+}
+
+// Precondition: both 'a' and 'b' should be sorted by tag, but don't need to be
+// sorted by index.
+// static
+bool b2ParticleSystem::AreProxyBuffersTheSame(const b2GrowableBuffer<Proxy>& a,
+								   			  const b2GrowableBuffer<Proxy>& b)
+{
+	if (a.GetCount() != b.GetCount())
+		return false;
+
+	// A given tag may have several indices. The order of these indices is
+	// not important, but the set must be equivalent.
+	for (int i = 0; i < a.GetCount();)
+	{
+		const int numWithSameTag = NumProxiesWithSameTag(
+			&a[i], &b[i], a.GetCount() - i);
+		if (numWithSameTag == 0)
+			return false;
+
+		for (int j = 0; j < numWithSameTag; ++j)
+		{
+			const bool hasIndex = ProxyBufferHasIndex(
+				a[i + j].index, &b[i], numWithSameTag);
+			if (!hasIndex)
+				return false;
+		}
+
+		i += numWithSameTag;
+	}
+	return true;
+}
+
+LIQUIDFUN_SIMD_INLINE
+void b2ParticleSystem::UpdateProxies(
+	b2GrowableBuffer<Proxy>& proxies) const
+{
+	#if defined(LIQUIDFUN_SIMD_TEST_VS_REFERENCE)
+		b2GrowableBuffer<Proxy> reference(proxies);
+	#endif
+
+	#if defined(LIQUIDFUN_SIMD_NEON)
+		UpdateProxies_Simd(proxies);
+	#else
+		UpdateProxies_Reference(proxies);
+	#endif
+
+	#if defined(LIQUIDFUN_SIMD_TEST_VS_REFERENCE)
+		UpdateProxies_Reference(reference);
+		b2Assert(AreProxyBuffersTheSame(proxies, reference));
+	#endif
+}
+
+
+// Sort the proxy array by 'tag'. This orders the particles into rows that
+// run left-to-right, top-to-bottom. The rows are spaced m_particleDiameter
+// apart, such that a particle in one row can only collide with the rows
+// immediately above and below it. This ordering makes collision computation
+// tractable.
+//
+// TODO OPT: The sort is a hot spot on the profiles. We could use SIMD to
+// speed this up. See http://www.vldb.org/pvldb/1/1454171.pdf for an excellent
+// explanation of a SIMD mergesort algorithm.
+void b2ParticleSystem::SortProxies(b2GrowableBuffer<Proxy>& proxies) const
+{
+	std::sort(proxies.Begin(), proxies.End());
+}
+
+class b2ParticleContactRemovePredicate
+{
+public:
+	b2ParticleContactRemovePredicate(
+		b2ParticleSystem* system,
+		b2ContactFilter* contactFilter) :
+		m_system(system),
+		m_contactFilter(contactFilter)
+	{}
+
+	bool operator()(const b2ParticleContact& contact)
+	{
+	    return (contact.GetFlags() & b2_particleContactFilterParticle)
+	        && !m_contactFilter->ShouldCollide(m_system, contact.GetIndexA(),
+	        								   contact.GetIndexB());
 	}
 
-	m_contactCount = 0;
+private:
+	b2ParticleSystem* m_system;
+	b2ContactFilter* m_contactFilter;
+};
+
+// Only changes 'contacts', but the contact filter has a non-const 'this'
+// pointer, so this member function cannot be const.
+void b2ParticleSystem::FilterContacts(
+	b2GrowableBuffer<b2ParticleContact>& contacts)
+{
+	// Optionally filter the contact.
 	b2ContactFilter* const contactFilter = GetParticleContactFilter();
-	for (Proxy *a = beginProxy, *c = beginProxy; a < endProxy; a++)
+	if (contactFilter == NULL)
+		return;
+
+	contacts.RemoveIf(b2ParticleContactRemovePredicate(this, contactFilter));
+}
+
+void b2ParticleSystem::NotifyContactListenerPreContact(
+	b2ParticlePairSet* particlePairs) const
+{
+	b2ContactListener* const contactListener = GetParticleContactListener();
+	if (contactListener == NULL)
+		return;
+
+	particlePairs->Initialize(m_contactBuffer.Begin(),
+							  m_contactBuffer.GetCount(),
+						      GetFlagsBuffer());
+}
+
+// Note: This function is not const because 'this' in BeginContact and
+// EndContact callbacks must be non-const. However, this function itself
+// does not change any internal data (though the callbacks might).
+void b2ParticleSystem::NotifyContactListenerPostContact(
+	b2ParticlePairSet& particlePairs)
+{
+	b2ContactListener* const contactListener = GetParticleContactListener();
+	if (contactListener == NULL)
+		return;
+
+	// Loop through all new contacts, reporting any new ones, and
+	// "invalidating" the ones that still exist.
+	const b2ParticleContact* const endContact = m_contactBuffer.End();
+	for (b2ParticleContact* contact = m_contactBuffer.Begin();
+		 contact < endContact; ++contact)
 	{
-		uint32 rightTag = computeRelativeTag(a->tag, 1, 0);
-		for (Proxy* b = a + 1; b < endProxy; b++)
+		ParticlePair pair;
+		pair.first = contact->GetIndexA();
+		pair.second = contact->GetIndexB();
+		const int32 itemIndex = particlePairs.Find(pair);
+		if (itemIndex >= 0)
 		{
-			if (rightTag < b->tag) break;
-			AddContact(a->index, b->index, contactFilter,
-					   contactListener, &particlePairs);
+			// Already touching, ignore this contact.
+			particlePairs.Invalidate(itemIndex);
 		}
-		uint32 bottomLeftTag = computeRelativeTag(a->tag, -1, 1);
-		for (; c < endProxy; c++)
+		else
 		{
-			if (bottomLeftTag <= c->tag) break;
-		}
-		uint32 bottomRightTag = computeRelativeTag(a->tag, 1, 1);
-		for (Proxy* b = c; b < endProxy; b++)
-		{
-			if (bottomRightTag < b->tag) break;
-			AddContact(a->index, b->index, contactFilter,
-					   contactListener, &particlePairs);
+			// Just started touching, inform the listener.
+			contactListener->BeginContact(this, contact);
 		}
 	}
+
+	// Report particles that are no longer touching.
+	// That is, any pairs that were not invalidated above.
+	const int32 pairCount = particlePairs.GetCount();
+	const ParticlePair* const pairs = particlePairs.GetBuffer();
+	const int8* const valid = particlePairs.GetValidBuffer();
+	for (int32 i = 0; i < pairCount; ++i)
+	{
+		if (valid[i])
+		{
+			contactListener->EndContact(this, pairs[i].first,
+										pairs[i].second);
+		}
+	}
+}
+
+void b2ParticleSystem::UpdateContacts(bool exceptZombie)
+{
+	UpdateProxies(m_proxyBuffer);
+	SortProxies(m_proxyBuffer);
+
+	b2ParticlePairSet particlePairs(&m_world->m_stackAllocator);
+	NotifyContactListenerPreContact(&particlePairs);
+
+	FindContacts(m_contactBuffer);
+	FilterContacts(m_contactBuffer);
+
+	NotifyContactListenerPostContact(particlePairs);
+
 	if (exceptZombie)
 	{
-		b2ParticleContact* lastContact = std::remove_if(
-			m_contactBuffer, m_contactBuffer + m_contactCount,
-			b2ParticleContactIsZombie);
-		m_contactCount = (int32) (lastContact - m_contactBuffer);
-	}
-	// Report particles that are no longer touching.
-	if (contactListener)
-	{
-		const int32 pairCount = particlePairs.GetCount();
-		const ParticlePair* pairs = particlePairs.GetBuffer();
-		const int8* valid = particlePairs.GetValidBuffer();
-		for (int32 i = 0; i < pairCount; ++i)
-		{
-			if (valid[i])
-			{
-				contactListener->EndContact(this, pairs[i].first,
-											pairs[i].second);
-			}
-		}
+		m_contactBuffer.RemoveIf(b2ParticleContactIsZombie);
 	}
 }
 
@@ -1686,12 +2307,8 @@ void b2ParticleSystem::DetectStuckParticle(int32 particle)
 		++(*consecutiveCount);
 		if (*consecutiveCount > m_stuckThreshold)
 		{
-			m_stuckParticleBuffer = RequestGrowableBuffer(
-					m_stuckParticleBuffer,
-					m_stuckParticleCount,
-					&m_stuckParticleCapacity);
-
-			m_stuckParticleBuffer[m_stuckParticleCount++] = particle;
+			int32& newStuckParticle = m_stuckParticleBuffer.Append();
+			newStuckParticle = particle;
 		}
 	}
 	*lastStep = m_timestamp;
@@ -1846,16 +2463,16 @@ void b2ParticlePairSet::Initialize(
 		{
 			ParticlePair* const pair = &set[i];
 			const b2ParticleContact& contact = contacts[i];
-			if (contact.indexA == b2_invalidParticleIndex ||
-				contact.indexB == b2_invalidParticleIndex ||
-				!((particleFlagsBuffer[contact.indexA] |
-				   particleFlagsBuffer[contact.indexB]) &
+			if (contact.GetIndexA() == b2_invalidParticleIndex ||
+				contact.GetIndexB() == b2_invalidParticleIndex ||
+				!((particleFlagsBuffer[contact.GetIndexA()] |
+				   particleFlagsBuffer[contact.GetIndexB()]) &
 				  b2_particleContactListenerParticle))
 			{
 				continue;
 			}
-			pair->first = contact.indexA;
-			pair->second = contact.indexB;
+			pair->first = contact.GetIndexA();
+			pair->second = contact.GetIndexB();
 			insertedContacts++;
 		}
 		SetCount(insertedContacts);
@@ -1877,17 +2494,124 @@ int32 b2ParticlePairSet::Find(const ParticlePair& pair) const
 	return index;
 }
 
+/// Callback class to receive pairs of fixtures and particles which may be
+/// overlapping. Used as an argument of b2World::QueryAABB.
+class b2FixtureParticleQueryCallback : public b2QueryCallback
+{
+public:
+	explicit b2FixtureParticleQueryCallback(b2ParticleSystem* system)
+	{
+		m_system = system;
+	}
+
+private:
+	// Skip reporting particles.
+	bool ShouldQueryParticleSystem(const b2ParticleSystem* system)
+	{
+		B2_NOT_USED(system);
+		return false;
+	}
+
+	// Receive a fixture and call ReportFixtureAndParticle() for each particle
+	// inside aabb of the fixture.
+	bool ReportFixture(b2Fixture* fixture)
+	{
+		if (fixture->IsSensor())
+		{
+			return true;
+		}
+		const b2Shape* shape = fixture->GetShape();
+		int32 childCount = shape->GetChildCount();
+		for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+		{
+			b2AABB aabb = fixture->GetAABB(childIndex);
+			b2ParticleSystem::InsideBoundsEnumerator enumerator =
+								m_system->GetInsideBoundsEnumerator(aabb);
+			int32 index;
+			while ((index = enumerator.GetNext()) >= 0)
+			{
+				ReportFixtureAndParticle(fixture, childIndex, index);
+			}
+		}
+		return true;
+	}
+
+	// Receive a fixture and a particle which may be overlapping.
+	virtual void ReportFixtureAndParticle(
+						b2Fixture* fixture, int32 childIndex, int32 index) = 0;
+
+protected:
+	b2ParticleSystem* m_system;
+};
+
+void b2ParticleSystem::NotifyBodyContactListenerPreContact(
+	FixtureParticleSet* fixtureSet) const
+{
+	b2ContactListener* const contactListener = GetFixtureContactListener();
+	if (contactListener == NULL)
+		return;
+
+	fixtureSet->Initialize(m_bodyContactBuffer.Begin(),
+						   m_bodyContactBuffer.GetCount(),
+						   GetFlagsBuffer());
+}
+
+// If a contact listener is present and the contact is just starting
+// report the contact.  If the contact is already in progress invalid
+// the contact from m_fixtureSet.
+void b2ParticleSystem::NotifyBodyContactListenerPostContact(
+	FixtureParticleSet& fixtureSet)
+{
+	b2ContactListener* const contactListener = GetFixtureContactListener();
+	if (contactListener == NULL)
+		return;
+
+	// Loop through all new contacts, reporting any new ones, and
+	// "invalidating" the ones that still exist.
+	for (b2ParticleBodyContact* contact = m_bodyContactBuffer.Begin();
+		 contact != m_bodyContactBuffer.End(); ++contact)
+	{
+		b2Assert(contact);
+		FixtureParticle fixtureParticleToFind;
+		fixtureParticleToFind.first = contact->fixture;
+		fixtureParticleToFind.second = contact->index;
+		const int32 index = fixtureSet.Find(fixtureParticleToFind);
+		if (index >= 0)
+		{
+			// Already touching remove this from the set.
+			fixtureSet.Invalidate(index);
+		}
+		else
+		{
+			// Just started touching, report it!
+			contactListener->BeginContact(this, contact);
+		}
+	}
+
+	// If the contact listener is enabled, report all fixtures that are no
+	// longer in contact with particles.
+	const FixtureParticle* const fixtureParticles = fixtureSet.GetBuffer();
+	const int8* const fixtureParticlesValid = fixtureSet.GetValidBuffer();
+	const int32 fixtureParticleCount = fixtureSet.GetCount();
+	for (int32 i = 0; i < fixtureParticleCount; ++i)
+	{
+		if (fixtureParticlesValid[i])
+		{
+			const FixtureParticle* const fixtureParticle =
+				&fixtureParticles[i];
+			contactListener->EndContact(fixtureParticle->first, this,
+										fixtureParticle->second);
+		}
+	}
+}
+
+
 void b2ParticleSystem::UpdateBodyContacts()
 {
 	// If the particle contact listener is enabled, generate a set of
 	// fixture / particle contacts.
-	b2ContactListener* const contactListener = GetFixtureContactListener();
 	FixtureParticleSet fixtureSet(&m_world->m_stackAllocator);
-	if (contactListener)
-	{
-		fixtureSet.Initialize(m_bodyContactBuffer, m_bodyContactCount,
-							  GetFlagsBuffer());
-	}
+	NotifyBodyContactListenerPreContact(&fixtureSet);
 
 	if (m_stuckThreshold > 0)
 	{
@@ -1903,10 +2627,10 @@ void b2ParticleSystem::UpdateBodyContacts()
 			}
 		}
 	}
-	m_bodyContactCount = 0;
-	m_stuckParticleCount = 0;
+	m_bodyContactBuffer.SetCount(0);
+	m_stuckParticleBuffer.SetCount(0);
 
-	class UpdateBodyContactsCallback : public b2QueryCallback
+	class UpdateBodyContactsCallback : public b2FixtureParticleQueryCallback
 	{
 		// Call the contact filter if it's set, to determine whether to
 		// filter this contact.  Returns true if contact calculations should
@@ -1926,170 +2650,62 @@ void b2ParticleSystem::UpdateBodyContacts()
 			return true;
 		}
 
-		// If a contact listener is present and the contact is just starting
-		// report the contact.  If the contact is already in progress invalid
-		// the contact from m_fixtureSet.
-		inline void ReportContact(
-			b2ParticleBodyContact* const particleBodyContact)
+		void ReportFixtureAndParticle(
+								b2Fixture* fixture, int32 childIndex, int32 a)
 		{
-			// Optionally report this contact.
-			if (m_contactListener)
+			b2Vec2 ap = m_system->m_positionBuffer.data[a];
+			float32 d;
+			b2Vec2 n;
+			fixture->ComputeDistance(ap, &d, &n, childIndex);
+			if (d < m_system->m_particleDiameter && ShouldCollide(fixture, a))
 			{
-				b2Assert(particleBodyContact);
-				FixtureParticle fixtureParticleToFind;
-				fixtureParticleToFind.first = particleBodyContact->fixture;
-				fixtureParticleToFind.second = particleBodyContact->index;
-				const int32 index = m_fixtureSet->Find(fixtureParticleToFind);
-				if (index >= 0)
-				{
-					// Already touching remove this from the set.
-					m_fixtureSet->Invalidate(index);
-				}
-				else
-				{
-					// Just started touching, report it!
-					m_contactListener->BeginContact(
-						m_system, particleBodyContact);
-				}
+				b2Body* b = fixture->GetBody();
+				b2Vec2 bp = b->GetWorldCenter();
+				float32 bm = b->GetMass();
+				float32 bI =
+					b->GetInertia() - bm * b->GetLocalCenter().LengthSquared();
+				float32 invBm = bm > 0 ? 1 / bm : 0;
+				float32 invBI = bI > 0 ? 1 / bI : 0;
+				float32 invAm =
+					m_system->m_flagsBuffer.data[a] &
+					b2_wallParticle ? 0 : m_system->GetParticleInvMass();
+				b2Vec2 rp = ap - bp;
+				float32 rpn = b2Cross(rp, n);
+				float32 invM = invAm + invBm + invBI * rpn * rpn;
+
+				b2ParticleBodyContact& contact =
+					m_system->m_bodyContactBuffer.Append();
+				contact.index = a;
+				contact.body = b;
+				contact.fixture = fixture;
+				contact.weight = 1 - d * m_system->m_inverseDiameter;
+				contact.normal = -n;
+				contact.mass = invM > 0 ? 1 / invM : 0;
+				m_system->DetectStuckParticle(a);
 			}
 		}
 
-		bool ReportFixture(b2Fixture* fixture)
-		{
-			if (fixture->IsSensor())
-			{
-				return true;
-			}
-			const b2Shape* shape = fixture->GetShape();
-			b2Body* b = fixture->GetBody();
-			b2Vec2 bp = b->GetWorldCenter();
-			float32 bm = b->GetMass();
-			float32 bI = b->GetInertia() -
-						 bm * b->GetLocalCenter().LengthSquared();
-			float32 invBm = bm > 0 ? 1 / bm : 0;
-			float32 invBI = bI > 0 ? 1 / bI : 0;
-			int32 childCount = shape->GetChildCount();
-			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
-			{
-				b2AABB aabb = fixture->GetAABB(childIndex);
-				aabb.lowerBound.x -= m_system->m_particleDiameter;
-				aabb.lowerBound.y -= m_system->m_particleDiameter;
-				aabb.upperBound.x += m_system->m_particleDiameter;
-				aabb.upperBound.y += m_system->m_particleDiameter;
-				Proxy* beginProxy = m_system->m_proxyBuffer;
-				Proxy* endProxy = beginProxy + m_system->m_proxyCount;
-				Proxy* firstProxy = std::lower_bound(
-					beginProxy, endProxy,
-					computeTag(
-						m_system->m_inverseDiameter * aabb.lowerBound.x,
-						m_system->m_inverseDiameter * aabb.lowerBound.y));
-				Proxy* lastProxy = std::upper_bound(
-					firstProxy, endProxy,
-					computeTag(
-						m_system->m_inverseDiameter * aabb.upperBound.x,
-						m_system->m_inverseDiameter * aabb.upperBound.y));
-
-				for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
-				{
-					int32 a = proxy->index;
-					b2Vec2 ap = m_system->m_positionBuffer.data[a];
-					if (aabb.lowerBound.x <= ap.x &&
-							ap.x <= aabb.upperBound.x &&
-						aabb.lowerBound.y <= ap.y &&
-							ap.y <= aabb.upperBound.y)
-					{
-						float32 d;
-						b2Vec2 n;
-						fixture->ComputeDistance(ap, &d, &n, childIndex);
-						if (d < m_system->m_particleDiameter)
-						{
-							if (!ShouldCollide(fixture, a))
-							{
-								continue;
-							}
-							float32 invAm =
-								m_system->m_flagsBuffer.data[a] &
-								b2_wallParticle ? 0 :
-									m_system->GetParticleInvMass();
-							b2Vec2 rp = ap - bp;
-							float32 rpn = b2Cross(rp, n);
-							float32 invM = invAm + invBm + invBI * rpn * rpn;
-
-							m_system->m_bodyContactBuffer =
-									m_system->RequestGrowableBuffer(
-										m_system->m_bodyContactBuffer,
-										m_system->m_bodyContactCount,
-										&m_system->m_bodyContactCapacity);
-
-							b2ParticleBodyContact& contact =
-								m_system->m_bodyContactBuffer[
-									m_system->m_bodyContactCount];
-							contact.index = a;
-							contact.body = b;
-							contact.fixture = fixture;
-							contact.weight =
-								1 - d * m_system->m_inverseDiameter;
-							contact.normal = -n;
-							contact.mass = invM > 0 ? 1 / invM : 0;
-							ReportContact(&contact);
-							m_system->m_bodyContactCount++;
-							m_system->DetectStuckParticle(a);
-						}
-					}
-				}
-			}
-			return true;
-		}
-
-		b2ParticleSystem* m_system;
-		b2World* m_world;
 		b2ContactFilter* m_contactFilter;
-		b2ContactListener* m_contactListener;
-		FixtureParticleSet* m_fixtureSet;
 
 	public:
 		UpdateBodyContactsCallback(
-			b2ParticleSystem* system, b2World* world,
-			b2ContactFilter* contactFilter, b2ContactListener* contactListener,
-			FixtureParticleSet* fixtureSet)
+			b2ParticleSystem* system, b2ContactFilter* contactFilter):
+			b2FixtureParticleQueryCallback(system)
 		{
-			m_system = system;
-			m_world = world;
 			m_contactFilter = contactFilter;
-			m_contactListener = contactListener;
-			m_fixtureSet = fixtureSet;
 		}
-	} callback(this, m_world, GetFixtureContactFilter(),
-			   GetFixtureContactListener(), &fixtureSet);
+	} callback(this, GetFixtureContactFilter());
 
 	b2AABB aabb;
 	ComputeAABB(&aabb);
 	m_world->QueryAABB(&callback, aabb);
 
-	if (m_strictContactCheck)
+	if (m_def.strictContactCheck)
 	{
 		RemoveSpuriousBodyContacts();
 	}
 
-	// If the contact listener is enabled, report all fixtures that are no
-	// longer in contact with particles.
-	if (contactListener)
-	{
-		const FixtureParticle* const fixtureParticles =
-			fixtureSet.GetBuffer();
-		const int8* const fixtureParticlesValid = fixtureSet.GetValidBuffer();
-		const int32 fixtureParticleCount = fixtureSet.GetCount();
-		for (int32 i = 0; i < fixtureParticleCount; ++i)
-		{
-			if (fixtureParticlesValid[i])
-			{
-				const FixtureParticle* const fixtureParticle =
-					&fixtureParticles[i];
-				contactListener->EndContact(fixtureParticle->first, this,
-											fixtureParticle->second);
-			}
-		}
-	}
+	NotifyBodyContactListenerPostContact(fixtureSet);
 }
 
 void b2ParticleSystem::RemoveSpuriousBodyContacts()
@@ -2111,15 +2727,15 @@ void b2ParticleSystem::RemoveSpuriousBodyContacts()
 	//         it, otherwise discard as impossible
 	//      - repeat for up to n nearest contacts, currently we get good results
 	//        from n=3.
-	std::sort(m_bodyContactBuffer, m_bodyContactBuffer + m_bodyContactCount,
+	std::sort(m_bodyContactBuffer.Begin(), m_bodyContactBuffer.End(),
 				b2ParticleSystem::BodyContactCompare);
 
 	int32 discarded = 0;
-	std::remove_if(m_bodyContactBuffer,
-					m_bodyContactBuffer + m_bodyContactCount,
+	std::remove_if(m_bodyContactBuffer.Begin(),
+					m_bodyContactBuffer.End(),
 					b2ParticleBodyContactRemovePredicate(this, &discarded));
 
-	m_bodyContactCount -= discarded;
+	m_bodyContactBuffer.SetCount(m_bodyContactBuffer.GetCount() - discarded);
 }
 
 bool b2ParticleSystem::BodyContactCompare(const b2ParticleBodyContact &lhs,
@@ -2153,86 +2769,63 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 		aabb.lowerBound = b2Min(aabb.lowerBound, b2Min(p1, p2));
 		aabb.upperBound = b2Max(aabb.upperBound, b2Max(p1, p2));
 	}
-	class SolveCollisionCallback : public b2QueryCallback
+	class SolveCollisionCallback : public b2FixtureParticleQueryCallback
 	{
-		bool ReportFixture(b2Fixture* fixture)
+		void ReportFixtureAndParticle(
+								b2Fixture* fixture, int32 childIndex, int32 a)
 		{
-			if (fixture->IsSensor())
-			{
-				return true;
-			}
-			const b2Shape* shape = fixture->GetShape();
 			b2Body* body = fixture->GetBody();
-			Proxy* beginProxy = m_system->m_proxyBuffer;
-			Proxy* endProxy = beginProxy + m_system->m_proxyCount;
-			int32 childCount = shape->GetChildCount();
-			for (int32 childIndex = 0; childIndex < childCount; childIndex++)
+			b2Vec2 ap = m_system->m_positionBuffer.data[a];
+			b2Vec2 av = m_system->m_velocityBuffer.data[a];
+			b2RayCastOutput output;
+			b2RayCastInput input;
+			if (m_system->m_iterationIndex == 0)
 			{
-				b2AABB aabb = fixture->GetAABB(childIndex);
-				aabb.lowerBound.x -= m_system->m_particleDiameter;
-				aabb.lowerBound.y -= m_system->m_particleDiameter;
-				aabb.upperBound.x += m_system->m_particleDiameter;
-				aabb.upperBound.y += m_system->m_particleDiameter;
-				Proxy* firstProxy = std::lower_bound(
-					beginProxy, endProxy,
-					computeTag(
-						m_system->m_inverseDiameter * aabb.lowerBound.x,
-						m_system->m_inverseDiameter * aabb.lowerBound.y));
-				Proxy* lastProxy = std::upper_bound(
-					firstProxy, endProxy,
-					computeTag(
-						m_system->m_inverseDiameter * aabb.upperBound.x,
-						m_system->m_inverseDiameter * aabb.upperBound.y));
-				for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
+				// Put 'ap' in the local space of the previous frame
+				b2Vec2 p1 = b2MulT(body->m_xf0, ap);
+				if (fixture->GetShape()->GetType() == b2Shape::e_circle)
 				{
-					int32 a = proxy->index;
-					b2Vec2 ap = m_system->m_positionBuffer.data[a];
-					if (aabb.lowerBound.x <= ap.x &&
-							ap.x <= aabb.upperBound.x &&
-						aabb.lowerBound.y <= ap.y &&
-							ap.y <= aabb.upperBound.y)
-					{
-						b2Vec2 av = m_system->m_velocityBuffer.data[a];
-						b2RayCastOutput output;
-						b2RayCastInput input;
-						if (m_system->m_iterationIndex == 0)
-						{
-							input.p1 = b2Mul(body->m_xf,
-											 b2MulT(body->m_xf0, ap));
-						}
-						else
-						{
-							input.p1 = ap;
-						}
-						input.p2 = ap + m_step.dt * av;
-						input.maxFraction = 1;
-						if (fixture->RayCast(&output, input, childIndex))
-						{
-							b2Vec2 n = output.normal;
-							b2Vec2 p =
-								(1 - output.fraction) * input.p1 +
-								output.fraction * input.p2 +
-								b2_linearSlop * n;
-							b2Vec2 v = m_step.inv_dt * (p - ap);
-							m_system->m_velocityBuffer.data[a] = v;
-							b2Vec2 f = m_step.inv_dt *
-								m_system->GetParticleMass() * (av - v);
-							m_system->ParticleApplyForce(a, f);
-						}
-					}
+					// Make relative to the center of the circle
+					p1 -= body->GetLocalCenter();
+					// Re-apply rotation about the center of the
+					// circle
+					p1 = b2Mul(body->m_xf0.q, p1);
+					// Subtract rotation of the current frame
+					p1 = b2MulT(body->m_xf.q, p1);
+					// Return to local space
+					p1 += body->GetLocalCenter();
 				}
+				// Return to global space and apply rotation of current frame
+				input.p1 = b2Mul(body->m_xf, p1);
 			}
-			return true;
+			else
+			{
+				input.p1 = ap;
+			}
+			input.p2 = ap + m_step.dt * av;
+			input.maxFraction = 1;
+			if (fixture->RayCast(&output, input, childIndex))
+			{
+				b2Vec2 n = output.normal;
+				b2Vec2 p =
+					(1 - output.fraction) * input.p1 +
+					output.fraction * input.p2 +
+					b2_linearSlop * n;
+				b2Vec2 v = m_step.inv_dt * (p - ap);
+				m_system->m_velocityBuffer.data[a] = v;
+				b2Vec2 f = m_step.inv_dt *
+					m_system->GetParticleMass() * (av - v);
+				m_system->ParticleApplyForce(a, f);
+			}
 		}
 
-		b2ParticleSystem* m_system;
 		b2TimeStep m_step;
 
 	public:
-		SolveCollisionCallback(b2ParticleSystem* system,
-							   const b2TimeStep& step)
+		SolveCollisionCallback(
+			b2ParticleSystem* system, const b2TimeStep& step):
+			b2FixtureParticleQueryCallback(system)
 		{
-			m_system = system;
 			m_step = step;
 		}
 	} callback(this, step);
@@ -2246,66 +2839,41 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 	for (int32 i = 0; i < m_count; i++)
 	{
 		uint32 flags = m_flagsBuffer.data[i];
-		if (flags & b2_barrierParticle)
+		static const uint32 k_barrierWallFlags =
+										b2_barrierParticle | b2_wallParticle;
+		if ((flags & k_barrierWallFlags) == k_barrierWallFlags)
 		{
-			if (flags & b2_wallParticle)
-			{
-				m_velocityBuffer.data[i].SetZero();
-				continue;
-			}
-			const b2ParticleGroup* group = m_groupBuffer[i];
-			if (group->m_groupFlags & b2_rigidParticleGroup)
-			{
-				m_velocityBuffer.data[i] =
-					group->GetLinearVelocity() +
-					b2Cross(
-						group->GetAngularVelocity(),
-						m_positionBuffer.data[i] - group->GetCenter());
-			}
+			m_velocityBuffer.data[i].SetZero();
 		}
 	}
-	Proxy* beginProxy = m_proxyBuffer;
-	Proxy* endProxy = beginProxy + m_proxyCount;
 	float32 tmax = b2_barrierCollisionTime * step.dt;
-	for (int32 k = 0; k < m_pairCount; k++)
+	for (int32 k = 0; k < m_pairBuffer.GetCount(); k++)
 	{
-		const Pair& pair = m_pairBuffer[k];
+		const b2ParticlePair& pair = m_pairBuffer[k];
 		if (pair.flags & b2_barrierParticle)
 		{
 			int32 a = pair.indexA;
 			int32 b = pair.indexB;
 			b2Vec2 pa = m_positionBuffer.data[a];
 			b2Vec2 pb = m_positionBuffer.data[b];
-			b2Vec2 lower = b2Min(pa, pb);
-			b2Vec2 upper = b2Max(pa, pb);
-			lower.x -= m_particleDiameter;
-			lower.y -= m_particleDiameter;
-			upper.x += m_particleDiameter;
-			upper.y += m_particleDiameter;
-			Proxy* firstProxy = std::lower_bound(
-				beginProxy, endProxy,
-				computeTag(
-					m_inverseDiameter * lower.x,
-					m_inverseDiameter * lower.y));
-			Proxy* lastProxy = std::upper_bound(
-				firstProxy, endProxy,
-				computeTag(
-					m_inverseDiameter * upper.x,
-					m_inverseDiameter * upper.y));
-			b2Vec2 va = m_velocityBuffer.data[a];
-			b2Vec2 vb = m_velocityBuffer.data[b];
+			b2AABB aabb;
+			aabb.lowerBound = b2Min(pa, pb);
+			aabb.upperBound = b2Max(pa, pb);
+			b2ParticleGroup *aGroup = m_groupBuffer[a];
+			b2ParticleGroup *bGroup = m_groupBuffer[b];
+			b2Vec2 va = GetLinearVelocity(aGroup, a, pa);
+			b2Vec2 vb = GetLinearVelocity(bGroup, b, pb);
 			b2Vec2 pba = pb - pa;
 			b2Vec2 vba = vb - va;
-			for (Proxy* proxy = firstProxy; proxy != lastProxy; ++proxy)
+			InsideBoundsEnumerator enumerator = GetInsideBoundsEnumerator(aabb);
+			int32 c;
+			while ((c = enumerator.GetNext()) >= 0)
 			{
-				int32 c = proxy->index;
 				b2Vec2 pc = m_positionBuffer.data[c];
-				if (lower.x <= pc.x && pc.x <= upper.x &&
-					lower.y <= pc.y && pc.y <= upper.y &&
-					m_groupBuffer[a] != m_groupBuffer[c] &&
-					m_groupBuffer[b] != m_groupBuffer[c])
+				b2ParticleGroup *cGroup = m_groupBuffer[c];
+				if (aGroup != cGroup && bGroup != cGroup)
 				{
-					b2Vec2& vc = m_velocityBuffer.data[c];
+					b2Vec2 vc = GetLinearVelocity(cGroup, c, pc);
 					// Solve the equation below:
 					//   (1-s)*(pa+t*va)+s*(pb+t*vb) = pc+t*vc
 					// which expresses that the particle c will pass a line
@@ -2350,13 +2918,33 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 							if (!(s >= 0 && s <= 1)) continue;
 						}
 					}
-					// Set velocity of particle c to interpolated velocity at
-					// the collision point on line ab, and add force to
-					// particle c after particle movement so that momentum will
-					// be preserved.
-					b2Vec2 f = va + s * vba - vc;
-					ParticleApplyForce(c, -step.inv_dt * GetParticleMass() * f);
-					vc += f;
+					// Apply a force to particle c so that it will have the
+					// interpolated velocity at the collision point on line ab.
+					b2Vec2 dv = va + s * vba - vc;
+					b2Vec2 f = GetParticleMass() * dv;
+					if (IsRigidGroup(cGroup))
+					{
+						// If c belongs to a rigid group, the force will be
+						// distributed in the group.
+						float32 mass = cGroup->GetMass();
+						float32 inertia = cGroup->GetInertia();
+						if (mass > 0)
+						{
+							cGroup->m_linearVelocity += 1 / mass * f;
+						}
+						if (inertia > 0)
+						{
+							cGroup->m_angularVelocity +=
+								b2Cross(pc - cGroup->GetCenter(), f) / inertia;
+						}
+					}
+					else
+					{
+						m_velocityBuffer.data[c] += dv;
+					}
+					// Apply a reversed force to particle c after particle
+					// movement so that momentum will be preserved.
+					ParticleApplyForce(c, -step.inv_dt * f);
 				}
 			}
 		}
@@ -2398,8 +2986,8 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		b2TimeStep subStep = step;
 		subStep.dt /= step.particleIterations;
 		subStep.inv_dt *= step.particleIterations;
-		UpdateBodyContacts();
 		UpdateContacts(false);
+		UpdateBodyContacts();
 		ComputeWeight();
 		if (m_allGroupFlags & b2_particleGroupNeedsUpdateDepth)
 		{
@@ -2459,6 +3047,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 			SolveSpring(subStep);
 		}
 		LimitVelocity(subStep);
+		if (m_allGroupFlags & b2_rigidParticleGroup)
+		{
+			SolveRigidDamping();
+		}
 		if (m_allParticleFlags & b2_barrierParticle)
 		{
 			SolveBarrier(subStep);
@@ -2520,7 +3112,7 @@ void b2ParticleSystem::LimitVelocity(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveGravity(const b2TimeStep& step)
 {
-	b2Vec2 gravity = step.dt * m_gravityScale * m_world->GetGravity();
+	b2Vec2 gravity = step.dt * m_def.gravityScale * m_world->GetGravity();
 	for (int32 i = 0; i < m_count; i++)
 	{
 		m_velocityBuffer.data[i] += gravity;
@@ -2548,14 +3140,14 @@ void b2ParticleSystem::SolveStaticPressure(const b2TimeStep& step)
 	{
 		memset(m_accumulationBuffer, 0,
 			   sizeof(*m_accumulationBuffer) * m_count);
-		for (int32 k = 0; k < m_contactCount; k++)
+		for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 		{
 			const b2ParticleContact& contact = m_contactBuffer[k];
-			if (contact.flags & b2_staticPressureParticle)
+			if (contact.GetFlags() & b2_staticPressureParticle)
 			{
-				int32 a = contact.indexA;
-				int32 b = contact.indexB;
-				float32 w = contact.weight;
+				int32 a = contact.GetIndexA();
+				int32 b = contact.GetIndexB();
+				float32 w = contact.GetWeight();
 				m_accumulationBuffer[a] +=
 					w * m_staticPressureBuffer[b]; // a <- b
 				m_accumulationBuffer[b] +=
@@ -2617,8 +3209,8 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 		}
 	}
 	// applies pressure between each particles in contact
-	float32 velocityPerPressure = step.dt / (m_density * m_particleDiameter);
-	for (int32 k = 0; k < m_bodyContactCount; k++)
+	float32 velocityPerPressure = step.dt / (m_def.density * m_particleDiameter);
+	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
 		int32 a = contact.index;
@@ -2632,13 +3224,13 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 		m_velocityBuffer.data[a] -= GetParticleInvMass() * f;
 		b->ApplyLinearImpulse(f, p, true);
 	}
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		float32 w = contact.weight;
-		b2Vec2 n = contact.normal;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		float32 w = contact.GetWeight();
+		b2Vec2 n = contact.GetNormal();
 		float32 h = m_accumulationBuffer[a] + m_accumulationBuffer[b];
 		b2Vec2 f = velocityPerPressure * w * h * n;
 		m_velocityBuffer.data[a] -= f;
@@ -2651,7 +3243,7 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 	// reduces normal velocity of each contact
 	float32 linearDamping = m_def.dampingStrength;
 	float32 quadraticDamping = 1 / GetCriticalVelocity(step);
-	for (int32 k = 0; k < m_bodyContactCount; k++)
+	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
 		int32 a = contact.index;
@@ -2672,13 +3264,13 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 			b->ApplyLinearImpulse(-f, p, true);
 		}
 	}
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		float32 w = contact.weight;
-		b2Vec2 n = contact.normal;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		float32 w = contact.GetWeight();
+		b2Vec2 n = contact.GetNormal();
 		b2Vec2 v = m_velocityBuffer.data[b] - m_velocityBuffer.data[a];
 		float32 vn = b2Dot(v, n);
 		if (vn < 0)
@@ -2692,12 +3284,183 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 	}
 }
 
+inline bool b2ParticleSystem::IsRigidGroup(b2ParticleGroup *group) const
+{
+	return group && (group->m_groupFlags & b2_rigidParticleGroup);
+}
+
+inline b2Vec2 b2ParticleSystem::GetLinearVelocity(
+	b2ParticleGroup *group, int32 particleIndex,
+	const b2Vec2 &point) const
+{
+	if (IsRigidGroup(group))
+	{
+		return group->GetLinearVelocityFromWorldPoint(point);
+	}
+	else
+	{
+		return m_velocityBuffer.data[particleIndex];
+	}
+}
+
+inline void b2ParticleSystem::InitDampingParameter(
+	float32* invMass, float32* invInertia, float32* tangentDistance,
+	float32 mass, float32 inertia, const b2Vec2& center,
+	const b2Vec2& point, const b2Vec2& normal) const
+{
+	*invMass = mass > 0 ? 1 / mass : 0;
+	*invInertia = inertia > 0 ? 1 / inertia : 0;
+	*tangentDistance = b2Cross(point - center, normal);
+}
+
+inline void b2ParticleSystem::InitDampingParameterWithRigidGroupOrParticle(
+	float32* invMass, float32* invInertia, float32* tangentDistance,
+	bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
+	const b2Vec2& point, const b2Vec2& normal) const
+{
+	if (isRigidGroup)
+	{
+		InitDampingParameter(
+			invMass, invInertia, tangentDistance,
+			group->GetMass(), group->GetInertia(), group->GetCenter(),
+			point, normal);
+	}
+	else
+	{
+		uint32 flags = m_flagsBuffer.data[particleIndex];
+		InitDampingParameter(
+			invMass, invInertia, tangentDistance,
+			flags & b2_wallParticle ? 0 : GetParticleMass(), 0, point,
+			point, normal);
+	}
+}
+
+inline float32 b2ParticleSystem::ComputeDampingImpulse(
+	float32 invMassA, float32 invInertiaA, float32 tangentDistanceA,
+	float32 invMassB, float32 invInertiaB, float32 tangentDistanceB,
+	float32 normalVelocity) const
+{
+	float32 invMass =
+		invMassA + invInertiaA * tangentDistanceA * tangentDistanceA +
+		invMassB + invInertiaB * tangentDistanceB * tangentDistanceB;
+	return invMass > 0 ? normalVelocity / invMass : 0;
+}
+
+inline void b2ParticleSystem::ApplyDamping(
+	float32 invMass, float32 invInertia, float32 tangentDistance,
+	bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
+	float32 impulse, const b2Vec2& normal)
+{
+	if (isRigidGroup)
+	{
+		group->m_linearVelocity += impulse * invMass * normal;
+		group->m_angularVelocity += impulse * tangentDistance * invInertia;
+	}
+	else
+	{
+		m_velocityBuffer.data[particleIndex] += impulse * invMass * normal;
+	}
+}
+
+void b2ParticleSystem::SolveRigidDamping()
+{
+	// Apply impulse to rigid particle groups colliding with other objects
+	// to reduce relative velocity at the colliding point.
+	float32 damping = m_def.dampingStrength;
+	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
+	{
+		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
+		int32 a = contact.index;
+		b2ParticleGroup* aGroup = m_groupBuffer[a];
+		if (IsRigidGroup(aGroup))
+		{
+			b2Body* b = contact.body;
+			b2Vec2 n = contact.normal;
+			float32 w = contact.weight;
+			b2Vec2 p = m_positionBuffer.data[a];
+			b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) -
+					   aGroup->GetLinearVelocityFromWorldPoint(p);
+			float32 vn = b2Dot(v, n);
+			if (vn < 0)
+			// The group's average velocity at particle position 'p' is pushing
+			// the particle into the body.
+			{
+				float32 invMassA, invInertiaA, tangentDistanceA;
+				float32 invMassB, invInertiaB, tangentDistanceB;
+				InitDampingParameterWithRigidGroupOrParticle(
+					&invMassA, &invInertiaA, &tangentDistanceA,
+					true, aGroup, a, p, n);
+				InitDampingParameter(
+					&invMassB, &invInertiaB, &tangentDistanceB,
+					b->GetMass(),
+					// Calculate b->m_I from public functions of b2Body.
+					b->GetInertia() -
+							b->GetMass() * b->GetLocalCenter().LengthSquared(),
+					b->GetWorldCenter(),
+					p, n);
+				float32 f = damping * b2Min(w, 1.0f) * ComputeDampingImpulse(
+					invMassA, invInertiaA, tangentDistanceA,
+					invMassB, invInertiaB, tangentDistanceB,
+					vn);
+				ApplyDamping(
+					invMassA, invInertiaA, tangentDistanceA,
+					true, aGroup, a, f, n);
+				b->ApplyLinearImpulse(-f * n, p, true);
+			}
+		}
+	}
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
+	{
+		const b2ParticleContact& contact = m_contactBuffer[k];
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		b2Vec2 n = contact.GetNormal();
+		float32 w = contact.GetWeight();
+		b2ParticleGroup* aGroup = m_groupBuffer[a];
+		b2ParticleGroup* bGroup = m_groupBuffer[b];
+		bool aRigid = IsRigidGroup(aGroup);
+		bool bRigid = IsRigidGroup(bGroup);
+		if (aGroup != bGroup && (aRigid || bRigid))
+		{
+			b2Vec2 p =
+				0.5f * (m_positionBuffer.data[a] + m_positionBuffer.data[b]);
+			b2Vec2 v =
+				GetLinearVelocity(bGroup, b, p) -
+				GetLinearVelocity(aGroup, a, p);
+			float32 vn = b2Dot(v, n);
+			if (vn < 0)
+			{
+				float32 invMassA, invInertiaA, tangentDistanceA;
+				float32 invMassB, invInertiaB, tangentDistanceB;
+				InitDampingParameterWithRigidGroupOrParticle(
+					&invMassA, &invInertiaA, &tangentDistanceA,
+					aRigid, aGroup, a,
+					p, n);
+				InitDampingParameterWithRigidGroupOrParticle(
+					&invMassB, &invInertiaB, &tangentDistanceB,
+					bRigid, bGroup, b,
+					p, n);
+				float32 f = damping * w * ComputeDampingImpulse(
+					invMassA, invInertiaA, tangentDistanceA,
+					invMassB, invInertiaB, tangentDistanceB,
+					vn);
+				ApplyDamping(
+					invMassA, invInertiaA, tangentDistanceA,
+					aRigid, aGroup, a, f, n);
+				ApplyDamping(
+					invMassB, invInertiaB, tangentDistanceB,
+					bRigid, bGroup, b, -f, n);
+			}
+		}
+	}
+}
+
 void b2ParticleSystem::SolveExtraDamping()
 {
 	// Applies additional damping force between bodies and particles which can
 	// produce strong repulsive force. Applying damping force multiple times
 	// is effective in suppressing vibration.
-	for (int32 k = 0; k < m_bodyContactCount; k++)
+	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
 		int32 a = contact.index;
@@ -2761,9 +3524,9 @@ void b2ParticleSystem::SolveRigid(const b2TimeStep& step)
 void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 {
 	float32 elasticStrength = step.inv_dt * m_def.elasticStrength;
-	for (int32 k = 0; k < m_triadCount; k++)
+	for (int32 k = 0; k < m_triadBuffer.GetCount(); k++)
 	{
-		const Triad& triad = m_triadBuffer[k];
+		const b2ParticleTriad& triad = m_triadBuffer[k];
 		if (triad.flags & b2_elasticParticle)
 		{
 			int32 a = triad.indexA;
@@ -2803,9 +3566,9 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 void b2ParticleSystem::SolveSpring(const b2TimeStep& step)
 {
 	float32 springStrength = step.inv_dt * m_def.springStrength;
-	for (int32 k = 0; k < m_pairCount; k++)
+	for (int32 k = 0; k < m_pairBuffer.GetCount(); k++)
 	{
-		const Pair& pair = m_pairBuffer[k];
+		const b2ParticlePair& pair = m_pairBuffer[k];
 		if (pair.flags & b2_springParticle)
 		{
 			int32 a = pair.indexA;
@@ -2834,15 +3597,15 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 	{
 		m_accumulation2Buffer[i] = b2Vec2_zero;
 	}
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_tensileParticle)
+		if (contact.GetFlags() & b2_tensileParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			float32 w = contact.weight;
-			b2Vec2 n = contact.normal;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
+			float32 w = contact.GetWeight();
+			b2Vec2 n = contact.GetNormal();
 			b2Vec2 weightedNormal = (1 - w) * w * n;
 			m_accumulation2Buffer[a] -= weightedNormal;
 			m_accumulation2Buffer[b] += weightedNormal;
@@ -2854,15 +3617,15 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 	float32 normalStrength = m_def.surfaceTensionNormalStrength
 						   * criticalVelocity;
 	float32 maxVelocityVariation = b2_maxParticleForce * criticalVelocity;
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_tensileParticle)
+		if (contact.GetFlags() & b2_tensileParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			float32 w = contact.weight;
-			b2Vec2 n = contact.normal;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
+			float32 w = contact.GetWeight();
+			b2Vec2 n = contact.GetNormal();
 			float32 h = m_weightBuffer[a] + m_weightBuffer[b];
 			b2Vec2 s = m_accumulation2Buffer[b] - m_accumulation2Buffer[a];
 			float32 fn = b2Min(
@@ -2878,7 +3641,7 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 void b2ParticleSystem::SolveViscous()
 {
 	float32 viscousStrength = m_def.viscousStrength;
-	for (int32 k = 0; k < m_bodyContactCount; k++)
+	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
 		int32 a = contact.index;
@@ -2895,14 +3658,14 @@ void b2ParticleSystem::SolveViscous()
 			b->ApplyLinearImpulse(-f, p, true);
 		}
 	}
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_viscousParticle)
+		if (contact.GetFlags() & b2_viscousParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
-			float32 w = contact.weight;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
+			float32 w = contact.GetWeight();
 			b2Vec2 v = m_velocityBuffer.data[b] - m_velocityBuffer.data[a];
 			b2Vec2 f = viscousStrength * w * v;
 			m_velocityBuffer.data[a] += f;
@@ -2915,17 +3678,17 @@ void b2ParticleSystem::SolveRepulsive(const b2TimeStep& step)
 {
 	float32 repulsiveStrength =
 		m_def.repulsiveStrength * GetCriticalVelocity(step);
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_repulsiveParticle)
+		if (contact.GetFlags() & b2_repulsiveParticle)
 		{
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
 			if (m_groupBuffer[a] != m_groupBuffer[b])
 			{
-				float32 w = contact.weight;
-				b2Vec2 n = contact.normal;
+				float32 w = contact.GetWeight();
+				b2Vec2 n = contact.GetNormal();
 				b2Vec2 f = repulsiveStrength * w * n;
 				m_velocityBuffer.data[a] -= f;
 				m_velocityBuffer.data[b] += f;
@@ -2938,17 +3701,17 @@ void b2ParticleSystem::SolvePowder(const b2TimeStep& step)
 {
 	float32 powderStrength = m_def.powderStrength * GetCriticalVelocity(step);
 	float32 minWeight = 1.0f - b2_particleStride;
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		if (contact.flags & b2_powderParticle)
+		if (contact.GetFlags() & b2_powderParticle)
 		{
-			float32 w = contact.weight;
+			float32 w = contact.GetWeight();
 			if (w > minWeight)
 			{
-				int32 a = contact.indexA;
-				int32 b = contact.indexB;
-				b2Vec2 n = contact.normal;
+				int32 a = contact.GetIndexA();
+				int32 b = contact.GetIndexB();
+				b2Vec2 n = contact.GetNormal();
 				b2Vec2 f = powderStrength * (w - minWeight) * n;
 				m_velocityBuffer.data[a] -= f;
 				m_velocityBuffer.data[b] += f;
@@ -2962,15 +3725,15 @@ void b2ParticleSystem::SolveSolid(const b2TimeStep& step)
 	// applies extra repulsive force from solid particle groups
 	b2Assert(m_depthBuffer);
 	float32 ejectionStrength = step.inv_dt * m_def.ejectionStrength;
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
 		if (m_groupBuffer[a] != m_groupBuffer[b])
 		{
-			float32 w = contact.weight;
-			b2Vec2 n = contact.normal;
+			float32 w = contact.GetWeight();
+			b2Vec2 n = contact.GetNormal();
 			float32 h = m_depthBuffer[a] + m_depthBuffer[b];
 			b2Vec2 f = ejectionStrength * h * w * n;
 			m_velocityBuffer.data[a] -= f;
@@ -2995,11 +3758,11 @@ void b2ParticleSystem::SolveColorMixing()
 	b2Assert(m_colorBuffer.data);
 	const int32 colorMixing128 = (int32) (128 * m_def.colorMixingStrength);
 	if (colorMixing128) {
-		for (int32 k = 0; k < m_contactCount; k++)
+		for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 		{
 			const b2ParticleContact& contact = m_contactBuffer[k];
-			int32 a = contact.indexA;
-			int32 b = contact.indexB;
+			int32 a = contact.GetIndexA();
+			int32 b = contact.GetIndexB();
 			if (m_flagsBuffer.data[a] & m_flagsBuffer.data[b] &
 				b2_colorMixingParticle)
 			{
@@ -3118,79 +3881,65 @@ void b2ParticleSystem::SolveZombie()
 		}
 		static bool IsContactInvalid(const b2ParticleContact& contact)
 		{
-			return contact.indexA < 0 || contact.indexB < 0;
+			return contact.GetIndexA() < 0 || contact.GetIndexB() < 0;
 		}
 		static bool IsBodyContactInvalid(const b2ParticleBodyContact& contact)
 		{
 			return contact.index < 0;
 		}
-		static bool IsPairInvalid(const Pair& pair)
+		static bool IsPairInvalid(const b2ParticlePair& pair)
 		{
 			return pair.indexA < 0 || pair.indexB < 0;
 		}
-		static bool IsTriadInvalid(const Triad& triad)
+		static bool IsTriadInvalid(const b2ParticleTriad& triad)
 		{
 			return triad.indexA < 0 || triad.indexB < 0 || triad.indexC < 0;
 		}
 	};
 
 	// update proxies
-	for (int32 k = 0; k < m_proxyCount; k++)
+	for (int32 k = 0; k < m_proxyBuffer.GetCount(); k++)
 	{
-		Proxy& proxy = m_proxyBuffer[k];
+		Proxy& proxy = m_proxyBuffer.Begin()[k];
 		proxy.index = newIndices[proxy.index];
 	}
-	Proxy* lastProxy = std::remove_if(
-		m_proxyBuffer, m_proxyBuffer + m_proxyCount,
-		Test::IsProxyInvalid);
-	m_proxyCount = (int32) (lastProxy - m_proxyBuffer);
+	m_proxyBuffer.RemoveIf(Test::IsProxyInvalid);
 
 	// update contacts
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		b2ParticleContact& contact = m_contactBuffer[k];
-		contact.indexA = newIndices[contact.indexA];
-		contact.indexB = newIndices[contact.indexB];
+		contact.SetIndices(newIndices[contact.GetIndexA()],
+						   newIndices[contact.GetIndexB()]);
 	}
-	b2ParticleContact* lastContact = std::remove_if(
-		m_contactBuffer, m_contactBuffer + m_contactCount,
-		Test::IsContactInvalid);
-	m_contactCount = (int32) (lastContact - m_contactBuffer);
+	m_contactBuffer.RemoveIf(Test::IsContactInvalid);
 
 	// update particle-body contacts
-	for (int32 k = 0; k < m_bodyContactCount; k++)
+	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
 		contact.index = newIndices[contact.index];
 	}
-	b2ParticleBodyContact* lastBodyContact = std::remove_if(
-		m_bodyContactBuffer, m_bodyContactBuffer + m_bodyContactCount,
-		Test::IsBodyContactInvalid);
-	m_bodyContactCount = (int32) (lastBodyContact - m_bodyContactBuffer);
+	m_bodyContactBuffer.RemoveIf(Test::IsBodyContactInvalid);
 
 	// update pairs
-	for (int32 k = 0; k < m_pairCount; k++)
+	for (int32 k = 0; k < m_pairBuffer.GetCount(); k++)
 	{
-		Pair& pair = m_pairBuffer[k];
+		b2ParticlePair& pair = m_pairBuffer[k];
 		pair.indexA = newIndices[pair.indexA];
 		pair.indexB = newIndices[pair.indexB];
 	}
-	Pair* lastPair = std::remove_if(
-		m_pairBuffer, m_pairBuffer + m_pairCount, Test::IsPairInvalid);
-	m_pairCount = (int32) (lastPair - m_pairBuffer);
+	m_pairBuffer.RemoveIf(Test::IsPairInvalid);
 
 	// update triads
-	for (int32 k = 0; k < m_triadCount; k++)
+	for (int32 k = 0; k < m_triadBuffer.GetCount(); k++)
 	{
-		Triad& triad = m_triadBuffer[k];
+		b2ParticleTriad& triad = m_triadBuffer[k];
 		triad.indexA = newIndices[triad.indexA];
 		triad.indexB = newIndices[triad.indexB];
 		triad.indexC = newIndices[triad.indexC];
 	}
-	Triad* lastTriad = std::remove_if(
-		m_triadBuffer, m_triadBuffer + m_triadCount,
-		Test::IsTriadInvalid);
-	m_triadCount = (int32) (lastTriad - m_triadBuffer);
+	m_triadBuffer.RemoveIf(Test::IsTriadInvalid);
 
 	// Update lifetime indices.
 	if (m_indexByExpirationTimeBuffer.data)
@@ -3235,7 +3984,6 @@ void b2ParticleSystem::SolveZombie()
 								  group->m_groupFlags |
 								  b2_particleGroupNeedsUpdateDepth);
 				}
-				// TODO: flag to split if needed
 			}
 		}
 		else
@@ -3264,7 +4012,6 @@ void b2ParticleSystem::SolveZombie()
 		{
 			DestroyParticleGroup(group);
 		}
-		// TODO: split the group if flagged
 		group = next;
 	}
 }
@@ -3426,39 +4173,39 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	}
 
 	// update proxies
-	for (int32 k = 0; k < m_proxyCount; k++)
+	for (int32 k = 0; k < m_proxyBuffer.GetCount(); k++)
 	{
-		Proxy& proxy = m_proxyBuffer[k];
+		Proxy& proxy = m_proxyBuffer.Begin()[k];
 		proxy.index = newIndices[proxy.index];
 	}
 
 	// update contacts
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		b2ParticleContact& contact = m_contactBuffer[k];
-		contact.indexA = newIndices[contact.indexA];
-		contact.indexB = newIndices[contact.indexB];
+		contact.SetIndices(newIndices[contact.GetIndexA()],
+						   newIndices[contact.GetIndexB()]);
 	}
 
 	// update particle-body contacts
-	for (int32 k = 0; k < m_bodyContactCount; k++)
+	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
 		contact.index = newIndices[contact.index];
 	}
 
 	// update pairs
-	for (int32 k = 0; k < m_pairCount; k++)
+	for (int32 k = 0; k < m_pairBuffer.GetCount(); k++)
 	{
-		Pair& pair = m_pairBuffer[k];
+		b2ParticlePair& pair = m_pairBuffer[k];
 		pair.indexA = newIndices[pair.indexA];
 		pair.indexB = newIndices[pair.indexB];
 	}
 
 	// update triads
-	for (int32 k = 0; k < m_triadCount; k++)
+	for (int32 k = 0; k < m_triadBuffer.GetCount(); k++)
 	{
-		Triad& triad = m_triadBuffer[k];
+		b2ParticleTriad& triad = m_triadBuffer[k];
 		triad.indexA = newIndices[triad.indexA];
 		triad.indexB = newIndices[triad.indexB];
 		triad.indexC = newIndices[triad.indexC];
@@ -3581,7 +4328,7 @@ template <typename T> void b2ParticleSystem::SetUserOverridableBuffer(
 	UserOverridableBuffer<T>* buffer, T* newData, int32 newCapacity)
 {
 	b2Assert((newData && newCapacity) || (!newData && !newCapacity));
-	if (!buffer->userSuppliedCapacity)
+	if (!buffer->userSuppliedCapacity && buffer->data)
 	{
 		m_world->m_blockAllocator.Free(
 			buffer->data, sizeof(T) * m_internalAllocatedCapacity);
@@ -3741,23 +4488,23 @@ void b2ParticleSystem::ApplyLinearImpulse(int32 firstIndex, int32 lastIndex,
 void b2ParticleSystem::QueryAABB(b2QueryCallback* callback,
 								 const b2AABB& aabb) const
 {
-	if (m_proxyCount == 0)
+	if (m_proxyBuffer.GetCount() == 0)
 	{
 		return;
 	}
-	Proxy* beginProxy = m_proxyBuffer;
-	Proxy* endProxy = beginProxy + m_proxyCount;
-	Proxy* firstProxy = std::lower_bound(
+	const Proxy* beginProxy = m_proxyBuffer.Begin();
+	const Proxy* endProxy = m_proxyBuffer.End();
+	const Proxy* firstProxy = std::lower_bound(
 		beginProxy, endProxy,
 		computeTag(
 			m_inverseDiameter * aabb.lowerBound.x,
 			m_inverseDiameter * aabb.lowerBound.y));
-	Proxy* lastProxy = std::upper_bound(
+	const Proxy* lastProxy = std::upper_bound(
 		firstProxy, endProxy,
 		computeTag(
 			m_inverseDiameter * aabb.upperBound.x,
 			m_inverseDiameter * aabb.upperBound.y));
-	for (Proxy* proxy = firstProxy; proxy < lastProxy; ++proxy)
+	for (const Proxy* proxy = firstProxy; proxy < lastProxy; ++proxy)
 	{
 		int32 i = proxy->index;
 		const b2Vec2& p = m_positionBuffer.data[i];
@@ -3785,31 +4532,23 @@ void b2ParticleSystem::RayCast(b2RayCastCallback* callback,
 							   const b2Vec2& point1,
 							   const b2Vec2& point2) const
 {
-	if (m_proxyCount == 0)
+	if (m_proxyBuffer.GetCount() == 0)
 	{
 		return;
 	}
-	Proxy* beginProxy = m_proxyBuffer;
-	Proxy* endProxy = beginProxy + m_proxyCount;
-	Proxy* firstProxy = std::lower_bound(
-		beginProxy, endProxy,
-		computeTag(
-			m_inverseDiameter * b2Min(point1.x, point2.x) - 1,
-			m_inverseDiameter * b2Min(point1.y, point2.y) - 1));
-	Proxy* lastProxy = std::upper_bound(
-		firstProxy, endProxy,
-		computeTag(
-			m_inverseDiameter * b2Max(point1.x, point2.x) + 1,
-			m_inverseDiameter * b2Max(point1.y, point2.y) + 1));
+	b2AABB aabb;
+	aabb.lowerBound = b2Min(point1, point2);
+	aabb.upperBound = b2Max(point1, point2);
 	float32 fraction = 1;
 	// solving the following equation:
 	// ((1-t)*point1+t*point2-position)^2=diameter^2
 	// where t is a potential fraction
 	b2Vec2 v = point2 - point1;
 	float32 v2 = b2Dot(v, v);
-	for (Proxy* proxy = firstProxy; proxy < lastProxy; ++proxy)
+	InsideBoundsEnumerator enumerator = GetInsideBoundsEnumerator(aabb);
+	int32 i;
+	while ((i = enumerator.GetNext()) >= 0)
 	{
-		int32 i = proxy->index;
 		b2Vec2 p = point1 - m_positionBuffer.data[i];
 		float32 pv = b2Dot(p, v);
 		float32 p2 = b2Dot(p, p);
@@ -3846,12 +4585,12 @@ void b2ParticleSystem::RayCast(b2RayCastCallback* callback,
 float32 b2ParticleSystem::ComputeCollisionEnergy() const
 {
 	float32 sum_v2 = 0;
-	for (int32 k = 0; k < m_contactCount; k++)
+	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
 	{
 		const b2ParticleContact& contact = m_contactBuffer[k];
-		int32 a = contact.indexA;
-		int32 b = contact.indexB;
-		b2Vec2 n = contact.normal;
+		int32 a = contact.GetIndexA();
+		int32 b = contact.GetIndexB();
+		b2Vec2 n = contact.GetNormal();
 		b2Vec2 v = m_velocityBuffer.data[b] - m_velocityBuffer.data[a];
 		float32 vn = b2Dot(v, n);
 		if (vn < 0)
@@ -3876,3 +4615,36 @@ void b2ParticleSystem::SetStuckThreshold(int32 steps)
 			m_consecutiveContactStepsBuffer.data);
 	}
 }
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
+b2ParticleSystem::b2ExceptionType b2ParticleSystem::IsBufCopyValid(
+	int startIndex, int numParticles, int copySize, int bufSize) const
+{
+	const int maxNumParticles = GetParticleCount();
+
+	// are we actually copying?
+	if (copySize == 0)
+	{
+		return b2_noExceptions;
+	}
+
+	// is the index out of bounds?
+	if (startIndex < 0 ||
+		startIndex >= maxNumParticles ||
+		numParticles < 0 ||
+		numParticles + startIndex > maxNumParticles)
+	{
+		return b2_particleIndexOutOfBounds;
+	}
+
+	// are we copying within the boundaries?
+	if (copySize > bufSize)
+	{
+		return b2_bufferTooSmall;
+	}
+
+	return b2_noExceptions;
+}
+
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API

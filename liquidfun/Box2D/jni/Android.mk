@@ -26,6 +26,8 @@ source_directories:=\
 	Particle \
 	Rope
 
+include $(LOCAL_PATH)/b2_android_common.mk
+
 # Conditionally include libstlport (so include path is added to CFLAGS) if
 # it's not being built using the NDK build process.
 define add-stlport-includes
@@ -57,13 +59,14 @@ $(eval \
   LOCAL_SRC_FILES:=\
     $(subst $(LOCAL_PATH)/,,\
       $(foreach source_dir,$(source_directories),\
-        $(wildcard $(LOCAL_PATH)/Box2D/$(source_dir)/*.cpp)))
+        $(foreach extension,$(b2_extensions),\
+          $(wildcard $(LOCAL_PATH)/Box2D/$(source_dir)/*.$(extension)))))
   LOCAL_COPY_HEADERS:=\
     Box2D/Box2D.h \
     $(subst $(LOCAL_PATH)/,,\
       $(foreach source_dir,$(source_directories),\
         $(wildcard $(LOCAL_PATH)/Box2D/$(source_dir)/*.h)))
-  LOCAL_CFLAGS:=$(if $(APP_DEBUG),-DDEBUG=1,-DDEBUG=0)
+  LOCAL_CFLAGS:=$(if $(APP_DEBUG),-DDEBUG=1,-DDEBUG=0) $(b2_cflags)
   LOCAL_EXPORT_C_INCLUDES:=$(LOCAL_PATH)
   LOCAL_ARM_MODE:=arm
   $$(call add-stlport-includes))

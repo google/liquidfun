@@ -282,6 +282,14 @@ struct b2ParticleDef
 		group = NULL;
 	}
 
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+	/// Set position with direct floats
+	void SetPosition(float32 x, float32 y);
+
+	/// Set color with direct ints.
+	void SetColor(int32 r, int32 g, int32 b, int32 a);
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
 	/// \brief Specifies the type of particle (see #b2ParticleFlag).
 	///
 	/// A particle may be more than one type.
@@ -314,9 +322,11 @@ struct b2ParticleDef
 int32 b2CalculateParticleIterations(
 	float32 gravity, float32 radius, float32 timeStep);
 
-/// Handle to a particle.
-/// Use #b2ParticleSystem::GetParticleHandleFromIndex() to retrieve the
-/// b2ParticleHandle of a particle from the particle system.
+/// Handle to a particle. Particle indices are ephemeral: the same index might
+/// refer to a different particle, from frame-to-frame. If you need to keep a
+/// reference to a particular particle across frames, you should acquire a
+/// b2ParticleHandle. Use #b2ParticleSystem::GetParticleHandleFromIndex() to
+/// retrieve the b2ParticleHandle of a particle from the particle system.
 class b2ParticleHandle : public b2TypedIntrusiveListNode<b2ParticleHandle>
 {
 	// Allow b2ParticleSystem to use SetIndex() to associate particle handles
@@ -340,5 +350,17 @@ private:
 	// Index of the particle within the particle system.
 	int32 m_index;
 };
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+inline void b2ParticleDef::SetPosition(float32 x, float32 y)
+{
+	position.Set(x, y);
+}
+
+inline void b2ParticleDef::SetColor(int32 r, int32 g, int32 b, int32 a)
+{
+	color.Set((uint8)r, (uint8)g, (uint8)b, (uint8)a);
+}
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 
 #endif

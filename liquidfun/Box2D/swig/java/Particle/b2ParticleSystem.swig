@@ -38,6 +38,39 @@ struct b2Exception {
 };
 %}
 
+// Typemaps for getting the raw address of output java.nio.ByteBuffer
+// This is mapping all function arguments with the signature
+//     (void* outBuf, int size)
+// to different Java intermediate ByteBuffer types.
+// See the Get*Buffer() functions for examples.
+%typemap(jni) (void* outBuf, int size) "jobject"
+%typemap(jtype) (void* outBuf, int size) "java.nio.ByteBuffer"
+%typemap(jstype) (void* outBuf, int size) "java.nio.ByteBuffer"
+%typemap(javain) (void* outBuf, int size) "$javainput"
+%typemap(javaout) (void* outBuf, int size) {
+    return $jnicall;
+}
+// This extracts the Java ByteBuffer address from C++
+%typemap(in) (void* outBuf, int size) {
+    $1 = jenv->GetDirectBufferAddress($input);
+    $2 = jenv->GetDirectBufferCapacity($input);
+    if (($1 == NULL) && ($2 != 0)) {
+        SWIG_JavaThrowException(
+                jenv,
+                SWIG_JavaRuntimeException,
+                "Unable to get address of java.nio.ByteBuffer. "
+                "Is the ByteBuffer initialized?");
+    }
+}
+// This checks the output of the C++ functions for exceptions
+%typemap(argout) (void* outBuf, int size) {
+    if($result != NO_EXCEPTIONS) {
+        jclass clazz = jenv->FindClass(
+                g_liquidfunExceptions[$result].jniType);
+        jenv->ThrowNew(clazz, g_liquidfunExceptions[$result].errorMsg);
+    }
+}
+
 // Disallow constructors and destructors; only made through b2World
 %nodefaultctor b2ParticleSystem;
 %nodefaultdtor b2ParticleSystem;
@@ -50,6 +83,7 @@ public:
     b2ParticleGroup* CreateParticleGroup (const b2ParticleGroupDef &def);
     int32 GetParticleGroupCount() const;
     int32 GetParticleCount() const;
+    void SetMaxParticleCount(int32 count);
     void SetDamping(float32 damping);
     void SetRadius(float32 radius);
 
@@ -57,105 +91,17 @@ public:
             b2QueryCallback* callback,
             const b2Shape& shape,
             const b2Transform& xf) const;
-};
 
+    void SetParticleVelocity(int32 index, float32 vx, float32 vy);
+    float GetParticlePositionX(int32 index) const;
+    float GetParticlePositionY(int32 index) const;
 
-/// b2ParticleSystem extensions for easier Java access
-%extend b2ParticleSystem {
-    void SetParticleVelocity(int32 index, float32 vx, float32 vy) {
-        b2Vec2& v = $self->GetVelocityBuffer()[index];
-        v.x = vx;
-        v.y = vy;
-    }
-
-    float GetParticlePositionX(int32 index) {
-        float x = $self->GetPositionBuffer()[index].x;
-        return x;
-    }
-
-    float GetParticlePositionY(int32 index) {
-        float y = $self->GetPositionBuffer()[index].y;
-        return y;
-    }
-
-    // Typemaps for getting the raw address of output java.nio.ByteBuffer
-    // This is mapping all function arguments with the signature
-    //     (void* outBuf, int size)
-    // to different Java intermediate ByteBuffer types.
-    // See the Get*Buffer() below for examples.
-    %typemap(jni) (void* outBuf, int size) "jobject"
-    %typemap(jtype) (void* outBuf, int size) "java.nio.ByteBuffer"
-    %typemap(jstype) (void* outBuf, int size) "java.nio.ByteBuffer"
-    %typemap(javain) (void* outBuf, int size) "$javainput"
-    %typemap(javaout) (void* outBuf, int size) {
-        return $jnicall;
-    }
-    // This extracts the Java ByteBuffer address from C++
-    %typemap(in) (void* outBuf, int size) {
-        $1 = jenv->GetDirectBufferAddress($input);
-        $2 = jenv->GetDirectBufferCapacity($input);
-        if (($1 == NULL) && ($2 != 0)) {
-            SWIG_JavaThrowException(
-                    jenv,
-                    SWIG_JavaRuntimeException,
-                    "Unable to get address of java.nio.ByteBuffer. "
-                    "Is the ByteBuffer initialized?");
-        }
-    }
-    // This checks the output of the C++ functions for exceptions
-    %typemap(argout) (void* outBuf, int size) {
-        if($result != NO_EXCEPTIONS) {
-            jclass clazz = jenv->FindClass(
-                    g_liquidfunExceptions[$result].jniType);
-            jenv->ThrowNew(clazz, g_liquidfunExceptions[$result].errorMsg);
-        }
-    }
-
-    // Helper function for checking validity of buffer size
-    b2ExceptionType IsBufCopyValid(
-            int startIndex, int numParticles, int copySize, int bufSize) {
-        const int maxNumParticles = $self->GetParticleCount();
-        // are we actually copying?
-        if (copySize == 0) {
-            return NO_EXCEPTIONS;
-        }
-        // is the index out of bounds?
-        if ((startIndex < 0) || (startIndex >= maxNumParticles) ||
-                (numParticles < 0) ||
-                (numParticles + startIndex > maxNumParticles)) {
-            return PARTICLE_INDEX_OUTOFBOUNDS;
-        }
-        // are we copying within the boundaries?
-        if (copySize > bufSize) {
-            return BUFFER_TOO_SMALL;
-        }
-        return NO_EXCEPTIONS;
-    }
-
-    int GetPositionBuffer(
-            int startIndex, int numParticles, void* outBuf, int size) {
-        int copySize = numParticles * sizeof(b2Vec2);
-        b2ExceptionType isValid = b2ParticleSystem_IsBufCopyValid(
-                $self, startIndex, numParticles, copySize, size);
-        if (isValid != NO_EXCEPTIONS) {
-            return isValid;
-        }
-        memcpy(outBuf,
-                $self->GetPositionBuffer() + startIndex, copySize);
-        return NO_EXCEPTIONS;
-    }
-
-    int GetColorBuffer(
-            int startIndex, int numParticles, void* outBuf, int size) {
-        int copySize = numParticles * sizeof(b2ParticleColor);
-        b2ExceptionType isValid = b2ParticleSystem_IsBufCopyValid(
-                $self, startIndex, numParticles, copySize, size);
-        if (isValid != NO_EXCEPTIONS) {
-            return isValid;
-        }
-        memcpy(outBuf, $self->GetColorBuffer() + startIndex, copySize);
-        return NO_EXCEPTIONS;
-    }
+    int CopyPositionBuffer(
+            int startIndex, int numParticles, void* outBuf, int size) const;
+    int CopyColorBuffer(
+            int startIndex, int numParticles, void* outBuf, int size) const;
+    int CopyWeightBuffer(
+            int startIndex, int numParticles, void* outBuf, int size) const;
 };
 
 /// Ignore other classes
@@ -168,3 +114,6 @@ public:
 /// Include original .h file for SWIG
 /// The original file is simple enough we will just pull it in
 %include "../../../Box2D/Box2D/Particle/b2ParticleSystem.h"
+
+/// Clear the typemaps
+%clear (void* outBuf, int size);

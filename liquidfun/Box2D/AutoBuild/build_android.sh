@@ -35,8 +35,9 @@ usage() {
   echo "\
 Build all ${project_name} libraries and applications for Android.
 
-Usage: ${script_name} [-h] [-n] [-a abi] [-o output_directory] [-z archive]
-         [-v] [-p projects] [-b build_configuration] [build_configuration]
+Usage: ${script_name} [-h] [-n] [-a abi] [-o output_directory] [-z archive] \
+[-t tests_archive] [-v] [-p projects] [-b build_configuration] \
+[build_configuration]
 
 -h:
   Display this help message.
@@ -56,6 +57,8 @@ Usage: ${script_name} [-h] [-n] [-a abi] [-o output_directory] [-z archive]
   Directory to copy build artifacts to.
 -z archive:
   Create a zip archive of build artifacts.
+-t tests_archive:
+  Create a zip archive for unittest apks.
 -p projects:
   Whitespace separated list of projects to build.
 -v:
@@ -63,6 +66,9 @@ Usage: ${script_name} [-h] [-n] [-a abi] [-o output_directory] [-z archive]
 
 build_configuration:
   Legacy form of '-b build_configuration'.
+
+e.g. ${script_name} -a \"x86 mips\" -b \"debug\" -z my_archive.zip -p \
+\"Box2D/Testbed Box2D/EyeCandy\"
 " >&2
   exit 1
 }
@@ -126,11 +132,12 @@ main() {
   local clean=1
   local output_dir=
   local archive=
+  local tests_archive=
   local delete_dirs=
   local verbose=0
   local projects_to_build=
 
-  while getopts 'hnda:b:o:z:vp:' option; do
+  while getopts 'hnda:b:o:z:t:vp:' option; do
     case ${option} in
       h) usage ;;
       n) clean=0 ;;
@@ -140,8 +147,9 @@ main() {
       o) mkdir -p "${OPTARG}"
          output_dir="$(cd ${OPTARG} && pwd)";;
       z) archive="${OPTARG}";;
+      t) tests_archive="${OPTARG}";;
       v) verbose=1;;
-      p) projects_to_build="${OPTARG}" ;;
+      p) projects_to_build=$(echo ${OPTARG} | tr ' ' '\n');;
       *) usage ;;
     esac
   done
@@ -159,9 +167,16 @@ main() {
 
   # If an archive was specified with no output directory, create a temporary
   # output directory.
-  if [[ "${archive}" != "" && "${output_dir}" == "" ]]; then
-    archive="$(cd "$(dirname "${archive}")" ; \
-               echo $(pwd)/$(basename "${archive}"))"
+  if [[ ("${archive}" != "" || "${tests_archive}" != "") && \
+       "${output_dir}" == "" ]]; then
+    if [[ "${archive}" != "" ]]; then
+      archive="$(cd "$(dirname "${archive}")" ; \
+        echo $(pwd)/$(basename "${archive}"))"
+    fi
+    if [[ "${tests_archive}" != "" ]]; then
+      tests_archive="$(cd "$(dirname "${tests_archive}")" ; \
+        echo $(pwd)/$(basename "${tests_archive}"))"
+    fi
     output_dir=$(mktemp -d XXXXXX)
     output_dir="$(cd "${output_dir}" && pwd)"
     delete_dirs="${delete_dirs} ${output_dir}"
@@ -195,8 +210,9 @@ main() {
         # can execute to 1.
         for target_dir in ${projects_to_build}; do
           pushd "${target_dir}" >/dev/null
-          build_apk clean ${ndk_debug} ${ndk_verbose} \
-                                    APP_ABI=${build_abi} -j1
+          rm -r bin >/dev/null
+          rm -r obj >/dev/null
+          rm -r libs >/dev/null
           popd >/dev/null
         done
       fi
@@ -206,7 +222,7 @@ main() {
         pushd "${target_dir}" >/dev/null
         echo "Building ${target_dir}..." >&2
         if ! build_apk ${ndk_debug} ${ndk_verbose} \
-                                 APP_ABI=${build_abi}; then
+                                APP_ABI=${build_abi}; then
           failed_builds="${failed_builds} ${target_dir}"
           build_failed=1
         fi
@@ -236,7 +252,7 @@ main() {
               cp -a "${artifact_dir}" "${artifact_output}"
             fi
           done
-          # Copy static libraries if they're present.
+          # Copy static libraries if they are present.
           for static_lib in $(cd "${project_dir}" && \
                               find obj/local/* -maxdepth 1 \
                                 -type f -name '*.a'); do
@@ -254,10 +270,17 @@ main() {
   done
 
   # Create the archive of build artifacts.
-  if [[ "${archive}" != "" ]]; then
+  if [[ "${archive}" != ""  ||  "${tests_archive}" != "" ]]; then
     pushd "${output_dir}" >/dev/null
     rm -f "${archive}"
-    zip -r "${archive}" .
+    rm -f "${tests_archive}"
+    if [[ "${archive}" != "" ]]; then
+      zip -r "${archive}" .
+    fi
+    if [[ "${tests_archive}" != "" ]]; then
+      find "${output_dir}" -name "*Tests-release.apk" | \
+        xargs zip -j "${tests_archive}"
+    fi
     popd >/dev/null
   fi
 

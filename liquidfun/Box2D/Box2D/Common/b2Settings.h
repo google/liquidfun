@@ -25,7 +25,7 @@
 #include <float.h>
 
 #define B2_NOT_USED(x) ((void)(x))
-#if DEBUG
+#if DEBUG && !defined(NDEBUG)
 #define b2Assert(A) assert(A)
 #define B2_ASSERT_ENABLED 1
 #else
@@ -71,6 +71,16 @@ typedef unsigned long long uint64;
 #define b2Inline inline
 #endif // defined(__GNUC__)
 #endif // !defined(b2Inline)
+
+// We expand the API so that other languages (e.g. Java) can call into
+// our C++ more easily. Only set if when the flag is not externally defined.
+#if !defined(LIQUIDFUN_EXTERNAL_LANGUAGE_API)
+#if SWIG || LIQUIDFUN_UNIT_TESTS
+#define LIQUIDFUN_EXTERNAL_LANGUAGE_API 1
+#else
+#define LIQUIDFUN_EXTERNAL_LANGUAGE_API 0
+#endif
+#endif
 
 /// @file
 /// Global tuning constants based on meters-kilograms-seconds (MKS) units.
@@ -149,8 +159,19 @@ typedef unsigned long long uint64;
 
 // Particle
 
+/// NEON SIMD requires 16-bit particle indices
+#if !defined(B2_USE_16_BIT_PARTICLE_INDICES) && defined(LIQUIDFUN_SIMD_NEON)
+#define B2_USE_16_BIT_PARTICLE_INDICES
+#endif
+
 /// A symbolic constant that stands for particle allocation error.
 #define b2_invalidParticleIndex		(-1)
+
+#ifdef B2_USE_16_BIT_PARTICLE_INDICES
+#define b2_maxParticleIndex			0x7FFF
+#else
+#define b2_maxParticleIndex			0x7FFFFFFF
+#endif
 
 /// The default distance between particles, multiplied by the particle diameter.
 #define b2_particleStride			0.75f

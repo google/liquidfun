@@ -25,6 +25,9 @@ class b2World;
 class b2ParticleSystem;
 class b2ParticleGroup;
 class b2ParticleColor;
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+class b2CircleShape;
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 
 /// @file
 
@@ -70,6 +73,18 @@ struct b2ParticleGroupDef
 		lifetime = 0.0f;
 		userData = NULL;
 		group = NULL;
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+		circleShapes = NULL;
+		ownShapesArray = false;
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
+	}
+
+	~b2ParticleGroupDef()
+	{
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+		FreeShapesMemory();
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 	}
 
 	/// The particle-behavior flags (See #b2ParticleFlag).
@@ -128,6 +143,29 @@ struct b2ParticleGroupDef
 	/// An existing particle group to which the particles will be added.
 	b2ParticleGroup* group;
 
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+	/// Storage for constructed CircleShapes from an incoming vertex list
+	const b2CircleShape* circleShapes;
+
+	/// True if we create the shapes array internally.
+	bool ownShapesArray;
+
+	/// Clean up all memory associated with SetCircleShapesFromVertexList
+	void FreeShapesMemory();
+
+	/// From a vertex list created by an external language API, construct
+	/// a list of circle shapes that can be used to create a b2ParticleGroup
+	/// This eliminates cumbersome array-interfaces between languages.
+	void SetCircleShapesFromVertexList(void* inBuf,
+									   int numShapes,
+									   float radius);
+
+	/// Set position with direct floats.
+	void SetPosition(float32 x, float32 y);
+
+	/// Set color with direct ints.
+	void SetColor(int32 r, int32 g, int32 b, int32 a);
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 };
 
 /// A group of particles. b2ParticleGroup::CreateParticleGroup creates these.
@@ -153,11 +191,14 @@ public:
 	/// Does this group contain the particle.
 	bool ContainsParticle(int32 index) const;
 
+	/// Get the logical sum of particle flags.
+	uint32 GetAllParticleFlags() const;
+
 	/// Get the construction flags for the group.
-	int32 GetGroupFlags() const;
+	uint32 GetGroupFlags() const;
 
 	/// Set the construction flags for the group.
-	void SetGroupFlags(int32 flags);
+	void SetGroupFlags(uint32 flags);
 
 	/// Get the total mass of the group: the sum of all particles in it.
 	float32 GetMass() const;
@@ -185,6 +226,12 @@ public:
 	/// Get the rotational angle of the particle group as a whole.
 	/// Used only with groups of rigid particles.
 	float32 GetAngle() const;
+
+	/// Get the world linear velocity of a world point, from the average linear
+	/// and angular velocities of the particle group.
+	/// @param a point in world coordinates.
+	/// @return the world velocity of a point.
+	b2Vec2 GetLinearVelocityFromWorldPoint(const b2Vec2& worldPoint) const;
 
 	/// Get the user data pointer that was provided in the group definition.
 	void* GetUserData() const;
@@ -278,7 +325,7 @@ inline int32 b2ParticleGroup::GetBufferIndex() const
   return m_firstIndex;
 }
 
-inline int32 b2ParticleGroup::GetGroupFlags() const
+inline uint32 b2ParticleGroup::GetGroupFlags() const
 {
 	return m_groupFlags & ~b2_particleGroupInternalMask;
 }
@@ -328,6 +375,13 @@ inline float32 b2ParticleGroup::GetAngle() const
 	return m_transform.q.GetAngle();
 }
 
+inline b2Vec2 b2ParticleGroup::GetLinearVelocityFromWorldPoint(
+												const b2Vec2& worldPoint) const
+{
+	UpdateStatistics();
+	return m_linearVelocity + b2Cross(m_angularVelocity, worldPoint - m_center);
+}
+
 inline void* b2ParticleGroup::GetUserData() const
 {
 	return m_userData;
@@ -342,5 +396,18 @@ inline void b2ParticleGroup::DestroyParticles()
 {
 	DestroyParticles(false);
 }
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+inline void b2ParticleGroupDef::SetPosition(float32 x, float32 y)
+{
+	position.Set(x, y);
+}
+
+inline void b2ParticleGroupDef::SetColor(int32 r, int32 g, int32 b, int32 a)
+{
+	color.Set((uint8)r, (uint8)g, (uint8)b, (uint8)a);
+}
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
 
 #endif

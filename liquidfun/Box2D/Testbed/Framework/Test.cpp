@@ -399,7 +399,9 @@ void Test::Step(Settings* settings)
 
 		int32 particleCount = m_particleSystem->GetParticleCount();
 		int32 groupCount = m_particleSystem->GetParticleGroupCount();
-		m_debugDraw.DrawString(5, m_textLine, "particles/groups = %d/%d", particleCount, groupCount);
+		int32 pairCount = m_particleSystem->GetPairCount();
+		int32 triadCount = m_particleSystem->GetTriadCount();
+		m_debugDraw.DrawString(5, m_textLine, "particles/groups/pairs/triads = %d/%d/%d/%d", particleCount, groupCount, pairCount, triadCount);
 		m_textLine += DRAW_STRING_NEW_LINE;
 
 		int32 proxyCount = m_world->GetProxyCount();

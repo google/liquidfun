@@ -772,6 +772,17 @@ SFG_Window* fghWindowUnderCursor(SFG_Window *window)
     return window;
 }
 
+static GLboolean fgAnyMouseButtonDown()
+{
+	// Note: GetAsyncKeyState returns an unreliable value in the least-significant bit.
+	// We have to the most-significant bit to know if the mouse button is down.
+	// See "Remarks" here, http://msdn.microsoft.com/en-us/library/windows/desktop/ms646293(v=vs.85).aspx
+	static const int ASYNC_KEY_DOWN_BIT = 0x8000;
+	return (GetAsyncKeyState(VK_LBUTTON) & ASYNC_KEY_DOWN_BIT) != 0
+		|| (GetAsyncKeyState(VK_MBUTTON) & ASYNC_KEY_DOWN_BIT) != 0
+		|| (GetAsyncKeyState(VK_RBUTTON) & ASYNC_KEY_DOWN_BIT) != 0;
+}
+
 /*
  * The window procedure for handling Win32 events
  */
@@ -1257,7 +1268,7 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
                 SetCapture ( window->Window.Handle ) ;
             setCaptureActive = 1; /* Set to false in WM_CAPTURECHANGED handler */
         }
-        else if (!GetAsyncKeyState(VK_LBUTTON) && !GetAsyncKeyState(VK_MBUTTON) && !GetAsyncKeyState(VK_RBUTTON))
+        else if (!fgAnyMouseButtonDown())
           /* Make sure all mouse buttons are released before releasing capture */
           ReleaseCapture () ;
 

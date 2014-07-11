@@ -33,20 +33,8 @@ struct b2Transform {
     b2Transform();
 
     void SetIdentity();
+    float32 GetPositionX();
+    float32 GetPositionY();
+    float32 GetRotationSin();
+    float32 GetRotationCos();
 };
-
-/// b2Transform extensions for easier Java access
-%extend b2Transform {
-    float32 getPosX() {
-        return $self->p.x;
-    }
-    float32 getPosY() {
-        return $self->p.y;
-    }
-    float32 getRotSin() {
-        return $self->q.s;
-    }
-    float32 getRotCos() {
-        return $self->q.c;
-    }
-}

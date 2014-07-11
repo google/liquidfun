@@ -103,7 +103,8 @@ public:
 	/// For the numerical stability of particles, minimize the following
 	/// dimensionless gravity acceleration:
 	///     gravity / particleRadius * (timeStep / particleIterations)^2
-	/// b2CalculateParticleIterations() helps to determine the optimal
+	/// b2CalculateParticleIterations() or
+	/// CalculateReasonableParticleIterations() help to determine the optimal
 	/// particleIterations.
 	/// @param timeStep the amount of time to simulate, this should not vary.
 	/// @param velocityIterations for the velocity constraint solver.
@@ -125,6 +126,13 @@ public:
 	{
 		Step(timeStep, velocityIterations, positionIterations, 1);
 	}
+
+	/// Recommend a value to be used in `Step` for `particleIterations`.
+	/// This calculation is necessarily a simplification and should only be
+	/// used as a starting point. Please see "Particle Iterations" in the
+	/// Programmer's Guide for details.
+	/// @param timeStep is the value to be passed into `Step`.
+	int CalculateReasonableParticleIterations(float32 timeStep) const;
 
 	/// Manually clear the force buffer on all bodies. By default, forces are cleared automatically
 	/// after each call to Step. The default behavior is modified by calling SetAutoClearForces.
@@ -265,6 +273,15 @@ public:
 		return m_liquidFunVersionString;
 	}
 
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+public:
+	/// Constructor which takes direct floats.
+	b2World(float32 gravityX, float32 gravityY);
+
+	/// Set gravity with direct floats.
+	void SetGravity(float32 gravityX, float32 gravityY);
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
 private:
 
 	// m_flags
@@ -280,6 +297,8 @@ private:
 	friend class b2ContactManager;
 	friend class b2Controller;
 	friend class b2ParticleSystem;
+
+	void Init(const b2Vec2& gravity);
 
 	void Solve(const b2TimeStep& step);
 	void SolveTOI(const b2TimeStep& step);
@@ -425,5 +444,17 @@ inline const b2Profile& b2World::GetProfile() const
 {
 	return m_profile;
 }
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+inline b2World::b2World(float32 gravityX, float32 gravityY)
+{
+	Init(b2Vec2(gravityX, gravityY));
+}
+
+inline void b2World::SetGravity(float32 gravityX, float32 gravityY)
+{
+	SetGravity(b2Vec2(gravityX, gravityY));
+}
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 
 #endif

@@ -33,6 +33,8 @@ protected:
 		// bodies.
 		m_world = new b2World(gravity);
 
+		m_particleSystemDef.radius = 0.01f;
+		m_particleSystemDef.gravityScale = 0.01f;
 		m_particleSystem = m_world->CreateParticleSystem(&m_particleSystemDef);
 	}
 	virtual void TearDown()
@@ -324,7 +326,7 @@ TEST_F(FunctionTests, CreateParticleInExistingGroup) {
 }
 
 TEST_F(FunctionTests, ParticleRadius) {
-	float r = 12.3f;
+	float r = 0.123f;
 	m_particleSystem->SetRadius(r);
 	EXPECT_EQ(m_particleSystem->GetRadius(), r);
 }
@@ -336,13 +338,13 @@ TEST_F(FunctionTests, ParticleDensity) {
 }
 
 TEST_F(FunctionTests, ParticleGravityScale) {
-	float g = 12.3f;
+	float g = 1.23f;
 	m_particleSystem->SetGravityScale(g);
 	EXPECT_EQ(m_particleSystem->GetGravityScale(), g);
 }
 
 TEST_F(FunctionTests, ParticleDamping) {
-	float r = 12.3f;
+	float r = 0.123f;
 	m_particleSystem->SetDamping(r);
 	EXPECT_EQ(m_particleSystem->GetDamping(), r);
 }
@@ -373,7 +375,7 @@ TEST_F(FunctionTests, DestroyParticle) {
 // perimeter of the shape.
 TEST_F(FunctionTests, DestroyParticlesInShapeNoneInShape) {
 	b2PolygonShape shape;
-	shape.SetAsBox(2, 2);
+	shape.SetAsBox(0.02f, 0.02f);
 	b2Transform xf;
 	xf.SetIdentity();
 
@@ -391,7 +393,7 @@ TEST_F(FunctionTests, DestroyParticlesInShapeNoneInShape) {
 // DestroyParticlesInShape(b2Shape&, b2Transform&, bool).
 TEST_F(FunctionTests, DestroyParticlesInShape) {
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	b2Transform xf;
 	xf.SetIdentity();
 	int32 destroyed;
@@ -437,8 +439,8 @@ TEST_F(FunctionTests, CreateParticleGroupWithShapeList) {
 	const b2Shape *shapes[shapeCount];
 	for (int32 i = 0; i < shapeCount; i++)
 	{
-		circleShapes[i].m_p.Set(2.0f * (float32)i, 10.0f);
-		circleShapes[i].m_radius = 1;
+		circleShapes[i].m_p.Set(0.02f * (float32)i, 0.1f);
+		circleShapes[i].m_radius = 0.01f;
 		shapes[i] = &circleShapes[i];
 	}
 	def.shapes = shapes;
@@ -453,7 +455,7 @@ TEST_F(FunctionTests, CreateParticleGroupWithShapeList) {
 TEST_F(FunctionTests, CreateParticleGroupWithCustomStride) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	def.stride = 1 * m_particleSystem->GetRadius();
 	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
@@ -472,7 +474,7 @@ TEST_F(FunctionTests, CreateEmptyParticleGroupWithNoShape) {
 	EXPECT_EQ(m_particleSystem->GetParticleCount(), 0);
 	EXPECT_EQ(group->GetParticleCount(), 0);
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	m_particleSystem->JoinParticleGroups(group, m_particleSystem->CreateParticleGroup(def));
 	EXPECT_GT(m_particleSystem->GetParticleCount(), 0);
@@ -489,7 +491,7 @@ TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
 	b2Vec2 positionData[particleCount];
 	for (int32 i = 0; i < particleCount; i++)
 	{
-		positionData[i].Set((float32)i, (float32)i);
+		positionData[i].Set(0.01f * (float32)i, 0.01f * (float32)i);
 	}
 	b2ParticleGroupDef def;
 	def.particleCount = particleCount;
@@ -500,8 +502,8 @@ TEST_F(FunctionTests, CreateParticleGroupWithParticleCount) {
 	const b2Vec2 *positionBuffer = m_particleSystem->GetPositionBuffer();
 	for (int32 i = 0; i < particleCount; i++)
 	{
-		ASSERT_EQ(positionBuffer[i].x, (float32) i);
-		ASSERT_EQ(positionBuffer[i].y, (float32) i);
+		ASSERT_EQ(positionBuffer[i].x, 0.01f * (float32)i);
+		ASSERT_EQ(positionBuffer[i].y, 0.01f * (float32)i);
 	}
 }
 
@@ -509,7 +511,7 @@ TEST_F(FunctionTests, CreateParticleGroupInExistingGroup) {
 	b2ParticleGroupDef groupDef;
 	b2ParticleGroup *groupA = m_particleSystem->CreateParticleGroup(groupDef);
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	groupDef.shape = &shape;
 	groupDef.group = groupA;
 	b2ParticleGroup *groupB = m_particleSystem->CreateParticleGroup(groupDef);
@@ -532,7 +534,7 @@ TEST_F(FunctionTests, DestroyParticleGroup) {
 TEST_F(FunctionTests, GetParticleBuffer) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
 	EXPECT_EQ(group->GetBufferIndex(), 0);
@@ -547,6 +549,8 @@ TEST_F(FunctionTests, GetParticleBuffer) {
 			  constParticleSystem->GetGroupBuffer());
 	EXPECT_EQ(m_particleSystem->GetColorBuffer(),
 			  constParticleSystem->GetColorBuffer());
+	EXPECT_EQ(m_particleSystem->GetWeightBuffer(),
+			  constParticleSystem->GetWeightBuffer());
 	EXPECT_EQ(m_particleSystem->GetUserDataBuffer(),
 			  constParticleSystem->GetUserDataBuffer());
 	const b2ParticleGroup *constGroup = group;
@@ -572,7 +576,7 @@ TEST_F(FunctionTests, SetParticleBuffer) {
 	EXPECT_EQ(m_particleSystem->GetUserDataBuffer(), userDataBuffer);
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	m_particleSystem->CreateParticleGroup(def);
 	EXPECT_LE(m_particleSystem->GetParticleCount(), size);
@@ -601,15 +605,18 @@ TEST_F(FunctionTests, SetParticleBuffer) {
 TEST_F(FunctionTests, GroupData) {
 	b2ParticleGroupDef def;
 	def.flags = b2_elasticParticle | b2_springParticle;
-	def.position.Set(1, 2);
+	def.groupFlags = b2_particleGroupCanBeEmpty;
+	def.position.Set(0.01f, 0.02f);
 	def.angle = 3;
-	def.linearVelocity.Set(4, 5);
+	def.linearVelocity.Set(0.04f, 0.05f);
 	def.color.Set(1, 2, 3, 4);
 	def.userData = this;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(group->GetAllParticleFlags(), def.flags);
+	EXPECT_EQ(group->GetGroupFlags(), def.groupFlags);
 	EXPECT_NE(group->GetParticleCount(), 0);
 	EXPECT_EQ(group->GetPosition(), def.position);
 	EXPECT_EQ(group->GetAngle(), def.angle);
@@ -654,12 +661,12 @@ TEST_F(FunctionTests, ConstGroupList) {
 TEST_F(FunctionTests, JoinParticleGroups) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
-	shape.SetAsBox(10, 20);
+	shape.SetAsBox(0.1f, 0.2f);
 	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
-	shape.SetAsBox(10, 30);
+	shape.SetAsBox(0.1f, 0.3f);
 	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
 	int32 count1 = group1->GetParticleCount();
 	int32 count2 = group2->GetParticleCount();
@@ -671,15 +678,58 @@ TEST_F(FunctionTests, JoinParticleGroups) {
 	EXPECT_EQ(count1 + count2, group1->GetParticleCount());
 }
 
+TEST_F(FunctionTests, SplitParticleGroup) {
+	b2ParticleGroupDef def;
+	static const int32 shapeCount = 3;
+	b2CircleShape circleShapes[shapeCount];
+	const b2Shape *shapes[shapeCount];
+	for (int32 i = 0; i < shapeCount; i++)
+	{
+		circleShapes[i].m_p.Set(0.2f * (float32)i, 0);
+		circleShapes[i].m_radius = 0.08f;
+		shapes[i] = &circleShapes[i];
+	}
+	def.shapes = shapes;
+	def.shapeCount = shapeCount;
+	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 1);
+	m_particleSystem->SplitParticleGroup(group);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), shapeCount);
+}
+
+TEST_F(FunctionTests, SplitParticleGroupInterminglingWithOtherGroups) {
+	b2ParticleGroupDef def;
+	static const int32 shapeCount = 3;
+	b2CircleShape circleShapes[shapeCount];
+	const b2Shape *shapes[shapeCount];
+	for (int32 i = 0; i < shapeCount; i++)
+	{
+		circleShapes[i].m_p.Set(0.2f * (float32)i, 0);
+		circleShapes[i].m_radius = 0.08f;
+		shapes[i] = &circleShapes[i];
+	}
+	def.shapes = shapes;
+	def.shapeCount = shapeCount;
+	b2ParticleGroup *group = m_particleSystem->CreateParticleGroup(def);
+	b2ParticleGroupDef anotherDef;
+	b2PolygonShape polygonShape;
+	polygonShape.SetAsBox(0.3f, 0.1f, b2Vec2(0.25f, 0), 0);
+	anotherDef.shape = &polygonShape;
+	m_particleSystem->CreateParticleGroup(anotherDef);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), 2);
+	m_particleSystem->SplitParticleGroup(group);
+	EXPECT_EQ(m_particleSystem->GetParticleGroupCount(), shapeCount + 1);
+}
+
 TEST_F(FunctionTests, GroupBuffer) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
-	shape.SetAsBox(10, 20);
+	shape.SetAsBox(0.1f, 0.2f);
 	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
-	shape.SetAsBox(10, 30);
+	shape.SetAsBox(0.1f, 0.3f);
 	b2ParticleGroup *group3 = m_particleSystem->CreateParticleGroup(def);
 	const b2ParticleGroup *const *groupBuffer =
 		m_particleSystem->GetGroupBuffer();
@@ -708,23 +758,41 @@ TEST_F(FunctionTests, GroupBuffer) {
 	}
 }
 
+TEST_F(FunctionTests, AllFlags) {
+	b2ParticleGroup* group = CreateBoxShapedParticleGroup(m_particleSystem);
+	EXPECT_EQ(m_particleSystem->GetAllParticleFlags(), 0u);
+	EXPECT_EQ(m_particleSystem->GetAllGroupFlags(), 0u);
+	int32 particleCount = m_particleSystem->GetParticleCount();
+	for (int32 i = 0; i < particleCount / 2; i++) {
+		m_particleSystem->SetParticleFlags(i, b2_elasticParticle);
+	}
+	for (int32 i = particleCount / 2; i < particleCount; i++) {
+		m_particleSystem->SetParticleFlags(i, b2_viscousParticle);
+	}
+	EXPECT_EQ(m_particleSystem->GetAllParticleFlags(),
+									(uint32)(b2_elasticParticle | b2_viscousParticle));
+	group->SetGroupFlags(b2_particleGroupCanBeEmpty);
+	EXPECT_EQ(m_particleSystem->GetAllGroupFlags(), b2_particleGroupCanBeEmpty);
+}
+
 TEST_F(FunctionTests, GroupFlags) {
 	b2ParticleGroup* group = CreateBoxShapedParticleGroup(m_particleSystem);
 	group->SetGroupFlags(b2_rigidParticleGroup);
 	EXPECT_EQ(group->GetGroupFlags(), b2_rigidParticleGroup);
 	group->SetGroupFlags(b2_rigidParticleGroup | b2_solidParticleGroup);
 	EXPECT_EQ(
-		group->GetGroupFlags(), b2_rigidParticleGroup | b2_solidParticleGroup);
+		group->GetGroupFlags(),
+                (uint32)(b2_rigidParticleGroup | b2_solidParticleGroup));
 	group->SetGroupFlags(b2_particleGroupCanBeEmpty);
 	EXPECT_EQ(group->GetGroupFlags(), b2_particleGroupCanBeEmpty);
 	group->SetGroupFlags(0);
-	EXPECT_EQ(group->GetGroupFlags(), 0);
+	EXPECT_EQ(group->GetGroupFlags(), 0u);
 }
 
 TEST_F(FunctionTests, GetParticleContact) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	m_particleSystem->CreateParticleGroup(def);
 	EXPECT_NE(m_particleSystem->GetContactCount(), 0);
@@ -734,7 +802,7 @@ TEST_F(FunctionTests, GetParticleContact) {
 TEST_F(FunctionTests, GetParticleBodyContact) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	m_particleSystem->CreateParticleGroup(def);
 	b2BodyDef bodyDef;
@@ -746,20 +814,54 @@ TEST_F(FunctionTests, GetParticleBodyContact) {
 			  (const b2ParticleBodyContact *)NULL);
 }
 
+TEST_F(FunctionTests, GetParticlePair) {
+	b2ParticleGroupDef def;
+	b2PolygonShape shape;
+	shape.SetAsBox(0.1f, 0.1f);
+	def.shape = &shape;
+	m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->GetPairCount(), 0);
+	def.flags = b2_springParticle;
+	def.position.Set(0.2f, 0);
+	b2ParticleGroup* group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_NE(m_particleSystem->GetPairCount(), 0);
+	group->DestroyParticles();
+	m_world->Step(0.001f, 1, 1);
+	EXPECT_EQ(m_particleSystem->GetPairCount(), 0);
+	EXPECT_NE(m_particleSystem->GetPairs(), (const b2ParticlePair *)NULL);
+}
+
+TEST_F(FunctionTests, GetParticleTriad) {
+	b2ParticleGroupDef def;
+	b2PolygonShape shape;
+	shape.SetAsBox(0.1f, 0.1f);
+	def.shape = &shape;
+	m_particleSystem->CreateParticleGroup(def);
+	EXPECT_EQ(m_particleSystem->GetTriadCount(), 0);
+	def.flags = b2_elasticParticle;
+	def.position.Set(0.2f, 0);
+	b2ParticleGroup* group = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_NE(m_particleSystem->GetTriadCount(), 0);
+	group->DestroyParticles();
+	m_world->Step(0.001f, 1, 1);
+	EXPECT_EQ(m_particleSystem->GetTriadCount(), 0);
+	EXPECT_NE(m_particleSystem->GetTriads(), (const b2ParticleTriad *)NULL);
+}
+
 TEST_F(FunctionTests, ComputeCollisionEnergy) {
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	m_particleSystem->CreateParticleGroup(def);
 	EXPECT_EQ(m_particleSystem->ComputeCollisionEnergy(), 0);
 
-	def.position.Set(20, 0);
-	def.linearVelocity.Set(-1, 0);
+	def.position.Set(0.2f, 0);
+	def.linearVelocity.Set(-0.01f, 0);
 	m_particleSystem->CreateParticleGroup(def);
-	for (int32 t = 0; t < 1000; t++)
+	for (int32 t = 0; t < 10; t++)
 	{
-		m_world->Step(0.1f, 1, 1);
+		m_world->Step(0.1f, 1, 1, 1);
 	}
 	EXPECT_NE(m_particleSystem->ComputeCollisionEnergy(), 0);
 }
@@ -769,8 +871,8 @@ TEST_F(FunctionTests, SetPaused) {
 
 	b2ParticleDef def;
 	def.flags = b2_elasticParticle | b2_springParticle;
-	def.position.Set(1, 2);
-	def.velocity.Set(3, 4);
+	def.position.Set(0.01f, 0.02f);
+	def.velocity.Set(0.03f, 0.04f);
 	def.color.Set(1, 2, 3, 4);
 	def.userData = this;
 	m_particleSystem->CreateParticle(def);
@@ -884,11 +986,11 @@ TEST_F(FunctionTests, ParticleHandlesTrackGroups)
 	// Create particle groups, join them, check data after resorting.
 	b2ParticleGroupDef groupDef;
 	b2PolygonShape box;
-	box.SetAsBox(10, 10);
+	box.SetAsBox(0.1f, 0.1f);
 	groupDef.shape = &box;
 	b2ParticleGroup *groupA = system->CreateParticleGroup(groupDef);
 	// Create a particle groupB next to groupA.
-	groupDef.position = b2Vec2(10.0f, 0.0f);
+	groupDef.position = b2Vec2(0.1f, 0.0f);
 	b2ParticleGroup *groupB = system->CreateParticleGroup(groupDef);
 
 	const int32 groupAParticleCount = groupA->GetParticleCount();
@@ -1056,7 +1158,7 @@ TEST_F(FunctionTests, CreateParticleWithFiniteLifetimeUsingDef)
 TEST_F(FunctionTests, CreateParticleGroupWithFiniteLifetime)
 {
 	b2PolygonShape shape;
-	shape.SetAsBox(10.0f, 10.0f);
+	shape.SetAsBox(0.1f, 0.1f);
 	b2ParticleGroupDef def;
 	def.lifetime = 1.0f;
 	def.shape = &shape;
@@ -1143,10 +1245,10 @@ TEST_F(FunctionTests, CreateParticleGroupsWithFiniteLifetimes)
 	// Create two particle groups.
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	groups[0] = m_particleSystem->CreateParticleGroup(def);
-	def.position = b2Vec2(5.0f, 0.0f);
+	def.position = b2Vec2(0.05f, 0.0f);
 	groups[1] = m_particleSystem->CreateParticleGroup(def);
 
 	// Allocate an array to save indices of particles in the groups.
@@ -1270,6 +1372,304 @@ TEST_F(FunctionTests, GetParticleMass) {
 	const float mass = m_particleSystem->GetParticleMass();
 	const float invMass = m_particleSystem->GetParticleInvMass();
 	EXPECT_NEAR(mass * invMass, 1.0f, 0.000001f);
+}
+
+#if !LIQUIDFUN_EXTERNAL_LANGUAGE_API
+#error The external language API should be defined for unit tests
+#endif
+
+static const b2Vec2 kParticlePositions[] = {
+	b2Vec2(0.01f, 0.01f),
+	b2Vec2(0.0f, 0.0f),
+	b2Vec2(0.02f, -0.01f),
+	b2Vec2(-0.041f, 0.035f),
+	b2Vec2(-0.022f, -0.01f),
+};
+
+static const b2ParticleColor kParticleColors[] = {
+	b2ParticleColor(100, 0, 0, 200),
+	b2ParticleColor(0, 64, 0, 128),
+	b2ParticleColor(0, 0, 32, 64),
+	b2ParticleColor(0, 0, 0, 0),
+	b2ParticleColor(255, 255, 255, 255),
+};
+
+TEST_F(FunctionTests, CircleShapeSetPosition) {
+	b2CircleShape shape;
+	b2CircleShape shape2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		shape.SetPosition(kParticlePositions[i].x, kParticlePositions[i].y);
+		shape2.m_p = kParticlePositions[i];
+		EXPECT_EQ(shape2.m_p, shape.m_p);
+	}
+}
+
+TEST_F(FunctionTests, CircleShapeGetPosition) {
+	b2CircleShape shape;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		shape.m_p = kParticlePositions[i];
+		EXPECT_EQ(shape.m_p.x, shape.GetPositionX());
+		EXPECT_EQ(shape.m_p.y, shape.GetPositionY());
+	}
+}
+
+TEST_F(FunctionTests, EdgeShapeSet) {
+	b2EdgeShape shape;
+	b2EdgeShape shape2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions) - 1; ++i)
+	{
+		shape.Set(kParticlePositions[i].x, kParticlePositions[i].y,
+				  kParticlePositions[i + 1].x, kParticlePositions[i + 1].y);
+		shape2.Set(kParticlePositions[i], kParticlePositions[i + 1]);
+		EXPECT_EQ(shape2.m_vertex1, shape.m_vertex1);
+		EXPECT_EQ(shape2.m_vertex2, shape.m_vertex2);
+	}
+}
+
+TEST_F(FunctionTests, PolygonShapeSetCentroid) {
+	b2PolygonShape shape;
+	b2PolygonShape shape2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		shape.SetCentroid(kParticlePositions[i].x, kParticlePositions[i].y);
+		shape2.m_centroid = kParticlePositions[i];
+		EXPECT_EQ(shape2.m_centroid, shape.m_centroid);
+	}
+}
+
+TEST_F(FunctionTests, PolygonShapeSetAsBox) {
+	b2PolygonShape shape;
+	b2PolygonShape shape2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		float halfWidth = 0.1f;
+		float halfHeight = 0.05f;
+		float angle = 3.0f;
+		shape.SetAsBox(halfWidth, halfHeight, kParticlePositions[i].x,
+									 kParticlePositions[i].y, angle);
+		shape2.SetAsBox(halfWidth, halfHeight, kParticlePositions[i], angle);
+		EXPECT_EQ(shape2.m_centroid, shape.m_centroid);
+		EXPECT_EQ(shape2.m_count, shape.m_count);
+		for (int32 j = 0; j < shape.m_count; ++j) {
+			EXPECT_EQ(shape2.m_vertices[j], shape.m_vertices[j]);
+			EXPECT_EQ(shape2.m_normals[j], shape.m_normals[j]);
+		}
+	}
+}
+
+TEST_F(FunctionTests, TransformGetPos) {
+	b2Transform xf;
+	float angle = 3.0f;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		xf.Set(kParticlePositions[i], angle);
+		EXPECT_EQ(xf.p.x, xf.GetPositionX());
+		EXPECT_EQ(xf.p.y, xf.GetPositionY());
+		EXPECT_EQ(xf.q.s, xf.GetRotationSin());
+		EXPECT_EQ(xf.q.c, xf.GetRotationCos());
+	}
+}
+
+TEST_F(FunctionTests, BodyDefSetPosition) {
+	b2BodyDef bd;
+	b2BodyDef bd2;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		bd.SetPosition(kParticlePositions[i].x, kParticlePositions[i].y);
+		bd2.position = kParticlePositions[i];
+		EXPECT_EQ(bd2.position, bd.position);
+	}
+}
+
+TEST_F(FunctionTests, BodyGetPosition) {
+	b2BodyDef bodyDef;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		bodyDef.position = kParticlePositions[i];
+		b2Body *body = m_world->CreateBody(&bodyDef);
+		EXPECT_EQ(body->GetPosition().x, body->GetPositionX());
+		EXPECT_EQ(body->GetPosition().y, body->GetPositionY());
+	}
+}
+
+TEST_F(FunctionTests, BodySetTransform) {
+	b2BodyDef bodyDef;
+	b2Body *body = m_world->CreateBody(&bodyDef);
+	b2Body *body2 = m_world->CreateBody(&bodyDef);
+	float angle = 3.0f;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		body->SetTransform(kParticlePositions[i].x, kParticlePositions[i].y, angle);
+		body2->SetTransform(kParticlePositions[i], angle);
+		EXPECT_EQ(body2->GetTransform().p, body->GetTransform().p);
+		EXPECT_EQ(body2->GetTransform().q.GetAngle(),
+							body->GetTransform().q.GetAngle());
+	}
+}
+
+TEST_F(FunctionTests, WorldConstruct) {
+	b2Vec2 gravity = m_world->GetGravity();
+	b2World* world = new b2World(gravity.x, gravity.y);
+	EXPECT_EQ(m_world->GetGravity(), world->GetGravity());
+	delete world;
+}
+
+TEST_F(FunctionTests, WorldSetGravity) {
+	b2Vec2 gravity = m_world->GetGravity();
+	b2World* world = new b2World(b2Vec2(0.0f, 0.0f));
+	world->SetGravity(gravity.x, gravity.y);
+	EXPECT_EQ(m_world->GetGravity(), world->GetGravity());
+	delete world;
+}
+
+TEST_F(FunctionTests, ParticleDefSetPositionColor) {
+	b2ParticleDef def;
+	b2ParticleDef def2;
+	def2.position.Set(0.01f, 0.02f);
+	def2.color.Set(3, 4, 5, 6);
+	def.SetPosition(def2.position.x, def2.position.y);
+	def.SetColor(def2.color.r, def2.color.g, def2.color.b, def2.color.a);
+	EXPECT_EQ(def2.position, def.position);
+	EXPECT_EQ(def2.color, def.color);
+}
+
+TEST_F(FunctionTests, ParticleSystemSetParticleVelocity) {
+	b2ParticleDef def;
+	def.velocity.Set(0.0f, 0.0f);
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		int index = m_particleSystem->CreateParticle(def);
+		m_particleSystem->SetParticleVelocity(index,
+											  kParticlePositions[i].x,
+											  kParticlePositions[i].y);
+		EXPECT_EQ(kParticlePositions[i].x,
+				  m_particleSystem->GetVelocityBuffer()[index].x);
+		EXPECT_EQ(kParticlePositions[i].y,
+				  m_particleSystem->GetVelocityBuffer()[index].y);
+	}
+}
+
+TEST_F(FunctionTests, ParticleSystemGetParticlePosition) {
+	b2ParticleDef def;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		def.position.Set(kParticlePositions[i].x, kParticlePositions[i].y);
+		int index = m_particleSystem->CreateParticle(def);
+		EXPECT_EQ(m_particleSystem->GetPositionBuffer()[index].x,
+				  m_particleSystem->GetParticlePositionX(index));
+		EXPECT_EQ(m_particleSystem->GetPositionBuffer()[index].y,
+				  m_particleSystem->GetParticlePositionY(index));
+	}
+}
+
+TEST_F(FunctionTests, CopyParticleBuffer) {
+	b2ParticleDef def;
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		def.position = kParticlePositions[i];
+		def.color = kParticleColors[i];
+		m_particleSystem->CreateParticle(def);
+	}
+
+	// Test position buffer
+	b2Vec2 positionsByValue[B2_ARRAY_SIZE(kParticlePositions)];
+	int exceptionType = m_particleSystem->CopyPositionBuffer(
+		0, B2_ARRAY_SIZE(kParticlePositions), positionsByValue,
+		sizeof(positionsByValue));
+
+	EXPECT_EQ(exceptionType, b2ParticleSystem::b2_noExceptions)
+		<< "Position buffer not read";
+
+	const b2Vec2* positionsByReference = m_particleSystem->GetPositionBuffer();
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		EXPECT_EQ(positionsByReference[i], positionsByValue[i])
+			<< "Buffer positions different";
+	}
+
+	// Test color buffer
+	b2ParticleColor colorsByValue[B2_ARRAY_SIZE(kParticlePositions)];
+	exceptionType = m_particleSystem->CopyColorBuffer(
+		0, B2_ARRAY_SIZE(kParticlePositions), colorsByValue,
+		sizeof(colorsByValue));
+
+	EXPECT_EQ(exceptionType, b2ParticleSystem::b2_noExceptions)
+		<< "Color buffer not read";
+
+	const b2ParticleColor* colorsByReference = m_particleSystem->GetColorBuffer();
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		EXPECT_EQ(colorsByReference[i], colorsByValue[i])
+			<< "Buffer colors different";
+	}
+
+	m_world->Step(0.001f, 1, 1);
+
+	// Test weight buffer after stepping
+	float32 weightsByValue[B2_ARRAY_SIZE(kParticlePositions)];
+	exceptionType = m_particleSystem->CopyWeightBuffer(
+		0, B2_ARRAY_SIZE(kParticlePositions), weightsByValue,
+		sizeof(weightsByValue));
+
+	EXPECT_EQ(exceptionType, b2ParticleSystem::b2_noExceptions)
+		<< "Weight buffer not read";
+
+	const float32* weightsByReference = m_particleSystem->GetWeightBuffer();
+	for (int32 i = 0; i < (int32)B2_ARRAY_SIZE(kParticlePositions); ++i)
+	{
+		EXPECT_EQ(weightsByReference[i], weightsByValue[i])
+			<< "Buffer weights different";
+	}
+}
+
+TEST_F(FunctionTests, CreateParticleGroupWithVertexList) {
+	b2ParticleGroupDef def;
+	const int shapeCount = B2_ARRAY_SIZE(kParticlePositions);
+	def.SetCircleShapesFromVertexList((void*) kParticlePositions,
+	                                  shapeCount, 1);
+	def.shapeCount = 1;
+	b2ParticleGroup *group1 = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_GT(group1->GetParticleCount(), 0);
+	def.shapeCount = shapeCount;
+	b2ParticleGroup *group2 = m_particleSystem->CreateParticleGroup(def);
+	EXPECT_GT(group2->GetParticleCount(), group1->GetParticleCount());
+}
+
+TEST_F(FunctionTests, ParticleGroupDefSetPositionColor) {
+	b2ParticleGroupDef def;
+	b2ParticleGroupDef def2;
+	def2.position.Set(0.01f, 0.02f);
+	def2.color.Set(3, 4, 5, 6);
+	def.SetPosition(def2.position.x, def2.position.y);
+	def.SetColor(def2.color.r, def2.color.g, def2.color.b, def2.color.a);
+	EXPECT_EQ(def2.position, def.position);
+	EXPECT_EQ(def2.color, def.color);
+}
+
+TEST_F(FunctionTests, AreProxyBuffersTheSame) {
+	b2BlockAllocator blockAllocator;
+	b2GrowableBuffer<b2ParticleSystem::Proxy> a(blockAllocator);
+	b2GrowableBuffer<b2ParticleSystem::Proxy> b(blockAllocator);
+
+	// Compare proxies with same tags, but indices in different orders.
+	static const int LEN_BUFFERS = 4;
+	for (int i = 0; i < LEN_BUFFERS; ++i)
+	{
+		b2ParticleSystem::Proxy proxy;
+		proxy.tag = 3;
+		proxy.index = i;
+		a.Append() = proxy;
+
+		proxy.index = LEN_BUFFERS - i - 1;
+		b.Append() = proxy;
+	}
+	EXPECT_TRUE(b2ParticleSystem::AreProxyBuffersTheSame(a, b));
+
+	// Compare proxies with same tags, but different indices.
+	b[LEN_BUFFERS / 2].index = LEN_BUFFERS - 1;
+	EXPECT_FALSE(b2ParticleSystem::AreProxyBuffersTheSame(a, b));
 }
 
 int main(int argc, char **argv)

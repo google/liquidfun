@@ -32,17 +32,22 @@ class b2Shape;
 %ignore b2_particleGroupNeedsUpdateDepth;
 %ignore b2_particleGroupInternalMask;
 
-/// b2ParticleGroupDef extensions for easier Java access
-%extend b2ParticleGroupDef {
-    // these won't override the default getters/setters
-    // SWIG generates, but provides a more sane alternative
-    // than to create (and have to destroy) throw away objects
-    void setPosition(float32 x, float32 y) {
-        $self->position.Set(x, y);
-    }
+// Typemaps for getting the raw address of output java.nio.ByteBuffer
+%typemap(jni) (void* inBuf) "jobject"
+%typemap(jtype) (void* inBuf) "java.nio.ByteBuffer"
+%typemap(jstype) (void* inBuf) "java.nio.ByteBuffer"
+%typemap(javain) (void* inBuf) "$javainput"
+%typemap(javaout) (void* inBuf) { return $jnicall; }
 
-    void setColor(int32 r, int32 g, int32 b, int32 a) {
-        $self->color.Set(r, g, b, a);
+// This extracts the Java ByteBuffer address from C++
+%typemap(in) (void* inBuf) {
+    $1 = jenv->GetDirectBufferAddress($input);
+    if ($1 == NULL) {
+        SWIG_JavaThrowException(
+                jenv,
+                SWIG_JavaRuntimeException,
+                "Unable to get address of java.nio.ByteBuffer. "
+                "Is the ByteBuffer initialized?");
     }
 }
 
@@ -59,8 +64,9 @@ public:
 %clearnodefaultdtor; // Re-enable default constructors
 %clearnodefaultctor; // Re-enable default destructors
 
-/// Ignore userdata pointers
+/// Ignore member variables so SWIG doesn't auto-generate get/setters
 %ignore b2ParticleGroupDef::userData;
+%ignore b2ParticleGroupDef::shapes;
 
 /// Ignore b2ParticleGroup class in the .h file because it's too complex
 /// A simple SWIG interface is provided before this
@@ -69,3 +75,6 @@ public:
 /// Include original .h file for SWIG
 /// The original file is simple enough we will just pull it in
 %include "../../../Box2D/Box2D/Particle/b2ParticleGroup.h"
+
+/// Clear the typemaps
+%clear (void* inBuf);

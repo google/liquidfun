@@ -217,7 +217,8 @@ void BodyContactTests::SetUp()
 	m_groundBody = m_world->CreateBody(&groundBodyDef);
 
 	// Create the particle system.
-	const b2ParticleSystemDef particleSystemDef;
+	b2ParticleSystemDef particleSystemDef;
+	particleSystemDef.radius = 0.1f;
 	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
 	m_particleDiameter = m_particleSystem->GetRadius() * 2.0f;
 }
@@ -239,33 +240,33 @@ void BodyContactTests::CreateValley()
 {
 	b2Assert(m_groundBody);
 	float32 i;
-	const float32 step = 1.0f;
-	for (i = -10.0f; i < 10.0f; i+=step)
+	const float32 step = 0.1f;
+	for (i = -1.0f; i < 1.0f; i+=step)
 	{
 		b2PolygonShape shape;
 		const b2Vec2 vertices[] = {
-			b2Vec2(i, -10.0f),
-			b2Vec2(i+step, -10.0f),
-			b2Vec2(0.0f, 15.0f)
+			b2Vec2(i, -1.0f),
+			b2Vec2(i+step, -1.0f),
+			b2Vec2(0.0f, 1.5f)
 		};
 		shape.Set(vertices, B2_ARRAY_SIZE(vertices));
 		m_groundBody->CreateFixture(&shape, 0.0f);
 	}
-	for (i = -10.0f; i < 35.0f; i+=step)
+	for (i = -1.0f; i < 3.5f; i+=step)
 	{
 		b2PolygonShape shape;
 		const b2Vec2 vertices[] = {
-			b2Vec2(-10.0f, i),
-			b2Vec2(-10.0f, i+step),
-			b2Vec2(0.0f, 15.0f)
+			b2Vec2(-1.0f, i),
+			b2Vec2(-1.0f, i+step),
+			b2Vec2(0.0f, 1.5f)
 		};
 		shape.Set(vertices, B2_ARRAY_SIZE(vertices));
 		m_groundBody->CreateFixture(&shape, 0.0f);
 
 		const b2Vec2 vertices2[] = {
-			b2Vec2(10.0f, i),
-			b2Vec2(10.0f, i+step),
-			b2Vec2(0.0f, 15.0f)
+			b2Vec2(1.0f, i),
+			b2Vec2(1.0f, i+step),
+			b2Vec2(0.0f, 1.5f)
 		};
 		shape.Set(vertices2, B2_ARRAY_SIZE(vertices2));
 		m_groundBody->CreateFixture(&shape, 0.0f);
@@ -323,8 +324,8 @@ void BodyContactTests::DropParticle()
 	m_world->Step(timeStep, velocityIterations, positionIterations);
 
 	b2ParticleDef pd;
-	pd.position.Set(0.0f, 33.0f);
-	pd.velocity.Set(0.0f, -1.0f);
+	pd.position.Set(0.0f, 3.3f);
+	pd.velocity.Set(0.0f, -0.1f);
 	m_particleSystem->CreateParticle(pd);
 
 	for (int32 i = 0; i < timeout; ++i)
@@ -487,6 +488,8 @@ TEST_F(BodyContactTests, EnableDisableFixtureParticleContactsWithContactFilter)
 // Verify that it's possible to enable / disable collisions between particles.
 TEST_F(BodyContactTests, EnableDisableParticleContactsWithContactFilter)
 {
+	m_world->SetGravity(b2Vec2_zero);
+
 	// Through two particles horizontally at each other
 	// (A moving right, B moving left).
 	b2ParticleDef pd;
@@ -518,10 +521,10 @@ TEST_F(BodyContactTests, EnableDisableParticleContactsWithContactFilter)
 	contactDisabler.m_enableParticleParticleCollisions = false;
 
 	// Reset the positions and velocities of the particles.
-	positions[particleIndexA].x = -m_particleDiameter * 2.0f;
-	velocities[particleIndexA].x = m_particleDiameter;
-	positions[particleIndexB].x = m_particleDiameter * 2.0f;
-	velocities[particleIndexB].x = -m_particleDiameter;
+	positions[particleIndexA].Set(-m_particleDiameter * 2.0f, 0.0f);
+	velocities[particleIndexA].Set(m_particleDiameter, 0.0f);
+	positions[particleIndexB].Set(m_particleDiameter * 2.0f, 0.0f);
+	velocities[particleIndexB].Set(-m_particleDiameter, 0.0f);
 
 	// Run the simulation and verify that particles now pass each other (i.e
 	// they no longer collide).
@@ -568,7 +571,7 @@ TEST_F(BodyContactTests, ParticleFixtureContactListener)
 	// Throw the particle above the ground fixture and verify it's no longer
 	// touching.
 	m_particleSystem->GetVelocityBuffer()[particleIndex].y =
-		m_particleDiameter * 2.0f;
+		m_particleDiameter * 20.0f;
 	RunStep(60.0f, 0.5f);
 	EXPECT_EQ(tracker.m_beginFixtureContacts.size(), 0U);
 	EXPECT_EQ(tracker.m_endFixtureContacts.size(), 1U);
@@ -606,8 +609,8 @@ TEST_F(BodyContactTests, ParticleContactListener)
 	for (uint32 i = 0; i < listener.m_beginParticleContacts.size(); ++i)
 	{
 		b2ParticleContact contact = listener.m_beginParticleContacts[i];
-		EXPECT_TRUE(contact.indexA == particleA ? contact.indexB == particleB :
-					contact.indexB == particleA);
+		EXPECT_TRUE(contact.GetIndexA() == particleA ? contact.GetIndexB() == particleB :
+					contact.GetIndexB() == particleA);
 	}
 
 	// Push particleB away from particleA.

@@ -16,14 +16,16 @@
 
 LOCAL_PATH := $(call my-dir)
 
+include ${call my-dir}/../../b2_android_common.mk
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := EyeCandy
-LOCAL_SRC_FILES := main.cpp
+LOCAL_SRC_FILES := main.cpp ../engine.cpp ../android/platform_android.cpp
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/.. $(LOCAL_PATH)/../android
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2
 LOCAL_STATIC_LIBRARIES := android_native_app_glue liquidfun_static
 LOCAL_ARM_MODE:=arm
-LOCAL_CPPFLAGS += -std=c++11 -Wall -Werror
+LOCAL_CPPFLAGS += -std=c++11 -Wall -Werror $(b2_cflags)
 
 include $(BUILD_SHARED_LIBRARY)
 

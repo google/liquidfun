@@ -35,6 +35,8 @@ if(CMAKE_CXX_COMPILER MATCHES ".*clang")
   set(CMAKE_COMPILER_IS_CLANGXX 1)
 endif()
 
+add_definitions( -DLIQUIDFUN_EXTERNAL_LANGUAGE_API=1 )
+
 # Enable / disable debug code depending upon the build configuration.
 set(DEBUG_FLAGS "-DDEBUG=1")
 set(RELEASE_FLAGS "-DDEBUG=0")

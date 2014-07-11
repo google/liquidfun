@@ -16,6 +16,8 @@ Box2D/*.def
 Box2D/*.h
 Box2D/*.pc
 Box2D/*.rc
+Box2D/Box2D.opensdf
+Box2D/Box2D.sdf
 Box2D/Box2D.xcodeproj/**
 Box2D/Box2D/Makefile
 Box2D/Box2D/Makefile_*
@@ -23,6 +25,8 @@ Box2D/CMakeScripts/**
 Box2D/HelloWorld/HelloWorld
 Box2D/HelloWorld/Makefile
 Box2D/HelloWorld/Makefile_*
+Box2D/lfjs/Makefile
+Box2D/lfjs/Makefile_*
 Box2D/Makefile
 Box2D/Makefile_*
 Box2D/Testbed/Makefile
@@ -66,6 +70,7 @@ Box2D/googletest/**
 **/CMakeCache.txt_*
 **/Debug/**
 **/Release/**
+**/xcuserdata/**
 build.xml
 local.properties
 project.properties

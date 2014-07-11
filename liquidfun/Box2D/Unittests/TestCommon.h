@@ -21,14 +21,14 @@
 
 #define EPSILON 0.001f
 
-// Create a 10x10 box shaped particle group.
+// Create a 0.1 x 0.1 box shaped particle group.
 b2ParticleGroup* CreateBoxShapedParticleGroup(
 	b2ParticleSystem *const particleSystem)
 {
 	assert(particleSystem);
 	b2ParticleGroupDef def;
 	b2PolygonShape shape;
-	shape.SetAsBox(10, 10);
+	shape.SetAsBox(0.1f, 0.1f);
 	def.shape = &shape;
 	return particleSystem->CreateParticleGroup(def);
 }

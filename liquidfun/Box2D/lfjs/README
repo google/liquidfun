@@ -1,0 +1,149 @@
+Background
+----------
+
+Liquidfun.js in its current state is largely comprised of four pieces:
+1) C bindings for liquid fun functions.  These are compiled, along with
+   liquidfun's source, and callbacks.js by emscripten and combined
+   together into a single js file 'lf_core.js' which represents basically
+   all of the liquidfun functionality in liquidfun.js.  To ease the
+   binding process, I have made strict C header files, with C++
+   implementations.  Otherwise it would be difficult for the bindings to
+   call into liquidfun.
+2) callbacks.js, this small file is actually compiled along with the C/C++
+   source and allows C/C++ code to call into javascript code.
+3) JS bindings which wrap lf_core.js, and make liquid fun functionality
+   accessible through javascript.  Because there is a significant penalty
+   for calling into emscripten compiled code, as types need to be unboxed
+   and such, I have rewritten some simple functionality in JS to be
+   invoked directly, such as b2Vec2.  The JS bindings unpack vectors
+   and such when calling into the C bindings around liquidfun.
+4) the testbed itself, which has been rewritten in javascript.  For
+   rendering of the tests, I have chosen a popular open source JS library
+   called three.js, though direct webgl calls can be used as well.  In a
+   future version we should consider directly using webgl itself.
+
+
+Building liquidfun.js
+---------------------
+
+NOTE: You need to download the latest version of emscripten.  Complete
+details are on their website
+
+If no changes are required to the bindings, then to build liquidfun.js
+simply run 'make' from the lfjs directory.  The makefile assumes
+lfjs is a subfolder of liquidfun's source directory.  This will generate
+a file called 'lf_core.js' which contains the emscripten 'heart' of
+liquidfun.js.  There may be build errors, in which case the bindings may
+need to be changed.  There is info on updating bindings in the next
+section.
+
+If no updates are required, download Google's closure compiler and run:
+CLOSURE_JAR=<Path to compiler.jar> ./uglify.sh
+
+This will package up all of the js bindings and lf_core.js into a single
+minified JS file - liquidfun.js
+
+Upload the full testbed with the new liquidfun.js to test
+
+Updating bindings
+-----------------
+
+Updating bindings is a manual process but extremely straightforward.
+1) I think it is helpful to start with the interface from the JS
+   perspective.  Look at what functionality you want to export from
+   liquidfun and decide how it will be used in JS.  For adding a function
+   simply find the appropriate JS object to extend.  Try to mirror the
+   liquidfun design as much as possible, ie if it is a world function, add
+   it to b2World JS object.  The lf.js folder structure mirrors liquidfun's
+   , with both JS and C bindings.  You may need to create new objects.  If
+   the function is very trivial and unlikely to change, for example,
+   multiplying two vectors, it makes sense to just redo this code in JS.
+   If the function just sets or gets a value, you can print the offset of
+   the member variable and update offsets.js with offset.  There are some
+   examples in the code of how to manipulate these offsets in JS.
+2) Once you have created the API, leave the implementation empty for now
+   and find or add the appropriate *Bindings.h file to add your function.
+   These exported functions have to be pure C, and you can only pass around
+   doubles and void*s.  Any objects or structs on the stack will have to
+   be decomposed into doubles and void*s in the function declarations.
+   Modify or add the appropriate .cpp file to define your new function.
+   Most of these functions will just involve rebuilding objects on the
+   stack and casting void*s to the correct type.  One point - if your C
+   function exports a member function, make the first argument the object
+   instance(as a void*) and cast it inside your .cpp implementation.  To
+   keep the packing and unpacking of objects into void*s and doubles sane,
+   I organize member fields alpabetically, this way its easy to see if
+   something has been missed.  I also do base objects before inherited
+   objects.
+3) Add the new C function to the Makefile so the compiler will remember to
+   generate code for it.
+4) Rebuild by running 'make', fix any compiler errors.
+5) Your new lf_core.js is ready, but your JS api needs to be wired up to
+   The C bindings.  To do this, simply use Module.cwrap.  There are many
+   examples, but the gist is:
+   'function_name', 'return type', [ 'argument types' ]
+   ALL types here are just 'number', ie for both pointers andn doubles.
+   If there is no return type and no arguments, then just make the return
+   type void and omit the arguments list.  This will return a function
+   pointer which you can now invoke with arguments as appropriate in your
+   API implementation.
+6) If you need an array type, there are a few examples sprinkled throughout
+   the code.  For example with chainshapes.  Note how non-trivial these are
+   .  Arrays can have overhead so be careful.  It makes sense to unpack
+   small arrays when possible annd also creating / destroying typed arrays
+   is very expensive in JS so create one typed array for every object type
+   which you might need and reuse it.
+7) If you added a new file, then both the .c and .cpp need to be added to
+   jsBindings.cpp.  The new js file should be added to uglify.sh
+
+This should handle most cases.  If you need to add a new callback then it
+can be a bit tricky.
+1) Export a function as above to hook the callback in C++.  Make a dummy
+   call back object in CPP.
+2) The dummy call back will actually call back into JS.  To do this, you
+   modify callbacks.js with a new entry.  This JS code should callback
+   into your JS program as appropriate.
+3) So that the compiler can wire things up correctly, add an extern
+   declaration in the cpp code.  See b2World's bindings for a concrete
+   example
+
+Last but not least, offsets.  Offsets was an idea I had for optimizing
+the overhead of calling into emscripten code.  Emscripten code is half
+native speed, but the call overhead is unbelievable(like 50x the cost of
+a JS only call).  For things like setters and getters, getTransform for
+example, this can slow down the whole system significantly.
+
+To understand how/why offsets work and why they are not dangerous, it is
+important to note liquidfun.js is only compiled with one compiler, llvm,
+and llvm has regular sane rules for how it lays out structs / classes in
+memory.  There is no padding, for example, unless a given target
+architecture requires it(ours does not) and no reordering, though this
+functionality CAN be dangerous on virtual classes with multiple inheritance
+
+Now, emscripten works by creating a giant typed array of unsigned chars,
+and then indexing it as appropriate.  All pointers, for example, are just
+number indexs into this array.  So, if you need a member foo, on a class
+bar, then the safest way to get a reusable offset is to instantiate foo
+and printf the subtraction of the pointers.  This will give you an offset
+which you can plug in to the offsets table.  Then in your function
+implementation in JS, you simply take your object pointer, add the offset
+index into the global emscripten heap, and using a dataview simply grab
+exactly the type of data you need, ie byte, short, long, etc.
+
+b2World getTransform has an example.
+
+Future TODOs:
+*Investigate making b2PolygonShape function calls pass around an array.
+ The current version is faster, but it may not be worth the added
+ complexity
+*Take another look at autogenerating C bindings using cppheaderparse.py
+*Try again to use Embind bindings instead of C bindings, they will be
+ slower but we might be able to use embind in some places and C bindings
+ elsewhere.
+*Finish implementing testbed tests, we have lots of coverage but more
+ never hurts
+*Create some demo games using liquidfun.js
+*cleanup globals
+*Convert hotspots to use offsets, switch to generation of offsets via
+ cppheaderparse
+*convert from three.js to webgl for the testbed

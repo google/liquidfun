@@ -22,7 +22,7 @@
 #include "../Framework/Main.h"
 #include "../Framework/ParticleParameter.h"
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(__IOS__)
 	#include <GLUT/glut.h>
 #else
 	#include "GL/freeglut.h"

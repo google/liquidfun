@@ -17,9 +17,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(__IOS__)
 #define ENABLE_GLUI 1
-#endif  // __ANDROID__
+#endif  // !defined(__ANDROID__) && !defined(__IOS__)
 
 #include "Render.h"
 #include "Test.h"

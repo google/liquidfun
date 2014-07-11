@@ -178,7 +178,7 @@ void b2BlockAllocator::Free(void* p, int32 size)
 	int32 index = s_blockSizeLookup[size];
 	b2Assert(0 <= index && index < b2_blockSizes);
 
-#if DEBUG
+#if B2_ASSERT_ENABLED
 	// Verify the memory address and size is valid.
 	int32 blockSize = s_blockSizes[index];
 	bool found = false;
@@ -200,8 +200,10 @@ void b2BlockAllocator::Free(void* p, int32 size)
 	}
 
 	b2Assert(found);
+#endif // B2_ASSERT_ENABLED
 
-	memset(p, 0xfd, blockSize);
+#if DEBUG
+	memset(p, 0xfd, s_blockSizes[index]);
 #endif
 
 	b2Block* block = (b2Block*)p;

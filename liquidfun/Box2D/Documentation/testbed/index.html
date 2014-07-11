@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<style>
+    body {
+        font-family: Monospace;
+        background-color: #f0f0f0;
+        margin: 0;
+        overflow: hidden;
+    }
+</style>
+  <script src="liquidfun.js"></script>
+
+  <!-- testbed code !-->
+  <script src="testbed/renderer.js"></script>
+  <script src="testbed/three.js"></script>
+  <script src="testbed/testbed.js"></script>
+  <script src="testbed/utils.js"></script>
+
+  <!-- tests !-->
+  <script src="testbed/tests/testDamBreak.js"></script>
+  <script src="testbed/tests/testDrawingParticles.js"></script>
+  <script src="testbed/tests/testElasticParticles.js"></script>
+  <script src="testbed/tests/testImpulse.js"></script>
+  <script src="testbed/tests/testLiquidTimer.js"></script>
+  <script src="testbed/tests/testParticles.js"></script>
+  <script src="testbed/tests/testRigidParticles.js"></script>
+  <script src="testbed/tests/testSoup.js"></script>
+  <script src="testbed/tests/testSoupStirrer.js"></script>
+  <script src="testbed/tests/testSparky.js"></script>
+  <script src="testbed/tests/testSurfaceTension.js"></script>
+  <script src="testbed/tests/testTheoJansen.js"></script>
+  <script src="testbed/tests/testWaveMachine.js"></script>
+
+  <body onload="initTestbed()"></body>
+
+  <div style="position:absolute;float:right;z-index:1;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;background:white">
+
+      <select id="tests" onchange="testSwitch(this.value)">
+        <option value="TestDamBreak">Dam Break</option>
+        <option value="TestDrawingParticles">Drawing Particles</option>
+        <option value="TestElasticParticles">Elastic Particles</option>
+        <option value="TestImpulse">Impulse</option>
+        <option value="TestLiquidTimer">Liquid Timer</option>
+        <option value="TestParticles">Particles</option>
+        <option value="TestRigidParticles">Rigid Particles</option>
+        <option value="TestSoup">Soup</option>
+        <option value="TestSoupStirrer">Soup Stirrer</option>
+        <option value="TestSparky">Sparky</option>
+        <option value="TestSurfaceTension">SurfaceTension</option>
+        <option value="TestTheoJansen">Theo Jansen</option>
+        <option value="TestWaveMachine" selected="selected">Wave Machine</option>
+      </select>
+
+  </div>
+
+  <!-- These tests are implemented, but removed since they're not
+       related to LiquidFun.
+  <script src="testbed/tests/testAddPair.js"></script>
+  <script src="testbed/tests/testAntiPointy.js"></script>
+  <script src="testbed/tests/testApplyForce.js"></script>
+  <script src="testbed/tests/testBodyTypes.js"></script>
+  <script src="testbed/tests/testBridge.js"></script>
+  <script src="testbed/tests/testBreakable.js"></script>
+  <script src="testbed/tests/testBullet.js"></script>
+  <script src="testbed/tests/testCantilever.js"></script>
+  <script src="testbed/tests/testCar.js"></script>
+  <script src="testbed/tests/testChain.js"></script>
+  <script src="testbed/tests/testCharacterCollision.js"></script>
+  <script src="testbed/tests/testCollisionFiltering.js"></script>
+  <script src="testbed/tests/testCompoundShapes.js"></script>
+  <script src="testbed/tests/testConfined.js"></script>
+  <script src="testbed/tests/testConvexHull.js"></script>
+  <script src="testbed/tests/testConveyorBelt.js"></script>
+  <script src="testbed/tests/testCornerCase.js"></script>
+  <script src="testbed/tests/testDominos.js"></script>
+  <script src="testbed/tests/testDumpShell.js"></script>
+  <script src="testbed/tests/testEdgeShape.js"></script>
+  <script src="testbed/tests/testEdgeTest.js"></script>
+  <script src="testbed/tests/testGears.js"></script>
+  <script src="testbed/tests/testHw.js"></script>
+  <script src="testbed/tests/testMaxwell.js"></script>
+  <script src="testbed/tests/testMobile.js"></script>
+  <script src="testbed/tests/testMobileBalanced.js"></script>
+  <script src="testbed/tests/testMotorJoint.js"></script>
+  <script src="testbed/tests/testPinball.js"></script>
+  <script src="testbed/tests/testPointy.js"></script>
+  <script src="testbed/tests/testPrismatic.js"></script>
+  <script src="testbed/tests/testPulley.js"></script>
+  <script src="testbed/tests/testPyramid.js"></script>
+  <script src="testbed/tests/testRamp.js"></script>
+  <script src="testbed/tests/testRevolute.js"></script>
+  <script src="testbed/tests/testRopeJoint.js"></script>
+  <script src="testbed/tests/testSensorTest.js"></script>
+  <script src="testbed/tests/testShapeEditing.js"></script>
+  <script src="testbed/tests/testSliderCrank.js"></script>
+  <script src="testbed/tests/testSphereStack.js"></script>
+  <script src="testbed/tests/testTiles.js"></script>
+  <script src="testbed/tests/testVaryingRestitution.js"></script>
+  <script src="testbed/tests/testVaryingFriction.js"></script>
+  <script src="testbed/tests/testVerticalStack.js"></script>
+  <script src="testbed/tests/testWeb.js"></script>
+  !-->
+
+  <!-- These tests have not yet been implemented.
+    faucet
+    fracker
+    multipleparticlesystems
+    raycast
+    sandbox 
+  !-->
+
+</html>

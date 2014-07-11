@@ -82,6 +82,20 @@ public:
 	/// @returns true if valid
 	bool Validate() const;
 
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+public:
+	/// Set centroid with direct floats.
+	void SetCentroid(float32 x, float32 y);
+
+	/// SetAsBox with direct floats for center.
+	/// @see b2Shape::SetAsBox
+	void SetAsBox(float32 hx,
+								float32 hy,
+								float32 centerX,
+								float32 centerY,
+								float32 angle);
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
+
 	b2Vec2 m_centroid;
 	b2Vec2 m_vertices[b2_maxPolygonVertices];
 	b2Vec2 m_normals[b2_maxPolygonVertices];
@@ -101,5 +115,20 @@ inline const b2Vec2& b2PolygonShape::GetVertex(int32 index) const
 	b2Assert(0 <= index && index < m_count);
 	return m_vertices[index];
 }
+
+#if LIQUIDFUN_EXTERNAL_LANGUAGE_API
+inline void b2PolygonShape::SetCentroid(float32 x, float32 y)
+{
+	m_centroid.Set(x, y);
+}
+
+inline void b2PolygonShape::SetAsBox(float32 hx,
+										 float32 hy,
+										 float32 centerX,
+										 float32 centerY,
+										 float32 angle) {
+	SetAsBox(hx, hy, b2Vec2(centerX, centerY), angle);
+}
+#endif // LIQUIDFUN_EXTERNAL_LANGUAGE_API
 
 #endif

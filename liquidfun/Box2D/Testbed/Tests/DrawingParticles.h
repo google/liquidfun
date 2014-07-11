@@ -242,6 +242,22 @@ public:
 		}
 	}
 
+	void SplitParticleGroups()
+	{
+		for (b2ParticleGroup* group = m_particleSystem->
+				GetParticleGroupList(); group; group = group->GetNext())
+		{
+			if (group != m_lastGroup &&
+				(group->GetGroupFlags() & b2_rigidParticleGroup) &&
+				(group->GetAllParticleFlags() & b2_zombieParticle))
+			{
+				// Split a rigid particle group which may be disconnected
+				// by destroying particles.
+				m_particleSystem->SplitParticleGroup(group);
+			}
+		}
+	}
+
 	void Step(Settings* settings)
 	{
 		const uint32 parameterValue = TestMain::GetParticleParameterValue();
@@ -286,6 +302,11 @@ public:
 			}
 		}
 
+		if (m_particleSystem->GetAllParticleFlags() & b2_zombieParticle)
+		{
+			SplitParticleGroups();
+		}
+
 		Test::Step(settings);
 		m_debugDraw.DrawString(
 			5, m_textLine, "Keys: (L) liquid, (E) elastic, (S) spring");
@@ -316,8 +337,8 @@ public:
 
 	b2ParticleGroup* m_lastGroup;
 	bool m_drawing;
-	int32 m_particleFlags;
-	int32 m_groupFlags;
+	uint32 m_particleFlags;
+	uint32 m_groupFlags;
 	uint32 m_colorIndex;
 
 	static const ParticleParameter::Value k_paramValues[];

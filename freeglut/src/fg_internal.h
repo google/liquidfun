@@ -49,9 +49,14 @@
 #   define  TARGET_HOST_POSIX_X11  1
 
 #elif defined(__APPLE__)
+#   include <TargetConditionals.h>
+#   if TARGET_OS_IPHONE
+#      define TARGET_HOST_IOS  1
+#   else
 /* This is a placeholder until we get native OSX support ironed out -- JFF 11/18/09 */
-#   define  TARGET_HOST_POSIX_X11  1
-/* #   define  TARGET_HOST_MAC_OSX    1 */
+#      define  TARGET_HOST_POSIX_X11  1
+/* #      define  TARGET_HOST_MAC_OSX    1 */
+#   endif
 
 #else
 #   error "Unrecognized target host!"
@@ -74,6 +79,10 @@
 
 #ifndef  TARGET_HOST_MAC_OSX
 #   define  TARGET_HOST_MAC_OSX    0
+#endif
+
+#ifndef  TARGET_HOST_IOS
+#   define  TARGET_HOST_IOS    0
 #endif
 
 #ifndef  TARGET_HOST_SOLARIS
@@ -197,6 +206,9 @@
 #endif
 #if TARGET_HOST_ANDROID
 #include "android/fg_internal_android.h"
+#endif
+#if TARGET_HOST_IOS
+#include "ios/fg_internal_ios.h"
 #endif
 
 

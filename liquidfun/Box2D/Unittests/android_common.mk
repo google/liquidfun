@@ -15,6 +15,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 # --- CallbackTests ---
+include ${call my-dir}/../b2_android_common.mk
 include $(CLEAR_VARS)
 namespace:=$(if $(NDK_PROJECT_PATH),,_liquidfun)
 LOCAL_MODULE:=$(LOCAL_TEST_NAME)${namespace}
@@ -29,7 +30,7 @@ LOCAL_LDLIBS:=-llog -landroid
 LOCAL_STATIC_LIBRARIES:=\
 	android_native_app_glue libgtest libliquidfun_static \
 	libandroidutil_static
-LOCAL_CFLAGS:=-DLIQUIDFUN_UNIT_TESTS
+LOCAL_CFLAGS:=-DLIQUIDFUN_UNIT_TESTS=1 $(b2_cflags)
 # Override the default log tag in the AndroidUtil library.
 ANDROIDUTIL_ADDITIONAL_CFLAGS:=-DANDROID_LOG_PRINT_TAG="$(LOCAL_MODULE)"
 # Redirect gtest to AndroidUtil's buffered print functions.
