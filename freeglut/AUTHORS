@@ -1,0 +1,42 @@
+Pawel W. Olszta <olszta@sourceforge.net>
+    the person to be blamed for freeglut
+
+Andreas Umbach <marvin@dataway.ch>
+    the first person to contribute to the freeglut project,
+    contributed the cube and sphere geometry code
+
+Steve Baker <sjbaker1@airmail.net>
+    joystick code (from his great PLIB), numerous hints 
+    tips on the freeglut usability
+    and for taking the project over when Pawel bowed out
+
+Christopher John Purnell
+Don Heyse
+Dave McClurg
+John F. Fay
+Norman Vine
+Daniel Wagner
+Sven Panne <sven.panne@aedion.de>
+    contributing to the project, using the product, and generally keeping it going
+
+Brian Paul
+Eric Sandall
+    giving us the oomph! to make an official release
+
+James 'J.C.' Jones
+    designing the new website
+
+John Tsiombikas <nuclear@member.fsf.org>
+	Linux spaceball support, XR&R gamemode, misc linux fixes and breakages
+
+Sylvain Beucler
+    support for Android, X11/EGL, OpenGL(ES) 2.x, misc fixes
+
+Diederick C. Niehorster
+Chris Marshall
+Clive McCarthy
+Eero Pajarre
+Florian Echtler
+Matti Lehtonen
+
+...and all the opengl-gamedev-l people that made Pawel start this project :)

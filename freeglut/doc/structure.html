@@ -1,0 +1,80 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="author" content="Pawel W. Olszta">
+   <meta name="copyright" content="Pawel W. Olszta">
+   <meta name="description" content="The freeglut project plans">
+   <meta name="keywords" content="freeglut glut OpenGL">
+   <meta name="GENERATOR" content="WebMaker">
+   <title>The freeglut project</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<center><img SRC="freeglut_logo.png" ALT="The freeglut logo" height=106 width=314></center>
+<center><dt><i><font face="Courier New,Courier"><font size=+1>
+I've got a master plan (to take your API down)...
+</font></font></i></dt></center>
+
+<center><table WIDTH="620" ><tr><td><hr WIDTH="100%">
+
+<p>After that I get the freeglut Windows port working in an acceptable manner and thus 
+getting assured that the freeglut internal structure is valid, I will split the project
+into three separate parts, listed below.
+
+<br><ul><li><b><font size=+2>freeglut-common</font></b></li>
+
+<p>The least common denominator between the two freeglut versions. This will probably 
+contain most of the internal structure of the toolkit, notably the windows and menu 
+hierarchy, and possibly some private helpers.
+
+<br><br><li><b><font size=+2>freeglut-1.3</font></b></li>
+
+<p>The GLUT API 3 compatible library. This is what's can be found now in the alpha 
+release (apart from the bugs, naturally :D).
+
+<br><br><li><b><font size=+2>freeglut-2.0</font></b></li>
+
+<p>Hopefully this will be what GLUT should have been from the beginning. I will give 
+a try to design a much more coherent API than GLUT's, aiming at fast games prototyping.
+<a href="mailto:olszta@sourceforge.net">Suggestions</a> are welcome.</ul>
+
+<br><p>Here's a list of propositions I have received so far. Hopefully this some day 
+turns into an API spefication proposal, not just a bunch of meaningless phrases...<br>
+
+<br><li>glutBitmapHeight() and glutStrokeHeight() -- I have added them to the 
+freeglut-1.3 API, they are already implemented and should work fine,</li>
+<br><li>glutBitmapString() and glutStrokeString(), to write (multiple-line maybe)
+strings, starting from the current raster position, using some simple formatting
+maybe (changing the color, font, etc.?)</li>
+<br><li>texture mapped fonts -- this is easy and could be added to freeglut-1.3, but 
+would require adding the...</li>
+<br><li>glutHint() function to tell freeglut to: use bitmapped/texture mapped fonts, 
+draw the menus and mouse cursor using OpenGL/window system, and stuff...</li>
+<br><li>glutMainLoop() termination and glutMainLoopStep() function, which should 
+perform a single check of pending events, so that one can have his own main loop,</li>
+<br><li>multiple joysticks support with multiple axes, buttons, hats, etc. It is a real
+good thing to do, yet the API to do the magic might result in being really twisted,</li>
+<br><li>glutModifierFunc() could be added, or glutGetModifierState() should be allowed
+to be called anywhere from the client's code</li>
+
+<br><p>We might also think about:<br>
+
+<br><li>freeglut-2.0 modularity via plugins, so that only the features that one 
+needs get loaded (plugins are easily supported by GLib),</li>
+<br><li>OpenGL state management functions,</li>
+<br><li>audio support -- using OpenAL maybe?,</li>
+<br><li>a real menu system, not only the popups</li>
+<br><li>non-OpenGL but portable UI, something like Java Swing</li>
+<br><li>window-closing confirmation box (this is related to the above)</li>
+
+<br><p>Following ideas are bad for freeglut:<br>
+
+<br><li>more accurate timers under Win32 -- this goes to the GLib development afaik</li>
+<br><li>portable file I/O, portable threads, plugins/modules -- this is already
+done in GLib</li>
+
+<br><br><a href="index.html"><i>Back to the main page</i></a>
+
+</table></center></body></html>
+
