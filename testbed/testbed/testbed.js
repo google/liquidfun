@@ -27,13 +27,30 @@ var g_groundBody = null;
 var windowWidth = window.innerWidth;
 var windowHeight = window.innerHeight;
 
-//var GenerateOffsets = Module.cwrap("GenerateOffsets", 'null');
+function printErrorMsg(msg) {
+  var domElement = document.createElement('div');
+  domElement.style.textAlign = 'center';
+  domElement.innerHTML = msg;
+  document.body.appendChild(domElement);
+}
 
 function initTestbed() {
   camera = new THREE.PerspectiveCamera(70
     , windowWidth / windowHeight
     , 1, 1000);
-  threeRenderer = new THREE.WebGLRenderer();
+
+  try {
+    threeRenderer = new THREE.WebGLRenderer();
+  } catch( error ) {
+    printErrorMsg('<p>Sorry, your browser does not support WebGL.</p>'
+                + '<p>This testbed application uses WebGL to quickly draw'
+                + ' LiquidFun particles.</p>'
+                + '<p>LiquidFun can be used without WebGL, but unfortunately'
+                + ' this testbed cannot.</p>'
+                + '<p>Have a great day!</p>');
+    return;
+  }
+
   threeRenderer.setClearColor(0xEEEEEE);
   threeRenderer.setSize(windowWidth, windowHeight);
 
