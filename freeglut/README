@@ -1,0 +1,77 @@
+
+    BRIEF OVERVIEW
+    ==============
+
+    This is the freeglut package.
+
+    Freeglut, the Free openGL Utility Toolkit, is meant to be a free alter-
+    native to Mark Kilgard's GLUT library. It is distributed under an X-Consor-
+    tium style license (see COPYING for details), to offer you a chance to use 
+    and/or modify the source.
+
+    It makes use of OpenGL, GLU, and pthreads-win32 libraries. The library does
+    not make use of any GLUT code and is not 100% compatible. Code recompilation
+    and/or slight modifications might be required for your applications to work
+    with freeglut.
+
+
+    PORTS
+    =====
+
+    Both X11 and Win32 ports are in an advanced alpha stage, which means that
+    they provide limited functionality of GLUT API 3. A somewhat more
+    limited port (mostly due to limits of the OS) to Andriod is now also
+    available.
+
+
+    INSTALLATION
+    ============
+
+    See README.cmake as a starting point, as well as the other README
+    files for further info.
+
+
+    CONTRIBUTING
+    ============
+
+    Bug and missing features patches are certainly welcome. Just as comments 
+    and FREEGLUT API propositions are.
+
+    Just please to make the fixes look visually just as the rest of the code 
+    does (tabs converted 4 white spaces). Comments are really welcome, as I 
+    believe it would be nice for people fresh new to OpenGL see how the things
+    are done... 
+
+
+    WEB SITE AND CONTACTING THE AUTHOR
+    ==================================
+
+    Freeglut project has moved to the SourceForge:
+    http://freeglut.sourceforge.net
+
+
+    THE HOPE
+    ========
+
+    Hope you find my work somehow useful.
+    Pawel W. Olszta, <olszta@sourceforge.net>
+
+
+    PASSING THE BATON
+    =================
+
+    In late December 2000, Pawel decided that he no longer
+    wished to maintain freeglut because he has moved out of
+    the graphics field.  I volunteered to take over from him
+    and have been running the project since Jan 13th 2001.
+
+    I'm also the author and maintainer of the PLIB library suite
+    and 'freeglut' really fits in well with that work.
+
+    I just hope I can live up to Pawel's high standards. Pawel
+    remains on the active developers list.
+
+    Steve Baker <sjbaker1@airmail.net>
+                http://plib.sourceforge.net
+
+
