@@ -44,6 +44,7 @@ set(BOX2D_Common_HDRS
 	Common/b2Draw.h
 	Common/b2FreeList.h
 	Common/b2GrowableStack.h
+	Common/b2GrowableBuffer.h
 	Common/b2IntrusiveList.h
 	Common/b2Math.h
 	Common/b2Settings.h
