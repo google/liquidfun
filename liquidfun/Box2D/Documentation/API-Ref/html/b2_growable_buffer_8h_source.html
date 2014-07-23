@@ -124,7 +124,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        allocator(&amp;allocator)</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">    #if defined(LIQUIDFUN_SIMD_NEON)</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor"></span>        <span class="comment">// b2ParticleAssemply.neon.s assumes these values are at fixed offsets.</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor"></span>        <span class="comment">// b2ParticleAssembly.neon.s assumes these values are at fixed offsets.</span></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="comment">// If this assert fails, be sure to update the assembly offsets!</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="comment">// ldr r3, [r9, #0] @ r3 = out = contacts.data</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="comment">// ldr r6, [r9, #8] @ r6 = contacts.capacity</span></div>
