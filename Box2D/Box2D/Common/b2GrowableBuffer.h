@@ -37,7 +37,7 @@ public:
 		allocator(&allocator)
 	{
 	#if defined(LIQUIDFUN_SIMD_NEON)
-		// b2ParticleAssemply.neon.s assumes these values are at fixed offsets.
+		// b2ParticleAssembly.neon.s assumes these values are at fixed offsets.
         // If this assert fails, be sure to update the assembly offsets!
 		// ldr r3, [r9, #0] @ r3 = out = contacts.data
         // ldr r6, [r9, #8] @ r6 = contacts.capacity
