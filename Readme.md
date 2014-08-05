@@ -22,8 +22,7 @@ Please see [Box2D/Documentation/Building/][] to learn how to build LiquidFun and
 run the testbed.
 
 LiquidFun has a logo that you can use, in your splash screens or documentation,
-for example. Please see the [Programmer's Guide][] for the graphics and further
-details.
+for example. Please see the [Programmer's Guide](https://google.github.io/liquidfun/Programmers-Guide/html/index.html) for the graphics and further details.
 
 For applications on Google Play that integrate this tool, usage is tracked.
 This tracking is done automatically using the embedded version string
