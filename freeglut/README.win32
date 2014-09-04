@@ -1,0 +1,85 @@
+Installing the Libraries with MSVC
+==================================
+
+To install "freeglut" on your system so that your other projects will see it,
+you will need to copy various files to various locations.
+
+    - The header files "freeglut.h", "freeglut_ext.h", "freeglut_std.h", and
+      "glut.h" (distributed in the directory "freeglut\freeglut\include\GL")
+      need to be copied to a "GL" directory under the MSVC include directory.
+      The MSVC include directory generally has a path similar to
+              "C:\Program Files\Microsoft Visual Studio\VC98\Include"
+      The "GL" subdirectory under that will probably already have the header
+      files "gl.h", "glaux.h", and "glu.h".
+    - The library file "freeglut.lib" or "freeglut_static.lib" (from the
+      corresponding debug or release directory) needs to be copied into the
+      MSVC library directory.  This usually has a path similar to:
+              "%ProgramFiles%\Microsoft SDKs\Windows\v7.0A\Lib" - x86 32 bits LIB's
+              "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.0A\Lib" - x64 32 bits LIB's
+			  "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.0A\Lib\x64" - x64 64 bits LIB's
+      Note that there is no "GL" subdirectory here.  This directory should
+      already have the files "opengl32.lib", "glu32.lib", and "glaux.lib".
+    - If you are using the DLL version of "freeglut", the file "freeglut.dll"
+      needs to be copied from the Debug or the Release directory into the
+      DLL directory.  This usually has a path similar to
+              "%SystemRoot%\System32\" - x86 32 bits DLL's
+			  "%SystemRoot%\SysWOW64\" - x64 32 bits DLL's
+			  "%SystemRoot%\System32\" - x64 64 bits DLL's
+      and will probably already have the files "opengl32.dll" and "glu32.dll".
+
+
+Building and Installing the Libraries with Open Watcom
+======================================================
+
+Start a command prompt and change directory to the freeglut installation
+directory.  Type "wmake -f Makefile.wat all" to build the DLL and static
+libraries in both debug and release versions.
+
+To install "freeglut" on your system so that your other projects will see it,
+you will need to copy various files to various locations.
+
+    - The header files "freeglut.h", "freeglut_ext.h", "freeglut_std.h", and
+      "glut.h" (distributed in the directory "freeglut\freeglut\include\GL")
+	  need to be copied to a "GL" directory under the Open Watcom 32-bit
+	  Windows include directory.  This usually has a path similar to
+			  "C:\WATCOM\h\nt\GL"
+    - The library file "freeglut.lib" or "freeglut_static.lib" (from the
+      corresponding debug or release directory) needs to be copied into the
+	  Open Watcom 32-bit Windows library directory.  This usually has a path
+	  similar to
+			  "C:\WATCOM\lib386\nt"
+    - If you are using the DLL version of "freeglut", the file "freeglut.dll"
+      needs to be copied from the Debug or the Release directory into the
+      DLL directory.  This usually has a path similar to
+              "C:\Windows\System32"
+      and will probably already have the files "opengl32.dll" and "glu32.dll".
+
+
+Unlike the *nix release, the library names are NOT automatic replacements for
+the GLUT library names.  You may rename them manually if you wish, but this is
+not necessary as the header file includes a pragma telling the compiler which
+library file to look for.
+
+
+Building and Installing the Libraries with Cygwin
+=================================================
+
+To build "freeglut" under Cygwin, you have two choices:
+
+- You can build a normal Cygwin library, which depends on Cygwin's X11
+  libraries. To do this, you can just use the normal autotools incantation:
+      ./configure && make install
+
+- Alternatively, you can build a DLL which does not depend on X11 and links
+  against the opengl32 DLL. To do this, configure need a few more flags:
+      ./configure CPPFLAGS=-mno-cygwin LDFLAGS=-mno-cygwin --without-x && make install
+
+
+If you don't have MSVC, Open Watcom or Cygwin
+=============================================
+
+The "freeglut" developers' community discussed the possibility of distributing
+binaries and decided against it.  If you need Windows library files, please
+contact John F. Fay at <john.fay@eglin.af.mil> or put a request on the
+"freeglut" developers' mailing list <freeglut-developer@lists.sourceforge.net>.
+

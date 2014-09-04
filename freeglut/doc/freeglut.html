@@ -1,0 +1,163 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="author" content="Pawel W. Olszta">
+   <meta name="copyright" content="Pawel W. Olszta">
+   <meta name="description" content="A bit about me and the freeglut project">
+   <meta name="keywords" content="freeglut glut OpenGL">
+   <meta name="GENERATOR" content="WebMaker">
+   <title>The freeglut project</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<center><img SRC="freeglut_logo.png" ALT="The freeglut logo" height=106 width=314></center>
+
+<center><dt><i><font face="Courier New,Courier"><font size=+1>
+I am best at what I do worst and for this gift I feel blessed...
+</font></font></i></dt></center>
+
+<center><table WIDTH="620"><tr><td><hr WIDTH="100%">
+
+<p><i>January the 2nd, 2000</i>
+
+<p>The alpha version has been released yesterday. Today I have been busy with moving 
+the project site to the <a href="http://www.sourceforge.net">SourceForge</a>. As for 
+now there will be the web site available and I will give it a try to set up the 
+freeglut mailing lists. There will be no CVS access available for now (my dialup 
+internet connection sucks so badly that I wouldn't be able to work on the project). 
+After I am done with that, I will try announcing the project on www.opengl.org.
+
+<p>Of other things, there has been rumours floating round the routers and hubs about 
+Mark Kilgard changing the GLUT's license, but this is unconfirmed. It would be really 
+cool if he did so, there's no better motivation to work than a bit of sound competition.
+As for me, I already put too much work into the freeglut project to terminate it just 
+now. We'll see what happens next.
+
+<p><i>January the 4th, 2000</i>
+
+<p>Ho-ho-ho. Freeglut-1.3 works fine with `Tux the Penguin and the Quest for Herring'.
+At least that's what Steve Baker, the author, says. Not only that, Steve has provided
+us with the joystick code (from his great PLIB project) and numerous hints and tips 
+about making freeglut more useful (I will try to put the results of our discussion
+on the <a href="structure.html">structure page</a>).
+
+<p>As for other issues -- I promise I will start the Win32 port this weekend.
+BTW. -- is there a decent cross compiler for Linux that generates Win32 executables,
+so that I don't have to use windows for development? And what about Wine OpenGL
+support?
+
+<p>The package is now some 40kB smaller than the previous one. Did some general
+clean ups, removed unnecessary configure scripts in the genfonts directory,
+the configure cahce, the Makefiles and so on. Also, I have started introducing 
+the new internal structure, as described <a href="structure.html">here</a>.
+
+<p><i>January the 6th, 2000</i>
+
+<p>The missing glutInit() issue seems to be solved. Chris Purnell (fxGLUT author) says 
+that the GLUT window and menu creation functions call glutInit() if the caller didn't 
+do that before.
+
+<p>The enumerations for GLUT_KEY_UP and GLUT_KEY_RIGHT were accidentally swapped.
+They should be OK now. Hope the rest is OK :)
+
+<p>Added two new API calls to freeglut-1.3 -- glutBitmapHeight() and glutStrokeHeight(),
+as suggested by Steve Baker. This won't break the GLUT compatibility a lot, and I've
+heard it can be useful. Here you go.
+
+<p>The <a href="structure.html">structure</a> plans page has been updated. The numerous
+feature hints from opengl-gamedev-l readers have been added.
+
+<p>Somebody (Chris?) hinted me that the stroke fonts can be found in the XFree86
+sources. I browsed through it and -- presto. Now I only need to define the stroke fonts
+structure (should be very similiar to bitmapped one) and write quite a simple parser.
+
+<p>I've spent the (late) evening doing the init display string parsing and making
+my logics classes homework :) Both is harder than I primarily thought, but fortunately
+for me I can commit errors in one of those tasks. Guess which one? Argh. :)
+
+<p><i>January the 8th, 2000</i>
+
+<p>First of all, both the missing glutInit() and glutGet(GLUT_WINDOW_[X|Y]) issues are 
+fixed now. The first problem was solved thanks to Chris Purnell, who showed me the way 
+GLUT dealt with the problem. Good for me there's someone who reads it's source code (I 
+just felt it would be unfair for me to do so :D). The second problem was solved by 
+adding a XMoveWindow call just after the window creation and initial mapping. This is 
+strange. Maybe one of the Xlib calls between the creation and mapping spoiled the 
+window's coordinates?
+
+<p>This makes even more GLUT tests work fine. The tests can be found in any decent
+GLUT 3.7 distribution. Following tests produce a FAIL message: test18.c (some layer
+issues), test19.c (see the GLUT_NORMAL_DAMAGED issue on the progress page), test22.c
+(window stacking/visibilty problems), test23.c (glutInitDisplayString() is unfinished),
+test25.c (the freeglut fonts differ a bit from GLUT's), test28.c (-iconic handling
+is missing(?)). Gee :)
+
+<p>I've spent another hour doing the glutInitDisplayString(), but it still is far from 
+being complete. And I've also started gathering information on doing the game mode
+stuff. The video mode enumeration in both cases will be painful.
+
+<p>There is a big issue with the window contents redrawing. Right now, it is forced
+every time there are no events pending in the main loop. I know it's wrong, but it
+without such an approach some of the test programs freeze soon after starting. Could
+someone peer-review the main loop code please?
+
+<p>I have decided to start the Win32 port this weekend. As for now, the code compiles
+under vc++5.0. I will start making it work as soon as I download the pthreads library 
+and the newest version of GLib for Windows. It was quite a good idea to start the port,
+as the Microsoft's compiler generates much more warnings and I had quite a few things 
+fixed for free.
+
+<p><i>January the 9th, 2000</i>
+
+<p>Doing the Win32 port all the day... Actually, there is enough code to make it work,
+however I am sure only of that it compiles (more or less). I need to download the
+pthreads-win32 library to get the GLib working first, and somehow I was unable to
+do it during the weekend. Once again -- the Win32 port does not work yet. Oh, and
+I need adding the __declspec(dllexport) thing...
+
+<p>After it starts working, I'll have to clean up the code a bit, I guess...
+
+<p><i>January the 10th, 2000</i>
+
+<p>Here I am at three o'clock am, half-awake, uploading and downloading things for 
+freeglut. I never thought I'd be able to force myself getting up that early :)
+
+<p><i>January the 16th, 2000</i>
+
+<p>Both the flu and a terrible feeling about the dialup bills made me slow down
+a bit, the internet activity I mean :). But here I am again uploading the latest
+snapshot. The biggest news about it is the Win32 port working, with nearly all 
+features you can find in the X11 version implemented (still, it needs some debugging). 
+For the Unix port, game mode support (loosely based on SDL source code posted at Neal 
+Tringham's www.pseudonymz.demon.co.uk) and numerous bug fixes have been introduced.
+
+<p>In order to compile the Win32 version, you'll need pthreads-win32 library (see 
+sourceware.cygnus.org), the GLib-1.2.x (www.gtk.org, I've been using the 1.2.6),
+a working native compiler (Microsoft VisualC++ 5.0 in my case), and a bit of patience.
+See the project files I've supplied for some definitions needed (FREEGLUT_LIBRARY_BUILD
+needs to be declared when building the DLL), and don't forget freeglut joystick code
+is making use of Win32 multimedia extensions (link against winmm.lib).
+
+<p>Be prepared to meet the fact Mesa 3.1 (or at least my compilation) doesn't work very
+well with this snapshot -- something's messed up when changing WGL contexts. This is
+really strange, as the Microsoft's OpenGL works pretty fine, as does Dominik Behr's 
+miniGL thing. The assumption is that I've taken some approach that somehow is valid
+with Microsoft's drivers, but is not OpenGL conformant. Could anyone check this out 
+please? 
+
+<p>My plan for next week is to add some lesser features missing, and start learning
+maths as the session at my university is coming in really fast :) This way or another,
+expect the next release not any sooner than next weekend (given that no nasty bugs get
+digged out).
+
+<p>Argh. Don't be surprised if the code doesn't compile under X-11 other than XFree86.
+It could fail when trying to include the X11/extensions/xf86vmode.h include header,
+in that case just comment out that inclusion line (found in freeglut_internal.h).
+Is there any intelligent way to detect the existence of an include header, and if
+it's autoconf to be the answer, how to use it?
+
+<br><br><a href="index.html"><i>Back to the main page</i></a>
+
+</table></center></body></html>
+

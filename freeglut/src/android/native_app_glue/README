@@ -1,0 +1,7 @@
+This code is copied from the Android NDK r7, from
+source/android/native_app_glue/ .
+
+A few GCC warnings were suppressed.
+
+'android_app_write_cmd' was made non-static so that resize events can
+be injected from FreeGLUT.

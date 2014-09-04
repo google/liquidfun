@@ -1,0 +1,29 @@
+#cmakedefine HAVE_X11_EXTENSIONS_XF86VMODE_H
+#cmakedefine HAVE_X11_EXTENSIONS_XRANDR_H
+#cmakedefine HAVE_X11_EXTENSIONS_XINPUT2_H
+#cmakedefine HAVE_SYS_TYPES_H
+#cmakedefine HAVE_UNISTD_H
+#cmakedefine HAVE_SYS_TIME_H
+#cmakedefine HAVE_STDBOOL_H
+#cmakedefine HAVE_SYS_PARAM_H
+#cmakedefine HAVE_SYS_IOCTL_H
+#cmakedefine HAVE_FCNTL_H
+#cmakedefine HAVE_ERRNO_H
+#cmakedefine HAVE_USBHID_H
+#cmakedefine HAVE_GETTIMEOFDAY
+#cmakedefine HAVE_VFPRINTF
+#cmakedefine HAVE_DOPRNT
+#cmakedefine NEED_XPARSEGEOMETRY_IMPL
+#cmakedefine HAVE_STDINT_H
+#cmakedefine HAVE_INTTYPES_H
+#cmakedefine HAVE_ULONG_LONG
+#cmakedefine HAVE_U__INT64
+
+/* version numbers */
+#define VERSION_MAJOR @VERSION_MAJOR@
+#define VERSION_MINOR @VERSION_MINOR@
+#define VERSION_PATCH @VERSION_PATCH@
+
+/* warning and errors printed? */
+#cmakedefine FREEGLUT_PRINT_WARNINGS
+#cmakedefine FREEGLUT_PRINT_ERRORS
