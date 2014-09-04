@@ -1,4 +1,4 @@
-<img src="../../Programmers-Guide/html/liquidfun-logo-square-small.png"
+<img src="liquidfun/Box2D/Documentation/Programmers-Guide/html/liquidfun-logo-square-small.png"
 alt="LiquidFun logo" style="float:right;" />
 
 LiquidFun Version [1.1.0][]
