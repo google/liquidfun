@@ -124,7 +124,7 @@ kill_process_group() {
 adb() {
   local adb_path=
   for path in "$(which adb 2>/dev/null)" \
-              "${ANDROID_SDK_HOME}/sdk/platform-tools/adb" \
+              "${ANDROID_SDK_HOME}/platform-tools/adb" \
               "${android_root}/prebuilts/sdk/platform-tools/adb"; do
     if [[ -e "${path}" ]]; then
       adb_path="${path}"
@@ -148,7 +148,7 @@ android() {
   fi
   local android_path=
   for path in "$(which ${android_executable})" \
-              "${ANDROID_SDK_HOME}/sdk/tools/${android_executable}" \
+              "${ANDROID_SDK_HOME}/tools/${android_executable}" \
               "${android_root}/prebuilts/sdk/tools/${android_executable}"; do
     if [[ -e "${path}" ]]; then
       android_path="${path}"
