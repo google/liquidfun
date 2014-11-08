@@ -859,7 +859,7 @@
 	* src/freeglut_gamemode.c: Fixed SF bug #1204256: Off-by-one error in
 	  X11 mode switching. The code which changes the X11 video mode has an
 	  off-by-one error, resulting in a wrong mode or segfault. I've
-	  refactored the code slighty to make it hopefully clearer what's going
+	  refactored the code slightly to make it hopefully clearer what's going
 	  on and corrected some #ifdefs on the way. Now at least the "One" demo
 	  works for me.
 	* src/freeglut_window.c: Fixed SF bug #1204261: Mini space leak when
@@ -1419,7 +1419,7 @@
 	* src/freeglut_callbacks.c: Fixed the bug where glutDisplayFunc() was
 	  effectively invoking glutPostRedsiplay(). This is wrong on the face of
 	  it, and may be at root for some of the annoying "timing" issues we've
-	  had with redisplay events being called inappopriately.
+	  had with redisplay events being called inappropriately.
 
 2004-02-19  rkrolib
 
@@ -1533,7 +1533,7 @@
 
 2004-01-16  rkrolib
 
-	* src/freeglut_main.c: Ammended a comment on fgCheckJoystickCallback().
+	* src/freeglut_main.c: Amended a comment on fgCheckJoystickCallback().
 	* src/freeglut_main.c: Minor style normalizations to minimize the diffs
 	  between *now* and from before John's changes. No functional changes:
 	  
@@ -1563,7 +1563,7 @@
 	* src/freeglut_main.c, src/freeglut_menu.c, src/freeglut_structure.c:
 	  Split a few overlong lines.
 	  
-	  Adjusted some spacing in a few spots to be more consistant with
+	  Adjusted some spacing in a few spots to be more consistent with
 	  freeglut style. Including one unindented if() body.
 	  
 	  Eliminated a dead variable.
@@ -2033,7 +2033,7 @@
 	  file.
 	  
 	  NOTE: The prior version of the *.dsw file does not in fact have CRs. I
-	  thought that it did. For consistancy, I am not putting them in in this
+	  thought that it did. For consistency, I am not putting them in in this
 	  version, either. (At least one person said that his MSVC++ system is
 	  happy with the current files. If there are problems, we can easily add
 	  the CRs, but that should be a separate commit...)
@@ -2194,7 +2194,7 @@
 	  
 	  * Don't write a == CONST. Instead, write CONST == a. Or, more
 	  generally (in C like languages): Avoid putting an lvalue on the
-	  left-hand side of an == comparison. (For consistancy, I try to avoid
+	  left-hand side of an == comparison. (For consistency, I try to avoid
 	  lvalues on the left- hand side of any comparison---but == is the most
 	  notorious.)
 	  
@@ -2314,7 +2314,7 @@
 	* src/freeglut_main.c: Missed a block where one level was 2-space
 	  indented.
 	  
-	  Nit-picked a few other lines for consistancy.
+	  Nit-picked a few other lines for consistency.
 
 2003-11-03  rkrolib
 
@@ -2379,9 +2379,9 @@
 	* src/freeglut_window.c: Missed a few say-nothing-new comments in
 	  fgOpenWindow(). Eeep. Should be better now. (^&
 	* src/freeglut_window.c: Cleansed fgCloseWindow(): * say-nothing-new
-	  comments axed. * de-TABbed. * Made the white-space to be consistant.
+	  comments axed. * de-TABbed. * Made the white-space to be consistent.
 	* src/freeglut_window.c: Cleaned up fgOpenWindow(): * Removed TABs. *
-	  Made indentation consistant. * Deleted say-nothing-new comments. *
+	  Made indentation consistent. * Deleted say-nothing-new comments. *
 	  Changed an *error*check* from an assert to an if(). (The error-check
 	  was on window creation; we don't want to lose that if the user
 	  compiles with asserts deactivated. Also, assert()s really tell us more
@@ -2390,14 +2390,14 @@
 	  depend upon assert()s never being compiled away to null statements.) *
 	  Added some XXX comments for things that bear some rumination.
 	* src/freeglut_window.c: Cleanup to fgSetWindow(). The usual suspects: *
-	  Removed tabs. * Made indentation consistant. * Killed off
+	  Removed tabs. * Made indentation consistent. * Killed off
 	  say-nothing-new comments.
 	* src/freeglut_window.c: Cleanup to fgSetupixelFormat(). Should be no
 	  functional changes.
 	  
 	  Code facelift included:
 	  
-	  * Consistant indentation. * Removal of all TABs (there were a bunch).
+	  * Consistent indentation. * Removal of all TABs (there were a bunch).
 	  * Fit to 80 columns.
 	* src/freeglut_window.c: There should be no changes to code
 	  functionality, though a fair bit of little changes to the code
@@ -2497,7 +2497,7 @@
 	  
 	  I missed a few lines that went past 80 columns. (^&
 	  
-	  Also made formatting more consistant.
+	  Also made formatting more consistent.
 	  
 	  Added a couple of XXX comments re. FreeBSD vs. general BSD #ifdef's.
 	* src/freeglut_joystick.c: Should be entirely superficial changes to
@@ -2505,7 +2505,7 @@
 	  
 	  * Fit lines to 80 columns. (It does get tiresome seeing long lines
 	  forced to break by the right-hand border of windows...(^&) *
-	  Eliminated say-nothing-new comments. * Made formatting more consistant
+	  Eliminated say-nothing-new comments. * Made formatting more consistent
 	  in spots. * Eliminated some hard TAB characters.
 	* src/freeglut_joystick.c: Added Thierry's change to include
 	  sys/param.h. This lets us pick out version numbers for OS releases
@@ -2535,7 +2535,7 @@
 	  
 	  Cleanup of fghGetConfig(). (One return statement, simpler code.)
 	  
-	  Made glutSetOption() have a more consistant style---and also got its
+	  Made glutSetOption() have a more consistent style---and also got its
 	  lines to stay under 80 columns.
 	* src/freeglut_misc.c: Got the last of the say-nothing-new comments in
 	  freeglut_misc.c.
@@ -2650,7 +2650,7 @@
 	  into glutMainLoopEvent() for some reason.
 	  
 	  If the X11 code could be tucked into another function,
-	  glutMainLoopEvent() could be platform-independant.
+	  glutMainLoopEvent() could be platform-independent.
 
 2003-10-26  rkrolib
 
@@ -2798,7 +2798,7 @@
 	  Removed depth-buffer usage. (Also done for Fractals in previous
 	  commit...)
 	* progs/demos/Fractals/fractals.c: A few minor changes: * glutInit*()
-	  calls should preceed glutInit(), per se, generally. This is so that
+	  calls should precede glutInit(), per se, generally. This is so that
 	  glutInit()'s configuration (which picks up on user parameters) can
 	  override application defaults. * glutInit() should be called before
 	  ANY attempt to process {argv, argc}. This is because there may be
@@ -3138,7 +3138,7 @@
 
 	* configure.in, src/Makefile.am, src/freeglut_glutfont_definitions.c,
 	  src/freeglut_internal.h: Added autoconf detection for the xf86 vid
-	  mode extentions.
+	  mode extensions.
 
 2003-08-01  Eric Sandall
 

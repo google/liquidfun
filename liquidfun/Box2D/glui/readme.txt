@@ -80,7 +80,7 @@ CHANGES:
 
 
 ----------------------------------
-- Removed need for type-declaring arguments when argment type suffices.
+- Removed need for type-declaring arguments when argument type suffices.
   This effects GLUI_Spinner and GLUI_EditText (and GLUI_CommandLine?).
 
   For example, instead of calling 

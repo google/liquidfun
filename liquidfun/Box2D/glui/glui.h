@@ -545,7 +545,7 @@ extern GLUI_Master_Object GLUI_Master;
  to the callbacks in this class, for arbitrary use by external users.
  (see GLUI_Master_Object::set_glutKeyboardFunc).
  
- This entire approach seems to be superceded by the "subwindow" flavor
+ This entire approach seems to be superseded by the "subwindow" flavor
  of GLUI.
 */
 class GLUI_Glut_Window : public GLUI_Node 

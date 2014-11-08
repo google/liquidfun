@@ -60,7 +60,7 @@ public:
 	b2Mat22 T;
 	/// Set this to a positive number to clamp the maximum amount of damping done.
 	float32 maxTimestep;
-	/// Sets damping independantly along the x and y axes
+	/// Sets damping independently along the x and y axes
 	void SetAxisAligned(float32 xDamping,float32 yDamping);
 private:
 	b2TensorDampingController* Create(b2BlockAllocator* allocator) const;

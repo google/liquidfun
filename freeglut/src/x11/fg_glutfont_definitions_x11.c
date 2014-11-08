@@ -44,7 +44,7 @@
  * freeglut_internal.h uses some GL types, but including the GL header portably
  * is a bit tricky, so we include freeglut_std.h here, which contains the
  * necessary machinery. But this poses another problem, caused by the ugly
- * original defintion of the font constants in "classic" GLUT: They are defined
+ * original definition of the font constants in "classic" GLUT: They are defined
  * as void* externally, so we move them temporarily out of the way by AN EXTREME
  * CPP HACK.
  */
