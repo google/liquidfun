@@ -37,6 +37,9 @@ var b2ParticleSystem_GetColorBuffer =
 var b2ParticleSystem_GetParticleCount =
   Module.cwrap('b2ParticleSystem_GetParticleCount', 'number', ['number']);
 
+var b2ParticleSystem_GetParticleLifetime =
+  Module.cwrap('b2ParticleSystem_GetParticleLifetime', 'number', ['number', 'number']);
+
 var b2ParticleSystem_GetPositionBuffer =
   Module.cwrap('b2ParticleSystem_GetPositionBuffer', 'number', ['number']);
 
@@ -49,6 +52,15 @@ var b2ParticleSystem_SetDamping =
 var b2ParticleSystem_SetDensity =
   Module.cwrap('b2ParticleSystem_SetDensity', 'null', ['number', 'number']);
 
+var b2ParticleSystem_SetGravityScale =
+  Module.cwrap('b2ParticleSystem_SetGravityScale', 'null', ['number', 'number']);
+
+var b2ParticleSystem_SetMaxParticleCount =
+  Module.cwrap('b2ParticleSystem_SetMaxParticleCount', 'null', ['number', 'number']);
+
+var b2ParticleSystem_SetParticleLifetime =
+  Module.cwrap('b2ParticleSystem_SetParticleLifetime', 'null', ['number', 'number', 'number']);
+
 var b2ParticleSystem_SetRadius =
   Module.cwrap('b2ParticleSystem_SetRadius', 'null', ['number', 'number']);
 
@@ -60,6 +72,7 @@ function b2ParticleSystem(ptr) {
   this.ptr = ptr;
   this.particleGroups = [];
   this.radius = 1.0;
+  this.gravityScale = 1.0;
 }
 
 b2ParticleSystem.prototype.CreateParticle = function(pd) {
@@ -86,9 +99,13 @@ b2ParticleSystem.prototype.GetColorBuffer = function() {
   return new Uint8Array(Module.HEAPU8.buffer, offset, count);
 };
 
+b2ParticleSystem.prototype.GetParticleLifetime = function(index) {
+  return b2ParticleSystem_GetParticleLifetime(this.ptr, index);
+}
+
 /**@return number*/
 b2ParticleSystem.prototype.GetParticleCount = function() {
-  return b2ParticleSystem_GetParticleCount(this.ptr) * 2;
+  return b2ParticleSystem_GetParticleCount(this.ptr);
 };
 
 b2ParticleSystem.prototype.GetPositionBuffer = function() {
@@ -111,6 +128,19 @@ b2ParticleSystem.prototype.SetDamping = function(damping) {
 b2ParticleSystem.prototype.SetDensity = function(density) {
   this.density = density;
   b2ParticleSystem_SetDensity(this.ptr, density);
+};
+
+b2ParticleSystem.prototype.SetGravityScale = function(gravityScale) {
+  this.gravityScale = gravityScale;
+  b2ParticleSystem_SetGravityScale(this.ptr, gravityScale);
+};
+
+b2ParticleSystem.prototype.SetMaxParticleCount = function(count) {
+  b2ParticleSystem_SetMaxParticleCount(this.ptr, count);
+};
+
+b2ParticleSystem.prototype.SetParticleLifetime = function(index, lifetime) {
+  b2ParticleSystem_SetParticleLifetime(this.ptr, index, lifetime);
 };
 
 b2ParticleSystem.prototype.SetRadius = function(radius) {

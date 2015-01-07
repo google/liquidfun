@@ -2,6 +2,9 @@
 var b2Body_ApplyAngularImpulse = Module.cwrap('b2Body_ApplyAngularImpulse', 'null',
   ['number', 'number', 'number']);
 
+var b2Body_ApplyLinearImpulse = Module.cwrap('b2Body_ApplyLinearImpulse', 'null',
+  ['number', 'number', 'number', 'number', 'number', 'number']);
+
 var b2Body_ApplyForce = Module.cwrap('b2Body_ApplyForce', 'number',
   ['number', 'number', 'number', 'number', 'number', 'number']);
 
@@ -54,6 +57,9 @@ var b2Body_SetAngularVelocity = Module.cwrap('b2Body_SetAngularVelocity', 'null'
 var b2Body_SetAwake =
   Module.cwrap('b2Body_SetAwake', 'number',['number', 'number']);
 
+var b2Body_SetFixedRotation =
+  Module.cwrap('b2Body_SetFixedRotation', 'number',['number', 'number']);
+
 var b2Body_SetLinearVelocity = Module.cwrap('b2Body_SetLinearVelocity', 'null',
   ['number', 'number', 'number']);
 
@@ -78,8 +84,12 @@ function b2Body(ptr) {
   this.fixtures = [];
 }
 
-b2Body.prototype.ApplyAngularImpulse = function(force, wake) {
-  b2Body_ApplyAngularImpulse(this.ptr, force, wake);
+b2Body.prototype.ApplyAngularImpulse = function(impulse, wake) {
+  b2Body_ApplyAngularImpulse(this.ptr, impulse, wake);
+};
+
+b2Body.prototype.ApplyLinearImpulse = function(impulse, point, wake) {
+  b2Body_ApplyLinearImpulse(this.ptr, impulse.x, impulse.y, point.x, point.y, wake);
 };
 
 b2Body.prototype.ApplyForce = function(force, point, wake) {
@@ -198,6 +208,10 @@ b2Body.prototype.SetAngularVelocity = function(angle) {
 
 b2Body.prototype.SetAwake = function(flag) {
   b2Body_SetAwake(this.ptr, flag);
+};
+
+b2Body.prototype.SetFixedRotation = function(flag) {
+  b2Body_SetFixedRotation(this.ptr, flag);
 };
 
 b2Body.prototype.SetLinearVelocity = function(v) {
