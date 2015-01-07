@@ -63,6 +63,7 @@ $(O)/Common/b2StackAllocator.cpp
 
 B2BODY = \
 	'_b2Body_ApplyAngularImpulse', \
+	'_b2Body_ApplyLinearImpulse', \
 	'_b2Body_ApplyForce', \
 	'_b2Body_ApplyForceToCenter', \
 	'_b2Body_ApplyTorque', \
@@ -82,6 +83,7 @@ B2BODY = \
 	'_b2Body_GetWorldVector', \
 	'_b2Body_SetAngularVelocity', \
 	'_b2Body_SetAwake', \
+	'_b2Body_SetFixedRotation', \
 	'_b2Body_SetLinearVelocity', \
 	'_b2Body_SetMassData', \
 	'_b2Body_SetTransform', \
@@ -245,3 +247,9 @@ EXPORTS = EXPORTED_FUNCTIONS="[ \
 bindings.js:
 	$(EMSCRIPTEN)/emcc -I../ -o lf_core.js jsBindings/jsBindings.cpp $(OBJECTS) -s $(EXPORTS) -s TOTAL_MEMORY=33554432 -O2 --js-library callbacks.js
 
+
+live:
+	cp liquidfun.js lib.js
+	cat impact-stuff >> lib.js
+	mv lib.js /home/doebi/Projects/impact/physics/lib/plugins/liquidfun/lib.js
+	cp lf_core.js.mem /home/doebi/Projects/impact/physics/

@@ -4,6 +4,8 @@
 extern "C" {
 // b2Body exports
 void b2Body_ApplyAngularImpulse(void* body, double impulse, double wake);
+void b2Body_ApplyLinearImpulse(void* body, double impulseX, double impulseY,
+                               double pointX, double pointY, double wake);
 void b2Body_ApplyForce(void* body, double forceX, double forceY,
                        double pointX, double pointY, double wake);
 void b2Body_ApplyForceToCenter(void* body, double forceX, double forceY,
@@ -25,6 +27,7 @@ void b2Body_GetWorldPoint(void* body, double pointX, double pointY, float* arr);
 void b2Body_GetWorldVector(void* body, double vX, double vY, float* arr);
 void b2Body_SetAngularVelocity(void* body, double angle);
 void b2Body_SetAwake(void* body, double flag);
+void b2Body_SetFixedRotation(void* body, double flag);
 void b2Body_SetLinearVelocity(void* body, double x, double y);
 void b2Body_SetMassData(void* body, double mass, double centerX,
                         double centerY, double inertia);
