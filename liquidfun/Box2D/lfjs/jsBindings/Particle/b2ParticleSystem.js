@@ -52,6 +52,9 @@ var b2ParticleSystem_SetDensity =
 var b2ParticleSystem_SetRadius =
   Module.cwrap('b2ParticleSystem_SetRadius', 'null', ['number', 'number']);
 
+var b2ParticleSystem_SetGravityScale =
+  Module.cwrap('b2ParticleSystem_SetGravityScale', 'null', ['number', 'number']);
+
 /** @constructor */
 function b2ParticleSystem(ptr) {
   this.dampingStrength = 1.0;
@@ -60,6 +63,7 @@ function b2ParticleSystem(ptr) {
   this.ptr = ptr;
   this.particleGroups = [];
   this.radius = 1.0;
+  this.gravityScale = 1.0;
 }
 
 b2ParticleSystem.prototype.CreateParticle = function(pd) {
@@ -116,4 +120,9 @@ b2ParticleSystem.prototype.SetDensity = function(density) {
 b2ParticleSystem.prototype.SetRadius = function(radius) {
   this.radius = radius;
   b2ParticleSystem_SetRadius(this.ptr, radius);
+};
+
+b2ParticleSystem.prototype.SetGravityScale = function(gravityScale) {
+  this.gravityScale = gravityScale;
+  b2ParticleSystem_SetGravityScale(this.ptr, gravityScale);
 };

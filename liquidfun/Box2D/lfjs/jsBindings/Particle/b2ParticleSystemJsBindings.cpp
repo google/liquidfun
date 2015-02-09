@@ -44,3 +44,7 @@ void b2ParticleSystem_SetDensity(void* particleSystem, double density) {
 void b2ParticleSystem_SetRadius(void* particleSystem, double radius) {
   ((b2ParticleSystem*)particleSystem)->SetRadius(radius);
 }
+
+void b2ParticleSystem_SetGravityScale(void* particleSystem, double gravityScale) {
+  ((b2ParticleSystem*)particleSystem)->SetGravityScale(gravityScale);
+}

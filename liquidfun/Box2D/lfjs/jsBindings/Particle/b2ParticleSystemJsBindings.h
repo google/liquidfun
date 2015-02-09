@@ -15,5 +15,6 @@ void* b2ParticleSystem_GetVelocityBuffer(void* particleSystem);
 void b2ParticleSystem_SetDamping(void* particleSystem, double damping);
 void b2ParticleSystem_SetDensity(void* particleSystem, double density);
 void b2ParticleSystem_SetRadius(void* particleSystem, double radius);
+void b2ParticleSystem_SetGravityScale(void* particleSystem, double gravityScale);
 }
 #endif
