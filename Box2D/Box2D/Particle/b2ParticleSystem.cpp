@@ -2771,64 +2771,84 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 	}
 	class SolveCollisionCallback : public b2FixtureParticleQueryCallback
 	{
+		// Call the contact filter if it's set, to determine whether to
+		// filter this contact.  Returns true if contact calculations should
+		// be performed, false otherwise.
+		inline bool ShouldCollide(b2Fixture * const fixture,
+								  int32 particleIndex)
+		{
+			if (m_contactFilter) {
+				const uint32* const flags = m_system->GetFlagsBuffer();
+				if (flags[particleIndex] & b2_fixtureContactFilterParticle) {
+					return m_contactFilter->ShouldCollide(fixture, m_system,
+														  particleIndex);
+				}
+			}
+			return true;
+		}
+
 		void ReportFixtureAndParticle(
 								b2Fixture* fixture, int32 childIndex, int32 a)
 		{
-			b2Body* body = fixture->GetBody();
-			b2Vec2 ap = m_system->m_positionBuffer.data[a];
-			b2Vec2 av = m_system->m_velocityBuffer.data[a];
-			b2RayCastOutput output;
-			b2RayCastInput input;
-			if (m_system->m_iterationIndex == 0)
-			{
-				// Put 'ap' in the local space of the previous frame
-				b2Vec2 p1 = b2MulT(body->m_xf0, ap);
-				if (fixture->GetShape()->GetType() == b2Shape::e_circle)
+			if (ShouldCollide(fixture, a)) {
+				b2Body* body = fixture->GetBody();
+				b2Vec2 ap = m_system->m_positionBuffer.data[a];
+				b2Vec2 av = m_system->m_velocityBuffer.data[a];
+				b2RayCastOutput output;
+				b2RayCastInput input;
+				if (m_system->m_iterationIndex == 0)
 				{
-					// Make relative to the center of the circle
-					p1 -= body->GetLocalCenter();
-					// Re-apply rotation about the center of the
-					// circle
-					p1 = b2Mul(body->m_xf0.q, p1);
-					// Subtract rotation of the current frame
-					p1 = b2MulT(body->m_xf.q, p1);
-					// Return to local space
-					p1 += body->GetLocalCenter();
+					// Put 'ap' in the local space of the previous frame
+					b2Vec2 p1 = b2MulT(body->m_xf0, ap);
+					if (fixture->GetShape()->GetType() == b2Shape::e_circle)
+					{
+						// Make relative to the center of the circle
+						p1 -= body->GetLocalCenter();
+						// Re-apply rotation about the center of the
+						// circle
+						p1 = b2Mul(body->m_xf0.q, p1);
+						// Subtract rotation of the current frame
+						p1 = b2MulT(body->m_xf.q, p1);
+						// Return to local space
+						p1 += body->GetLocalCenter();
+					}
+					// Return to global space and apply rotation of current frame
+					input.p1 = b2Mul(body->m_xf, p1);
 				}
-				// Return to global space and apply rotation of current frame
-				input.p1 = b2Mul(body->m_xf, p1);
-			}
-			else
-			{
-				input.p1 = ap;
-			}
-			input.p2 = ap + m_step.dt * av;
-			input.maxFraction = 1;
-			if (fixture->RayCast(&output, input, childIndex))
-			{
-				b2Vec2 n = output.normal;
-				b2Vec2 p =
-					(1 - output.fraction) * input.p1 +
-					output.fraction * input.p2 +
-					b2_linearSlop * n;
-				b2Vec2 v = m_step.inv_dt * (p - ap);
-				m_system->m_velocityBuffer.data[a] = v;
-				b2Vec2 f = m_step.inv_dt *
-					m_system->GetParticleMass() * (av - v);
-				m_system->ParticleApplyForce(a, f);
+				else
+				{
+					input.p1 = ap;
+				}
+				input.p2 = ap + m_step.dt * av;
+				input.maxFraction = 1;
+				if (fixture->RayCast(&output, input, childIndex))
+				{
+					b2Vec2 n = output.normal;
+					b2Vec2 p =
+						(1 - output.fraction) * input.p1 +
+						output.fraction * input.p2 +
+						b2_linearSlop * n;
+					b2Vec2 v = m_step.inv_dt * (p - ap);
+					m_system->m_velocityBuffer.data[a] = v;
+					b2Vec2 f = m_step.inv_dt *
+						m_system->GetParticleMass() * (av - v);
+					m_system->ParticleApplyForce(a, f);
+				}
 			}
 		}
 
 		b2TimeStep m_step;
+		b2ContactFilter* m_contactFilter;
 
 	public:
 		SolveCollisionCallback(
-			b2ParticleSystem* system, const b2TimeStep& step):
+			b2ParticleSystem* system, const b2TimeStep& step, b2ContactFilter* contactFilter) :
 			b2FixtureParticleQueryCallback(system)
 		{
 			m_step = step;
+			m_contactFilter = contactFilter;
 		}
-	} callback(this, step);
+	} callback(this, step, GetFixtureContactFilter());
 	m_world->QueryAABB(&callback, aabb);
 }
 

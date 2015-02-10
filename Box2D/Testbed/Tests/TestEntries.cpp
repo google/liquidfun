@@ -90,6 +90,7 @@
 #include "Maxwell.h"
 #include "MultipleParticleSystems.h"
 #include "Particles.h"
+#include "ParticleCollisionFilter.h"
 #include "ParticlesSurfaceTension.h"
 #include "Pointy.h"
 #include "Ramp.h"
@@ -123,6 +124,7 @@ TestEntry g_testEntries[] =
 	{"Pointy", Pointy::Create},
 	{"AntiPointy", AntiPointy::Create},
 	{"Corner Case", CornerCase::Create},
+	{"Particle Collisions", ParticleCollisionFilter::Create},
 
 	{"Ray-Cast", RayCast::Create},
 	{"Dump Shell", DumpShell::Create},

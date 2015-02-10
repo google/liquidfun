@@ -84,6 +84,7 @@ set(Testbed_Tests_SRCS
 	Tests/Maxwell.h
 	Tests/MultipleParticleSystems.h
 	Tests/Particles.h
+	Tests/ParticleCollisionFilter.h
 	Tests/ParticlesSurfaceTension.h
 	Tests/Pointy.h
 	Tests/Ramp.h
