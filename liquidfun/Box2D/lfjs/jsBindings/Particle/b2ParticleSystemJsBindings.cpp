@@ -1,6 +1,5 @@
 #include<Box2D/Box2D.h>
 #include <stdio.h>
-// TODO add setDamping, setRadius
 
 double b2ParticleSystem_CreateParticle(void* particleSystem,
     //particleDef
@@ -41,10 +40,18 @@ void b2ParticleSystem_SetDensity(void* particleSystem, double density) {
   ((b2ParticleSystem*)particleSystem)->SetDensity(density);
 }
 
-void b2ParticleSystem_SetRadius(void* particleSystem, double radius) {
-  ((b2ParticleSystem*)particleSystem)->SetRadius(radius);
-}
-
 void b2ParticleSystem_SetGravityScale(void* particleSystem, double gravityScale) {
   ((b2ParticleSystem*)particleSystem)->SetGravityScale(gravityScale);
+}
+
+void b2ParticleSystem_SetMaxParticleCount(void* particleSystem, double count) {
+  ((b2ParticleSystem*)particleSystem)->SetMaxParticleCount((int)count);
+}
+
+void b2ParticleSystem_SetParticleLifetime(void* particleSystem, double index, double lifetime){
+  ((b2ParticleSystem*)particleSystem)->SetParticleLifetime((int)index, lifetime);
+}
+
+void b2ParticleSystem_SetRadius(void* particleSystem, double radius) {
+  ((b2ParticleSystem*)particleSystem)->SetRadius(radius);
 }

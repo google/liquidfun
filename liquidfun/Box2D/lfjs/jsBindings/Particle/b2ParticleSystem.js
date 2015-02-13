@@ -49,11 +49,17 @@ var b2ParticleSystem_SetDamping =
 var b2ParticleSystem_SetDensity =
   Module.cwrap('b2ParticleSystem_SetDensity', 'null', ['number', 'number']);
 
-var b2ParticleSystem_SetRadius =
-  Module.cwrap('b2ParticleSystem_SetRadius', 'null', ['number', 'number']);
-
 var b2ParticleSystem_SetGravityScale =
   Module.cwrap('b2ParticleSystem_SetGravityScale', 'null', ['number', 'number']);
+
+var b2ParticleSystem_SetMaxParticleCount =
+  Module.cwrap('b2ParticleSystem_SetMaxParticleCount', 'null', ['number', 'number']);
+
+var b2ParticleSystem_SetParticleLifetime =
+  Module.cwrap('b2ParticleSystem_SetParticleLifetime', 'null', ['number', 'number', 'number']);
+
+var b2ParticleSystem_SetRadius =
+  Module.cwrap('b2ParticleSystem_SetRadius', 'null', ['number', 'number']);
 
 /** @constructor */
 function b2ParticleSystem(ptr) {
@@ -117,12 +123,20 @@ b2ParticleSystem.prototype.SetDensity = function(density) {
   b2ParticleSystem_SetDensity(this.ptr, density);
 };
 
-b2ParticleSystem.prototype.SetRadius = function(radius) {
-  this.radius = radius;
-  b2ParticleSystem_SetRadius(this.ptr, radius);
-};
-
 b2ParticleSystem.prototype.SetGravityScale = function(gravityScale) {
   this.gravityScale = gravityScale;
   b2ParticleSystem_SetGravityScale(this.ptr, gravityScale);
+};
+
+b2ParticleSystem.prototype.SetMaxParticleCount = function(count) {
+  b2ParticleSystem_SetMaxParticleCount(this.ptr, count);
+};
+
+b2ParticleSystem.prototype.SetParticleLifetime = function(index, lifetime) {
+  b2ParticleSystem_SetParticleLifetime(this.ptr, index, lifetime);
+};
+
+b2ParticleSystem.prototype.SetRadius = function(radius) {
+  this.radius = radius;
+  b2ParticleSystem_SetRadius(this.ptr, radius);
 };
