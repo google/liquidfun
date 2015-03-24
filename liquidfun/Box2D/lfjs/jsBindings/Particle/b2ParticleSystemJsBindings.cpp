@@ -27,6 +27,10 @@ double b2ParticleSystem_GetParticleCount(void* particleSystem) {
   return ((b2ParticleSystem*)particleSystem)->GetParticleCount();
 }
 
+double b2ParticleSystem_GetParticleLifetime(void* particleSystem, double index){
+  return ((b2ParticleSystem*)particleSystem)->GetParticleLifetime((int)index);
+}
+
 void* b2ParticleSystem_GetPositionBuffer(void* particleSystem) {
   return ((b2ParticleSystem*)particleSystem)->GetPositionBuffer();
 }

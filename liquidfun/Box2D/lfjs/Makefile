@@ -148,6 +148,7 @@ B2PARTICLESYSTEM = \
 	'_b2ParticleSystem_CreateParticle', \
 	'_b2ParticleSystem_GetColorBuffer', \
 	'_b2ParticleSystem_GetParticleCount', \
+	'_b2ParticleSystem_GetParticleLifetime', \
 	'_b2ParticleSystem_GetPositionBuffer', \
 	'_b2ParticleSystem_GetVelocityBuffer', \
 	'_b2ParticleSystem_SetDamping', \

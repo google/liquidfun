@@ -9,6 +9,7 @@ double b2ParticleSystem_CreateParticle(void* particleSystem,
 
     void* b2ParticleSystem_GetColorBuffer(void* particleSystem);
     double b2ParticleSystem_GetParticleCount(void* particleSystem);
+    double b2ParticleSystem_GetParticleLifetime(void* particleSystem, double index);
     void* b2ParticleSystem_GetPositionBuffer(void* particleSystem);
     void* b2ParticleSystem_GetVelocityBuffer(void* particleSystem);
     

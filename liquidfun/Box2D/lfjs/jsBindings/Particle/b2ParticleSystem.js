@@ -37,6 +37,9 @@ var b2ParticleSystem_GetColorBuffer =
 var b2ParticleSystem_GetParticleCount =
   Module.cwrap('b2ParticleSystem_GetParticleCount', 'number', ['number']);
 
+var b2ParticleSystem_GetParticleLifetime =
+  Module.cwrap('b2ParticleSystem_GetParticleLifetime', 'number', ['number', 'number']);
+
 var b2ParticleSystem_GetPositionBuffer =
   Module.cwrap('b2ParticleSystem_GetPositionBuffer', 'number', ['number']);
 
@@ -96,9 +99,13 @@ b2ParticleSystem.prototype.GetColorBuffer = function() {
   return new Uint8Array(Module.HEAPU8.buffer, offset, count);
 };
 
+b2ParticleSystem.prototype.GetParticleLifetime = function(index) {
+  return b2ParticleSystem_GetParticleLifetime(this.ptr, index);
+}
+
 /**@return number*/
 b2ParticleSystem.prototype.GetParticleCount = function() {
-  return b2ParticleSystem_GetParticleCount(this.ptr) * 2;
+  return b2ParticleSystem_GetParticleCount(this.ptr);
 };
 
 b2ParticleSystem.prototype.GetPositionBuffer = function() {
