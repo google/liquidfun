@@ -63,6 +63,7 @@ $(O)/Common/b2StackAllocator.cpp
 
 B2BODY = \
 	'_b2Body_ApplyAngularImpulse', \
+	'_b2Body_ApplyLinearImpulse', \
 	'_b2Body_ApplyForce', \
 	'_b2Body_ApplyForceToCenter', \
 	'_b2Body_ApplyTorque', \
@@ -82,6 +83,7 @@ B2BODY = \
 	'_b2Body_GetWorldVector', \
 	'_b2Body_SetAngularVelocity', \
 	'_b2Body_SetAwake', \
+	'_b2Body_SetFixedRotation', \
 	'_b2Body_SetLinearVelocity', \
 	'_b2Body_SetMassData', \
 	'_b2Body_SetTransform', \
@@ -146,10 +148,14 @@ B2PARTICLESYSTEM = \
 	'_b2ParticleSystem_CreateParticle', \
 	'_b2ParticleSystem_GetColorBuffer', \
 	'_b2ParticleSystem_GetParticleCount', \
+	'_b2ParticleSystem_GetParticleLifetime', \
 	'_b2ParticleSystem_GetPositionBuffer', \
 	'_b2ParticleSystem_GetVelocityBuffer', \
 	'_b2ParticleSystem_SetDamping', \
 	'_b2ParticleSystem_SetDensity', \
+	'_b2ParticleSystem_SetGravityScale', \
+	'_b2ParticleSystem_SetMaxParticleCount', \
+	'_b2ParticleSystem_SetParticleLifetime', \
 	'_b2ParticleSystem_SetRadius'
 
 B2POLYGONSHAPE = \
@@ -244,4 +250,3 @@ EXPORTS = EXPORTED_FUNCTIONS="[ \
 
 bindings.js:
 	$(EMSCRIPTEN)/emcc -I../ -o lf_core.js jsBindings/jsBindings.cpp $(OBJECTS) -s $(EXPORTS) -s TOTAL_MEMORY=33554432 -O2 --js-library callbacks.js
-
