@@ -4,6 +4,11 @@
 void b2Body_ApplyAngularImpulse(void* body, double impulse, double wake) {
   ((b2Body*)body)->ApplyAngularImpulse(impulse, wake);
 }
+void b2Body_ApplyLinearImpulse(void* body, double impulseX, double impulseY,
+                       double pointX, double pointY, double wake) {
+  ((b2Body*)body)->ApplyForce(b2Vec2(impulseX, impulseY), b2Vec2(pointX, pointY),
+                              (bool)wake);
+}
 void b2Body_ApplyForce(void* body, double forceX, double forceY,
                        double pointX, double pointY, double wake) {
   ((b2Body*)body)->ApplyForce(b2Vec2(forceX, forceY), b2Vec2(pointX, pointY),
@@ -95,6 +100,10 @@ void b2Body_GetWorldVector(void* body, double vX, double vY, float* arr) {
 
 void b2Body_SetAwake(void* body, double flag) {
   ((b2Body*)body)->SetAwake((bool)flag);
+}
+
+void b2Body_SetFixedRotation(void* body, double flag) {
+  ((b2Body*)body)->SetFixedRotation((bool)flag);
 }
 
 void b2Body_SetAngularVelocity(void* body, double angle) {
