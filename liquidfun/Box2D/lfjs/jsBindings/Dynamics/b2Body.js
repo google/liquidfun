@@ -77,11 +77,13 @@ var b2Body_SetType =
 // memory offsets
 var b2Body_xf_offset = Offsets.b2Body.xf;
 var b2Body_userData_offset = Offsets.b2Body.userData;
+var b2Body_world_offset = Offsets.b2Body.world;
 /**@constructor*/
 function b2Body(ptr) {
   this.buffer = new DataView(Module.HEAPU8.buffer, ptr);
   this.ptr = ptr;
   this.fixtures = [];
+  this.world = null;
 }
 
 b2Body.prototype.ApplyAngularImpulse = function(impulse, wake) {
@@ -110,7 +112,7 @@ b2Body.prototype.CreateFixtureFromDef = function(fixtureDef) {
   fixture._SetPtr(fixtureDef.shape._CreateFixture(this, fixtureDef));
   fixture.body = this;
   b2World._Push(fixture, this.fixtures);
-  world.fixturesLookup[fixture.ptr] = fixture;
+  this.world.fixturesLookup[fixture.ptr] = fixture;
   return fixture;
 };
 
@@ -182,6 +184,10 @@ b2Body.prototype.GetType = function() {
 
 b2Body.prototype.GetUserData = function() {
   return this.buffer.getUint32(b2Body_userData_offset, true);
+};
+
+b2Body.prototype.GetWorld = function() {
+  return this.world;
 };
 
 b2Body.prototype.GetWorldCenter = function() {
