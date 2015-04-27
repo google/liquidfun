@@ -77,7 +77,6 @@ var b2Body_SetType =
 // memory offsets
 var b2Body_xf_offset = Offsets.b2Body.xf;
 var b2Body_userData_offset = Offsets.b2Body.userData;
-var b2Body_world_offset = Offsets.b2Body.world;
 /**@constructor*/
 function b2Body(ptr) {
   this.buffer = new DataView(Module.HEAPU8.buffer, ptr);
