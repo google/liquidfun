@@ -37,6 +37,10 @@ if(CMAKE_CXX_COMPILER MATCHES ".*clang")
   # set_target_properties Can not find target to add properties to: Threads::Threads
   find_package(Threads)
 endif()
+if (WIN32)
+  find_package(Threads)
+endif()
+
 
 add_definitions( -DLIQUIDFUN_EXTERNAL_LANGUAGE_API=1 )
 
