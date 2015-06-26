@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Box2D)
 
+find_package (Threads)
+
 if(UNIX)
   set(BOX2D_INSTALL_BY_DEFAULT ON)
 else(UNIX)
