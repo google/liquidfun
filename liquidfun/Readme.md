@@ -1,4 +1,4 @@
-<img src="../../Programmers-Guide/html/liquidfun-logo-square-small.png"
+<img src="liquidfun/Box2D/Documentation/Programmers-Guide/html/liquidfun-logo-square-small.png"
 alt="LiquidFun logo" style="float:right;" />
 
 LiquidFun Version [1.1.0][]
@@ -40,5 +40,5 @@ you would leave it in.
   [landing page]: http://google.github.io/liquidfun
   [1.1.0]: http://google.github.io/liquidfun/ReleaseNotes.html
   [Box2D]: http://box2d.org
-  [Box2D/Documentation/Building/]: ../../Building/html/index.html
-  [Programmer's Guide]: ../../Programmers-Guide/html/md__logo.html
+  [Box2D/Documentation/Building/]: http://google.github.io/liquidfun/Building.html
+  [Programmer's Guide]: http://google.github.io/liquidfun/Programmers-Guide.html
