@@ -3,5 +3,6 @@
 
 extern "C" {
 double b2Fixture_TestPoint(void* fixture, double x, double y);
+void b2Fixture_Refilter(void* fixture);
 }
 #endif

@@ -61,6 +61,9 @@ var Offsets = {
     proxies: 24,
     proxyCount: 28,
     filter: 32,
+    filterCategoryBits: 32,
+    filterMaskBits: 34,
+    filterGroupIndex: 36,
     isSensor: 38,
     userData: 40
   },
