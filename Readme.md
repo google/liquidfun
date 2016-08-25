@@ -34,7 +34,7 @@ is useful and if we should continue to invest in it. Since this is open
 source, you are free to remove the version string but we would appreciate if
 you would leave it in.
 
-  [LiquidFun Google Group]: http://group.google.com/group/liquidfun
+  [LiquidFun Google Group]: https://groups.google.com/forum/#!forum/liquidfun
   [LiquidFun Issues Tracker]: http://github.com/google/liquidfun/issues
   [stackoverflow.com]: http://www.stackoverflow.com
   [landing page]: http://google.github.io/liquidfun
