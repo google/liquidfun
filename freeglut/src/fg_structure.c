@@ -332,7 +332,7 @@ void fgDestroyMenu( SFG_Menu* menu )
  * This function should be called on glutInit(). It will prepare the internal
  * structure of freeglut to be used in the application. The structure will be
  * destroyed using fgDestroyStructure() on glutMainLoop() return. In that
- * case further use of freeglut should be preceeded with a glutInit() call.
+ * case further use of freeglut should be preceded with a glutInit() call.
  */
 void fgCreateStructure( void )
 {

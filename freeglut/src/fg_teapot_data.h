@@ -59,7 +59,7 @@
 
  Following this, there is a numbered list of vertices.  Following the
  vertices are, one per line, a list of indices of vertices, describing
- each patch.  The first index in each patch is preceeded by the character
+ each patch.  The first index in each patch is preceded by the character
  "-" to delimit patch index lists.  The patches are all bicubic Bezier
  patches, so there are 16 vertices in each patch, and thus the vertex lists
  are each 16 entries long.  This is analogous to an "indexed polygon", if you

@@ -993,14 +993,14 @@ TEST(ThreadLocalTest, SingleParamConstructorInitializesToParam) {
   EXPECT_EQ(&i, t2.get());
 }
 
-class NoDefaultContructor {
+class NoDefaultConstructor {
  public:
-  explicit NoDefaultContructor(const char*) {}
-  NoDefaultContructor(const NoDefaultContructor&) {}
+  explicit NoDefaultConstructor(const char*) {}
+  NoDefaultConstructor(const NoDefaultConstructor&) {}
 };
 
-TEST(ThreadLocalTest, ValueDefaultContructorIsNotRequiredForParamVersion) {
-  ThreadLocal<NoDefaultContructor> bar(NoDefaultContructor("foo"));
+TEST(ThreadLocalTest, ValueDefaultConstructorIsNotRequiredForParamVersion) {
+  ThreadLocal<NoDefaultConstructor> bar(NoDefaultConstructor("foo"));
   bar.pointer();
 }
 
@@ -1116,7 +1116,7 @@ TEST(MutexTest, OnlyOneThreadCanLockAtATime) {
 
   // If the mutex lets more than one thread to increment the counter at a
   // time, they are likely to encounter a race condition and have some
-  // increments overwritten, resulting in the lower then expected counter
+  // increments overwritten, resulting in the lower than expected counter
   // value.
   EXPECT_EQ(kCycleCount * kThreadCount, locked_counter.value());
 }
