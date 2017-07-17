@@ -1322,10 +1322,9 @@ void b2ParticleSystem::CreateParticleGroupsFromParticleList(
 		for (ParticleListNode* node = list; node; node = node->next)
 		{
 			int32 oldIndex = node->index;
-			uint32& flags = m_flagsBuffer.data[oldIndex];
-			b2Assert(!(flags & b2_zombieParticle));
+			b2Assert(!(m_flagsBuffer.data[oldIndex] & b2_zombieParticle));
 			int32 newIndex = CloneParticle(oldIndex, newGroup);
-			flags |= b2_zombieParticle;
+			m_flagsBuffer.data[oldIndex] |= b2_zombieParticle;
 			node->index = newIndex;
 		}
 	}
