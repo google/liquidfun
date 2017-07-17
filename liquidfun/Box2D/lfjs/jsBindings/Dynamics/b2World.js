@@ -133,6 +133,7 @@ b2World.prototype.CreateBody = function(bodyDef) {
     bodyDef.linearVelocity.y, bodyDef.position.x, bodyDef.position.y,
     bodyDef.type, bodyDef.userData));
   b2World._Push(body, this.bodies);
+  body.world = this;
   this.bodiesLookup[body.ptr] = body;
   return body;
 };
