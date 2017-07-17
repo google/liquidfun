@@ -112,7 +112,8 @@ B2EDGESHAPE = \
 	'_b2EdgeShape_CreateFixture'
 
 B2FIXTURE = \
-	'_b2Fixture_TestPoint'
+	'_b2Fixture_TestPoint', \
+	'_b2Fixture_Refilter' \
 
 B2FRICTIONJOINT = \
 	'_b2FrictionJointDef_Create', \
