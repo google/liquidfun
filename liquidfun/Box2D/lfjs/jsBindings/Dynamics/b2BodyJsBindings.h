@@ -33,5 +33,8 @@ void b2Body_SetMassData(void* body, double mass, double centerX,
                         double centerY, double inertia);
 void b2Body_SetTransform(void* body, double x, double y, double angle);
 void b2Body_SetType(void* body, double type);
+
+void b2Body_SetGravityScale(void* body, double scale);
+double b2Body_GetGravityScale(void* body);
 }
 #endif

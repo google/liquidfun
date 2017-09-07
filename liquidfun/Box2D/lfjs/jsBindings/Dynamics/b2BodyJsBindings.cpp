@@ -130,3 +130,10 @@ void b2Body_SetTransform(void* body, double x, double y, double angle) {
 void b2Body_SetType(void* body, double type) {
   ((b2Body*)body)->SetType((b2BodyType)type);
 }
+
+void b2Body_SetGravityScale(void* body, double scale) {
+  ((b2Body*)body)->SetGravityScale(scale);
+}
+double b2Body_GetGravityScale(void* body) {
+  return ((b2Body*)body)->GetGravityScale();
+}
