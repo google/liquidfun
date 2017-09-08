@@ -236,7 +236,7 @@ b2Body.prototype.SetGravityScale = function(scale) {
   b2Body_SetGravityScale(this.ptr, scale);
 };
 
-b2Body.prototype.GetGravityScale = function(scale) {
+b2Body.prototype.GetGravityScale = function() {
   return b2Body_GetGravityScale(this.ptr);
 };
 
