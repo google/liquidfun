@@ -21,6 +21,7 @@
 #include <Box2D/Common/b2SlabAllocator.h>
 #include <Box2D/Common/b2GrowableBuffer.h>
 #include <Box2D/Particle/b2Particle.h>
+#include <Box2D/Dynamics/b2Fixture.h>
 #include <Box2D/Dynamics/b2TimeStep.h>
 
 #if LIQUIDFUN_UNIT_TESTS
@@ -39,7 +40,6 @@ class b2BlockAllocator;
 class b2StackAllocator;
 class b2QueryCallback;
 class b2RayCastCallback;
-class b2Fixture;
 class b2ContactFilter;
 class b2ContactListener;
 class b2ParticlePairSet;
@@ -183,6 +183,9 @@ struct b2ParticleSystemDef
 	/// Enable strict Particle/Body contact check.
 	/// See SetStrictContactCheck for details.
 	bool strictContactCheck;
+
+	/// Contact filtering data.
+	b2Filter filter;
 
 	/// Set the particle density.
 	/// See SetDensity for details.
@@ -1006,6 +1009,9 @@ private:
 	float32 GetParticleMass() const;
 	float32 GetParticleInvMass() const;
 
+	// Get the filter mask, category and group bits
+	const b2Filter& GetFilterData() const;
+
 	// Get the world's contact filter if any particles with the
 	// b2_contactFilterParticle flag are present in the system.
 	b2ContactFilter* GetFixtureContactFilter() const;
@@ -1366,6 +1372,11 @@ inline float32 b2ParticleSystem::GetParticleInvMass() const
 	// mass = density * stride^2, so we take the inverse of this.
 	float32 inverseStride = m_inverseDiameter * (1.0f / b2_particleStride);
 	return m_inverseDensity * inverseStride * inverseStride;
+}
+
+inline const b2Filter& b2ParticleSystem::GetFilterData() const
+{
+	return m_def.filter;
 }
 
 inline b2Vec2* b2ParticleSystem::GetPositionBuffer()

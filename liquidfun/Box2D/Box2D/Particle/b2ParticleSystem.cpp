@@ -2511,14 +2511,34 @@ private:
 		return false;
 	}
 
+	// Return true if our particles can collide with this fixture
+	bool CanCollideWithFixture(b2Fixture* fixture)
+	{
+		if (fixture->IsSensor())
+		{
+			return false;
+		}
+
+		const b2Filter& filterA = fixture->GetFilterData();
+		const b2Filter& filterB = m_system->GetFilterData();
+		if (filterA.groupIndex == filterB.groupIndex && filterA.groupIndex != 0)
+		{
+			return filterA.groupIndex > 0;
+		}
+
+		bool collide = (filterA.maskBits & filterB.categoryBits) != 0 && (filterA.categoryBits & filterB.maskBits) != 0;
+		return collide;
+	}
+
 	// Receive a fixture and call ReportFixtureAndParticle() for each particle
 	// inside aabb of the fixture.
 	bool ReportFixture(b2Fixture* fixture)
 	{
-		if (fixture->IsSensor())
+		if (!CanCollideWithFixture(fixture))
 		{
 			return true;
 		}
+
 		const b2Shape* shape = fixture->GetShape();
 		int32 childCount = shape->GetChildCount();
 		for (int32 childIndex = 0; childIndex < childCount; childIndex++)
