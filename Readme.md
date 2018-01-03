@@ -40,5 +40,5 @@ you would leave it in.
   [landing page]: http://google.github.io/liquidfun
   [1.1.0]: http://google.github.io/liquidfun/ReleaseNotes.html
   [Box2D]: http://box2d.org
-  [Box2D/Documentation/Building/]: http://google.github.io/liquidfun/Building.html
+  [Box2D/Documentation/Building/]: http://google.github.io/liquidfun/Building/html/index.html
   [Programmer's Guide]: http://google.github.io/liquidfun/Programmers-Guide.html
