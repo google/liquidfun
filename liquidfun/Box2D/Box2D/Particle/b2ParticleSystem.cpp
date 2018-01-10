@@ -52,7 +52,7 @@ static const uint32 yMask = ((1u << yTruncBits) - 1u) << yShift;
 static const uint32 xMask = ~yMask;
 static const uint32 relativeTagRight = 1u << xShift;
 static const uint32 relativeTagBottomLeft = (uint32)((1 << yShift) +
-                                                    (-1 << xShift));
+                                                    ((~uint32(0)) << xShift));
 
 static const uint32 relativeTagBottomRight = (1u << yShift) + (1u << xShift);
 
