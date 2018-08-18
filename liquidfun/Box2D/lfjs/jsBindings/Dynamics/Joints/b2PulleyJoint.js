@@ -1,8 +1,9 @@
 /**@constructor*/
 function b2PulleyJoint(def) {
-  this.ptr = null;
-  this.next = null;
+  b2Joint.call(this);
 }
+b2PulleyJoint.prototype = Object.create(b2Joint.prototype);
+b2PulleyJoint.prototype.constructor = b2PulleyJoint;
 
 var b2PulleyJointDef_Create = Module.cwrap("b2PulleyJointDef_Create",
   'number',

@@ -60,8 +60,9 @@ b2FrictionJointDef.prototype.InitializeAndCreate  = function(bodyA, bodyB, ancho
 };
 
 function b2FrictionJoint(def) {
+  b2Joint.call(this);
   this.bodyA = def.bodyA;
   this.bodyB = def.bodyB;
-  this.ptr = null;
-  this.next = null;
 }
+b2FrictionJoint.prototype = Object.create(b2Joint.prototype);
+b2FrictionJoint.prototype.constructor = b2FrictionJoint;
