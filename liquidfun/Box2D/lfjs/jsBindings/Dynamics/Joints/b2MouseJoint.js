@@ -4,9 +4,10 @@ var b2MouseJoint_SetTarget =
 
 /**@constructor*/
 function b2MouseJoint(def) {
-  this.ptr = null;
-  this.next = null;
+  b2Joint.call(this);
 }
+b2MouseJoint.prototype = Object.create(b2Joint.prototype);
+b2MouseJoint.prototype.constructor = b2MouseJoint;
 
 b2MouseJoint.prototype.SetTarget = function(p) {
   b2MouseJoint_SetTarget(this.ptr, p.x, p.y);

@@ -128,7 +128,10 @@ B2GEARJOINT = \
 
 B2JOINT = \
 	'_b2Joint_GetBodyA', \
-	'_b2Joint_GetBodyB'
+	'_b2Joint_GetBodyB', \
+	'_b2Joint_GetType', \
+	'_b2Joint_GetAnchorA', \
+	'_b2Joint_GetAnchorB'
 
 B2MOTORJOINT = \
 	'_b2MotorJoint_SetAngularOffset', \

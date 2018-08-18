@@ -65,8 +65,9 @@ b2WeldJointDef.prototype.InitializeAndCreate  = function(bodyA, bodyB, anchor) {
 
 /** @constructor */
 function b2WeldJoint(def) {
+  b2Joint.call(this);
   this.bodyA = def.bodyA;
   this.bodyB = def.bodyB;
-  this.next = null;
-  this.ptr = null;
 }
+b2WeldJoint.prototype = Object.create(b2Joint.prototype);
+b2WeldJoint.prototype.constructor = b2WeldJoint;
