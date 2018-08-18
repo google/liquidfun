@@ -43,3 +43,13 @@ void* b2DistanceJointDef_InitializeAndCreate(
   return ((b2World*)world)->CreateJoint(&def);
 
 }
+
+void b2DistanceJoint_SetLength(void* joint, double length) {
+    ((b2DistanceJoint*)joint)->SetLength(length);
+}
+void b2DistanceJoint_SetFrequency(void* joint, double frequencyHz) {
+    ((b2DistanceJoint*)joint)->SetFrequency(frequencyHz);
+}
+void b2DistanceJoint_SetDampingRatio(void* joint, double dampingRatio) {
+    ((b2DistanceJoint*)joint)->SetDampingRatio(dampingRatio);
+}

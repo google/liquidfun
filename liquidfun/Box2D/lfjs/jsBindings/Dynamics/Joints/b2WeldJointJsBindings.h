@@ -2,6 +2,9 @@
 #define B2WELDJOINTJSBINDINGS_H
 
 extern "C" {
+void b2WeldJoint_SetFrequency(void* joint, double hz);
+void b2WeldJoint_SetDampingRatio(void* joint, double ratio);
+
 void* b2WeldJointDef_Create(
     void* world,
     // joint def

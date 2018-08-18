@@ -5,6 +5,16 @@ extern "C" {
 void b2WheelJoint_SetMotorSpeed(void* wheel, double speed);
 void b2WheelJoint_SetSpringFrequencyHz(void* wheel, double frequency);
 
+void b2WheelJoint_GetLocalAxisA(void* joint, float* arr);
+double b2WheelJoint_GetJointTranslation(void* joint);
+double b2WheelJoint_GetJointSpeed(void* joint);
+double b2WheelJoint_IsMotorEnabled(void* joint);
+void b2WheelJoint_EnableMotor(void* joint, double flag);
+double b2WheelJoint_GetMotorSpeed(void* joint);
+void b2WheelJoint_SetMaxMotorTorque(void* joint, double torque);
+double b2WheelJoint_GetMotorTorque(void* joint, double inv_dt);
+void b2WheelJoint_SetSpringDampingRatio(void* joint, double ratio);
+
 void* b2WheelJointDef_Create(
     void* world,
     // joint def

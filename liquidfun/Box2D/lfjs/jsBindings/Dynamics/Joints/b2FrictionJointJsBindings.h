@@ -22,4 +22,7 @@ void* b2FrictionJointDef_InitializeAndCreate(
     double maxForce, double maxTorque);
 }
 
+void b2FrictionJoint_SetMaxForce(void* joint, double force);
+void b2FrictionJoint_SetMaxTorque(void* joint, double torque);
+
 #endif

@@ -15,50 +15,75 @@ var b2PrismaticJoint_IsMotorEnabled =
 var b2PrismaticJoint_SetMotorSpeed =
   Module.cwrap('b2PrismaticJoint_SetMotorSpeed', 'number', ['number', 'number']);
 
+var b2PrismaticJoint_GetLocalAxisA = Module.cwrap('b2PrismaticJoint_GetLocalAxisA', 'null', ['number', 'number']);
+var b2PrismaticJoint_GetJointSpeed = Module.cwrap('b2PrismaticJoint_GetJointSpeed', 'number', ['number']);
+var b2PrismaticJoint_SetLimits = Module.cwrap('b2PrismaticJoint_SetLimits', 'null', ['number', 'number', 'number']);
+var b2PrismaticJoint_SetMaxMotorForce = Module.cwrap('b2PrismaticJoint_SetMaxMotorForce', 'null', ['number', 'number']);
+
 /**@constructor*/
 function b2PrismaticJoint(def) {
-  this.ptr = null;
-  this.next = null;
+  b2Joint.call(this, def);
+  this.referenceAngle = def.referenceAngle;
+  this.lowerTranslation = def.lowerTranslation;
+  this.upperTranslation = def.upperTranslation;
+  this.maxMotorForce = def.maxMotorForce;
 }
+b2PrismaticJoint.prototype = Object.create(b2Joint.prototype);
+b2PrismaticJoint.prototype.constructor = b2PrismaticJoint;
 
-b2PrismaticJoint.prototype = new b2Joint;
-
-b2PrismaticJoint.prototype.EnableLimit = function(flag) {
+b2PrismaticJoint.prototype.EnableLimit = function (flag) {
   return b2PrismaticJoint_EnableLimit(this.ptr, flag);
 };
 
-b2PrismaticJoint.prototype.EnableMotor = function(flag) {
+b2PrismaticJoint.prototype.EnableMotor = function (flag) {
   return b2PrismaticJoint_EnableMotor(this.ptr, flag);
 };
 
-b2PrismaticJoint.prototype.GetJointTranslation = function() {
+b2PrismaticJoint.prototype.GetJointTranslation = function () {
   return b2PrismaticJoint_GetJointTranslation(this.ptr);
 };
 
-b2PrismaticJoint.prototype.GetMotorSpeed = function() {
+b2PrismaticJoint.prototype.GetMotorSpeed = function () {
   return b2PrismaticJoint_GetMotorSpeed(this.ptr);
 };
 
-b2PrismaticJoint.prototype.GetMotorForce = function(hz) {
+b2PrismaticJoint.prototype.GetMotorForce = function (hz) {
   return b2PrismaticJoint_GetMotorForce(this.ptr, hz);
 };
 
-b2PrismaticJoint.prototype.IsLimitEnabled = function() {
+b2PrismaticJoint.prototype.IsLimitEnabled = function () {
   return b2PrismaticJoint_IsLimitEnabled(this.ptr);
 };
 
-b2PrismaticJoint.prototype.IsMotorEnabled = function() {
+b2PrismaticJoint.prototype.IsMotorEnabled = function () {
   return b2PrismaticJoint_IsMotorEnabled(this.ptr);
 };
 
-b2PrismaticJoint.prototype.GetMotorEnabled = function() {
+b2PrismaticJoint.prototype.GetMotorEnabled = function () {
   return b2PrismaticJoint_IsMotorEnabled(this.ptr);
 };
 
-b2PrismaticJoint.prototype.SetMotorSpeed = function(speed) {
+b2PrismaticJoint.prototype.SetMotorSpeed = function (speed) {
   return b2PrismaticJoint_SetMotorSpeed(this.ptr, speed);
 };
 
+b2PrismaticJoint.prototype.GetLocalAxisA = function () {
+  b2PrismaticJoint_GetLocalAxisA(this.ptr, _vec2Buf.byteOffset);
+  var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
+  return new b2Vec2(result[0], result[1]);
+}
+b2PrismaticJoint.prototype.GetJointSpeed = function () {
+  return b2PrismaticJoint_GetJointSpeed(this.ptr);
+}
+b2PrismaticJoint.prototype.SetLimits = function (lower, upper) {
+  b2PrismaticJoint_SetLimits(this.ptr, lower, upper);
+  this.lowerTranslation = lower;
+  this.upperTranslation = upper;
+}
+b2PrismaticJoint.prototype.SetMaxMotorForce = function (force) {
+  b2PrismaticJoint_SetMaxMotorForce(this.ptr, force);
+  this.maxMotorForce = force;
+}
 
 var b2PrismaticJointDef_Create = Module.cwrap("b2PrismaticJointDef_Create",
   'number',
@@ -104,7 +129,7 @@ function b2PrismaticJointDef() {
   this.upperTranslation = 0;
 }
 
-b2PrismaticJointDef.prototype.Create = function(world) {
+b2PrismaticJointDef.prototype.Create = function (world) {
   var prismaticJoint = new b2PrismaticJoint(this);
   prismaticJoint.ptr = b2PrismaticJointDef_Create(
     world.ptr,
@@ -119,7 +144,7 @@ b2PrismaticJointDef.prototype.Create = function(world) {
   return prismaticJoint;
 };
 
-b2PrismaticJointDef.prototype.InitializeAndCreate  = function(bodyA, bodyB, anchor, axis) {
+b2PrismaticJointDef.prototype.InitializeAndCreate = function (bodyA, bodyB, anchor, axis) {
   this.bodyA = bodyA;
   this.bodyB = bodyB;
   var prismaticJoint = new b2PrismaticJoint(this);

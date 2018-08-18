@@ -1,4 +1,21 @@
 #include <Box2D/Box2D.h>
+void b2PulleyJoint_GetGroundAnchorA(void* joint, float* arr) {
+    b2Vec2 anchor = ((b2PulleyJoint*)joint)->GetGroundAnchorA();
+    arr[0] = anchor.x;
+    arr[1] = anchor.y;
+}
+void b2PulleyJoint_GetGroundAnchorB(void* joint, float* arr) {
+    b2Vec2 anchor = ((b2PulleyJoint*)joint)->GetGroundAnchorB();
+    arr[0] = anchor.x;
+    arr[1] = anchor.y;
+}
+double b2PulleyJoint_GetCurrentLengthA(void* joint) {
+    return ((b2PulleyJoint*)joint)->GetCurrentLengthA();
+}
+double b2PulleyJoint_GetCurrentLengthB(void* joint) {
+    return ((b2PulleyJoint*)joint)->GetCurrentLengthB();
+}
+
 void* b2PulleyJointDef_Create(
     void* world,
     // joint def

@@ -11,6 +11,11 @@ double b2PrismaticJoint_IsLimitEnabled(void* joint);
 double b2PrismaticJoint_IsMotorEnabled(void* joint);
 void b2PrismaticJoint_SetMotorSpeed(void* joint, double speed);
 
+void b2PrismaticJoint_GetLocalAxisA(void* joint, float* arr);
+double b2PrismaticJoint_GetJointSpeed(void* joint);
+void b2PrismaticJoint_SetLimits(void* joint, double lower, double upper);
+void b2PrismaticJoint_SetMaxMotorForce(void *joint, double force);
+
 void* b2PrismaticJointDef_Create(
     void* world,
     // joint def
