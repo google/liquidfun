@@ -275,6 +275,18 @@ B2WELDJOINT = \
 B2WHEELJOINT = \
 	'_b2WheelJoint_SetMotorSpeed', \
 	'_b2WheelJoint_SetSpringFrequencyHz', \
+	'_b2WheelJoint_GetLocalAxisA', \
+	'_b2WheelJoint_GetJointTranslation', \
+	'_b2WheelJoint_GetJointSpeed', \
+	'_b2WheelJoint_IsMotorEnabled', \
+	'_b2WheelJoint_EnableMotor', \
+	'_b2WheelJoint_GetMotorSpeed', \
+	'_b2WheelJoint_SetMaxMotorTorque', \
+	'_b2WheelJoint_GetMaxMotorTorque', \
+	'_b2WheelJoint_GetMotorTorque', \
+	'_b2WheelJoint_GetSpringFrequencyHz', \
+	'_b2WheelJoint_SetSpringDampingRatio', \
+	'_b2WheelJoint_GetSpringDampingRatio', \
 	'_b2WheelJointDef_Create', \
 	'_b2WheelJointDef_InitializeAndCreate' \
 

@@ -4,6 +4,19 @@ var b2WheelJoint_SetMotorSpeed =
 var b2WheelJoint_SetSpringFrequencyHz =
   Module.cwrap('b2WheelJoint_SetSpringFrequencyHz', 'null', ['number', 'number']);
 
+var b2WheelJoint_GetLocalAxisA = Module.cwrap('b2WheelJoint_GetLocalAxisA', 'null', ['number', 'number']);
+var b2WheelJoint_GetJointTranslation = Module.cwrap('b2WheelJoint_GetJointTranslation', 'number', ['number']);
+var b2WheelJoint_GetJointSpeed = Module.cwrap('b2WheelJoint_GetJointSpeed', 'number', ['number']);
+var b2WheelJoint_IsMotorEnabled = Module.cwrap('b2WheelJoint_IsMotorEnabled', 'number', ['number']);
+var b2WheelJoint_EnableMotor = Module.cwrap('b2WheelJoint_EnableMotor', 'null', ['number', 'number']);
+var b2WheelJoint_GetMotorSpeed = Module.cwrap('b2WheelJoint_GetMotorSpeed', 'number', ['number']);
+var b2WheelJoint_SetMaxMotorTorque = Module.cwrap('b2WheelJoint_SetMaxMotorTorque', 'null', ['number', 'number']);
+var b2WheelJoint_GetMaxMotorTorque = Module.cwrap('b2WheelJoint_GetMaxMotorTorque', 'number', ['number']);
+var b2WheelJoint_GetMotorTorque = Module.cwrap('b2WheelJoint_GetMotorTorque', 'number', ['number', 'number']);
+var b2WheelJoint_GetSpringFrequencyHz = Module.cwrap('b2WheelJoint_GetSpringFrequencyHz', 'number', ['number']);
+var b2WheelJoint_SetSpringDampingRatio = Module.cwrap('b2WheelJoint_SetSpringDampingRatio', 'null', ['number', 'number']);
+var b2WheelJoint_GetSpringDampingRatio = Module.cwrap('b2WheelJoint_GetSpringDampingRatio', 'number', ['number']);
+
 /**@constructor*/
 function b2WheelJoint(def) {
   b2Joint.call(this, def);
@@ -18,6 +31,45 @@ b2WheelJoint.prototype.SetMotorSpeed = function(speed) {
 b2WheelJoint.prototype.SetSpringFrequencyHz = function(hz) {
   b2WheelJoint_SetSpringFrequencyHz(this.ptr, hz);
 };
+
+b2WheelJoint.prototype.GetLocalAxisA = function() {
+    b2WheelJoint_GetLocalAxisA(this.ptr, _vec2Buf.byteOffset);
+    var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
+    return new b2Vec2(result[0], result[1]);
+}
+b2WheelJoint.prototype.GetJointTranslation = function() {
+    return b2WheelJoint_GetJointTranslation(this.ptr);
+}
+b2WheelJoint.prototype.GetJointSpeed = function() {
+    return b2WheelJoint_GetJointSpeed(this.ptr);
+}
+b2WheelJoint.prototype.IsMotorEnabled = function() {
+    return b2WheelJoint_IsMotorEnabled(this.ptr);
+}
+b2WheelJoint.prototype.EnableMotor = function(flag) {
+    b2WheelJoint_EnableMotor(this.ptr, flag);
+}
+b2WheelJoint.prototype.GetMotorSpeed = function() {
+    return b2WheelJoint_GetMotorSpeed(this.ptr);
+}
+b2WheelJoint.prototype.SetMaxMotorTorque = function(torque) {
+    b2WheelJoint_SetMaxMotorTorque(this.ptr, torque);
+}
+b2WheelJoint.prototype.GetMaxMotorTorque = function() {
+    return b2WheelJoint_GetMaxMotorTorque(this.ptr);
+}
+b2WheelJoint.prototype.GetMotorTorque = function(inv_dt) {
+    return b2WheelJoint_GetMotorTorque(this.ptr, inv_dt);
+}
+b2WheelJoint.prototype.GetSpringFrequencyHz = function() {
+    return b2WheelJoint_GetSpringFrequencyHz(this.ptr);
+}
+b2WheelJoint.prototype.SetSpringDampingRatio = function(ratio) {
+    b2WheelJoint_SetSpringDampingRatio(this.ptr, ratio);
+}
+b2WheelJoint.prototype.GetSpringDampingRatio = function() {
+    return b2WheelJoint_GetSpringDampingRatio(this.ptr);
+}
 
 // wheeljoint def
 var b2WheelJointDef_Create = Module.cwrap("b2WheelJointDef_Create",
