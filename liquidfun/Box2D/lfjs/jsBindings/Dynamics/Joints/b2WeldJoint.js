@@ -63,9 +63,31 @@ b2WeldJointDef.prototype.InitializeAndCreate  = function(bodyA, bodyB, anchor) {
   return weldJoint;
 };
 
+var b2WeldJoint_GetReferenceAngle = Module.cwrap('b2WeldJoint_GetReferenceAngle', 'number', ['number']);
+var b2WeldJoint_SetFrequency = Module.cwrap('b2WeldJoint_SetFrequency', 'null', ['number', 'number']);
+var b2WeldJoint_GetFrequency = Module.cwrap('b2WeldJoint_GetFrequency', 'number', ['number']);
+var b2WeldJoint_SetDampingRatio = Module.cwrap('b2WeldJoint_SetDampingRatio', 'null', ['number', 'number']);
+var b2WeldJoint_GetDampingRatio = Module.cwrap('b2WeldJoint_GetDampingRatio', 'number', ['number']);
+
 /** @constructor */
 function b2WeldJoint(def) {
   b2Joint.call(this, def);
 }
 b2WeldJoint.prototype = Object.create(b2Joint.prototype);
 b2WeldJoint.prototype.constructor = b2WeldJoint;
+
+b2WeldJoint.prototype.GetReferenceAngle = function() {
+    return b2WeldJoint_GetReferenceAngle(this.ptr);
+}
+b2WeldJoint.prototype.SetFrequency = function(hz) {
+    b2WeldJoint_SetFrequency(this.ptr, hz);
+}
+b2WeldJoint.prototype.GetFrequency = function() {
+    return b2WeldJoint_GetFrequency(this.ptr);
+}
+b2WeldJoint.prototype.SetDampingRatio = function(ratio) {
+    b2WeldJoint_SetDampingRatio(this.ptr, ratio);
+}
+b2WeldJoint.prototype.GetDampingRatio = function() {
+    return b2WeldJoint_GetDampingRatio(this.ptr);
+}

@@ -2,6 +2,12 @@
 #define B2WELDJOINTJSBINDINGS_H
 
 extern "C" {
+double b2WeldJoint_GetReferenceAngle(void* joint);
+void b2WeldJoint_SetFrequency(void* joint, hz);
+double b2WeldJoint_GetFrequency(void* joint);
+void b2WeldJoint_SetDampingRatio(void* joint, ratio);
+double b2WeldJoint_GetDampingRatio(void* joint);
+
 void* b2WeldJointDef_Create(
     void* world,
     // joint def

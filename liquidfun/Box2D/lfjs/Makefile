@@ -264,6 +264,11 @@ B2ROPEJOINT = \
 	'_b2RopeJointDef_Create'
 
 B2WELDJOINT = \
+	'_b2WeldJoint_GetReferenceAngle', \
+	'_b2WeldJoint_SetFrequency', \
+	'_b2WeldJoint_GetFrequency', \
+	'_b2WeldJoint_SetDampingRatio', \
+	'_b2WeldJoint_GetDampingRatio', \
 	'_b2WeldJointDef_Create', \
 	'_b2WeldJointDef_InitializeAndCreate' \
 
