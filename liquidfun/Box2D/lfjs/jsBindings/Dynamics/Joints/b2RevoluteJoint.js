@@ -24,19 +24,18 @@ var b2RevoluteJoint_SetMotorSpeed =
 
 /** @constructor */
 function b2RevoluteJoint(revoluteJointDef) {
+  b2Joint.call(this, revoluteJointDef);
   this.collideConnected = revoluteJointDef.collideConnected;
   this.enableLimit = revoluteJointDef.enableLimit;
   this.enableMotor = revoluteJointDef.enableMotor;
   this.lowerAngle = revoluteJointDef.lowerAngle;
   this.maxMotorTorque = revoluteJointDef.maxMotorTorque;
   this.motorSpeed = revoluteJointDef.motorSpeed;
-  this.next = null;
-  this.ptr = null;
   this.upperAngle = revoluteJointDef.upperAngle;
   this.userData = revoluteJointDef.userData;
 }
-
-b2RevoluteJoint.prototype = new b2Joint;
+b2RevoluteJoint.prototype = Object.create(b2Joint.prototype);
+b2RevoluteJoint.prototype.constructor = b2RevoluteJoint;
 
 b2RevoluteJoint.prototype.EnableLimit = function(flag) {
   b2RevoluteJoint_EnableLimit(this.ptr, flag);

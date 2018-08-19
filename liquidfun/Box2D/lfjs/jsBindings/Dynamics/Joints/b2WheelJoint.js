@@ -6,9 +6,10 @@ var b2WheelJoint_SetSpringFrequencyHz =
 
 /**@constructor*/
 function b2WheelJoint(def) {
-  this.next = null;
-  this.ptr = null;
+  b2Joint.call(this, def);
 }
+b2WheelJoint.prototype = Object.create(b2Joint.prototype);
+b2WheelJoint.prototype.constructor = b2WheelJoint;
 
 b2WheelJoint.prototype.SetMotorSpeed = function(speed) {
   b2WheelJoint_SetMotorSpeed(this.ptr, speed);

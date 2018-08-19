@@ -17,11 +17,10 @@ var b2PrismaticJoint_SetMotorSpeed =
 
 /**@constructor*/
 function b2PrismaticJoint(def) {
-  this.ptr = null;
-  this.next = null;
+  b2Joint.call(this, def);
 }
-
-b2PrismaticJoint.prototype = new b2Joint;
+b2PrismaticJoint.prototype = Object.create(b2Joint.prototype);
+b2PrismaticJoint.prototype.constructor = b2PrismaticJoint;
 
 b2PrismaticJoint.prototype.EnableLimit = function(flag) {
   return b2PrismaticJoint_EnableLimit(this.ptr, flag);

@@ -1,8 +1,9 @@
 /**@constructor*/
 function b2RopeJoint(def) {
-  this.next = null;
-  this.ptr = null;
+  b2Joint.call(this, def);
 }
+b2RopeJoint.prototype = Object.create(b2Joint.prototype);
+b2RopeJoint.prototype.constructor = b2RopeJoint;
 
 var b2RopeJointDef_Create = Module.cwrap("b2RopeJointDef_Create",
   'number',

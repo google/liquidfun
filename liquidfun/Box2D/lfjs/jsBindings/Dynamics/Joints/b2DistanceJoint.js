@@ -1,10 +1,9 @@
 /**@constructor*/
 function b2DistanceJoint(def) {
-  this.bodyA = def.bodyA;
-  this.bodyB = def.bodyB;
-  this.ptr = null;
-  this.next = null;
+  b2Joint.call(this, def);
 }
+b2DistanceJoint.prototype = Object.create(b2Joint.prototype);
+b2DistanceJoint.prototype.constructor = b2DistanceJoint;
 
 var b2DistanceJointDef_Create = Module.cwrap("b2DistanceJointDef_Create",
   'number',
