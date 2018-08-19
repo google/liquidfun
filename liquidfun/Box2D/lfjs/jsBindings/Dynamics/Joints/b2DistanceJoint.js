@@ -1,9 +1,9 @@
-var b2DistanceJointDef_SetLength = Module.cwrap("b2DistanceJointDef_SetLength", "null", ["number", "number"]);
-var b2DistanceJointDef_GetLength = Module.cwrap("b2DistanceJointDef_GetLength", "number", ["number"]);
-var b2DistanceJointDef_SetFrequency = Module.cwrap("b2DistanceJointDef_SetFrequency", "null", ["number", "number"]);
-var b2DistanceJointDef_GetFrequency = Module.cwrap("b2DistanceJointDef_GetFrequency", "number", ["number"]);
-var b2DistanceJointDef_SetDampingRatio = Module.cwrap("b2DistanceJointDef_SetDampingRatio", "null", ["number", "number"]);
-var b2DistanceJointDef_GetDampingRatio = Module.cwrap("b2DistanceJointDef_GetDampingRatio", "number", ["number"]);
+var b2DistanceJoint_SetLength = Module.cwrap("b2DistanceJoint_SetLength", "null", ["number", "number"]);
+var b2DistanceJoint_GetLength = Module.cwrap("b2DistanceJoint_GetLength", "number", ["number"]);
+var b2DistanceJoint_SetFrequency = Module.cwrap("b2DistanceJoint_SetFrequency", "null", ["number", "number"]);
+var b2DistanceJoint_GetFrequency = Module.cwrap("b2DistanceJoint_GetFrequency", "number", ["number"]);
+var b2DistanceJoint_SetDampingRatio = Module.cwrap("b2DistanceJoint_SetDampingRatio", "null", ["number", "number"]);
+var b2DistanceJoint_GetDampingRatio = Module.cwrap("b2DistanceJoint_GetDampingRatio", "number", ["number"]);
 
 /**@constructor*/
 function b2DistanceJoint(def) {
@@ -13,24 +13,24 @@ b2DistanceJoint.prototype = Object.create(b2Joint.prototype);
 b2DistanceJoint.prototype.constructor = b2DistanceJoint;
 
 b2DistanceJoint.prototype.SetLength = function(length) {
-    b2DistanceJointDef_SetLength(this.prt, length);
+    b2DistanceJoint_SetLength(this.prt, length);
 }
 b2DistanceJoint.prototype.GetLength = function() {
-    return b2DistanceJointDef_GetLength(this.prt);
+    return b2DistanceJoint_GetLength(this.prt);
 }
 
 b2DistanceJoint.prototype.SetFrequency = function(hz) {
-    b2DistanceJointDef_SetFrequency(this.prt, hz);
+    b2DistanceJoint_SetFrequency(this.prt, hz);
 }
 b2DistanceJoint.prototype.GetLength = function() {
-    return b2DistanceJointDef_GetLength(this.prt);
+    return b2DistanceJoint_GetLength(this.prt);
 }
 
 b2DistanceJoint.prototype.SetDampingRatio = function(ratio) {
-    b2DistanceJointDef_SetDampingRatio(this.prt, ratio);
+    b2DistanceJoint_SetDampingRatio(this.prt, ratio);
 }
 b2DistanceJoint.prototype.GetDampingRatio = function() {
-    return b2DistanceJointDef_GetDampingRatio(this.prt);
+    return b2DistanceJoint_GetDampingRatio(this.prt);
 }
 
 var b2DistanceJointDef_Create = Module.cwrap("b2DistanceJointDef_Create",

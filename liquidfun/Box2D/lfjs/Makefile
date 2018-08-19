@@ -166,6 +166,13 @@ B2MOTORJOINT = \
 
 B2MOUSEJOINT = \
 	'_b2MouseJoint_SetTarget', \
+	'_b2MouseJoint_GetTarget', \
+	'_b2MouseJoint_SetMaxForce', \
+	'_b2MouseJoint_GetMaxForce', \
+	'_b2MouseJoint_SetFrequency', \
+	'_b2MouseJoint_GetFrequency', \
+	'_b2MouseJoint_SetDampingRatio', \
+	'_b2MouseJoint_GetDampingRatio' \
 	'_b2MouseJointDef_Create'
 
 B2PARTICLEGROUP = \
