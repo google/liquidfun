@@ -1,15 +1,20 @@
-var e_unknownJoint = 0;
-var e_revoluteJoint = 1;
-var e_prismaticJoint = 2;
-var e_distanceJoint = 3;
-var e_pulleyJoint = 4;
-var e_mouseJoint = 5;
-var e_gearJoint = 6;
-var e_wheelJoint = 7;
-var e_weldJoint = 8;
-var e_frictionJoint = 9;
-var e_ropeJoint = 10;
-var e_motorJoint = 11;
+var b2_unknownJoint = 0;
+var b2_revoluteJoint = 1;
+var b2_prismaticJoint = 2;
+var b2_distanceJoint = 3;
+var b2_pulleyJoint = 4;
+var b2_mouseJoint = 5;
+var b2_gearJoint = 6;
+var b2_wheelJoint = 7;
+var b2_weldJoint = 8;
+var b2_frictionJoint = 9;
+var b2_ropeJoint = 10;
+var b2_motorJoint = 11;
+
+var b2_inactiveLimit = 0;
+var b2_atLowerLimit = 1;
+var b2_atUpperLimit = 2;
+var b2_equalLimits = 3;
 
 var b2Joint_GetBodyA = Module.cwrap('b2Joint_GetBodyA', 'number', ['number']);
 var b2Joint_GetBodyB = Module.cwrap('b2Joint_GetBodyB', 'number', ['number']);

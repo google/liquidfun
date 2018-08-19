@@ -258,6 +258,9 @@ B2REVOLUTEJOINT = \
 	'_b2RevoluteJointDef_InitializeAndCreate'
 
 B2ROPEJOINT = \
+	'_b2RopeJoint_SetMaxLength', \
+	'_b2RopeJoint_GetMaxLength', \
+	'_b2RopeJoint_GetLimitState', \
 	'_b2RopeJointDef_Create'
 
 B2WELDJOINT = \

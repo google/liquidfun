@@ -2,6 +2,10 @@
 #define B2ROPEJOINTJSBINDINGS_H
 
 extern "C" {
+void b2RopeJoint_SetMaxLength(void* joint, length);
+double b2RopeJoint_GetMaxLength(void* joint);
+double b2RopeJoint_GetLimitState(void* joint);
+
 void* b2RopeJointDef_Create(
     void* world,
     // joint def
