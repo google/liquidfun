@@ -47,8 +47,8 @@ b2PrismaticJoint.prototype.GetMotorSpeed = function() {
   return b2PrismaticJoint_GetMotorSpeed(this.ptr);
 };
 
-b2PrismaticJoint.prototype.GetMotorForce = function(inv_dt) {
-  return b2PrismaticJoint_GetMotorForce(this.ptr, inv_dt);
+b2PrismaticJoint.prototype.GetMotorForce = function(hz) {
+  return b2PrismaticJoint_GetMotorForce(this.ptr, hz);
 };
 
 b2PrismaticJoint.prototype.IsLimitEnabled = function() {

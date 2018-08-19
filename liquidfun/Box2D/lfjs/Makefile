@@ -244,6 +244,16 @@ B2REVOLUTEJOINT = \
 	'_b2RevoluteJoint_IsLimitEnabled', \
 	'_b2RevoluteJoint_IsMotorEnabled', \
 	'_b2RevoluteJoint_SetMotorSpeed', \
+	'_b2RevoluteJoint_SetMotorSpeed', \
+	'_b2RevoluteJoint_GetReferenceAngle', \
+	'_b2RevoluteJoint_GetJointSpeed', \
+	'_b2RevoluteJoint_GetLowerLimit', \
+	'_b2RevoluteJoint_GetUpperLimit', \
+	'_b2RevoluteJoint_SetLimits', \
+	'_b2RevoluteJoint_GetMotorSpeed', \
+	'_b2RevoluteJoint_SetMaxMotorTorque', \
+	'_b2RevoluteJoint_GetMaxMotorTorque', \
+	'_b2RevoluteJoint_GetMotorTorque', \
 	'_b2RevoluteJointDef_Create', \
 	'_b2RevoluteJointDef_InitializeAndCreate'
 
