@@ -8,6 +8,36 @@ void b2MotorJoint_SetLinearOffset(void* motorJoint, double x, double y) {
   ((b2MotorJoint*)motorJoint)->SetLinearOffset(b2Vec2(x, y));
 }
 
+double b2MotorJoint_GetAngularOffset(void* joint) {
+    return ((b2MotorJoint*)motorJoint)->GetAngularOffset();
+}
+void b2MotorJoint_GetLinearOffset(void* joint, float* arr) {
+    b2Vec2 offset = ((b2MotorJoint*)joint)->GetLinearOffset();
+    arr[0] = force.x;
+    arr[1] = force.y;
+}
+
+void b2MotorJoint_SetMaxForce(void* joint, double force) {
+    ((b2MotorJoint*)joint)->SetMaxForce(force);
+}
+double b2MotorJoint_GetMaxForce(void* joint) {
+  return ((b2MotorJoint*)joint)->GetMaxForce();
+}
+
+void b2MotorJoint_SetMaxTorque(void* joint, double torque) {
+    ((b2MotorJoint*)joint)->SetMaxTorque(torque);
+}
+double b2MotorJoint_GetMaxTorque(void* joint) {
+  return ((b2MotorJoint*)joint)->GetMaxTorque();
+}
+
+void b2MotorJoint_SetCorrectionFactor(void* joint, double factor) {
+    ((b2MotorJoint*)joint)->SetCorrectionFactor(factor);
+}
+double b2MotorJoint_GetCorrectionFactor(void* joint) {
+  return ((b2MotorJoint*)joint)->GetCorrectionFactor();
+}
+
 void* b2MotorJointDef_Create(
     void* world,
     // joint def

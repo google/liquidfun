@@ -153,6 +153,14 @@ B2JOINT = \
 B2MOTORJOINT = \
 	'_b2MotorJoint_SetAngularOffset', \
 	'_b2MotorJoint_SetLinearOffset', \
+	'_b2MotorJoint_GetAngularOffset', \
+	'_b2MotorJoint_GetLinearOffset', \
+	'_b2MotorJoint_SetMaxForce', \
+	'_b2MotorJoint_GetMaxForce', \
+	'_b2MotorJoint_SetMaxTorque', \
+	'_b2MotorJoint_GetMaxTorque' \
+	'_b2MotorJoint_SetCorrectionFactor', \
+	'_b2MotorJoint_GetCorrectionFactor' \
 	'_b2MotorJointDef_Create', \
 	'_b2MotorJointDef_InitializeAndCreate'
 
