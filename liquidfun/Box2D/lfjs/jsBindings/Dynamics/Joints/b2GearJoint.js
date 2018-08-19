@@ -2,7 +2,7 @@ var b2GearJoint_GetRatio = Module.cwrap("b2GearJoint_GetRatio", 'number',
   ['number']);
 
 function b2GearJoint(def) {
-  b2Joint.call(this);
+  b2Joint.call(this, def);
 }
 b2GearJoint.prototype = Object.create(b2Joint.prototype);
 b2GearJoint.prototype.constructor = b2GearJoint;

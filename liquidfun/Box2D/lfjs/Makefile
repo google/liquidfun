@@ -131,7 +131,11 @@ B2JOINT = \
 	'_b2Joint_GetBodyB', \
 	'_b2Joint_GetType', \
 	'_b2Joint_GetAnchorA', \
-	'_b2Joint_GetAnchorB'
+	'_b2Joint_GetAnchorB', \
+	'_b2Joint_GetReactionForce', \
+	'_b2Joint_GetReactionTorque', \
+	'_b2Joint_IsActive', \
+	'_b2Joint_GetCollideConnected'
 
 B2MOTORJOINT = \
 	'_b2MotorJoint_SetAngularOffset', \

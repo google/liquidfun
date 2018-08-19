@@ -4,7 +4,7 @@ var b2MouseJoint_SetTarget =
 
 /**@constructor*/
 function b2MouseJoint(def) {
-  b2Joint.call(this);
+  b2Joint.call(this, def);
 }
 b2MouseJoint.prototype = Object.create(b2Joint.prototype);
 b2MouseJoint.prototype.constructor = b2MouseJoint;

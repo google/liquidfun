@@ -17,7 +17,7 @@ var b2PrismaticJoint_SetMotorSpeed =
 
 /**@constructor*/
 function b2PrismaticJoint(def) {
-  b2Joint.call(this);
+  b2Joint.call(this, def);
 }
 b2PrismaticJoint.prototype = Object.create(b2Joint.prototype);
 b2PrismaticJoint.prototype.constructor = b2PrismaticJoint;

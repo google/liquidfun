@@ -7,9 +7,7 @@ var b2MotorJoint_SetLinearOffset =
 
 /**@constructor*/
 function b2MotorJoint(def) {
-  b2Joint.call(this);
-  this.bodyA = def.bodyA;
-  this.bodyB = def.bodyB;
+  b2Joint.call(this, def);
 }
 b2MotorJoint.prototype = Object.create(b2Joint.prototype);
 b2MotorJoint.prototype.constructor = b2MotorJoint;

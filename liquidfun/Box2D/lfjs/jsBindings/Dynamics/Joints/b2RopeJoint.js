@@ -1,6 +1,6 @@
 /**@constructor*/
 function b2RopeJoint(def) {
-  b2Joint.call(this);
+  b2Joint.call(this, def);
 }
 b2RopeJoint.prototype = Object.create(b2Joint.prototype);
 b2RopeJoint.prototype.constructor = b2RopeJoint;

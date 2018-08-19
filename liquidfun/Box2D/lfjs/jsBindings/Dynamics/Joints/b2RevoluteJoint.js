@@ -24,7 +24,7 @@ var b2RevoluteJoint_SetMotorSpeed =
 
 /** @constructor */
 function b2RevoluteJoint(revoluteJointDef) {
-  b2Joint.call(this);
+  b2Joint.call(this, revoluteJointDef);
   this.collideConnected = revoluteJointDef.collideConnected;
   this.enableLimit = revoluteJointDef.enableLimit;
   this.enableMotor = revoluteJointDef.enableMotor;

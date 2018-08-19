@@ -1,6 +1,6 @@
 /**@constructor*/
 function b2PulleyJoint(def) {
-  b2Joint.call(this);
+  b2Joint.call(this, def);
 }
 b2PulleyJoint.prototype = Object.create(b2Joint.prototype);
 b2PulleyJoint.prototype.constructor = b2PulleyJoint;
