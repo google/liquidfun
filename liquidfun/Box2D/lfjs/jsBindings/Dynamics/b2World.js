@@ -91,6 +91,7 @@ function b2World(gravity) {
   this.bodiesLookup = {};
   this.fixturesLookup = {};
   this.joints = [];
+  this.jointsLoopup = {};
   this.listener = null;
   this.particleSystems = [];
   this.ptr = b2World_Create(gravity.x, gravity.y);
@@ -140,6 +141,7 @@ b2World.prototype.CreateBody = function(bodyDef) {
 b2World.prototype.CreateJoint = function(jointDef) {
   var joint = jointDef.Create(this);
   b2World._Push(joint, this.joints);
+  this.jointsLoopup[joint.ptr] = joint;
   return joint;
 };
 

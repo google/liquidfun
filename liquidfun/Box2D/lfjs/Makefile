@@ -132,6 +132,9 @@ B2FRICTIONJOINT = \
 	'_b2FrictionJoint_GetMaxTorque' \
 
 B2GEARJOINT = \
+	'_b2GearJoint_GetJoint1', \
+	'_b2GearJoint_GetJoint2', \
+	'_b2GearJoint_SetRatio', \
 	'_b2GearJoint_GetRatio', \
 	'_b2GearJointDef_Create', \
 	'_b2GearJointDef_InitializeAndCreate'

@@ -60,10 +60,10 @@ b2FrictionJointDef.prototype.InitializeAndCreate  = function(bodyA, bodyB, ancho
   return frictionJoint;
 };
 
-b2FrictionJoint_SetMaxForce = Module.cwrap("b2FrictionJoint_SetMaxForce", "null", ["number", "number"]);
-b2FrictionJoint_GetMaxForce = Module.cwrap("b2FrictionJoint_GetMaxForce", "number", ["number"]);
-b2FrictionJoint_SetMaxTorque = Module.cwrap("b2FrictionJoint_SetMaxTorque", "null", ["number", "number"]);
-b2FrictionJoint_GetMaxTorque = Module.cwrap("b2FrictionJoint_GetMaxTorque", "number", ["number"]);
+var b2FrictionJoint_SetMaxForce = Module.cwrap("b2FrictionJoint_SetMaxForce", "null", ["number", "number"]);
+var b2FrictionJoint_GetMaxForce = Module.cwrap("b2FrictionJoint_GetMaxForce", "number", ["number"]);
+var b2FrictionJoint_SetMaxTorque = Module.cwrap("b2FrictionJoint_SetMaxTorque", "null", ["number", "number"]);
+var b2FrictionJoint_GetMaxTorque = Module.cwrap("b2FrictionJoint_GetMaxTorque", "number", ["number"]);
 
 /**@constructor*/
 function b2FrictionJoint(def) {

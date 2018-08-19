@@ -1,12 +1,24 @@
-var b2GearJoint_GetRatio = Module.cwrap("b2GearJoint_GetRatio", 'number',
-  ['number']);
+var b2GearJoint_GetJoint1 = Module.cwrap("b2GearJoint_GetJoint1", 'number', ['number']);
+var b2GearJoint_GetJoint2 = Module.cwrap("b2GearJoint_GetJoint2", 'number', ['number']);
+var b2GearJoint_SetRatio = Module.cwrap("b2GearJoint_SetRatio", 'number', ['number', 'number']);
+var b2GearJoint_GetRatio = Module.cwrap("b2GearJoint_GetRatio", 'number', ['number']);
 
+/**@constructor*/
 function b2GearJoint(def) {
   b2Joint.call(this, def);
 }
 b2GearJoint.prototype = Object.create(b2Joint.prototype);
 b2GearJoint.prototype.constructor = b2GearJoint;
 
+b2GearJoint.prototype.GetJoint1 = function() {
+    return world.jointsLoopup[b2GearJoint_GetJoint1(this.ptr)];
+}
+b2GearJoint.prototype.GetJoint2 = function() {
+    return world.jointsLoopup[b2GearJoint_GetJoint2(this.ptr)];
+}
+b2GearJoint.prototype.SetRatio = function(ratio) {
+    b2GearJoint_SetRatio(this.ptr, ratio);
+}
 b2GearJoint.prototype.GetRatio = function() {
   return b2GearJoint_GetRatio(this.ptr);
 };

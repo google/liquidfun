@@ -1,4 +1,13 @@
 #include <Box2D/Box2D.h>
+void* b2GearJoint_GetJoint1(void* joint) {
+    return ((b2GearJoint*)joint)->GetJoint1();
+}
+void* b2GearJoint_GetJoint2(void* joint) {
+    return ((b2GearJoint*)joint)->GetJoint2();
+}
+void b2GearJoint_SetRatio(void* joint, double ratio) {
+    ((b2GearJoint*)joint)->SetRatio(ratio);
+}
 double b2GearJoint_GetRatio(void* joint) {
   return ((b2GearJoint*)joint)->GetRatio();
 }

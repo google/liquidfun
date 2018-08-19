@@ -2,6 +2,9 @@
 #define B2GEARJOINTJSBINDINGS_H
 
 extern "C" {
+void* b2GearJoint_GetJoint1(void* joint);
+void* b2GearJoint_GetJoint2(void* joint);
+void b2GearJoint_SetRatio(void* joint, double ratio);
 double b2GearJoint_GetRatio(void* joint);
 
 void* b2GearJointDef_Create(
