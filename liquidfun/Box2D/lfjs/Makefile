@@ -108,7 +108,13 @@ B2CONTACT = \
 
 B2DISTANCEJOINT = \
 	'_b2DistanceJointDef_Create', \
-	'_b2DistanceJointDef_InitializeAndCreate' \
+	'_b2DistanceJointDef_InitializeAndCreate', \
+	'_b2DistanceJoint_SetLength', \
+	'_b2DistanceJoint_GetLength', \
+	'_b2DistanceJoint_SetFrequency', \
+	'_b2DistanceJoint_GetFrequency', \
+	'_b2DistanceJoint_SetDampingRatio', \
+	'_b2DistanceJoint_GetDampingRatio' \
 
 B2EDGESHAPE = \
 	'_b2EdgeShape_CreateFixture'
