@@ -125,7 +125,11 @@ B2FIXTURE = \
 
 B2FRICTIONJOINT = \
 	'_b2FrictionJointDef_Create', \
-	'_b2FrictionJointDef_InitializeAndCreate' \
+	'_b2FrictionJointDef_InitializeAndCreate', \
+	'_b2FrictionJoint_SetMaxForce', \
+	'_b2FrictionJoint_GetMaxForce', \
+	'_b2FrictionJoint_SetMaxTorque', \
+	'_b2FrictionJoint_GetMaxTorque' \
 
 B2GEARJOINT = \
 	'_b2GearJoint_GetRatio', \

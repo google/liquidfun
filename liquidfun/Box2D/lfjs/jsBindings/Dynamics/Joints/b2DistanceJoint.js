@@ -1,8 +1,8 @@
-var b2DistanceJointDef_SetLength = Module.cwrap("b2DistanceJointDef_GetLength", "null", ["number", "number"]);
+var b2DistanceJointDef_SetLength = Module.cwrap("b2DistanceJointDef_SetLength", "null", ["number", "number"]);
 var b2DistanceJointDef_GetLength = Module.cwrap("b2DistanceJointDef_GetLength", "number", ["number"]);
-var b2DistanceJointDef_SetFrequency = Module.cwrap("b2DistanceJointDef_GetFrequency", "null", ["number", "number"]);
+var b2DistanceJointDef_SetFrequency = Module.cwrap("b2DistanceJointDef_SetFrequency", "null", ["number", "number"]);
 var b2DistanceJointDef_GetFrequency = Module.cwrap("b2DistanceJointDef_GetFrequency", "number", ["number"]);
-var b2DistanceJointDef_SetDampingRatio = Module.cwrap("b2DistanceJointDef_GetDampingRatio", "null", ["number", "number"]);
+var b2DistanceJointDef_SetDampingRatio = Module.cwrap("b2DistanceJointDef_SetDampingRatio", "null", ["number", "number"]);
 var b2DistanceJointDef_GetDampingRatio = Module.cwrap("b2DistanceJointDef_GetDampingRatio", "number", ["number"]);
 
 /**@constructor*/
