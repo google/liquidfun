@@ -215,6 +215,14 @@ B2PRISMATICJOINT = \
 	'_b2PrismaticJoint_IsLimitEnabled', \
 	'_b2PrismaticJoint_IsMotorEnabled', \
 	'_b2PrismaticJoint_SetMotorSpeed', \
+	'_b2PrismaticJoint_GetLocalAxisA', \
+	'_b2PrismaticJoint_GetReferenceAngle', \
+	'_b2PrismaticJoint_GetJointSpeed', \
+	'_b2PrismaticJoint_GetLowerLimit', \
+	'_b2PrismaticJoint_GetUpperLimit', \
+	'_b2PrismaticJoint_SetLimits', \
+	'_b2PrismaticJoint_SetMaxMotorForce', \
+	'_b2PrismaticJoint_GetMaxMotorForce', \
 	'_b2PrismaticJointDef_Create', \
 	'_b2PrismaticJointDef_InitializeAndCreate' \
 

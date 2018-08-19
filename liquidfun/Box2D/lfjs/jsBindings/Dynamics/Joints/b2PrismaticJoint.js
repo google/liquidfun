@@ -15,6 +15,15 @@ var b2PrismaticJoint_IsMotorEnabled =
 var b2PrismaticJoint_SetMotorSpeed =
   Module.cwrap('b2PrismaticJoint_SetMotorSpeed', 'number', ['number', 'number']);
 
+var b2PrismaticJoint_GetLocalAxisA = Module.cwrap('b2PrismaticJoint_GetLocalAxisA', 'null', ['number', 'number']);
+var b2PrismaticJoint_GetReferenceAngle = Module.cwrap('b2PrismaticJoint_GetReferenceAngle', 'number', ['number']);
+var b2PrismaticJoint_GetJointSpeed = Module.cwrap('b2PrismaticJoint_GetJointSpeed', 'number', ['number']);
+var b2PrismaticJoint_GetLowerLimit = Module.cwrap('b2PrismaticJoint_GetLowerLimit', 'number', ['number']);
+var b2PrismaticJoint_GetUpperLimit = Module.cwrap('b2PrismaticJoint_GetUpperLimit', 'number', ['number']);
+var b2PrismaticJoint_SetLimits = Module.cwrap('b2PrismaticJoint_SetLimits', 'null', ['number', 'number', 'number']);
+var b2PrismaticJoint_SetMaxMotorForce = Module.cwrap('b2PrismaticJoint_SetMaxMotorForce', 'null', ['number', 'null']);
+var b2PrismaticJoint_GetMaxMotorForce = Module.cwrap('b2PrismaticJoint_GetMaxMotorForce', 'number', ['number']);
+
 /**@constructor*/
 function b2PrismaticJoint(def) {
   b2Joint.call(this, def);
@@ -38,8 +47,8 @@ b2PrismaticJoint.prototype.GetMotorSpeed = function() {
   return b2PrismaticJoint_GetMotorSpeed(this.ptr);
 };
 
-b2PrismaticJoint.prototype.GetMotorForce = function(hz) {
-  return b2PrismaticJoint_GetMotorForce(this.ptr, hz);
+b2PrismaticJoint.prototype.GetMotorForce = function(inv_dt) {
+  return b2PrismaticJoint_GetMotorForce(this.ptr, inv_dt);
 };
 
 b2PrismaticJoint.prototype.IsLimitEnabled = function() {
@@ -58,6 +67,32 @@ b2PrismaticJoint.prototype.SetMotorSpeed = function(speed) {
   return b2PrismaticJoint_SetMotorSpeed(this.ptr, speed);
 };
 
+b2PrismaticJoint.prototype.GetLocalAxisA = function() {
+    b2PrismaticJoint_GetLocalAxisA(this.ptr, _vec2Buf.byteOffset);
+    var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
+    return new b2Vec2(result[0], result[1]);
+}
+b2PrismaticJoint.prototype.GetReferenceAngle = function() {
+    return b2PrismaticJoint_GetReferenceAngle(this.ptr);
+}
+b2PrismaticJoint.prototype.GetJointSpeed = function() {
+    return b2PrismaticJoint_GetJointSpeed(this.ptr);
+}
+b2PrismaticJoint.prototype.GetLowerLimit = function() {
+    return b2PrismaticJoint_GetLowerLimit(this.ptr);
+}
+b2PrismaticJoint.prototype.GetUpperLimit = function() {
+    return b2PrismaticJoint_GetUpperLimit(this.ptr);
+}
+b2PrismaticJoint.prototype.SetLimits = function(lower, upper) {
+    b2PrismaticJoint_SetLimits(this.ptr, lower, upper);
+}
+b2PrismaticJoint.prototype.SetMaxMotorForce = function(force) {
+    b2PrismaticJoint_SetMaxMotorForce(this.ptr, force);
+}
+b2PrismaticJoint.prototype.GetMaxMotorForce = function() {
+    return b2PrismaticJoint_GetMaxMotorForce(this.ptr);
+}
 
 var b2PrismaticJointDef_Create = Module.cwrap("b2PrismaticJointDef_Create",
   'number',

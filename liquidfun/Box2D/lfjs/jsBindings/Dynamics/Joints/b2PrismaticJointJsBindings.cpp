@@ -27,6 +27,33 @@ void b2PrismaticJoint_SetMotorSpeed(void* joint, double speed) {
   ((b2PrismaticJoint*)joint)->SetMotorSpeed(speed);
 }
 
+void b2PrismaticJoint_GetLocalAxisA(void* joint, float* arr) {
+  b2Vec2 axis = ((b2PrismaticJoint*)joint)->GetLocalAxisA();
+  arr[0] = axis.x;
+  arr[1] = axis.y;
+}
+double b2PrismaticJoint_GetReferenceAngle(void* joint) {
+    return ((b2PrismaticJoint*)joint)->GetReferenceAngle();
+}
+double b2PrismaticJoint_GetJointSpeed(void* joint) {
+    return ((b2PrismaticJoint*)joint)->GetJointSpeed();
+}
+double b2PrismaticJoint_GetLowerLimit(void* joint) {
+    return ((b2PrismaticJoint*)joint)->GetLowerLimit();
+}
+double b2PrismaticJoint_GetUpperLimit(void* joint) {
+    return ((b2PrismaticJoint*)joint)->GetUpperLimit();
+}
+void b2PrismaticJoint_SetLimits(void* joint, double lower, double upper) {
+    ((b2PrismaticJoint*)joint)->SetLimits(lower, upper);
+}
+void b2PrismaticJoint_SetMaxMotorForce(void *joint, double force) {
+    ((b2PrismaticJoint*)joint)->SetMaxMotorForce(force);
+}
+double b2PrismaticJoint_GetMaxMotorForce(void* joint); {
+    return ((b2PrismaticJoint*)joint)->GetMaxMotorForce();
+}
+
 void* b2PrismaticJointDef_Create(
     void* world,
     // joint def
