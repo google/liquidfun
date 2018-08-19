@@ -227,6 +227,13 @@ B2PRISMATICJOINT = \
 	'_b2PrismaticJointDef_InitializeAndCreate' \
 
 B2PULLEYJOINT = \
+	'_b2PulleyJoint_GetGroundAnchorA', \
+	'_b2PulleyJoint_GetGroundAnchorB', \
+	'_b2PulleyJoint_GetLengthA', \
+	'_b2PulleyJoint_GetLengthB', \
+	'_b2PulleyJoint_GetRatio', \
+	'_b2PulleyJoint_GetCurrentLengthA', \
+	'_b2PulleyJoint_GetCurrentLengthB', \
 	'_b2PulleyJointDef_Create', \
 	'_b2PulleyJointDef_InitializeAndCreate' \
 

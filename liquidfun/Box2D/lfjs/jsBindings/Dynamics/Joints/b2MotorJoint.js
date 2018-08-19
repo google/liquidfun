@@ -38,22 +38,22 @@ b2MotorJoint.prototype.GetLinearOffset = function () {
     return new b2Vec2(result[0], result[1]);
 };
 b2MotorJoint.prototype.SetMaxForce = function(force) {
-    b2MotorJoint_SetMaxForce(this.prt, force);
+    b2MotorJoint_SetMaxForce(this.ptr, force);
 }
 b2MotorJoint.prototype.GetMaxForce = function() {
-    return b2MotorJoint_GetMaxForce(this.prt);
+    return b2MotorJoint_GetMaxForce(this.ptr);
 }
 b2MotorJoint.prototype.SetMaxTorque = function(torque) {
-    b2MotorJoint_SetMaxTorque(this.prt, torque);
+    b2MotorJoint_SetMaxTorque(this.ptr, torque);
 }
 b2MotorJoint.prototype.GetMaxTorque = function() {
-    return b2MotorJoint_GetMaxTorque(this.prt);
+    return b2MotorJoint_GetMaxTorque(this.ptr);
 }
 b2MotorJoint.prototype.SetCorrectionFactor = function(factor) {
-    b2MotorJoint_SetCorrectionFactor(this.prt, factor);
+    b2MotorJoint_SetCorrectionFactor(this.ptr, factor);
 }
 b2MotorJoint.prototype.GetCorrectionFactor = function() {
-    return b2MotorJoint_GetCorrectionFactor(this.prt);
+    return b2MotorJoint_GetCorrectionFactor(this.ptr);
 }
 
 

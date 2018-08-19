@@ -2,6 +2,14 @@
 #define B2PULLEYJOINTJSBINDINGS_H
 
 extern "C" {
+void b2PulleyJoint_GetGroundAnchorA(void* joint, float* arr);
+void b2PulleyJoint_GetGroundAnchorB(void* joint, float* arr);
+double b2PulleyJoint_GetLengthA(void* joint);
+double b2PulleyJoint_GetLengthB(void* joint);
+double b2PulleyJoint_GetRatio(void* joint);
+double b2PulleyJoint_GetCurrentLengthA(void* joint);
+double b2PulleyJoint_GetCurrentLengthB(void* joint);
+
 void* b2PulleyJointDef_Create(
     void* world,
     // joint def

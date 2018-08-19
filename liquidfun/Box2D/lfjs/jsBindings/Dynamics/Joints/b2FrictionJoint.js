@@ -73,14 +73,14 @@ b2FrictionJoint.prototype = Object.create(b2Joint.prototype);
 b2FrictionJoint.prototype.constructor = b2FrictionJoint;
 
 b2FrictionJoint.prototype.SetMaxForce = function(force) {
-    b2FrictionJoint_SetMaxForce(this.prt, force);
+    b2FrictionJoint_SetMaxForce(this.ptr, force);
 }
 b2FrictionJoint.prototype.GetMaxForce = function() {
-    return b2FrictionJoint_GetMaxForce(this.prt);
+    return b2FrictionJoint_GetMaxForce(this.ptr);
 }
 b2FrictionJoint.prototype.SetMaxTorque = function(torque) {
-    b2FrictionJoint_SetMaxTorque(this.prt, torque);
+    b2FrictionJoint_SetMaxTorque(this.ptr, torque);
 }
 b2FrictionJoint.prototype.GetMaxTorque = function() {
-    return b2FrictionJoint_GetMaxTorque(this.prt);
+    return b2FrictionJoint_GetMaxTorque(this.ptr);
 }

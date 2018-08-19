@@ -24,22 +24,22 @@ b2MouseJoint.prototype.GetTarget = function() {
     return new b2Vec2(result[0], result[1]);
 }
 b2MouseJoint.prototype.SetMaxForce = function(force) {
-    b2MouseJoint_SetMaxForce(this.prt, force);
+    b2MouseJoint_SetMaxForce(this.ptr, force);
 }
 b2MouseJoint.prototype.GetMaxForce = function() {
-    return b2MouseJoint_GetMaxForce(this.prt);
+    return b2MouseJoint_GetMaxForce(this.ptr);
 }
 b2MouseJoint.prototype.SetFrequency = function(hz) {
-    b2MouseJoint_SetFrequency(this.prt, hz);
+    b2MouseJoint_SetFrequency(this.ptr, hz);
 }
 b2MouseJoint.prototype.GetLength = function() {
-    return b2MouseJoint_GetLength(this.prt);
+    return b2MouseJoint_GetLength(this.ptr);
 }
 b2MouseJoint.prototype.SetDampingRatio = function(ratio) {
-    b2MouseJoint_SetDampingRatio(this.prt, ratio);
+    b2MouseJoint_SetDampingRatio(this.ptr, ratio);
 }
 b2MouseJoint.prototype.GetDampingRatio = function() {
-    return b2MouseJoint_GetDampingRatio(this.prt);
+    return b2MouseJoint_GetDampingRatio(this.ptr);
 }
 
 var b2MouseJointDef_Create = Module.cwrap("b2MouseJointDef_Create",
