@@ -1,14 +1,19 @@
-var b2GearJoint_GetRatio = Module.cwrap("b2GearJoint_GetRatio", 'number',
-  ['number']);
+var b2GearJoint_SetRatio = Module.cwrap("b2GearJoint_SetRatio", 'number', ['number', 'number']);
 
+/**@constructor*/
 function b2GearJoint(def) {
-  this.ptr = null;
-  this.next = null;
+  b2Joint.call(this, def);
+  this.joint1 = def.joint1;
+  this.joint2 = def.joint2;
+  this.ratio = def.ratio;
 }
+b2GearJoint.prototype = Object.create(b2Joint.prototype);
+b2GearJoint.prototype.constructor = b2GearJoint;
 
-b2GearJoint.prototype.GetRatio = function() {
-  return b2GearJoint_GetRatio(this.ptr);
-};
+b2GearJoint.prototype.SetRatio = function(ratio) {
+    b2GearJoint_SetRatio(this.ptr, ratio);
+    this.ratio = ratio;
+}
 
 var b2GearJointDef_Create = Module.cwrap("b2GearJointDef_Create",
   'number',

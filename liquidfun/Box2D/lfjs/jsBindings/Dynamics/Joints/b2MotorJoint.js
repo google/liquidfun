@@ -5,21 +5,43 @@ var b2MotorJoint_SetLinearOffset =
   Module.cwrap('b2MotorJoint_SetLinearOffset', 'null',
     ['number', 'number', 'number']);
 
+var b2MotorJoint_SetMaxForce = Module.cwrap("b2MotorJoint_SetMaxForce", "null", ["number", "number"]);
+var b2MotorJoint_SetMaxTorque = Module.cwrap("b2MotorJoint_SetMaxTorque", "null", ["number", "number"]);
+var b2MotorJoint_SetCorrectionFactor = Module.cwrap("b2MotorJoint_SetCorrectionFactor", "null", ["number", "number"]);
+
+
 /**@constructor*/
 function b2MotorJoint(def) {
-  this.bodyA = def.bodyA;
-  this.bodyB = def.bodyB;
-  this.ptr = null;
-  this.next = null;
+  b2Joint.call(this, def);
+  this.angularOffset = def.angularOffset;
+  this.linearOffset = def.linearOffset.Clone();
+  this.maxForce = def.maxForce;
+  this.maxTorque = def.maxTorque;
+  this.correctionFactor = def.correctionFactor;
 }
+b2MotorJoint.prototype = Object.create(b2Joint.prototype);
+b2MotorJoint.prototype.constructor = b2MotorJoint;
 
 b2MotorJoint.prototype.SetAngularOffset = function(angle) {
   b2MotorJoint_SetAngularOffset(this.ptr, angle);
+  this.angularOffset = angle;
 };
-
 b2MotorJoint.prototype.SetLinearOffset = function(v) {
   b2MotorJoint_SetLinearOffset(this.ptr, v.x, v.y);
+  this.linearOffset.Set(v.x, v.y);
 };
+b2MotorJoint.prototype.SetMaxForce = function(force) {
+    b2MotorJoint_SetMaxForce(this.ptr, force);
+    this.maxForce = force;
+}
+b2MotorJoint.prototype.SetMaxTorque = function(torque) {
+    b2MotorJoint_SetMaxTorque(this.ptr, torque);
+    this.maxTorque = torque;
+}
+b2MotorJoint.prototype.SetCorrectionFactor = function(factor) {
+    b2MotorJoint_SetCorrectionFactor(this.ptr, factor);
+    this.correctionFactor = factor;
+}
 
 var b2MotorJointDef_Create = Module.cwrap("b2MotorJointDef_Create",
   'number',

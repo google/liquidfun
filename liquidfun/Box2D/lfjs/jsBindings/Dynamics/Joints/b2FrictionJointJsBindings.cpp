@@ -38,3 +38,10 @@ void* b2FrictionJointDef_InitializeAndCreate(
   fJoint.Initialize((b2Body*)bodyA, (b2Body*)bodyB, b2Vec2(anchorX, anchorY));
   return ((b2World*)world)->CreateJoint(&fJoint);
 }
+
+void b2FrictionJoint_SetMaxForce(void* joint, double force) {
+    ((b2FrictionJoint*)joint)->SetMaxForce(force);
+}
+void b2FrictionJoint_SetMaxTorque(void* joint, double torque) {
+    ((b2FrictionJoint*)joint)->SetMaxTorque(torque);
+}

@@ -1,6 +1,6 @@
 #include <Box2D/Box2D.h>
-double b2GearJoint_GetRatio(void* joint) {
-  return ((b2GearJoint*)joint)->GetRatio();
+void b2GearJoint_SetRatio(void* joint, double ratio) {
+    ((b2GearJoint*)joint)->SetRatio(ratio);
 }
 
 void* b2GearJointDef_Create(

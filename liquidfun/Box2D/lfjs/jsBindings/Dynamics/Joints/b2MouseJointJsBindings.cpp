@@ -3,6 +3,15 @@
 void b2MouseJoint_SetTarget(void* mouseJoint, double x, double y) {
   ((b2MouseJoint*)mouseJoint)->SetTarget(b2Vec2(x, y));
 }
+void b2MouseJoint_SetMaxForce(void* joint, double force) {
+    ((b2MouseJoint*)joint)->SetMaxForce(force);
+}
+void b2MouseJoint_SetFrequency(void* joint, double frequencyHz) {
+    ((b2MouseJoint*)joint)->SetFrequency(frequencyHz);
+}
+void b2MouseJoint_SetDampingRatio(void* joint, double dampingRatio) {
+    ((b2MouseJoint*)joint)->SetDampingRatio(dampingRatio);
+}
 
 void* b2MouseJointDef_Create(
     void* world,

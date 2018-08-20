@@ -1,4 +1,5 @@
 #!/bin/bash
+#b2Joint.js needs to be placed before any other joints
 java -jar $CLOSURE_JAR --language_in ECMASCRIPT5 \
 --compilation_level WHITESPACE_ONLY \
 ./lf_core.js \
@@ -12,10 +13,10 @@ java -jar $CLOSURE_JAR --language_in ECMASCRIPT5 \
 ./jsBindings/Collision/Shapes/b2CircleShape.js \
 ./jsBindings/Dynamics/b2Body.js \
 ./jsBindings/Dynamics/b2World.js \
+./jsBindings/Dynamics/Joints/b2Joint.js \
 ./jsBindings/Dynamics/Joints/b2WheelJoint.js \
 ./jsBindings/Dynamics/Joints/b2WeldJoint.js \
 ./jsBindings/Dynamics/Joints/b2GearJoint.js \
-./jsBindings/Dynamics/Joints/b2Joint.js \
 ./jsBindings/Dynamics/Joints/b2FrictionJoint.js \
 ./jsBindings/Dynamics/Joints/b2RevoluteJoint.js \
 ./jsBindings/Dynamics/Joints/b2MotorJoint.js \

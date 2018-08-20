@@ -4,6 +4,9 @@
 extern "C" {
 void b2MotorJoint_SetAngularOffset(void* motorJoint, double angle);
 void b2MotorJoint_SetLinearOffset(void* motorJoint, double x, double y);
+void b2MotorJoint_SetMaxForce(void* joint, double force);
+void b2MotorJoint_SetMaxTorque(void* joint, double torque);
+void b2MotorJoint_SetCorrectionFactor(void* joint, double factor);
 
 void* b2MotorJointDef_Create(
     void* world,

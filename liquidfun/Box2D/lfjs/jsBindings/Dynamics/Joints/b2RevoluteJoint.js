@@ -22,21 +22,25 @@ var b2RevoluteJoint_SetMotorSpeed =
   Module.cwrap('b2RevoluteJoint_SetMotorSpeed', 'number',
     ['number', 'number']);
 
+var b2RevoluteJoint_GetJointSpeed = Module.cwrap('b2RevoluteJoint_GetJointSpeed', 'number', ['number']);
+var b2RevoluteJoint_SetLimits = Module.cwrap('b2RevoluteJoint_SetLimits', 'null', ['number', 'number', 'number']);
+var b2RevoluteJoint_GetMotorSpeed = Module.cwrap('b2RevoluteJoint_GetMotorSpeed', 'number', ['number']);
+var b2RevoluteJoint_SetMaxMotorTorque = Module.cwrap('b2RevoluteJoint_SetMaxMotorTorque', 'null', ['number', 'number']);
+var b2RevoluteJoint_GetMotorTorque = Module.cwrap('b2RevoluteJoint_GetMotorTorque', 'number', ['number']);
+
 /** @constructor */
 function b2RevoluteJoint(revoluteJointDef) {
-  this.collideConnected = revoluteJointDef.collideConnected;
+  b2Joint.call(this, revoluteJointDef);
   this.enableLimit = revoluteJointDef.enableLimit;
   this.enableMotor = revoluteJointDef.enableMotor;
   this.lowerAngle = revoluteJointDef.lowerAngle;
   this.maxMotorTorque = revoluteJointDef.maxMotorTorque;
   this.motorSpeed = revoluteJointDef.motorSpeed;
-  this.next = null;
-  this.ptr = null;
   this.upperAngle = revoluteJointDef.upperAngle;
-  this.userData = revoluteJointDef.userData;
+  this.referenceAngle = revoluteJointDef.referenceAngle;
 }
-
-b2RevoluteJoint.prototype = new b2Joint;
+b2RevoluteJoint.prototype = Object.create(b2Joint.prototype);
+b2RevoluteJoint.prototype.constructor = b2RevoluteJoint;
 
 b2RevoluteJoint.prototype.EnableLimit = function(flag) {
   b2RevoluteJoint_EnableLimit(this.ptr, flag);
@@ -62,6 +66,25 @@ b2RevoluteJoint.prototype.SetMotorSpeed = function(speed) {
   b2RevoluteJoint_SetMotorSpeed(this.ptr, speed);
   this.motorSpeed = speed;
 };
+
+b2RevoluteJoint.prototype.GetJointSpeed = function() {
+    return b2RevoluteJoint_GetJointSpeed(this.ptr);
+}
+b2RevoluteJoint.prototype.SetLimits = function(lower, upper) {
+    b2RevoluteJoint_SetLimits(this.ptr, lower, upper);
+    this.lowerAngle = lower;
+    this.upperAngle = upper;
+}
+b2RevoluteJoint.prototype.GetMotorSpeed = function() {
+    return b2RevoluteJoint_GetMotorSpeed(this.ptr);
+}
+b2RevoluteJoint.prototype.SetMaxMotorTorque = function(torque) {
+    b2RevoluteJoint_SetMaxMotorTorque(this.ptr, torque);
+    this.maxMotorTorque = torque;
+}
+b2RevoluteJoint.prototype.GetMotorTorque = function() {
+    return b2RevoluteJoint_GetMotorTorque(this.ptr);
+}
 
 
 var b2RevoluteJointDef_Create =

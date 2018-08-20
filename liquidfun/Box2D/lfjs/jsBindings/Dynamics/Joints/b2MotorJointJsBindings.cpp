@@ -3,9 +3,17 @@
 void b2MotorJoint_SetAngularOffset(void* motorJoint, double angle) {
   ((b2MotorJoint*)motorJoint)->SetAngularOffset(angle);
 }
-
 void b2MotorJoint_SetLinearOffset(void* motorJoint, double x, double y) {
   ((b2MotorJoint*)motorJoint)->SetLinearOffset(b2Vec2(x, y));
+}
+void b2MotorJoint_SetMaxForce(void* joint, double force) {
+    ((b2MotorJoint*)joint)->SetMaxForce(force);
+}
+void b2MotorJoint_SetMaxTorque(void* joint, double torque) {
+    ((b2MotorJoint*)joint)->SetMaxTorque(torque);
+}
+void b2MotorJoint_SetCorrectionFactor(void* joint, double factor) {
+    ((b2MotorJoint*)joint)->SetCorrectionFactor(factor);
 }
 
 void* b2MotorJointDef_Create(
