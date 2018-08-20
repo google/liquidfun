@@ -42,13 +42,6 @@ void* b2FrictionJointDef_InitializeAndCreate(
 void b2FrictionJoint_SetMaxForce(void* joint, double force) {
     ((b2FrictionJoint*)joint)->SetMaxForce(force);
 }
-double b2FrictionJoint_GetMaxForce(void* joint) {
-  return ((b2FrictionJoint*)joint)->GetMaxForce();
-}
-
 void b2FrictionJoint_SetMaxTorque(void* joint, double torque) {
     ((b2FrictionJoint*)joint)->SetMaxTorque(torque);
-}
-double b2FrictionJoint_GetMaxTorque(void* joint) {
-  return ((b2FrictionJoint*)joint)->GetMaxTorque();
 }

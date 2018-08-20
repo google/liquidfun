@@ -9,15 +9,6 @@ void b2PulleyJoint_GetGroundAnchorB(void* joint, float* arr) {
     arr[0] = anchor.x;
     arr[1] = anchor.y;
 }
-double b2PulleyJoint_GetLengthA(void* joint) {
-    return ((b2PulleyJoint*)joint)->GetLengthA();
-}
-double b2PulleyJoint_GetLengthB(void* joint) {
-    return ((b2PulleyJoint*)joint)->GetLengthB();
-}
-double b2PulleyJoint_GetRatio(void* joint) {
-    return ((b2PulleyJoint*)joint)->GetRatio();
-}
 double b2PulleyJoint_GetCurrentLengthA(void* joint) {
     return ((b2PulleyJoint*)joint)->GetCurrentLengthA();
 }

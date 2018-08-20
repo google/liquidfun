@@ -24,12 +24,7 @@ void* b2DistanceJointDef_InitializeAndCreate(
 }
 
 void b2DistanceJoint_SetLength(void* joint, double length);
-double b2DistanceJoint_GetLength();
-
 void b2DistanceJoint_SetFrequency(void* joint, double frequencyHz);
-double b2DistanceJoint_GetFrequency();
-
 void b2DistanceJoint_SetDampingRatio(void* joint, double dampingRatio);
-double b2DistanceJoint_GetDampingRatio();
 
 #endif

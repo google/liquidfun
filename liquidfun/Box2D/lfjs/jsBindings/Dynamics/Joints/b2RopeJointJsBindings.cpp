@@ -1,9 +1,6 @@
 #include <Box2D/Box2D.h>
-void b2RopeJoint_SetMaxLength(void* joint, length) {
+void b2RopeJoint_SetMaxLength(void* joint, double length) {
     ((b2RopeJoint*)joint)->SetMaxLength(length);
-}
-double b2RopeJoint_GetMaxLength(void* joint) {
-    return ((b2RopeJoint*)joint)->GetMaxLength();
 }
 double b2RopeJoint_GetLimitState(void* joint) {
     return ((b2RopeJoint*)joint)->GetLimitState();

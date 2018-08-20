@@ -12,11 +12,8 @@ double b2WheelJoint_IsMotorEnabled(void* joint);
 void b2WheelJoint_EnableMotor(void* joint, double flag);
 double b2WheelJoint_GetMotorSpeed(void* joint);
 void b2WheelJoint_SetMaxMotorTorque(void* joint, double torque);
-double b2WheelJoint_GetMaxMotorTorque(void* joint);
 double b2WheelJoint_GetMotorTorque(void* joint, double inv_dt);
-double b2WheelJoint_GetSpringFrequencyHz(void* joint);
 void b2WheelJoint_SetSpringDampingRatio(void* joint, double ratio);
-double b2WheelJoint_GetSpringDampingRatio(void* joint);
 
 void* b2WheelJointDef_Create(
     void* world,

@@ -32,6 +32,7 @@ function b2Joint(def) {
   this.next = null;
   this.bodyA = def.bodyA;
   this.bodyB = def.bodyB;
+  this.collideConnected = def.collideConnected;
   this.userData = def.userData;
 }
 

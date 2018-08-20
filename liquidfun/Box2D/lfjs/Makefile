@@ -87,8 +87,8 @@ B2BODY = \
 	'_b2Body_SetLinearVelocity', \
 	'_b2Body_SetMassData', \
 	'_b2Body_SetTransform', \
-	'_b2Body_SetType',\
-	'_b2Body_SetGravityScale',\
+	'_b2Body_SetType', \
+	'_b2Body_SetGravityScale', \
 	'_b2Body_GetGravityScale'
 
 B2CHAINSHAPE = \
@@ -110,11 +110,8 @@ B2DISTANCEJOINT = \
 	'_b2DistanceJointDef_Create', \
 	'_b2DistanceJointDef_InitializeAndCreate', \
 	'_b2DistanceJoint_SetLength', \
-	'_b2DistanceJoint_GetLength', \
 	'_b2DistanceJoint_SetFrequency', \
-	'_b2DistanceJoint_GetFrequency', \
-	'_b2DistanceJoint_SetDampingRatio', \
-	'_b2DistanceJoint_GetDampingRatio' \
+	'_b2DistanceJoint_SetDampingRatio' \
 
 B2EDGESHAPE = \
 	'_b2EdgeShape_CreateFixture'
@@ -127,52 +124,38 @@ B2FRICTIONJOINT = \
 	'_b2FrictionJointDef_Create', \
 	'_b2FrictionJointDef_InitializeAndCreate', \
 	'_b2FrictionJoint_SetMaxForce', \
-	'_b2FrictionJoint_GetMaxForce', \
-	'_b2FrictionJoint_SetMaxTorque', \
-	'_b2FrictionJoint_GetMaxTorque' \
+	'_b2FrictionJoint_SetMaxTorque' \
 
 B2GEARJOINT = \
-	'_b2GearJoint_GetJoint1', \
-	'_b2GearJoint_GetJoint2', \
 	'_b2GearJoint_SetRatio', \
-	'_b2GearJoint_GetRatio', \
 	'_b2GearJointDef_Create', \
 	'_b2GearJointDef_InitializeAndCreate'
 
 B2JOINT = \
 	'_b2Joint_GetBodyA', \
 	'_b2Joint_GetBodyB', \
-	'_b2Joint_GetType', \
 	'_b2Joint_GetAnchorA', \
 	'_b2Joint_GetAnchorB', \
 	'_b2Joint_GetReactionForce', \
 	'_b2Joint_GetReactionTorque', \
-	'_b2Joint_IsActive', \
-	'_b2Joint_GetCollideConnected'
+	'_b2Joint_GetType', \
+	'_b2Joint_GetCollideConnected', \
+	'_b2Joint_IsActive' \
 
 B2MOTORJOINT = \
 	'_b2MotorJoint_SetAngularOffset', \
 	'_b2MotorJoint_SetLinearOffset', \
-	'_b2MotorJoint_GetAngularOffset', \
-	'_b2MotorJoint_GetLinearOffset', \
 	'_b2MotorJoint_SetMaxForce', \
-	'_b2MotorJoint_GetMaxForce', \
 	'_b2MotorJoint_SetMaxTorque', \
-	'_b2MotorJoint_GetMaxTorque' \
 	'_b2MotorJoint_SetCorrectionFactor', \
-	'_b2MotorJoint_GetCorrectionFactor' \
 	'_b2MotorJointDef_Create', \
 	'_b2MotorJointDef_InitializeAndCreate'
 
 B2MOUSEJOINT = \
 	'_b2MouseJoint_SetTarget', \
-	'_b2MouseJoint_GetTarget', \
 	'_b2MouseJoint_SetMaxForce', \
-	'_b2MouseJoint_GetMaxForce', \
 	'_b2MouseJoint_SetFrequency', \
-	'_b2MouseJoint_GetFrequency', \
 	'_b2MouseJoint_SetDampingRatio', \
-	'_b2MouseJoint_GetDampingRatio' \
 	'_b2MouseJointDef_Create'
 
 B2PARTICLEGROUP = \
@@ -202,7 +185,7 @@ B2POLYGONSHAPE = \
 	'_b2PolygonShape_CreateFixture_5', \
 	'_b2PolygonShape_CreateFixture_6', \
 	'_b2PolygonShape_CreateFixture_7', \
-  '_b2PolygonShape_CreateFixture_8', \
+	'_b2PolygonShape_CreateFixture_8', \
 	'_b2PolygonShape_CreateParticleGroup_4', \
 	'_b2PolygonShape_DestroyParticlesInShape_4'
 
@@ -216,22 +199,15 @@ B2PRISMATICJOINT = \
 	'_b2PrismaticJoint_IsMotorEnabled', \
 	'_b2PrismaticJoint_SetMotorSpeed', \
 	'_b2PrismaticJoint_GetLocalAxisA', \
-	'_b2PrismaticJoint_GetReferenceAngle', \
 	'_b2PrismaticJoint_GetJointSpeed', \
-	'_b2PrismaticJoint_GetLowerLimit', \
-	'_b2PrismaticJoint_GetUpperLimit', \
 	'_b2PrismaticJoint_SetLimits', \
 	'_b2PrismaticJoint_SetMaxMotorForce', \
-	'_b2PrismaticJoint_GetMaxMotorForce', \
 	'_b2PrismaticJointDef_Create', \
 	'_b2PrismaticJointDef_InitializeAndCreate' \
 
 B2PULLEYJOINT = \
 	'_b2PulleyJoint_GetGroundAnchorA', \
 	'_b2PulleyJoint_GetGroundAnchorB', \
-	'_b2PulleyJoint_GetLengthA', \
-	'_b2PulleyJoint_GetLengthB', \
-	'_b2PulleyJoint_GetRatio', \
 	'_b2PulleyJoint_GetCurrentLengthA', \
 	'_b2PulleyJoint_GetCurrentLengthB', \
 	'_b2PulleyJointDef_Create', \
@@ -244,31 +220,22 @@ B2REVOLUTEJOINT = \
 	'_b2RevoluteJoint_IsLimitEnabled', \
 	'_b2RevoluteJoint_IsMotorEnabled', \
 	'_b2RevoluteJoint_SetMotorSpeed', \
-	'_b2RevoluteJoint_SetMotorSpeed', \
-	'_b2RevoluteJoint_GetReferenceAngle', \
 	'_b2RevoluteJoint_GetJointSpeed', \
-	'_b2RevoluteJoint_GetLowerLimit', \
-	'_b2RevoluteJoint_GetUpperLimit', \
 	'_b2RevoluteJoint_SetLimits', \
 	'_b2RevoluteJoint_GetMotorSpeed', \
 	'_b2RevoluteJoint_SetMaxMotorTorque', \
-	'_b2RevoluteJoint_GetMaxMotorTorque', \
 	'_b2RevoluteJoint_GetMotorTorque', \
 	'_b2RevoluteJointDef_Create', \
-	'_b2RevoluteJointDef_InitializeAndCreate'
+	'_b2RevoluteJointDef_InitializeAndCreate' \
 
 B2ROPEJOINT = \
 	'_b2RopeJoint_SetMaxLength', \
-	'_b2RopeJoint_GetMaxLength', \
 	'_b2RopeJoint_GetLimitState', \
 	'_b2RopeJointDef_Create'
 
 B2WELDJOINT = \
-	'_b2WeldJoint_GetReferenceAngle', \
 	'_b2WeldJoint_SetFrequency', \
-	'_b2WeldJoint_GetFrequency', \
 	'_b2WeldJoint_SetDampingRatio', \
-	'_b2WeldJoint_GetDampingRatio', \
 	'_b2WeldJointDef_Create', \
 	'_b2WeldJointDef_InitializeAndCreate' \
 
@@ -282,11 +249,8 @@ B2WHEELJOINT = \
 	'_b2WheelJoint_EnableMotor', \
 	'_b2WheelJoint_GetMotorSpeed', \
 	'_b2WheelJoint_SetMaxMotorTorque', \
-	'_b2WheelJoint_GetMaxMotorTorque', \
 	'_b2WheelJoint_GetMotorTorque', \
-	'_b2WheelJoint_GetSpringFrequencyHz', \
 	'_b2WheelJoint_SetSpringDampingRatio', \
-	'_b2WheelJoint_GetSpringDampingRatio', \
 	'_b2WheelJointDef_Create', \
 	'_b2WheelJointDef_InitializeAndCreate' \
 

@@ -1,36 +1,28 @@
 var b2DistanceJoint_SetLength = Module.cwrap("b2DistanceJoint_SetLength", "null", ["number", "number"]);
-var b2DistanceJoint_GetLength = Module.cwrap("b2DistanceJoint_GetLength", "number", ["number"]);
 var b2DistanceJoint_SetFrequency = Module.cwrap("b2DistanceJoint_SetFrequency", "null", ["number", "number"]);
-var b2DistanceJoint_GetFrequency = Module.cwrap("b2DistanceJoint_GetFrequency", "number", ["number"]);
 var b2DistanceJoint_SetDampingRatio = Module.cwrap("b2DistanceJoint_SetDampingRatio", "null", ["number", "number"]);
-var b2DistanceJoint_GetDampingRatio = Module.cwrap("b2DistanceJoint_GetDampingRatio", "number", ["number"]);
 
 /**@constructor*/
 function b2DistanceJoint(def) {
   b2Joint.call(this, def);
+  this.length = def.length;
+  this.frequencyHz = def.frequencyHz;
+  this.dampingRatio = def.dampingRatio;
 }
 b2DistanceJoint.prototype = Object.create(b2Joint.prototype);
 b2DistanceJoint.prototype.constructor = b2DistanceJoint;
 
 b2DistanceJoint.prototype.SetLength = function(length) {
     b2DistanceJoint_SetLength(this.ptr, length);
+    this.length = length;
 }
-b2DistanceJoint.prototype.GetLength = function() {
-    return b2DistanceJoint_GetLength(this.ptr);
-}
-
 b2DistanceJoint.prototype.SetFrequency = function(hz) {
     b2DistanceJoint_SetFrequency(this.ptr, hz);
+    this.frequencyHz = hz;
 }
-b2DistanceJoint.prototype.GetLength = function() {
-    return b2DistanceJoint_GetLength(this.ptr);
-}
-
 b2DistanceJoint.prototype.SetDampingRatio = function(ratio) {
     b2DistanceJoint_SetDampingRatio(this.ptr, ratio);
-}
-b2DistanceJoint.prototype.GetDampingRatio = function() {
-    return b2DistanceJoint_GetDampingRatio(this.ptr);
+    this.dampingRatio = ratio;
 }
 
 var b2DistanceJointDef_Create = Module.cwrap("b2DistanceJointDef_Create",

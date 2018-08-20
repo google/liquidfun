@@ -1,14 +1,14 @@
 var b2PulleyJoint_GetGroundAnchorA = Module.cwrap('b2PulleyJoint_GetGroundAnchorA', 'null', ['number', 'number']);
 var b2PulleyJoint_GetGroundAnchorB = Module.cwrap('b2PulleyJoint_GetGroundAnchorB', 'null', ['number', 'number']);
-var b2PulleyJoint_GetLengthA = Module.cwrap('b2PulleyJoint_GetLengthA', 'number', ['number']);
-var b2PulleyJoint_GetLengthB = Module.cwrap('b2PulleyJoint_GetLengthB', 'number', ['number']);
-var b2PulleyJoint_GetRatio = Module.cwrap('b2PulleyJoint_GetRatio', 'number', ['number']);
 var b2PulleyJoint_GetCurrentLengthA = Module.cwrap('b2PulleyJoint_GetCurrentLengthA', 'number', ['number']);
 var b2PulleyJoint_GetCurrentLengthB = Module.cwrap('b2PulleyJoint_GetCurrentLengthB', 'number', ['number']);
 
 /**@constructor*/
 function b2PulleyJoint(def) {
   b2Joint.call(this, def);
+  this.lengthA = def.lengthA;
+  this.lengthB = def.lengthB;
+  this.ratio = def.ratio;
 }
 b2PulleyJoint.prototype = Object.create(b2Joint.prototype);
 b2PulleyJoint.prototype.constructor = b2PulleyJoint;
@@ -22,15 +22,6 @@ b2PulleyJoint.prototype.GetGroundAnchorB = function() {
     b2PulleyJoint_GetGroundAnchorB(this.ptr, _vec2Buf.byteOffset);
     var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
     return new b2Vec2(result[0], result[1]);
-}
-b2PulleyJoint.prototype.GetLengthA = function() {
-    return b2PulleyJoint_GetLengthA(this.ptr);
-}
-b2PulleyJoint.prototype.GetLengthB = function() {
-    return b2PulleyJoint_GetLengthB(this.ptr);
-}
-b2PulleyJoint.prototype.GetRatio = function() {
-    return b2PulleyJoint_GetRatio(this.ptr);
 }
 b2PulleyJoint.prototype.GetCurrentLengthA = function() {
     return b2PulleyJoint_GetCurrentLengthA(this.ptr);

@@ -61,26 +61,22 @@ b2FrictionJointDef.prototype.InitializeAndCreate  = function(bodyA, bodyB, ancho
 };
 
 var b2FrictionJoint_SetMaxForce = Module.cwrap("b2FrictionJoint_SetMaxForce", "null", ["number", "number"]);
-var b2FrictionJoint_GetMaxForce = Module.cwrap("b2FrictionJoint_GetMaxForce", "number", ["number"]);
 var b2FrictionJoint_SetMaxTorque = Module.cwrap("b2FrictionJoint_SetMaxTorque", "null", ["number", "number"]);
-var b2FrictionJoint_GetMaxTorque = Module.cwrap("b2FrictionJoint_GetMaxTorque", "number", ["number"]);
 
 /**@constructor*/
 function b2FrictionJoint(def) {
   b2Joint.call(this, def);
+  this.maxForce = def.maxForce;
+  this.maxTorque = def.maxTorque;
 }
 b2FrictionJoint.prototype = Object.create(b2Joint.prototype);
 b2FrictionJoint.prototype.constructor = b2FrictionJoint;
 
 b2FrictionJoint.prototype.SetMaxForce = function(force) {
     b2FrictionJoint_SetMaxForce(this.ptr, force);
-}
-b2FrictionJoint.prototype.GetMaxForce = function() {
-    return b2FrictionJoint_GetMaxForce(this.ptr);
+    this.maxForce = force;
 }
 b2FrictionJoint.prototype.SetMaxTorque = function(torque) {
     b2FrictionJoint_SetMaxTorque(this.ptr, torque);
-}
-b2FrictionJoint.prototype.GetMaxTorque = function() {
-    return b2FrictionJoint_GetMaxTorque(this.ptr);
+    this.maxTorque = torque;
 }

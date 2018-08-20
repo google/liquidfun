@@ -9,14 +9,10 @@ double b2RevoluteJoint_IsLimitEnabled(void* joint);
 double b2RevoluteJoint_IsMotorEnabled(void* joint);
 void b2RevoluteJoint_SetMotorSpeed(void* joint, double speed);
 
-double b2RevoluteJoint_GetReferenceAngle(void* joint);
 double b2RevoluteJoint_GetJointSpeed(void* joint);
-double b2RevoluteJoint_GetLowerLimit(void* joint);
-double b2RevoluteJoint_GetUpperLimit(void* joint);
 void b2RevoluteJoint_SetLimits(void* joint, double lower, double upper);
 double b2RevoluteJoint_GetMotorSpeed(void* joint);
 void b2RevoluteJoint_SetMaxMotorTorque(void* joint, double torque);
-double b2RevoluteJoint_GetMaxMotorTorque(void* joint);
 double b2RevoluteJoint_GetMotorTorque(void* joint, double inv_dt);
 
 void* b2RevoluteJointDef_Create(

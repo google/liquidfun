@@ -47,18 +47,9 @@ void* b2DistanceJointDef_InitializeAndCreate(
 void b2DistanceJoint_SetLength(void* joint, double length) {
     ((b2DistanceJoint*)joint)->SetLength(length);
 }
-double b2DistanceJoint_GetLength(void* joint) {
-  return ((b2DistanceJoint*)joint)->GetLength();
-}
 void b2DistanceJoint_SetFrequency(void* joint, double frequencyHz) {
-    ((b2DistanceJoint*)joint)->SetLFrequency(frequencyHz);
-}
-double b2DistanceJoint_GetFrequency(void* joint) {
-  return ((b2DistanceJoint*)joint)->GetFrequency();
+    ((b2DistanceJoint*)joint)->SetFrequency(frequencyHz);
 }
 void b2DistanceJoint_SetDampingRatio(void* joint, double dampingRatio) {
     ((b2DistanceJoint*)joint)->SetDampingRatio(dampingRatio);
-}
-double b2DistanceJoint_GetDampingRatio(void* joint) {
-  return ((b2DistanceJoint*)joint)->GetDampingRatio();
 }

@@ -1,18 +1,9 @@
 #include <Box2D/Box2D.h>
-double b2WeldJoint_GetReferenceAngle(void* joint) {
-    return ((b2WeldJoint*)joint)->GetReferenceAngle();
-}
-void b2WeldJoint_SetFrequency(void* joint, hz) {
+void b2WeldJoint_SetFrequency(void* joint, double hz) {
     ((b2WeldJoint*)joint)->SetFrequency(hz);
 }
-double b2WeldJoint_GetFrequency(void* joint) {
-    return ((b2WeldJoint*)joint)->GetFrequency();
-}
-void b2WeldJoint_SetDampingRatio(void* joint, ratio) {
+void b2WeldJoint_SetDampingRatio(void* joint, double ratio) {
     ((b2WeldJoint*)joint)->SetDampingRatio(ratio);
-}
-double b2WeldJoint_GetDampingRatio(void* joint) {
-    return ((b2WeldJoint*)joint)->GetDampingRatio();
 }
 
 void* b2WeldJointDef_Create(
