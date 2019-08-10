@@ -2,10 +2,10 @@
 #include <stdio.h>
 
 void b2RevoluteJoint_EnableLimit(void* joint, double flag) {
-  ((b2RevoluteJoint*)joint)->EnableLimit(flag);
+  ((b2RevoluteJoint*)joint)->EnableLimit((bool)flag);
 }
 void b2RevoluteJoint_EnableMotor(void* joint, double flag) {
-  ((b2RevoluteJoint*)joint)->EnableMotor(flag);
+  ((b2RevoluteJoint*)joint)->EnableMotor((bool)flag);
 }
 double b2RevoluteJoint_GetJointAngle(void* joint) {
   return ((b2RevoluteJoint*)joint)->GetJointAngle();
@@ -15,6 +15,21 @@ double b2RevoluteJoint_IsLimitEnabled(void* joint) {
 }
 double b2RevoluteJoint_IsMotorEnabled(void* joint) {
   return ((b2RevoluteJoint*)joint)->IsMotorEnabled();
+}
+double b2RevoluteJoint_GetJointSpeed(void* joint) {
+    return ((b2RevoluteJoint*)joint)->GetJointSpeed();
+}
+void b2RevoluteJoint_SetLimits(void* joint, double lower, double upper) {
+    ((b2RevoluteJoint*)joint)->SetLimits(lower, upper);
+}
+double b2RevoluteJoint_GetMotorSpeed(void* joint) {
+    return ((b2RevoluteJoint*)joint)->GetMotorSpeed();
+}
+void b2RevoluteJoint_SetMaxMotorTorque(void* joint, double torque) {
+    ((b2RevoluteJoint*)joint)->SetMaxMotorTorque(torque);
+}
+double b2RevoluteJoint_GetMotorTorque(void* joint, double inv_dt) {
+    return ((b2RevoluteJoint*)joint)->GetMotorTorque(inv_dt);
 }
 
 void* b2RevoluteJointDef_Create(

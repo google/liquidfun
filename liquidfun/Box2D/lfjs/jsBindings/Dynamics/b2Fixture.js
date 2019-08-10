@@ -25,12 +25,12 @@ var b2Fixture_TestPoint =
 var b2Fixture_Refilter =
   Module.cwrap('b2Fixture_Refilter', 'null', ['number']);
 
-b2Fixture.prototype._SetPtr = function(ptr) {
+b2Fixture.prototype._SetPtr = function (ptr) {
   this.ptr = ptr;
   this.buffer = new DataView(Module.HEAPU8.buffer, ptr);
 };
 
-b2Fixture.prototype.FromFixtureDef = function(fixtureDef) {
+b2Fixture.prototype.FromFixtureDef = function (fixtureDef) {
   this.density = fixtureDef.density;
   this.friction = fixtureDef.friction;
   this.isSensor = fixtureDef.isSensor;
@@ -40,26 +40,26 @@ b2Fixture.prototype.FromFixtureDef = function(fixtureDef) {
   this.vertices = [];
 };
 
-b2Fixture.prototype.GetUserData = function() {
+b2Fixture.prototype.GetUserData = function () {
   return this.buffer.getUint32(b2Fixture_userData_offset, true);
 };
 
-b2Fixture.prototype.SetFilterData = function(filter) {
+b2Fixture.prototype.SetFilterData = function (filter) {
   this.buffer.setUint16(b2Fixture_filter_categoryBits_offset, filter.categoryBits, true);
   this.buffer.setUint16(b2Fixture_filter_maskBits_offset, filter.maskBits, true);
   this.buffer.setUint16(b2Fixture_filter_groupIndex_offset, filter.groupIndex, true);
   this.Refilter();
 };
 
-b2Fixture.prototype.SetSensor = function(flag) {
+b2Fixture.prototype.SetSensor = function (flag) {
   this.buffer.setUint32(b2Fixture_isSensor_offset, flag, true);
 };
 
-b2Fixture.prototype.Refilter = function() {
+b2Fixture.prototype.Refilter = function () {
   b2Fixture_Refilter(this.ptr);
 };
 
-b2Fixture.prototype.TestPoint = function(p) {
+b2Fixture.prototype.TestPoint = function (p) {
   return b2Fixture_TestPoint(this.ptr, p.x, p.y);
 };
 

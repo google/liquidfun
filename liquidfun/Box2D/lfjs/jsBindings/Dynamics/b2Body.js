@@ -55,17 +55,17 @@ var b2Body_SetAngularVelocity = Module.cwrap('b2Body_SetAngularVelocity', 'null'
   ['number', 'number']);
 
 var b2Body_SetAwake =
-  Module.cwrap('b2Body_SetAwake', 'number',['number', 'number']);
+  Module.cwrap('b2Body_SetAwake', 'number', ['number', 'number']);
 
 var b2Body_SetFixedRotation =
-  Module.cwrap('b2Body_SetFixedRotation', 'number',['number', 'number']);
+  Module.cwrap('b2Body_SetFixedRotation', 'number', ['number', 'number']);
 
 var b2Body_SetLinearVelocity = Module.cwrap('b2Body_SetLinearVelocity', 'null',
   ['number', 'number', 'number']);
 
 var b2Body_SetMassData = Module.cwrap('b2Body_SetMassData', 'null',
   ['number', 'number', 'number',
-   'number', 'number']);
+    'number', 'number']);
 
 var b2Body_SetTransform =
   Module.cwrap('b2Body_SetTransform', 'null', ['number', 'number', 'number']);
@@ -75,6 +75,19 @@ var b2Body_SetType =
 
 var b2Body_SetGravityScale = Module.cwrap('b2Body_SetGravityScale', 'null', ['number', 'number']);
 var b2Body_GetGravityScale = Module.cwrap('b2Body_GetGravityScale', 'number', ['number']);
+
+var b2Body_SetLinearDamping = Module.cwrap('b2Body_SetLinearDamping', 'null', ['number', 'number']);
+var b2Body_GetLinearDamping = Module.cwrap('b2Body_GetLinearDamping', 'number', ['number']);
+var b2Body_SetAngularDamping = Module.cwrap('b2Body_SetAngularDamping', 'null', ['number', 'number']);
+var b2Body_GetAngularDamping = Module.cwrap('b2Body_GetAngularDamping', 'number', ['number']);
+var b2Body_IsAwake = Module.cwrap('b2Body_IsAwake', 'boolean', ['number']);
+var b2Body_SetBullet = Module.cwrap('b2Body_SetBullet', 'null', ['number', 'number']);
+var b2Body_IsBullet = Module.cwrap('b2Body_IsBullet', 'boolean', ['number']);
+var b2Body_SetSleepingAllowed = Module.cwrap('b2Body_SetSleepingAllowed', 'null', ['number', 'number']);
+var b2Body_IsSleepingAllowed = Module.cwrap('b2Body_IsSleepingAllowed', 'boolean', ['number']);
+var b2Body_SetActive = Module.cwrap('b2Body_SetActive', 'null', ['number', 'number']);
+var b2Body_IsActive = Module.cwrap('b2Body_IsActive', 'boolean', ['number']);
+var boBody_IsFixedRotation = Module.cwrap('boBody_IsFixedRotation', 'boolean', ['number']);
 
 // memory offsets
 var b2Body_xf_offset = Offsets.b2Body.xf;
@@ -86,27 +99,27 @@ function b2Body(ptr) {
   this.fixtures = [];
 }
 
-b2Body.prototype.ApplyAngularImpulse = function(impulse, wake) {
+b2Body.prototype.ApplyAngularImpulse = function (impulse, wake) {
   b2Body_ApplyAngularImpulse(this.ptr, impulse, wake);
 };
 
-b2Body.prototype.ApplyLinearImpulse = function(impulse, point, wake) {
+b2Body.prototype.ApplyLinearImpulse = function (impulse, point, wake) {
   b2Body_ApplyLinearImpulse(this.ptr, impulse.x, impulse.y, point.x, point.y, wake);
 };
 
-b2Body.prototype.ApplyForce = function(force, point, wake) {
+b2Body.prototype.ApplyForce = function (force, point, wake) {
   b2Body_ApplyForce(this.ptr, force.x, force.y, point.x, point.y, wake);
 };
 
-b2Body.prototype.ApplyForceToCenter = function(force, wake) {
+b2Body.prototype.ApplyForceToCenter = function (force, wake) {
   b2Body_ApplyForceToCenter(this.ptr, force.x, force.y, wake);
 };
 
-b2Body.prototype.ApplyTorque = function(force, wake) {
+b2Body.prototype.ApplyTorque = function (force, wake) {
   b2Body_ApplyTorque(this.ptr, force, wake);
 };
 
-b2Body.prototype.CreateFixtureFromDef = function(fixtureDef) {
+b2Body.prototype.CreateFixtureFromDef = function (fixtureDef) {
   var fixture = new b2Fixture();
   fixture.FromFixtureDef(fixtureDef);
   fixture._SetPtr(fixtureDef.shape._CreateFixture(this, fixtureDef));
@@ -117,131 +130,177 @@ b2Body.prototype.CreateFixtureFromDef = function(fixtureDef) {
   return fixture;
 };
 
-b2Body.prototype.CreateFixtureFromShape = function(shape, density) {
+b2Body.prototype.CreateFixtureFromShape = function (shape, density) {
   var fixtureDef = new b2FixtureDef();
   fixtureDef.shape = shape;
   fixtureDef.density = density;
   return this.CreateFixtureFromDef(fixtureDef);
 };
 
-b2Body.prototype.DestroyFixture = function(fixture) {
+b2Body.prototype.DestroyFixture = function (fixture) {
   b2Body_DestroyFixture(this.ptr, fixture.ptr);
   b2World._RemoveItem(fixture, this.fixtures);
 };
 
-b2Body.prototype.GetAngle = function() {
+b2Body.prototype.GetAngle = function () {
   return b2Body_GetAngle(this.ptr);
 };
 
-b2Body.prototype.GetAngularVelocity = function() {
+b2Body.prototype.GetAngularVelocity = function () {
   return b2Body_GetAngularVelocity(this.ptr);
 };
 
-b2Body.prototype.GetInertia = function() {
+b2Body.prototype.GetInertia = function () {
   return b2Body_GetInertia(this.ptr);
 };
 
-b2Body.prototype.GetMass = function() {
+b2Body.prototype.GetMass = function () {
   return b2Body_GetMass(this.ptr);
 };
 
-b2Body.prototype.GetLinearVelocity = function() {
+b2Body.prototype.GetLinearVelocity = function () {
   b2Body_GetLinearVelocity(this.ptr, _vec2Buf.byteOffset);
   var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
   return new b2Vec2(result[0], result[1]);
 };
 
-b2Body.prototype.GetLocalPoint = function(vec) {
+b2Body.prototype.GetLocalPoint = function (vec) {
   b2Body_GetLocalPoint(this.ptr, vec.x, vec.y, _vec2Buf.byteOffset);
   var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
   return new b2Vec2(result[0], result[1]);
 };
 
-b2Body.prototype.GetLocalVector = function(vec) {
+b2Body.prototype.GetLocalVector = function (vec) {
   b2Body_GetLocalVector(this.ptr, vec.x, vec.y, _vec2Buf.byteOffset);
   var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
   return new b2Vec2(result[0], result[1]);
 };
 
 
-b2Body.prototype.GetPosition = function() {
+b2Body.prototype.GetPosition = function () {
   b2Body_GetPosition(this.ptr, _vec2Buf.byteOffset);
   var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
-  return  new b2Vec2(result[0], result[1]);
+  return new b2Vec2(result[0], result[1]);
 };
 
-b2Body.prototype.GetTransform = function() {
+b2Body.prototype.GetTransform = function () {
   var transform = new b2Transform();
   transform.p.x = this.buffer.getFloat32(b2Body_xf_offset, true);
-  transform.p.y = this.buffer.getFloat32(b2Body_xf_offset+4, true);
-  transform.q.s = this.buffer.getFloat32(b2Body_xf_offset+8, true);
-  transform.q.c = this.buffer.getFloat32(b2Body_xf_offset+12, true);
+  transform.p.y = this.buffer.getFloat32(b2Body_xf_offset + 4, true);
+  transform.q.s = this.buffer.getFloat32(b2Body_xf_offset + 8, true);
+  transform.q.c = this.buffer.getFloat32(b2Body_xf_offset + 12, true);
   return transform;
 };
 
-b2Body.prototype.GetType = function() {
+b2Body.prototype.GetType = function () {
   return b2Body_GetType(this.ptr);
 };
 
-b2Body.prototype.GetUserData = function() {
+b2Body.prototype.GetUserData = function () {
   return this.buffer.getUint32(b2Body_userData_offset, true);
 };
 
-b2Body.prototype.GetWorldCenter = function() {
+b2Body.prototype.GetWorldCenter = function () {
   b2Body_GetWorldCenter(this.ptr, _vec2Buf.byteOffset);
   var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
   return new b2Vec2(result[0], result[1]);
 };
 
-b2Body.prototype.GetWorldPoint = function(vec) {
+b2Body.prototype.GetWorldPoint = function (vec) {
   b2Body_GetWorldPoint(this.ptr, vec.x, vec.y, _vec2Buf.byteOffset);
   var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
   return new b2Vec2(result[0], result[1]);
 };
 
-b2Body.prototype.GetWorldVector = function(vec) {
+b2Body.prototype.GetWorldVector = function (vec) {
   b2Body_GetWorldVector(this.ptr, vec.x, vec.y, _vec2Buf.byteOffset);
   var result = new Float32Array(_vec2Buf.buffer, _vec2Buf.byteOffset, _vec2Buf.length);
   return new b2Vec2(result[0], result[1]);
 };
 
-b2Body.prototype.SetAngularVelocity = function(angle) {
+b2Body.prototype.SetAngularVelocity = function (angle) {
   b2Body_SetAngularVelocity(this.ptr, angle);
 };
 
-b2Body.prototype.SetAwake = function(flag) {
+b2Body.prototype.SetAwake = function (flag) {
   b2Body_SetAwake(this.ptr, flag);
 };
 
-b2Body.prototype.SetFixedRotation = function(flag) {
+b2Body.prototype.SetFixedRotation = function (flag) {
   b2Body_SetFixedRotation(this.ptr, flag);
 };
 
-b2Body.prototype.SetLinearVelocity = function(v) {
+b2Body.prototype.SetLinearVelocity = function (v) {
   b2Body_SetLinearVelocity(this.ptr, v.x, v.y);
 };
 
-b2Body.prototype.SetMassData = function(massData) {
+b2Body.prototype.SetMassData = function (massData) {
   b2Body_SetMassData(this.ptr, massData.mass, massData.center.x, massData.center.y, massData.I);
 };
 
-b2Body.prototype.SetTransform = function(v, angle) {
+b2Body.prototype.SetTransform = function (v, angle) {
   b2Body_SetTransform(this.ptr, v.x, v.y, angle);
 };
 
-b2Body.prototype.SetType = function(type) {
+b2Body.prototype.SetType = function (type) {
   b2Body_SetType(this.ptr, type);
 };
 
-b2Body.prototype.SetGravityScale = function(scale) {
+b2Body.prototype.SetGravityScale = function (scale) {
   b2Body_SetGravityScale(this.ptr, scale);
 };
 
-b2Body.prototype.GetGravityScale = function() {
+b2Body.prototype.GetGravityScale = function () {
   return b2Body_GetGravityScale(this.ptr);
 };
 
+b2Body.prototype.SetLinearDamping = function (linearDamping) {
+  b2Body_SetLinearDamping(this.ptr, linearDamping);
+}
 
+b2Body.prototype.GetLinearDamping = function () {
+  return b2Body_GetLinearDamping(this.ptr);
+}
+
+b2Body.prototype.SetAngularDamping = function (angularDamping) {
+  b2Body_SetAngularDamping(this.ptr, angularDamping);
+}
+
+b2Body.prototype.GetAngularDamping = function () {
+  return b2Body_GetAngularDamping(this.ptr);
+}
+
+b2Body.prototype.IsAwake = function () {
+  return b2Body_IsAwake(this.ptr);
+}
+
+b2Body.prototype.SetBullet = function (flag) {
+  b2Body_SetBullet(this.ptr, flag);
+}
+
+b2Body.prototype.IsBullet = function () {
+  return b2Body_IsBullet(this.ptr);
+}
+
+b2Body.prototype.SetSleepingAllowed = function (flag) {
+  b2Body_SetSleepingAllowed(this.ptr, flag);
+}
+
+b2Body.prototype.IsSleepingAllowed = function () {
+  return b2Body_IsSleepingAllowed(this.ptr);
+}
+
+b2Body.prototype.SetActive = function (flag) {
+  b2Body_SetActive(this.ptr, flag);
+}
+
+b2Body.prototype.IsActive = function () {
+  return b2Body_IsActive(this.ptr);
+}
+
+b2Body.prototype.IsFixedRotation = function () {
+  return boBody_IsFixedRotation(this.ptr);
+}
 
 // General body globals
 var b2_staticBody = 0;

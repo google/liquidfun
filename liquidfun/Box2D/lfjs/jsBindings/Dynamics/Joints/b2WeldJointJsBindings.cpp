@@ -1,4 +1,11 @@
 #include <Box2D/Box2D.h>
+void b2WeldJoint_SetFrequency(void* joint, double hz) {
+    ((b2WeldJoint*)joint)->SetFrequency(hz);
+}
+void b2WeldJoint_SetDampingRatio(void* joint, double ratio) {
+    ((b2WeldJoint*)joint)->SetDampingRatio(ratio);
+}
+
 void* b2WeldJointDef_Create(
     void* world,
     // joint def

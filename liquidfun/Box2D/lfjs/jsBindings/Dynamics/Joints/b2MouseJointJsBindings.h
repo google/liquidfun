@@ -3,6 +3,9 @@
 
 extern "C" {
 void b2MouseJoint_SetTarget(void* mouseJoint, double x, double y);
+void b2MouseJoint_SetMaxForce(void* joint, double force);
+void b2MouseJoint_SetFrequency(void* joint, double frequencyHz);
+void b2MouseJoint_SetDampingRatio(void* joint, double dampingRatio);
 
 void* b2MouseJointDef_Create(
     void* world,

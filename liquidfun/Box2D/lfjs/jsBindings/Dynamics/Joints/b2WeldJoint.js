@@ -33,7 +33,7 @@ function b2WeldJointDef() {
   this.referenceAngle = 0;
 }
 
-b2WeldJointDef.prototype.Create = function(world) {
+b2WeldJointDef.prototype.Create = function (world) {
   var weldJoint = new b2WeldJoint(this);
   weldJoint.ptr = b2WeldJointDef_Create(
     world.ptr,
@@ -46,7 +46,7 @@ b2WeldJointDef.prototype.Create = function(world) {
   return weldJoint;
 };
 
-b2WeldJointDef.prototype.InitializeAndCreate  = function(bodyA, bodyB, anchor) {
+b2WeldJointDef.prototype.InitializeAndCreate = function (bodyA, bodyB, anchor) {
   this.bodyA = bodyA;
   this.bodyB = bodyB;
   var weldJoint = new b2WeldJoint(this);
@@ -63,10 +63,24 @@ b2WeldJointDef.prototype.InitializeAndCreate  = function(bodyA, bodyB, anchor) {
   return weldJoint;
 };
 
+var b2WeldJoint_SetFrequency = Module.cwrap('b2WeldJoint_SetFrequency', 'null', ['number', 'number']);
+var b2WeldJoint_SetDampingRatio = Module.cwrap('b2WeldJoint_SetDampingRatio', 'null', ['number', 'number']);
+
 /** @constructor */
 function b2WeldJoint(def) {
-  this.bodyA = def.bodyA;
-  this.bodyB = def.bodyB;
-  this.next = null;
-  this.ptr = null;
+  b2Joint.call(this, def);
+  this.referenceAngle = def.referenceAngle;
+  this.frequencyHz = def.frequencyHz;
+  this.dampingRatio = def.dampingRatio;
+}
+b2WeldJoint.prototype = Object.create(b2Joint.prototype);
+b2WeldJoint.prototype.constructor = b2WeldJoint;
+
+b2WeldJoint.prototype.SetFrequency = function (hz) {
+  b2WeldJoint_SetFrequency(this.ptr, hz);
+  this.frequencyHz = hz;
+}
+b2WeldJoint.prototype.SetDampingRatio = function (ratio) {
+  b2WeldJoint_SetDampingRatio(this.ptr, ratio);
+  this.dampingRatio = ratio;
 }

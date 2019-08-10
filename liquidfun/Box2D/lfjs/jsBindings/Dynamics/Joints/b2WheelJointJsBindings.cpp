@@ -8,6 +8,36 @@ void b2WheelJoint_SetSpringFrequencyHz(void* wheel, double frequency) {
   ((b2WheelJoint*)wheel)->SetSpringFrequencyHz(frequency);
 }
 
+void b2WheelJoint_GetLocalAxisA(void* joint, float* arr) {
+    b2Vec2 axis = ((b2WheelJoint*)joint)->GetLocalAxisA();
+    arr[0] = axis.x;
+    arr[1] = axis.y;
+}
+double b2WheelJoint_GetJointTranslation(void* joint) {
+    return ((b2WheelJoint*)joint)->GetJointTranslation();
+}
+double b2WheelJoint_GetJointSpeed(void* joint) {
+    return ((b2WheelJoint*)joint)->GetJointSpeed();
+}
+double b2WheelJoint_IsMotorEnabled(void* joint) {
+    return ((b2WheelJoint*)joint)->IsMotorEnabled();
+}
+void b2WheelJoint_EnableMotor(void* joint, double flag) {
+    ((b2WheelJoint*)joint)->EnableMotor((bool)flag);
+}
+double b2WheelJoint_GetMotorSpeed(void* joint) {
+    return ((b2WheelJoint*)joint)->GetMotorSpeed();
+}
+void b2WheelJoint_SetMaxMotorTorque(void* joint, double torque) {
+    ((b2WheelJoint*)joint)->SetMaxMotorTorque(torque);
+}
+double b2WheelJoint_GetMotorTorque(void* joint, double inv_dt) {
+    return ((b2WheelJoint*)joint)->GetMotorTorque(inv_dt);
+}
+void b2WheelJoint_SetSpringDampingRatio(void* joint, double ratio) {
+    ((b2WheelJoint*)joint)->SetSpringDampingRatio(ratio);
+}
+
 void* b2WheelJointDef_Create(
     void* world,
     // joint def

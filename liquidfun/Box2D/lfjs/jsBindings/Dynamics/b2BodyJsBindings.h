@@ -36,5 +36,18 @@ void b2Body_SetType(void* body, double type);
 
 void b2Body_SetGravityScale(void* body, double scale);
 double b2Body_GetGravityScale(void* body);
+
+void b2Body_SetLinearDamping(void* body, double linearDamping);
+double b2Body_GetLinearDamping(void* body);
+void b2Body_SetAngularDamping(void* body, double angularDamping);
+double b2Body_GetAngularDamping(void* body);
+bool b2Body_IsAwake(void* body);
+void b2Body_SetBullet(void* body, double flag);
+bool b2Body_IsBullet(void* body);
+void b2Body_SetSleepingAllowed(void* body, double flag);
+bool b2Body_IsSleepingAllowed(void* body);
+void b2Body_SetActive(void* body, double flag);
+bool b2Body_IsActive(void* body);
+bool boBody_IsFixedRotation(void* body);
 }
 #endif

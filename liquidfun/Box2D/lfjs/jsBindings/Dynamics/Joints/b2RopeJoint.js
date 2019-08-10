@@ -1,7 +1,20 @@
+var b2RopeJoint_SetMaxLength = Module.cwrap('b2RopeJoint_SetMaxLength', 'null', ['number', 'number']);
+var b2RopeJoint_GetLimitState = Module.cwrap('b2RopeJoint_GetLimitState', 'number', ['number']);
+
 /**@constructor*/
 function b2RopeJoint(def) {
-  this.next = null;
-  this.ptr = null;
+  b2Joint.call(this, def);
+  this.maxLength = def.maxLength;
+}
+b2RopeJoint.prototype = Object.create(b2Joint.prototype);
+b2RopeJoint.prototype.constructor = b2RopeJoint;
+
+b2RopeJoint.prototype.SetMaxLength = function (length) {
+  b2RopeJoint_SetMaxLength(this.ptr, length);
+  this.maxLength = length;
+}
+b2RopeJoint.prototype.GetLimitState = function () {
+  return b2RopeJoint_GetLimitState(this.ptr);
 }
 
 var b2RopeJointDef_Create = Module.cwrap("b2RopeJointDef_Create",
@@ -26,7 +39,7 @@ function b2RopeJointDef() {
   this.maxLength = 0;
 }
 
-b2RopeJointDef.prototype.Create = function(world) {
+b2RopeJointDef.prototype.Create = function (world) {
   var ropeJoint = new b2RopeJoint(this);
   ropeJoint.ptr = b2RopeJointDef_Create(
     world.ptr,
