@@ -278,7 +278,7 @@ b2Body.prototype.SetBullet = function (flag) {
   b2Body_SetBullet(this.ptr, flag);
 }
 
-b2Body.prototype.bIsBullet = function () {
+b2Body.prototype.IsBullet = function () {
   return b2Body_IsBullet(this.ptr);
 }
 
