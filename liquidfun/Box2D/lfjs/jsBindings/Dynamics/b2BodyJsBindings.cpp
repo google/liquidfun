@@ -137,3 +137,40 @@ void b2Body_SetGravityScale(void* body, double scale) {
 double b2Body_GetGravityScale(void* body) {
   return ((b2Body*)body)->GetGravityScale();
 }
+
+void b2Body_SetLinearDamping(void* body, double linearDamping) {
+  ((b2Body*)body)->SetLinearDamping(linearDamping);
+}
+double b2Body_GetLinearDamping(void* body) {
+  return ((b2Body*)body)->GetLinearDamping();
+}
+void b2Body_SetAngularDamping(void* body, double angularDamping) {
+  ((b2Body*)body)->SetAngularDamping(angularDamping);
+}
+double b2Body_GetAngularDamping(void* body) {
+  return ((b2Body*)body)->GetAngularDamping();
+}
+bool b2Body_IsAwake(void* body) {
+  return ((b2Body*)body)->IsAwake();
+}
+void b2Body_SetBullet(void* body, double flag) {
+  ((b2Body*)body)->SetBullet(flag);
+}
+bool b2Body_IsBullet(void* body) {
+  return ((b2Body*)body)->IsBullet();
+}
+void b2Body_SetSleepingAllowed(void* body, double flag) {
+  ((b2Body*)body)->SetSleepingAllowed(flag);
+}
+bool b2Body_IsSleepingAllowed(void* body) {
+  return ((b2Body*)body)->IsSleepingAllowed();
+}
+void b2Body_SetActive(void* body, double flag) {
+  ((b2Body*)body)->SetActive(flag);
+}
+bool b2Body_IsActive(void* body) {
+  return ((b2Body*)body)->IsActive();
+}
+bool boBody_IsFixedRotation(void* body) {
+  return ((b2Body*)body)->IsFixedRotation();
+}

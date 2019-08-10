@@ -89,7 +89,19 @@ B2BODY = \
 	'_b2Body_SetTransform', \
 	'_b2Body_SetType', \
 	'_b2Body_SetGravityScale', \
-	'_b2Body_GetGravityScale'
+	'_b2Body_GetGravityScale'\
+	'_b2Body_SetLinearDamping',\
+	'_b2Body_GetLinearDamping',\
+	'_b2Body_SetAngularDamping',\
+	'_b2Body_GetAngularDamping',\
+	'_b2Body_IsAwake',\
+	'_b2Body_SetBullet',\
+	'_b2Body_IsBullet',\
+	'_b2Body_SetSleepingAllowed',\
+	'_b2Body_IsSleepingAllowed',\
+	'_b2Body_SetActive',\
+	'_b2Body_IsActive',\
+	'_boBody_IsFixedRotation'
 
 B2CHAINSHAPE = \
 	'_b2ChainShape_CreateFixture'
@@ -296,4 +308,4 @@ EXPORTS = EXPORTED_FUNCTIONS="[ \
 	]"
 
 bindings.js:
-	$(EMSCRIPTEN)/emcc -I../ -o lf_core.js jsBindings/jsBindings.cpp $(OBJECTS) -s $(EXPORTS) -s TOTAL_MEMORY=33554432 -O2 --js-library callbacks.js
+	$(EMSCRIPTEN)/emcc -I../ -o lf_core.js jsBindings/jsBindings.cpp $(OBJECTS) -s $(EXPORTS) -s TOTAL_MEMORY=33554432 -O2 --memory-init-file 0 --js-library callbacks.js
