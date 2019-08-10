@@ -93,6 +93,7 @@ function b2World(gravity) {
   this.joints = [];
   this.listener = null;
   this.particleSystems = [];
+  this.gravity = gravity.Clone();
   this.ptr = b2World_Create(gravity.x, gravity.y);
   this.queryAABBCallback = null;
   this.rayCastCallback = null;
@@ -190,6 +191,7 @@ b2World.prototype.SetContactListener = function(listener) {
 };
 
 b2World.prototype.SetGravity = function(gravity) {
+  this.gravity.Set(gravity.x, gravity.y);
   b2World_SetGravity(this.ptr, gravity.x, gravity.y);
 };
 
