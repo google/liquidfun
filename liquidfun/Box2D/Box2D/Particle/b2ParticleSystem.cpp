@@ -1730,9 +1730,9 @@ void b2ParticleSystem::ComputeDepth()
 		m_accumulationBuffer[b] += w;
 	}
 	b2Assert(m_depthBuffer);
-	for (int32 i = 0; i < groupsToUpdateCount; i++)
+	for (int32 j = 0; j < groupsToUpdateCount; j++)
 	{
-		const b2ParticleGroup* group = groupsToUpdate[i];
+		const b2ParticleGroup* group = groupsToUpdate[j];
 		for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 		{
 			float32 w = m_accumulationBuffer[i];
@@ -1772,9 +1772,9 @@ void b2ParticleSystem::ComputeDepth()
 			break;
 		}
 	}
-	for (int32 i = 0; i < groupsToUpdateCount; i++)
+	for (int32 j = 0; j < groupsToUpdateCount; j++)
 	{
-		const b2ParticleGroup* group = groupsToUpdate[i];
+		const b2ParticleGroup* group = groupsToUpdate[j];
 		for (int32 i = group->m_firstIndex; i < group->m_lastIndex; i++)
 		{
 			float32& p = m_depthBuffer[i];
