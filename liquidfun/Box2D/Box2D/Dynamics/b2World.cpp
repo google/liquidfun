@@ -1057,6 +1057,11 @@ void b2World::ClearForces()
 		body->m_force.SetZero();
 		body->m_torque = 0.0f;
 	}
+
+	for (b2ParticleSystem* p = m_particleSystemList; p; p = p->GetNext())
+	{
+		p->m_hasForce = false;
+	}
 }
 
 struct b2WorldQueryWrapper

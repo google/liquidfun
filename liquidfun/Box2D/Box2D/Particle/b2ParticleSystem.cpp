@@ -182,13 +182,12 @@ struct LightweightPair
 	A first;
 	B second;
 
-	// Compares the value of two FixtureParticle objects returning
-	// true if left is a smaller value than right.
 	static bool Compare(const LightweightPair& left,
 						const LightweightPair& right)
 	{
-		return left.first < right.first &&
-			left.second < right.second;
+		if (left.first == right.first)
+			return left.second < right.second;
+		return left.first < right.first;
 	}
 
 };
@@ -332,8 +331,7 @@ public:
 
 	// Initialize from a set of particle contacts.
 	void Initialize(const b2ParticleContact * const contacts,
-					const int32 numContacts,
-					const uint32 * const particleFlagsBuffer);
+					const int32 numContacts);
 
 	// Find the index of a particle pair in the set or -1
 	// if it's not present.
@@ -2204,8 +2202,7 @@ void b2ParticleSystem::NotifyContactListenerPreContact(
 		return;
 
 	particlePairs->Initialize(m_contactBuffer.Begin(),
-							  m_contactBuffer.GetCount(),
-						      GetFlagsBuffer());
+							  m_contactBuffer.GetCount());
 }
 
 // Note: This function is not const because 'this' in BeginContact and
@@ -2224,20 +2221,23 @@ void b2ParticleSystem::NotifyContactListenerPostContact(
 	for (b2ParticleContact* contact = m_contactBuffer.Begin();
 		 contact < endContact; ++contact)
 	{
-		ParticlePair pair;
-		pair.first = contact->GetIndexA();
-		pair.second = contact->GetIndexB();
-		const int32 itemIndex = particlePairs.Find(pair);
-		if (itemIndex >= 0)
-		{
-			// Already touching, ignore this contact.
-			particlePairs.Invalidate(itemIndex);
-		}
-		else
-		{
-			// Just started touching, inform the listener.
-			contactListener->BeginContact(this, contact);
-		}
+        if (contact->GetFlags() & b2_particleContactListenerParticle)
+        {
+            ParticlePair pair;
+            pair.first = contact->GetIndexA();
+            pair.second = contact->GetIndexB();
+            const int32 itemIndex = particlePairs.Find(pair);
+            if (itemIndex >= 0)
+            {
+                // Still touching, ignore this contact.
+                particlePairs.Invalidate(itemIndex);
+            }
+            else
+            {
+                // Just started touching, inform the listener.
+                contactListener->BeginContact(this, contact);
+            }
+        }
 	}
 
 	// Report particles that are no longer touching.
@@ -2423,7 +2423,7 @@ void FixtureParticleSet::Initialize(
 		int32 insertedContacts = 0;
 		for (int32 i = 0; i < numBodyContacts; ++i)
 		{
-			FixtureParticle* const fixtureParticle = &set[i];
+			FixtureParticle* const fixtureParticle = &set[insertedContacts];
 			const b2ParticleBodyContact& bodyContact = bodyContacts[i];
 			if (bodyContact.index == b2_invalidParticleIndex ||
 				!(particleFlagsBuffer[bodyContact.index] &
@@ -2445,13 +2445,21 @@ void FixtureParticleSet::Initialize(
 int32 FixtureParticleSet::Find(
 	const FixtureParticle& fixtureParticle) const
 {
-	return FindItemIndexInFixedSet(*this, fixtureParticle);
+	int32 index = FindItemIndexInFixedSet(*this, fixtureParticle);
+	if (index >= 0)
+	{
+        // Because std::lower_bound finds the first that is equal or larger
+        // So we need to check that it is equal
+		FixtureParticle found = GetBuffer()[index];
+		if (found.second != fixtureParticle.second || found.first != fixtureParticle.first)
+			index = -1;
+	}
+	return index;
 }
 
 // Initialize from a set of particle contacts.
 void b2ParticlePairSet::Initialize(
-	const b2ParticleContact * const contacts, const int32 numContacts,
-	const uint32 * const particleFlagsBuffer)
+	const b2ParticleContact * const contacts, const int32 numContacts)
 {
 	Clear();
 	if (Allocate(numContacts))
@@ -2460,13 +2468,11 @@ void b2ParticlePairSet::Initialize(
 		int32 insertedContacts = 0;
 		for (int32 i = 0; i < numContacts; ++i)
 		{
-			ParticlePair* const pair = &set[i];
+			ParticlePair* const pair = &set[insertedContacts];
 			const b2ParticleContact& contact = contacts[i];
 			if (contact.GetIndexA() == b2_invalidParticleIndex ||
 				contact.GetIndexB() == b2_invalidParticleIndex ||
-				!((particleFlagsBuffer[contact.GetIndexA()] |
-				   particleFlagsBuffer[contact.GetIndexB()]) &
-				  b2_particleContactListenerParticle))
+				!(contact.GetFlags() & b2_particleContactListenerParticle))
 			{
 				continue;
 			}
@@ -2483,12 +2489,29 @@ void b2ParticlePairSet::Initialize(
 int32 b2ParticlePairSet::Find(const ParticlePair& pair) const
 {
 	int32 index = FindItemIndexInFixedSet(*this, pair);
+
+	// Because std::lower_bound finds the first that is equal or larger
+	// So we need to check that it is equal
+	if (index >= 0)
+	{
+		ParticlePair found = GetBuffer()[index];
+		if (found.first != pair.first || found.second != pair.second)
+            index = -1;
+	}
+
 	if (index < 0)
 	{
 		ParticlePair swapped;
 		swapped.first = pair.second;
 		swapped.second = pair.first;
 		index = FindItemIndexInFixedSet(*this, swapped);
+
+		if (index >= 0)
+		{
+			ParticlePair found = GetBuffer()[index];
+			if (found.first != swapped.first || found.second != swapped.second)
+				index = -1;
+		}
 	}
 	return index;
 }
@@ -2571,20 +2594,23 @@ void b2ParticleSystem::NotifyBodyContactListenerPostContact(
 		 contact != m_bodyContactBuffer.End(); ++contact)
 	{
 		b2Assert(contact);
-		FixtureParticle fixtureParticleToFind;
-		fixtureParticleToFind.first = contact->fixture;
-		fixtureParticleToFind.second = contact->index;
-		const int32 index = fixtureSet.Find(fixtureParticleToFind);
-		if (index >= 0)
+        if (m_flagsBuffer.data[contact->index] & b2_fixtureContactListenerParticle)
 		{
-			// Already touching remove this from the set.
-			fixtureSet.Invalidate(index);
-		}
-		else
-		{
-			// Just started touching, report it!
-			contactListener->BeginContact(this, contact);
-		}
+            FixtureParticle fixtureParticleToFind;
+            fixtureParticleToFind.first = contact->fixture;
+            fixtureParticleToFind.second = contact->index;
+            const int32 index = fixtureSet.Find(fixtureParticleToFind);
+			if (index >= 0)
+            {
+				// Still touching, don't need to call EndContact on it.
+                fixtureSet.Invalidate(index);
+            }
+            else
+            {
+                // Just started touching, report it!
+                contactListener->BeginContact(this, contact);
+            }
+        }
 	}
 
 	// If the contact listener is enabled, report all fixtures that are no
@@ -2656,7 +2682,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 			float32 d;
 			b2Vec2 n;
 			fixture->ComputeDistance(ap, &d, &n, childIndex);
-			if (d < m_system->m_particleDiameter && ShouldCollide(fixture, a))
+			if (d < m_radius && ShouldCollide(fixture, a))
 			{
 				b2Body* b = fixture->GetBody();
 				b2Vec2 bp = b->GetWorldCenter();
@@ -2667,7 +2693,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 				float32 invBI = bI > 0 ? 1 / bI : 0;
 				float32 invAm =
 					m_system->m_flagsBuffer.data[a] &
-					b2_wallParticle ? 0 : m_system->GetParticleInvMass();
+					b2_wallParticle ? 0 : m_inverseMass;
 				b2Vec2 rp = ap - bp;
 				float32 rpn = b2Cross(rp, n);
 				float32 invM = invAm + invBm + invBI * rpn * rpn;
@@ -2677,7 +2703,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 				contact.index = a;
 				contact.body = b;
 				contact.fixture = fixture;
-				contact.weight = 1 - d * m_system->m_inverseDiameter;
+				contact.weight = 1 - d * m_inverseRadius;
 				contact.normal = -n;
 				contact.mass = invM > 0 ? 1 / invM : 0;
 				m_system->DetectStuckParticle(a);
@@ -2685,6 +2711,9 @@ void b2ParticleSystem::UpdateBodyContacts()
 		}
 
 		b2ContactFilter* m_contactFilter;
+		float32 m_inverseMass;
+		float32 m_radius;
+		float32 m_inverseRadius;
 
 	public:
 		UpdateBodyContactsCallback(
@@ -2692,6 +2721,9 @@ void b2ParticleSystem::UpdateBodyContacts()
 			b2FixtureParticleQueryCallback(system)
 		{
 			m_contactFilter = contactFilter;
+			m_inverseMass = system->GetParticleInvMass();
+			m_radius = 0.5 * m_system->m_particleDiameter * b2_fixtureParticleCollisionRadiusScaler;
+			m_inverseRadius = m_system->m_inverseDiameter * (2.0f / b2_fixtureParticleCollisionRadiusScaler);
 		}
 	} callback(this, GetFixtureContactFilter());
 
@@ -3227,7 +3259,9 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 			}
 		}
 	}
+    
 	// applies pressure between each particles in contact
+    float32 invMass = GetParticleInvMass();
 	float32 velocityPerPressure = step.dt / (m_def.density * m_particleDiameter);
 	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
@@ -3240,7 +3274,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 		b2Vec2 p = m_positionBuffer.data[a];
 		float32 h = m_accumulationBuffer[a] + pressurePerWeight * w;
 		b2Vec2 f = velocityPerPressure * w * m * h * n;
-		m_velocityBuffer.data[a] -= GetParticleInvMass() * f;
+		m_velocityBuffer.data[a] -= invMass * f;
 		b->ApplyLinearImpulse(f, p, true);
 	}
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
@@ -3260,6 +3294,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 {
 	// reduces normal velocity of each contact
+	float32 invMass = GetParticleInvMass();
 	float32 linearDamping = m_def.dampingStrength;
 	float32 quadraticDamping = 1 / GetCriticalVelocity(step);
 	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
@@ -3279,7 +3314,7 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 			float32 damping =
 				b2Max(linearDamping * w, b2Min(- quadraticDamping * vn, 0.5f));
 			b2Vec2 f = damping * m * vn * n;
-			m_velocityBuffer.data[a] += GetParticleInvMass() * f;
+			m_velocityBuffer.data[a] += invMass * f;
 			b->ApplyLinearImpulse(-f, p, true);
 		}
 	}
@@ -3479,6 +3514,7 @@ void b2ParticleSystem::SolveExtraDamping()
 	// Applies additional damping force between bodies and particles which can
 	// produce strong repulsive force. Applying damping force multiple times
 	// is effective in suppressing vibration.
+	float32 invMass = GetParticleInvMass();
 	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
@@ -3496,7 +3532,7 @@ void b2ParticleSystem::SolveExtraDamping()
 			if (vn < 0)
 			{
 				b2Vec2 f = 0.5f * m * vn * n;
-				m_velocityBuffer.data[a] += GetParticleInvMass() * f;
+				m_velocityBuffer.data[a] += invMass * f;
 				b->ApplyLinearImpulse(-f, p, true);
 			}
 		}
@@ -3563,7 +3599,7 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 			pa += step.dt * va;
 			pb += step.dt * vb;
 			pc += step.dt * vc;
-			b2Vec2 midPoint = (float32) 1 / 3 * (pa + pb + pc);
+			b2Vec2 midPoint = (1.0f / 3) * (pa + pb + pc);
 			pa -= midPoint;
 			pb -= midPoint;
 			pc -= midPoint;
@@ -3575,9 +3611,18 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 			r.s *= invR;
 			r.c *= invR;
 			float32 strength = elasticStrength * triad.strength;
-			va += strength * (b2Mul(r, oa) - pa);
-			vb += strength * (b2Mul(r, ob) - pb);
-			vc += strength * (b2Mul(r, oc) - pc);
+            b2Vec2 fa = strength * (b2Mul(r, oa) - pa);
+			b2Vec2 fb = strength * (b2Mul(r, ob) - pb);
+			b2Vec2 fc = strength * (b2Mul(r, oc) - pc);
+#ifdef b2_elasticPreserveVelocity
+			b2Vec2 fmid = (1.0f / 3) * (fa + fb + fc);
+			fa -= fmid;
+			fb -= fmid;
+			fc -= fmid;
+#endif
+			va += fa;
+			vb += fb;
+			vc += fc;
 		}
 	}
 }
@@ -3659,6 +3704,7 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveViscous()
 {
+    float32 invMass = GetParticleInvMass();
 	float32 viscousStrength = m_def.viscousStrength;
 	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
@@ -3673,7 +3719,7 @@ void b2ParticleSystem::SolveViscous()
 			b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) -
 					   m_velocityBuffer.data[a];
 			b2Vec2 f = viscousStrength * m * w * v;
-			m_velocityBuffer.data[a] += GetParticleInvMass() * f;
+			m_velocityBuffer.data[a] += invMass * f;
 			b->ApplyLinearImpulse(-f, p, true);
 		}
 	}
@@ -3768,7 +3814,6 @@ void b2ParticleSystem::SolveForce(const b2TimeStep& step)
 	{
 		m_velocityBuffer.data[i] += velocityPerForce * m_forceBuffer[i];
 	}
-	m_hasForce = false;
 }
 
 void b2ParticleSystem::SolveColorMixing()
