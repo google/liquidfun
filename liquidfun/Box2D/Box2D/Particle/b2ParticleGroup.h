@@ -271,8 +271,8 @@ private:
 	b2ParticleGroup* m_next;
 
 	mutable int32 m_timestamp;
-	mutable float32 m_mass;
-	mutable float32 m_inertia;
+	mutable float32 m_mass, m_invMass;
+	mutable float32 m_inertia, m_invInertia;
 	mutable b2Vec2 m_center;
 	mutable b2Vec2 m_linearVelocity;
 	mutable float32 m_angularVelocity;

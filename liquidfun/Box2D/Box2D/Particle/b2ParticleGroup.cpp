@@ -36,7 +36,9 @@ b2ParticleGroup::b2ParticleGroup()
 
 	m_timestamp = -1;
 	m_mass = 0;
+	m_invMass = 0;
 	m_inertia = 0;
+	m_invInertia = 0;
 	m_center = b2Vec2_zero;
 	m_linearVelocity = b2Vec2_zero;
 	m_angularVelocity = 0;
@@ -79,9 +81,12 @@ void b2ParticleGroup::UpdateStatistics() const
 		}
 		if (m_mass > 0)
 		{
-			m_center *= 1 / m_mass;
-			m_linearVelocity *= 1 / m_mass;
+			m_invMass = 1 / m_mass;
+			m_center *= m_invMass;
+			m_linearVelocity *= m_invMass;
 		}
+		else
+			m_invMass = 0;
 		m_inertia = 0;
 		m_angularVelocity = 0;
 		for (int32 i = m_firstIndex; i < m_lastIndex; i++)
@@ -93,8 +98,11 @@ void b2ParticleGroup::UpdateStatistics() const
 		}
 		if (m_inertia > 0)
 		{
-			m_angularVelocity *= 1 / m_inertia;
+			m_invInertia = 1 / m_inertia;
+			m_angularVelocity *= m_invInertia;
 		}
+		else
+			m_invInertia = 0;
 		m_timestamp = m_system->m_timestamp;
 	}
 }

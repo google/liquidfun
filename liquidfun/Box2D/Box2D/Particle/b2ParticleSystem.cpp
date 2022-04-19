@@ -399,6 +399,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_allGroupFlags = 0;
 	m_needsUpdateAllGroupFlags = false;
 	m_hasForce = false;
+	m_hasImpulse = false;
 	m_iterationIndex = 0;
 
 	SetStrictContactCheck(def->strictContactCheck);
@@ -410,6 +411,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_count = 0;
 	m_internalAllocatedCapacity = 0;
 	m_forceBuffer = NULL;
+	m_impulseBuffer = NULL;
 	m_weightBuffer = NULL;
 	m_staticPressureBuffer = NULL;
 	m_accumulationBuffer = NULL;
@@ -452,6 +454,7 @@ b2ParticleSystem::~b2ParticleSystem()
 	FreeUserOverridableBuffer(&m_expirationTimeBuffer);
 	FreeUserOverridableBuffer(&m_indexByExpirationTimeBuffer);
 	FreeBuffer(&m_forceBuffer, m_internalAllocatedCapacity);
+	FreeBuffer(&m_impulseBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_weightBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_staticPressureBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_accumulationBuffer, m_internalAllocatedCapacity);
@@ -603,6 +606,8 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 			&m_velocityBuffer, m_internalAllocatedCapacity, capacity, false);
 		m_forceBuffer = ReallocateBuffer(
 			m_forceBuffer, 0, m_internalAllocatedCapacity, capacity, false);
+		m_impulseBuffer = ReallocateBuffer(
+			m_impulseBuffer, 0, m_internalAllocatedCapacity, capacity, false);
 		m_weightBuffer = ReallocateBuffer(
 			m_weightBuffer, 0, m_internalAllocatedCapacity, capacity, false);
 		m_staticPressureBuffer = ReallocateBuffer(
@@ -680,6 +685,7 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	m_velocityBuffer.data[index] = def.velocity;
 	m_weightBuffer[index] = 0;
 	m_forceBuffer[index] = b2Vec2_zero;
+	m_impulseBuffer[index] = b2Vec2_zero;
 	if (m_staticPressureBuffer)
 	{
 		m_staticPressureBuffer[index] = 0;
@@ -1412,6 +1418,10 @@ int32 b2ParticleSystem::CloneParticle(int32 oldIndex, b2ParticleGroup* group)
 	if (m_hasForce)
 	{
 		m_forceBuffer[newIndex] = m_forceBuffer[oldIndex];
+	}
+	if (m_hasImpulse)
+	{
+		m_impulseBuffer[newIndex] = m_impulseBuffer[oldIndex];
 	}
 	if (m_staticPressureBuffer)
 	{
@@ -2686,11 +2696,8 @@ void b2ParticleSystem::UpdateBodyContacts()
 			{
 				b2Body* b = fixture->GetBody();
 				b2Vec2 bp = b->GetWorldCenter();
-				float32 bm = b->GetMass();
-				float32 bI =
-					b->GetInertia() - bm * b->GetLocalCenter().LengthSquared();
-				float32 invBm = bm > 0 ? 1 / bm : 0;
-				float32 invBI = bI > 0 ? 1 / bI : 0;
+				float32 invBm = b->m_invMass;
+				float32 invBI = b->m_invI;
 				float32 invAm =
 					m_system->m_flagsBuffer.data[a] &
 					b2_wallParticle ? 0 : m_inverseMass;
@@ -2861,9 +2868,8 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 						b2_linearSlop * n;
 					b2Vec2 v = m_step.inv_dt * (p - ap);
 					m_system->m_velocityBuffer.data[a] = v;
-					b2Vec2 f = m_step.inv_dt *
-						m_system->GetParticleMass() * (av - v);
-					m_system->ParticleApplyForce(a, f);
+					b2Vec2 f = m_system->GetParticleMass() * (av - v);
+					m_system->ParticleApplyBufferLinearImpulse(a, f);
 				}
 			}
 		}
@@ -2977,17 +2983,10 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 					{
 						// If c belongs to a rigid group, the force will be
 						// distributed in the group.
-						float32 mass = cGroup->GetMass();
-						float32 inertia = cGroup->GetInertia();
-						if (mass > 0)
-						{
-							cGroup->m_linearVelocity += 1 / mass * f;
-						}
-						if (inertia > 0)
-						{
-							cGroup->m_angularVelocity +=
-								b2Cross(pc - cGroup->GetCenter(), f) / inertia;
-						}
+						cGroup->UpdateStatistics();
+						cGroup->m_linearVelocity += cGroup->m_invMass * f;
+						cGroup->m_angularVelocity += cGroup->m_invInertia *
+							b2Cross(pc - cGroup->GetCenter(), f);
 					}
 					else
 					{
@@ -2995,7 +2994,7 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 					}
 					// Apply a reversed force to particle c after particle
 					// movement so that momentum will be preserved.
-					ParticleApplyForce(c, -step.inv_dt * f);
+					ParticleApplyBufferLinearImpulse(c, -f);
 				}
 			}
 		}
@@ -3051,6 +3050,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		if (m_hasForce)
 		{
 			SolveForce(subStep);
+		}
+		if (m_hasImpulse)
+		{
+			SolveImpulse(subStep);
 		}
 		if (m_allParticleFlags & b2_viscousParticle)
 		{
@@ -3357,35 +3360,24 @@ inline b2Vec2 b2ParticleSystem::GetLinearVelocity(
 	}
 }
 
-inline void b2ParticleSystem::InitDampingParameter(
-	float32* invMass, float32* invInertia, float32* tangentDistance,
-	float32 mass, float32 inertia, const b2Vec2& center,
-	const b2Vec2& point, const b2Vec2& normal) const
-{
-	*invMass = mass > 0 ? 1 / mass : 0;
-	*invInertia = inertia > 0 ? 1 / inertia : 0;
-	*tangentDistance = b2Cross(point - center, normal);
-}
-
 inline void b2ParticleSystem::InitDampingParameterWithRigidGroupOrParticle(
 	float32* invMass, float32* invInertia, float32* tangentDistance,
 	bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
-	const b2Vec2& point, const b2Vec2& normal) const
+	const b2Vec2& point, const b2Vec2& normal, float32 particleInvMass) const
 {
 	if (isRigidGroup)
 	{
-		InitDampingParameter(
-			invMass, invInertia, tangentDistance,
-			group->GetMass(), group->GetInertia(), group->GetCenter(),
-			point, normal);
+		group->UpdateStatistics();
+		*invMass = group->m_invMass;
+		*invInertia = group->m_invInertia;
+		*tangentDistance = b2Cross(point - group->GetCenter(), normal);
 	}
 	else
 	{
 		uint32 flags = m_flagsBuffer.data[particleIndex];
-		InitDampingParameter(
-			invMass, invInertia, tangentDistance,
-			flags & b2_wallParticle ? 0 : GetParticleMass(), 0, point,
-			point, normal);
+		*invMass = flags & b2_wallParticle ? 0 : particleInvMass;
+		*invInertia = 0.0f;
+		*tangentDistance = 0.0f;
 	}
 }
 
@@ -3418,6 +3410,8 @@ inline void b2ParticleSystem::ApplyDamping(
 
 void b2ParticleSystem::SolveRigidDamping()
 {
+	float32 particleInvMass = GetParticleInvMass();
+
 	// Apply impulse to rigid particle groups colliding with other objects
 	// to reduce relative velocity at the colliding point.
 	float32 damping = m_def.dampingStrength;
@@ -3439,19 +3433,13 @@ void b2ParticleSystem::SolveRigidDamping()
 			// The group's average velocity at particle position 'p' is pushing
 			// the particle into the body.
 			{
-				float32 invMassA, invInertiaA, tangentDistanceA;
-				float32 invMassB, invInertiaB, tangentDistanceB;
-				InitDampingParameterWithRigidGroupOrParticle(
-					&invMassA, &invInertiaA, &tangentDistanceA,
-					true, aGroup, a, p, n);
-				InitDampingParameter(
-					&invMassB, &invInertiaB, &tangentDistanceB,
-					b->GetMass(),
-					// Calculate b->m_I from public functions of b2Body.
-					b->GetInertia() -
-							b->GetMass() * b->GetLocalCenter().LengthSquared(),
-					b->GetWorldCenter(),
-					p, n);
+				aGroup->UpdateStatistics();
+				float32 invMassA = aGroup->m_invMass;
+				float32 invInertiaA = aGroup->m_invInertia;
+				float32 tangentDistanceA = b2Cross(p - aGroup->GetCenter(), n);
+				float32 invMassB = b->m_invMass;
+				float32 invInertiaB = b->m_invI;
+				float32 tangentDistanceB = b2Cross(p - b->GetWorldCenter(), n);
 				float32 f = damping * b2Min(w, 1.0f) * ComputeDampingImpulse(
 					invMassA, invInertiaA, tangentDistanceA,
 					invMassB, invInertiaB, tangentDistanceB,
@@ -3489,11 +3477,11 @@ void b2ParticleSystem::SolveRigidDamping()
 				InitDampingParameterWithRigidGroupOrParticle(
 					&invMassA, &invInertiaA, &tangentDistanceA,
 					aRigid, aGroup, a,
-					p, n);
+					p, n, particleInvMass);
 				InitDampingParameterWithRigidGroupOrParticle(
 					&invMassB, &invInertiaB, &tangentDistanceB,
 					bRigid, bGroup, b,
-					p, n);
+					p, n, particleInvMass);
 				float32 f = damping * w * ComputeDampingImpulse(
 					invMassA, invInertiaA, tangentDistanceA,
 					invMassB, invInertiaB, tangentDistanceB,
@@ -3815,6 +3803,15 @@ void b2ParticleSystem::SolveForce(const b2TimeStep& step)
 		m_velocityBuffer.data[i] += velocityPerForce * m_forceBuffer[i];
 	}
 }
+void b2ParticleSystem::SolveImpulse(const b2TimeStep& step)
+{
+	float32 velocityPerImpulse = GetParticleInvMass();
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_velocityBuffer.data[i] += velocityPerImpulse * m_impulseBuffer[i];
+	}
+	m_hasImpulse = false;
+}
 
 void b2ParticleSystem::SolveColorMixing()
 {
@@ -3907,6 +3904,10 @@ void b2ParticleSystem::SolveZombie()
 				if (m_hasForce)
 				{
 					m_forceBuffer[newCount] = m_forceBuffer[i];
+				}
+				if (m_hasImpulse)
+				{
+					m_impulseBuffer[newCount] = m_impulseBuffer[i];
 				}
 				if (m_staticPressureBuffer)
 				{
@@ -4185,6 +4186,11 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	{
 		std::rotate(m_forceBuffer + start, m_forceBuffer + mid,
 					m_forceBuffer + end);
+	}
+	if (m_hasImpulse)
+	{
+		std::rotate(m_impulseBuffer + start, m_impulseBuffer + mid,
+					m_impulseBuffer + end);
 	}
 	if (m_staticPressureBuffer)
 	{
@@ -4498,6 +4504,14 @@ inline void b2ParticleSystem::PrepareForceBuffer()
 		m_hasForce = true;
 	}
 }
+inline void b2ParticleSystem::PrepareImpulseBuffer()
+{
+	if (!m_hasImpulse)
+	{
+		memset(m_impulseBuffer, 0, sizeof(*m_impulseBuffer) * m_count);
+		m_hasImpulse = true;
+	}
+}
 
 void b2ParticleSystem::ApplyForce(int32 firstIndex, int32 lastIndex,
 								  const b2Vec2& force)
@@ -4534,6 +4548,15 @@ void b2ParticleSystem::ParticleApplyForce(int32 index, const b2Vec2& force)
 	{
 		PrepareForceBuffer();
 		m_forceBuffer[index] += force;
+	}
+}
+
+void b2ParticleSystem::ParticleApplyBufferLinearImpulse(int32 index, const b2Vec2& impulse)
+{
+	if (ForceCanBeApplied(m_flagsBuffer.data[index]))
+	{
+		PrepareImpulseBuffer();
+		m_impulseBuffer[index] += impulse;
 	}
 }
 
