@@ -262,9 +262,27 @@ void b2PolygonShape::ComputeDistance(const b2Transform& xf, const b2Vec2& p, flo
 	B2_NOT_USED(childIndex);
 
 	b2Vec2 pLocal = b2MulT(xf.q, p - xf.p);
+    
+    // If the nearest point is a corner, then the dot products of the normals on each of its edges will be positive.
+    int32 prevI = m_count - 1;
+	for (int32 i = 0; i < m_count; ++i)
+	{
+		const b2Vec2& beforeNorm = m_normals[prevI]; // The normal of point i and the point i-1
+		const b2Vec2& afterNorm = m_normals[i]; // The normal of point i and the point i+1
+		b2Vec2 dist = pLocal - m_vertices[i];
+		if (b2Dot(dist, beforeNorm) > 0.0f && b2Dot(dist, afterNorm) > 0.0f)
+		{
+			*distance = dist.Length();
+			*normal = b2Mul(xf.q, dist);
+            if (*distance > 0.0f)
+                *normal /= *distance;
+			return;
+		}
+		prevI = i;
+	}
+    
 	float32 maxDistance = -FLT_MAX;
 	b2Vec2 normalForMaxDistance = pLocal;
-
 	for (int32 i = 0; i < m_count; ++i)
 	{
 		float32 dot = b2Dot(m_normals[i], pLocal - m_vertices[i]);
@@ -274,31 +292,8 @@ void b2PolygonShape::ComputeDistance(const b2Transform& xf, const b2Vec2& p, flo
 			normalForMaxDistance = m_normals[i];
 		}
 	}
-
-	if (maxDistance > 0)
-	{
-		b2Vec2 minDistance = normalForMaxDistance;
-		float32 minDistance2 = maxDistance * maxDistance;
-		for (int32 i = 0; i < m_count; ++i)
-		{
-			b2Vec2 distance = pLocal - m_vertices[i];
-			float32 distance2 = distance.LengthSquared();
-			if (minDistance2 > distance2)
-			{
-				minDistance = distance;
-				minDistance2 = distance2;
-			}
-		}
-
-		*distance = b2Sqrt(minDistance2);
-		*normal = b2Mul(xf.q, minDistance);
-		normal->Normalize();
-	}
-	else
-	{
-		*distance = maxDistance;
-		*normal = b2Mul(xf.q, normalForMaxDistance);
-	}
+    *distance = maxDistance;
+    *normal = b2Mul(xf.q, normalForMaxDistance);
 }
 
 bool b2PolygonShape::RayCast(b2RayCastOutput* output, const b2RayCastInput& input,
