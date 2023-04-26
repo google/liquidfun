@@ -182,13 +182,12 @@ struct LightweightPair
 	A first;
 	B second;
 
-	// Compares the value of two FixtureParticle objects returning
-	// true if left is a smaller value than right.
 	static bool Compare(const LightweightPair& left,
 						const LightweightPair& right)
 	{
-		return left.first < right.first &&
-			left.second < right.second;
+		if (left.first == right.first)
+			return left.second < right.second;
+		return left.first < right.first;
 	}
 
 };
@@ -332,8 +331,7 @@ public:
 
 	// Initialize from a set of particle contacts.
 	void Initialize(const b2ParticleContact * const contacts,
-					const int32 numContacts,
-					const uint32 * const particleFlagsBuffer);
+					const int32 numContacts);
 
 	// Find the index of a particle pair in the set or -1
 	// if it's not present.
@@ -401,6 +399,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_allGroupFlags = 0;
 	m_needsUpdateAllGroupFlags = false;
 	m_hasForce = false;
+	m_hasImpulse = false;
 	m_iterationIndex = 0;
 
 	SetStrictContactCheck(def->strictContactCheck);
@@ -412,6 +411,7 @@ b2ParticleSystem::b2ParticleSystem(const b2ParticleSystemDef* def,
 	m_count = 0;
 	m_internalAllocatedCapacity = 0;
 	m_forceBuffer = NULL;
+	m_impulseBuffer = NULL;
 	m_weightBuffer = NULL;
 	m_staticPressureBuffer = NULL;
 	m_accumulationBuffer = NULL;
@@ -454,6 +454,7 @@ b2ParticleSystem::~b2ParticleSystem()
 	FreeUserOverridableBuffer(&m_expirationTimeBuffer);
 	FreeUserOverridableBuffer(&m_indexByExpirationTimeBuffer);
 	FreeBuffer(&m_forceBuffer, m_internalAllocatedCapacity);
+	FreeBuffer(&m_impulseBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_weightBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_staticPressureBuffer, m_internalAllocatedCapacity);
 	FreeBuffer(&m_accumulationBuffer, m_internalAllocatedCapacity);
@@ -605,6 +606,8 @@ void b2ParticleSystem::ReallocateInternalAllocatedBuffers(int32 capacity)
 			&m_velocityBuffer, m_internalAllocatedCapacity, capacity, false);
 		m_forceBuffer = ReallocateBuffer(
 			m_forceBuffer, 0, m_internalAllocatedCapacity, capacity, false);
+		m_impulseBuffer = ReallocateBuffer(
+			m_impulseBuffer, 0, m_internalAllocatedCapacity, capacity, false);
 		m_weightBuffer = ReallocateBuffer(
 			m_weightBuffer, 0, m_internalAllocatedCapacity, capacity, false);
 		m_staticPressureBuffer = ReallocateBuffer(
@@ -682,6 +685,7 @@ int32 b2ParticleSystem::CreateParticle(const b2ParticleDef& def)
 	m_velocityBuffer.data[index] = def.velocity;
 	m_weightBuffer[index] = 0;
 	m_forceBuffer[index] = b2Vec2_zero;
+	m_impulseBuffer[index] = b2Vec2_zero;
 	if (m_staticPressureBuffer)
 	{
 		m_staticPressureBuffer[index] = 0;
@@ -1414,6 +1418,10 @@ int32 b2ParticleSystem::CloneParticle(int32 oldIndex, b2ParticleGroup* group)
 	if (m_hasForce)
 	{
 		m_forceBuffer[newIndex] = m_forceBuffer[oldIndex];
+	}
+	if (m_hasImpulse)
+	{
+		m_impulseBuffer[newIndex] = m_impulseBuffer[oldIndex];
 	}
 	if (m_staticPressureBuffer)
 	{
@@ -2204,8 +2212,7 @@ void b2ParticleSystem::NotifyContactListenerPreContact(
 		return;
 
 	particlePairs->Initialize(m_contactBuffer.Begin(),
-							  m_contactBuffer.GetCount(),
-						      GetFlagsBuffer());
+							  m_contactBuffer.GetCount());
 }
 
 // Note: This function is not const because 'this' in BeginContact and
@@ -2224,20 +2231,23 @@ void b2ParticleSystem::NotifyContactListenerPostContact(
 	for (b2ParticleContact* contact = m_contactBuffer.Begin();
 		 contact < endContact; ++contact)
 	{
-		ParticlePair pair;
-		pair.first = contact->GetIndexA();
-		pair.second = contact->GetIndexB();
-		const int32 itemIndex = particlePairs.Find(pair);
-		if (itemIndex >= 0)
-		{
-			// Already touching, ignore this contact.
-			particlePairs.Invalidate(itemIndex);
-		}
-		else
-		{
-			// Just started touching, inform the listener.
-			contactListener->BeginContact(this, contact);
-		}
+        if (contact->GetFlags() & b2_particleContactListenerParticle)
+        {
+            ParticlePair pair;
+            pair.first = contact->GetIndexA();
+            pair.second = contact->GetIndexB();
+            const int32 itemIndex = particlePairs.Find(pair);
+            if (itemIndex >= 0)
+            {
+                // Still touching, ignore this contact.
+                particlePairs.Invalidate(itemIndex);
+            }
+            else
+            {
+                // Just started touching, inform the listener.
+                contactListener->BeginContact(this, contact);
+            }
+        }
 	}
 
 	// Report particles that are no longer touching.
@@ -2423,7 +2433,7 @@ void FixtureParticleSet::Initialize(
 		int32 insertedContacts = 0;
 		for (int32 i = 0; i < numBodyContacts; ++i)
 		{
-			FixtureParticle* const fixtureParticle = &set[i];
+			FixtureParticle* const fixtureParticle = &set[insertedContacts];
 			const b2ParticleBodyContact& bodyContact = bodyContacts[i];
 			if (bodyContact.index == b2_invalidParticleIndex ||
 				!(particleFlagsBuffer[bodyContact.index] &
@@ -2445,13 +2455,21 @@ void FixtureParticleSet::Initialize(
 int32 FixtureParticleSet::Find(
 	const FixtureParticle& fixtureParticle) const
 {
-	return FindItemIndexInFixedSet(*this, fixtureParticle);
+	int32 index = FindItemIndexInFixedSet(*this, fixtureParticle);
+	if (index >= 0)
+	{
+        // Because std::lower_bound finds the first that is equal or larger
+        // So we need to check that it is equal
+		FixtureParticle found = GetBuffer()[index];
+		if (found.second != fixtureParticle.second || found.first != fixtureParticle.first)
+			index = -1;
+	}
+	return index;
 }
 
 // Initialize from a set of particle contacts.
 void b2ParticlePairSet::Initialize(
-	const b2ParticleContact * const contacts, const int32 numContacts,
-	const uint32 * const particleFlagsBuffer)
+	const b2ParticleContact * const contacts, const int32 numContacts)
 {
 	Clear();
 	if (Allocate(numContacts))
@@ -2460,13 +2478,11 @@ void b2ParticlePairSet::Initialize(
 		int32 insertedContacts = 0;
 		for (int32 i = 0; i < numContacts; ++i)
 		{
-			ParticlePair* const pair = &set[i];
+			ParticlePair* const pair = &set[insertedContacts];
 			const b2ParticleContact& contact = contacts[i];
 			if (contact.GetIndexA() == b2_invalidParticleIndex ||
 				contact.GetIndexB() == b2_invalidParticleIndex ||
-				!((particleFlagsBuffer[contact.GetIndexA()] |
-				   particleFlagsBuffer[contact.GetIndexB()]) &
-				  b2_particleContactListenerParticle))
+				!(contact.GetFlags() & b2_particleContactListenerParticle))
 			{
 				continue;
 			}
@@ -2483,12 +2499,29 @@ void b2ParticlePairSet::Initialize(
 int32 b2ParticlePairSet::Find(const ParticlePair& pair) const
 {
 	int32 index = FindItemIndexInFixedSet(*this, pair);
+
+	// Because std::lower_bound finds the first that is equal or larger
+	// So we need to check that it is equal
+	if (index >= 0)
+	{
+		ParticlePair found = GetBuffer()[index];
+		if (found.first != pair.first || found.second != pair.second)
+            index = -1;
+	}
+
 	if (index < 0)
 	{
 		ParticlePair swapped;
 		swapped.first = pair.second;
 		swapped.second = pair.first;
 		index = FindItemIndexInFixedSet(*this, swapped);
+
+		if (index >= 0)
+		{
+			ParticlePair found = GetBuffer()[index];
+			if (found.first != swapped.first || found.second != swapped.second)
+				index = -1;
+		}
 	}
 	return index;
 }
@@ -2571,20 +2604,23 @@ void b2ParticleSystem::NotifyBodyContactListenerPostContact(
 		 contact != m_bodyContactBuffer.End(); ++contact)
 	{
 		b2Assert(contact);
-		FixtureParticle fixtureParticleToFind;
-		fixtureParticleToFind.first = contact->fixture;
-		fixtureParticleToFind.second = contact->index;
-		const int32 index = fixtureSet.Find(fixtureParticleToFind);
-		if (index >= 0)
+        if (m_flagsBuffer.data[contact->index] & b2_fixtureContactListenerParticle)
 		{
-			// Already touching remove this from the set.
-			fixtureSet.Invalidate(index);
-		}
-		else
-		{
-			// Just started touching, report it!
-			contactListener->BeginContact(this, contact);
-		}
+            FixtureParticle fixtureParticleToFind;
+            fixtureParticleToFind.first = contact->fixture;
+            fixtureParticleToFind.second = contact->index;
+            const int32 index = fixtureSet.Find(fixtureParticleToFind);
+			if (index >= 0)
+            {
+				// Still touching, don't need to call EndContact on it.
+                fixtureSet.Invalidate(index);
+            }
+            else
+            {
+                // Just started touching, report it!
+                contactListener->BeginContact(this, contact);
+            }
+        }
 	}
 
 	// If the contact listener is enabled, report all fixtures that are no
@@ -2656,18 +2692,15 @@ void b2ParticleSystem::UpdateBodyContacts()
 			float32 d;
 			b2Vec2 n;
 			fixture->ComputeDistance(ap, &d, &n, childIndex);
-			if (d < m_system->m_particleDiameter && ShouldCollide(fixture, a))
+			if (d < m_radius && ShouldCollide(fixture, a))
 			{
 				b2Body* b = fixture->GetBody();
 				b2Vec2 bp = b->GetWorldCenter();
-				float32 bm = b->GetMass();
-				float32 bI =
-					b->GetInertia() - bm * b->GetLocalCenter().LengthSquared();
-				float32 invBm = bm > 0 ? 1 / bm : 0;
-				float32 invBI = bI > 0 ? 1 / bI : 0;
+				float32 invBm = b->m_invMass;
+				float32 invBI = b->m_invI;
 				float32 invAm =
 					m_system->m_flagsBuffer.data[a] &
-					b2_wallParticle ? 0 : m_system->GetParticleInvMass();
+					b2_wallParticle ? 0 : m_inverseMass;
 				b2Vec2 rp = ap - bp;
 				float32 rpn = b2Cross(rp, n);
 				float32 invM = invAm + invBm + invBI * rpn * rpn;
@@ -2677,7 +2710,7 @@ void b2ParticleSystem::UpdateBodyContacts()
 				contact.index = a;
 				contact.body = b;
 				contact.fixture = fixture;
-				contact.weight = 1 - d * m_system->m_inverseDiameter;
+				contact.weight = 1 - d * m_inverseRadius;
 				contact.normal = -n;
 				contact.mass = invM > 0 ? 1 / invM : 0;
 				m_system->DetectStuckParticle(a);
@@ -2685,6 +2718,9 @@ void b2ParticleSystem::UpdateBodyContacts()
 		}
 
 		b2ContactFilter* m_contactFilter;
+		float32 m_inverseMass;
+		float32 m_radius;
+		float32 m_inverseRadius;
 
 	public:
 		UpdateBodyContactsCallback(
@@ -2692,6 +2728,9 @@ void b2ParticleSystem::UpdateBodyContacts()
 			b2FixtureParticleQueryCallback(system)
 		{
 			m_contactFilter = contactFilter;
+			m_inverseMass = system->GetParticleInvMass();
+			m_radius = 0.5 * m_system->m_particleDiameter * b2_fixtureParticleCollisionRadiusScaler;
+			m_inverseRadius = m_system->m_inverseDiameter * (2.0f / b2_fixtureParticleCollisionRadiusScaler);
 		}
 	} callback(this, GetFixtureContactFilter());
 
@@ -2829,9 +2868,8 @@ void b2ParticleSystem::SolveCollision(const b2TimeStep& step)
 						b2_linearSlop * n;
 					b2Vec2 v = m_step.inv_dt * (p - ap);
 					m_system->m_velocityBuffer.data[a] = v;
-					b2Vec2 f = m_step.inv_dt *
-						m_system->GetParticleMass() * (av - v);
-					m_system->ParticleApplyForce(a, f);
+					b2Vec2 f = m_system->GetParticleMass() * (av - v);
+					m_system->ParticleApplyBufferLinearImpulse(a, f);
 				}
 			}
 		}
@@ -2945,17 +2983,10 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 					{
 						// If c belongs to a rigid group, the force will be
 						// distributed in the group.
-						float32 mass = cGroup->GetMass();
-						float32 inertia = cGroup->GetInertia();
-						if (mass > 0)
-						{
-							cGroup->m_linearVelocity += 1 / mass * f;
-						}
-						if (inertia > 0)
-						{
-							cGroup->m_angularVelocity +=
-								b2Cross(pc - cGroup->GetCenter(), f) / inertia;
-						}
+						cGroup->UpdateStatistics();
+						cGroup->m_linearVelocity += cGroup->m_invMass * f;
+						cGroup->m_angularVelocity += cGroup->m_invInertia *
+							b2Cross(pc - cGroup->GetCenter(), f);
 					}
 					else
 					{
@@ -2963,7 +2994,7 @@ void b2ParticleSystem::SolveBarrier(const b2TimeStep& step)
 					}
 					// Apply a reversed force to particle c after particle
 					// movement so that momentum will be preserved.
-					ParticleApplyForce(c, -step.inv_dt * f);
+					ParticleApplyBufferLinearImpulse(c, -f);
 				}
 			}
 		}
@@ -3019,6 +3050,10 @@ void b2ParticleSystem::Solve(const b2TimeStep& step)
 		if (m_hasForce)
 		{
 			SolveForce(subStep);
+		}
+		if (m_hasImpulse)
+		{
+			SolveImpulse(subStep);
 		}
 		if (m_allParticleFlags & b2_viscousParticle)
 		{
@@ -3227,7 +3262,9 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 			}
 		}
 	}
+    
 	// applies pressure between each particles in contact
+    float32 invMass = GetParticleInvMass();
 	float32 velocityPerPressure = step.dt / (m_def.density * m_particleDiameter);
 	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
@@ -3240,7 +3277,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 		b2Vec2 p = m_positionBuffer.data[a];
 		float32 h = m_accumulationBuffer[a] + pressurePerWeight * w;
 		b2Vec2 f = velocityPerPressure * w * m * h * n;
-		m_velocityBuffer.data[a] -= GetParticleInvMass() * f;
+		m_velocityBuffer.data[a] -= invMass * f;
 		b->ApplyLinearImpulse(f, p, true);
 	}
 	for (int32 k = 0; k < m_contactBuffer.GetCount(); k++)
@@ -3260,6 +3297,7 @@ void b2ParticleSystem::SolvePressure(const b2TimeStep& step)
 void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 {
 	// reduces normal velocity of each contact
+	float32 invMass = GetParticleInvMass();
 	float32 linearDamping = m_def.dampingStrength;
 	float32 quadraticDamping = 1 / GetCriticalVelocity(step);
 	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
@@ -3279,7 +3317,7 @@ void b2ParticleSystem::SolveDamping(const b2TimeStep& step)
 			float32 damping =
 				b2Max(linearDamping * w, b2Min(- quadraticDamping * vn, 0.5f));
 			b2Vec2 f = damping * m * vn * n;
-			m_velocityBuffer.data[a] += GetParticleInvMass() * f;
+			m_velocityBuffer.data[a] += invMass * f;
 			b->ApplyLinearImpulse(-f, p, true);
 		}
 	}
@@ -3322,35 +3360,24 @@ inline b2Vec2 b2ParticleSystem::GetLinearVelocity(
 	}
 }
 
-inline void b2ParticleSystem::InitDampingParameter(
-	float32* invMass, float32* invInertia, float32* tangentDistance,
-	float32 mass, float32 inertia, const b2Vec2& center,
-	const b2Vec2& point, const b2Vec2& normal) const
-{
-	*invMass = mass > 0 ? 1 / mass : 0;
-	*invInertia = inertia > 0 ? 1 / inertia : 0;
-	*tangentDistance = b2Cross(point - center, normal);
-}
-
 inline void b2ParticleSystem::InitDampingParameterWithRigidGroupOrParticle(
 	float32* invMass, float32* invInertia, float32* tangentDistance,
 	bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
-	const b2Vec2& point, const b2Vec2& normal) const
+	const b2Vec2& point, const b2Vec2& normal, float32 particleInvMass) const
 {
 	if (isRigidGroup)
 	{
-		InitDampingParameter(
-			invMass, invInertia, tangentDistance,
-			group->GetMass(), group->GetInertia(), group->GetCenter(),
-			point, normal);
+		group->UpdateStatistics();
+		*invMass = group->m_invMass;
+		*invInertia = group->m_invInertia;
+		*tangentDistance = b2Cross(point - group->GetCenter(), normal);
 	}
 	else
 	{
 		uint32 flags = m_flagsBuffer.data[particleIndex];
-		InitDampingParameter(
-			invMass, invInertia, tangentDistance,
-			flags & b2_wallParticle ? 0 : GetParticleMass(), 0, point,
-			point, normal);
+		*invMass = flags & b2_wallParticle ? 0 : particleInvMass;
+		*invInertia = 0.0f;
+		*tangentDistance = 0.0f;
 	}
 }
 
@@ -3383,6 +3410,8 @@ inline void b2ParticleSystem::ApplyDamping(
 
 void b2ParticleSystem::SolveRigidDamping()
 {
+	float32 particleInvMass = GetParticleInvMass();
+
 	// Apply impulse to rigid particle groups colliding with other objects
 	// to reduce relative velocity at the colliding point.
 	float32 damping = m_def.dampingStrength;
@@ -3404,19 +3433,13 @@ void b2ParticleSystem::SolveRigidDamping()
 			// The group's average velocity at particle position 'p' is pushing
 			// the particle into the body.
 			{
-				float32 invMassA, invInertiaA, tangentDistanceA;
-				float32 invMassB, invInertiaB, tangentDistanceB;
-				InitDampingParameterWithRigidGroupOrParticle(
-					&invMassA, &invInertiaA, &tangentDistanceA,
-					true, aGroup, a, p, n);
-				InitDampingParameter(
-					&invMassB, &invInertiaB, &tangentDistanceB,
-					b->GetMass(),
-					// Calculate b->m_I from public functions of b2Body.
-					b->GetInertia() -
-							b->GetMass() * b->GetLocalCenter().LengthSquared(),
-					b->GetWorldCenter(),
-					p, n);
+				aGroup->UpdateStatistics();
+				float32 invMassA = aGroup->m_invMass;
+				float32 invInertiaA = aGroup->m_invInertia;
+				float32 tangentDistanceA = b2Cross(p - aGroup->GetCenter(), n);
+				float32 invMassB = b->m_invMass;
+				float32 invInertiaB = b->m_invI;
+				float32 tangentDistanceB = b2Cross(p - b->GetWorldCenter(), n);
 				float32 f = damping * b2Min(w, 1.0f) * ComputeDampingImpulse(
 					invMassA, invInertiaA, tangentDistanceA,
 					invMassB, invInertiaB, tangentDistanceB,
@@ -3454,11 +3477,11 @@ void b2ParticleSystem::SolveRigidDamping()
 				InitDampingParameterWithRigidGroupOrParticle(
 					&invMassA, &invInertiaA, &tangentDistanceA,
 					aRigid, aGroup, a,
-					p, n);
+					p, n, particleInvMass);
 				InitDampingParameterWithRigidGroupOrParticle(
 					&invMassB, &invInertiaB, &tangentDistanceB,
 					bRigid, bGroup, b,
-					p, n);
+					p, n, particleInvMass);
 				float32 f = damping * w * ComputeDampingImpulse(
 					invMassA, invInertiaA, tangentDistanceA,
 					invMassB, invInertiaB, tangentDistanceB,
@@ -3479,6 +3502,7 @@ void b2ParticleSystem::SolveExtraDamping()
 	// Applies additional damping force between bodies and particles which can
 	// produce strong repulsive force. Applying damping force multiple times
 	// is effective in suppressing vibration.
+	float32 invMass = GetParticleInvMass();
 	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
 		const b2ParticleBodyContact& contact = m_bodyContactBuffer[k];
@@ -3496,7 +3520,7 @@ void b2ParticleSystem::SolveExtraDamping()
 			if (vn < 0)
 			{
 				b2Vec2 f = 0.5f * m * vn * n;
-				m_velocityBuffer.data[a] += GetParticleInvMass() * f;
+				m_velocityBuffer.data[a] += invMass * f;
 				b->ApplyLinearImpulse(-f, p, true);
 			}
 		}
@@ -3563,7 +3587,7 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 			pa += step.dt * va;
 			pb += step.dt * vb;
 			pc += step.dt * vc;
-			b2Vec2 midPoint = (float32) 1 / 3 * (pa + pb + pc);
+			b2Vec2 midPoint = (1.0f / 3) * (pa + pb + pc);
 			pa -= midPoint;
 			pb -= midPoint;
 			pc -= midPoint;
@@ -3575,9 +3599,18 @@ void b2ParticleSystem::SolveElastic(const b2TimeStep& step)
 			r.s *= invR;
 			r.c *= invR;
 			float32 strength = elasticStrength * triad.strength;
-			va += strength * (b2Mul(r, oa) - pa);
-			vb += strength * (b2Mul(r, ob) - pb);
-			vc += strength * (b2Mul(r, oc) - pc);
+            b2Vec2 fa = strength * (b2Mul(r, oa) - pa);
+			b2Vec2 fb = strength * (b2Mul(r, ob) - pb);
+			b2Vec2 fc = strength * (b2Mul(r, oc) - pc);
+#ifdef b2_elasticPreserveVelocity
+			b2Vec2 fmid = (1.0f / 3) * (fa + fb + fc);
+			fa -= fmid;
+			fb -= fmid;
+			fc -= fmid;
+#endif
+			va += fa;
+			vb += fb;
+			vc += fc;
 		}
 	}
 }
@@ -3659,6 +3692,7 @@ void b2ParticleSystem::SolveTensile(const b2TimeStep& step)
 
 void b2ParticleSystem::SolveViscous()
 {
+    float32 invMass = GetParticleInvMass();
 	float32 viscousStrength = m_def.viscousStrength;
 	for (int32 k = 0; k < m_bodyContactBuffer.GetCount(); k++)
 	{
@@ -3673,7 +3707,7 @@ void b2ParticleSystem::SolveViscous()
 			b2Vec2 v = b->GetLinearVelocityFromWorldPoint(p) -
 					   m_velocityBuffer.data[a];
 			b2Vec2 f = viscousStrength * m * w * v;
-			m_velocityBuffer.data[a] += GetParticleInvMass() * f;
+			m_velocityBuffer.data[a] += invMass * f;
 			b->ApplyLinearImpulse(-f, p, true);
 		}
 	}
@@ -3768,7 +3802,15 @@ void b2ParticleSystem::SolveForce(const b2TimeStep& step)
 	{
 		m_velocityBuffer.data[i] += velocityPerForce * m_forceBuffer[i];
 	}
-	m_hasForce = false;
+}
+void b2ParticleSystem::SolveImpulse(const b2TimeStep& step)
+{
+	float32 velocityPerImpulse = GetParticleInvMass();
+	for (int32 i = 0; i < m_count; i++)
+	{
+		m_velocityBuffer.data[i] += velocityPerImpulse * m_impulseBuffer[i];
+	}
+	m_hasImpulse = false;
 }
 
 void b2ParticleSystem::SolveColorMixing()
@@ -3862,6 +3904,10 @@ void b2ParticleSystem::SolveZombie()
 				if (m_hasForce)
 				{
 					m_forceBuffer[newCount] = m_forceBuffer[i];
+				}
+				if (m_hasImpulse)
+				{
+					m_impulseBuffer[newCount] = m_impulseBuffer[i];
 				}
 				if (m_staticPressureBuffer)
 				{
@@ -4140,6 +4186,11 @@ void b2ParticleSystem::RotateBuffer(int32 start, int32 mid, int32 end)
 	{
 		std::rotate(m_forceBuffer + start, m_forceBuffer + mid,
 					m_forceBuffer + end);
+	}
+	if (m_hasImpulse)
+	{
+		std::rotate(m_impulseBuffer + start, m_impulseBuffer + mid,
+					m_impulseBuffer + end);
 	}
 	if (m_staticPressureBuffer)
 	{
@@ -4453,6 +4504,14 @@ inline void b2ParticleSystem::PrepareForceBuffer()
 		m_hasForce = true;
 	}
 }
+inline void b2ParticleSystem::PrepareImpulseBuffer()
+{
+	if (!m_hasImpulse)
+	{
+		memset(m_impulseBuffer, 0, sizeof(*m_impulseBuffer) * m_count);
+		m_hasImpulse = true;
+	}
+}
 
 void b2ParticleSystem::ApplyForce(int32 firstIndex, int32 lastIndex,
 								  const b2Vec2& force)
@@ -4489,6 +4548,15 @@ void b2ParticleSystem::ParticleApplyForce(int32 index, const b2Vec2& force)
 	{
 		PrepareForceBuffer();
 		m_forceBuffer[index] += force;
+	}
+}
+
+void b2ParticleSystem::ParticleApplyBufferLinearImpulse(int32 index, const b2Vec2& impulse)
+{
+	if (ForceCanBeApplied(m_flagsBuffer.data[index]))
+	{
+		PrepareImpulseBuffer();
+		m_impulseBuffer[index] += impulse;
 	}
 }
 

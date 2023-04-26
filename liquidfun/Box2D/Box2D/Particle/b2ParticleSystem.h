@@ -639,9 +639,9 @@ public:
 	/// applied to the total mass of all particles. So, calling
 	/// ParticleApplyLinearImpulse(0, impulse) and
 	/// ParticleApplyLinearImpulse(1, impulse) will impart twice as much
-	/// velocity as calling just ApplyLinearImpulse(0, 1, impulse).
+	/// velocity as calling just ApplyLinearImpulse(0, 2, impulse).
 	/// @param firstIndex the first particle to be modified.
-	/// @param lastIndex the last particle to be modified.
+	/// @param lastIndex the index AFTER the last particle to be modified.
 	/// @param impulse the world impulse vector, usually in N-seconds or
     ///        kg-m/s.
 	void ApplyLinearImpulse(int32 firstIndex, int32 lastIndex,
@@ -652,12 +652,19 @@ public:
 	/// @param force the world force vector, usually in Newtons (N).
 	void ParticleApplyForce(int32 index, const b2Vec2& force);
 
+	/// Apply an impulse to one particle. This will modify the velocity
+	/// at the beginning of the next iteration, by adding to m_impulseBuffer.
+	/// @param index the particle that will be modified.
+	/// @param impulse the world impulse vector, usually in N-seconds or
+    ///        kg-m/s.
+	void ParticleApplyBufferLinearImpulse(int32 index, const b2Vec2& impulse);
+
 	/// Distribute a force across several particles. The particles must not be
 	/// wall particles. Note that the force is distributed across all the
 	/// particles, so calling this function for indices 0..N is not the same as
 	/// calling ParticleApplyForce(i, force) for i in 0..N.
 	/// @param firstIndex the first particle to be modified.
-	/// @param lastIndex the last particle to be modified.
+	/// @param lastIndex the index AFTER the last particle to be modified.
 	/// @param force the world force vector, usually in Newtons (N).
 	void ApplyForce(int32 firstIndex, int32 lastIndex, const b2Vec2& force);
 
@@ -992,6 +999,7 @@ private:
 	void SolvePowder(const b2TimeStep& step);
 	void SolveSolid(const b2TimeStep& step);
 	void SolveForce(const b2TimeStep& step);
+	void SolveImpulse(const b2TimeStep& step);
 	void SolveColorMixing();
 	void SolveZombie();
 	/// Destroy all particles which have outlived their lifetimes set by
@@ -1043,6 +1051,7 @@ private:
 
 	bool ForceCanBeApplied(uint32 flags) const;
 	void PrepareForceBuffer();
+	void PrepareImpulseBuffer();
 
 	bool IsRigidGroup(b2ParticleGroup *group) const;
 	b2Vec2 GetLinearVelocity(
@@ -1055,7 +1064,7 @@ private:
 	void InitDampingParameterWithRigidGroupOrParticle(
 		float32* invMass, float32* invInertia, float32* tangentDistance,
 		bool isRigidGroup, b2ParticleGroup* group, int32 particleIndex,
-		const b2Vec2& point, const b2Vec2& normal) const;
+		const b2Vec2& point, const b2Vec2& normal, float32 particleInvMass) const;
 	float32 ComputeDampingImpulse(
 		float32 invMassA, float32 invInertiaA, float32 tangentDistanceA,
 		float32 invMassB, float32 invInertiaB, float32 tangentDistanceB,
@@ -1072,6 +1081,7 @@ private:
 	int32 m_allGroupFlags;
 	bool m_needsUpdateAllGroupFlags;
 	bool m_hasForce;
+    bool m_hasImpulse;
 	int32 m_iterationIndex;
 	float32 m_inverseDensity;
 	float32 m_particleDiameter;
@@ -1088,6 +1098,7 @@ private:
 	UserOverridableBuffer<b2Vec2> m_positionBuffer;
 	UserOverridableBuffer<b2Vec2> m_velocityBuffer;
 	b2Vec2* m_forceBuffer;
+	b2Vec2* m_impulseBuffer;
 	/// m_weightBuffer is populated in ComputeWeight and used in
 	/// ComputeDepth(), SolveStaticPressure() and SolvePressure().
 	float32* m_weightBuffer;

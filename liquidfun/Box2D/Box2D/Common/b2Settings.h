@@ -82,9 +82,11 @@ typedef unsigned long long uint64;
 #endif
 #endif
 
+
 /// @file
 /// Global tuning constants based on meters-kilograms-seconds (MKS) units.
 ///
+
 
 // Collision
 
@@ -196,6 +198,14 @@ typedef unsigned long long uint64;
 /// The time into the future that collisions against barrier particles will be detected.
 #define b2_barrierCollisionTime 2.5f
 
+/// Multiplier for the radius of a particle when colliding with a fixture.
+/// Originally the diameter was used, so a multiplier of 2 would restore that behaviour.
+#define b2_fixtureParticleCollisionRadiusScaler 1
+
+/// Prevents directional bias when solving elastic triads
+#define b2_elasticPreserveVelocity
+
+
 // Sleep
 
 /// The time that a body must be still before it will go to sleep.
@@ -206,6 +216,7 @@ typedef unsigned long long uint64;
 
 /// A body cannot sleep if its angular velocity is above this tolerance.
 #define b2_angularSleepTolerance	(2.0f / 180.0f * b2_pi)
+
 
 // Memory Allocation
 
@@ -236,8 +247,10 @@ void b2SetNumAllocs(const int32 numAllocs);
 /// Get number of calls to b2Alloc minus number of calls to b2Free.
 int32 b2GetNumAllocs();
 
+
 /// Logging function.
 void b2Log(const char* string, ...);
+
 
 /// Version numbering scheme.
 /// See http://en.wikipedia.org/wiki/Software_versioning
