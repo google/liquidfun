@@ -262,9 +262,25 @@ void b2PolygonShape::ComputeDistance(const b2Transform& xf, const b2Vec2& p, flo
 	B2_NOT_USED(childIndex);
 
 	b2Vec2 pLocal = b2MulT(xf.q, p - xf.p);
+
+	for (int32 i = 0; i < m_count; ++i)
+	{
+		const b2Vec2& p0 = m_vertices[i - 1 >= 0 ? i - 1 : m_count - 1];
+		const b2Vec2& p1 = m_vertices[i];
+		const b2Vec2& p2 = m_vertices[i + 1 < m_count ? i + 1 : 0];
+		b2Vec2 dist = pLocal - p1;
+		if (b2Dot(dist, p1 - p0) > 0.0f && b2Dot(dist, p1 - p2) > 0.0f)
+		{
+			*distance = dist.Length();
+			*normal = b2Mul(xf.q, dist);
+			if (*distance > 0.0f)
+				*normal /= *distance;
+			return;
+		}
+	}
+
 	float32 maxDistance = -FLT_MAX;
 	b2Vec2 normalForMaxDistance = pLocal;
-
 	for (int32 i = 0; i < m_count; ++i)
 	{
 		float32 dot = b2Dot(m_normals[i], pLocal - m_vertices[i]);
@@ -274,31 +290,8 @@ void b2PolygonShape::ComputeDistance(const b2Transform& xf, const b2Vec2& p, flo
 			normalForMaxDistance = m_normals[i];
 		}
 	}
-
-	if (maxDistance > 0)
-	{
-		b2Vec2 minDistance = normalForMaxDistance;
-		float32 minDistance2 = maxDistance * maxDistance;
-		for (int32 i = 0; i < m_count; ++i)
-		{
-			b2Vec2 distance = pLocal - m_vertices[i];
-			float32 distance2 = distance.LengthSquared();
-			if (minDistance2 > distance2)
-			{
-				minDistance = distance;
-				minDistance2 = distance2;
-			}
-		}
-
-		*distance = b2Sqrt(minDistance2);
-		*normal = b2Mul(xf.q, minDistance);
-		normal->Normalize();
-	}
-	else
-	{
-		*distance = maxDistance;
-		*normal = b2Mul(xf.q, normalForMaxDistance);
-	}
+	*distance = maxDistance;
+	*normal = b2Mul(xf.q, normalForMaxDistance);
 }
 
 bool b2PolygonShape::RayCast(b2RayCastOutput* output, const b2RayCastInput& input,
